@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Achievement Unlocked! - K-Pop Pulse</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#22101e",
+                        "secondary": "#00f0ff",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(34, 16, 30, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(244, 37, 192, 0.3);
+        }
+        .achievement-glow {
+            box-shadow: 0 0 50px rgba(244, 37, 192, 0.4), inset 0 0 20px rgba(0, 240, 255, 0.2);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .rotate-slow {
+            animation: rotate-slow 12s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-[#120811] text-slate-100 font-display min-h-screen flex items-center justify-center overflow-hidden relative">
+<div class="absolute inset-0 z-0">
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 blur-[120px] rounded-full"></div>
+<div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');"></div>
+</div>
+<div class="relative z-10 w-full max-w-2xl px-6">
+<div class="glass-panel achievement-glow rounded-[2.5rem] p-12 text-center relative overflow-hidden">
+<div class="absolute -top-24 -left-24 w-48 h-48 bg-primary/20 rotate-45 blur-3xl"></div>
+<div class="absolute -bottom-24 -right-24 w-48 h-48 bg-secondary/20 rotate-45 blur-3xl"></div>
+<div class="relative mb-10">
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-48 h-48 bg-neon-gradient rounded-full opacity-20 blur-2xl rotate-slow"></div>
+</div>
+<div class="relative flex items-center justify-center">
+<div class="w-32 h-32 rounded-full border-4 border-secondary flex items-center justify-center bg-black/40 backdrop-blur-md float-animation">
+<span class="material-symbols-outlined text-6xl text-secondary" style="font-variation-settings: 'FILL' 1">military_tech</span>
+</div>
+</div>
+</div>
+<div class="mb-8">
+<span class="text-secondary font-black tracking-[0.3em] text-xs uppercase mb-3 block">Level Up!</span>
+<h1 class="text-4xl md:text-5xl font-black text-white mb-4 neon-text italic">SUPER FAN UNLOCKED</h1>
+<p class="text-slate-400 text-lg leading-relaxed max-w-md mx-auto">
+                    Congratulations! You've officially reached "Super Fan" status by tuning into 50+ hours of live K-Pop Pulse broadcasts.
+                </p>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-10">
+<div class="bg-white/5 rounded-2xl p-4 border border-white/10">
+<span class="text-slate-500 text-[10px] uppercase font-bold block mb-1">Rewards</span>
+<p class="text-white font-bold text-sm">Exclusive Badge</p>
+</div>
+<div class="bg-white/5 rounded-2xl p-4 border border-white/10">
+<span class="text-slate-500 text-[10px] uppercase font-bold block mb-1">Station XP</span>
+<p class="text-secondary font-bold text-sm">+5,000 Pts</p>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button onclick="window.location.href='{% url 'profile' %}'" class="bg-neon-gradient text-white font-bold px-10 py-4 rounded-full shadow-[0_0_20px_rgba(244,37,192,0.4)] hover:shadow-[0_0_30px_rgba(244,37,192,0.6)] transition-all transform hover:-translate-y-1 active:scale-95">
+                    View My Achievements
+                </button>
+<button onclick="window.history.back()" class="bg-white/10 hover:bg-white/20 text-white font-bold px-10 py-4 rounded-full border border-white/10 transition-all">
+                    Continue Listening
+                </button>
+</div>
+<div class="mt-8 pt-8 border-t border-white/10">
+<p class="text-xs text-slate-500">Share your achievement on social media</p>
+<div class="flex justify-center gap-6 mt-4">
+<button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined">share</span></button>
+<button class="text-slate-400 hover:text-secondary transition-colors"><span class="material-symbols-outlined">download</span></button>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

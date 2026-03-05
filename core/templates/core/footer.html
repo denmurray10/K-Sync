@@ -1,0 +1,56 @@
+{% load static %}
+<footer class="bg-black border-t border-white/5 pt-16 pb-8">
+<div class="container mx-auto px-6">
+<div class="flex flex-col md:flex-row justify-between items-start gap-12">
+<div class="max-w-xs">
+<div class="flex items-center gap-2 mb-4">
+    <img src="{% static 'core/images/logo.png' %}" alt="K-Sync Logo" class="h-10 w-auto opacity-80 hover:opacity-100 transition-opacity">
+</div>
+<p class="text-slate-500 text-sm leading-relaxed">
+                        Your #1 source for K-Pop music, news, and culture. Streaming live from the heart of Seoul to the world.
+                    </p>
+</div>
+<div class="flex flex-wrap gap-12 sm:gap-24">
+<div>
+<h4 class="text-white font-normal nav-cinzel mb-4">Station</h4>
+<ul class="flex flex-col gap-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="{% url 'about_us' %}">About Us</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Presenters</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'schedule' %}">Schedule</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'promo' %}">Mobile App</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-normal nav-cinzel mb-4">Community</h4>
+<ul class="flex flex-col gap-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="#">Request Song</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Fan Club</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Contests</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'shop' %}">Merch Shop</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-normal nav-cinzel mb-4">Follow Us</h4>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">public</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">videocam</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">music_note</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
+<p>&copy; 2026 K-Sync Radio. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-slate-400" href="#">Privacy Policy</a>
+<a class="hover:text-slate-400" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Live Player - Neon Variant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#1a0b16", 
+                        "secondary": "#00f0ff",
+                        "surface-dark": "#2d1b29"
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                        'texture-dots': 'radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)'
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(34, 16, 30, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-panel-strong {
+            background: rgba(20, 10, 18, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-text-primary {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7);
+        }
+        .neon-text-secondary {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+        }
+        .neon-box-primary {
+             box-shadow: 0 0 15px rgba(244, 37, 192, 0.3);
+        }
+        .neon-box-secondary {
+             box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(244, 37, 192, 0.3); 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(244, 37, 192, 0.6); 
+        }.dial-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(from 180deg, #f425c0 0%, #f425c0 70%, #333 70%, #333 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(244,37,192,0.4);
+            transform: rotate(-135deg);}
+        .dial-inner {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #1a0b16;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(135deg);position: relative;
+        }
+        .dial-knob {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            transform: translate(-50%, -50%) rotate(0deg);}
+        .knob-point {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px white;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
+<header class="glass-panel fixed top-0 left-0 right-0 z-50 px-6 py-4 border-b border-white/5">
+<div class="max-w-[1600px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-10">
+<a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors duration-300" href="#">
+<span class="material-symbols-outlined text-4xl">equalizer</span>
+<h1 class="text-2xl font-black tracking-tight text-white italic">K-POP<span class="text-primary neon-text-primary">PULSE</span></h1>
+</a>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-white hover:text-secondary font-bold text-sm uppercase tracking-wide transition-colors neon-text-secondary" href="#">Live</a>
+<a class="text-slate-400 hover:text-primary font-bold text-sm uppercase tracking-wide transition-colors" href="#">Charts</a>
+<a class="text-slate-400 hover:text-primary font-bold text-sm uppercase tracking-wide transition-colors" href="#">Community</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-sm text-slate-400">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span>24,892 Listening</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-purple-600 p-[2px]">
+<div class="w-full h-full rounded-full bg-black/50 backdrop-blur-sm overflow-hidden flex items-center justify-center">
+<span class="material-symbols-outlined text-white">person</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow pt-[80px] h-screen flex flex-col lg:flex-row relative overflow-hidden">
+<div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-[120px] pointer-events-none"></div>
+<section class="lg:w-7/12 w-full h-full flex flex-col justify-center items-center relative z-10 p-6 lg:p-12 lg:border-r border-white/5">
+<div class="w-full max-w-2xl flex flex-col gap-8">
+<div class="relative group mx-auto w-full max-w-[480px] aspect-square rounded-[3rem] overflow-hidden shadow-2xl neon-box-primary border border-white/10">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" data-alt="Futuristic neon album cover with K-pop aesthetics" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB5bCkWBnicZrZGGUbnm2QTxp2-2H22c1b5q6u_c5oQ1aUynFfSRKtpnJTyRsYIrVSnYI3w8Bl4x-IPNO1vyPDjKdkH2rqsRI9ZMzNvnje4b47NcDo-kCrU8fUzCkbUbo19N5DV2F8X1Mfdqd5cV9njvlTpzJBTu9dzydYSS7rE23UM5NRnmPnHzmNIcHdiDaIEok-t0H7TzsvV6UNdbv0gp6wWi2y5QcwBCN2LvRiEpk59ZkH5J_V4fYOI6NnLBn-2ogP9UmfEG_0F');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 via-transparent to-transparent"></div>
+<div class="absolute top-0 left-0 right-0 p-8 flex justify-between items-start">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-secondary/30 text-secondary bg-secondary/10 backdrop-blur-md">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+<span class="text-xs font-bold tracking-widest uppercase">Live</span>
+</div>
+<button class="text-white/60 hover:text-white transition-colors"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 p-8 text-center pb-12">
+<h2 class="text-4xl md:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-lg">I AM</h2>
+<p class="text-xl text-primary font-medium tracking-wide uppercase">IVE</p>
+</div>
+</div>
+<div class="flex items-center justify-between gap-8 mt-4">
+<div class="flex flex-col items-center gap-3">
+<div class="dial-container">
+<div class="dial-inner">
+<span class="material-symbols-outlined text-secondary text-2xl">volume_up</span>
+</div>
+</div>
+<span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Volume</span>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-slate-400 hover:text-white transition-transform hover:scale-110">
+<span class="material-symbols-outlined text-4xl">skip_previous</span>
+</button>
+<button class="w-24 h-24 rounded-full bg-white text-background-dark flex items-center justify-center hover:bg-primary hover:text-white hover:shadow-[0_0_40px_rgba(244,37,192,0.6)] transition-all duration-300 transform hover:scale-105">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+<button class="text-slate-400 hover:text-white transition-transform hover:scale-110">
+<span class="material-symbols-outlined text-4xl">skip_next</span>
+</button>
+</div>
+<div class="flex flex-col items-center gap-4 w-[120px]">
+<button class="text-xs font-bold border border-white/20 px-3 py-1 rounded text-secondary hover:bg-secondary/10 transition-colors">HD AUDIO</button>
+<div class="flex gap-4">
+<button class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">lyrics</span></button>
+<button class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">cast</span></button>
+</div>
+</div>
+</div>
+<div class="w-full mt-2 group cursor-pointer">
+<div class="flex justify-between text-xs font-mono text-slate-400 mb-2">
+<span>1:42</span>
+<span>3:05</span>
+</div>
+<div class="h-2 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-secondary w-1/3 relative">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="lg:w-5/12 w-full h-full glass-panel-strong border-l border-white/5 flex flex-col overflow-hidden relative z-20">
+<div class="flex border-b border-white/5">
+<button class="flex-1 py-4 text-sm font-bold uppercase tracking-wider text-white border-b-2 border-primary bg-white/5">Activity Feed</button>
+<button class="flex-1 py-4 text-sm font-bold uppercase tracking-wider text-slate-500 hover:text-white transition-colors">History</button>
+<button class="flex-1 py-4 text-sm font-bold uppercase tracking-wider text-slate-500 hover:text-white transition-colors">Chat</button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-8">
+<div class="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-secondary/30 transition-colors">
+<div class="flex items-center justify-between mb-3">
+<span class="text-xs font-bold text-secondary uppercase tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">update</span> Up Next
+                        </span>
+<span class="text-xs text-slate-500 font-mono">3:05</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded bg-cover bg-center shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCTfvY2Z00_G50AWNVgtLKNqX39aJibg45A2EvVxrLxrwP4T9c_vIqfkzkYuwvMk9kEEFeP21vBN_Noj0ZGtpTWji_yLB5s-yfnV65fz6ge7SB42wUcue5C4-9RAn3YEcCshjn8epFx3Q2ucRZbtBxskAF1ehXiXd_S4VCEgksL_O6TPtHJCDCjf6G1jVP-5IlfsLtqqSWob_4VgG2xdSGWBf0spM5zdMtbJxj8brxifwyaXtLfgqokrdvAocy6LZ1-xlmw6yAXNa-_');"></div>
+<div>
+<h4 class="text-white font-bold text-sm">S-Class</h4>
+<p class="text-slate-400 text-xs">Stray Kids</p>
+</div>
+<button class="ml-auto text-slate-500 hover:text-white"><span class="material-symbols-outlined">playlist_add</span></button>
+</div>
+</div>
+<div>
+<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Just Played</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-4 group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+<div class="w-10 h-10 rounded bg-cover bg-center shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDjHBCTkI39QRw1PFymRAeKGy1V5Y7Q4FsyGk033jSOv3WEwixo-Iesg5FIvgwgP8lAEKDvJn-aXbFwvZsh2sUjyW5w5gb4wzbVS4QKMicFK0Odn6m_bwFq6WWZzaNv7nkauFuWNgcTCNX5BTOHaqHnoNmBdmCEyEDHKspH6X99VUzUnJBVcHrRAQr-Jhg5OSnXGwQvsubMs7YbE6UbebDy_56FPXqgIQ3TN3ikwBAhyCaLHOuFjcxgeoTEEMqzPwAwB4aM2kCeesiq');"></div>
+<div class="flex-1 min-w-0">
+<h4 class="text-slate-300 font-medium text-sm truncate group-hover:text-primary transition-colors">Seven (feat. Latto)</h4>
+<p class="text-slate-500 text-xs">Jung Kook</p>
+</div>
+<span class="text-xs text-slate-600 font-mono">3m ago</span>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+<div class="w-10 h-10 rounded bg-cover bg-center shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAfEMzPimO_8CcKO5KS6EUpOa3Z3G3l539cotdfg1iVoBqkCy3gPR0y4oPuYQ39E-R5DXnxqCI43Q7BcJfIaEckKKSm6e2JIOd12_CYG-azHydICuyEMleuWpdWgKCqqXCdVDfe5ex66quS8JvsmjFTxI5HPs2sgFCoOLlr1CECjAI6F9ZsbnfRTratSErIv4LOo21F9hdaiRvBDaIE3eohgNJgBgx5z6R9x0NuNm7U99yotWvak8azYaLJGyG477ekI4Mdj12EUB6R');"></div>
+<div class="flex-1 min-w-0">
+<h4 class="text-slate-300 font-medium text-sm truncate group-hover:text-primary transition-colors">Super Shy</h4>
+<p class="text-slate-500 text-xs">NewJeans</p>
+</div>
+<span class="text-xs text-slate-600 font-mono">7m ago</span>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+<div class="w-10 h-10 rounded bg-cover bg-center shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAxWRZjpkxi3pHEliLEZIEn8PkF2YvBetmKxNwis7FsugO_d8YBeMzIG5L14fGKn0VeggDS7AUhEyvYTMJmHY4RIVqQna10TMyi-Z1Yt4kO4LAJ7M1GB4lCb_7HYTkZxOZN4njTBDlQMWflqFM-k6vJN57tslVBUJOVenhOXcNdUWwUlWyf0Z67BbC8Po0BE1UIfW8Xn9kHES9sAvJQIGzRhQ8Ne6ZDx7hNb7BSJPRR_vbAD5ifGgUpKsKT3wMmC05lFYhG_bz37fT8');"></div>
+<div class="flex-1 min-w-0">
+<h4 class="text-slate-300 font-medium text-sm truncate group-hover:text-primary transition-colors">Queencard</h4>
+<p class="text-slate-500 text-xs">(G)I-DLE</p>
+</div>
+<span class="text-xs text-slate-600 font-mono">11m ago</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-white/5">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                            Live Reactions
+                        </h3>
+<span class="text-xs text-slate-500">1.2k online</span>
+</div>
+<div class="space-y-4 relative">
+<div class="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-surface-dark/0 to-transparent z-10 pointer-events-none"></div>
+<div class="flex gap-3 items-start animate-fade-in-up">
+<div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center text-xs font-bold shrink-0">K</div>
+<div class="bg-white/5 rounded-2xl rounded-tl-none p-3 text-sm border border-white/5">
+<p class="text-slate-200"><span class="text-primary font-bold text-xs mr-1">@KaiLvr:</span> This beat drop is insane! 🔥🔥🔥</p>
+</div>
+</div>
+<div class="flex gap-3 items-start animate-fade-in-up">
+<div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center text-xs font-bold shrink-0">M</div>
+<div class="bg-white/5 rounded-2xl rounded-tl-none p-3 text-sm border border-white/5">
+<p class="text-slate-200"><span class="text-secondary font-bold text-xs mr-1">@MinjiFan:</span> Song of the year honestly.</p>
+</div>
+</div>
+<div class="flex gap-3 items-start animate-fade-in-up">
+<img alt="User" class="w-8 h-8 rounded-full object-cover shrink-0 grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGdFvAMTWl3CIXm1xVGio05im3IB7hqfcnmkQr9qGs2mT0Gm-VV52lAr1CETEaodj1Fe4fIlzcvzIYO-HpdkolBdf6a18eMRqukG0Uhu0_cfDIx14ek5MBOpV3H-P0DanfJbwCVQU6UhxeJK7YkvBvkMNKBsHfvMm6s4Yw-QX8RceTtXENTUHuuZOJYFv94iHclPuyiHkhxNm-TgC2GMwnY3IZi3CuEwU2r-vItPvS8CWHHHwp0XX6-iCrdAmj-yKUuQ4KRgzDqNfu"/>
+<div class="bg-gradient-to-r from-primary/10 to-transparent rounded-2xl rounded-tl-none p-3 text-sm border border-primary/20">
+<p class="text-white font-medium"><span class="text-primary font-bold text-xs mr-1">@OfficialMod:</span> Don't forget to vote for the Top 10 countdown!</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 bg-black/40 border-t border-white/10 mt-auto">
+<div class="flex gap-2 mb-3 overflow-x-auto pb-2 scrollbar-none">
+<button class="shrink-0 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1 text-lg transition-colors">❤️</button>
+<button class="shrink-0 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1 text-lg transition-colors">🔥</button>
+<button class="shrink-0 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1 text-lg transition-colors">💃</button>
+<button class="shrink-0 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1 text-lg transition-colors">🙌</button>
+<button class="shrink-0 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1 text-lg transition-colors">😭</button>
+</div>
+<div class="relative">
+<input class="w-full bg-white/5 border border-white/10 rounded-full py-3 px-4 text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-slate-600" placeholder="Join the conversation..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-primary rounded-full text-white hover:bg-primary/80 transition-colors">
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+
+</body></html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Signup Confirmation - Neon Variant 1/3</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#22101e",
+                        "secondary": "#00f0ff",
+                        "dark-accent": "#1a0b17",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                        'mesh-gradient': 'radial-gradient(circle at 50% 50%, rgba(244, 37, 192, 0.15) 0%, rgba(34, 16, 30, 0) 50%)',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 3s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(244, 37, 192, 0.3)' },
+                            '100%': { boxShadow: '0 0 40px rgba(0, 240, 255, 0.5), 0 0 10px rgba(244, 37, 192, 0.5)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(34, 16, 30, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .neon-card {
+            background: rgba(20, 10, 25, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(244, 37, 192, 0.3);
+            box-shadow: 0 0 30px rgba(244, 37, 192, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
+        }
+        .neon-text-glow {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.8), 0 0 20px rgba(244, 37, 192, 0.4);
+        }
+        .cyan-text-glow {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 20px rgba(0, 240, 255, 0.4);
+        }.light-streak {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(244, 37, 192, 0.5), transparent);
+            height: 2px;
+            width: 100%;
+            opacity: 0;
+            animation: streak 4s linear infinite;
+        }
+        .light-streak:nth-child(1) { top: 20%; animation-delay: 0s; width: 80%; left: -80%; }
+        .light-streak:nth-child(2) { top: 60%; animation-delay: 2s; width: 60%; left: -60%; background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.5), transparent); }
+        .light-streak:nth-child(3) { top: 80%; animation-delay: 1s; width: 90%; left: -90%; }
+        @keyframes streak {
+            0% { left: -100%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+        .icon-hologram {
+            background: radial-gradient(circle at center, rgba(0, 240, 255, 0.2) 0%, transparent 70%);
+            filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.6));
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden selection:bg-primary selection:text-white">
+<header class="glass-panel fixed top-0 left-0 right-0 z-50 px-6 py-4 border-b border-primary/20">
+<div class="max-w-[1440px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-10">
+<a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors duration-300" href="#">
+<span class="material-symbols-outlined text-4xl">equalizer</span>
+<h1 class="text-2xl font-black tracking-tight text-white italic">K-POP<span class="text-primary">PULSE</span></h1>
+</a>
+</div>
+<div class="flex items-center gap-6">
+<a class="text-slate-300 hover:text-white text-sm font-bold transition-colors" href="#">Help Center</a>
+</div>
+</div>
+</header>
+<main class="flex-grow pt-[80px] relative flex items-center justify-center min-h-screen">
+<div class="absolute inset-0 z-0 overflow-hidden bg-[url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&amp;w=2940&amp;auto=format&amp;fit=crop')] bg-cover bg-center opacity-20 blur-sm mix-blend-overlay"></div>
+<div class="absolute inset-0 z-0 bg-background-dark/90"></div>
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="light-streak"></div>
+<div class="light-streak"></div>
+<div class="light-streak"></div>
+<div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+<div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary/10 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+</div>
+<div class="container mx-auto px-6 relative z-10 flex flex-col items-center justify-center py-10">
+<div class="neon-card w-full max-w-lg rounded-3xl p-1 relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary via-transparent to-secondary opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+<div class="bg-[#1a0b17]/80 backdrop-blur-xl rounded-[1.4rem] p-8 md:p-12 text-center relative z-10 flex flex-col items-center h-full border border-white/5">
+<div class="relative w-32 h-32 mb-8 animate-float">
+<div class="absolute inset-0 icon-hologram rounded-full"></div>
+<span class="material-symbols-outlined text-[80px] text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_0_15px_rgba(244,37,192,1)]" style="font-variation-settings: 'FILL' 1, 'wght' 300;">
+                            mark_email_unread
+                        </span>
+<div class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full animate-ping"></div>
+<div class="absolute bottom-2 left-4 w-1 h-1 bg-primary rounded-full animate-ping" style="animation-delay: 0.5s"></div>
+</div>
+<h2 class="text-4xl md:text-5xl font-black mb-4 leading-tight tracking-tight">
+<span class="text-primary neon-text-glow">CHECK YOUR</span><br/>
+<span class="text-secondary cyan-text-glow">INBOX</span>
+</h2>
+<div class="w-16 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mb-6 mx-auto"></div>
+<p class="text-slate-300 text-lg mb-8 leading-relaxed font-light">
+                        We've sent a verification link to your email. <br/>
+<span class="text-white font-medium">Verify now to unlock your <span class="text-primary font-bold">"Newbie Stan"</span> badge!</span>
+</p>
+<div class="flex flex-col w-full gap-4">
+<button class="w-full bg-transparent border border-white/20 text-white font-bold py-3.5 px-6 rounded-xl hover:bg-white/5 hover:border-secondary hover:text-secondary hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-300 flex items-center justify-center gap-2 group/btn">
+<span class="material-symbols-outlined text-lg group-hover/btn:rotate-12 transition-transform">refresh</span>
+                            Resend Email
+                        </button>
+<a class="text-slate-400 hover:text-white text-sm font-medium mt-4 transition-colors flex items-center gap-2 justify-center group/link" href="#">
+<span class="material-symbols-outlined text-base group-hover/link:-translate-x-1 transition-transform text-primary">arrow_back</span>
+                            Go Back Home
+                        </a>
+</div>
+</div>
+</div>
+<div class="mt-12 flex items-center gap-6 text-xs text-slate-500 font-medium tracking-wide uppercase">
+<a class="hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+<span class="w-1 h-1 bg-slate-700 rounded-full"></span>
+<a class="hover:text-secondary transition-colors" href="#">Terms of Service</a>
+<span class="w-1 h-1 bg-slate-700 rounded-full"></span>
+<a class="hover:text-secondary transition-colors" href="#">Contact Support</a>
+</div>
+</div>
+</main>
+<footer class="glass-panel border-t border-white/5 py-6 mt-auto relative z-20">
+<div class="container mx-auto px-6 text-center">
+<p class="text-slate-500 text-xs">
+                © 2023 K-Pop Pulse Radio. Streaming live from Seoul.
+            </p>
+</div>
+</footer>
+
+</body></html>

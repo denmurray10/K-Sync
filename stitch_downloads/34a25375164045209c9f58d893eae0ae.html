@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>STAY Community Hub - Neon Variant 2/3</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#22101e",
+                        "secondary": "#00f0ff",
+                        "skz-red": "#ff3b3b",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(34, 16, 30, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(244, 37, 192, 0.2);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        .neon-border {
+             box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+        .bias-card:hover {
+            box-shadow: 0 0 20px rgba(244, 37, 192, 0.6);
+            border-color: #f425c0;
+        }
+        .bias-card.selected {
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
+            border-color: #00f0ff;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+<header class="glass-panel fixed top-0 left-0 right-0 z-50 px-6 py-4 border-b border-primary/20">
+<div class="max-w-[1440px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-10">
+<a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors duration-300" href="#">
+<span class="material-symbols-outlined text-4xl">equalizer</span>
+<h1 class="text-2xl font-black tracking-tight text-white italic">K-POP<span class="text-primary">PULSE</span> <span class="text-slate-400 not-italic text-lg font-normal ml-2 hidden sm:inline">| STAY HUB</span></h1>
+</a>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-200 hover:text-primary font-bold text-sm uppercase tracking-wide transition-colors" href="#">Home</a>
+<a class="text-primary font-bold text-sm uppercase tracking-wide transition-colors neon-text" href="#">STAY Community</a>
+<a class="text-slate-200 hover:text-primary font-bold text-sm uppercase tracking-wide transition-colors" href="#">Schedule</a>
+<a class="text-slate-200 hover:text-primary font-bold text-sm uppercase tracking-wide transition-colors" href="#">Shop</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center relative group">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+<input class="bg-black/30 border border-primary/30 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-64 placeholder:text-slate-500" placeholder="Search STAY posts..." type="text"/>
+</div>
+<div class="flex gap-3 items-center">
+<div class="flex items-center gap-2">
+<span class="text-xs text-secondary font-bold">Lvl 12 STAY</span>
+<div class="h-8 w-8 rounded-full bg-cover bg-center border border-secondary" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqlHue5x2ztz5YzE_KcXdAy0TiZx6cTlNz8x076PxJRGQcuSRvWIYKRlS8hWT0iaDlFa-2sxWrs4aOcHsXEnW7HtjZCNIQepH94OKaRa6zNpFJjLLHB3gHiLXQKVwXhiYAnuH60-uUo6zEFbLg43TJIc1JI2ZtPG_PByWnOI0Qe7Vjpx7eCupn0q4HZ_SL5IG8tbwqDORB4hjn4P1hOQOPRzDTYv6M7OTkmYHaTbZu66ge7gtIUUB_bCvUUMum25lLTWWvzJRptz_B');"></div>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow pt-[100px] px-6 pb-20">
+<div class="max-w-[1440px] mx-auto">
+<section class="mb-16">
+<div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-0.5 rounded bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider border border-primary/20">Profile Theme</span>
+</div>
+<h2 class="text-4xl font-black text-white">CHOOSE YOUR <span class="text-secondary neon-text">BIAS</span></h2>
+<p class="text-slate-400 mt-2">Select a member to unlock exclusive themes and badges for your profile.</p>
+</div>
+<div class="flex gap-2">
+<button class="text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-colors">Reset</button>
+<button class="text-xs font-bold text-black bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-full transition-colors shadow-[0_0_15px_rgba(0,240,255,0.4)]">Apply Theme</button>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+<div class="bias-card group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA2yzAZYp90dcY6OqxOFjvgjmfAHhrDupqhEJ3iQZ8RuA6fXjP4XelDwxwHJbSnGa_tFKeq4kLkH2-NprV4GFUJbUGRN6yjv0usor_VKesTliMgOxl0SxbFrQNpqgUwH0sFAYW0EfH99uoNpPjzEqU3-Qun1Si4Sl6q3YVSL4mPeljqJPVFLD8TgWTDiFU8cUs0gQ50NO3LxBiLyW5Or3ygQIOMyNfSx83CJSxI40rKBiYfusHpTIaq8leJndY2hAR__sRugfXwSN4u');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-3 left-0 right-0 text-center">
+<h3 class="text-white font-bold text-sm uppercase tracking-wider">Bang Chan</h3>
+</div>
+<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-secondary text-xl filled">check_circle</span>
+</div>
+</div>
+<div class="bias-card group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCTfvY2Z00_G50AWNVgtLKNqX39aJibg45A2EvVxrLxrwP4T9c_vIqfkzkYuwvMk9kEEFeP21vBN_Noj0ZGtpTWji_yLB5s-yfnV65fz6ge7SB42wUcue5C4-9RAn3YEcCshjn8epFx3Q2ucRZbtBxskAF1ehXiXd_S4VCEgksL_O6TPtHJCDCjf6G1jVP-5IlfsLtqqSWob_4VgG2xdSGWBf0spM5zdMtbJxj8brxifwyaXtLfgqokrdvAocy6LZ1-xlmw6yAXNa-_');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-3 left-0 right-0 text-center">
+<h3 class="text-white font-bold text-sm uppercase tracking-wider">Lee Know</h3>
+</div>
+</div>
+<div class="bias-card group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB5bCkWBnicZrZGGUbnm2QTxp2-2H22c1b5q6u_c5oQ1aUynFfSRKtpnJTyRsYIrVSnYI3w8Bl4x-IPNO1vyPDjKdkH2rqsRI9ZMzNvnje4b47NcDo-kCrU8fUzCkbUbo19N5DV2F8X1Mfdqd5cV9njvlTpzJBTu9dzydYSS7rE23UM5NRnmPnHzmNIcHdiDaIEok-t0H7TzsvV6UNdbv0gp6wWi2y5QcwBCN2LvRiEpk59ZkH5J_V4fYOI6NnLBn-2ogP9UmfEG_0F');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-3 left-0 right-0 text-center">
+<h3 class="text-white font-bold text-sm uppercase tracking-wider">Changbin</h3>
+</div>
+</div>
+<div class="bias-card selected group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border-2 border-secondary transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqlHue5x2ztz5YzE_KcXdAy0TiZx6cTlNz8x076PxJRGQcuSRvWIYKRlS8hWT0iaDlFa-2sxWrs4aOcHsXEnW7HtjZCNIQepH94OKaRa6zNpFJjLLHB3gHiLXQKVwXhiYAnuH60-uUo6zEFbLg43TJIc1JI2ZtPG_PByWnOI0Qe7Vjpx7eCupn0q4HZ_SL5IG8tbwqDORB4hjn4P1hOQOPRzDTYv6M7OTkmYHaTbZu66ge7gtIUUB_bCvUUMum25lLTWWvzJRptz_B');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-3 left-0 right-0 text-center">
+<h3 class="text-white font-bold text-sm uppercase tracking-wider">Hyunjin</h3>
+</div>
+<div class="absolute top-2 right-2">
+<span class="material-symbols-outlined text-secondary text-xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="bias-card group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAxWRZjpkxi3pHEliLEZIEn8PkF2YvBetmKxNwis7FsugO_d8YBeMzIG5L14fGKn0VeggDS7AUhEyvYTMJmHY4RIVqQna10TMyi-Z1Yt4kO4LAJ7M1GB4lCb_7HYTkZxOZN4njTBDlQMWflqFM-k6vJN57tslVBUJOVenhOXcNdUWwUlWyf0Z67BbC8Po0BE1UIfW8Xn9kHES9sAvJQIGzRhQ8Ne6ZDx7hNb7BSJPRR_vbAD5ifGgUpKsKT3wMmC05lFYhG_bz37fT8');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-3 left-0 right-0 text-center">
+<h3 class="text-white font-bold text-sm uppercase tracking-wider">Han</h3>
+</div>
+</div>
+<div class="bias-card group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGdFvAMTWl3CIXm1xVGio05im3IB7hqfcnmkQr9qGs2mT0Gm-VV52lAr1CETEaodj1Fe4fIlzcvzIYO-HpdkolBdf6a18eMRqukG0Uhu0_cfDIx14ek5MBOpV3H-P0DanfJbwCVQU6UhxeJK7YkvBvkMNKBsHfvMm6s4Yw-QX8RceTtXENTUHuuZOJYFv94iHclPuyiHkhxNm-TgC2GMwnY3IZi3CuEwU2r-vItPvS8CWHHHwp0XX6-iCrdAmj-yKUuQ4KRgzDqNfu');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-3 left-0 right-0 text-center">
+<h3 class="text-white font-bold text-sm uppercase tracking-wider">Felix</h3>
+</div>
+</div>
+<div class="bias-card group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBoXaaYoB8BcJWFTwWbs1edD2c4WG9SIQD9zgufIZD2fYQdRIlQoz1Fl-uvlRycHz3Vw7bomHx9hZtltSjZsoj7fReMmeR7u9SpnCLyhh-21vtrBFeWMK0ryFNDHnrDttQJHFqh0e56C_1M5S0Lei1w-k7YRY2eHuZdQj_p3i8dnoVX_REewpF_hiomIKCx4RWST988TSKo95SoTzMST_kKAkub7HXc3isyb7W_W6jZYRNjn14TbE4V3ODmhtP0vTtbJRBwaxn_sU83');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-3 left-0 right-0 text-center">
+<h3 class="text-white font-bold text-sm uppercase tracking-wider">Seungmin</h3>
+</div>
+</div>
+<div class="bias-card group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border border-white/10 transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAfEMzPimO_8CcKO5KS6EUpOa3Z3G3l539cotdfg1iVoBqkCy3gPR0y4oPuYQ39E-R5DXnxqCI43Q7BcJfIaEckKKSm6e2JIOd12_CYG-azHydICuyEMleuWpdWgKCqqXCdVDfe5ex66quS8JvsmjFTxI5HPs2sgFCoOLlr1CECjAI6F9ZsbnfRTratSErIv4LOo21F9hdaiRvBDaIE3eohgNJgBgx5z6R9x0NuNm7U99yotWvak8azYaLJGyG477ekI4Mdj12EUB6R');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-3 left-0 right-0 text-center">
+<h3 class="text-white font-bold text-sm uppercase tracking-wider">I.N</h3>
+</div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-8 flex flex-col gap-8">
+<section class="relative rounded-3xl overflow-hidden min-h-[400px] flex items-end p-8 border border-white/10 shadow-2xl group">
+<div class="absolute inset-0 bg-cover bg-top transition-transform duration-1000 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAFwwkAyazy0CqmzTMq3TrAanKdSpx4-1OVJSWO-U6B-_Y0QaxQEhv6Bc_JyY5QFJ-mJl-Whwyn8g9_hKOmo4RxtlEHYv5KT6WHiXgbPAC86g4MKanJXHuP-5LEtPXWCdvyl-pm3rjAPh0Xb-YxxmlOW6Z2QWZ6eUgevksChNbmz-e7GaFeOVHKdGyto8ie2KfT7gdAJTYFqhoaT1BFGR6qjRy56M0yow_YaxIAwzyebB1gpuYnSmOGQ0Jm1VNq_ncgvxznnRwwdUBq');"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-background-dark via-background-dark/50 to-transparent"></div>
+<div class="relative z-10 max-w-xl">
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-[0_0_10px_rgba(244,37,192,0.6)]">SPOTLIGHT</span>
+<span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Member of the Week</span>
+</div>
+<h2 class="text-5xl font-black text-white mb-4 leading-none neon-text">FELIX <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">SUNSHINE</span></h2>
+<p class="text-slate-200 text-lg mb-6 line-clamp-2">Celebrating Felix's iconic deep voice and angelic visuals. Check out his best moments from the recent "5-STAR" Dome Tour in Seoul.</p>
+<div class="flex gap-4">
+<button class="bg-white text-black font-bold py-3 px-6 rounded-full hover:bg-slate-200 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">play_arrow</span> Watch Cam
+                            </button>
+<button class="bg-black/40 backdrop-blur text-white border border-white/20 font-bold py-3 px-6 rounded-full hover:bg-black/60 transition-colors">
+                                View Gallery
+                            </button>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-2xl font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">queue_music</span> 
+                            STAY Picks
+                        </h3>
+<a class="text-xs text-secondary font-bold hover:underline uppercase tracking-wider" href="#">Submit Song</a>
+</div>
+<div class="glass-panel rounded-3xl p-6 flex flex-col gap-4">
+<div class="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer border border-transparent hover:border-white/5">
+<div class="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
+<img alt="Album Cover" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjHBCTkI39QRw1PFymRAeKGy1V5Y7Q4FsyGk033jSOv3WEwixo-Iesg5FIvgwgP8lAEKDvJn-aXbFwvZsh2sUjyW5w5gb4wzbVS4QKMicFK0Odn6m_bwFq6WWZzaNv7nkauFuWNgcTCNX5BTOHaqHnoNmBdmCEyEDHKspH6X99VUzUnJBVcHrRAQr-Jhg5OSnXGwQvsubMs7YbE6UbebDy_56FPXqgIQ3TN3ikwBAhyCaLHOuFjcxgeoTEEMqzPwAwB4aM2kCeesiq"/>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white">play_arrow</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="text-white font-bold text-lg truncate group-hover:text-primary transition-colors">S-Class</h4>
+<p class="text-slate-400 text-sm">Stray Kids • 5-STAR</p>
+</div>
+<div class="hidden sm:flex items-center gap-6 pr-4">
+<div class="text-right">
+<p class="text-xs text-slate-500 uppercase font-bold">Votes</p>
+<p class="text-secondary font-bold">24.5k</p>
+</div>
+<span class="text-slate-500 text-sm">3:16</span>
+<button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer border border-transparent hover:border-white/5">
+<div class="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
+<img alt="Album Cover" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxWRZjpkxi3pHEliLEZIEn8PkF2YvBetmKxNwis7FsugO_d8YBeMzIG5L14fGKn0VeggDS7AUhEyvYTMJmHY4RIVqQna10TMyi-Z1Yt4kO4LAJ7M1GB4lCb_7HYTkZxOZN4njTBDlQMWflqFM-k6vJN57tslVBUJOVenhOXcNdUWwUlWyf0Z67BbC8Po0BE1UIfW8Xn9kHES9sAvJQIGzRhQ8Ne6ZDx7hNb7BSJPRR_vbAD5ifGgUpKsKT3wMmC05lFYhG_bz37fT8"/>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white">play_arrow</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="text-white font-bold text-lg truncate group-hover:text-primary transition-colors">God's Menu</h4>
+<p class="text-slate-400 text-sm">Stray Kids • GO LIVE</p>
+</div>
+<div class="hidden sm:flex items-center gap-6 pr-4">
+<div class="text-right">
+<p class="text-xs text-slate-500 uppercase font-bold">Votes</p>
+<p class="text-secondary font-bold">19.2k</p>
+</div>
+<span class="text-slate-500 text-sm">2:48</span>
+<button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer border border-transparent hover:border-white/5">
+<div class="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
+<img alt="Album Cover" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCr6Ie7qYtuVvNcDvTDJIFcg8XbDbcwb2POspdaZSZQYeGZMrxDBgjoTNLy36Thd7JOY8I14Zztz9uZn4b5DpHo28SpmNHdpv966LP2cRGy7lbm28OL5HNxzMwJS8gM80ns41WjNxJ8pcgfwMW4P9CDge6VQ95JFB48mpwFMatsJoKyeZO65U_vnzIxK4wPXzmxzxSQhAALerxVDfUvRNEV-f0XNF87R6wnWlhaiu6iQ2z-navAG0U3dUNUJos6Cl4-XOXoKMk-VHJV"/>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white">play_arrow</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="text-white font-bold text-lg truncate group-hover:text-primary transition-colors">MANIAC</h4>
+<p class="text-slate-400 text-sm">Stray Kids • ODDINARY</p>
+</div>
+<div class="hidden sm:flex items-center gap-6 pr-4">
+<div class="text-right">
+<p class="text-xs text-slate-500 uppercase font-bold">Votes</p>
+<p class="text-secondary font-bold">15.8k</p>
+</div>
+<span class="text-slate-500 text-sm">3:02</span>
+<button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<div class="lg:col-span-4 flex flex-col gap-8">
+<div class="bg-gradient-to-b from-primary/10 to-background-dark border border-primary/30 rounded-3xl p-6 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-10 -mt-10"></div>
+<div class="flex items-center justify-between mb-6 relative z-10">
+<h3 class="text-xl font-black text-white uppercase italic tracking-tighter">Fandom <br/><span class="text-primary neon-text">Battle</span></h3>
+<span class="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded animate-pulse">LIVE</span>
+</div>
+<div class="space-y-4 relative z-10">
+<div class="bg-black/40 backdrop-blur rounded-xl p-4 border border-primary/50 flex items-center gap-4 shadow-[0_0_15px_rgba(244,37,192,0.15)] transform scale-105">
+<div class="text-2xl font-black text-yellow-400 italic">01</div>
+<div class="h-10 w-10 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden">
+<img alt="STAY Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGdFvAMTWl3CIXm1xVGio05im3IB7hqfcnmkQr9qGs2mT0Gm-VV52lAr1CETEaodj1Fe4fIlzcvzIYO-HpdkolBdf6a18eMRqukG0Uhu0_cfDIx14ek5MBOpV3H-P0DanfJbwCVQU6UhxeJK7YkvBvkMNKBsHfvMm6s4Yw-QX8RceTtXENTUHuuZOJYFv94iHclPuyiHkhxNm-TgC2GMwnY3IZi3CuEwU2r-vItPvS8CWHHHwp0XX6-iCrdAmj-yKUuQ4KRgzDqNfu"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-bold text-white text-sm">STAY</h4>
+<span class="text-primary text-xs font-bold">45.2M pts</span>
+</div>
+<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-secondary h-full rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+<div class="bg-white/5 backdrop-blur rounded-xl p-4 border border-white/5 flex items-center gap-4">
+<div class="text-xl font-black text-slate-400 italic">02</div>
+<div class="h-10 w-10 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden">
+<img alt="Logo" class="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjHBCTkI39QRw1PFymRAeKGy1V5Y7Q4FsyGk033jSOv3WEwixo-Iesg5FIvgwgP8lAEKDvJn-aXbFwvZsh2sUjyW5w5gb4wzbVS4QKMicFK0Odn6m_bwFq6WWZzaNv7nkauFuWNgcTCNX5BTOHaqHnoNmBdmCEyEDHKspH6X99VUzUnJBVcHrRAQr-Jhg5OSnXGwQvsubMs7YbE6UbebDy_56FPXqgIQ3TN3ikwBAhyCaLHOuFjcxgeoTEEMqzPwAwB4aM2kCeesiq"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-bold text-slate-300 text-sm">MOA</h4>
+<span class="text-slate-400 text-xs font-bold">38.1M pts</span>
+</div>
+<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-slate-500 h-full rounded-full" style="width: 65%"></div>
+</div>
+</div>
+</div>
+<div class="bg-white/5 backdrop-blur rounded-xl p-4 border border-white/5 flex items-center gap-4">
+<div class="text-xl font-black text-slate-400 italic">03</div>
+<div class="h-10 w-10 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden">
+<img alt="Logo" class="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfEMzPimO_8CcKO5KS6EUpOa3Z3G3l539cotdfg1iVoBqkCy3gPR0y4oPuYQ39E-R5DXnxqCI43Q7BcJfIaEckKKSm6e2JIOd12_CYG-azHydICuyEMleuWpdWgKCqqXCdVDfe5ex66quS8JvsmjFTxI5HPs2sgFCoOLlr1CECjAI6F9ZsbnfRTratSErIv4LOo21F9hdaiRvBDaIE3eohgNJgBgx5z6R9x0NuNm7U99yotWvak8azYaLJGyG477ekI4Mdj12EUB6R"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-bold text-slate-300 text-sm">ATINY</h4>
+<span class="text-slate-400 text-xs font-bold">32.4M pts</span>
+</div>
+<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-slate-500 h-full rounded-full" style="width: 50%"></div>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-bold py-3 rounded-xl transition-colors text-sm uppercase tracking-wide">
+                        Vote Now (+50 pts)
+                    </button>
+</div>
+<div class="glass-panel rounded-3xl p-6">
+<h3 class="text-lg font-bold text-white mb-4">Upcoming Schedule</h3>
+<ul class="space-y-4">
+<li class="flex gap-4">
+<div class="bg-white/10 rounded-lg p-2 text-center min-w-[50px]">
+<span class="block text-xs text-slate-400 uppercase">Oct</span>
+<span class="block text-xl font-bold text-white">24</span>
+</div>
+<div>
+<h4 class="text-white font-bold text-sm">Music Bank Performance</h4>
+<p class="text-slate-400 text-xs">Live Broadcast • 5:00 PM KST</p>
+</div>
+</li>
+<li class="flex gap-4">
+<div class="bg-white/10 rounded-lg p-2 text-center min-w-[50px]">
+<span class="block text-xs text-slate-400 uppercase">Oct</span>
+<span class="block text-xl font-bold text-white">28</span>
+</div>
+<div>
+<h4 class="text-white font-bold text-sm">Fan Meeting: Seoul</h4>
+<p class="text-slate-400 text-xs">Offline Event • KSPO Dome</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-[#181116] border-t border-white/5 pt-16 pb-8">
+<div class="container mx-auto px-6">
+<div class="flex flex-col md:flex-row justify-between items-start gap-12">
+<div class="max-w-xs">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary text-3xl">equalizer</span>
+<span class="text-xl font-bold text-white italic">K-POP<span class="text-primary">PULSE</span></span>
+</div>
+<p class="text-slate-500 text-sm leading-relaxed">
+                    The official community hub for STAYs worldwide. Connect, share, and support Stray Kids together.
+                </p>
+</div>
+<div class="flex flex-wrap gap-12 sm:gap-24">
+<div>
+<h4 class="text-white font-bold mb-4">Fan Club</h4>
+<ul class="flex flex-col gap-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="#">Membership</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Benefits</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Community Guidelines</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">Support</h4>
+<ul class="flex flex-col gap-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="#">FAQ</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Contact Us</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Report Issue</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">Follow SKZ</h4>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">public</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">videocam</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">music_note</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
+<p>© 2023 K-Pop Pulse Radio &amp; JYP Entertainment. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-slate-400" href="#">Privacy Policy</a>
+<a class="hover:text-slate-400" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>

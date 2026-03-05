@@ -1,0 +1,62 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('charts/', views.charts, name='charts'),
+    path('idols/', views.idols, name='idols'),
+    path('idols/stray-kids/', views.stray_kids, name='stray_kids'),
+    path('idols/universe/', views.idol_universe, name='idol_universe'),
+    path('schedule/', views.schedule, name='schedule'),
+    path('profile/', views.profile, name='profile'),
+    path('news/', views.news, name='news'),
+    path('shop/', views.shop, name='shop'),
+    path('about/', views.about_us, name='about_us'),
+    path('achievement/', views.achievement_popup, name='achievement_popup'),
+    path('login/', views.login_page, name='login'),
+    path('promo/', views.promo, name='promo'),
+    path('signup/', views.signup, name='signup'),
+    path('request/', views.request_track, name='request_track'),
+    path('game/', views.song_game, name='song_game'),
+    path('contests/', views.contests, name='contests'),
+    path('results/', views.results, name='results'),
+    path('bias-selector/', views.bias_selector, name='bias_selector'),
+    path('live/', views.live, name='live'),
+    path('comeback-timeline/', views.comeback_timeline, name='comeback_timeline'),
+    path('calendar/', views.calendar, name='calendar'),
+    
+    # New Stitch Export Pages
+    path('top-cheerleader-badges/', views.top_cheerleader_badges, name='top_cheerleader_badges'),
+    path('cheerleader-leaderboard/', views.cheerleader_leaderboard, name='cheerleader_leaderboard'),
+    path('legendary-item-claimed/', views.legendary_item_claimed, name='legendary_item_claimed'),
+    path('neon-home-v1/', views.neon_home_variant_1, name='neon_home_variant_1'),
+    path('neon-home-v2/', views.neon_home_variant_2, name='neon_home_variant_2'),
+    path('celebration-toggle/', views.celebration_toggle, name='celebration_toggle'),
+    path('profile-personalization-settings/', views.profile_personalization_settings, name='profile_personalization_settings'),
+    path('avatar-frame-gallery/', views.avatar_frame_gallery, name='avatar_frame_gallery'),
+    path('legendary-item-drop/', views.legendary_item_drop, name='legendary_item_drop'),
+    path('gift-received/', views.gift_received, name='gift_received'),
+    path('k-pop-pulse-idol-emote/', views.k_pop_pulse_idol_emote, name='k_pop_pulse_idol_emote'),
+    path('emote-unlocked/', views.emote_unlocked, name='emote_unlocked'),
+    path('daily-login-rewards-calendar/', views.daily_login_rewards_calendar, name='daily_login_rewards_calendar'),
+    path('streak-recovery/', views.streak_recovery, name='streak_recovery'),
+    path('pulse-point-store/', views.pulse_point_store, name='pulse_point_store'),
+    path('k-pop-pulse-home-neon-variant/', views.k_pop_pulse_home_neon_variant, name='k_pop_pulse_home_neon_variant'),
+    path('purchase-successful-celebration-modal/', views.purchase_successful_celebration_modal, name='purchase_successful_celebration_modal'),
+    path('gift-to-a-friend/', views.gift_to_a_friend, name='gift_to_a_friend'),
+    path('d-day-comeback-notification/', views.d_day_comeback_notification, name='d_day_comeback_notification'),
+    path('blog-page/', views.blog_page, name='blog_page'),
+    path('new-release-spotlight/', views.new_release_spotlight, name='new_release_spotlight'),
+    path('streaming-party-chat/', views.streaming_party_chat, name='streaming_party_chat'),
+    path('confetti-rain/', views.confetti_rain, name='confetti_rain'),
+    
+    # ── AI endpoints ───────────────────────────────────────────────────────
+    path('ai/generate-image/', views.ai_generate_image, name='ai_generate_image'),
+    path('live/ai/like/', views.ai_like, name='ai_like'),
+    path('live/ai/commentary/', views.ai_commentary, name='ai_commentary'),
+    path('live/ai/theme/', views.ai_theme, name='ai_theme'),
+    path('charts/ai/ranking/', views.ai_generate_ranking, name='ai_generate_ranking'),
+
+    # ── Dynamic Idol Pages ────────────────────────────────────────────────
+    path('idols/<slug:slug>/', views.idol_page, name='idol_page'),
+]

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BLACKPINK Ultimate - Editorial Variant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "bp-pink": "#FF8EAF",
+                        "bp-black": "#121212",
+                        "bp-dark": "#1A1A1A",
+                        "bp-gray": "#2D2D2D",
+                        "bp-light": "#F5F5F5"
+                    },
+                    fontFamily: {
+                        "editorial": ["Cinzel", "serif"],
+                        "sans": ["Inter", "sans-serif"]
+                    },
+                    backgroundImage: {
+                        'holographic': 'linear-gradient(125deg, rgba(255,142,175,0.05) 0%, rgba(18,18,18,1) 40%, rgba(18,18,18,1) 60%, rgba(255,142,175,0.05) 100%)',
+                        'pink-glow': 'radial-gradient(circle at center, rgba(255,142,175,0.15) 0%, transparent 70%)'
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        :root {
+            --neon-pink: #FF8EAF;
+        }
+        body {
+            background-color: #121212;
+            color: #F5F5F5;
+        }
+        .editorial-text {
+            font-family: 'Cinzel', serif;
+        }
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+        }
+        .glass-nav {
+            background: rgba(18, 18, 18, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 142, 175, 0.1);
+        }.gauge-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+        .gauge-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+        .gauge-bg {
+            fill: none;
+            stroke: #2D2D2D;
+            stroke-width: 8;
+        }
+        .gauge-fill-pink {
+            fill: none;
+            stroke: #FF8EAF;
+            stroke-width: 8;
+            stroke-dasharray: 502;
+            stroke-dashoffset: 200;stroke-linecap: round;
+        }
+        .gauge-fill-other {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 8;
+            stroke-dasharray: 502;
+            stroke-dashoffset: 400;stroke-linecap: round;
+        }
+        .neon-border-hover:hover {
+            box-shadow: 0 0 15px rgba(255, 142, 175, 0.3);
+            border-color: rgba(255, 142, 175, 0.5);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-sans bg-bp-black bg-holographic min-h-screen relative overflow-x-hidden">
+<nav class="glass-nav fixed top-0 w-full z-50 transition-all duration-300">
+<div class="max-w-[1440px] mx-auto px-6 py-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-bp-pink text-3xl">radio</span>
+<span class="editorial-text text-xl font-bold tracking-widest text-white">PULSE<span class="text-bp-pink">K</span></span>
+</div>
+<div class="hidden lg:flex items-center gap-6 overflow-x-auto hide-scrollbar">
+<a class="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-bp-pink transition-colors" href="#hero">Intro</a>
+<a class="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-bp-pink transition-colors" href="#members">Members</a>
+<a class="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-bp-pink transition-colors" href="#discography">Discography</a>
+<a class="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-bp-pink transition-colors" href="#tracks">Top Tracks</a>
+<a class="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-bp-pink transition-colors" href="#fanwall">Fan Wall</a>
+<a class="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-bp-pink transition-colors" href="#battle">Battle</a>
+<a class="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-bp-pink transition-colors" href="#events">Events</a>
+<a class="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-bp-pink transition-colors" href="#media">Media</a>
+<a class="text-xs uppercase tracking-[0.2em] text-gray-400 hover:text-bp-pink transition-colors" href="#feed">Feed</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-gray-400 hover:text-white transition-colors">search</button>
+<button class="material-symbols-outlined text-gray-400 hover:text-white transition-colors">menu</button>
+</div>
+</div>
+</div>
+</nav>
+<main class="pt-[72px]">
+<section class="relative min-h-[90vh] flex items-center justify-center border-b border-white/5 overflow-hidden" id="hero">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity" data-alt="High fashion group portrait" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAFwwkAyazy0CqmzTMq3TrAanKdSpx4-1OVJSWO-U6B-_Y0QaxQEhv6Bc_JyY5QFJ-mJl-Whwyn8g9_hKOmo4RxtlEHYv5KT6WHiXgbPAC86g4MKanJXHuP-5LEtPXWCdvyl-pm3rjAPh0Xb-YxxmlOW6Z2QWZ6eUgevksChNbmz-e7GaFeOVHKdGyto8ie2KfT7gdAJTYFqhoaT1BFGR6qjRy56M0yow_YaxIAwzyebB1gpuYnSmOGQ0Jm1VNq_ncgvxznnRwwdUBq');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-bp-black via-bp-black/60 to-transparent"></div>
+<div class="absolute inset-0 bg-pink-glow mix-blend-screen opacity-50"></div>
+</div>
+<div class="relative z-10 w-full max-w-[1440px] mx-auto px-6 flex flex-col items-center text-center pt-20">
+<span class="text-bp-pink text-sm uppercase tracking-[0.5em] mb-6 font-medium">Ultimate Idol</span>
+<h1 class="editorial-text text-7xl md:text-[9rem] lg:text-[12rem] leading-none text-white tracking-tighter mb-4 mix-blend-screen">
+                    BLACK<span class="text-transparent bg-clip-text bg-gradient-to-b from-bp-pink to-[#ff4d79]">PINK</span>
+</h1>
+<p class="text-gray-400 max-w-2xl text-lg md:text-xl font-light tracking-wide mb-12">
+                    The revolutionary quartet redefining global pop culture through unapologetic confidence and high-fashion aesthetics.
+                </p>
+<div class="flex items-center gap-6">
+<button class="bg-bp-pink text-bp-black hover:bg-white px-8 py-4 rounded-full font-semibold uppercase tracking-widest text-sm transition-all duration-300 flex items-center gap-2">
+<span class="material-symbols-outlined">play_circle</span>
+                        Play Station
+                    </button>
+<button class="border border-white/20 text-white hover:border-bp-pink hover:text-bp-pink px-8 py-4 rounded-full font-semibold uppercase tracking-widest text-sm transition-all duration-300">
+                        Follow
+                    </button>
+</div>
+<div class="absolute bottom-12 flex gap-12 text-center text-sm uppercase tracking-widest text-gray-500">
+<div><span class="block text-white font-bold text-xl editorial-text mb-1">42M</span> Followers</div>
+<div><span class="block text-white font-bold text-xl editorial-text mb-1">#1</span> Global Rank</div>
+<div><span class="block text-white font-bold text-xl editorial-text mb-1">2016</span> Debut</div>
+</div>
+</div>
+</section>
+<section class="py-24 border-b border-white/5" id="members">
+<div class="max-w-[1440px] mx-auto px-6">
+<div class="flex justify-between items-end mb-16">
+<h2 class="editorial-text text-4xl md:text-5xl text-white">THE <span class="text-bp-pink italic">MUSE</span></h2>
+<span class="text-gray-500 text-sm uppercase tracking-widest">04 Members</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="group relative aspect-[2/3] overflow-hidden bg-bp-dark">
+<div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-700 grayscale group-hover:grayscale-0" data-alt="JISOO portrait" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCTfvY2Z00_G50AWNVgtLKNqX39aJibg45A2EvVxrLxrwP4T9c_vIqfkzkYuwvMk9kEEFeP21vBN_Noj0ZGtpTWji_yLB5s-yfnV65fz6ge7SB42wUcue5C4-9RAn3YEcCshjn8epFx3Q2ucRZbtBxskAF1ehXiXd_S4VCEgksL_O6TPtHJCDCjf6G1jVP-5IlfsLtqqSWob_4VgG2xdSGWBf0spM5zdMtbJxj8brxifwyaXtLfgqokrdvAocy6LZ1-xlmw6yAXNa-_');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-bp-black via-transparent to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-6 flex items-end justify-between w-full">
+<div>
+<h3 class="editorial-text text-3xl text-white mb-1">JISOO</h3>
+<p class="text-bp-pink text-xs uppercase tracking-widest">Lead Vocalist</p>
+</div>
+<span class="vertical-text text-gray-500 text-xs uppercase tracking-[0.3em] font-light">Elegance</span>
+</div>
+</div>
+<div class="group relative aspect-[2/3] overflow-hidden bg-bp-dark">
+<div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-700 grayscale group-hover:grayscale-0" data-alt="JENNIE portrait" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGdFvAMTWl3CIXm1xVGio05im3IB7hqfcnmkQr9qGs2mT0Gm-VV52lAr1CETEaodj1Fe4fIlzcvzIYO-HpdkolBdf6a18eMRqukG0Uhu0_cfDIx14ek5MBOpV3H-P0DanfJbwCVQU6UhxeJK7YkvBvkMNKBsHfvMm6s4Yw-QX8RceTtXENTUHuuZOJYFv94iHclPuyiHkhxNm-TgC2GMwnY3IZi3CuEwU2r-vItPvS8CWHHHwp0XX6-iCrdAmj-yKUuQ4KRgzDqNfu');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-bp-black via-transparent to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-6 flex items-end justify-between w-full">
+<div>
+<h3 class="editorial-text text-3xl text-white mb-1">JENNIE</h3>
+<p class="text-bp-pink text-xs uppercase tracking-widest">Main Rapper</p>
+</div>
+<span class="vertical-text text-gray-500 text-xs uppercase tracking-[0.3em] font-light">Charisma</span>
+</div>
+</div>
+<div class="group relative aspect-[2/3] overflow-hidden bg-bp-dark">
+<div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-700 grayscale group-hover:grayscale-0" data-alt="ROSÉ portrait" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBoXaaYoB8BcJWFTwWbs1edD2c4WG9SIQD9zgufIZD2fYQdRIlQoz1Fl-uvlRycHz3Vw7bomHx9hZtltSjZsoj7fReMmeR7u9SpnCLyhh-21vtrBFeWMK0ryFNDHnrDttQJHFqh0e56C_1M5S0Lei1w-k7YRY2eHuZdQj_p3i8dnoVX_REewpF_hiomIKCx4RWST988TSKo95SoTzMST_kKAkub7HXc3isyb7W_W6jZYRNjn14TbE4V3ODmhtP0vTtbJRBwaxn_sU83');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-bp-black via-transparent to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-6 flex items-end justify-between w-full">
+<div>
+<h3 class="editorial-text text-3xl text-white mb-1">ROSÉ</h3>
+<p class="text-bp-pink text-xs uppercase tracking-widest">Main Vocalist</p>
+</div>
+<span class="vertical-text text-gray-500 text-xs uppercase tracking-[0.3em] font-light">Soul</span>
+</div>
+</div>
+<div class="group relative aspect-[2/3] overflow-hidden bg-bp-dark">
+<div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-700 grayscale group-hover:grayscale-0" data-alt="LISA portrait" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqlHue5x2ztz5YzE_KcXdAy0TiZx6cTlNz8x076PxJRGQcuSRvWIYKRlS8hWT0iaDlFa-2sxWrs4aOcHsXEnW7HtjZCNIQepH94OKaRa6zNpFJjLLHB3gHiLXQKVwXhiYAnuH60-uUo6zEFbLg43TJIc1JI2ZtPG_PByWnOI0Qe7Vjpx7eCupn0q4HZ_SL5IG8tbwqDORB4hjn4P1hOQOPRzDTYv6M7OTkmYHaTbZu66ge7gtIUUB_bCvUUMum25lLTWWvzJRptz_B');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-bp-black via-transparent to-transparent opacity-80"></div>
+<div class="absolute bottom-0 left-0 p-6 flex items-end justify-between w-full">
+<div>
+<h3 class="editorial-text text-3xl text-white mb-1">LISA</h3>
+<p class="text-bp-pink text-xs uppercase tracking-widest">Main Dancer</p>
+</div>
+<span class="vertical-text text-gray-500 text-xs uppercase tracking-[0.3em] font-light">Dynamic</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 border-b border-white/5 relative" id="discography">
+<div class="absolute right-0 top-0 w-1/2 h-full bg-pink-glow opacity-20 pointer-events-none"></div>
+<div class="max-w-[1440px] mx-auto px-6 relative z-10">
+<div class="flex justify-between items-end mb-16">
+<h2 class="editorial-text text-4xl md:text-5xl text-white">THE <span class="text-bp-pink italic">ARCHIVE</span></h2>
+<a class="text-xs uppercase tracking-[0.2em] text-white hover:text-bp-pink transition-colors border-b border-white/20 pb-1" href="#">View All</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<div class="group cursor-pointer">
+<div class="relative aspect-square mb-4 overflow-hidden border border-white/5 neon-border-hover transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Born Pink Album Cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDjHBCTkI39QRw1PFymRAeKGy1V5Y7Q4FsyGk033jSOv3WEwixo-Iesg5FIvgwgP8lAEKDvJn-aXbFwvZsh2sUjyW5w5gb4wzbVS4QKMicFK0Odn6m_bwFq6WWZzaNv7nkauFuWNgcTCNX5BTOHaqHnoNmBdmCEyEDHKspH6X99VUzUnJBVcHrRAQr-Jhg5OSnXGwQvsubMs7YbE6UbebDy_56FPXqgIQ3TN3ikwBAhyCaLHOuFjcxgeoTEEMqzPwAwB4aM2kCeesiq');"></div>
+<div class="absolute inset-0 bg-bp-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-white">play_circle</span>
+</div>
+</div>
+<h4 class="text-white font-medium uppercase tracking-wide text-sm mb-1">Born Pink</h4>
+<p class="text-gray-500 text-xs uppercase tracking-widest">2022 • Studio Album</p>
+</div>
+<div class="group cursor-pointer">
+<div class="relative aspect-square mb-4 overflow-hidden border border-white/5 neon-border-hover transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="The Album Cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAxWRZjpkxi3pHEliLEZIEn8PkF2YvBetmKxNwis7FsugO_d8YBeMzIG5L14fGKn0VeggDS7AUhEyvYTMJmHY4RIVqQna10TMyi-Z1Yt4kO4LAJ7M1GB4lCb_7HYTkZxOZN4njTBDlQMWflqFM-k6vJN57tslVBUJOVenhOXcNdUWwUlWyf0Z67BbC8Po0BE1UIfW8Xn9kHES9sAvJQIGzRhQ8Ne6ZDx7hNb7BSJPRR_vbAD5ifGgUpKsKT3wMmC05lFYhG_bz37fT8');"></div>
+<div class="absolute inset-0 bg-bp-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-white">play_circle</span>
+</div>
+</div>
+<h4 class="text-white font-medium uppercase tracking-wide text-sm mb-1">The Album</h4>
+<p class="text-gray-500 text-xs uppercase tracking-widest">2020 • Studio Album</p>
+</div>
+<div class="group cursor-pointer">
+<div class="relative aspect-square mb-4 overflow-hidden border border-white/5 neon-border-hover transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Kill This Love Album Cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB5bCkWBnicZrZGGUbnm2QTxp2-2H22c1b5q6u_c5oQ1aUynFfSRKtpnJTyRsYIrVSnYI3w8Bl4x-IPNO1vyPDjKdkH2rqsRI9ZMzNvnje4b47NcDo-kCrU8fUzCkbUbo19N5DV2F8X1Mfdqd5cV9njvlTpzJBTu9dzydYSS7rE23UM5NRnmPnHzmNIcHdiDaIEok-t0H7TzsvV6UNdbv0gp6wWi2y5QcwBCN2LvRiEpk59ZkH5J_V4fYOI6NnLBn-2ogP9UmfEG_0F');"></div>
+<div class="absolute inset-0 bg-bp-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-white">play_circle</span>
+</div>
+</div>
+<h4 class="text-white font-medium uppercase tracking-wide text-sm mb-1">Kill This Love</h4>
+<p class="text-gray-500 text-xs uppercase tracking-widest">2019 • EP</p>
+</div>
+<div class="group cursor-pointer">
+<div class="relative aspect-square mb-4 overflow-hidden border border-white/5 neon-border-hover transition-all duration-300">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Square Up Album Cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAfEMzPimO_8CcKO5KS6EUpOa3Z3G3l539cotdfg1iVoBqkCy3gPR0y4oPuYQ39E-R5DXnxqCI43Q7BcJfIaEckKKSm6e2JIOd12_CYG-azHydICuyEMleuWpdWgKCqqXCdVDfe5ex66quS8JvsmjFTxI5HPs2sgFCoOLlr1CECjAI6F9ZsbnfRTratSErIv4LOo21F9hdaiRvBDaIE3eohgNJgBgx5z6R9x0NuNm7U99yotWvak8azYaLJGyG477ekI4Mdj12EUB6R');"></div>
+<div class="absolute inset-0 bg-bp-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-white">play_circle</span>
+</div>
+</div>
+<h4 class="text-white font-medium uppercase tracking-wide text-sm mb-1">Square Up</h4>
+<p class="text-gray-500 text-xs uppercase tracking-widest">2018 • EP</p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 border-b border-white/5">
+<div class="max-w-[1440px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16">
+<div class="lg:col-span-8" id="tracks">
+<h2 class="editorial-text text-3xl text-white mb-10">SIGNATURE <span class="text-bp-pink italic">SOUNDS</span></h2>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-4 p-4 hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors group">
+<span class="text-gray-600 font-mono text-sm w-6">01</span>
+<div class="w-12 h-12 bg-cover bg-center" data-alt="Track thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDjHBCTkI39QRw1PFymRAeKGy1V5Y7Q4FsyGk033jSOv3WEwixo-Iesg5FIvgwgP8lAEKDvJn-aXbFwvZsh2sUjyW5w5gb4wzbVS4QKMicFK0Odn6m_bwFq6WWZzaNv7nkauFuWNgcTCNX5BTOHaqHnoNmBdmCEyEDHKspH6X99VUzUnJBVcHrRAQr-Jhg5OSnXGwQvsubMs7YbE6UbebDy_56FPXqgIQ3TN3ikwBAhyCaLHOuFjcxgeoTEEMqzPwAwB4aM2kCeesiq');"></div>
+<div class="flex-grow">
+<h4 class="text-white text-sm font-medium">Pink Venom</h4>
+<p class="text-gray-500 text-xs">Born Pink</p>
+</div>
+<span class="text-gray-500 text-xs font-mono">3:06</span>
+<button class="material-symbols-outlined text-gray-500 hover:text-bp-pink opacity-0 group-hover:opacity-100 transition-all">play_arrow</button>
+</div>
+<div class="flex items-center gap-4 p-4 hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors group">
+<span class="text-gray-600 font-mono text-sm w-6">02</span>
+<div class="w-12 h-12 bg-cover bg-center" data-alt="Track thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAxWRZjpkxi3pHEliLEZIEn8PkF2YvBetmKxNwis7FsugO_d8YBeMzIG5L14fGKn0VeggDS7AUhEyvYTMJmHY4RIVqQna10TMyi-Z1Yt4kO4LAJ7M1GB4lCb_7HYTkZxOZN4njTBDlQMWflqFM-k6vJN57tslVBUJOVenhOXcNdUWwUlWyf0Z67BbC8Po0BE1UIfW8Xn9kHES9sAvJQIGzRhQ8Ne6ZDx7hNb7BSJPRR_vbAD5ifGgUpKsKT3wMmC05lFYhG_bz37fT8');"></div>
+<div class="flex-grow">
+<h4 class="text-white text-sm font-medium">How You Like That</h4>
+<p class="text-gray-500 text-xs">The Album</p>
+</div>
+<span class="text-gray-500 text-xs font-mono">3:01</span>
+<button class="material-symbols-outlined text-gray-500 hover:text-bp-pink opacity-0 group-hover:opacity-100 transition-all">play_arrow</button>
+</div>
+<div class="flex items-center gap-4 p-4 hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors group">
+<span class="text-gray-600 font-mono text-sm w-6">03</span>
+<div class="w-12 h-12 bg-cover bg-center" data-alt="Track thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB5bCkWBnicZrZGGUbnm2QTxp2-2H22c1b5q6u_c5oQ1aUynFfSRKtpnJTyRsYIrVSnYI3w8Bl4x-IPNO1vyPDjKdkH2rqsRI9ZMzNvnje4b47NcDo-kCrU8fUzCkbUbo19N5DV2F8X1Mfdqd5cV9njvlTpzJBTu9dzydYSS7rE23UM5NRnmPnHzmNIcHdiDaIEok-t0H7TzsvV6UNdbv0gp6wWi2y5QcwBCN2LvRiEpk59ZkH5J_V4fYOI6NnLBn-2ogP9UmfEG_0F');"></div>
+<div class="flex-grow">
+<h4 class="text-white text-sm font-medium">Kill This Love</h4>
+<p class="text-gray-500 text-xs">Kill This Love</p>
+</div>
+<span class="text-gray-500 text-xs font-mono">3:09</span>
+<button class="material-symbols-outlined text-gray-500 hover:text-bp-pink opacity-0 group-hover:opacity-100 transition-all">play_arrow</button>
+</div>
+<div class="flex items-center gap-4 p-4 hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors group">
+<span class="text-gray-600 font-mono text-sm w-6">04</span>
+<div class="w-12 h-12 bg-cover bg-center" data-alt="Track thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAfEMzPimO_8CcKO5KS6EUpOa3Z3G3l539cotdfg1iVoBqkCy3gPR0y4oPuYQ39E-R5DXnxqCI43Q7BcJfIaEckKKSm6e2JIOd12_CYG-azHydICuyEMleuWpdWgKCqqXCdVDfe5ex66quS8JvsmjFTxI5HPs2sgFCoOLlr1CECjAI6F9ZsbnfRTratSErIv4LOo21F9hdaiRvBDaIE3eohgNJgBgx5z6R9x0NuNm7U99yotWvak8azYaLJGyG477ekI4Mdj12EUB6R');"></div>
+<div class="flex-grow">
+<h4 class="text-white text-sm font-medium">DDU-DU DDU-DU</h4>
+<p class="text-gray-500 text-xs">Square Up</p>
+</div>
+<span class="text-gray-500 text-xs font-mono">3:29</span>
+<button class="material-symbols-outlined text-gray-500 hover:text-bp-pink opacity-0 group-hover:opacity-100 transition-all">play_arrow</button>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 flex flex-col items-center justify-center bg-bp-dark/50 p-8 border border-white/5" id="battle">
+<h3 class="editorial-text text-xl text-white mb-2 text-center">FANDOM <span class="text-bp-pink">ENERGY</span></h3>
+<p class="text-xs text-gray-500 uppercase tracking-widest mb-8 text-center">Current Station Ranking</p>
+<div class="gauge-container mb-8">
+<svg class="gauge-svg" viewBox="0 0 200 200">
+<circle class="gauge-bg" cx="100" cy="100" r="80"></circle>
+<circle class="gauge-fill-other" cx="100" cy="100" r="80"></circle>
+<circle class="gauge-fill-pink" cx="100" cy="100" r="80"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="editorial-text text-4xl text-white">#1</span>
+<span class="text-xs text-bp-pink uppercase tracking-widest mt-1">BLINKs</span>
+</div>
+</div>
+<div class="w-full flex justify-between text-xs uppercase tracking-wider text-gray-400 mb-6">
+<span>Blackpink <strong class="text-bp-pink">60%</strong></span>
+<span>Others <strong class="text-white">40%</strong></span>
+</div>
+<button class="w-full border border-bp-pink text-bp-pink hover:bg-bp-pink hover:text-bp-black py-3 text-xs uppercase tracking-[0.2em] font-medium transition-colors">
+                        Boost Energy
+                    </button>
+</div>
+</div>
+</section>
+<section class="py-24 border-b border-white/5">
+<div class="max-w-[1440px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16">
+<div id="fanwall">
+<div class="flex justify-between items-end mb-10">
+<h2 class="editorial-text text-3xl text-white">BLINK <span class="text-bp-pink italic">CONFESSIONS</span></h2>
+<button class="text-xs uppercase tracking-widest text-bp-pink hover:text-white transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">edit</span> Write
+                        </button>
+</div>
+<div class="space-y-4">
+<div class="p-6 bg-bp-dark border border-white/5">
+<p class="text-gray-300 text-sm italic mb-4">"The Coachella headline performance was absolutely legendary. They owned that stage like true queens."</p>
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-bp-gray"></div>
+<span class="text-xs text-gray-500 uppercase tracking-widest">@jennieruby_fan</span>
+</div>
+</div>
+<div class="p-6 bg-bp-dark border border-white/5">
+<p class="text-gray-300 text-sm italic mb-4">"Still can't get over Lisa's dance break in Pink Venom. The energy is unmatched!"</p>
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-bp-gray"></div>
+<span class="text-xs text-gray-500 uppercase tracking-widest">@lalisa_love</span>
+</div>
+</div>
+<div class="p-6 bg-bp-dark border border-white/5">
+<p class="text-gray-300 text-sm italic mb-4">"Jisoo's vocals in 'Flower' are heavenly. So proud of her solo debut."</p>
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-bp-gray"></div>
+<span class="text-xs text-gray-500 uppercase tracking-widest">@sooyaaa_stan</span>
+</div>
+</div>
+</div>
+</div>
+<div id="events">
+<div class="flex justify-between items-end mb-10">
+<h2 class="editorial-text text-3xl text-white">GLOBAL <span class="text-bp-pink italic">AGENDA</span></h2>
+</div>
+<div class="flex flex-col border-t border-white/10">
+<div class="flex items-center gap-6 py-6 border-b border-white/10 group hover:bg-white/5 transition-colors px-4 -mx-4">
+<div class="text-center min-w-[60px]">
+<span class="block text-bp-pink text-xs uppercase tracking-widest mb-1">NOV</span>
+<span class="editorial-text text-2xl text-white">12</span>
+</div>
+<div class="flex-grow">
+<h4 class="text-white text-base font-medium mb-1 group-hover:text-bp-pink transition-colors">BORN PINK World Tour Finale</h4>
+<p class="text-gray-500 text-xs uppercase tracking-wider">Seoul, Gocheok Sky Dome</p>
+</div>
+<button class="border border-white/20 text-white text-xs uppercase tracking-widest px-4 py-2 hover:border-bp-pink hover:text-bp-pink transition-colors">Tickets</button>
+</div>
+<div class="flex items-center gap-6 py-6 border-b border-white/10 group hover:bg-white/5 transition-colors px-4 -mx-4">
+<div class="text-center min-w-[60px]">
+<span class="block text-bp-pink text-xs uppercase tracking-widest mb-1">DEC</span>
+<span class="editorial-text text-2xl text-white">05</span>
+</div>
+<div class="flex-grow">
+<h4 class="text-white text-base font-medium mb-1 group-hover:text-bp-pink transition-colors">Exclusive VR Concert Premiere</h4>
+<p class="text-gray-500 text-xs uppercase tracking-wider">Meta Quest Platforms</p>
+</div>
+<button class="border border-white/20 text-white text-xs uppercase tracking-widest px-4 py-2 hover:border-bp-pink hover:text-bp-pink transition-colors">RSVP</button>
+</div>
+<div class="flex items-center gap-6 py-6 border-b border-white/10 group hover:bg-white/5 transition-colors px-4 -mx-4 opacity-50">
+<div class="text-center min-w-[60px]">
+<span class="block text-gray-500 text-xs uppercase tracking-widest mb-1">OCT</span>
+<span class="editorial-text text-2xl text-gray-400">28</span>
+</div>
+<div class="flex-grow">
+<h4 class="text-gray-400 text-base font-medium mb-1">Paris Fashion Week Appearances</h4>
+<p class="text-gray-600 text-xs uppercase tracking-wider">Paris, France</p>
+</div>
+<span class="text-xs uppercase tracking-widest text-gray-600 px-4">Ended</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 border-b border-white/5" id="media">
+<div class="max-w-[1440px] mx-auto px-6">
+<div class="flex justify-between items-end mb-16">
+<h2 class="editorial-text text-4xl md:text-5xl text-white">VISUAL <span class="text-bp-pink italic">DIARY</span></h2>
+<div class="flex gap-2">
+<button class="w-10 h-10 border border-white/20 flex items-center justify-center text-white hover:border-bp-pink hover:text-bp-pink transition-colors"><span class="material-symbols-outlined text-sm">arrow_back_ios_new</span></button>
+<button class="w-10 h-10 border border-white/20 flex items-center justify-center text-white hover:border-bp-pink hover:text-bp-pink transition-colors"><span class="material-symbols-outlined text-sm">arrow_forward_ios</span></button>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="aspect-[3/4] bg-bp-dark bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-500" data-alt="Gallery Image 1" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAFwwkAyazy0CqmzTMq3TrAanKdSpx4-1OVJSWO-U6B-_Y0QaxQEhv6Bc_JyY5QFJ-mJl-Whwyn8g9_hKOmo4RxtlEHYv5KT6WHiXgbPAC86g4MKanJXHuP-5LEtPXWCdvyl-pm3rjAPh0Xb-YxxmlOW6Z2QWZ6eUgevksChNbmz-e7GaFeOVHKdGyto8ie2KfT7gdAJTYFqhoaT1BFGR6qjRy56M0yow_YaxIAwzyebB1gpuYnSmOGQ0Jm1VNq_ncgvxznnRwwdUBq');"></div>
+<div class="aspect-[3/4] bg-bp-dark bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-500 mt-8" data-alt="Gallery Image 2" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCTfvY2Z00_G50AWNVgtLKNqX39aJibg45A2EvVxrLxrwP4T9c_vIqfkzkYuwvMk9kEEFeP21vBN_Noj0ZGtpTWji_yLB5s-yfnV65fz6ge7SB42wUcue5C4-9RAn3YEcCshjn8epFx3Q2ucRZbtBxskAF1ehXiXd_S4VCEgksL_O6TPtHJCDCjf6G1jVP-5IlfsLtqqSWob_4VgG2xdSGWBf0spM5zdMtbJxj8brxifwyaXtLfgqokrdvAocy6LZ1-xlmw6yAXNa-_');"></div>
+<div class="aspect-[3/4] bg-bp-dark bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-500" data-alt="Gallery Image 3" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGdFvAMTWl3CIXm1xVGio05im3IB7hqfcnmkQr9qGs2mT0Gm-VV52lAr1CETEaodj1Fe4fIlzcvzIYO-HpdkolBdf6a18eMRqukG0Uhu0_cfDIx14ek5MBOpV3H-P0DanfJbwCVQU6UhxeJK7YkvBvkMNKBsHfvMm6s4Yw-QX8RceTtXENTUHuuZOJYFv94iHclPuyiHkhxNm-TgC2GMwnY3IZi3CuEwU2r-vItPvS8CWHHHwp0XX6-iCrdAmj-yKUuQ4KRgzDqNfu');"></div>
+<div class="aspect-[3/4] bg-bp-dark bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-500 mt-8" data-alt="Gallery Image 4" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBoXaaYoB8BcJWFTwWbs1edD2c4WG9SIQD9zgufIZD2fYQdRIlQoz1Fl-uvlRycHz3Vw7bomHx9hZtltSjZsoj7fReMmeR7u9SpnCLyhh-21vtrBFeWMK0ryFNDHnrDttQJHFqh0e56C_1M5S0Lei1w-k7YRY2eHuZdQj_p3i8dnoVX_REewpF_hiomIKCx4RWST988TSKo95SoTzMST_kKAkub7HXc3isyb7W_W6jZYRNjn14TbE4V3ODmhtP0vTtbJRBwaxn_sU83');"></div>
+</div>
+</div>
+</section>
+<section class="py-24">
+<div class="max-w-[1440px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-16">
+<div class="lg:col-span-2" id="feed">
+<h2 class="editorial-text text-3xl text-white mb-10">LATEST <span class="text-bp-pink italic">DISPATCHES</span></h2>
+<div class="space-y-8">
+<article class="flex flex-col md:flex-row gap-6 group cursor-pointer">
+<div class="w-full md:w-64 aspect-[16/9] bg-bp-dark bg-cover bg-center border border-white/5 group-hover:border-bp-pink/50 transition-colors" data-alt="News image" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA2yzAZYp90dcY6OqxOFjvgjmfAHhrDupqhEJ3iQZ8RuA6fXjP4XelDwxwHJbSnGa_tFKeq4kLkH2-NprV4GFUJbUGRN6yjv0usor_VKesTliMgOxl0SxbFrQNpqgUwH0sFAYW0EfH99uoNpPjzEqU3-Qun1Si4Sl6q3YVSL4mPeljqJPVFLD8TgWTDiFU8cUs0gQ50NO3LxBiLyW5Or3ygQIOMyNfSx83CJSxI40rKBiYfusHpTIaq8leJndY2hAR__sRugfXwSN4u');"></div>
+<div class="flex-grow flex flex-col justify-center">
+<span class="text-bp-pink text-xs uppercase tracking-widest mb-2">Fashion • 2 Hours Ago</span>
+<h3 class="text-xl text-white font-medium mb-3 group-hover:text-bp-pink transition-colors">BLACKPINK Makes History at Met Gala</h3>
+<p class="text-gray-400 text-sm line-clamp-2">The quartet stunned the fashion world with their coordinated yet distinctly individual archival looks, setting a new standard for K-pop representation.</p>
+</div>
+</article>
+<article class="flex flex-col md:flex-row gap-6 group cursor-pointer">
+<div class="w-full md:w-64 aspect-[16/9] bg-bp-dark bg-cover bg-center border border-white/5 group-hover:border-bp-pink/50 transition-colors" data-alt="News image" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCr6Ie7qYtuVvNcDvTDJIFcg8XbDbcwb2POspdaZSZQYeGZMrxDBgjoTNLy36Thd7JOY8I14Zztz9uZn4b5DpHo28SpmNHdpv966LP2cRGy7lbm28OL5HNxzMwJS8gM80ns41WjNxJ8pcgfwMW4P9CDge6VQ95JFB48mpwFMatsJoKyeZO65U_vnzIxK4wPXzmxzxSQhAALerxVDfUvRNEV-f0XNF87R6wnWlhaiu6iQ2z-navAG0U3dUNUJos6Cl4-XOXoKMk-VHJV');"></div>
+<div class="flex-grow flex flex-col justify-center">
+<span class="text-bp-pink text-xs uppercase tracking-widest mb-2">Music • 1 Day Ago</span>
+<h3 class="text-xl text-white font-medium mb-3 group-hover:text-bp-pink transition-colors">New Single Surpasses 100M Views in Record Time</h3>
+<p class="text-gray-400 text-sm line-clamp-2">Breaking their own previous records, the latest release dominates global charts and sets a new milestone for music videos on the platform.</p>
+</div>
+</article>
+</div>
+</div>
+<div id="related">
+<h2 class="editorial-text text-xl text-white mb-8">SIMILAR <span class="text-bp-pink italic">VIBES</span></h2>
+<div class="flex flex-col gap-4">
+<a class="flex items-center gap-4 p-3 bg-bp-dark border border-white/5 hover:border-bp-pink/50 transition-colors group" href="#">
+<div class="w-12 h-12 rounded-full bg-bp-gray bg-cover bg-center grayscale group-hover:grayscale-0 transition-all" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAfEMzPimO_8CcKO5KS6EUpOa3Z3G3l539cotdfg1iVoBqkCy3gPR0y4oPuYQ39E-R5DXnxqCI43Q7BcJfIaEckKKSm6e2JIOd12_CYG-azHydICuyEMleuWpdWgKCqqXCdVDfe5ex66quS8JvsmjFTxI5HPs2sgFCoOLlr1CECjAI6F9ZsbnfRTratSErIv4LOo21F9hdaiRvBDaIE3eohgNJgBgx5z6R9x0NuNm7U99yotWvak8azYaLJGyG477ekI4Mdj12EUB6R');"></div>
+<div>
+<h4 class="text-white text-sm font-medium group-hover:text-bp-pink transition-colors">BABYMONSTER</h4>
+<p class="text-gray-500 text-xs">YG Entertainment</p>
+</div>
+</a>
+<a class="flex items-center gap-4 p-3 bg-bp-dark border border-white/5 hover:border-bp-pink/50 transition-colors group" href="#">
+<div class="w-12 h-12 rounded-full bg-bp-gray bg-cover bg-center grayscale group-hover:grayscale-0 transition-all" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqlHue5x2ztz5YzE_KcXdAy0TiZx6cTlNz8x076PxJRGQcuSRvWIYKRlS8hWT0iaDlFa-2sxWrs4aOcHsXEnW7HtjZCNIQepH94OKaRa6zNpFJjLLHB3gHiLXQKVwXhiYAnuH60-uUo6zEFbLg43TJIc1JI2ZtPG_PByWnOI0Qe7Vjpx7eCupn0q4HZ_SL5IG8tbwqDORB4hjn4P1hOQOPRzDTYv6M7OTkmYHaTbZu66ge7gtIUUB_bCvUUMum25lLTWWvzJRptz_B');"></div>
+<div>
+<h4 class="text-white text-sm font-medium group-hover:text-bp-pink transition-colors">2NE1</h4>
+<p class="text-gray-500 text-xs">Legends</p>
+</div>
+</a>
+<a class="flex items-center gap-4 p-3 bg-bp-dark border border-white/5 hover:border-bp-pink/50 transition-colors group" href="#">
+<div class="w-12 h-12 rounded-full bg-bp-gray bg-cover bg-center grayscale group-hover:grayscale-0 transition-all" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAxWRZjpkxi3pHEliLEZIEn8PkF2YvBetmKxNwis7FsugO_d8YBeMzIG5L14fGKn0VeggDS7AUhEyvYTMJmHY4RIVqQna10TMyi-Z1Yt4kO4LAJ7M1GB4lCb_7HYTkZxOZN4njTBDlQMWflqFM-k6vJN57tslVBUJOVenhOXcNdUWwUlWyf0Z67BbC8Po0BE1UIfW8Xn9kHES9sAvJQIGzRhQ8Ne6ZDx7hNb7BSJPRR_vbAD5ifGgUpKsKT3wMmC05lFYhG_bz37fT8');"></div>
+<div>
+<h4 class="text-white text-sm font-medium group-hover:text-bp-pink transition-colors">aespa</h4>
+<p class="text-gray-500 text-xs">SM Entertainment</p>
+</div>
+</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="border-t border-white/10 bg-[#0a0a0a] pt-16 pb-8">
+<div class="max-w-[1440px] mx-auto px-6">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-bp-pink text-3xl">radio</span>
+<span class="editorial-text text-2xl font-bold tracking-widest text-white">PULSE<span class="text-bp-pink">K</span></span>
+</div>
+<div class="flex gap-6 text-sm uppercase tracking-widest text-gray-400">
+<a class="hover:text-bp-pink transition-colors" href="#">Terms</a>
+<a class="hover:text-bp-pink transition-colors" href="#">Privacy</a>
+<a class="hover:text-bp-pink transition-colors" href="#">Contact</a>
+</div>
+</div>
+<div class="text-center text-xs text-gray-600 uppercase tracking-widest">
+<p>© 2023 PULSE K-POP RADIO. EDITORIAL VARIANT.</p>
+</div>
+</div>
+</footer>
+
+</body></html>

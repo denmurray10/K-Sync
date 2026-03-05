@@ -1,0 +1,370 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>K-Pop Pulse Home - Neon Variant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#000000",
+                        "secondary": "#00f0ff", // Cyan accent for neon theme
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        .neon-border {
+             box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+        /* Ticker Animation */
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-ticker {
+            animation: ticker 30s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+{% include 'core/header.html' %}
+<!-- Main Content -->
+<main class="flex-grow pt-0">
+<!-- Hero Section -->
+<section id="hero-section" class="relative h-[90vh] min-h-[700px] w-full overflow-hidden flex items-center justify-center border-b border-white/10">
+<!-- Background -->
+<div class="absolute inset-0 z-0 bg-black">
+<img src="{% static 'core/images/about_banner.webp' %}" alt="K-Pop Pulse" class="w-full h-full object-cover opacity-40 grayscale mix-blend-luminosity">
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+</div>
+
+<div class="relative z-20 container mx-auto px-6 max-w-[1400px] h-full flex flex-col md:flex-row items-end justify-between pb-24 pt-32">
+<!-- Left Content: Massive Typography -->
+<div class="flex flex-col gap-0 max-w-4xl text-left relative z-30 pointer-events-none">
+<div class="mb-4 inline-flex items-center gap-2 self-start px-2 py-1 border border-primary text-primary bg-primary/10">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="text-[10px] font-bold tracking-[0.2em] uppercase">Live On Air</span>
+</div>
+<h1 class="text-7xl md:text-[8rem] lg:text-[11rem] font-black text-white leading-[0.8] tracking-tighter uppercase font-display relative z-20">
+<span class="block relative group">
+                        SEOUL
+                        <span class="absolute inset-0 text-transparent [-webkit-text-stroke:2px_theme(colors.primary)] translate-x-2 -translate-y-2 mix-blend-screen opacity-0 group-hover:opacity-100 transition-opacity duration-300">SEOUL</span>
+</span>
+<span class="block text-transparent [-webkit-text-stroke:2px_white] hover:text-white transition-colors duration-500">VIBRATIONS</span>
+</h1>
+<p class="text-base md:text-lg text-slate-300 max-w-md font-light leading-relaxed mt-8 tracking-wide">
+                        Experience the electrifying beat of K-Pop. 24/7 non-stop hits, exclusive interviews, and live performances direct from Korea.
+                    </p>
+<div class="flex flex-wrap items-center gap-6 mt-8 pointer-events-auto">
+<a href="{% url 'live' %}" class="group relative flex items-center justify-center h-16 w-16 border border-white hover:bg-white hover:text-black transition-all duration-300 bg-black/50 backdrop-blur-sm">
+<span class="material-symbols-outlined text-4xl ml-1 transition-transform">play_arrow</span>
+</a>
+<a href="{% url 'live' %}" class="flex flex-col hover:opacity-80 transition-opacity">
+<span class="text-[10px] text-primary uppercase tracking-[0.2em] font-bold mb-1">Now Playing</span>
+<span class="text-xl font-bold text-white tracking-tight">Seven - Jung Kook <span class="text-slate-500 text-sm font-normal">feat. Latto</span></span>
+</a>
+</div>
+</div>
+<!-- Right Content: Sharp Featured Card -->
+<div class="hidden md:flex flex-col relative group cursor-pointer w-[300px] aspect-[3/4] overflow-hidden border border-white/20 bg-black mt-12 md:mt-0 z-20 hover:border-primary transition-colors duration-500 hover:-translate-y-2 transform transition-transform">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110 opacity-70 group-hover:opacity-100" data-alt="Portrait of a popular K-pop idol looking stylish" style="background-image: url('{% static 'core/images/featured-card.webp' %}');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+<div class="absolute bottom-0 left-0 right-0 p-8 border-t border-white/10 bg-black/80 backdrop-blur-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+<span class="text-primary text-[10px] font-bold mb-2 inline-block uppercase tracking-[0.2em]">Coming Up</span>
+<h3 class="text-2xl font-black text-white leading-none uppercase tracking-tight">Exclusive<br/>Interview</h3>
+<p class="text-slate-400 text-xs mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">Stray Kids talks about their new world tour.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Ticker -->
+<div class="relative w-full bg-black/60 backdrop-blur-md border-t border-b border-white/10 h-12 flex items-center overflow-hidden z-30">
+<div class="flex whitespace-nowrap animate-ticker">
+<div class="flex items-center gap-12 px-4">
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-primary material-symbols-outlined text-sm">music_note</span> IVE - After LIKE</span>
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-secondary material-symbols-outlined text-sm">trending_up</span> SEVENTEEN - Super</span>
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-primary material-symbols-outlined text-sm">music_note</span> TWICE - Moonlight Sunrise</span>
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-secondary material-symbols-outlined text-sm">mic</span> Live: DJ Soda Remix Set</span>
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-primary material-symbols-outlined text-sm">music_note</span> LE SSERAFIM - Unforgiven</span>
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-secondary material-symbols-outlined text-sm">schedule</span> Up Next: Top 40 Countdown</span>
+<!-- Repeat content for seamless loop effect -->
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-primary material-symbols-outlined text-sm">music_note</span> IVE - After LIKE</span>
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-secondary material-symbols-outlined text-sm">trending_up</span> SEVENTEEN - Super</span>
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-primary material-symbols-outlined text-sm">music_note</span> TWICE - Moonlight Sunrise</span>
+<span class="text-slate-300 text-sm font-medium flex items-center gap-2"><span class="text-secondary material-symbols-outlined text-sm">mic</span> Live: DJ Soda Remix Set</span>
+</div>
+</div>
+</div>
+<!-- Trending Section (Brutalist Grid) -->
+<section class="w-full bg-black py-32 border-b border-white/10">
+<div class="container mx-auto px-6 max-w-[1400px]">
+<div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
+<div>
+<h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">TRENDING <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">NOW</span></h2>
+<p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">The hottest tracks lighting up the charts right now.</p>
+</div>
+<a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase" href="{% url 'charts' %}">
+                    View Full Chart <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px bg-white/10 border border-white/10">
+
+{% for track in trending_tracks %}
+<div class="group relative flex flex-col bg-black overflow-hidden h-full cursor-pointer" onclick="window.location.href='{% url 'charts' %}'">
+<div class="relative aspect-square w-full">
+<img data-itunes-artist="{{ track.artist }}" data-itunes-track="{{ track.title }}" src="{{ track.image }}" alt="{{ track.title }} - {{ track.artist }}" class="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-700 opacity-70 group-hover:opacity-30 group-hover:scale-105">
+<!-- Intense Bold Hover Overlay -->
+<div class="absolute inset-0 bg-primary/90 transition-opacity duration-300 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center mix-blend-multiply"></div>
+<!-- Overlapping Play Icon on Hover -->
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 scale-90 group-hover:scale-100 z-20">
+<span class="material-symbols-outlined text-6xl text-white">play_arrow</span>
+</div>
+<!-- Massive Watermark Numbering -->
+<div class="absolute -bottom-6 -right-4 text-9xl font-black text-white/5 font-display select-none pointer-events-none group-hover:text-white/20 transition-colors duration-500 z-10 leading-none">0{{ track.rank }}</div>
+<div class="absolute top-4 left-4 border border-white/20 px-2 py-0.5 text-[10px] font-mono font-bold text-white bg-black/50 backdrop-blur-sm z-20 uppercase tracking-widest">RANK 0{{ track.rank }}</div>
+</div>
+<div class="p-5 border-t border-white/10 group-hover:bg-primary transition-colors duration-300 z-20 relative">
+<h3 class="text-white font-black text-xl leading-tight truncate uppercase tracking-tight">{{ track.title }}</h3>
+<p class="text-slate-400 text-xs font-mono uppercase tracking-widest mt-2 group-hover:text-black transition-colors">{{ track.artist }}</p>
+</div>
+</div>
+{% endfor %}
+
+</div>
+</div>
+</section>
+<!-- Upcoming Comebacks Calendar -->
+<section class="bg-black py-32 border-t border-white/5">
+<div class="container mx-auto px-6 max-w-[1400px]">
+<div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
+<div>
+<h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">UPCOMING <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">COMEBACKS</span></h2>
+<p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">The official schedule for upcoming K-Pop releases and debuts.</p>
+</div>
+<a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase" href="{% url 'comeback_timeline' %}">
+                    Full Calendar <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="flex flex-col border-t border-white/20">
+
+{% for r in upcoming_comebacks %}
+<div class="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-6 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer" onclick="window.location.href='{% url 'comeback_timeline' %}'">
+<div class="flex items-center gap-6 w-full md:w-auto mb-4 md:mb-0">
+<div class="relative w-24 h-24 overflow-hidden bg-black shrink-0">
+<img class="w-full h-full object-cover grayscale transition-transform duration-700 ease-out group-hover:scale-110" alt="{{ r.artist }} {{ r.title }}" src="{{ r.image }}">
+</div>
+<div class="flex flex-col">
+<span class="inline-block bg-primary text-black text-[10px] font-black px-2 py-0.5 mb-2 uppercase tracking-widest w-max">{{ r.type }}</span>
+<h4 class="text-white font-black text-xl leading-tight uppercase tracking-tight group-hover:text-primary transition-colors truncate max-w-[200px] sm:max-w-xs md:max-w-md">{{ r.title }}</h4>
+<p class="text-slate-400 text-sm font-mono tracking-widest uppercase mt-1">{{ r.artist }}</p>
+</div>
+</div>
+
+<div class="flex flex-col md:items-end w-full md:w-auto">
+<span class="text-slate-400 text-xs font-mono tracking-widest uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">schedule</span> {{ r.date_str }}
+</span>
+<span class="text-white text-lg font-black font-mono tracking-wider mt-1" data-countdown="{{ r.iso_date }}">--d --h --m</span>
+</div>
+</div>
+{% empty %}
+<div class="py-12 text-center opacity-30 border-b border-white/10">
+    <p class="text-sm font-bold uppercase tracking-widest">More comebacks coming soon</p>
+</div>
+{% endfor %}
+
+</div>
+</div>
+</section>
+
+<!-- Latest News Section -->
+<section class="w-full bg-black py-32 border-t border-white/10">
+<div class="container mx-auto px-6 max-w-[1400px]">
+<div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
+<div>
+<h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">LATEST <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">NEWS</span></h2>
+<p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Stay updated with the latest in the K-Pop universe.</p>
+</div>
+<a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase" href="{% url 'news' %}">
+                    Read More News <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+{% for article in news_articles %}
+<div class="group cursor-pointer" onclick="window.location.href='{% url 'news' %}'">
+<div class="relative aspect-video mb-6 overflow-hidden border border-white/10">
+<img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+<span class="absolute top-0 left-0 bg-primary text-black text-[10px] font-black px-3 py-1 uppercase tracking-widest">{{ article.category }}</span>
+</div>
+<div class="space-y-4">
+<span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">{{ article.date }}</span>
+<h3 class="text-white text-2xl font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors">{{ article.title }}</h3>
+<p class="text-slate-400 text-sm leading-relaxed line-clamp-2">{{ article.excerpt }}</p>
+<div class="pt-4 flex items-center gap-2 text-white text-[10px] font-black uppercase tracking-[0.2em] group-hover:gap-4 transition-all">
+                        Read Story <span class="material-symbols-outlined text-sm">east</span>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</section>
+<!-- Newsletter / CTA (Sharp Block) -->
+<section class="border-t border-b border-white/20 bg-primary">
+<div class="container mx-auto px-6 py-24 max-w-5xl flex flex-col md:flex-row items-center justify-between gap-12">
+<div class="w-full md:w-1/2">
+<h2 class="text-5xl md:text-7xl font-black text-black leading-none tracking-tighter uppercase mb-4">NEVER MISS <br/>A BEAT</h2>
+<p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-4">Join the community. Get exclusive access to artist fan-signs, concert ticket giveaways, and weekly chart updates.</p>
+</div>
+<div class="w-full md:w-1/2">
+<form class="flex flex-col w-full gap-4">
+<input class="w-full bg-black border border-black px-6 py-4 text-white placeholder:text-slate-500 focus:outline-none placeholder:font-mono placeholder:uppercase placeholder:text-xs placeholder:tracking-widest rounded-none text-sm" placeholder="Enter your email address" type="email"/>
+<button class="w-full bg-white hover:bg-black hover:text-white text-black font-black px-10 py-5 rounded-none transition-colors uppercase tracking-[0.2em] text-sm border border-black" type="button">
+                            SUBSCRIBE NOW
+                        </button>
+</form>
+</div>
+</div>
+</section>
+</main>
+{% include 'core/footer.html' %}
+<script>
+// ── iTunes Album Art Fetcher ────────────────────────────────────
+async function fetchLiveArtwork() {
+    const images = document.querySelectorAll('img[data-itunes-artist][data-itunes-track]');
+    const requests = {};
+    images.forEach(img => {
+        const key = `${img.dataset.itunesArtist}%%%${img.dataset.itunesTrack}`;
+        if (!requests[key]) requests[key] = [];
+        requests[key].push(img);
+    });
+    for (const [key, targets] of Object.entries(requests)) {
+        const [artist, track] = key.split('%%%');
+        const query = encodeURIComponent(`${artist} ${track}`);
+        try {
+            const resp = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`);
+            const data = await resp.json();
+            if (data.results && data.results.length > 0) {
+                const highResUrl = data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
+                targets.forEach(img => { img.src = highResUrl; });
+            }
+        } catch (e) { console.error(`Artwork fetch failed: ${artist} - ${track}`, e); }
+    }
+}
+// ── Countdown Timers ───────────────────────────────────────────
+function updateCountdowns() {
+    document.querySelectorAll('[data-countdown]').forEach(el => {
+        const target = new Date(el.dataset.countdown).getTime();
+        const now = Date.now();
+        const diff = target - now;
+        if (diff <= 0) {
+            el.textContent = '🎉 RELEASED!';
+            el.classList.add('text-primary');
+            return;
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        el.textContent = `${d}d ${h}h ${m}m`;
+    });
+}
+updateCountdowns();
+setInterval(updateCountdowns, 60000);
+window.addEventListener('load', fetchLiveArtwork);
+// ── Sparkle Particles Canvas ─────────────────────────────────────
+const canvas = document.getElementById('sparkle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+const particleCount = 100;
+const colors = ['#f425c0', '#00f0ff', '#ffffff', '#9B00FF'];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = document.getElementById('hero-section').offsetHeight || window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = Math.random() * 0.5 - 0.25;
+        this.speedY = Math.random() * -0.5 - 0.1; // slow float up
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.life = Math.random() * 100;
+    }
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.life += 1;
+        
+        // boundary wrap
+        if (this.y < 0) this.y = canvas.height;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        const opacity = Math.sin(this.life * 0.05) * 0.5 + 0.5; // twinkle
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = opacity * 0.4; // make it more subtle
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+}
+
+function initParticles() {
+    resizeCanvas();
+    particles = [];
+    for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+    }
+    animateParticles();
+}
+
+function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
+    requestAnimationFrame(animateParticles);
+}
+window.addEventListener('load', initParticles);
+
+</script>
+</body></html>

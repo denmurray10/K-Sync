@@ -1,0 +1,638 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stray Kids Discography &amp; Tour - Neon Variant 3/3</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff003c", // Red neon
+                        "secondary": "#00f0ff", // Cyan neon
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#0a0a0a", // Darker black
+                        "surface-dark": "#121212",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #ff003c, #00f0ff)',
+                        'grid-pattern': "url('data:image/svg+xml,%3Csvg width=\\'40\\' height=\\'40\\' viewBox=\\'0 0 40 40\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cpath d=\\'M0 0h40v40H0V0zm1 1h38v38H1V1z\\' fill=\\'%23222\\' fill-opacity=\\'0.4\\' fill-rule=\\'evenodd\\'/%3E%3C/svg%3E')",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 0, 60, 0.2);
+        }
+        .neon-text-red {
+            text-shadow: 0 0 5px rgba(255, 0, 60, 0.8), 0 0 15px rgba(255, 0, 60, 0.5);
+        }
+        .neon-text-cyan {
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.8), 0 0 15px rgba(0, 240, 255, 0.5);
+        }
+        .neon-box-red {
+             box-shadow: 0 0 10px rgba(255, 0, 60, 0.3), inset 0 0 10px rgba(255, 0, 60, 0.1);
+             border: 1px solid rgba(255, 0, 60, 0.5);
+        }
+        .neon-box-cyan {
+             box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1);
+             border: 1px solid rgba(0, 240, 255, 0.5);
+        }
+        .member-card:hover .member-info {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .glitch-effect::before {
+            content: attr(data-text);
+            position: absolute;
+            left: -2px;
+            text-shadow: 1px 0 #ff003c;
+            top: 0;
+            color: white;
+            overflow: hidden;
+            clip: rect(0, 900px, 0, 0);
+            animation: noise-anim-2 3s infinite linear alternate-reverse;
+        }
+        .glitch-effect::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 2px;
+            text-shadow: -1px 0 #00f0ff;
+            top: 0;
+            color: white;
+            overflow: hidden;
+            clip: rect(0, 900px, 0, 0);
+            animation: noise-anim 2s infinite linear alternate-reverse;
+        }
+        @keyframes noise-anim {
+            0% { clip: rect(12px, 9999px, 86px, 0); }
+            20% { clip: rect(69px, 9999px, 14px, 0); }
+            40% { clip: rect(3px, 9999px, 58px, 0); }
+            60% { clip: rect(44px, 9999px, 7px, 0); }
+            80% { clip: rect(21px, 9999px, 32px, 0); }
+            100% { clip: rect(96px, 9999px, 98px, 0); }
+        }
+        @keyframes noise-anim-2 {
+            0% { clip: rect(82px, 9999px, 12px, 0); }
+            20% { clip: rect(2px, 9999px, 59px, 0); }
+            40% { clip: rect(56px, 9999px, 33px, 0); }
+            60% { clip: rect(18px, 9999px, 92px, 0); }
+            80% { clip: rect(91px, 9999px, 5px, 0); }
+            100% { clip: rect(34px, 9999px, 72px, 0); }
+        }
+        .map-marker {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.33); opacity: 1; }
+            80%, 100% { transform: scale(2); opacity: 0; }
+        }::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff003c; 
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden selection:bg-primary selection:text-white">
+{% include 'core/header.html' %}
+<main class="flex-grow pt-[80px] bg-grid-pattern relative">
+<section class="relative h-[60vh] min-h-[500px] w-full flex items-end justify-start border-b border-white/10 overflow-hidden">
+<div class="absolute inset-0 z-0 bg-cover bg-top" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqlHue5x2ztz5YzE_KcXdAy0TiZx6cTlNz8x076PxJRGQcuSRvWIYKRlS8hWT0iaDlFa-2sxWrs4aOcHsXEnW7HtjZCNIQepH94OKaRa6zNpFJjLLHB3gHiLXQKVwXhiYAnuH60-uUo6zEFbLg43TJIc1JI2ZtPG_PByWnOI0Qe7Vjpx7eCupn0q4HZ_SL5IG8tbwqDORB4hjn4P1hOQOPRzDTYv6M7OTkmYHaTbZu66ge7gtIUUB_bCvUUMum25lLTWWvzJRptz_B'); filter: grayscale(100%) contrast(120%) brightness(60%);"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/80 to-transparent z-10"></div>
+<div class="absolute top-0 right-0 w-1/3 h-full border-l border-white/5 bg-gradient-to-b from-primary/5 to-transparent z-10 hidden lg:block"></div>
+<div class="absolute bottom-20 right-20 z-20 hidden lg:block">
+<span class="block text-[200px] font-black leading-none text-white/5 select-none pointer-events-none">SKZ</span>
+</div>
+<div class="relative z-20 container mx-auto px-6 pb-16 flex flex-col gap-2">
+<div class="flex items-center gap-4 mb-2">
+<span class="px-3 py-1 border border-primary text-primary text-xs font-bold tracking-[0.2em] uppercase neon-box-red">Artist Focus</span>
+<span class="h-[1px] w-20 bg-primary/50"></span>
+</div>
+<h1 class="text-6xl md:text-8xl font-black text-white leading-none tracking-tighter uppercase relative inline-block glitch-effect" data-text="STRAY KIDS">
+                STRAY KIDS
+            </h1>
+<p class="text-xl text-slate-300 max-w-2xl font-light mt-4 border-l-4 border-secondary pl-6">
+                Redefining the global soundscape with self-produced intensity. Explore the members, the discography, and the upcoming world domination.
+            </p>
+<div class="mt-8 flex gap-4">
+<button class="px-8 py-3 bg-white text-black font-black uppercase tracking-wider hover:bg-secondary hover:text-black transition-colors skew-x-[-10deg]">
+                     Latest Album
+                 </button>
+<button class="px-8 py-3 border border-white/30 text-white font-black uppercase tracking-wider hover:border-secondary hover:text-secondary transition-colors skew-x-[-10deg]">
+                     Watch M/V
+                 </button>
+</div>
+</div>
+</section>
+
+{% if upcoming_events %}
+<!-- ── AUTOMATED EVENTS BANNER ──────────────────────────────── -->
+<section class="bg-primary/10 border-y border-primary/20 py-4">
+    <div class="container mx-auto px-6 flex items-center gap-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
+        <span class="flex items-center gap-2 text-primary font-black uppercase tracking-tighter text-sm shrink-0">
+            <span class="material-symbols-outlined text-sm animate-pulse">event</span>
+            Upcoming Events:
+        </span>
+        {% for event in upcoming_events %}
+        <div class="flex items-center gap-3 px-4 py-1 rounded-full bg-black/40 border border-white/5 shrink-0">
+            <span class="text-xs font-bold text-slate-300">{{ event.date }}</span>
+            <span class="h-1 w-1 rounded-full bg-primary"></span>
+            <span class="text-xs font-black text-white uppercase tracking-wider">{{ event.title }}</span>
+            {% if event.is_today %}
+            <span class="px-2 py-0.5 bg-primary text-white text-[8px] font-black rounded animate-bounce">TODAY</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ── STATS BANNER ─────────────────────────────────────────── -->
+<section class="border-y border-white/5 bg-[#0d0d0d] py-6">
+<div class="container mx-auto px-6">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="text-4xl font-black text-primary neon-text-red">2018</span>
+<span class="text-slate-500 text-xs uppercase tracking-widest">Debut Year</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-4xl font-black text-secondary neon-text-cyan">15+</span>
+<span class="text-slate-500 text-xs uppercase tracking-widest">Studio Albums</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-4xl font-black text-primary neon-text-red">2.4M</span>
+<span class="text-slate-500 text-xs uppercase tracking-widest">Concert Audience</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-4xl font-black text-secondary neon-text-cyan">STAY</span>
+<span class="text-slate-500 text-xs uppercase tracking-widest">Official Fandom</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ── MEMBER PROFILES ───────────────────────────────────────── -->
+<section class="container mx-auto px-6 py-20 relative">
+<div class="flex justify-between items-end mb-8 border-b border-white/10 pb-6">
+<div>
+<h2 class="text-4xl font-black text-white mb-2 uppercase flex items-center gap-3">
+<span class="w-3 h-12 bg-primary neon-box-red block"></span>
+  Meet The Members
+</h2>
+<p class="text-slate-400 font-mono text-sm tracking-wider">All 8 members — hover to reveal stats.</p>
+</div>
+<div class="flex gap-2">
+<button id="members-prev" class="w-10 h-10 border border-white/20 flex items-center justify-center text-white hover:bg-primary hover:border-primary transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
+<button id="members-next" class="w-10 h-10 border border-white/20 flex items-center justify-center text-white hover:bg-primary hover:border-primary transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+<div id="members-scroll" class="flex gap-5 overflow-x-auto pb-4 scroll-smooth" style="scrollbar-width:thin; scrollbar-color:#ff003c #111;">
+<!-- 01 Bang Chan -->
+<div class="group member-card relative flex-shrink-0 w-64 aspect-[3/4] cursor-pointer overflow-hidden border border-white/10 hover:border-secondary transition-all duration-500 neon-box-cyan bg-surface-dark">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale" style="background-image: url('{% static 'core/images/skz_ai/bang_chan.jpg' %}');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute top-0 left-0 p-4 w-full flex justify-between items-start z-10">
+    <span class="font-mono text-xs text-secondary border border-secondary px-2 py-1 bg-black/50">LDR</span>
+    <span class="text-4xl font-black text-white/10 group-hover:text-secondary/20 transition-colors">01</span>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6 z-20 transition-all duration-300 group-hover:bottom-1/3"><h3 class="text-3xl font-black text-white uppercase italic tracking-tighter group-hover:text-secondary transition-colors neon-text-cyan">Bang Chan</h3><p class="text-slate-400 text-xs uppercase tracking-[0.2em] mt-1">Leader / Producer</p></div>
+<div class="member-info absolute bottom-0 left-0 w-full h-1/3 bg-black/90 backdrop-blur-md border-t border-secondary/30 p-4 translate-y-full opacity-0 transition-all duration-300 flex flex-col justify-between z-30">
+<div class="space-y-1"><div class="flex justify-between text-sm border-b border-white/10 pb-1"><span class="text-slate-400">Unit</span><span class="text-white font-mono text-xs">3RACHA</span></div></div>
+<div class="mt-1"><div class="flex gap-2 flex-wrap"><span class="bg-secondary/10 text-secondary text-xs px-2 py-0.5 rounded-sm">Production</span><span class="bg-secondary/10 text-secondary text-xs px-2 py-0.5 rounded-sm">Vocals</span></div></div>
+</div></div>
+<!-- 02 Lee Know -->
+<div class="group member-card relative flex-shrink-0 w-64 aspect-[3/4] cursor-pointer overflow-hidden border border-white/10 hover:border-primary transition-all duration-500 neon-box-red bg-surface-dark">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale" style="background-image: url('{% static 'core/images/skz_ai/lee_know.jpg' %}');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute top-0 left-0 p-4 w-full flex justify-between items-start z-10">
+    <span class="font-mono text-xs text-primary border border-primary px-2 py-1 bg-black/50">DNC</span>
+    <span class="text-4xl font-black text-white/10 group-hover:text-primary/20 transition-colors">02</span>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6 z-20 transition-all duration-300 group-hover:bottom-1/3"><h3 class="text-3xl font-black text-white uppercase italic tracking-tighter group-hover:text-primary transition-colors neon-text-red">Lee Know</h3><p class="text-slate-400 text-xs uppercase tracking-[0.2em] mt-1">Dancer / Vocalist</p></div>
+<div class="member-info absolute bottom-0 left-0 w-full h-1/3 bg-black/90 backdrop-blur-md border-t border-primary/30 p-4 translate-y-full opacity-0 transition-all duration-300 flex flex-col justify-between z-30">
+<div class="space-y-1"><div class="flex justify-between text-sm border-b border-white/10 pb-1"><span class="text-slate-400">Unit</span><span class="text-white font-mono text-xs">DANCE RACHA</span></div></div>
+<div class="mt-1"><div class="flex gap-2 flex-wrap"><span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-sm">Visuals</span><span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-sm">Cats</span></div></div>
+</div></div>
+<!-- 03 Changbin -->
+<div class="group member-card relative flex-shrink-0 w-64 aspect-[3/4] cursor-pointer overflow-hidden border border-white/10 hover:border-secondary transition-all duration-500 neon-box-cyan bg-surface-dark">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale" style="background-image: url('{% static 'core/images/skz_ai/changbin.jpg' %}');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute top-0 left-0 p-4 w-full flex justify-between items-start z-10"><span class="font-mono text-xs text-secondary border border-secondary px-2 py-1 bg-black/50">RAP</span><span class="text-4xl font-black text-white/10 group-hover:text-secondary/20 transition-colors">03</span></div>
+<div class="absolute bottom-0 left-0 w-full p-6 z-20 transition-all duration-300 group-hover:bottom-1/3"><h3 class="text-3xl font-black text-white uppercase italic tracking-tighter group-hover:text-secondary transition-colors neon-text-cyan">Changbin</h3><p class="text-slate-400 text-xs uppercase tracking-[0.2em] mt-1">Rapper / Producer</p></div>
+<div class="member-info absolute bottom-0 left-0 w-full h-1/3 bg-black/90 backdrop-blur-md border-t border-secondary/30 p-4 translate-y-full opacity-0 transition-all duration-300 flex flex-col justify-between z-30">
+<div class="space-y-1"><div class="flex justify-between text-sm border-b border-white/10 pb-1"><span class="text-slate-400">Unit</span><span class="text-white font-mono text-xs">3RACHA</span></div></div>
+<div class="mt-1"><div class="flex gap-2 flex-wrap"><span class="bg-secondary/10 text-secondary text-xs px-2 py-0.5 rounded-sm">Speed</span><span class="bg-secondary/10 text-secondary text-xs px-2 py-0.5 rounded-sm">Power</span></div></div>
+</div></div>
+<!-- 04 Hyunjin -->
+<div class="group member-card relative flex-shrink-0 w-64 aspect-[3/4] cursor-pointer overflow-hidden border border-white/10 hover:border-primary transition-all duration-500 neon-box-red bg-surface-dark">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale" style="background-image: url('{% static 'core/images/skz_ai/hyunjin.jpg' %}');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute top-0 left-0 p-4 w-full flex justify-between items-start z-10">
+    <span class="font-mono text-xs text-primary border border-primary px-2 py-1 bg-black/50">ART</span>
+    <span class="text-4xl font-black text-white/10 group-hover:text-primary/20 transition-colors">04</span>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6 z-20 transition-all duration-300 group-hover:bottom-1/3"><h3 class="text-3xl font-black text-white uppercase italic tracking-tighter group-hover:text-primary transition-colors neon-text-red">Hyunjin</h3><p class="text-slate-400 text-xs uppercase tracking-[0.2em] mt-1">Dancer / Rapper</p></div>
+<div class="member-info absolute bottom-0 left-0 w-full h-1/3 bg-black/90 backdrop-blur-md border-t border-primary/30 p-4 translate-y-full opacity-0 transition-all duration-300 flex flex-col justify-between z-30">
+<div class="space-y-1"><div class="flex justify-between text-sm border-b border-white/10 pb-1"><span class="text-slate-400">Unit</span><span class="text-white font-mono text-xs">DANCE RACHA</span></div></div>
+<div class="mt-1"><div class="flex gap-2 flex-wrap"><span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-sm">Performance</span><span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-sm">Art</span></div></div>
+</div></div>
+<!-- 05 Han -->
+<div class="group member-card relative flex-shrink-0 w-64 aspect-[3/4] cursor-pointer overflow-hidden border border-white/10 hover:border-secondary transition-all duration-500 neon-box-cyan bg-surface-dark">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale" style="background-image: url('{% static 'core/images/skz_ai/han.jpg' %}'); filter: sepia(0.3) hue-rotate(200deg);"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute top-0 left-0 p-4 w-full flex justify-between items-start z-10"><span class="font-mono text-xs text-secondary border border-secondary px-2 py-1 bg-black/50">VOC</span><span class="text-4xl font-black text-white/10 group-hover:text-secondary/20 transition-colors">05</span></div>
+<div class="absolute bottom-0 left-0 w-full p-6 z-20 transition-all duration-300 group-hover:bottom-1/3"><h3 class="text-3xl font-black text-white uppercase italic tracking-tighter group-hover:text-secondary transition-colors neon-text-cyan">Han</h3><p class="text-slate-400 text-xs uppercase tracking-[0.2em] mt-1">Rapper / Vocalist</p></div>
+<div class="member-info absolute bottom-0 left-0 w-full h-1/3 bg-black/90 backdrop-blur-md border-t border-secondary/30 p-4 translate-y-full opacity-0 transition-all duration-300 flex flex-col justify-between z-30">
+<div class="space-y-1"><div class="flex justify-between text-sm border-b border-white/10 pb-1"><span class="text-slate-400">Unit</span><span class="text-white font-mono text-xs">3RACHA</span></div></div>
+<div class="mt-1"><div class="flex gap-2 flex-wrap"><span class="bg-secondary/10 text-secondary text-xs px-2 py-0.5 rounded-sm">Songwriting</span><span class="bg-secondary/10 text-secondary text-xs px-2 py-0.5 rounded-sm">Emotion</span></div></div>
+</div></div>
+<!-- 06 Felix -->
+<div class="group member-card relative flex-shrink-0 w-64 aspect-[3/4] cursor-pointer overflow-hidden border border-white/10 hover:border-primary transition-all duration-500 neon-box-red bg-surface-dark">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale" style="background-image: url('{% static 'core/images/skz_ai/felix.jpg' %}'); filter: hue-rotate(30deg) brightness(0.85);"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute top-0 left-0 p-4 w-full flex justify-between items-start z-10"><span class="font-mono text-xs text-primary border border-primary px-2 py-1 bg-black/50">DNC</span><span class="text-4xl font-black text-white/10 group-hover:text-primary/20 transition-colors">06</span></div>
+<div class="absolute bottom-0 left-0 w-full p-6 z-20 transition-all duration-300 group-hover:bottom-1/3"><h3 class="text-3xl font-black text-white uppercase italic tracking-tighter group-hover:text-primary transition-colors neon-text-red">Felix</h3><p class="text-slate-400 text-xs uppercase tracking-[0.2em] mt-1">Dancer / Vocalist</p></div>
+<div class="member-info absolute bottom-0 left-0 w-full h-1/3 bg-black/90 backdrop-blur-md border-t border-primary/30 p-4 translate-y-full opacity-0 transition-all duration-300 flex flex-col justify-between z-30">
+<div class="space-y-1"><div class="flex justify-between text-sm border-b border-white/10 pb-1"><span class="text-slate-400">Unit</span><span class="text-white font-mono text-xs">DANCE RACHA</span></div></div>
+<div class="mt-1"><div class="flex gap-2 flex-wrap"><span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-sm">Freckles</span><span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-sm">Deep Voice</span></div></div>
+</div></div>
+<!-- 07 Seungmin -->
+<div class="group member-card relative flex-shrink-0 w-64 aspect-[3/4] cursor-pointer overflow-hidden border border-white/10 hover:border-secondary transition-all duration-500 neon-box-cyan bg-surface-dark">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale" style="background-image: url('{% static 'core/images/skz_ai/seungmin.jpg' %}'); filter: hue-rotate(90deg) brightness(0.8);"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute top-0 left-0 p-4 w-full flex justify-between items-start z-10"><span class="font-mono text-xs text-secondary border border-secondary px-2 py-1 bg-black/50">VOC</span><span class="text-4xl font-black text-white/10 group-hover:text-secondary/20 transition-colors">07</span></div>
+<div class="absolute bottom-0 left-0 w-full p-6 z-20 transition-all duration-300 group-hover:bottom-1/3"><h3 class="text-3xl font-black text-white uppercase italic tracking-tighter group-hover:text-secondary transition-colors neon-text-cyan">Seungmin</h3><p class="text-slate-400 text-xs uppercase tracking-[0.2em] mt-1">Vocalist</p></div>
+<div class="member-info absolute bottom-0 left-0 w-full h-1/3 bg-black/90 backdrop-blur-md border-t border-secondary/30 p-4 translate-y-full opacity-0 transition-all duration-300 flex flex-col justify-between z-30">
+<div class="space-y-1"><div class="flex justify-between text-sm border-b border-white/10 pb-1"><span class="text-slate-400">Unit</span><span class="text-white font-mono text-xs">VOCAL RACHA</span></div></div>
+<div class="mt-1"><div class="flex gap-2 flex-wrap"><span class="bg-secondary/10 text-secondary text-xs px-2 py-0.5 rounded-sm">Baseball</span><span class="bg-secondary/10 text-secondary text-xs px-2 py-0.5 rounded-sm">Vocals</span></div></div>
+</div></div>
+<!-- 08 I.N -->
+<div class="group member-card relative flex-shrink-0 w-64 aspect-[3/4] cursor-pointer overflow-hidden border border-white/10 hover:border-primary transition-all duration-500 neon-box-red bg-surface-dark">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale" style="background-image: url('{% static 'core/images/skz_ai/in.jpg' %}'); filter: hue-rotate(280deg) brightness(0.8);"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute top-0 left-0 p-4 w-full flex justify-between items-start z-10"><span class="font-mono text-xs text-primary border border-primary px-2 py-1 bg-black/50">MNE</span><span class="text-4xl font-black text-white/10 group-hover:text-primary/20 transition-colors">08</span></div>
+<div class="absolute bottom-0 left-0 w-full p-6 z-20 transition-all duration-300 group-hover:bottom-1/3"><h3 class="text-3xl font-black text-white uppercase italic tracking-tighter group-hover:text-primary transition-colors neon-text-red">I.N</h3><p class="text-slate-400 text-xs uppercase tracking-[0.2em] mt-1">Maknae / Vocalist</p></div>
+<div class="member-info absolute bottom-0 left-0 w-full h-1/3 bg-black/90 backdrop-blur-md border-t border-primary/30 p-4 translate-y-full opacity-0 transition-all duration-300 flex flex-col justify-between z-30">
+<div class="space-y-1"><div class="flex justify-between text-sm border-b border-white/10 pb-1"><span class="text-slate-400">Unit</span><span class="text-white font-mono text-xs">VOCAL RACHA</span></div></div>
+<div class="mt-1"><div class="flex gap-2 flex-wrap"><span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-sm">Maknae</span><span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-sm">Dancing</span></div></div>
+</div></div>
+</div><!-- /members-scroll -->
+</section>
+<section class="border-t border-white/10 bg-[#050505]">
+<div class="container mx-auto px-6 py-20">
+<div class="flex flex-col md:flex-row gap-12 items-start">
+<div class="w-full md:w-1/3 flex flex-col gap-8">
+<div>
+<span class="text-secondary font-mono text-sm tracking-wider mb-2 block uppercase animate-pulse">Live Tracker Online</span>
+<h2 class="text-5xl font-black text-white leading-tight">WORLD TOUR <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary neon-text-cyan">DOMINATE</span></h2>
+<p class="text-slate-400 mt-4 leading-relaxed">
+                            Track the global movement. Upcoming dates, ticket availability, and venue details updated in real-time for Stay members.
+                        </p>
+</div>
+<div class="space-y-4">
+<div class="group bg-surface-dark border border-white/10 p-4 hover:border-primary transition-colors cursor-pointer flex justify-between items-center">
+<div>
+<div class="text-primary font-bold text-xs uppercase tracking-wider mb-1">Next Stop</div>
+<h4 class="text-xl font-bold text-white group-hover:text-primary transition-colors">Seoul, KR</h4>
+<p class="text-slate-500 text-sm">KSPO Dome</p>
+</div>
+<div class="text-right">
+<span class="block text-white font-mono text-lg">AUG 24</span>
+<span class="inline-block px-2 py-0.5 bg-red-500/20 text-red-500 text-[10px] font-bold rounded">SOLD OUT</span>
+</div>
+</div>
+<div class="group bg-surface-dark border border-white/10 p-4 hover:border-secondary transition-colors cursor-pointer flex justify-between items-center">
+<div>
+<div class="text-secondary font-bold text-xs uppercase tracking-wider mb-1">Upcoming</div>
+<h4 class="text-xl font-bold text-white group-hover:text-secondary transition-colors">Osaka, JP</h4>
+<p class="text-slate-500 text-sm">Kyocera Dome</p>
+</div>
+<div class="text-right">
+<span class="block text-white font-mono text-lg">SEP 09</span>
+<span class="inline-block px-2 py-0.5 bg-green-500/20 text-green-500 text-[10px] font-bold rounded">AVAILABLE</span>
+</div>
+</div>
+<div class="group bg-surface-dark border border-white/10 p-4 hover:border-secondary transition-colors cursor-pointer flex justify-between items-center">
+<div>
+<div class="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Upcoming</div>
+<h4 class="text-xl font-bold text-white group-hover:text-secondary transition-colors">Tokyo, JP</h4>
+<p class="text-slate-500 text-sm">Tokyo Dome</p>
+</div>
+<div class="text-right">
+<span class="block text-white font-mono text-lg">OCT 28</span>
+<span class="inline-block px-2 py-0.5 bg-green-500/20 text-green-500 text-[10px] font-bold rounded">AVAILABLE</span>
+</div>
+</div>
+</div>
+<button class="w-full py-4 border border-white/20 text-white uppercase font-bold hover:bg-white hover:text-black transition-colors tracking-widest text-sm">
+                        View Full Schedule
+                    </button>
+</div>
+<div class="w-full md:w-2/3 h-[500px] relative bg-[#111] rounded-xl overflow-hidden border border-white/10 shadow-2xl neon-box-cyan">
+<div class="absolute inset-0 opacity-30" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 2000 1000\'%3E%3Cpath fill=\'%23333\' d=\'M150,300 Q200,250 250,300 T350,300 T450,250 T550,350 T650,300 T750,350 T850,250 T950,300 T1050,300 T1150,250 T1250,350 T1350,300 T1450,350 T1550,250 T1650,300 T1750,300 T1850,250\' stroke=\'%23444\' stroke-width=\'2\' fill-opacity=\'0.2\'/%3E%3C/svg%3E'); background-size: cover;"></div>
+<div class="absolute inset-0" style="background-image: linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px); background-size: 40px 40px;"></div>
+<div class="absolute top-[35%] left-[78%] group cursor-pointer">
+<div class="relative flex items-center justify-center">
+<span class="map-marker absolute h-4 w-4 rounded-full bg-primary opacity-75"></span>
+<span class="relative h-3 w-3 rounded-full bg-primary shadow-[0_0_15px_#ff003c]"></span>
+</div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded border border-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            SEOUL: LIVE NOW
+                        </div>
+</div>
+<div class="absolute top-[38%] left-[81%] group cursor-pointer">
+<div class="relative flex items-center justify-center">
+<span class="absolute h-2 w-2 rounded-full bg-secondary opacity-75 animate-ping"></span>
+<span class="relative h-2 w-2 rounded-full bg-secondary shadow-[0_0_10px_#00f0ff]"></span>
+</div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded border border-secondary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            OSAKA: SEP 09
+                        </div>
+</div>
+<div class="absolute top-[36%] left-[83%] group cursor-pointer">
+<div class="relative flex items-center justify-center">
+<span class="relative h-2 w-2 rounded-full bg-slate-500"></span>
+</div>
+</div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none">
+<path d="M780,175 L810,190 L830,180" fill="none" opacity="0.6" stroke="#ff003c" stroke-dasharray="4" stroke-width="1">
+<animate attributeName="stroke-dashoffset" dur="2s" from="100" repeatCount="indefinite" to="0"></animate>
+</path>
+</svg>
+<div class="absolute bottom-6 right-6 bg-black/80 backdrop-blur border border-white/10 p-4 rounded max-w-xs">
+<h5 class="text-white text-sm font-bold mb-2">Tour Stats</h5>
+<div class="flex justify-between text-xs text-slate-400 mb-1">
+<span>Distance Traveled</span>
+<span class="text-secondary font-mono">12,403 km</span>
+</div>
+<div class="flex justify-between text-xs text-slate-400">
+<span>Total Audience</span>
+<span class="text-primary font-mono">2.4M</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+    <section class="py-20 bg-background-dark relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+        <div class="container mx-auto px-6">
+            <h2 class="text-center text-5xl font-black text-white mb-12 uppercase tracking-widest glitch-effect" data-text="TOP 10 SONGS">TOP 10 SONGS</h2>
+            
+<div class="grid grid-cols-2 md:grid-cols-5 gap-8">
+
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="God's Menu" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="God's Menu">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">God's Menu</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="S-Class" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="S-Class">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">S-Class</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="Maniac" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="Maniac">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">Maniac</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="Thunderous" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="Thunderous">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">Thunderous</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="Back Door" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="Back Door">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">Back Door</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="Case 143" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="Case 143">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">Case 143</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="LALALALA" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="LALALALA">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">LALALALA</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="MIROH" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="MIROH">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">MIROH</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="Chk Chk Boom" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="Chk Chk Boom">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">Chk Chk Boom</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    
+    <div class="group relative aspect-square perspective-1000">
+        <div class="w-full h-full relative transform transition-transform duration-500 group-hover:scale-105 shadow-2xl rounded-2xl overflow-hidden border border-white/10 neon-box-red">
+            <img data-itunes-artist="Stray Kids" data-itunes-track="VENOM" src="{% static 'core/images/idol_skz_placeholder.webp' %}" onerror="this.src='{% static 'core/images/trending-4.webp' %}'" class="w-full h-full object-cover" alt="VENOM">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100">play_circle</span>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <h4 class="text-white font-bold uppercase text-sm truncate">VENOM</h4>
+            <p class="text-slate-500 text-xs truncate">Stray Kids</p>
+        </div>
+    </div>
+    </div>
+        </div>
+    </section>
+    
+</main>
+<footer class="bg-[#181116] border-t border-white/5 pt-16 pb-8">
+<div class="container mx-auto px-6">
+<div class="flex flex-col md:flex-row justify-between items-start gap-12">
+<div class="max-w-xs">
+<div class="flex items-center gap-2 mb-4">
+    <img src="{% static 'core/images/logo.png' %}" alt="K-Sync Logo" class="h-10 w-auto opacity-80 hover:opacity-100 transition-opacity">
+</div>
+<p class="text-slate-500 text-sm leading-relaxed">
+                        Your #1 source for K-Pop music, news, and culture. Streaming live from the heart of Seoul to the world.
+                    </p>
+</div>
+<div class="flex flex-wrap gap-12 sm:gap-24">
+<div>
+<h4 class="text-white font-bold mb-4">Station</h4>
+<ul class="flex flex-col gap-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="{% url 'about_us' %}">About Us</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Presenters</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'schedule' %}">Schedule</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'promo' %}">Mobile App</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">Community</h4>
+<ul class="flex flex-col gap-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="#">Request Song</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Fan Club</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Contests</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'shop' %}">Merch Shop</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">Follow Us</h4>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">public</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">videocam</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">music_note</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
+<p>© 2026 K-Pop Pulse Radio. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-slate-400" href="#">Privacy Policy</a>
+<a class="hover:text-slate-400" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+
+
+<script>
+// ── Member scroll controls ──────────────────────────────────────
+const scrollEl = document.getElementById('members-scroll');
+document.getElementById('members-next').addEventListener('click', () => {
+    scrollEl.scrollBy({ left: 280, behavior: 'smooth' });
+});
+document.getElementById('members-prev').addEventListener('click', () => {
+    scrollEl.scrollBy({ left: -280, behavior: 'smooth' });
+});
+
+// ── iTunes Album Art Fetcher ────────────────────────────────────
+async function fetchLiveArtwork() {
+    const images = document.querySelectorAll('img[data-itunes-artist][data-itunes-track]');
+    const requests = {};
+    images.forEach(img => {
+        const key = `${img.dataset.itunesArtist}%%%${img.dataset.itunesTrack}`;
+        if (!requests[key]) requests[key] = [];
+        requests[key].push(img);
+    });
+
+    for (const [key, targets] of Object.entries(requests)) {
+        const [artist, track] = key.split('%%%');
+        const query = encodeURIComponent(`${artist} ${track}`);
+        try {
+            const resp = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`);
+            const data = await resp.json();
+            if (data.results && data.results.length > 0) {
+                const highResUrl = data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
+                targets.forEach(img => {
+                    img.src = highResUrl;
+                });
+            }
+        } catch (e) {
+            console.error(`Failed to fetch artwork for ${artist} - ${track}`, e);
+        }
+    }
+}
+window.addEventListener('load', fetchLiveArtwork);
+</script>
+</body>
+</html>

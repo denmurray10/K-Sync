@@ -1,0 +1,297 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>K-Pop Pulse Mission &amp; Team</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#22101e",
+                        "secondary": "#00f0ff", // Cyan accent for neon theme
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(34, 16, 30, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(244, 37, 192, 0.2);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        .neon-border {
+             box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+        .neon-box-shadow {
+            box-shadow: 0 0 15px rgba(244, 37, 192, 0.3);
+        }@keyframes map-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+        .map-dot {
+            animation: map-pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+{% include 'core/header.html' %}
+<main class="flex-grow pt-[80px]">
+<section class="relative h-[60vh] min-h-[500px] w-full overflow-hidden flex items-center justify-center">
+<div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat" style="background-image: url('{% static 'core/images/about_banner.webp' %}');"></div>
+<div class="absolute inset-0 z-10 bg-gradient-to-t from-background-dark via-background-dark/70 to-transparent"></div>
+<div class="absolute inset-0 z-10 bg-black/30"></div>
+<div class="relative z-20 container mx-auto px-6 flex flex-col items-center justify-center text-center h-full pb-10 pt-10">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-secondary/50 text-secondary bg-secondary/10 backdrop-blur-md mb-6">
+<span class="material-symbols-outlined text-sm">radio</span>
+<span class="text-xs font-bold tracking-widest uppercase">Since 2018</span>
+</div>
+<h1 class="text-6xl md:text-8xl font-black text-white leading-none tracking-tight drop-shadow-2xl mb-6">
+                THE PULSE OF <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary neon-text">K-POP</span>
+</h1>
+<p class="text-lg md:text-xl text-slate-200 max-w-2xl font-light leading-relaxed mx-auto">
+                Connecting the world to the heartbeat of Seoul. We are the premier global station for K-Pop culture, music, and exclusive idol content.
+            </p>
+</div>
+</section>
+<section class="container mx-auto px-6 py-16 -mt-20 relative z-30">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="glass-card rounded-3xl p-10 relative overflow-hidden group hover:border-primary/50 transition-colors duration-500">
+<div class="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-9xl text-primary">campaign</span>
+</div>
+<h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
+<span class="w-2 h-8 bg-primary rounded-full"></span>
+                    Our Mission
+                </h2>
+<p class="text-slate-300 leading-relaxed text-lg mb-6">
+                    To transcend borders and language barriers through the universal language of music. K-Pop Pulse is dedicated to bringing the authentic Seoul experience to fans worldwide, curating not just the hits, but the stories behind the idols.
+                </p>
+<div class="flex gap-4 mt-8">
+<div class="flex flex-col">
+<span class="text-3xl font-black text-secondary">24/7</span>
+<span class="text-xs text-slate-400 uppercase tracking-wider">Live Streaming</span>
+</div>
+<div class="w-px bg-white/10 mx-2"></div>
+<div class="flex flex-col">
+<span class="text-3xl font-black text-secondary">150+</span>
+<span class="text-xs text-slate-400 uppercase tracking-wider">Countries</span>
+</div>
+<div class="w-px bg-white/10 mx-2"></div>
+<div class="flex flex-col">
+<span class="text-3xl font-black text-secondary">5M+</span>
+<span class="text-xs text-slate-400 uppercase tracking-wider">Listeners</span>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-3xl p-10 relative overflow-hidden group hover:border-secondary/50 transition-colors duration-500">
+<div class="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-9xl text-secondary">history_edu</span>
+</div>
+<h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
+<span class="w-2 h-8 bg-secondary rounded-full"></span>
+                    Our History
+                </h2>
+<p class="text-slate-300 leading-relaxed text-lg mb-6">
+                    Founded in a small studio in Hongdae, K-Pop Pulse began as a passion project by three DJs obsessed with the Hallyu wave. Today, we broadcast from a state-of-the-art studio in Gangnam, partnering with major entertainment labels to bring exclusive interviews and comeback showcases.
+                </p>
+<a class="inline-flex items-center text-primary font-bold hover:text-white transition-colors mt-4" href="#">
+                    Read Full Story <span class="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<section class="relative py-20 bg-background-dark overflow-hidden">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background-dark to-background-dark z-0 pointer-events-none"></div>
+<div class="container mx-auto px-6 relative z-10">
+<div class="text-center mb-16">
+<span class="text-secondary font-bold tracking-widest text-sm uppercase mb-2 block">Worldwide Connection</span>
+<h2 class="text-4xl md:text-5xl font-black text-white">LISTENING <span class="text-primary">GLOBALLY</span></h2>
+</div>
+<div class="relative w-full aspect-[16/9] max-w-5xl mx-auto rounded-2xl bg-black/40 border border-white/5 shadow-2xl overflow-hidden backdrop-blur-sm">
+<div class="absolute inset-0 bg-cover bg-center opacity-40" style="background-image: url('{% static 'core/images/vinyl_lp.webp' %}'); filter: grayscale(100%) contrast(150%);"></div>
+<div class="absolute inset-0 bg-[#22101e]/60 mix-blend-color"></div>
+<div class="absolute top-[38%] left-[82%] group cursor-pointer">
+<div class="w-4 h-4 bg-primary rounded-full map-dot relative z-10"></div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded border border-primary/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                        HQ: Seoul, KR
+                    </div>
+</div>
+<div class="absolute top-[36%] left-[18%] group cursor-pointer">
+<div class="w-3 h-3 bg-secondary rounded-full map-dot relative z-10" style="animation-delay: 0.5s;"></div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded border border-secondary/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                        Los Angeles, USA
+                    </div>
+</div>
+<div class="absolute top-[28%] left-[49%] group cursor-pointer">
+<div class="w-3 h-3 bg-secondary rounded-full map-dot relative z-10" style="animation-delay: 1s;"></div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded border border-secondary/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                        London, UK
+                    </div>
+</div>
+<div class="absolute top-[38%] left-[85%] group cursor-pointer">
+<div class="w-3 h-3 bg-secondary rounded-full map-dot relative z-10" style="animation-delay: 1.5s;"></div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded border border-secondary/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                        Tokyo, JP
+                    </div>
+</div>
+<div class="absolute top-[75%] left-[88%] group cursor-pointer">
+<div class="w-3 h-3 bg-secondary rounded-full map-dot relative z-10" style="animation-delay: 0.2s;"></div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded border border-secondary/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                        Sydney, AU
+                    </div>
+</div>
+<div class="absolute top-[70%] left-[32%] group cursor-pointer">
+<div class="w-3 h-3 bg-secondary rounded-full map-dot relative z-10" style="animation-delay: 0.8s;"></div>
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded border border-secondary/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                        Sao Paulo, BR
+                    </div>
+</div>
+<div class="absolute bottom-6 right-6 text-right">
+<div class="text-4xl font-black text-white">LIVE</div>
+<div class="text-secondary font-bold tracking-widest text-sm">BROADCASTING</div>
+</div>
+</div>
+</div>
+</section>
+<section class="container mx-auto px-6 py-20">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+<div>
+<h2 class="text-4xl font-black text-white mb-2">MEET THE <span class="text-primary neon-text">TEAM</span></h2>
+<p class="text-slate-400 max-w-lg">The voices that keep the vibe alive. Our DJs and presenters are experts in K-Pop culture.</p>
+</div>
+<a href="{% url 'schedule' %}" class="px-6 py-3 border border-white/20 hover:border-primary text-white hover:text-primary rounded-full transition-all font-bold text-sm">
+                View Schedule
+            </a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="group relative">
+<div class="relative overflow-hidden rounded-2xl aspect-[3/4] border-2 border-transparent group-hover:border-secondary transition-all duration-300 neon-box-shadow">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('{% static 'core/images/tote_wendy.webp' %}');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+<span class="text-secondary text-xs font-bold tracking-widest uppercase mb-1 block">Main Host</span>
+<h3 class="text-2xl font-bold text-white mb-1">DJ Wendy</h3>
+<p class="text-slate-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">"Bringing you the sweetest tunes every evening."</p>
+</div>
+</div>
+</div>
+<div class="group relative">
+<div class="relative overflow-hidden rounded-2xl aspect-[3/4] border-2 border-transparent group-hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_rgba(244,37,192,0.5)]">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('{% static 'core/images/dj_minhyuk.webp' %}');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+<span class="text-primary text-xs font-bold tracking-widest uppercase mb-1 block">Evening Mix</span>
+<h3 class="text-2xl font-bold text-white mb-1">DJ Minhyuk</h3>
+<p class="text-slate-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">"Energy, beats, and the best guest interviews."</p>
+</div>
+</div>
+</div>
+<div class="group relative">
+<div class="relative overflow-hidden rounded-2xl aspect-[3/4] border-2 border-transparent group-hover:border-secondary transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('{% static 'core/images/cap_heize.webp' %}');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+<span class="text-secondary text-xs font-bold tracking-widest uppercase mb-1 block">Late Night</span>
+<h3 class="text-2xl font-bold text-white mb-1">Heize</h3>
+<p class="text-slate-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">"Relax with soulful R&amp;B and chill vibes."</p>
+</div>
+</div>
+</div>
+<div class="group relative">
+<div class="relative overflow-hidden rounded-2xl aspect-[3/4] border-2 border-transparent group-hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_rgba(244,37,192,0.5)]">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('{% static 'core/images/dj_cultwo.webp' %}');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+<div class="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+<span class="text-primary text-xs font-bold tracking-widest uppercase mb-1 block">Variety Hour</span>
+<h3 class="text-2xl font-bold text-white mb-1">The Cultwo</h3>
+<p class="text-slate-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">"Comedy, chaos, and K-pop charts."</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-[#181116] border-t border-white/5 pt-16 pb-8">
+<div class="container mx-auto px-6">
+<div class="flex flex-col md:flex-row justify-between items-start gap-12">
+<div class="max-w-xs">
+<div class="flex items-center gap-2 mb-4">
+    <img src="{% static 'core/images/logo.png' %}" alt="K-Sync Logo" class="h-10 w-auto opacity-80 hover:opacity-100 transition-opacity">
+</div>
+<p class="text-slate-500 text-sm leading-relaxed">
+                    Your #1 source for K-Pop music, news, and culture. Streaming live from the heart of Seoul to the world.
+                </p>
+</div>
+<div class="flex flex-wrap gap-12 sm:gap-24">
+<div>
+<h4 class="text-white font-bold mb-4">Station</h4>
+<ul class="flex flex-col gap-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="{% url 'about_us' %}">About Us</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Presenters</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'schedule' %}">Schedule</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'promo' %}">Mobile App</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">Community</h4>
+<ul class="flex flex-col gap-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="#">Request Song</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Fan Club</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Contests</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'shop' %}">Merch Shop</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">Follow Us</h4>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">public</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">videocam</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">music_note</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
+<p>© 2026 K-Pop Pulse Radio. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-slate-400" href="#">Privacy Policy</a>
+<a class="hover:text-slate-400" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>
