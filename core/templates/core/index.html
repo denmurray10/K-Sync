@@ -268,6 +268,56 @@
 </div>
 </div>
 </section>
+<!-- Featured Artist Spotlight (Cinematic Brutalist) -->
+<section class="relative w-full h-[80vh] min-h-[600px] flex items-center justify-center border-t border-b border-white/20 overflow-hidden bg-black group">
+<!-- Background Image with Parallax & Darken -->
+<div class="absolute inset-0 z-0 bg-black">
+<img src="{% static 'core/images/stray_kids_stray_kids.png' %}" alt="Stray Kids Featured Artist" class="w-full h-full object-cover grayscale opacity-40 group-hover:opacity-50 group-hover:scale-105 transition-all duration-1000 mix-blend-luminosity">
+<div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+</div>
+
+<div class="container mx-auto px-6 max-w-[1400px] relative z-20 flex flex-col md:flex-row items-end justify-between h-full pb-24">
+<!-- Left: Text -->
+<div class="flex flex-col max-w-2xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 self-start mb-6">
+<span class="text-[10px] font-black tracking-[0.2em] uppercase">Artist of the Week</span>
+</div>
+<h2 class="text-6xl md:text-8xl lg:text-9xl font-black text-white uppercase tracking-tighter leading-[0.85] mb-6">
+<span class="block">STRAY</span>
+<span class="block text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">KIDS</span>
+</h2>
+<p class="text-slate-300 font-mono text-xs md:text-sm tracking-widest uppercase leading-relaxed max-w-lg">
+Experience the explosive energy of this generation's most dynamic self-producing idols. Dive into our exclusive editorial and curated playlist.
+</p>
+
+<div class="flex items-center gap-6 mt-10">
+<a href="{% url 'stray_kids' %}" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+    Explore Profile
+</a>
+</div>
+</div>
+
+<!-- Right: Top Tracks -->
+<div class="hidden lg:flex flex-col gap-4 w-72 backdrop-blur-md bg-black/60 border border-white/20 p-6 self-end mb-6">
+<h3 class="text-white font-black uppercase tracking-widest text-sm mb-4 border-b border-white/20 pb-2">Essential Tracks</h3>
+<div class="flex flex-col gap-4">
+<a href="#" class="group/track flex items-center justify-between hover:text-primary transition-colors">
+<span class="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover/track:text-primary transition-colors">01. S-Class</span>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover/track:opacity-100 transition-opacity">play_arrow</span>
+</a>
+<a href="#" class="group/track flex items-center justify-between hover:text-primary transition-colors">
+<span class="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover/track:text-primary transition-colors">02. MANIAC</span>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover/track:opacity-100 transition-opacity">play_arrow</span>
+</a>
+<a href="#" class="group/track flex items-center justify-between hover:text-primary transition-colors">
+<span class="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover/track:text-primary transition-colors">03. God's Menu</span>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover/track:opacity-100 transition-opacity">play_arrow</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+
 <!-- Upcoming Comebacks Calendar -->
 <section class="bg-black py-32 border-t border-white/5">
 <div class="container mx-auto px-6 max-w-[1400px]">
