@@ -90,7 +90,28 @@
                 margin-top: -60px;
             }
         }
-    </style>
+        @media (min-width: 769px) {
+            main {
+                display: flex;
+                flex-direction: column;
+            }
+            .relative.w-full.bg-primary {
+                margin-top: 50px;
+            }
+        }        @media (max-width: 768px) {
+            section.w-full.bg-black.py-32 {
+                padding-top: 2rem; /* Half of py-32 on mobile */
+                padding-bottom: 2rem;
+            }
+            .flex.flex-col.max-w-2xl.reveal-left {
+                padding-top: 120px;
+            }
+            section.bg-black.py-32 {
+                padding-top: calc(8rem - 160px); /* Reduced padding-top by 40px on mobile */
+                border-top: none; /* Hide border above Upcoming Comebacks on mobile */
+            }
+            }
+        }    </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
 <!-- Top Navigation -->
