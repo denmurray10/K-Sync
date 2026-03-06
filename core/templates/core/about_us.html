@@ -63,6 +63,12 @@
     .hover-glow:hover {
         animation: pulsing-glow 2s ease-in-out infinite;
     }
+    /* Global scaling for desktop/laptop views */
+    body {
+        zoom: 0.9;
+        -moz-transform: scale(0.9);
+        -moz-transform-origin: 0 0;
+    }
 </style>
 </head>
 <body class="bg-black text-white font-display min-h-screen flex flex-col overflow-x-hidden">
@@ -81,7 +87,7 @@
     </div>
 
     <!-- Content -->
-    <div class="relative z-20 container mx-auto px-6 max-w-[1400px] pb-20 pt-48 w-full">
+    <div class="relative z-20 container mx-auto px-6 max-w-[1400px] pb-20 pt-64 w-full">
         <div class="max-w-4xl">
             <p class="font-mono text-primary text-xs tracking-[0.4em] uppercase mb-6 reveal-left">Est. 2026 · Cornwall, UK</p>
             <h1 class="text-7xl md:text-[8rem] lg:text-[9rem] font-black text-white leading-[0.85] tracking-tighter uppercase reveal-left" style="transition-delay: 100ms;">
@@ -296,7 +302,7 @@
                 <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-500"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10">
                     <span class="inline-block bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest mb-2 shadow-[2px_2px_0px_rgba(255,255,255,0.3)]">Main Host</span>
-                    <h3 class="font-black text-white text-xl uppercase tracking-tight">DJ Wendy</h3>
+                    <h3 class="font-black text-white text-xl uppercase tracking-tight">DJ Izzy</h3>
                     <p class="text-slate-400 text-xs mt-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300">"Bringing you the sweetest tunes every evening."</p>
                 </div>
             </div>
@@ -307,7 +313,7 @@
                 <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-500"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10">
                     <span class="inline-block bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest mb-2 shadow-[2px_2px_0px_rgba(255,255,255,0.3)]">Evening Mix</span>
-                    <h3 class="font-black text-white text-xl uppercase tracking-tight">DJ Minhyuk</h3>
+                    <h3 class="font-black text-white text-xl uppercase tracking-tight">DJ Uknown</h3>
                     <p class="text-slate-400 text-xs mt-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300">"Energy, beats, and the best guest interviews."</p>
                 </div>
             </div>
@@ -318,7 +324,7 @@
                 <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-500"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10">
                     <span class="inline-block bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest mb-2 shadow-[2px_2px_0px_rgba(255,255,255,0.3)]">Late Night</span>
-                    <h3 class="font-black text-white text-xl uppercase tracking-tight">Heize</h3>
+                    <h3 class="font-black text-white text-xl uppercase tracking-tight">Not quite Sure</h3>
                     <p class="text-slate-400 text-xs mt-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300">"Relax with soulful R&B and chill vibes."</p>
                 </div>
             </div>
@@ -329,7 +335,7 @@
                 <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-500"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10">
                     <span class="inline-block bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest mb-2 shadow-[2px_2px_0px_rgba(255,255,255,0.3)]">Variety Hour</span>
-                    <h3 class="font-black text-white text-xl uppercase tracking-tight">The Cultwo</h3>
+                    <h3 class="font-black text-white text-xl uppercase tracking-tight">Could be Anyone</h3>
                     <p class="text-slate-400 text-xs mt-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300">"Comedy, chaos, and K-pop charts."</p>
                 </div>
             </div>

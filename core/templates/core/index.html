@@ -79,6 +79,12 @@
             opacity: 1;
             transform: translate(0);
         }
+        /* Global scaling for desktop/laptop views */
+        body {
+            zoom: 0.9;
+            -moz-transform: scale(0.9);
+            -moz-transform-origin: 0 0;
+        }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
@@ -94,7 +100,7 @@
 <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
 </div>
 
-<div class="relative z-20 container mx-auto px-6 max-w-[1400px] h-full flex flex-col md:flex-row items-end justify-between pb-24 pt-48">
+<div class="relative z-20 container mx-auto px-6 max-w-[1400px] h-full flex flex-col md:flex-row items-end justify-between pb-24 pt-64">
 <!-- Left Content: Massive Typography -->
 <div class="flex flex-col gap-0 max-w-4xl text-left relative z-30 pointer-events-none">
 <h1 class="text-7xl md:text-[8rem] lg:text-[11rem] font-black text-white leading-[0.8] tracking-tighter uppercase font-display relative z-20">
