@@ -496,7 +496,7 @@ Experience the explosive energy of this generation's most dynamic self-producing
 <!-- Upcoming Comebacks Calendar -->
 <section class="bg-black py-32 border-t border-white/5">
 <div class="container mx-auto px-6 max-w-[1400px]">
-<div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
+<div class="flex items-end justify-between pb-4 border-b border-white/20">
 <div class="reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">UPCOMING <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">COMEBACKS</span></h2>
 <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">The official schedule for upcoming K-Pop releases and debuts.</p>
@@ -505,6 +505,36 @@ Experience the explosive energy of this generation's most dynamic self-producing
                     Full Calendar <span class="material-symbols-outlined text-sm">arrow_forward</span>
 </a>
 </div>
+
+<!-- Brutalist Ticker for Comebacks 5-20 -->
+{% if upcoming_ticker %}
+<div class="relative w-full overflow-hidden bg-black border-y border-white/10 h-12 flex items-center reveal-up" style="transition-delay: 100ms;">
+<div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
+<div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
+<div class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
+    {% for r in upcoming_ticker %}
+    <a href="{% url 'comeback_timeline' %}" class="inline-flex items-center gap-3 group/t cursor-pointer shrink-0">
+        <span class="font-black text-primary group-hover/t:text-white transition-colors">{{ r.date_str|slice:"5:" }}</span>
+        <span class="font-black text-xs uppercase tracking-tighter text-white group-hover/t:text-primary transition-colors">{{ r.title }}</span>
+        <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">{{ r.artist }}</span>
+        <span class="inline-block bg-white/10 text-white text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest">{{ r.type }}</span>
+        <span class="text-white/20 mx-4">/</span>
+    </a>
+    {% endfor %}
+    <!-- Duplicate for seamless loop -->
+    {% for r in upcoming_ticker %}
+    <a href="{% url 'comeback_timeline' %}" class="inline-flex items-center gap-3 group/t cursor-pointer shrink-0">
+        <span class="font-black text-primary group-hover/t:text-white transition-colors">{{ r.date_str|slice:"5:" }}</span>
+        <span class="font-black text-xs uppercase tracking-tighter text-white group-hover/t:text-primary transition-colors">{{ r.title }}</span>
+        <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">{{ r.artist }}</span>
+        <span class="inline-block bg-white/10 text-white text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest">{{ r.type }}</span>
+        <span class="text-white/20 mx-4">/</span>
+    </a>
+    {% endfor %}
+</div>
+</div>
+{% endif %}
+
 <div class="flex flex-col border-t border-white/20 reveal-up">
 
 {% for r in upcoming_comebacks %}

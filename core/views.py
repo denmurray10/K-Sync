@@ -60,7 +60,9 @@ def home(request):
 
     all_releases.sort(key=lambda x: x['date_str'])
     today_str = now.strftime('%Y-%m-%d')
-    upcoming = [r for r in all_releases if r['date_str'] >= today_str][:4]
+    upcoming_all = [r for r in all_releases if r['date_str'] >= today_str][:20]
+    upcoming = upcoming_all[:4]
+    upcoming_ticker = upcoming_all[4:20]
 
     # Trending Sidebar: Use daily ranking data (now synced from iChart)
     daily_rank = Ranking.objects.filter(timeframe='daily').first()
@@ -160,6 +162,7 @@ def home(request):
     
     return render(request, 'core/index.html', {
         'upcoming_comebacks': upcoming,
+        'upcoming_ticker': upcoming_ticker,
         'trending_tracks': trending,
         'trending_ticker_tracks': trending_ticker,
         'news_articles': news_articles,
