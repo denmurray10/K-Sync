@@ -28,7 +28,7 @@
         <!-- Logo + Nav -->
         <div class="flex items-center gap-8">
             <a href="{% url 'home' %}" class="flex items-center gap-2 group shrink-0">
-                <img src="{% static 'core/images/logo.png' %}" alt="K-Beats Logo" class="h-24 w-auto -ml-[58px] -my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
+                <img src="{% static 'core/images/logo.png' %}" alt="K-Beats Logo" class="h-16 md:h-24 w-auto -ml-4 md:-ml-[58px] -my-2 md:-my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
             </a>
             <nav class="hidden md:flex items-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'live' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
@@ -60,7 +60,7 @@
                 <span class="material-symbols-outlined text-xl">settings</span>
             </button>
             <!-- Log In -->
-            <a class="nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
+            <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
         </div>
     </div>
 </header>
@@ -70,7 +70,7 @@
     <div class="container mx-auto flex items-center justify-between">
         <div class="flex items-center gap-10">
             <a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors duration-300" href="{% url 'home' %}">
-                <img src="{% static 'core/images/logo.png' %}" alt="K-Beats Logo" class="h-24 w-auto -ml-[58px] -my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
+                <img src="{% static 'core/images/logo.png' %}" alt="K-Beats Logo" class="h-16 md:h-24 w-auto -ml-4 md:-ml-[58px] -my-2 md:-my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
             </a>
             <nav class="hidden md:flex items-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
@@ -87,10 +87,10 @@
                 <input name="q" class="bg-black/30 border border-primary/30 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-64 placeholder:text-slate-500" placeholder="Search artist, song..." type="text"/>
             </form>
             <div class="flex gap-4 items-center">
-                <button class="bg-primary text-black font-bold uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]" onclick="window.location.href='{% url 'live' %}'">
+                <button class="bg-primary text-black font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs px-4 py-3 md:px-8 md:py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]" onclick="window.location.href='{% url 'live' %}'">
                     Start Listening
                 </button>
-                <a class="nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
+                <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
             </div>
         </div>
     </div>
