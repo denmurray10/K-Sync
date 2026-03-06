@@ -1,0 +1,8 @@
+*.py[cod]
+*__pycache__*
+db.sqlite3
+staticfiles/
+.env
+.gemini/
+brain/
+tmp/
