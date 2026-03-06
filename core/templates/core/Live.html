@@ -1,0 +1,518 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>K-Beats Live Radio — 24/7 K-Pop</title>
+<meta name="description" content="Listen to K-Beats Live Radio — 24/7 non-stop K-Pop hits, exclusive DJ sets, and real-time listener interaction."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f425c0",
+                    "background-dark": "#000000",
+                    "secondary": "#00f0ff",
+                },
+                fontFamily: {
+                    "display": ["Montserrat", "sans-serif"]
+                },
+                borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+            },
+        },
+    }
+</script>
+<style>
+    .glass-panel {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    .glass-bright {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+    .neon-text-pink {
+        text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+    }
+    .neon-text-cyan {
+        text-shadow: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 20px rgba(0, 240, 255, 0.5);
+    }
+    .neon-border-cyan {
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.05);
+    }
+    /* Waveform Animation */
+    @keyframes equalize {
+        0%   { height: 15%; }
+        25%  { height: 80%; }
+        50%  { height: 100%; }
+        75%  { height: 60%; }
+        100% { height: 15%; }
+    }
+    .bar-animate {
+        animation: equalize 1s ease-in-out infinite;
+        transform-origin: bottom;
+    }
+    /* Large waveform bars */
+    @keyframes equalize-lg {
+        0%   { height: 10%; }
+        20%  { height: 90%; }
+        40%  { height: 50%; }
+        60%  { height: 100%; }
+        80%  { height: 30%; }
+        100% { height: 10%; }
+    }
+    .bar-animate-lg {
+        animation: equalize-lg 1.2s ease-in-out infinite;
+        transform-origin: bottom;
+    }
+    /* Pulse glow on the play button */
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(244, 37, 192, 0.4); }
+        50%      { box-shadow: 0 0 40px rgba(244, 37, 192, 0.8), 0 0 60px rgba(244, 37, 192, 0.3); }
+    }
+    .pulse-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+    /* Progress bar animation */
+    @keyframes progress-sweep {
+        0%   { width: 0%; }
+        100% { width: 100%; }
+    }
+    .progress-animate {
+        animation: progress-sweep 240s linear infinite;
+    }
+    /* Scroll Reveal */
+    .reveal-up {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-up.is-visible {
+        opacity: 1;
+        transform: translate(0);
+    }
+    /* Global scaling */
+    body {
+        zoom: 0.9;
+        -moz-transform: scale(0.9);
+        -moz-transform-origin: 0 0;
+    }
+</style>
+</head>
+<body class="bg-black text-white font-display min-h-screen flex flex-col overflow-x-hidden">
+
+<!-- Header -->
+{% include 'core/header.html' %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     HERO PLAYER — FULL SCREEN
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden">
+    <!-- Background -->
+    <div class="absolute inset-0 z-0 bg-black">
+        <div class="w-full h-full bg-cover bg-center bg-fixed opacity-20 grayscale mix-blend-luminosity" style="background-image: url('{% static 'core/images/about_banner.webp' %}');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black"></div>
+    </div>
+
+    <!-- Central Player -->
+    <div class="relative z-20 flex flex-col items-center text-center px-6 pt-48 pb-24 max-w-4xl mx-auto w-full">
+
+        <!-- Live Badge -->
+        <div class="flex items-center gap-2 px-4 py-2 border border-red-500/40 bg-red-500/10 backdrop-blur-sm mb-10">
+            <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+            <span class="text-[10px] font-black uppercase tracking-[0.3em] text-red-400">Live On Air</span>
+        </div>
+
+        <!-- Waveform Visualizer (Large) -->
+        <div class="flex gap-1 items-end h-24 md:h-32 mb-12 opacity-80">
+            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 0.7s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 1.1s;"></div>
+            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.9s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.3s;"></div>
+            <div class="w-1 md:w-1.5 bg-secondary/80 bar-animate-lg" style="animation-duration: 0.6s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary/60 bar-animate-lg" style="animation-duration: 1.0s;"></div>
+            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.8s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.2s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 0.5s;"></div>
+            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 1.4s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 0.7s;"></div>
+            <div class="w-1 md:w-1.5 bg-secondary/80 bar-animate-lg" style="animation-duration: 1.1s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary/60 bar-animate-lg" style="animation-duration: 0.9s;"></div>
+            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 1.3s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 0.6s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.0s;"></div>
+            <div class="w-1 md:w-1.5 bg-secondary/80 bar-animate-lg" style="animation-duration: 0.8s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.2s;"></div>
+            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.5s;"></div>
+            <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 1.4s;"></div>
+        </div>
+
+        <!-- Track Info -->
+        <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-4">Now Playing</p>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-4">
+            SEVEN
+        </h1>
+        <p class="text-lg md:text-xl text-slate-300 font-light tracking-wide uppercase mb-12">
+            Jung Kook feat. Latto
+        </p>
+
+        <!-- Play Button -->
+        <button id="play-btn" class="w-20 h-20 md:w-24 md:h-24 bg-primary text-black hover:bg-white flex items-center justify-center transition-all duration-300 border border-primary shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] pulse-glow mb-10">
+            <span class="material-symbols-outlined text-5xl md:text-6xl">play_arrow</span>
+        </button>
+
+        <!-- Progress Bar -->
+        <div class="w-full max-w-xl">
+            <div class="w-full h-1 bg-white/10 relative overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-primary to-secondary progress-animate"></div>
+            </div>
+            <div class="flex justify-between mt-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                <span>1:47</span>
+                <span>3:04</span>
+            </div>
+        </div>
+
+        <!-- Volume -->
+        <div class="flex items-center gap-3 mt-8">
+            <span class="material-symbols-outlined text-slate-400 text-xl">volume_down</span>
+            <input type="range" min="0" max="100" value="75" class="w-32 h-1 accent-primary cursor-pointer bg-white/10 appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer"/>
+            <span class="material-symbols-outlined text-slate-400 text-xl">volume_up</span>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce">
+        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-[0.3em]">Explore</span>
+        <span class="material-symbols-outlined text-slate-500">expand_more</span>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PINK INFO BAR
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="relative w-full bg-primary border-t border-b border-white/20 h-24 flex items-center z-40 overflow-hidden">
+    <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
+    <div class="container mx-auto max-w-[1400px] px-6 flex items-center justify-between w-full relative z-10">
+        <!-- Left: Status -->
+        <div class="flex items-center gap-4 md:gap-6">
+            <div class="flex items-center gap-2">
+                <span class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-black"></span>
+                </span>
+                <span class="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-black">Global Studio 1</span>
+            </div>
+            <div class="hidden sm:flex items-center gap-1.5 text-black/60 text-xs font-medium">
+                <span class="material-symbols-outlined text-base">headphones</span>
+                <span class="font-bold text-black">3,847</span> Listening Now
+            </div>
+        </div>
+
+        <!-- Center: Track -->
+        <div class="hidden md:flex flex-1 items-center justify-center gap-6 px-8 max-w-2xl mx-auto">
+            <div class="flex gap-1.5 items-end h-10 opacity-90 w-16">
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.8s;"></div>
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 1.1s;"></div>
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.9s;"></div>
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 1.3s;"></div>
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.7s;"></div>
+            </div>
+            <div class="text-center truncate min-w-[200px] flex-1">
+                <span class="font-black uppercase tracking-tighter text-2xl md:text-3xl leading-none text-black block truncate">SEVEN</span>
+                <span class="block text-black/70 font-mono text-[10px] tracking-widest uppercase mt-1 truncate">JUNG KOOK FEAT. LATTO</span>
+            </div>
+            <div class="flex gap-1.5 items-end h-10 opacity-90 w-16">
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.7s;"></div>
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 1.3s;"></div>
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.9s;"></div>
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 1.1s;"></div>
+                <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.8s;"></div>
+            </div>
+        </div>
+
+        <!-- Right: CTA -->
+        <div class="flex items-center gap-4">
+            <a href="{% url 'request_track' %}" class="bg-black text-white px-4 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                Request Song
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     CONTENT GRID — UP NEXT + RECENTLY PLAYED
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="w-full bg-black py-20 border-b border-white/10">
+    <div class="container mx-auto px-6 max-w-[1400px]">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+            <!-- UP NEXT QUEUE -->
+            <div class="reveal-up">
+                <div class="flex items-end justify-between mb-8">
+                    <div>
+                        <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-2">Coming Up</p>
+                        <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">Up Next</h2>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-500 text-3xl">queue_music</span>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <!-- Track 1 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                        <span class="text-slate-600 font-mono text-xs w-6 text-center">01</span>
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Magnetic</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">ILLIT</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:12</span>
+                    </div>
+
+                    <!-- Track 2 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                        <span class="text-slate-600 font-mono text-xs w-6 text-center">02</span>
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Supernova</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">AESPA</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:30</span>
+                    </div>
+
+                    <!-- Track 3 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                        <span class="text-slate-600 font-mono text-xs w-6 text-center">03</span>
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Chk Chk Boom</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">STRAY KIDS</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:18</span>
+                    </div>
+
+                    <!-- Track 4 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                        <span class="text-slate-600 font-mono text-xs w-6 text-center">04</span>
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">How Sweet</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">NEWJEANS</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:08</span>
+                    </div>
+
+                    <!-- Track 5 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                        <span class="text-slate-600 font-mono text-xs w-6 text-center">05</span>
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Armageddon</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">AESPA</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:45</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECENTLY PLAYED -->
+            <div class="reveal-up" style="transition-delay: 200ms;">
+                <div class="flex items-end justify-between mb-8">
+                    <div>
+                        <p class="font-mono text-primary text-[10px] tracking-[0.4em] uppercase mb-2">Previously Aired</p>
+                        <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">Recently Played</h2>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-500 text-3xl">history</span>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <!-- Recent 1 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Flower</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">JISOO</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">2 min ago</span>
+                    </div>
+
+                    <!-- Recent 2 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Super Shy</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">NEWJEANS</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">6 min ago</span>
+                    </div>
+
+                    <!-- Recent 3 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">UNFORGIVEN</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">LE SSERAFIM</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">10 min ago</span>
+                    </div>
+
+                    <!-- Recent 4 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Love Dive</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">IVE</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">14 min ago</span>
+                    </div>
+
+                    <!-- Recent 5 -->
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Ditto</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">NEWJEANS</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">18 min ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     AI DJ COMMENTARY
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="w-full bg-black py-20 border-b border-white/10">
+    <div class="container mx-auto px-6 max-w-[1400px]">
+        <div class="flex items-end justify-between mb-12">
+            <div>
+                <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-2">Powered by AI</p>
+                <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">AI DJ</h2>
+            </div>
+            <span class="material-symbols-outlined text-secondary text-3xl neon-text-cyan">smart_toy</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-up">
+            <!-- Commentary Card -->
+            <div class="md:col-span-2 p-8 border border-secondary/30 bg-secondary/5 neon-border-cyan">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-secondary/20 flex items-center justify-center border border-secondary/30">
+                        <span class="material-symbols-outlined text-secondary">mic</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-white uppercase tracking-tight">Track Commentary</p>
+                        <p class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">About "SEVEN"</p>
+                    </div>
+                </div>
+                <p class="text-slate-300 text-sm leading-relaxed font-light">
+                    "SEVEN" by Jung Kook featuring Latto is a summer anthem that dominated global charts upon release.
+                    The track blends infectious pop hooks with hip-hop verses, showcasing Jung Kook's versatility as a solo artist.
+                    It spent multiple weeks at #1 on the Billboard Hot 100, making it one of the most successful K-Pop solo singles in history.
+                    The song's minimalist production and catchy chorus exemplify the evolving sound of fourth-generation K-Pop.
+                </p>
+                <div class="flex items-center gap-4 mt-6">
+                    <button class="flex items-center gap-2 text-secondary text-xs font-bold uppercase tracking-[0.2em] hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-base">thumb_up</span> Helpful
+                    </button>
+                    <button class="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-[0.2em] hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-base">refresh</span> New Insight
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="flex flex-col gap-6">
+                <div class="p-6 border border-white/10 bg-white/[0.03]">
+                    <p class="text-[10px] font-mono text-primary uppercase tracking-[0.3em] mb-2">Peak Chart Position</p>
+                    <p class="text-4xl font-black text-white">#1</p>
+                    <p class="text-xs text-slate-500 font-mono uppercase tracking-widest mt-1">Billboard Hot 100</p>
+                </div>
+                <div class="p-6 border border-white/10 bg-white/[0.03]">
+                    <p class="text-[10px] font-mono text-secondary uppercase tracking-[0.3em] mb-2">Total Streams</p>
+                    <p class="text-4xl font-black text-white">1.8B</p>
+                    <p class="text-xs text-slate-500 font-mono uppercase tracking-widest mt-1">Spotify Worldwide</p>
+                </div>
+                <div class="p-6 border border-white/10 bg-white/[0.03]">
+                    <p class="text-[10px] font-mono text-primary uppercase tracking-[0.3em] mb-2">Release Date</p>
+                    <p class="text-4xl font-black text-white">JUL</p>
+                    <p class="text-xs text-slate-500 font-mono uppercase tracking-widest mt-1">14, 2023</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+{% include 'core/footer.html' %}
+
+<!-- Scroll Reveal Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
+
+        // Play button toggle
+        const playBtn = document.getElementById('play-btn');
+        if (playBtn) {
+            let isPlaying = false;
+            playBtn.addEventListener('click', () => {
+                isPlaying = !isPlaying;
+                playBtn.querySelector('.material-symbols-outlined').textContent = isPlaying ? 'pause' : 'play_arrow';
+                playBtn.classList.toggle('pulse-glow', !isPlaying);
+            });
+        }
+
+        // Simulate listener count fluctuation
+        const listenerEl = document.getElementById('listener-count');
+        if (listenerEl) {
+            setInterval(() => {
+                const base = 3847;
+                const variation = Math.floor(Math.random() * 50) - 25;
+                listenerEl.textContent = (base + variation).toLocaleString();
+            }, 5000);
+        }
+    });
+</script>
+
+</body>
+</html>
