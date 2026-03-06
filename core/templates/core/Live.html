@@ -123,6 +123,23 @@
         -moz-transform: scale(0.9);
         -moz-transform-origin: 0 0;
     }
+    /* Chat Message Animation */
+    @keyframes slide-in-right {
+        0% { transform: translateX(20px); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+    .chat-msg {
+        animation: slide-in-right 0.4s ease-out forwards;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #f425c0;
+    }
 </style>
 </head>
 <body class="bg-black text-white font-display min-h-screen flex flex-col overflow-x-hidden">
@@ -137,7 +154,7 @@
     <!-- Background: Blurred Album Art -->
     <div class="absolute inset-0 z-0 bg-black overflow-hidden">
         <div class="absolute inset-[-50px] album-bg">
-            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4d/e2/7b/4de27bfd-1743-4fa1-76e5-3e04ceaef27a/196922440700.jpg/600x600bb.jpg"
+            <img src="{% static 'core/images/seven_album.png' %}"
                  alt="" class="w-full h-full object-cover blur-[60px] opacity-40 scale-110" />
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/50"></div>
@@ -162,7 +179,7 @@
         <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-12 w-full justify-center">
             <!-- Album Cover -->
             <div class="w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0 border-2 border-white/20 album-cover-glow overflow-hidden relative group">
-                <img src="https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4d/e2/7b/4de27bfd-1743-4fa1-76e5-3e04ceaef27a/196922440700.jpg/600x600bb.jpg"
+                <img src="{% static 'core/images/seven_album.png' %}"
                      alt="Seven - Jung Kook" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <!-- Overlay gradient -->
                 <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
@@ -290,9 +307,9 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════
      CONTENT GRID — UP NEXT + RECENTLY PLAYED
      ═══════════════════════════════════════════════════════════════════════ -->
-<section class="w-full bg-black py-20 border-b border-white/10">
+<section class="w-full bg-black py-20 border-b border-white/10 overflow-hidden">
     <div class="container mx-auto px-6 max-w-[1400px]">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
             <!-- UP NEXT QUEUE -->
             <div class="reveal-up">
@@ -547,6 +564,52 @@
                 listenerEl.textContent = (base + variation).toLocaleString();
             }, 5000);
         }
+
+        // Live Chat Simulation
+        const chatContainer = document.getElementById('chat-messages');
+        const users = ['JiminieP', 'KpopQueen', 'ArmyForever', 'Blink2024', 'Felix_Skz', 'Hanni_Fan', 'V_Tae', 'Jennie_Ruby'];
+        const messages = [
+            'STREAMING FROM LONDON! 🇬🇧',
+            'This beat is actually insane',
+            'K-Sync (K-Beats) always has the best vibes',
+            'I need to request an Aespa track next!',
+            'Does anyone know when the next comeback is?',
+            'Seven is legendary.',
+            'Best radio app hands down.',
+            'Can we get some Stray Kids please? 🙏',
+            'Love from Brazil! 🇧🇷',
+            'This AI commentary is so cool'
+        ];
+
+        function addMessage() {
+            if (!chatContainer) return;
+            
+            const user = users[Math.floor(Math.random() * users.length)];
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            const isSecondary = Math.random() > 0.5;
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-msg';
+            msgDiv.innerHTML = `
+                <span class="text-[10px] font-bold ${isSecondary ? 'text-secondary' : 'text-primary'} uppercase tracking-tighter block mb-1">${user}</span>
+                <div class="bg-white/5 border-l-2 ${isSecondary ? 'border-secondary' : 'border-primary'} p-3 text-xs text-white leading-relaxed">
+                    ${msg}
+                </div>
+            `;
+            
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Keep only last 20 messages for performance
+            if (chatContainer.children.length > 20) {
+                chatContainer.removeChild(chatContainer.children[0]);
+            }
+        }
+
+        // Add a new message every 3-8 seconds
+        setInterval(() => {
+            if (Math.random() > 0.4) addMessage();
+        }, 5000);
     });
 </script>
 
