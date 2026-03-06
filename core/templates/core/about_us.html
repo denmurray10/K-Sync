@@ -4,8 +4,8 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>About K-Sync — Our Story, Mission & Team</title>
-<meta name="description" content="K-Sync is the #1 global source for K-Pop music, news, and culture. Learn about our mission, our team, and the story behind Seoul's most dedicated broadcast station."/>
+<title>About K-Beats — Our Story, Mission & Team</title>
+<meta name="description" content="K-Beats is the #1 global source for K-Pop music, news, and culture. Learn about our mission, our team, and the story behind Seoul's most dedicated broadcast station."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -55,6 +55,14 @@
         font-family: 'Cinzel', serif;
         font-weight: 900;
     }
+    /* Pulsing Glow Animation */
+    @keyframes pulsing-glow {
+        0%, 100% { text-shadow: 0 0 10px rgba(244, 37, 192, 0); }
+        50% { text-shadow: 0 0 20px rgba(244, 37, 192, 0.6), 0 0 40px rgba(244, 37, 192, 0.4); }
+    }
+    .hover-glow:hover {
+        animation: pulsing-glow 2s ease-in-out infinite;
+    }
 </style>
 </head>
 <body class="bg-black text-white font-display min-h-screen flex flex-col overflow-x-hidden">
@@ -78,16 +86,16 @@
             <p class="font-mono text-primary text-xs tracking-[0.4em] uppercase mb-6 reveal-left">Est. 2026 · Cornwall, UK</p>
             <h1 class="text-7xl md:text-[8rem] lg:text-[9rem] font-black text-white leading-[0.85] tracking-tighter uppercase reveal-left" style="transition-delay: 100ms;">
                 <span class="block">THE PULSE</span>
-                <span class="block text-transparent [-webkit-text-stroke:2px_theme(colors.primary)] hover:text-primary transition-colors duration-500">OF K-POP</span>
+                <span class="block text-transparent [-webkit-text-stroke:2px_theme(colors.primary)] hover:text-primary transition-colors duration-500 hover-glow">OF K-POP</span>
             </h1>
             <p class="text-slate-400 mt-8 max-w-lg text-base leading-relaxed reveal-up" style="transition-delay: 200ms;">
-                We are K-Sync — the world's most dedicated K-Pop broadcast station. Built by fans, powered by Cornwall, and broadcasting to over 150 countries.
+                We are K-Beats — the world's most dedicated K-Pop broadcast station. Built by fans, powered by Cornwall, and broadcasting to over 150 countries.
             </p>
             <div class="mt-10 flex items-center gap-0 reveal-up" style="transition-delay: 300ms;">
-                <a href="{% url 'schedule' %}" class="group bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 py-5 hover:bg-white transition-colors shadow-[6px_6px_0px_rgba(244,37,192,0.4)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                <a href="{% url 'schedule' %}" class="bg-primary text-black font-bold uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                     View Schedule
                 </a>
-                <a href="{% url 'live' %}" class="group border border-white/30 text-white font-black uppercase tracking-[0.2em] text-[10px] px-8 py-5 hover:border-primary hover:text-primary transition-colors ml-4">
+                <a href="{% url 'live' %}" class="group border border-white/30 text-white font-bold uppercase tracking-[0.2em] text-[10px] px-8 py-5 hover:border-primary hover:text-primary transition-colors ml-4">
                     Listen Live
                 </a>
             </div>
@@ -148,7 +156,7 @@
                     To transcend borders and language barriers through the universal language of music.
                 </p>
                 <p class="text-slate-400 text-base leading-relaxed">
-                    K-Sync is dedicated to bringing the authentic K-Pop experience to fans worldwide — curating not just the hits, but the stories behind the idols, the culture behind the craft, and the passion behind every note.
+                    K-Beats is dedicated to bringing the authentic K-Pop experience to fans worldwide — curating not just the hits, but the stories behind the idols, the culture behind the craft, and the passion behind every note.
                 </p>
                 <p class="text-slate-400 text-base leading-relaxed mt-4">
                     We syndicate high-velocity data from official Korean charts (Circle, Melon, Hanteo), music show results, and global streaming platforms to give fans a real-time pulse on the industry.
@@ -224,7 +232,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                     <h3 class="font-black text-xl md:text-2xl uppercase tracking-tight mb-2 group-hover:text-white">Global Expansion</h3>
-                    <p class="text-black/60 group-hover:text-white/60 text-sm leading-relaxed max-w-2xl">K-Sync hits 1 million listeners across 50 countries and launches its first official mobile app. International fan clubs begin forming in Europe, the Americas, and Southeast Asia.</p>
+                    <p class="text-black/60 group-hover:text-white/60 text-sm leading-relaxed max-w-2xl">K-Beats hits 1 million listeners across 50 countries and launches its first official mobile app. International fan clubs begin forming in Europe, the Americas, and Southeast Asia.</p>
                 </div>
                 <span class="material-symbols-outlined text-2xl text-black/20 group-hover:text-white/30 transition-colors shrink-0 hidden md:block mt-1">arrow_forward</span>
             </div>
@@ -245,8 +253,8 @@
                     <span class="font-black text-4xl md:text-5xl text-primary leading-none">2025</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <h3 class="font-black text-xl md:text-2xl uppercase tracking-tight mb-2 group-hover:text-white">K-Sync Is Born</h3>
-                    <p class="text-black/60 group-hover:text-white/60 text-sm leading-relaxed max-w-2xl">A full platform relaunch introduces the K-Sync brand. Real-time AI-powered charts, live polls, interactive fan experiences, and the new editorial design language. 5 million listeners and growing.</p>
+                    <h3 class="font-black text-xl md:text-2xl uppercase tracking-tight mb-2 group-hover:text-white">K-Beats Is Born</h3>
+                    <p class="text-black/60 group-hover:text-white/60 text-sm leading-relaxed max-w-2xl">A full platform relaunch introduces the K-Beats brand. Real-time AI-powered charts, live polls, interactive fan experiences, and the new editorial design language. 5 million listeners and growing.</p>
                 </div>
                 <span class="material-symbols-outlined text-2xl text-black/20 group-hover:text-white/30 transition-colors shrink-0 hidden md:block mt-1">arrow_forward</span>
             </div>
@@ -396,7 +404,7 @@
                 <p class="font-mono text-primary text-xs tracking-[0.4em] uppercase mb-4">Join The Community</p>
                 <h2 class="text-4xl md:text-6xl font-black text-white leading-none tracking-tighter uppercase">BE PART OF<br/><span class="text-transparent [-webkit-text-stroke:1px_white]">THE STORY</span></h2>
                 <p class="text-slate-400 mt-6 text-base leading-relaxed">
-                    Subscribe to our newsletter, vote on live polls, request your favourite tracks. K-Sync is built by its community — and that means you.
+                    K-Beats is built by its community — and that means you. Subscribe to our newsletter, vote on live polls, request your favourite tracks.
                 </p>
             </div>
             <div class="flex flex-col gap-4 shrink-0">
