@@ -6,6 +6,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>K-Pop Pulse Home - Neon Variant</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -230,6 +231,118 @@
 </div>
 </section>
 
+<!-- Live Fan Vote (Brutalist Poll) -->
+{% if active_poll %}
+<section class="w-full bg-black py-20 border-b border-white/20 relative overflow-hidden" 
+         x-data="{
+            pollId: {{ active_poll.id }},
+            voted: localStorage.getItem('poll_voted_{{ active_poll.id }}') === 'true',
+            selected: parseInt(localStorage.getItem('poll_selected_{{ active_poll.id }}')) || null,
+            options: [
+                {% for option in active_poll.options.all %}
+                { id: {{ option.id }}, text: '{{ option.text|escapejs }}', votes: {{ option.votes }}, percentage: {{ option.percentage }}, label: '{{ forloop.counter|stringformat:"c"|upper|add:"64" }}' },
+                {% endfor %}
+            ],
+            get total() {
+                return this.options.reduce((sum, opt) => sum + opt.votes, 0);
+            },
+            async submitVote(optionId) {
+                if (this.voted) return;
+                this.selected = optionId;
+                this.voted = true;
+                localStorage.setItem('poll_voted_' + this.pollId, 'true');
+                localStorage.setItem('poll_selected_' + this.pollId, optionId.toString());
+                
+                // Optimistic UI update
+                const opt = this.options.find(o => o.id === optionId);
+                if(opt) opt.votes++;
+                this.recalculatePercentages();
+
+                try {
+                    const res = await fetch('{% url 'vote_poll' %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({option_id: optionId})
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.options.forEach(o => {
+                            if (data.results[o.id] !== undefined) {
+                                o.percentage = data.results[o.id];
+                            }
+                        });
+                    }
+                } catch(e) { console.error('Vote failed:', e); }
+            },
+            recalculatePercentages() {
+                const t = this.total;
+                if (t === 0) return;
+                this.options.forEach(o => {
+                    o.percentage = Math.round((o.votes / t) * 100);
+                });
+            }
+         }">
+<!-- Decorative Background Text -->
+<div class="absolute -top-10 -right-10 text-[10rem] md:text-[15rem] font-black text-white/5 uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+VOTE VOTE
+</div>
+
+<div class="container mx-auto px-6 max-w-[1400px] relative z-10 flex flex-col lg:flex-row gap-16 items-center">
+<!-- Left: Poll Context -->
+<div class="flex-1 w-full lg:max-w-xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 mb-6">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-[10px] font-black tracking-[0.2em] uppercase">Live Poll</span>
+</div>
+<h2 class="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-none mb-6 text-white text-wrap">
+{{ active_poll.question|safe }}
+</h2>
+<p class="font-mono text-sm tracking-widest uppercase opacity-70 mb-8 max-w-md">
+Cast your vote now. 
+</p>
+<div class="flex items-center gap-4 border-t border-white/20 pt-6">
+<span class="material-symbols-outlined text-primary text-3xl">how_to_vote</span>
+<div>
+<div class="font-black text-2xl tracking-tighter" x-text="total.toLocaleString()">0</div>
+<div class="font-mono text-[10px] tracking-widest uppercase opacity-50">Total Votes Cast</div>
+</div>
+</div>
+</div>
+
+<!-- Right: Brutalist Voting Interface -->
+<div class="flex-1 w-full border border-white/20 bg-black/50 backdrop-blur-md p-6 md:p-10 z-20">
+<div class="flex flex-col gap-4">
+
+<template x-for="(option, index) in options" :key="option.id">
+<!-- Poll Option Component -->
+<button @click="submitVote(option.id)" 
+        :class="{'cursor-default': voted, 'hover:border-primary hover:bg-black group': !voted, 'border-primary': selected === option.id, 'border-white/20': selected !== option.id}"
+        class="relative w-full border bg-white/5 flex items-center justify-between p-6 transition-all duration-300 text-left overflow-hidden">
+<!-- Result Bar (Hidden initially) -->
+<div x-show="voted" x-transition.duration.1000ms class="absolute left-0 top-0 bottom-0 bg-primary/20 z-0 transition-all duration-1000" :style="`width: ${option.percentage}%;`"></div>
+<div x-show="voted && selected === option.id" class="absolute left-0 top-0 bottom-0 w-2 bg-primary z-10"></div>
+    
+<div class="relative z-10 flex items-center gap-4">
+<div :class="{'bg-primary text-black border-transparent': selected === option.id, 'border-white/40 group-hover:border-primary text-white': selected !== option.id}" 
+     class="w-8 h-8 flex items-center justify-center border font-mono text-xs font-black transition-colors" x-text="String.fromCharCode(65 + index)">A</div>
+<span class="font-bold text-lg tracking-tight uppercase" x-text="option.text">Option</span>
+</div>
+<div x-show="voted" x-transition class="relative z-10 font-black text-xl text-primary" x-text="`${option.percentage}%`">0%</div>
+</button>
+</template>
+
+</div>
+<p x-show="voted" x-transition class="text-primary font-mono text-[10px] uppercase tracking-widest mt-6 text-center">
+    Vote registered. Broadcast updates at 20:00 KST.
+</p>
+</div>
+</div>
+</section>
+{% endif %}
+
 <!-- Trending Section (Brutalist Grid) -->
 <section class="w-full bg-black py-32 border-b border-white/10">
 <div class="container mx-auto px-6 max-w-[1400px]">
@@ -272,7 +385,7 @@
 <section class="relative w-full h-[80vh] min-h-[600px] flex items-center justify-center border-t border-b border-white/20 overflow-hidden bg-black group">
 <!-- Background Image with Parallax & Darken -->
 <div class="absolute inset-0 z-0 bg-black">
-<img src="{% static 'core/images/skz_ai/skz_group_new.jpg' %}" alt="Stray Kids Featured Artist" class="w-full h-full object-cover grayscale opacity-40 group-hover:opacity-50 group-hover:scale-105 transition-all duration-1000 mix-blend-luminosity">
+<img src="{% static 'core/images/skz_ai/stray_kids_performance.jpg' %}" alt="Stray Kids Featured Artist" class="w-full h-full object-cover grayscale opacity-40 group-hover:opacity-50 group-hover:scale-105 transition-all duration-1000 mix-blend-luminosity">
 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
 </div>
 

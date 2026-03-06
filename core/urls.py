@@ -56,6 +56,7 @@ urlpatterns = [
     path('live/ai/commentary/', views.ai_commentary, name='ai_commentary'),
     path('live/ai/theme/', views.ai_theme, name='ai_theme'),
     path('charts/ai/ranking/', views.ai_generate_ranking, name='ai_generate_ranking'),
+    path('vote-poll/', views.vote_poll, name='vote_poll'),
 
     # ── Dynamic Idol Pages ────────────────────────────────────────────────
     path('idols/<slug:slug>/', views.idol_page, name='idol_page'),

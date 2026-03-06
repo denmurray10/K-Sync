@@ -49,3 +49,25 @@ class KPopGroup(models.Model):
     
     def __str__(self):
         return f"{self.name} ({self.group_type})"
+
+class LivePoll(models.Model):
+    question = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.question
+
+class LivePollOption(models.Model):
+    poll = models.ForeignKey(LivePoll, related_name='options', on_delete=models.CASCADE)
+    text = models.CharField(max_length=255)
+    votes = models.IntegerField(default=0)
+
+    def percentage(self):
+        total = sum(option.votes for option in self.poll.options.all())
+        if total == 0:
+            return 0
+        return int((self.votes / total) * 100)
+
+    def __str__(self):
+        return f"{self.text} ({self.votes} votes)"

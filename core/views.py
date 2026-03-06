@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 import requests
 from openai import OpenAI
-from .models import Ranking, ComebackData, KPopGroup
+from .models import Ranking, ComebackData, KPopGroup, LivePoll
 
 # ── DeepSeek client ──────────────────────────────────────────────────────────
 def _ds_client():
@@ -114,11 +114,15 @@ def home(request):
         }
     ]
 
+    # Get the active LivePoll
+    active_poll = LivePoll.objects.filter(is_active=True).first()
+    
     return render(request, 'core/index.html', {
         'upcoming_comebacks': upcoming,
         'trending_tracks': trending,
         'news_articles': news_articles,
-        'current_month': now.strftime('%B %Y')
+        'current_month': now.strftime('%B %Y'),
+        'active_poll': active_poll
     })
 
 def charts(request):
@@ -631,3 +635,26 @@ def idol_page(request, slug):
         'gallery': [],
     }
     return render(request, 'core/idol_band_page.html', context)
+
+
+@csrf_exempt
+@require_POST
+def vote_poll(request):
+    from .models import LivePollOption
+    try:
+        data = json.loads(request.body)
+        option_id = data.get('option_id')
+        option = LivePollOption.objects.get(id=option_id)
+        option.votes += 1
+        option.save()
+        
+        poll = option.poll
+        total_votes = sum(o.votes for o in poll.options.all())
+        
+        results = {
+            o.id: o.percentage() for o in poll.options.all()
+        }
+        
+        return JsonResponse({'success': True, 'total_votes': total_votes, 'results': results})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
