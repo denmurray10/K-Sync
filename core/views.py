@@ -63,6 +63,10 @@ def home(request):
     upcoming_all = [r for r in all_releases if r['date_str'] >= today_str][:20]
     upcoming = upcoming_all[:4]
     upcoming_ticker = upcoming_all[4:20]
+    
+    # Ensure ticker isn't empty if we have releases but not enough for a separate ticker
+    if not upcoming_ticker and upcoming:
+        upcoming_ticker = upcoming
 
     # Trending Sidebar: Use daily ranking data (now synced from iChart)
     daily_rank = Ranking.objects.filter(timeframe='daily').first()
@@ -107,10 +111,15 @@ def home(request):
             })
             
     trending = trending_all[:10]
-    trending_ticker = trending_all[10:20]
+    if trending_all[10:20]:
+        trending_ticker = trending_all[10:20]
+    else:
+        # If we only have 10 or fewer items, duplicate them but with ranks 11-20
+        trending_ticker = [{**item, 'rank': item['rank'] + 10} for item in trending_all[:10]]
     
     # Fallback if DB is empty for the first 10
     if not trending and all_releases:
+        trending = []
         for idx, r in enumerate(all_releases[:10]):
             trending.append({
                 'rank': idx + 1,
@@ -121,7 +130,10 @@ def home(request):
                 'trend_class': 'text-slate-500',
                 'trend_value': '',
             })
-        for idx, r in enumerate(all_releases[10:20] if len(all_releases) >= 20 else all_releases[:10]):
+        
+        trending_ticker = []
+        ticker_source = all_releases[10:20] if len(all_releases) >= 20 else all_releases[:10]
+        for idx, r in enumerate(ticker_source):
             trending_ticker.append({
                 'rank': idx + 11,
                 'artist': r.get('artist'),
