@@ -66,27 +66,73 @@ def home(request):
     daily_rank = Ranking.objects.filter(timeframe='daily').first()
     trending = []
     if daily_rank and daily_rank.ranking_data:
-        raw_trending = daily_rank.ranking_data[:5]
+        raw_trending = daily_rank.ranking_data[:10]
+        
+        # Realistic fallback movement data in case 'trend' isn't explicitly defined in DB
+        mock_trends = [
+            ('—', 'text-slate-500', ''), 
+            ('▲', 'text-primary', '2'), 
+            ('▼', 'text-slate-500', '1'), 
+            ('—', 'text-slate-500', ''), 
+            ('▲', 'text-primary', '5'), 
+            ('—', 'text-slate-500', ''), 
+            ('▼', 'text-slate-500', '2'), 
+            ('▲', 'text-primary', '1'), 
+            ('—', 'text-slate-500', ''), 
+            ('▲', 'text-primary', '3')
+        ]
+        
         for idx, item in enumerate(raw_trending):
-            # Use artwork_url from iChart sync, or fallback to DiceBear
             img_url = item.get('artwork_url')
             if not img_url:
                 img_url = f"https://api.dicebear.com/7.x/initials/svg?seed={item.get('artist')}&backgroundColor=f425c0"
+            
+            trend_raw = item.get('trend')
+            if trend_raw and trend_raw != '-':
+                # Handle actual movement from the scraped data
+                if '+' in trend_raw or '▲' in trend_raw:
+                    trend_icon = '▲'
+                    trend_class = 'text-primary'
+                    trend_value = ''.join(filter(str.isdigit, trend_raw))
+                elif '-' in trend_raw or '▼' in trend_raw:
+                    trend_icon = '▼'
+                    trend_class = 'text-slate-500'
+                    trend_value = ''.join(filter(str.isdigit, trend_raw))
+                else:
+                    trend_icon = '—'
+                    trend_class = 'text-slate-500'
+                    trend_value = ''
+            else:
+                # Flatline for no movement
+                trend_icon = '—'
+                trend_class = 'text-slate-500'
+                trend_value = ''
             
             trending.append({
                 'rank': idx + 1,
                 'artist': item.get('artist'),
                 'title': item.get('track'),
                 'image': img_url,
+                'trend_icon': trend_icon,
+                'trend_class': trend_class,
+                'trend_value': trend_value,
             })
     else:
-        # Fallback to current releases if no ranking data
-        for idx, r in enumerate(all_releases[:5]):
+        mock_trends = [
+            ('—', 'text-slate-500', ''), ('▲', 'text-primary', '2'), ('▼', 'text-slate-500', '1'), 
+            ('—', 'text-slate-500', ''), ('▲', 'text-primary', '5'), ('—', 'text-slate-500', ''), 
+            ('▼', 'text-slate-500', '2'), ('▲', 'text-primary', '1'), ('—', 'text-slate-500', ''), ('—', 'text-slate-500', '')
+        ]
+        for idx, r in enumerate(all_releases[:10]):
+            t_icon, t_cls, t_val = mock_trends[idx] if idx < len(mock_trends) else ('—', 'text-slate-500', '')
             trending.append({
                 'rank': idx + 1,
                 'artist': r.get('artist'),
                 'title': r.get('title'),
                 'image': r.get('image'),
+                'trend_icon': t_icon,
+                'trend_class': t_cls,
+                'trend_value': t_val,
             })
 
     # Mock News Articles for Brutalist Section
