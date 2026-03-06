@@ -253,9 +253,9 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     PINK INFO BAR
+     PINK INFO BAR (Sticky)
      ═══════════════════════════════════════════════════════════════════════ -->
-<div class="relative w-full bg-primary border-t border-b border-white/20 h-24 flex items-center z-40 overflow-hidden">
+<div id="sticky-info-bar" class="sticky top-[96px] w-full bg-primary border-t border-b border-white/20 h-24 flex items-center z-40 overflow-hidden transition-[top] duration-300">
     <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
     <div class="container mx-auto max-w-[1400px] px-6 flex items-center relative h-full w-full z-10">
         <!-- Left: Status -->
@@ -318,7 +318,7 @@
                 <div class="flex items-end justify-between mb-8">
                     <div>
                         <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-2">Coming Up</p>
-                        <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter line-height-none">Up Next</h2>
+                        <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter leading-none">Up Next</h2>
                     </div>
                     <span class="material-symbols-outlined text-slate-500 text-3xl">queue_music</span>
                 </div>
@@ -396,7 +396,7 @@
                 <div class="flex items-end justify-between mb-8">
                     <div>
                         <p class="font-mono text-primary text-[10px] tracking-[0.4em] uppercase mb-2">Previously Aired</p>
-                        <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter line-height-none">Recently Played</h2>
+                        <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter leading-none">Recently Played</h2>
                     </div>
                     <span class="material-symbols-outlined text-slate-500 text-3xl">history</span>
                 </div>
@@ -469,7 +469,7 @@
                 <div class="flex items-end justify-between mb-8">
                     <div>
                         <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-2">Listener Feed</p>
-                        <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter line-height-none">Live Chat</h2>
+                        <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter leading-none">Live Chat</h2>
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="flex h-2 w-2 rounded-full bg-secondary animate-pulse"></span>
@@ -520,7 +520,7 @@
         <div class="flex items-end justify-between mb-12">
             <div>
                 <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-2">Powered by AI</p>
-                <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">AI DJ</h2>
+                <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter leading-none">AI DJ</h2>
             </div>
             <span class="material-symbols-outlined text-secondary text-3xl neon-text-cyan">smart_toy</span>
         </div>
@@ -616,6 +616,20 @@
             });
         }
         setInterval(updateListeners, 5000);
+
+        // Sticky Info Bar Offset Correction
+        const stickyBar = document.getElementById('sticky-info-bar');
+        if (stickyBar) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    // Header shrinks (header-glass) - adjust offset
+                    stickyBar.style.top = window.innerWidth < 768 ? '64px' : '72px';
+                } else {
+                    // Header is expanded
+                    stickyBar.style.top = window.innerWidth < 768 ? '80px' : '96px';
+                }
+            });
+        }
 
         // Live Chat Simulation
         const chatContainer = document.getElementById('chat-messages');
