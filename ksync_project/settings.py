@@ -132,6 +132,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ── AI API Keys ──────────────────────────────────────────────────────────────
-# Move to .env / environment variable before deploying to production
-DEEPSEEK_API_KEY = 'sk-16a74707578d4d589f9fb72db4954176'
-GETIMG_API_KEY = 'key-3t583MrYM5GrTQMJuymWSCOlQkylmA90xhvX7KB7eVRXgq24GwLXDHSYCVMqCDEBrTdYQn5n5MTVguY9tsFI8ZbQM4T4dbQ2'
+# In Heroku, add these via: heroku config:set DEEPSEEK_API_KEY=...
+DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', 'sk-16a74707578d4d589f9fb72db4954176')
+GETIMG_API_KEY = os.environ.get('GETIMG_API_KEY', 'key-3t583MrYM5GrTQMJuymWSCOlQkylmA90xhvX7KB7eVRXgq24GwLXDHSYCVMqCDEBrTdYQn5n5MTVguY9tsFI8ZbQM4T4dbQ2')
