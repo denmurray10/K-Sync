@@ -620,7 +620,7 @@
         // Sticky Info Bar Offset Correction
         const stickyBar = document.getElementById('sticky-info-bar');
         if (stickyBar) {
-            window.addEventListener('scroll', () => {
+            const updateStickyTop = () => {
                 if (window.scrollY > 20) {
                     // Header shrinks (header-glass) - adjust offset
                     stickyBar.style.top = window.innerWidth < 768 ? '64px' : '72px';
@@ -628,7 +628,22 @@
                     // Header is expanded
                     stickyBar.style.top = window.innerWidth < 768 ? '80px' : '96px';
                 }
-            });
+            };
+
+            let ticking = false;
+            const onScrollResize = () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        updateStickyTop();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            };
+
+            window.addEventListener('scroll', onScrollResize);
+            window.addEventListener('resize', onScrollResize);
+            updateStickyTop(); // Initial call
         }
 
         // Live Chat Simulation
