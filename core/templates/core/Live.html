@@ -89,6 +89,24 @@
     .progress-animate {
         animation: progress-sweep 240s linear infinite;
     }
+    /* Album art background zoom */
+    @keyframes ken-burns {
+        0%   { transform: scale(1.0); }
+        50%  { transform: scale(1.08); }
+        100% { transform: scale(1.0); }
+    }
+    .album-bg {
+        animation: ken-burns 30s ease-in-out infinite;
+    }
+    /* Album cover glow */
+    .album-cover-glow {
+        box-shadow: 0 0 30px rgba(244, 37, 192, 0.3), 0 0 60px rgba(244, 37, 192, 0.15);
+        transition: box-shadow 0.5s ease, transform 0.5s ease;
+    }
+    .album-cover-glow:hover {
+        box-shadow: 0 0 40px rgba(244, 37, 192, 0.5), 0 0 80px rgba(244, 37, 192, 0.25);
+        transform: translateY(-4px);
+    }
     /* Scroll Reveal */
     .reveal-up {
         opacity: 0;
@@ -116,15 +134,20 @@
      HERO PLAYER — FULL SCREEN
      ═══════════════════════════════════════════════════════════════════════ -->
 <section class="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden">
-    <!-- Background -->
-    <div class="absolute inset-0 z-0 bg-black">
-        <div class="w-full h-full bg-cover bg-center bg-fixed opacity-20 grayscale mix-blend-luminosity" style="background-image: url('{% static 'core/images/about_banner.webp' %}');"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black"></div>
+    <!-- Background: Blurred Album Art -->
+    <div class="absolute inset-0 z-0 bg-black overflow-hidden">
+        <div class="absolute inset-[-50px] album-bg">
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4d/e2/7b/4de27bfd-1743-4fa1-76e5-3e04ceaef27a/196922440700.jpg/600x600bb.jpg"
+                 alt="" class="w-full h-full object-cover blur-[60px] opacity-40 scale-110" />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/50"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black"></div>
+        <!-- Subtle colour tint overlay -->
+        <div class="absolute inset-0 bg-primary/5 mix-blend-overlay"></div>
     </div>
 
     <!-- Central Player -->
-    <div class="relative z-20 flex flex-col items-center text-center px-6 pt-48 pb-24 max-w-4xl mx-auto w-full">
+    <div class="relative z-20 flex flex-col items-center text-center px-6 pt-48 pb-24 max-w-5xl mx-auto w-full">
 
         <!-- Live Badge -->
         <div class="flex items-center gap-2 px-4 py-2 border border-red-500/40 bg-red-500/10 backdrop-blur-sm mb-10">
@@ -135,38 +158,51 @@
             <span class="text-[10px] font-black uppercase tracking-[0.3em] text-red-400">Live On Air</span>
         </div>
 
-        <!-- Waveform Visualizer (Large) -->
-        <div class="flex gap-1 items-end h-24 md:h-32 mb-12 opacity-80">
-            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 0.7s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 1.1s;"></div>
-            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.9s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.3s;"></div>
-            <div class="w-1 md:w-1.5 bg-secondary/80 bar-animate-lg" style="animation-duration: 0.6s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary/60 bar-animate-lg" style="animation-duration: 1.0s;"></div>
-            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.8s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.2s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 0.5s;"></div>
-            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 1.4s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 0.7s;"></div>
-            <div class="w-1 md:w-1.5 bg-secondary/80 bar-animate-lg" style="animation-duration: 1.1s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary/60 bar-animate-lg" style="animation-duration: 0.9s;"></div>
-            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 1.3s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 0.6s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.0s;"></div>
-            <div class="w-1 md:w-1.5 bg-secondary/80 bar-animate-lg" style="animation-duration: 0.8s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.2s;"></div>
-            <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.5s;"></div>
-            <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 1.4s;"></div>
-        </div>
+        <!-- Album Art + Track Info Row -->
+        <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-12 w-full justify-center">
+            <!-- Album Cover -->
+            <div class="w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0 border-2 border-white/20 album-cover-glow overflow-hidden relative group">
+                <img src="https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4d/e2/7b/4de27bfd-1743-4fa1-76e5-3e04ceaef27a/196922440700.jpg/600x600bb.jpg"
+                     alt="Seven - Jung Kook" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <!-- Overlay gradient -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+            </div>
 
-        <!-- Track Info -->
-        <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-4">Now Playing</p>
-        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-4">
-            SEVEN
-        </h1>
-        <p class="text-lg md:text-xl text-slate-300 font-light tracking-wide uppercase mb-12">
-            Jung Kook feat. Latto
-        </p>
+            <!-- Track Info & Waveforms -->
+            <div class="flex flex-col items-center md:items-start text-center md:text-left">
+                <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-3">Now Playing</p>
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-3">
+                    SEVEN
+                </h1>
+                <p class="text-lg md:text-xl text-slate-300 font-light tracking-wide uppercase mb-6">
+                    Jung Kook feat. Latto
+                </p>
+
+                <!-- Inline Waveform -->
+                <div class="flex gap-1 items-end h-12 md:h-16 opacity-80">
+                    <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 0.7s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 1.1s;"></div>
+                    <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.9s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.3s;"></div>
+                    <div class="w-1 md:w-1.5 bg-secondary/80 bar-animate-lg" style="animation-duration: 0.6s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary/60 bar-animate-lg" style="animation-duration: 1.0s;"></div>
+                    <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.8s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.2s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 0.5s;"></div>
+                    <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 1.4s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 0.7s;"></div>
+                    <div class="w-1 md:w-1.5 bg-secondary/80 bar-animate-lg" style="animation-duration: 1.1s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary/60 bar-animate-lg" style="animation-duration: 0.9s;"></div>
+                    <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 1.3s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 0.6s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.0s;"></div>
+                    <div class="w-1 md:w-1.5 bg-secondary/80 bar-animate-lg" style="animation-duration: 0.8s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary bar-animate-lg" style="animation-duration: 1.2s;"></div>
+                    <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.5s;"></div>
+                    <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 1.4s;"></div>
+                </div>
+            </div>
+        </div>
 
         <!-- Play Button -->
         <button id="play-btn" class="w-20 h-20 md:w-24 md:h-24 bg-primary text-black hover:bg-white flex items-center justify-center transition-all duration-300 border border-primary shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] pulse-glow mb-10">
