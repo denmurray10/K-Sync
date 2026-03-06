@@ -2,6 +2,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from django.utils import timezone
 import json
 import logging
+import re
 from core.models import Ranking
 from core.views import _chat
 import urllib.request
@@ -61,7 +62,7 @@ def generate_ranking(timeframe):
         }.get(timeframe, 'over the past 7 days')
 
         prompt = (
-            f"Generate a definitive K-Pop power ranking of the Top 10 tracks {timeframe_text}. "
+            f"Generate a definitive K-Pop power ranking of the Top 20 tracks {timeframe_text}. "
             "Synthesize high-velocity data from three pillars: "
             "1. Digital Impact (Streaming - 50% Weight): Circle Chart (Digital), MelOn Top 100, Spotify Daily Top Songs South Korea, YouTube Music. "
             "2. Music Show Wins (20% Weight): M Countdown, Music Bank, Inkigayo. "
@@ -76,28 +77,31 @@ def generate_ranking(timeframe):
         )
     
     try:
-        raw_response = _chat(prompt, system="You are an expert K-Pop music industry analyst and data synthesizer.")
+        raw_response = _chat(prompt, system="You are an expert K-Pop music industry analyst and data synthesizer. Return ONLY raw JSON.")
         
-        start_idx = raw_response.find('[')
-        end_idx = raw_response.rfind(']') + 1
-        
-        if start_idx != -1 and end_idx != -1:
-            json_str = raw_response[start_idx:end_idx]
+        # Robust JSON extraction
+        json_match = re.search(r'\[\s*\{.*\}\s*\]', raw_response, re.DOTALL)
+        if json_match:
+            json_str = json_match.group(0)
             ranking_data = json.loads(json_str)
             
             # Fetch album art for each track
             for item in ranking_data:
-                item['artwork_url'] = fetch_album_art(item.get('artist', ''), item.get('track', ''))
+                if not item.get('artwork_url'):
+                    item['artwork_url'] = fetch_album_art(item.get('artist', ''), item.get('track', ''))
                 
-            # Save to Database using update_or_create to avoid IntegrityError
-            Ranking.objects.update_or_create(
-                date=today,
-                timeframe=timeframe,
-                defaults={'ranking_data': ranking_data}
-            )
-            logger.info(f"Successfully generated and saved {timeframe} ranking for {today}.")
+            # Double check we have a decent sized list
+            if len(ranking_data) > 0:
+                Ranking.objects.update_or_create(
+                    date=today,
+                    timeframe=timeframe,
+                    defaults={'ranking_data': ranking_data}
+                )
+                logger.info(f"Successfully generated and saved {len(ranking_data)} items for {timeframe} ranking for {today}.")
+            else:
+                logger.error(f"AI returned an empty list for {timeframe}")
         else:
-            logger.error(f"Failed to find JSON brackets in AI response: {raw_response}")
+            logger.error(f"Failed to find JSON array in AI response for {timeframe}: {raw_response[:200]}...")
             
     except Exception as e:
         logger.error(f"Exception during scheduled {timeframe} ranking generation: {e}")
@@ -163,7 +167,7 @@ def sync_ichart_data():
             # Find entries: <a class="flex w-full gap-3 ...">
             entries = re.findall(r'<a[^>]+flex[^>]+w-full[^>]+gap-3[^>]*>(.*?)</a>', html, re.DOTALL)
             
-            for i, entry in enumerate(entries[:10]):
+            for i, entry in enumerate(entries[:20]):
                 title_match = re.search(r'<h3[^>]*>(.*?)</h3>', entry)
                 # Cleanup title: remove HTML tags if any
                 title = re.sub(r'<[^>]+>', '', title_match.group(1)).strip() if title_match else None
@@ -228,9 +232,7 @@ def start_scheduler():
     # Schedule Calendar Sync: Run every 6 hours
     scheduler.add_job(sync_calendar_data, 'interval', hours=6, id='sync_calendar_data', replace_existing=True)
     
-    # Run a sync immediately on startup
-    scheduler.add_job(sync_calendar_data, 'date', run_date=timezone.now(), id='initial_calendar_sync')
-    scheduler.add_job(sync_ichart_data, 'date', run_date=timezone.now(), id='initial_ichart_sync')
+    scheduler.add_job(generate_ranking, 'date', args=['daily'], run_date=timezone.now(), id='initial_daily_sync')
     scheduler.add_job(generate_ranking, 'date', args=['soloists'], run_date=timezone.now(), id='initial_soloists_sync')
     scheduler.add_job(generate_ranking, 'date', args=['groups'], run_date=timezone.now(), id='initial_groups_sync')
 

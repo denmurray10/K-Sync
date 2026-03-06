@@ -45,12 +45,13 @@
              box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
         }
         /* Ticker Animation */
-        @keyframes ticker {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
         .animate-ticker {
-            animation: ticker 30s linear infinite;
+            width: max-content;
+            animation: ticker-scroll 40s linear infinite;
         }
         /* Audio Visualizer Waveform Animation */
         @keyframes equalize {
@@ -61,6 +62,22 @@
         .bar-animate {
             animation: equalize 1s ease-in-out infinite;
             transform-origin: bottom;
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.is-visible, .reveal-left.is-visible {
+            opacity: 1;
+            transform: translate(0);
         }
     </style>
 </head>
@@ -292,7 +309,7 @@ VOTE VOTE
 
 <div class="container mx-auto px-6 max-w-[1400px] relative z-10 flex flex-col lg:flex-row gap-16 items-center">
 <!-- Left: Poll Context -->
-<div class="flex-1 w-full lg:max-w-xl">
+<div class="flex-1 w-full lg:max-w-xl reveal-left">
 <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 mb-6">
 <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
 <span class="text-[10px] font-black tracking-[0.2em] uppercase">Live Poll</span>
@@ -313,7 +330,7 @@ Cast your vote now.
 </div>
 
 <!-- Right: Brutalist Voting Interface -->
-<div class="flex-1 w-full border border-white/20 bg-black/50 backdrop-blur-md p-6 md:p-10 z-20">
+<div class="flex-1 w-full border border-white/20 bg-black/50 backdrop-blur-md p-6 md:p-10 z-20 reveal-up">
 <div class="flex flex-col gap-4">
 
 <template x-for="(option, index) in options" :key="option.id">
@@ -346,16 +363,47 @@ Cast your vote now.
 <!-- Trending Section (Brutalist Grid) -->
 <section class="w-full bg-black py-32 border-b border-white/10">
 <div class="container mx-auto px-6 max-w-[1400px]">
-<div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
-<div>
+<div class="flex items-end justify-between pb-4 border-b border-white/20">
+<div class="reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">TRENDING <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">NOW</span></h2>
 <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">The hottest tracks lighting up the charts right now.</p>
 </div>
-<a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase" href="{% url 'charts' %}">
+<a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase reveal-left" style="transition-delay: 200ms;" href="{% url 'charts' %}">
                     View Full Chart <span class="material-symbols-outlined text-sm">arrow_forward</span>
 </a>
 </div>
-<div class="flex flex-col border-t border-white/20">
+
+<!-- Brutalist Ticker for Tracks 11-20 -->
+<div class="relative w-full overflow-hidden bg-black border-y border-white/10 h-12 flex items-center reveal-up" style="transition-delay: 100ms;">
+<div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
+<div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
+<div class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
+    {% for track in trending_ticker_tracks %}
+    <a href="{% url 'charts' %}" class="inline-flex items-center gap-3 group/t cursor-pointer shrink-0">
+        <span class="font-black text-white/50 group-hover/t:text-white transition-colors">{{ track.rank }}</span>
+        <span class="font-black text-xs uppercase tracking-tighter text-white group-hover/t:text-primary transition-colors">{{ track.title }}</span>
+        <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">{{ track.artist }}</span>
+        <div class="flex items-center gap-1 font-mono text-[9px] uppercase font-bold {{ track.trend_class }}">
+            <span>{{ track.trend_icon }}</span> <span>{{ track.trend_value }}</span>
+        </div>
+        <span class="text-white/20 mx-4">/</span>
+    </a>
+    {% endfor %}
+    <!-- Duplicate for seamless loop if needed by CSS -->
+    {% for track in trending_ticker_tracks %}
+    <a href="{% url 'charts' %}" class="inline-flex items-center gap-3 group/t cursor-pointer shrink-0">
+        <span class="font-black text-white/50 group-hover/t:text-white transition-colors">{{ track.rank }}</span>
+        <span class="font-black text-xs uppercase tracking-tighter text-white group-hover/t:text-primary transition-colors">{{ track.title }}</span>
+        <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">{{ track.artist }}</span>
+        <div class="flex items-center gap-1 font-mono text-[9px] uppercase font-bold {{ track.trend_class }}">
+            <span>{{ track.trend_icon }}</span> <span>{{ track.trend_value }}</span>
+        </div>
+        <span class="text-white/20 mx-4">/</span>
+    </a>
+    {% endfor %}
+</div>
+</div>
+<div class="flex flex-col border-t border-white/20 reveal-up">
 
 {% for track in trending_tracks %}
 <div class="group flex items-center justify-between border-b border-white/20 hover:bg-white hover:text-black transition-colors cursor-pointer p-4 sm:p-6" onclick="window.location.href='{% url 'charts' %}'">
@@ -405,7 +453,7 @@ Cast your vote now.
 
 <div class="container mx-auto px-6 max-w-[1400px] relative z-20 flex flex-col md:flex-row items-end justify-between h-full pb-24">
 <!-- Left: Text -->
-<div class="flex flex-col max-w-2xl">
+<div class="flex flex-col max-w-2xl reveal-left">
 <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 self-start mb-6">
 <span class="text-[10px] font-black tracking-[0.2em] uppercase">Artist of the Week</span>
 </div>
@@ -425,7 +473,7 @@ Experience the explosive energy of this generation's most dynamic self-producing
 </div>
 
 <!-- Right: Top Tracks -->
-<div class="hidden lg:flex flex-col gap-4 w-72 backdrop-blur-md bg-black/60 border border-white/20 p-6 self-end mb-6">
+<div class="hidden lg:flex flex-col gap-4 w-72 backdrop-blur-md bg-black/60 border border-white/20 p-6 self-end mb-6 reveal-up" style="transition-delay: 200ms;">
 <h3 class="text-white font-black uppercase tracking-widest text-sm mb-4 border-b border-white/20 pb-2">Essential Tracks</h3>
 <div class="flex flex-col gap-4">
 <a href="#" class="group/track flex items-center justify-between hover:text-primary transition-colors">
@@ -449,15 +497,15 @@ Experience the explosive energy of this generation's most dynamic self-producing
 <section class="bg-black py-32 border-t border-white/5">
 <div class="container mx-auto px-6 max-w-[1400px]">
 <div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
-<div>
+<div class="reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">UPCOMING <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">COMEBACKS</span></h2>
 <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">The official schedule for upcoming K-Pop releases and debuts.</p>
 </div>
-<a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase" href="{% url 'comeback_timeline' %}">
+<a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase reveal-left" style="transition-delay: 200ms;" href="{% url 'comeback_timeline' %}">
                     Full Calendar <span class="material-symbols-outlined text-sm">arrow_forward</span>
 </a>
 </div>
-<div class="flex flex-col border-t border-white/20">
+<div class="flex flex-col border-t border-white/20 reveal-up">
 
 {% for r in upcoming_comebacks %}
 <div class="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-6 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer" onclick="window.location.href='{% url 'comeback_timeline' %}'">
@@ -493,16 +541,16 @@ Experience the explosive energy of this generation's most dynamic self-producing
 <section class="w-full bg-black py-32 border-t border-white/10">
 <div class="container mx-auto px-6 max-w-[1400px]">
 <div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
-<div>
+<div class="reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">LATEST <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">NEWS</span></h2>
 <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Stay updated with the latest in the K-Pop universe.</p>
 </div>
-<a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase" href="{% url 'news' %}">
+<a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase reveal-left" style="transition-delay: 200ms;" href="{% url 'news' %}">
                     Read More News <span class="material-symbols-outlined text-sm">arrow_forward</span>
 </a>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 reveal-up">
 {% for article in news_articles %}
 <div class="group cursor-pointer" onclick="window.location.href='{% url 'news' %}'">
 <div class="relative aspect-video mb-6 overflow-hidden border border-white/10">
@@ -523,13 +571,13 @@ Experience the explosive energy of this generation's most dynamic self-producing
 </div>
 </section>
 <!-- Newsletter / CTA (Sharp Block) -->
-<section class="border-t border-b border-white/20 bg-primary">
+<section class="border-t border-b border-white/20 bg-primary overflow-hidden">
 <div class="container mx-auto px-6 py-24 max-w-5xl flex flex-col md:flex-row items-center justify-between gap-12">
-<div class="w-full md:w-1/2">
+<div class="w-full md:w-1/2 reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-black leading-none tracking-tighter uppercase mb-4">NEVER MISS <br/>A BEAT</h2>
 <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-4">Join the community. Get exclusive access to artist fan-signs, concert ticket giveaways, and weekly chart updates.</p>
 </div>
-<div class="w-full md:w-1/2">
+<div class="w-full md:w-1/2 reveal-left" style="transition-delay: 200ms;">
 <form class="flex flex-col w-full gap-4">
 <input class="w-full bg-black border border-black px-6 py-4 text-white placeholder:text-slate-500 focus:outline-none placeholder:font-mono placeholder:uppercase placeholder:text-xs placeholder:tracking-widest rounded-none text-sm" placeholder="Enter your email address" type="email"/>
 <button class="w-full bg-white hover:bg-black hover:text-white text-black font-black px-10 py-5 rounded-none transition-colors uppercase tracking-[0.2em] text-sm border border-black" type="button">
@@ -584,6 +632,29 @@ function updateCountdowns() {
 updateCountdowns();
 setInterval(updateCountdowns, 60000);
 window.addEventListener('load', fetchLiveArtwork);
+
+// ── Scroll Reveal Animations ─────────────────────────────────────
+const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.15
+};
+
+const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target); // Only animate once
+        }
+    });
+}, observerOptions);
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => {
+        observer.observe(el);
+    });
+});
+
 // ── Sparkle Particles Canvas ─────────────────────────────────────
 const canvas = document.getElementById('sparkle-canvas');
 const ctx = canvas.getContext('2d');

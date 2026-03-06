@@ -24,7 +24,7 @@ def _chat(prompt, system="You are an expert K-Pop radio assistant."):
             {'role': 'system', 'content': system},
             {'role': 'user',   'content': prompt},
         ],
-        max_tokens=1000,
+        max_tokens=4000,
         temperature=0.8,
     )
     return resp.choices[0].message.content.strip()
@@ -64,23 +64,9 @@ def home(request):
 
     # Trending Sidebar: Use daily ranking data (now synced from iChart)
     daily_rank = Ranking.objects.filter(timeframe='daily').first()
-    trending = []
+    trending_all = []
     if daily_rank and daily_rank.ranking_data:
-        raw_trending = daily_rank.ranking_data[:10]
-        
-        # Realistic fallback movement data in case 'trend' isn't explicitly defined in DB
-        mock_trends = [
-            ('—', 'text-slate-500', ''), 
-            ('▲', 'text-primary', '2'), 
-            ('▼', 'text-slate-500', '1'), 
-            ('—', 'text-slate-500', ''), 
-            ('▲', 'text-primary', '5'), 
-            ('—', 'text-slate-500', ''), 
-            ('▼', 'text-slate-500', '2'), 
-            ('▲', 'text-primary', '1'), 
-            ('—', 'text-slate-500', ''), 
-            ('▲', 'text-primary', '3')
-        ]
+        raw_trending = daily_rank.ranking_data[:20]
         
         for idx, item in enumerate(raw_trending):
             img_url = item.get('artwork_url')
@@ -108,7 +94,7 @@ def home(request):
                 trend_class = 'text-slate-500'
                 trend_value = ''
             
-            trending.append({
+            trending_all.append({
                 'rank': idx + 1,
                 'artist': item.get('artist'),
                 'title': item.get('track'),
@@ -117,22 +103,31 @@ def home(request):
                 'trend_class': trend_class,
                 'trend_value': trend_value,
             })
-    else:
-        mock_trends = [
-            ('—', 'text-slate-500', ''), ('▲', 'text-primary', '2'), ('▼', 'text-slate-500', '1'), 
-            ('—', 'text-slate-500', ''), ('▲', 'text-primary', '5'), ('—', 'text-slate-500', ''), 
-            ('▼', 'text-slate-500', '2'), ('▲', 'text-primary', '1'), ('—', 'text-slate-500', ''), ('—', 'text-slate-500', '')
-        ]
+            
+    trending = trending_all[:10]
+    trending_ticker = trending_all[10:20]
+    
+    # Fallback if DB is empty for the first 10
+    if not trending and all_releases:
         for idx, r in enumerate(all_releases[:10]):
-            t_icon, t_cls, t_val = mock_trends[idx] if idx < len(mock_trends) else ('—', 'text-slate-500', '')
             trending.append({
                 'rank': idx + 1,
                 'artist': r.get('artist'),
                 'title': r.get('title'),
                 'image': r.get('image'),
-                'trend_icon': t_icon,
-                'trend_class': t_cls,
-                'trend_value': t_val,
+                'trend_icon': '—',
+                'trend_class': 'text-slate-500',
+                'trend_value': '',
+            })
+        for idx, r in enumerate(all_releases[10:20] if len(all_releases) >= 20 else all_releases[:10]):
+            trending_ticker.append({
+                'rank': idx + 11,
+                'artist': r.get('artist'),
+                'title': r.get('title'),
+                'image': r.get('image'),
+                'trend_icon': '—',
+                'trend_class': 'text-slate-500',
+                'trend_value': '',
             })
 
     # Mock News Articles for Brutalist Section
@@ -166,6 +161,7 @@ def home(request):
     return render(request, 'core/index.html', {
         'upcoming_comebacks': upcoming,
         'trending_tracks': trending,
+        'trending_ticker_tracks': trending_ticker,
         'news_articles': news_articles,
         'current_month': now.strftime('%B %Y'),
         'active_poll': active_poll
