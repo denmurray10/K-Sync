@@ -1,0 +1,442 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>K-Beats Shop</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#000000",
+                        "secondary": "#00f0ff",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-ticker {
+            width: max-content;
+            animation: ticker-scroll 30s linear infinite;
+        }
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.is-visible, .reveal-left.is-visible {
+            opacity: 1;
+            transform: translate(0);
+        }
+        body {
+            zoom: 0.9;
+            -moz-transform: scale(0.9);
+            -moz-transform-origin: 0 0;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+{% include 'core/header.html' %}
+
+<main class="flex-grow pt-0">
+
+    <!-- Hero Section -->
+    <section class="relative h-[60vh] min-h-[500px] w-full overflow-hidden flex items-end border-b border-white/10">
+        <div class="absolute inset-0 z-0 bg-black">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/20 via-black to-secondary/10"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+            <!-- Decorative text -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20vw] font-black text-white/[0.03] uppercase leading-none whitespace-nowrap pointer-events-none select-none">
+                SHOP
+            </div>
+        </div>
+        <div class="relative z-20 container mx-auto px-6 max-w-[1400px] pb-16 md:pb-24">
+            <div class="flex flex-col gap-0 max-w-4xl reveal-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 self-start mb-6">
+                    <span class="material-symbols-outlined text-sm">storefront</span>
+                    <span class="text-[10px] font-black tracking-[0.2em] uppercase">Official Store</span>
+                </div>
+                <h1 class="text-[10vw] sm:text-5xl md:text-[5.5rem] lg:text-[7rem] font-black text-white leading-[0.85] tracking-tighter uppercase whitespace-nowrap">
+                    K-BEATS <span class="text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">SHOP</span>
+                </h1>
+                <p class="text-base md:text-lg text-slate-300 max-w-md font-light leading-relaxed mt-8 tracking-wide">
+                    Exclusive merch, limited drops, and collector's editions. Rep your bias with style.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ticker -->
+    <div class="relative w-full bg-primary border-t border-b border-white/20 h-14 flex items-center z-40 overflow-hidden">
+        <div class="whitespace-nowrap flex items-center gap-8 animate-ticker">
+            {% for i in "123456" %}
+            <span class="inline-flex items-center gap-4 shrink-0">
+                <span class="font-black text-black text-sm uppercase tracking-[0.2em]">Limited Drops</span>
+                <span class="text-black/60">/</span>
+                <span class="font-black text-black text-sm uppercase tracking-[0.2em]">Free Shipping Over £75</span>
+                <span class="text-black/60">/</span>
+                <span class="font-black text-black text-sm uppercase tracking-[0.2em]">Exclusive Merch</span>
+                <span class="text-black/60">/</span>
+                <span class="font-black text-black text-sm uppercase tracking-[0.2em]">New Arrivals Weekly</span>
+                <span class="text-black/60 mx-4">/</span>
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Category Filter Tabs -->
+    <section class="w-full bg-black border-b border-white/10" x-data="{ activeTab: 'all' }">
+        <div class="container mx-auto px-6 max-w-[1400px] py-6">
+            <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+                <template x-for="tab in ['all', 'apparel', 'albums', 'accessories', 'lightsticks', 'posters']" :key="tab">
+                    <button
+                        @click="activeTab = tab"
+                        :class="activeTab === tab ? 'bg-primary text-black border-primary' : 'bg-transparent text-white border-white/20 hover:border-primary hover:text-primary'"
+                        class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border transition-colors whitespace-nowrap"
+                        x-text="tab"
+                    ></button>
+                </template>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Drop Banner -->
+    <section class="w-full bg-black py-20 border-b border-white/10 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 text-[10rem] md:text-[15rem] font-black text-white/5 uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+            LIMITED
+        </div>
+        <div class="container mx-auto px-6 max-w-[1400px] relative z-10">
+            <div class="flex flex-col lg:flex-row items-stretch border border-white/20 bg-white/5 overflow-hidden reveal-up">
+                <!-- Left: Image -->
+                <div class="w-full lg:w-1/2 aspect-square lg:aspect-auto relative overflow-hidden bg-black/50 min-h-[300px]">
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/30 via-black/50 to-secondary/20"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[120px] md:text-[200px] text-white/10">diamond</span>
+                    </div>
+                    <div class="absolute top-6 left-6">
+                        <span class="bg-primary text-black text-[10px] font-black px-3 py-1.5 uppercase tracking-[0.2em]">Limited Edition</span>
+                    </div>
+                </div>
+                <!-- Right: Info -->
+                <div class="w-full lg:w-1/2 p-10 md:p-16 flex flex-col justify-center">
+                    <span class="text-primary font-mono text-[10px] tracking-[0.3em] uppercase mb-4">Featured Drop · March 2026</span>
+                    <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none mb-4">
+                        K-BEATS<br/><span class="text-primary">SPECTRUM</span><br/>COLLECTION
+                    </h2>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed mb-8 max-w-md">
+                        The official Spectrum Collection. Premium streetwear designed for the culture. Each piece is individually numbered.
+                    </p>
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="text-white font-black text-3xl tracking-tighter">£89.00</span>
+                        <span class="text-slate-500 line-through text-lg">£120.00</span>
+                    </div>
+                    <button class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] w-max">
+                        Shop Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Grid -->
+    <section class="w-full bg-black py-32 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">ALL<br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">PRODUCTS</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Browse our full catalogue of official K-Beats merchandise.</p>
+                </div>
+                <div class="hidden sm:flex items-center gap-4 pb-2">
+                    <span class="text-white/40 font-mono text-[10px] uppercase tracking-widest">Sort by</span>
+                    <select class="bg-transparent border border-white/20 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 focus:outline-none focus:border-primary">
+                        <option value="newest">Newest</option>
+                        <option value="price-low">Price: Low</option>
+                        <option value="price-high">Price: High</option>
+                        <option value="popular">Popular</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal-up">
+
+                <!-- Product 1 -->
+                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                    <div class="relative aspect-square overflow-hidden bg-black/50">
+                        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">checkroom</span>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">New</span>
+                    </div>
+                    <div class="p-6 border-t border-white/10">
+                        <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Apparel</span>
+                        <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Neon Logo Hoodie</h3>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-white font-black text-xl tracking-tighter">£79.00</span>
+                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
+                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                    <div class="relative aspect-square overflow-hidden bg-black/50">
+                        <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">album</span>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Sold Out</span>
+                    </div>
+                    <div class="p-6 border-t border-white/10">
+                        <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Albums</span>
+                        <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Stray Kids &middot; ROCK-STAR</h3>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-white font-black text-xl tracking-tighter">£34.99</span>
+                            <button class="border border-white/20 text-white/30 p-2 cursor-not-allowed" disabled>
+                                <span class="material-symbols-outlined text-lg">remove_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                    <div class="relative aspect-square overflow-hidden bg-black/50">
+                        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-black group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">flashlight_on</span>
+                        </div>
+                    </div>
+                    <div class="p-6 border-t border-white/10">
+                        <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Lightsticks</span>
+                        <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Official ARMY Bomb Ver.4</h3>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-white font-black text-xl tracking-tighter">£59.99</span>
+                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
+                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                    <div class="relative aspect-square overflow-hidden bg-black/50">
+                        <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">image</span>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-secondary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Hot</span>
+                    </div>
+                    <div class="p-6 border-t border-white/10">
+                        <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Posters</span>
+                        <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">NewJeans &middot; Get Up Poster</h3>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-white font-black text-xl tracking-tighter">£24.99</span>
+                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
+                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 5 -->
+                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                    <div class="relative aspect-square overflow-hidden bg-black/50">
+                        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">checkroom</span>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Sale</span>
+                    </div>
+                    <div class="p-6 border-t border-white/10">
+                        <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Apparel</span>
+                        <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Spectrum Oversized Tee</h3>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-primary font-black text-xl tracking-tighter">£39.00</span>
+                                <span class="text-slate-500 line-through text-sm">£55.00</span>
+                            </div>
+                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
+                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 6 -->
+                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                    <div class="relative aspect-square overflow-hidden bg-black/50">
+                        <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">album</span>
+                        </div>
+                    </div>
+                    <div class="p-6 border-t border-white/10">
+                        <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Albums</span>
+                        <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">aespa &middot; Armageddon</h3>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-white font-black text-xl tracking-tighter">£29.99</span>
+                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
+                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 7 -->
+                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                    <div class="relative aspect-square overflow-hidden bg-black/50">
+                        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-black group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">deployed_code</span>
+                        </div>
+                    </div>
+                    <div class="p-6 border-t border-white/10">
+                        <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Accessories</span>
+                        <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Photocard Binder Set</h3>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-white font-black text-xl tracking-tighter">£19.99</span>
+                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
+                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 8 -->
+                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                    <div class="relative aspect-square overflow-hidden bg-black/50">
+                        <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">flashlight_on</span>
+                        </div>
+                        <span class="absolute top-4 left-4 bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">New</span>
+                    </div>
+                    <div class="p-6 border-t border-white/10">
+                        <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Lightsticks</span>
+                        <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">BLINK Official Lightstick</h3>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-white font-black text-xl tracking-tighter">£54.99</span>
+                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
+                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Load More -->
+            <div class="flex justify-center mt-16 reveal-up">
+                <button class="bg-transparent text-white font-black uppercase tracking-[0.2em] text-xs px-12 py-5 border border-white/20 hover:border-primary hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    Load More Products
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Shop With Us -->
+    <section class="w-full bg-white text-black py-20 border-b border-white/20">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-0 border border-black reveal-up">
+                <div class="p-10 border-b md:border-b-0 md:border-r border-black flex flex-col items-start group hover:bg-black hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-6">local_shipping</span>
+                    <h3 class="font-black text-xl uppercase tracking-tight mb-2">Free Shipping</h3>
+                    <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">On orders over £75 worldwide.</p>
+                </div>
+                <div class="p-10 border-b md:border-b-0 md:border-r border-black flex flex-col items-start group hover:bg-black hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-6">verified</span>
+                    <h3 class="font-black text-xl uppercase tracking-tight mb-2">100% Authentic</h3>
+                    <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">Official licensed merchandise only.</p>
+                </div>
+                <div class="p-10 border-b md:border-b-0 md:border-r border-black flex flex-col items-start group hover:bg-black hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-6">autorenew</span>
+                    <h3 class="font-black text-xl uppercase tracking-tight mb-2">Easy Returns</h3>
+                    <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">30-day hassle-free return policy.</p>
+                </div>
+                <div class="p-10 flex flex-col items-start group hover:bg-black hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-6">lock</span>
+                    <h3 class="font-black text-xl uppercase tracking-tight mb-2">Secure Checkout</h3>
+                    <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">Encrypted payment for your safety.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter CTA -->
+    <section class="border-t border-b border-white/20 bg-primary overflow-hidden">
+        <div class="container mx-auto px-6 py-24 max-w-5xl flex flex-col md:flex-row items-center justify-between gap-12">
+            <div class="w-full md:w-1/2 reveal-left">
+                <h2 class="text-5xl md:text-7xl font-black text-black leading-none tracking-tighter uppercase mb-4">GET 10%<br/>OFF</h2>
+                <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-4">Subscribe for exclusive drops, early access, and a welcome discount on your first order.</p>
+            </div>
+            <div class="w-full md:w-1/2 reveal-left" style="transition-delay: 200ms;">
+                <form class="flex flex-col w-full gap-4">
+                    <input class="w-full bg-black border border-black px-6 py-4 text-white placeholder:text-slate-500 focus:outline-none placeholder:font-mono placeholder:uppercase placeholder:text-xs placeholder:tracking-widest rounded-none text-sm" placeholder="Enter your email address" type="email" />
+                    <button class="w-full bg-white hover:bg-black hover:text-white text-black font-black px-10 py-5 rounded-none transition-colors uppercase tracking-[0.2em] text-sm border border-black" type="button">
+                        Get My Discount
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+{% include 'core/footer.html' %}
+
+<script>
+// Scroll Reveal
+const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => observer.observe(el));
+});
+</script>
+</body>
+</html>
