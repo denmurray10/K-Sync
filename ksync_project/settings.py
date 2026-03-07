@@ -139,3 +139,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # In Heroku, add these via: heroku config:set DEEPSEEK_API_KEY=...
 DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', 'sk-16a74707578d4d589f9fb72db4954176')
 GETIMG_API_KEY = os.environ.get('GETIMG_API_KEY', 'key-3t583MrYM5GrTQMJuymWSCOlQkylmA90xhvX7KB7eVRXgq24GwLXDHSYCVMqCDEBrTdYQn5n5MTVguY9tsFI8ZbQM4T4dbQ2')
+
+# ── Cloudinary (image CDN) ───────────────────────────────────────────────────
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'diuanqnce')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '285831974678743')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')

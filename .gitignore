@@ -6,3 +6,6 @@ staticfiles/
 .gemini/
 brain/
 tmp/
+core/static/core/images/
+upload_to_cloudinary.py
+compress_upload.py

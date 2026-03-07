@@ -28,7 +28,7 @@
         <!-- Logo + Nav -->
         <div class="flex items-center gap-8">
             <a href="{% url 'home' %}" class="flex items-center gap-2 group shrink-0">
-                <img src="{% static 'core/images/logo.png' %}" alt="K-Beats Logo" class="h-16 md:h-24 w-auto -ml-4 md:-ml-[58px] -my-2 md:-my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
+                <img src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/logo" alt="K-Beats Logo" class="h-16 md:h-24 w-auto -ml-4 md:-ml-[58px] -my-2 md:-my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
             </a>
             <nav class="hidden md:flex items-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'live' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
@@ -70,7 +70,7 @@
     <div class="container mx-auto flex items-center justify-between">
         <div class="flex items-center gap-10">
             <a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors duration-300 group" href="{% url 'home' %}">
-                <img src="{% static 'core/images/logo.png' %}" alt="K-Beats Logo" class="h-16 md:h-24 w-auto -ml-4 md:-ml-[58px] -my-2 md:-my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
+                <img src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/logo" alt="K-Beats Logo" class="h-16 md:h-24 w-auto -ml-4 md:-ml-[58px] -my-2 md:-my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
             </a>
             <nav class="hidden md:flex items-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>

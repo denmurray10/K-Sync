@@ -352,7 +352,7 @@
                                 />
                                 {% elif group.logo_path %}
                                 <img
-                                    src="{% static group.logo_path %}"
+                                    src="{{ group.logo_path }}"
                                     alt="{{ group.name }}"
                                     class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                                 />
