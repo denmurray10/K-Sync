@@ -189,11 +189,65 @@ def charts(request):
     db_type = 'daily' if chart_type == 'songs' else chart_type
     
     ranking_obj = Ranking.objects.filter(timeframe=db_type).first()
-    rankings = ranking_obj.ranking_data if ranking_obj else []
+    raw_rankings = ranking_obj.ranking_data if ranking_obj else []
+    last_updated = ranking_obj.created_at if ranking_obj else None
+    
+    rankings = []
+    for idx, item in enumerate(raw_rankings):
+        img_url = item.get('artwork_url')
+        if not img_url:
+            img_url = f"https://api.dicebear.com/7.x/initials/svg?seed={item.get('artist')}&backgroundColor=f425c0"
+        
+        trend_raw = item.get('trend')
+        if trend_raw and trend_raw != '-' and trend_raw != 'Stable':
+            if '+' in trend_raw or '▲' in trend_raw:
+                trend_icon = '▲'
+                trend_class = 'text-primary'
+                trend_value = ''.join(filter(str.isdigit, trend_raw))
+            elif '-' in trend_raw or '▼' in trend_raw:
+                trend_icon = '▼'
+                trend_class = 'text-slate-500'
+                trend_value = ''.join(filter(str.isdigit, trend_raw))
+            else:
+                trend_icon = '—'
+                trend_class = 'text-slate-500'
+                trend_value = ''
+        else:
+            trend_icon = '—'
+            trend_class = 'text-slate-500'
+            trend_value = ''
+        
+        rankings.append({
+            'rank': idx + 1,
+            'artist': item.get('artist'),
+            'title': item.get('track'),
+            'image': img_url,
+            'trend_icon': trend_icon,
+            'trend_class': trend_class,
+            'trend_value': trend_value,
+        })
+    
+    chart_types = [
+        {'key': 'songs', 'label': 'Daily', 'db': 'daily'},
+        {'key': 'weekly', 'label': 'Weekly', 'db': 'weekly'},
+        {'key': 'monthly', 'label': 'Monthly', 'db': 'monthly'},
+        {'key': 'soloists', 'label': 'Solo Artists', 'db': 'soloists'},
+        {'key': 'groups', 'label': 'Idol Groups', 'db': 'groups'},
+    ]
+    
+    # Separate #1 track, main chart (2-10), and ticker (11-20)
+    number_one = rankings[0] if rankings else None
+    chart_main = rankings[1:10] if len(rankings) > 1 else []
+    chart_ticker = rankings[10:20] if len(rankings) > 10 else []
     
     context = {
         'rankings': rankings,
+        'number_one': number_one,
+        'chart_main': chart_main,
+        'chart_ticker': chart_ticker,
         'current_type': chart_type,
+        'chart_types': chart_types,
+        'last_updated': last_updated,
     }
     return render(request, 'core/charts.html', context)
 

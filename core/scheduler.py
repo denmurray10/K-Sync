@@ -39,7 +39,7 @@ def generate_ranking(timeframe):
 
     if timeframe == 'soloists':
         prompt = (
-            "Generate a definitive K-Pop power ranking of the Top 10 Solo Artists active right now. "
+            "Generate a definitive K-Pop power ranking of the Top 20 Solo Artists active right now. "
             "Consider digital sales, streaming, brand reputation, and recent social media buzz. "
             "Return the ranking as ONLY a valid JSON array of objects. "
             "Each object MUST have: 'rank' (int), 'artist' (string), 'track' (string, put 'N/A' or their latest hit), "
@@ -47,7 +47,7 @@ def generate_ranking(timeframe):
         )
     elif timeframe == 'groups':
         prompt = (
-            "Generate a definitive K-Pop power ranking of the Top 10 K-Pop Groups leading the industry right now. "
+            "Generate a definitive K-Pop power ranking of the Top 20 K-Pop Groups leading the industry right now. "
             "Consider album sales, world tour impact, digital dominance, and fandom size. "
             "Return the ranking as ONLY a valid JSON array of objects. "
             "Each object MUST have: 'rank' (int), 'artist' (string), 'track' (string, put 'N/A' or their latest comeback), "
