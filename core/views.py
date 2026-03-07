@@ -716,6 +716,11 @@ def calendar(request):
 
 def idol_page(request, slug):
     from django.shortcuts import get_object_or_404
+    import urllib.request
+    import urllib.parse
+    import logging
+    logger = logging.getLogger(__name__)
+
     group = get_object_or_404(KPopGroup, slug=slug)
 
     # Default accent colors per group type
@@ -742,17 +747,16 @@ def idol_page(request, slug):
     today_str = now.strftime('%Y-%m-%d')
     name_lower = group.name.lower()
 
-    albums = []
+    comeback_albums = []
     events = []
     for y, m in months:
         data_obj = ComebackData.objects.filter(year=y, month=m).first()
         if not data_obj:
             continue
         for date_key, day_data in data_obj.data.items():
-            # Releases matching this group
             for r in day_data.get('releases', []):
                 if name_lower in r.get('artist', '').lower():
-                    albums.append({
+                    comeback_albums.append({
                         'title': r.get('title', ''),
                         'image': r.get('image', ''),
                         'type': r.get('type', 'Release'),
@@ -765,7 +769,6 @@ def idol_page(request, slug):
                             'date': date_key,
                             'iso_date': f"{date_key}T09:00:00Z",
                         })
-            # Birthdays matching this group
             for b in day_data.get('birthdays', []):
                 if name_lower in (b.get('group', '') or '').lower() or name_lower in (b.get('name', '') or '').lower():
                     events.append({
@@ -774,7 +777,6 @@ def idol_page(request, slug):
                         'date': date_key,
                         'iso_date': f"{date_key}T00:00:00Z" if date_key >= today_str else '',
                     })
-            # Anniversaries matching this group
             for a in day_data.get('anniversaries', []):
                 if name_lower in (a.get('group', '') or '').lower():
                     events.append({
@@ -784,20 +786,76 @@ def idol_page(request, slug):
                         'iso_date': f"{date_key}T00:00:00Z" if date_key >= today_str else '',
                     })
 
-    albums.sort(key=lambda x: x['date_str'], reverse=True)
+    comeback_albums.sort(key=lambda x: x['date_str'], reverse=True)
     events.sort(key=lambda x: x['date'])
 
     # Pull charted tracks if this group appears in the daily ranking
-    tracks = []
+    chart_tracks = []
     daily_rank = Ranking.objects.filter(timeframe='daily').first()
     if daily_rank and daily_rank.ranking_data:
         for item in daily_rank.ranking_data:
             if name_lower in item.get('artist', '').lower():
-                tracks.append({
+                chart_tracks.append({
                     'title': item.get('track', ''),
                     'image': item.get('artwork_url', ''),
                     'album': item.get('album', ''),
                 })
+
+    # ── iTunes: Fetch discography + top songs ────────────────────────────
+    itunes_albums = []
+    itunes_tracks = []
+
+    # Map group names to iTunes search terms where needed
+    ITUNES_NAME_MAP = {
+        '(G)I-DLE': 'G I-DLE',
+    }
+    itunes_term = ITUNES_NAME_MAP.get(group.name, group.name)
+    encoded_term = urllib.parse.quote_plus(itunes_term)
+
+    def _itunes_fetch(entity, limit):
+        url = (
+            f"https://itunes.apple.com/search?term={encoded_term}"
+            f"&entity={entity}&attribute=artistTerm&limit={limit}"
+        )
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        try:
+            with urllib.request.urlopen(req, timeout=6) as resp:
+                return json.loads(resp.read().decode()).get('results', [])
+        except Exception as e:
+            logger.warning("iTunes %s fetch failed for %s: %s", entity, group.name, e)
+            return []
+
+    # Fetch albums (up to 20)
+    for item in _itunes_fetch('album', 20):
+        art = item.get('artworkUrl100', '').replace('100x100bb', '600x600bb')
+        itunes_albums.append({
+            'title': item.get('collectionName', ''),
+            'image': art,
+            'type': item.get('collectionType', 'Album'),
+            'date_str': (item.get('releaseDate', '') or '')[:10],
+            'track_count': item.get('trackCount', 0),
+            'collection_id': item.get('collectionId', ''),
+            'itunes_url': item.get('collectionViewUrl', ''),
+        })
+    itunes_albums.sort(key=lambda x: x['date_str'], reverse=True)
+
+    # Fetch top songs (up to 15)
+    for item in _itunes_fetch('song', 15):
+        art = item.get('artworkUrl100', '').replace('100x100bb', '600x600bb')
+        duration_ms = item.get('trackTimeMillis', 0) or 0
+        mins, secs = divmod(duration_ms // 1000, 60)
+        itunes_tracks.append({
+            'title': item.get('trackName', ''),
+            'album': item.get('collectionName', ''),
+            'image': art,
+            'preview_url': item.get('previewUrl', ''),
+            'duration': f"{mins}:{secs:02d}",
+            'itunes_url': item.get('trackViewUrl', ''),
+        })
+
+    # Merge: Use iTunes albums as primary, fall back to comeback data
+    albums = itunes_albums if itunes_albums else comeback_albums
+    tracks = itunes_tracks if itunes_tracks else chart_tracks
 
     context = {
         'group': group,
@@ -820,6 +878,98 @@ def idol_page(request, slug):
         'gallery': [],
     }
     return render(request, 'core/idol_band_page.html', context)
+
+
+def album_detail(request, slug, collection_id):
+    """Album detail page — fetches tracklist from iTunes."""
+    from django.shortcuts import get_object_or_404
+    import urllib.request
+    import urllib.parse
+    import logging
+    logger = logging.getLogger(__name__)
+
+    group = get_object_or_404(KPopGroup, slug=slug)
+
+    accent_map = {
+        'GIRL': '#FF8EAF',
+        'BOY': '#00f0ff',
+        'SOLO': '#c084fc',
+    }
+    accent_rgb_map = {
+        'GIRL': '255,142,175',
+        'BOY': '0,240,255',
+        'SOLO': '192,132,252',
+    }
+
+    # Lookup album + tracks from iTunes
+    url = (
+        f"https://itunes.apple.com/lookup"
+        f"?id={int(collection_id)}&entity=song"
+    )
+    req = urllib.request.Request(
+        url, headers={'User-Agent': 'Mozilla/5.0'}
+    )
+    album_info = {}
+    tracks = []
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read().decode())
+            for item in data.get('results', []):
+                wt = item.get('wrapperType', '')
+                if wt == 'collection':
+                    art = item.get(
+                        'artworkUrl100', ''
+                    ).replace('100x100bb', '1200x1200bb')
+                    album_info = {
+                        'title': item.get('collectionName', ''),
+                        'artist': item.get('artistName', ''),
+                        'image': art,
+                        'release_date': (
+                            item.get('releaseDate', '') or ''
+                        )[:10],
+                        'track_count': item.get('trackCount', 0),
+                        'genre': item.get('primaryGenreName', ''),
+                        'copyright': item.get('copyright', ''),
+                        'itunes_url': item.get(
+                            'collectionViewUrl', ''
+                        ),
+                    }
+                elif wt == 'track':
+                    dur_ms = item.get('trackTimeMillis', 0) or 0
+                    mins, secs = divmod(dur_ms // 1000, 60)
+                    tracks.append({
+                        'number': item.get('trackNumber', 0),
+                        'title': item.get('trackName', ''),
+                        'duration': f"{mins}:{secs:02d}",
+                        'duration_ms': dur_ms,
+                        'preview_url': item.get('previewUrl', ''),
+                        'image': item.get(
+                            'artworkUrl100', ''
+                        ).replace('100x100bb', '600x600bb'),
+                    })
+    except Exception as e:
+        logger.warning(
+            "iTunes album lookup failed for %s: %s",
+            collection_id, e
+        )
+
+    tracks.sort(key=lambda x: x['number'])
+
+    # Total album duration
+    total_ms = sum(t['duration_ms'] for t in tracks)
+    total_mins = total_ms // 60000
+
+    context = {
+        'group': group,
+        'album': album_info,
+        'tracks': tracks,
+        'total_mins': total_mins,
+        'accent_color': accent_map.get(group.group_type, '#FF8EAF'),
+        'accent_rgb': accent_rgb_map.get(
+            group.group_type, '255,142,175'
+        ),
+    }
+    return render(request, 'core/album_detail.html', context)
 
 
 @csrf_exempt

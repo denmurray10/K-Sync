@@ -1,0 +1,480 @@
+{% load static %}
+<!doctype html>
+<html class="dark" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>K-Beats — {{ album.title }} by {{ group.name }}</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"
+        ></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet"
+        />
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: "#f425c0",
+                            "background-light": "#f8f5f8",
+                            "background-dark": "#000000",
+                            secondary: "#00f0ff",
+                            accent: "{{ accent_color }}",
+                        },
+                        fontFamily: {
+                            display: ["Montserrat", "sans-serif"],
+                        },
+                        borderRadius: {
+                            DEFAULT: "0px",
+                            sm: "0px",
+                            md: "0px",
+                            lg: "0px",
+                            xl: "0px",
+                            "2xl": "0px",
+                            "3xl": "0px",
+                            full: "9999px",
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            .glass-panel {
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+            .neon-text {
+                text-shadow:
+                    0 0 10px rgba({{ accent_rgb }}, 0.7),
+                    0 0 20px rgba({{ accent_rgb }}, 0.5);
+            }
+            .reveal-up {
+                opacity: 0;
+                transform: translateY(40px);
+                transition:
+                    opacity 1.5s ease-out,
+                    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .reveal-left {
+                opacity: 0;
+                transform: translateX(-50px);
+                transition:
+                    opacity 1.5s ease-out,
+                    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .reveal-up.is-visible,
+            .reveal-left.is-visible {
+                opacity: 1;
+                transform: translate(0);
+            }
+            body {
+                zoom: 0.9;
+                -moz-transform: scale(0.9);
+                -moz-transform-origin: 0 0;
+            }
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+    </head>
+    <body
+        class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden"
+    >
+        {% include 'core/header.html' %}
+
+        <main
+            class="flex-grow pt-0"
+            x-data="{
+                playing: null,
+                audio: null,
+                progress: 0,
+                interval: null,
+                play(idx, url) {
+                    if (this.playing === idx) {
+                        this.audio.pause();
+                        this.playing = null;
+                        clearInterval(this.interval);
+                        this.progress = 0;
+                        return;
+                    }
+                    if (this.audio) { this.audio.pause(); clearInterval(this.interval); }
+                    this.audio = new Audio(url);
+                    this.audio.play();
+                    this.playing = idx;
+                    this.progress = 0;
+                    this.interval = setInterval(() => {
+                        if (this.audio && this.audio.duration) {
+                            this.progress = (this.audio.currentTime / this.audio.duration) * 100;
+                        }
+                    }, 100);
+                    this.audio.onended = () => {
+                        this.playing = null;
+                        this.progress = 0;
+                        clearInterval(this.interval);
+                    };
+                }
+            }"
+        >
+            <!-- ═══════════════════════════════════════════════════════════════
+                 ALBUM HERO — Cinematic full-width banner
+                 ═══════════════════════════════════════════════════════════════ -->
+            <section
+                class="relative w-full min-h-[70vh] flex items-end border-b border-white/10 overflow-hidden bg-black"
+            >
+                <!-- Blurred Album Art Background -->
+                <div class="absolute inset-0 z-0">
+                    {% if album.image %}
+                    <img
+                        src="{{ album.image }}"
+                        alt=""
+                        class="w-full h-full object-cover scale-110 blur-3xl opacity-20"
+                    />
+                    {% endif %}
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/40"
+                    ></div>
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent"
+                    ></div>
+                </div>
+
+                <div
+                    class="relative z-20 container mx-auto px-6 max-w-[1400px] pb-16 md:pb-24 pt-48 w-full"
+                >
+                    <div
+                        class="flex flex-col md:flex-row items-end gap-10 md:gap-16"
+                    >
+                        <!-- Album Artwork -->
+                        <div
+                            class="w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80 shrink-0 border-2 border-white/20 overflow-hidden reveal-left"
+                            style="box-shadow: 8px 8px 0px rgba({{ accent_rgb }}, 0.3);"
+                        >
+                            {% if album.image %}
+                            <img
+                                src="{{ album.image }}"
+                                alt="{{ album.title }}"
+                                class="w-full h-full object-cover"
+                            />
+                            {% else %}
+                            <div
+                                class="w-full h-full flex items-center justify-center bg-white/5"
+                            >
+                                <span
+                                    class="material-symbols-outlined text-8xl text-white/10"
+                                    >album</span
+                                >
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Album Info -->
+                        <div class="flex flex-col gap-0 reveal-left" style="transition-delay: 100ms;">
+                            <!-- Breadcrumb -->
+                            <div class="flex items-center gap-2 mb-4">
+                                <a
+                                    href="{% url 'idols' %}"
+                                    class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors"
+                                    >Idols</a
+                                >
+                                <span class="text-slate-600">/</span>
+                                <a
+                                    href="{% url 'idol_page' slug=group.slug %}"
+                                    class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors"
+                                    >{{ group.name }}</a
+                                >
+                                <span class="text-slate-600">/</span>
+                                <span
+                                    class="font-mono text-[10px] tracking-widest uppercase"
+                                    style="color: {{ accent_color }};"
+                                    >Album</span
+                                >
+                            </div>
+
+                            <!-- Type Badge -->
+                            <div
+                                class="inline-flex items-center gap-2 px-3 py-1 border text-[10px] font-black tracking-[0.2em] uppercase self-start mb-4"
+                                style="border-color: {{ accent_color }}; color: {{ accent_color }}; background: rgba({{ accent_rgb }}, 0.1);"
+                            >
+                                <span class="material-symbols-outlined text-sm">album</span>
+                                Album
+                            </div>
+
+                            <!-- Title -->
+                            <h1
+                                class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase"
+                            >
+                                {{ album.title }}
+                            </h1>
+
+                            <!-- Artist -->
+                            <a
+                                href="{% url 'idol_page' slug=group.slug %}"
+                                class="font-mono text-sm md:text-base tracking-widest uppercase text-slate-300 mt-4 hover:text-white transition-colors"
+                            >
+                                {{ album.artist|default:group.name }}
+                            </a>
+
+                            <!-- Meta row -->
+                            <div class="flex flex-wrap items-center gap-4 mt-6">
+                                {% if album.release_date %}
+                                <span
+                                    class="inline-block bg-white/10 text-white text-[10px] font-black px-3 py-1 uppercase tracking-widest"
+                                    >{{ album.release_date }}</span
+                                >
+                                {% endif %}
+                                {% if tracks %}
+                                <span
+                                    class="inline-block text-[10px] font-black px-3 py-1 uppercase tracking-widest text-black"
+                                    style="background: {{ accent_color }};"
+                                    >{{ tracks|length }} Tracks</span
+                                >
+                                {% endif %}
+                                {% if total_mins %}
+                                <span
+                                    class="inline-block bg-white/10 text-white text-[10px] font-black px-3 py-1 uppercase tracking-widest"
+                                    >{{ total_mins }} min</span
+                                >
+                                {% endif %}
+                                {% if album.genre %}
+                                <span
+                                    class="inline-block bg-white/10 text-white text-[10px] font-black px-3 py-1 uppercase tracking-widest"
+                                    >{{ album.genre }}</span
+                                >
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 STATS BAR — Quick info strip
+                 ═══════════════════════════════════════════════════════════════ -->
+            <section
+                class="w-full border-b border-white/10"
+                style="background: {{ accent_color }};"
+            >
+                <div
+                    class="container mx-auto px-6 max-w-[1400px] py-6 flex flex-wrap items-center justify-between gap-6"
+                >
+                    <div class="flex items-center gap-8 md:gap-12">
+                        <div class="flex flex-col items-center">
+                            <span class="font-black text-3xl md:text-4xl text-black tracking-tighter">{{ tracks|length }}</span>
+                            <span class="font-mono text-[10px] tracking-widest uppercase text-black/60">Tracks</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="font-black text-3xl md:text-4xl text-black tracking-tighter">{{ total_mins }}<span class="text-lg">m</span></span>
+                            <span class="font-mono text-[10px] tracking-widest uppercase text-black/60">Duration</span>
+                        </div>
+                    </div>
+                    <a
+                        href="{% url 'idol_page' slug=group.slug %}"
+                        class="bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] px-6 py-3 border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
+                    >
+                        {{ group.name }}
+                        <span class="material-symbols-outlined text-sm align-middle ml-1">arrow_forward</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 TRACKLIST — Brutalist list with 30s previews
+                 ═══════════════════════════════════════════════════════════════ -->
+            {% if tracks %}
+            <section class="w-full bg-black py-12 md:py-20 border-b border-white/10">
+                <div class="container mx-auto px-6 max-w-[1400px]">
+                    <!-- Section Header -->
+                    <div
+                        class="flex items-end justify-between pb-4 border-b border-white/20 mb-2 reveal-left"
+                    >
+                        <div>
+                            <h2
+                                class="text-4xl md:text-5xl font-black text-white leading-none tracking-tighter uppercase"
+                            >
+                                TRACK<span
+                                    class="text-transparent"
+                                    style="-webkit-text-stroke: 1.5px {{ accent_color }};"
+                                    >LIST</span
+                                >
+                            </h2>
+                            <p
+                                class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-2"
+                            >
+                                Click any track to play a 30-second preview
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Header Row -->
+                    <div
+                        class="hidden md:flex items-center justify-between px-6 py-3 border-b border-white/20 reveal-up"
+                    >
+                        <div class="flex items-center gap-8 w-full">
+                            <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 w-12 text-center">#</span>
+                            <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 flex-1">Title</span>
+                        </div>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 w-24 text-right">Duration</span>
+                    </div>
+
+                    <!-- Track Rows -->
+                    <div class="flex flex-col reveal-up">
+                        {% for track in tracks %}
+                        <div
+                            class="group flex items-center justify-between border-b border-white/10 hover:bg-white/[0.04] transition-colors p-4 sm:p-5"
+                            {% if track.preview_url %}
+                            @click="play({{ track.number }}, '{{ track.preview_url }}')"
+                            style="cursor: pointer;"
+                            {% endif %}
+                        >
+                            <div class="flex items-center gap-6 md:gap-8 w-full">
+                                <!-- Track Number / Play Icon -->
+                                <div class="flex items-center justify-center w-10 md:w-12 shrink-0">
+                                    <span
+                                        class="font-black text-2xl md:text-3xl leading-none tracking-tighter transition-colors"
+                                        :class="playing === {{ track.number }} ? 'hidden' : 'text-white/30 group-hover:text-white'"
+                                    >{{ track.number }}</span>
+                                    <!-- Play/Pause icon -->
+                                    <span
+                                        class="material-symbols-outlined text-3xl transition-colors"
+                                        :class="playing === {{ track.number }} ? 'block' : 'hidden group-hover:block'"
+                                        :style="playing === {{ track.number }} ? 'color: {{ accent_color }};' : 'color: white;'"
+                                        x-text="playing === {{ track.number }} ? 'pause' : 'play_arrow'"
+                                    >play_arrow</span>
+                                </div>
+
+                                <!-- Track Art (small) -->
+                                {% if track.image %}
+                                <div class="relative w-12 h-12 shrink-0 overflow-hidden border border-white/10">
+                                    <img
+                                        src="{{ track.image }}"
+                                        alt="{{ track.title }}"
+                                        class="w-full h-full object-cover transition-all duration-300"
+                                        :class="playing === {{ track.number }} ? 'scale-110' : 'grayscale opacity-60 group-hover:opacity-100 group-hover:grayscale-0'"
+                                    />
+                                </div>
+                                {% endif %}
+
+                                <!-- Track Title -->
+                                <div class="flex flex-col justify-center flex-1 min-w-0">
+                                    <h3
+                                        class="font-black text-lg md:text-xl uppercase tracking-tighter truncate transition-colors"
+                                        :class="playing === {{ track.number }} ? 'text-[{{ accent_color }}]' : 'text-white'"
+                                    >
+                                        {{ track.title }}
+                                    </h3>
+                                    {% if track.preview_url %}
+                                    <!-- Mini progress bar -->
+                                    <div
+                                        class="h-0.5 bg-white/10 mt-2 overflow-hidden transition-opacity duration-300"
+                                        :class="playing === {{ track.number }} ? 'opacity-100' : 'opacity-0'"
+                                    >
+                                        <div
+                                            class="h-full transition-all duration-100"
+                                            style="background: {{ accent_color }};"
+                                            :style="playing === {{ track.number }} ? 'width:' + progress + '%' : 'width: 0%'"
+                                        ></div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Duration -->
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <span
+                                        class="font-mono text-xs tracking-widest text-slate-500"
+                                    >{{ track.duration }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Total Duration Footer -->
+                    <div class="flex items-center justify-between px-6 py-4 border-t border-white/20 mt-2">
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">
+                            {{ tracks|length }} tracks, {{ total_mins }} minutes
+                        </span>
+                        {% if album.copyright %}
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-600 hidden md:block">
+                            {{ album.copyright }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 BOTTOM CTA — Back to artist
+                 ═══════════════════════════════════════════════════════════════ -->
+            <section
+                class="border-t border-b border-white/20 overflow-hidden"
+                style="background: {{ accent_color }};"
+            >
+                <div
+                    class="container mx-auto px-6 py-14 md:py-16 max-w-[1400px] flex flex-col md:flex-row items-center justify-between gap-8"
+                >
+                    <div class="reveal-left">
+                        <h2
+                            class="text-3xl md:text-4xl font-black text-black leading-none tracking-tighter uppercase"
+                        >
+                            MORE FROM <br />{{ group.name|upper }}
+                        </h2>
+                        <p
+                            class="text-black/70 text-sm font-mono tracking-widest uppercase mt-2"
+                        >
+                            Explore all albums, tracks &amp; members.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 reveal-left" style="transition-delay: 200ms;">
+                        <a
+                            href="{% url 'idol_page' slug=group.slug %}"
+                            class="bg-black text-white font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
+                        >
+                            {{ group.name }} Profile
+                            <span class="material-symbols-outlined text-sm align-middle ml-1">person</span>
+                        </a>
+                        <a
+                            href="{% url 'idols' %}"
+                            class="bg-transparent text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border-2 border-black hover:bg-black hover:text-white transition-colors"
+                        >
+                            All Artists
+                            <span class="material-symbols-outlined text-sm align-middle ml-1">groups</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        {% include 'core/footer.html' %}
+
+        <!-- Scroll Reveal -->
+        <script>
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("is-visible");
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                },
+                { threshold: 0.1 },
+            );
+            document.addEventListener("DOMContentLoaded", () => {
+                document
+                    .querySelectorAll(".reveal-up, .reveal-left")
+                    .forEach((el) => observer.observe(el));
+            });
+        </script>
+    </body>
+</html>

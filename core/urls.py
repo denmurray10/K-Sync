@@ -59,4 +59,5 @@ urlpatterns = [
 
     # ── Dynamic Idol Pages ────────────────────────────────────────────────
     path('idols/<slug:slug>/', views.idol_page, name='idol_page'),
+    path('idols/<slug:slug>/album/<int:collection_id>/', views.album_detail, name='album_detail'),
 ]
