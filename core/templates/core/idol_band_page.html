@@ -127,12 +127,15 @@
             >
                 <!-- Background Image -->
                 <div class="absolute inset-0 z-0 bg-black">
-                    {% if group.logo_path %}
+                    {% if group.image_url %}
                     <div
                         class="w-full h-full bg-cover bg-center opacity-30 grayscale mix-blend-luminosity"
-                        style="
-                            background-image: url(&quot;{% static group.logo_path %}&quot;);
-                        "
+                        style="background-image: url('{{ group.image_url }}');"
+                    ></div>
+                    {% elif group.logo_path %}
+                    <div
+                        class="w-full h-full bg-cover bg-center opacity-30 grayscale mix-blend-luminosity"
+                        style="background-image: url(&quot;{% static group.logo_path %}&quot;);"
                     ></div>
                     {% endif %}
                     <div
@@ -229,7 +232,13 @@
                             class="hidden md:block w-[200px] h-[200px] border border-white/10 bg-black overflow-hidden shrink-0 reveal-up"
                             style="transition-delay: 300ms"
                         >
-                            {% if group.logo_path %}
+                            {% if group.image_url %}
+                            <img
+                                src="{{ group.image_url }}"
+                                alt="{{ group.name }}"
+                                class="w-full h-full object-cover opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-500"
+                            />
+                            {% elif group.logo_path %}
                             <img
                                 src="{% static group.logo_path %}"
                                 alt="{{ group.name }}"
@@ -859,7 +868,13 @@
                             <div
                                 class="w-full aspect-[4/3] bg-white/[0.03] flex items-center justify-center relative overflow-hidden"
                             >
-                                {% if rg.logo_path %}
+                                {% if rg.image_url %}
+                                <img
+                                    src="{{ rg.image_url }}"
+                                    alt="{{ rg.name }}"
+                                    class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                                />
+                                {% elif rg.logo_path %}
                                 <img
                                     src="{% static rg.logo_path %}"
                                     alt="{{ rg.name }}"

@@ -344,7 +344,13 @@
                             <div
                                 class="w-full aspect-square bg-white/[0.03] flex items-center justify-center relative overflow-hidden"
                             >
-                                {% if group.logo_path %}
+                                {% if group.image_url %}
+                                <img
+                                    src="{{ group.image_url }}"
+                                    alt="{{ group.name }}"
+                                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                                />
+                                {% elif group.logo_path %}
                                 <img
                                     src="{% static group.logo_path %}"
                                     alt="{{ group.name }}"

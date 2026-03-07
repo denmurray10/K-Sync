@@ -46,9 +46,26 @@ class KPopGroup(models.Model):
     group_type = models.CharField(max_length=10, choices=GROUP_TYPE_CHOICES)
     rank = models.IntegerField(null=True, blank=True)
     logo_path = models.CharField(max_length=255, null=True, blank=True)
-    
+    description = models.TextField(null=True, blank=True)
+    image_url = models.URLField(max_length=500, null=True, blank=True)
+
     def __str__(self):
         return f"{self.name} ({self.group_type})"
+
+
+class KPopMember(models.Model):
+    group = models.ForeignKey(KPopGroup, related_name='members', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    stage_name = models.CharField(max_length=100, blank=True)
+    position = models.CharField(max_length=100, blank=True)
+    image_url = models.URLField(max_length=500, null=True, blank=True)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.group.name})"
 
 class LivePoll(models.Model):
     question = models.CharField(max_length=255)

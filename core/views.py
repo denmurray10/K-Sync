@@ -804,8 +804,16 @@ def idol_page(request, slug):
         'accent_color': accent_map.get(group.group_type, '#FF8EAF'),
         'accent_rgb': accent_rgb_map.get(group.group_type, '255,142,175'),
         'related_groups': related,
-        'description': f"Explore the world of {group.name} — members, discography, top tracks, and more. Stay updated with the latest releases, events, and everything about {group.name} on K-Beats.",
-        'members': [],
+        'description': group.description or f"Explore the world of {group.name} — members, discography, top tracks, and more.",
+        'members': [
+            {
+                'name': m.stage_name or m.name,
+                'full_name': m.name,
+                'position': m.position,
+                'image': m.image_url or '',
+            }
+            for m in group.members.all()
+        ],
         'albums': albums,
         'tracks': tracks,
         'events': events,
