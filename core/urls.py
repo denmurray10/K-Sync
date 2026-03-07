@@ -46,6 +46,7 @@ urlpatterns = [
     path('d-day-comeback-notification/', views.d_day_comeback_notification, name='d_day_comeback_notification'),
     path('blog-page/', views.blog_page, name='blog_page'),
     path('blog/generate/', views.blog_generate, name='blog_generate'),
+    path('blog/link-pass/', views.blog_internal_link_pass, name='blog_internal_link_pass'),
     path('blog/<slug:slug>/', views.blog_article_read, name='blog_article_read'),
     path('new-release-spotlight/', views.new_release_spotlight, name='new_release_spotlight'),
     path('streaming-party-chat/', views.streaming_party_chat, name='streaming_party_chat'),

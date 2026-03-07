@@ -86,6 +86,17 @@
                 line-height: 1.85;
                 margin-bottom: 1.5rem;
             }
+            .article-body h2 {
+                color: white;
+                font-size: 1.875rem;
+                font-weight: 900;
+                text-transform: uppercase;
+                letter-spacing: -0.025em;
+                margin-top: 3rem;
+                margin-bottom: 1.25rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid #f425c0;
+            }
             .article-body h3 {
                 color: white;
                 font-size: 1.5rem;
@@ -201,11 +212,6 @@
                             <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">
                                 {{ article.created_at|date:"M d, Y \a\t H:i" }}
                             </span>
-                            {% if article.source_name %}
-                            <span class="font-mono text-[10px] tracking-widest uppercase text-primary">
-                                Source: {{ article.source_name }}
-                            </span>
-                            {% endif %}
                             <span class="font-mono text-[10px] tracking-widest uppercase text-slate-600">
                                 K-Beats Editorial
                             </span>
@@ -246,32 +252,20 @@
                             </div>
                             {% endif %}
 
-                            <!-- Source Attribution -->
-                            {% if article.source_url %}
-                            <div class="mt-12 p-6 border border-white/10 bg-white/[0.02]">
-                                <div class="flex items-center gap-3 mb-3">
-                                    <span class="material-symbols-outlined text-secondary text-lg">info</span>
-                                    <span class="font-black text-xs uppercase tracking-[0.2em] text-white">Source</span>
-                                </div>
-                                <p class="text-slate-500 text-sm font-mono tracking-wide">
-                                    Based on reporting from
-                                    <strong class="text-slate-300">{{ article.source_name|default:"external sources" }}</strong>.
-                                </p>
-                                <a
-                                    href="{{ article.source_url }}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="inline-flex items-center gap-2 mt-3 text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:text-white transition-colors"
-                                >
-                                    View Original Source
-                                    <span class="material-symbols-outlined text-sm">open_in_new</span>
-                                </a>
+                            {% if article.image_3 %}
+                            <div class="w-full aspect-video my-12 overflow-hidden border border-white/10">
+                                <img
+                                    src="{{ article.image_3 }}"
+                                    alt=""
+                                    class="w-full h-full object-cover"
+                                />
                             </div>
                             {% endif %}
                         </article>
 
                         <!-- Sidebar -->
                         <aside class="lg:w-80 shrink-0 reveal-up" style="transition-delay: 200ms">
+                            <div class="lg:sticky lg:top-24">
                             <!-- Article Info Card -->
                             <div class="border border-white/10 bg-white/[0.02] p-6 mb-6">
                                 <h3 class="font-black text-xs uppercase tracking-[0.2em] text-white mb-4 pb-3 border-b border-white/10">
@@ -290,12 +284,6 @@
                                         <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Reading Time</span>
                                         <span class="font-black text-sm uppercase tracking-tight text-white">{{ article.reading_time }} minutes</span>
                                     </div>
-                                    {% if article.source_name %}
-                                    <div>
-                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Source</span>
-                                        <span class="font-black text-sm uppercase tracking-tight text-white">{{ article.source_name }}</span>
-                                    </div>
-                                    {% endif %}
                                 </div>
                             </div>
 

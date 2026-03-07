@@ -93,7 +93,7 @@ class LivePollOption(models.Model):
 
 class BlogArticle(models.Model):
     ALLOWED_TAGS = [
-        'p', 'h3', 'strong', 'em', 'blockquote',
+        'p', 'h2', 'h3', 'strong', 'em', 'blockquote',
         'a', 'ul', 'ol', 'li', 'br',
     ]
     ALLOWED_ATTRIBUTES = {
@@ -109,6 +109,7 @@ class BlogArticle(models.Model):
     source_name = models.CharField(max_length=100, blank=True)
     image = models.URLField(max_length=500, blank=True)
     image_2 = models.URLField(max_length=500, blank=True)
+    image_3 = models.URLField(max_length=500, blank=True)
     body_html = models.TextField()
     reading_time = models.IntegerField(default=3)
     created_at = models.DateTimeField(auto_now_add=True)

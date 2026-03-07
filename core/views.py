@@ -32,6 +32,21 @@ def _chat(prompt, system="You are an expert K-Pop radio assistant."):
     )
     return resp.choices[0].message.content.strip()
 
+
+def _chat_reasoner(prompt, system="You are an expert K-Pop journalist."):
+    """Use DeepSeek Reasoner (R1) for higher-quality long-form text generation."""
+    client = _ds_client()
+    messages = []
+    if system:
+        messages.append({'role': 'system', 'content': system})
+    messages.append({'role': 'user', 'content': prompt})
+    resp = client.chat.completions.create(
+        model='deepseek-reasoner',
+        messages=messages,
+        max_tokens=8000,
+    )
+    return resp.choices[0].message.content.strip()
+
 # ── Page views ───────────────────────────────────────────────────────────────
 
 
@@ -650,40 +665,120 @@ def blog_article_read(request, slug):
     })
 
 
-def _generate_blog_image(prompt):
-    """Call GetImg Seedream 4.0 API; save result to media/blog/; return URL."""
-    import base64
-    import uuid
-    import os
+def _fetch_blog_image(title, category, excerpt='', variant=1):
+    """Use DeepSeek for keywords, fetch via Serper, upload to Cloudinary."""
+    import cloudinary
+    import cloudinary.uploader
+    serper_key = getattr(settings, 'SERPER_API_KEY', '')
+    if not serper_key:
+        return ''
 
-    url = "https://api.getimg.ai/v1/seedream-v4/text-to-image"
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "authorization": f"Bearer {settings.GETIMG_API_KEY}",
-    }
-    payload = {
-        "prompt": prompt,
-        "aspect_ratio": "16:9",
-        "response_format": "b64",
-    }
-    resp = requests.post(url, json=payload, headers=headers, timeout=60)
-    if resp.status_code != 200:
-        return ''
-    b64 = resp.json().get('image', '')
-    if not b64:
-        return ''
-    img_dir = os.path.join(settings.MEDIA_ROOT, 'blog')
-    os.makedirs(img_dir, exist_ok=True)
-    fname = f"{uuid.uuid4().hex[:12]}.png"
-    fpath = os.path.join(img_dir, fname)
-    with open(fpath, 'wb') as f:
-        f.write(base64.b64decode(b64))
-    return f"{settings.MEDIA_URL}blog/{fname}"
+    cloudinary.config(
+        cloud_name=getattr(settings, 'CLOUDINARY_CLOUD_NAME', ''),
+        api_key=getattr(settings, 'CLOUDINARY_API_KEY', ''),
+        api_secret=getattr(settings, 'CLOUDINARY_API_SECRET', ''),
+        secure=True,
+    )
+
+    # Ask DeepSeek for concise image search keywords
+    if variant == 1:
+        kw_prompt = (
+            f"Give me 2-4 concise English search keywords for finding a "
+            f"relevant news image on Google for a K-Pop article. "
+            f"Return ONLY the keywords separated by spaces, nothing else.\n\n"
+            f"Title: {title}\nCategory: {category}\nExcerpt: {excerpt[:200]}"
+        )
+    elif variant == 3:
+        kw_prompt = (
+            f"Give me 2-4 concise English search keywords for an image showing "
+            f"fans, merchandise, or cultural impact related to a K-Pop article "
+            f"about: {title}. Category: {category}.\n"
+            f"Return ONLY the keywords separated by spaces, nothing else.\n"
+            f"Examples: 'kpop fans lightsticks concert', 'kpop album merchandise', "
+            f"'kpop street fashion Seoul'"
+        )
+    else:
+        kw_prompt = (
+            f"Give me 2-4 concise English search keywords for a second "
+            f"atmospheric/mood image (not the same subject) that complements "
+            f"a K-Pop article about: {title}. Category: {category}.\n"
+            f"Return ONLY the keywords separated by spaces, nothing else.\n"
+            f"Examples: 'kpop concert stage lights', 'kpop fans crowd', "
+            f"'music recording studio microphone'"
+        )
+    try:
+        keywords = _chat(
+            kw_prompt,
+            system="You output only image search keywords, nothing else.",
+        ).strip().strip('"').strip("'")
+        logger.info(
+            "[blog image %d] keywords for %r -> %r", variant, title, keywords
+        )
+    except Exception:
+        if variant == 1:
+            keywords = f"kpop {category}"
+        elif variant == 3:
+            keywords = "kpop fans lightsticks"
+        else:
+            keywords = "kpop concert stage"
+
+    if not keywords:
+        keywords = "kpop performance stage"
+
+    # Build a stable Cloudinary public_id for this image slot
+    from django.utils.text import slugify
+    title_slug = slugify(title)[:60]
+    public_id = f"ksync/blog/{title_slug}/img{variant}"
+
+    # Search via Serper.dev Google Images, then upload to Cloudinary
+    fallback = 'kpop concert stage'
+    for query in (keywords, fallback):
+        try:
+            resp = requests.post(
+                'https://google.serper.dev/images',
+                json={'q': query, 'num': 5},
+                headers={
+                    'X-API-KEY': serper_key,
+                    'Content-Type': 'application/json',
+                },
+                timeout=15,
+            )
+            if resp.status_code == 200:
+                items = resp.json().get('images', [])
+                for item in items:
+                    img_url = item.get('imageUrl', '')
+                    if not img_url:
+                        continue
+                    # Download and upload to Cloudinary for stable hosting
+                    try:
+                        result = cloudinary.uploader.upload(
+                            img_url,
+                            public_id=public_id,
+                            overwrite=False,
+                            resource_type='image',
+                            timeout=20,
+                        )
+                        cdn_url = result.get('secure_url', '')
+                        if cdn_url:
+                            logger.info(
+                                "[blog image %d] uploaded to Cloudinary: %r",
+                                variant, cdn_url,
+                            )
+                            return cdn_url
+                    except Exception as upload_err:
+                        logger.warning(
+                            "[blog image %d] Cloudinary upload failed "
+                            "for %r: %s — trying next item",
+                            variant, img_url, upload_err,
+                        )
+                        continue
+        except Exception:
+            pass
+    return ''
 
 
 def blog_generate(request):
-    """Generate articles from RSS feed via DeepSeek + GetImg."""
+    """Generate articles from RSS feed via DeepSeek Reasoner."""
     import re
     from django.utils.text import slugify
     from django.shortcuts import redirect
@@ -691,7 +786,12 @@ def blog_generate(request):
     articles = _fetch_kpop_news()
     created = 0
 
-    for item in articles[:6]:
+    # Gather existing article slugs/titles for SEO inter-linking hints
+    existing_articles = list(
+        BlogArticle.objects.values('slug', 'title')[:15]
+    )
+
+    for item in articles:
         title = item.get('title', '').strip()
         if not title:
             continue
@@ -705,43 +805,72 @@ def blog_generate(request):
         category = item.get('category', 'News')
         excerpt = item.get('excerpt', '')
 
-        # ── DeepSeek article ──
+        # Build inter-linking hints from already-existing articles
+        internal_links_hint = ''
+        if existing_articles:
+            link_refs = ', '.join(
+                f'"{a["title"]}" at /blog/{a["slug"]}/'
+                for a in existing_articles[:5]
+            )
+            internal_links_hint = (
+                f"\n\nFor SEO inter-linking, naturally reference and link to "
+                f"1-2 of these existing K-Beats articles where relevant "
+                f"(use <a href=\"/blog/SLUG/\">Title</a> format): {link_refs}"
+            )
+
+        site_links_hint = (
+            "\nAlso include 1-2 natural links to K-Beats internal pages using "
+            "<a href=\"/idols/\">our Artists page</a>, "
+            "<a href=\"/charts/\">our Charts page</a>, or "
+            "<a href=\"/news/\">our News page</a> where contextually appropriate."
+        )
+
+        # ── DeepSeek Reasoner article ──
         prompt = (
-            f"Write an original, in-depth K-Pop news article based "
-            f"on this headline:\n\n"
+            f"Write an original, in-depth K-Pop news article based on this headline:\n\n"
             f"Title: {title}\n"
             f"Source: {source}\n"
             f"Summary: {excerpt}\n\n"
-            f"Write as a professional K-Pop journalist for K-Beats, "
-            f"a major K-Pop media outlet. The article MUST be at "
-            f"least 1,000 words — aim for 1,000-1,200 words. Make "
-            f"it informative, entertaining, and thorough.\n\n"
+            f"Write as a professional K-Pop journalist for K-Beats, a major K-Pop media outlet. "
+            f"The article MUST be at least 1,500 words. Make it deeply informative, engaging, and comprehensive.\n\n"
             f"Structure your response EXACTLY as follows:\n"
             f"SUBTITLE: (one catchy subtitle line)\n"
             f"---\n"
-            f"(article body in HTML using <p>, <h3>, <strong>, <em>"
-            f", <blockquote> tags — no <h1> or <h2>)\n\n"
-            f"Important:\n"
-            f"- Write original content, do NOT copy the source\n"
-            f"- Include context about the artist/group history\n"
-            f"- Add fan reaction / community perspective\n"
-            f"- Discuss industry impact and significance\n"
-            f"- End with a forward-looking statement\n"
-            f"- Use proper HTML paragraph tags\n"
-            f"- Do NOT include the title in the body\n"
+            f"(article body in HTML)\n\n"
+            f"HTML Formatting Rules:\n"
+            f"- Use <h2> tags for major section headings (aim for 3-4 per article)\n"
+            f"- Use <h3> tags for sub-section headings within major sections\n"
+            f"- Use <p> for all paragraphs\n"
+            f"- Use <strong> to bold key terms and artist names\n"
+            f"- Use <em> for stylistic emphasis\n"
+            f"- Use <blockquote> for notable quotes or standout statements\n"
+            f"- Use <ul>/<ol>/<li> for lists where appropriate\n"
+            f"- Do NOT use <h1> tags (the page already has an h1 title)\n\n"
+            f"Content Sections Required:\n"
+            f"1. Opening — hook the reader and introduce the story\n"
+            f"2. Background — artist/group history and context\n"
+            f"3. The News — detailed breakdown of the main story\n"
+            f"4. Fan & Community Reaction — what fans are saying\n"
+            f"5. Industry Analysis — impact and significance\n"
+            f"6. What's Next — forward-looking conclusion\n\n"
+            f"Rules:\n"
+            f"- Write completely original content, do NOT copy the source\n"
+            f"- Total length: minimum 1,500 words\n"
+            f"- Do NOT include the article title in the body\n"
             f"- Do NOT mention AI anywhere in the article\n"
-            f"- Write as a human journalist, not an AI"
+            f"- Write as a human journalist, not an AI\n"
+            f"{internal_links_hint}"
+            f"{site_links_hint}"
         )
 
         try:
-            raw = _chat(
+            raw = _chat_reasoner(
                 prompt,
                 system=(
-                    "You are a senior K-Pop journalist at K-Beats, "
-                    "a leading K-Pop news outlet. Write engaging, "
-                    "original long-form articles with insider knowledge. "
-                    "Always use HTML tags for formatting. Never mention "
-                    "AI, never reveal you are an AI."
+                    "You are a senior K-Pop journalist at K-Beats, a leading K-Pop news outlet. "
+                    "Write engaging, original long-form articles with insider knowledge. "
+                    "Always use HTML tags for formatting as specified. "
+                    "Never mention AI, never reveal you are an AI."
                 ),
             )
         except Exception:
@@ -766,35 +895,22 @@ def blog_generate(request):
         word_count = len(re.sub(r'<[^>]+>', '', body).split())
         reading_time = max(1, word_count // 200)
 
-        # ── GetImg images ──
-        img_prompt_base = (
-            f"Professional editorial photo for K-Pop article: "
-            f"{title}. Vibrant concert/stage lighting, neon pink "
-            f"and cyan tones, dramatic composition, editorial "
-            f"magazine quality. No text, no logos, no faces."
-        )
+        # ── Fetch 3 images via Serper ──
         try:
-            image_1 = _generate_blog_image(img_prompt_base)
+            image_1 = _fetch_blog_image(title, category, excerpt, variant=1)
         except Exception as e:
-            logger.exception(
-                "Blog image_1 generation failed for title=%r: %s",
-                title,
-                e,
-            )
+            logger.exception("Blog image_1 fetch failed for title=%r: %s", title, e)
             image_1 = ''
         try:
-            image_2 = _generate_blog_image(
-                f"Abstract K-Pop aesthetic: {category} theme, "
-                f"neon lights, music stage atmosphere, futuristic "
-                f"concert vibes. No text, no logos, no faces."
-            )
+            image_2 = _fetch_blog_image(title, category, excerpt, variant=2)
         except Exception as e:
-            logger.exception(
-                "Blog image_2 generation failed for title=%r: %s",
-                title,
-                e,
-            )
+            logger.exception("Blog image_2 fetch failed for title=%r: %s", title, e)
             image_2 = ''
+        try:
+            image_3 = _fetch_blog_image(title, category, excerpt, variant=3)
+        except Exception as e:
+            logger.exception("Blog image_3 fetch failed for title=%r: %s", title, e)
+            image_3 = ''
 
         BlogArticle.objects.create(
             slug=base_slug,
@@ -806,12 +922,85 @@ def blog_generate(request):
             source_name=source,
             image=image_1,
             image_2=image_2,
+            image_3=image_3,
             body_html=body,
             reading_time=reading_time,
         )
         created += 1
 
+        # Keep inter-linking list current for subsequent articles
+        existing_articles.append({'slug': base_slug, 'title': title})
+
     return redirect('news')
+
+
+def blog_internal_link_pass(request):
+    """
+    Post-generation pass: scan every article's body_html and inject
+    <a href="/blog/SLUG/"> hyperlinks wherever sibling article titles
+    are naturally mentioned in the text.
+    """
+    from django.shortcuts import redirect
+
+    all_articles = list(BlogArticle.objects.all())
+    if len(all_articles) < 2:
+        return redirect('news')
+
+    # Build a lookup of title -> slug for all articles
+    article_map = {a.title: a.slug for a in all_articles}
+
+    updated = 0
+    for article in all_articles:
+        # Collect other articles as link candidates
+        others = [
+            {'title': t, 'slug': s}
+            for t, s in article_map.items()
+            if t != article.title
+        ]
+        if not others:
+            continue
+
+        candidates = '\n'.join(
+            f'- "{o["title"]}" -> /blog/{o["slug"]}/'
+            for o in others[:15]
+        )
+
+        prompt = (
+            f"You are an SEO editor. Review the following HTML article and "
+            f"add hyperlinks (<a href=\"URL\">anchor text</a>) ONLY where "
+            f"the following article titles (or key subjects from them) are "
+            f"*naturally mentioned* in the text. Do not force links — only "
+            f"add them where they genuinely fit. Do NOT change any other "
+            f"content, wording, or HTML structure.\n\n"
+            f"Candidate links:\n{candidates}\n\n"
+            f"Article HTML:\n{article.body_html}\n\n"
+            f"Return ONLY the complete modified HTML with links added "
+            f"(or unchanged if no natural fits were found). "
+            f"No explanation, no markdown fences."
+        )
+
+        try:
+            updated_html = _chat(
+                prompt,
+                system=(
+                    "You are an expert SEO editor. You add internal hyperlinks "
+                    "to HTML articles without changing any other content. "
+                    "Return only the raw HTML."
+                ),
+            )
+            # Sanity check: make sure we got HTML back
+            if updated_html and '<p>' in updated_html:
+                article.body_html = updated_html
+                # Use update to skip bleach re-sanitization stripping new <a> tags
+                BlogArticle.objects.filter(pk=article.pk).update(
+                    body_html=updated_html
+                )
+                updated += 1
+        except Exception:
+            continue
+
+    return redirect('news')
+
 
 def new_release_spotlight(request):
     return render(request, 'core/new_release_spotlight.html')
