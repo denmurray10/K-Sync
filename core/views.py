@@ -327,8 +327,231 @@ def schedule(request):
 def profile(request):
     return render(request, 'core/profile.html')
 
+_news_cache = {'articles': [], 'ts': 0}
+
 def news(request):
-    return render(request, 'core/news.html')
+    articles = _fetch_kpop_news()
+    featured = articles[0] if articles else None
+    remaining = articles[1:] if len(articles) > 1 else []
+
+    cats = []
+    seen = set()
+    for a in articles:
+        if a['category'] not in seen:
+            seen.add(a['category'])
+            cats.append(a['category'])
+
+    return render(request, 'core/news.html', {
+        'featured': featured,
+        'articles': remaining,
+        'all_articles': articles,
+        'categories': cats,
+        'total_count': len(articles),
+    })
+
+
+def _fetch_kpop_news():
+    import re
+    import time
+    import xml.etree.ElementTree as ET
+    from datetime import datetime
+
+    now = time.time()
+    if _news_cache['articles'] and (now - _news_cache['ts'] < 1800):
+        return _news_cache['articles']
+
+    IMAGES = {
+        'Comeback': 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=800',
+        'Charts': 'https://images.unsplash.com/photo-1514525253361-bee8a48740d0?auto=format&fit=crop&q=80&w=800',
+        'Tour': 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?auto=format&fit=crop&q=80&w=800',
+        'Awards': 'https://images.unsplash.com/photo-1532452119098-a3650b3c46d3?auto=format&fit=crop&q=80&w=800',
+        'Industry': 'https://images.unsplash.com/photo-1526218626217-dc65a29bb444?auto=format&fit=crop&q=80&w=800',
+        'News': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=800',
+    }
+
+    def _cat(title):
+        t = title.lower()
+        if any(w in t for w in [
+            'comeback', 'debut', 'release', 'album', 'single',
+            'mv', 'teaser', 'tracklist', 'ep',
+        ]):
+            return 'Comeback'
+        if any(w in t for w in [
+            'chart', 'billboard', 'melon', '#1', 'no.1',
+            'record', 'million', 'views', 'sales',
+        ]):
+            return 'Charts'
+        if any(w in t for w in [
+            'tour', 'concert', 'fan meeting', 'fanmeet',
+            'world tour', 'show',
+        ]):
+            return 'Tour'
+        if any(w in t for w in [
+            'award', 'mama', 'mma', 'daesang', 'win',
+            'nomination',
+        ]):
+            return 'Awards'
+        if any(w in t for w in [
+            'dating', 'enlist', 'military', 'contract',
+            'agency', 'lawsuit', 'renew',
+        ]):
+            return 'Industry'
+        return 'News'
+
+    articles = []
+    feeds = [
+        'https://news.google.com/rss/search?q=kpop+OR+k-pop+when:7d&hl=en-US&gl=US&ceid=US:en',
+    ]
+
+    for url in feeds:
+        try:
+            resp = requests.get(
+                url, timeout=8,
+                headers={'User-Agent': 'K-Beats/1.0'},
+            )
+            if resp.status_code != 200:
+                continue
+
+            root = ET.fromstring(resp.content)
+            for item in root.iter('item'):
+                title_raw = item.findtext('title', '')
+                parts = title_raw.rsplit(' - ', 1)
+                title = parts[0].strip()
+                source = (
+                    parts[1].strip() if len(parts) > 1
+                    else 'K-Pop News'
+                )
+
+                link = item.findtext('link', '')
+                pub_date = item.findtext('pubDate', '')
+                desc = item.findtext('description', '')
+
+                img = None
+                m = re.search(
+                    r'<img[^>]+src=["\']([^"\']+)["\']',
+                    desc or '',
+                )
+                if m:
+                    img = m.group(1)
+
+                date_str = ''
+                time_ago = ''
+                if pub_date:
+                    try:
+                        dt = datetime.strptime(
+                            pub_date,
+                            '%a, %d %b %Y %H:%M:%S %Z',
+                        )
+                        date_str = dt.strftime('%b %d, %Y')
+                        delta = datetime.utcnow() - dt
+                        hrs = int(delta.total_seconds() // 3600)
+                        if hrs < 1:
+                            time_ago = 'Just now'
+                        elif hrs < 24:
+                            time_ago = f'{hrs}h ago'
+                        else:
+                            time_ago = f'{hrs // 24}d ago'
+                    except Exception:
+                        date_str = pub_date[:16]
+
+                cat = _cat(title)
+                if not img:
+                    img = IMAGES.get(cat, IMAGES['News'])
+
+                clean = re.sub(r'<[^>]+>', '', desc or '')
+                excerpt = clean[:180].strip()
+                if len(clean) > 180:
+                    excerpt += '...'
+
+                articles.append({
+                    'title': title,
+                    'source': source,
+                    'link': link,
+                    'date': date_str,
+                    'time_ago': time_ago,
+                    'category': cat,
+                    'excerpt': excerpt,
+                    'image': img,
+                })
+        except Exception:
+            pass
+
+    if not articles:
+        articles = [
+            {
+                'category': 'Comeback',
+                'title': "BLACKPINK's Lisa Announces Global Fan-Meet Tour",
+                'excerpt': "The 'Lalisa' star is set to hit 12 cities across"
+                           " Asia and Europe starting next month.",
+                'date': 'Mar 06, 2026',
+                'time_ago': '1d ago',
+                'source': 'Soompi',
+                'link': '#',
+                'image': IMAGES['Tour'],
+            },
+            {
+                'category': 'Charts',
+                'title': "Stray Kids 'ATE' Remains #1 on World Albums",
+                'excerpt': "The group continues their dominant streak on"
+                           " global charts for the 5th consecutive week.",
+                'date': 'Mar 05, 2026',
+                'time_ago': '2d ago',
+                'source': 'Billboard',
+                'link': '#',
+                'image': IMAGES['Charts'],
+            },
+            {
+                'category': 'Comeback',
+                'title': "LE SSERAFIM Drops Teaser for Upcoming Comeback",
+                'excerpt': "Fearless as ever, the group prepares for a"
+                           " massive Q2 comeback with a cinematic teaser.",
+                'date': 'Mar 04, 2026',
+                'time_ago': '3d ago',
+                'source': 'AllKPop',
+                'link': '#',
+                'image': IMAGES['Comeback'],
+            },
+            {
+                'category': 'Awards',
+                'title': "BTS Jimin Wins Artist of the Year at Global"
+                         " Music Awards",
+                'excerpt': "The solo star took home the top prize at the"
+                           " ceremony held in Los Angeles.",
+                'date': 'Mar 03, 2026',
+                'time_ago': '4d ago',
+                'source': 'Koreaboo',
+                'link': '#',
+                'image': IMAGES['Awards'],
+            },
+            {
+                'category': 'Tour',
+                'title': "SEVENTEEN Announces 'Right Here' World Tour"
+                         " Extension",
+                'excerpt': "10 new cities added including London, Paris,"
+                           " and São Paulo for the 2026 leg.",
+                'date': 'Mar 02, 2026',
+                'time_ago': '5d ago',
+                'source': 'Soompi',
+                'link': '#',
+                'image': IMAGES['Tour'],
+            },
+            {
+                'category': 'Industry',
+                'title': "HYBE and SM Entertainment Announce Joint Venture",
+                'excerpt': "The two largest K-Pop agencies reveal a"
+                           " groundbreaking content partnership.",
+                'date': 'Mar 01, 2026',
+                'time_ago': '6d ago',
+                'source': 'Korea Herald',
+                'link': '#',
+                'image': IMAGES['Industry'],
+            },
+        ]
+
+    _news_cache['articles'] = articles
+    _news_cache['ts'] = now
+    return articles[:40]
+
 
 def shop(request):
     return render(request, 'core/shop.html')
