@@ -178,19 +178,11 @@
                                 class="inline-block bg-white/10 text-white text-[10px] font-black px-3 py-1 uppercase tracking-widest"
                                 >{{ featured.category }}</span
                             >
-                            {% if featured.time_ago %}
-                            <span
-                                class="text-slate-500 font-mono text-[10px] tracking-widest uppercase ml-3"
-                                >{{ featured.time_ago }}</span
-                            >
-                            {% endif %}
                         </div>
 
                         <!-- Featured Title -->
                         <a
-                            href="{{ featured.link }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href="{% url 'blog_article_read' slug=featured.slug %}"
                             class="block reveal-left"
                             style="transition-delay: 200ms"
                         >
@@ -202,28 +194,30 @@
                         </a>
 
                         <!-- Excerpt & Meta -->
+                        {% if featured.subtitle %}
                         <p
                             class="text-slate-400 text-base md:text-lg leading-relaxed mt-6 max-w-xl reveal-left"
                             style="transition-delay: 250ms"
                         >
-                            {{ featured.excerpt }}
+                            {{ featured.subtitle }}
                         </p>
+                        {% endif %}
                         <div
                             class="flex items-center gap-6 mt-8 reveal-left"
                             style="transition-delay: 300ms"
                         >
                             <span
                                 class="font-mono text-[10px] tracking-widest uppercase text-slate-500"
-                                >{{ featured.date }}</span
+                                >{{ featured.created_at|date:"M d, Y" }}</span
                             >
+                            {% if featured.source_name %}
                             <span
                                 class="font-mono text-[10px] tracking-widest uppercase text-primary"
-                                >{{ featured.source }}</span
+                                >{{ featured.source_name }}</span
                             >
+                            {% endif %}
                             <a
-                                href="{{ featured.link }}"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href="{% url 'blog_article_read' slug=featured.slug %}"
                                 class="flex items-center gap-2 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:text-primary transition-colors hover:gap-4"
                             >
                                 Read Full Story
@@ -267,7 +261,7 @@
                                 {{ a.title }}
                                 <span
                                     class="ml-3 text-[9px] font-mono opacity-50"
-                                    >{{ a.source }}</span
+                                    >{{ a.source_name }}</span
                                 >
                             </span>
                             {% endfor %}
@@ -280,7 +274,7 @@
                                 {{ a.title }}
                                 <span
                                     class="ml-3 text-[9px] font-mono opacity-50"
-                                    >{{ a.source }}</span
+                                    >{{ a.source_name }}</span
                                 >
                             </span>
                             {% endfor %}
@@ -415,9 +409,7 @@
                     >
                         {% for article in articles %}
                         <a
-                            href="{{ article.link }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href="{% url 'blog_article_read' slug=article.slug %}"
                             class="group border border-white/10 bg-black hover:border-primary overflow-hidden flex flex-col transition-all duration-300"
                             x-show="show('{{ article.category }}')"
                             x-transition:enter="transition ease-out duration-300"
@@ -428,11 +420,17 @@
                             <div
                                 class="relative aspect-[16/10] overflow-hidden"
                             >
+                                {% if article.image %}
                                 <img
                                     src="{{ article.image }}"
                                     alt="{{ article.title }}"
                                     class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100"
                                 />
+                                {% else %}
+                                <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-6xl text-white/10">article</span>
+                                </div>
+                                {% endif %}
                                 <div
                                     class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"
                                 ></div>
@@ -444,18 +442,18 @@
                                 >
 
                                 <!-- Source Badge -->
+                                {% if article.source_name %}
                                 <span
                                     class="absolute top-0 right-0 bg-black/80 text-slate-400 text-[9px] font-mono px-3 py-1.5 tracking-widest uppercase"
-                                    >{{ article.source }}</span
-                                >
-
-                                <!-- Time Badge -->
-                                {% if article.time_ago %}
-                                <span
-                                    class="absolute bottom-0 right-0 bg-black/80 text-slate-500 text-[9px] font-mono px-3 py-1.5 tracking-widest"
-                                    >{{ article.time_ago }}</span
+                                    >{{ article.source_name }}</span
                                 >
                                 {% endif %}
+
+                                <!-- Reading time -->
+                                <span
+                                    class="absolute bottom-0 right-0 bg-black/80 text-slate-500 text-[9px] font-mono px-3 py-1.5 tracking-widest"
+                                    >{{ article.reading_time }} min read</span
+                                >
                             </div>
 
                             <!-- Content -->
@@ -464,22 +462,24 @@
                             >
                                 <span
                                     class="text-slate-500 font-mono text-[10px] tracking-widest uppercase"
-                                    >{{ article.date }}</span
+                                    >{{ article.created_at|date:"M d, Y" }}</span
                                 >
                                 <h3
                                     class="text-white text-xl md:text-2xl font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors line-clamp-3"
                                 >
                                     {{ article.title }}
                                 </h3>
+                                {% if article.subtitle %}
                                 <p
                                     class="text-slate-400 text-sm leading-relaxed line-clamp-2"
                                 >
-                                    {{ article.excerpt }}
+                                    {{ article.subtitle }}
                                 </p>
+                                {% endif %}
                                 <div
                                     class="pt-4 mt-auto flex items-center gap-2 text-white text-[10px] font-black uppercase tracking-[0.2em] group-hover:gap-4 transition-all"
                                 >
-                                    Read Story
+                                    Read Article
                                     <span
                                         class="material-symbols-outlined text-sm"
                                         >east</span

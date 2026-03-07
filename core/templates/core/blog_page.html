@@ -1,0 +1,359 @@
+{% load static %}
+<!doctype html>
+<html class="dark" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>K-Beats — Blog</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"
+        ></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet"
+        />
+        <script>
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: "#f425c0",
+                            "background-dark": "#000000",
+                            secondary: "#00f0ff",
+                        },
+                        fontFamily: {
+                            display: ["Montserrat", "sans-serif"],
+                        },
+                        borderRadius: {
+                            DEFAULT: "0px",
+                            sm: "0px",
+                            md: "0px",
+                            lg: "0px",
+                            xl: "0px",
+                            "2xl": "0px",
+                            "3xl": "0px",
+                            full: "9999px",
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            .neon-text {
+                text-shadow:
+                    0 0 10px rgba(244, 37, 192, 0.7),
+                    0 0 20px rgba(244, 37, 192, 0.5);
+            }
+            .reveal-up {
+                opacity: 0;
+                transform: translateY(40px);
+                transition:
+                    opacity 1.5s ease-out,
+                    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .reveal-left {
+                opacity: 0;
+                transform: translateX(-50px);
+                transition:
+                    opacity 1.5s ease-out,
+                    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .reveal-up.is-visible,
+            .reveal-left.is-visible {
+                opacity: 1;
+                transform: translate(0);
+            }
+            body {
+                zoom: 0.9;
+                -moz-transform: scale(0.9);
+                -moz-transform-origin: 0 0;
+            }
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+    </head>
+    <body
+        class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden"
+    >
+        {% include 'core/header.html' %}
+
+        <main
+            class="flex-grow pt-0"
+            x-data="{
+                filter: 'All',
+                setFilter(cat) { this.filter = cat; },
+                show(cat) { return this.filter === 'All' || this.filter === cat; }
+            }"
+        >
+            <!-- ═══════════════════════════════════════════════════════════════
+                 HERO — Blog Header
+                 ═══════════════════════════════════════════════════════════════ -->
+            <section
+                class="relative w-full bg-black border-b border-white/10 overflow-hidden"
+            >
+                <div
+                    class="container mx-auto px-6 max-w-[1400px] pt-48 pb-20 md:pb-28"
+                >
+                    <!-- Breadcrumb -->
+                    <div class="flex items-center gap-2 mb-6 reveal-left">
+                        <a
+                            href="{% url 'home' %}"
+                            class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors"
+                            >Home</a
+                        >
+                        <span class="text-slate-600">/</span>
+                        <span
+                            class="font-mono text-[10px] tracking-widest uppercase text-primary"
+                            >Blog</span
+                        >
+                    </div>
+
+                    <h1
+                        class="text-[14vw] sm:text-8xl md:text-9xl font-black text-white leading-[0.8] tracking-tighter uppercase reveal-left"
+                    >
+                        K-BEATS<br /><span
+                            class="text-transparent [-webkit-text-stroke:2px_#f425c0]"
+                            >BLOG</span
+                        >
+                    </h1>
+                    <p
+                        class="text-slate-400 mt-6 font-mono text-sm tracking-widest uppercase max-w-xl reveal-left"
+                        style="transition-delay: 100ms"
+                    >
+                        Original K-Pop articles — generated
+                        from the latest breaking headlines.
+                    </p>
+
+                    <div class="flex items-center gap-4 mt-8 reveal-left" style="transition-delay: 200ms">
+                        <span
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-black text-[10px] font-black tracking-[0.2em] uppercase"
+                        >
+                            <span class="material-symbols-outlined text-sm">newspaper</span>
+                            K-Beats Editorial
+                        </span>
+                        <a
+                            href="{% url 'news' %}"
+                            class="inline-flex items-center gap-2 px-4 py-2 border border-white/20 text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase hover:border-primary hover:text-primary transition-colors"
+                        >
+                            <span class="material-symbols-outlined text-sm">rss_feed</span>
+                            News Feed
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            {% if articles %}
+            <!-- ═══════════════════════════════════════════════════════════════
+                 CATEGORY FILTER TABS
+                 ═══════════════════════════════════════════════════════════════ -->
+            <section
+                class="sticky top-0 z-40 w-full bg-black/90 backdrop-blur-lg border-b border-white/10"
+            >
+                <div
+                    class="container mx-auto px-6 max-w-[1400px] flex items-center gap-0 overflow-x-auto"
+                >
+                    <button
+                        @click="setFilter('All')"
+                        class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
+                        :class="filter === 'All' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'"
+                    >
+                        All
+                    </button>
+                    {% for cat in categories %}
+                    <button
+                        @click="setFilter('{{ cat }}')"
+                        class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
+                        :class="filter === '{{ cat }}' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'"
+                    >
+                        {{ cat }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 ARTICLE GRID
+                 ═══════════════════════════════════════════════════════════════ -->
+            <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+                <div class="container mx-auto px-6 max-w-[1400px]">
+                    <div
+                        class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left"
+                    >
+                        <div>
+                            <h2
+                                class="text-4xl md:text-5xl lg:text-7xl font-black text-white leading-none tracking-tighter uppercase"
+                            >
+                                ALL<span
+                                    class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]"
+                                >
+                                    ARTICLES</span
+                                >
+                            </h2>
+                        </div>
+                        <span
+                            class="hidden md:block font-mono text-[10px] tracking-widest uppercase text-slate-600 pb-2"
+                        >
+                            {{ articles|length }} articles
+                        </span>
+                    </div>
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-0 reveal-up"
+                    >
+                        {% for art in articles %}
+                        <a
+                            href="{% url 'blog_article_read' slug=art.slug %}"
+                            class="group border border-white/10 bg-black hover:border-primary overflow-hidden flex flex-col transition-all duration-300"
+                            x-show="show('{{ art.category }}')"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                        >
+                            <!-- Image -->
+                            <div class="relative aspect-[16/10] overflow-hidden">
+                                {% if art.image %}
+                                <img
+                                    src="{{ art.image }}"
+                                    alt="{{ art.title }}"
+                                    class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                                />
+                                {% else %}
+                                <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-6xl text-white/10">article</span>
+                                </div>
+                                {% endif %}
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
+
+                                <!-- Category -->
+                                <span
+                                    class="absolute top-0 left-0 bg-primary text-black text-[10px] font-black px-3 py-1.5 uppercase tracking-widest"
+                                >{{ art.category }}</span>
+
+                                <!-- Reading time -->
+                                <span
+                                    class="absolute bottom-0 right-0 bg-black/80 text-slate-500 text-[9px] font-mono px-3 py-1.5 tracking-widest"
+                                >{{ art.reading_time }} min read</span>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="p-6 flex flex-col gap-3 flex-grow border-t border-white/10">
+                                <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">
+                                    {{ art.created_at|date:"M d, Y" }}
+                                    {% if art.source_name %}
+                                    <span class="text-primary ml-2">{{ art.source_name }}</span>
+                                    {% endif %}
+                                </span>
+                                <h3
+                                    class="text-white text-xl md:text-2xl font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors line-clamp-3"
+                                >
+                                    {{ art.title }}
+                                </h3>
+                                {% if art.subtitle %}
+                                <p class="text-slate-400 text-sm leading-relaxed line-clamp-2">
+                                    {{ art.subtitle }}
+                                </p>
+                                {% endif %}
+                                <div class="pt-4 mt-auto flex items-center gap-2 text-white text-[10px] font-black uppercase tracking-[0.2em] group-hover:gap-4 transition-all">
+                                    Read Article
+                                    <span class="material-symbols-outlined text-sm">east</span>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            {% else %}
+            <!-- ═══════════════════════════════════════════════════════════════
+                 EMPTY STATE
+                 ═══════════════════════════════════════════════════════════════ -->
+            <section class="w-full bg-black py-32 border-b border-white/10">
+                <div class="container mx-auto px-6 max-w-[1400px] text-center">
+                    <span class="material-symbols-outlined text-8xl text-white/10">article</span>
+                    <h2 class="text-3xl font-black text-white uppercase tracking-tighter mt-6">
+                        No Articles Yet
+                    </h2>
+                    <p class="text-slate-500 font-mono text-sm tracking-widest uppercase mt-4 max-w-md mx-auto">
+                        Head to the News page to browse the latest
+                        K-Pop stories and articles.
+                    </p>
+                    <a
+                        href="{% url 'news' %}"
+                        class="inline-flex items-center gap-2 mt-8 bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 hover:bg-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
+                    >
+                        <span class="material-symbols-outlined text-sm">rss_feed</span>
+                        Go to News
+                    </a>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- ═══════════════════════════════════════════════════════════════
+                 BOTTOM CTA
+                 ═══════════════════════════════════════════════════════════════ -->
+            <section class="border-t border-b border-white/20 bg-primary overflow-hidden">
+                <div
+                    class="container mx-auto px-6 py-16 md:py-20 max-w-[1400px] flex flex-col md:flex-row items-center justify-between gap-10"
+                >
+                    <div class="w-full md:w-1/2 reveal-left">
+                        <h2
+                            class="text-4xl md:text-6xl font-black text-black leading-none tracking-tighter uppercase mb-4"
+                        >
+                            STAY IN<br />THE LOOP
+                        </h2>
+                        <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-3">
+                            Fresh articles generated from real-time K-Pop headlines.
+                        </p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-4 reveal-left" style="transition-delay: 200ms">
+                        <a
+                            href="{% url 'news' %}"
+                            class="bg-black text-white font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
+                        >
+                            <span class="material-symbols-outlined text-sm align-middle mr-1">rss_feed</span>
+                            Latest News
+                        </a>
+                        <a
+                            href="{% url 'home' %}"
+                            class="bg-transparent text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border-2 border-black hover:bg-black hover:text-white transition-colors"
+                        >
+                            <span class="material-symbols-outlined text-sm align-middle mr-1">home</span>
+                            Home
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        {% include 'core/footer.html' %}
+
+        <!-- Scroll Reveal -->
+        <script>
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("is-visible");
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                },
+                { threshold: 0.1 },
+            );
+            document.addEventListener("DOMContentLoaded", () => {
+                document
+                    .querySelectorAll(".reveal-up, .reveal-left")
+                    .forEach((el) => observer.observe(el));
+            });
+        </script>
+    </body>
+</html>

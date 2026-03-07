@@ -614,19 +614,32 @@ Experience the explosive energy of this generation's most dynamic self-producing
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-12 reveal-up">
 {% for article in news_articles %}
-<div class="group cursor-pointer" onclick="window.location.href='{% url 'news' %}'">
+<a href="{% url 'blog_article_read' slug=article.slug %}" class="group block">
 <div class="relative aspect-video mb-6 overflow-hidden border border-white/10">
+{% if article.image %}
 <img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+{% else %}
+<div class="w-full h-full bg-white/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-white/10">article</span>
+</div>
+{% endif %}
 <span class="absolute top-0 left-0 bg-primary text-black text-[10px] font-black px-3 py-1 uppercase tracking-widest">{{ article.category }}</span>
 </div>
 <div class="space-y-4">
-<span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">{{ article.date }}</span>
+<span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">{{ article.created_at|date:"M d, Y" }}</span>
 <h3 class="text-white text-2xl font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors">{{ article.title }}</h3>
-<p class="text-slate-400 text-sm leading-relaxed line-clamp-2">{{ article.excerpt }}</p>
+{% if article.subtitle %}
+<p class="text-slate-400 text-sm leading-relaxed line-clamp-2">{{ article.subtitle }}</p>
+{% endif %}
 <div class="pt-4 flex items-center gap-2 text-white text-[10px] font-black uppercase tracking-[0.2em] group-hover:gap-4 transition-all">
                         Read Story <span class="material-symbols-outlined text-sm">east</span>
 </div>
 </div>
+</a>
+{% empty %}
+<div class="col-span-3 text-center py-12">
+<span class="material-symbols-outlined text-6xl text-white/10">newspaper</span>
+<p class="text-slate-500 font-mono text-sm tracking-widest uppercase mt-4">Articles coming soon</p>
 </div>
 {% endfor %}
 </div>

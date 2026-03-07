@@ -88,3 +88,24 @@ class LivePollOption(models.Model):
 
     def __str__(self):
         return f"{self.text} ({self.votes} votes)"
+
+
+class BlogArticle(models.Model):
+    slug = models.SlugField(max_length=200, unique=True)
+    title = models.CharField(max_length=300)
+    subtitle = models.CharField(max_length=500, blank=True)
+    category = models.CharField(max_length=50)
+    source_title = models.CharField(max_length=300)
+    source_url = models.URLField(max_length=500, blank=True)
+    source_name = models.CharField(max_length=100, blank=True)
+    image = models.URLField(max_length=500, blank=True)
+    image_2 = models.URLField(max_length=500, blank=True)
+    body_html = models.TextField()
+    reading_time = models.IntegerField(default=3)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title

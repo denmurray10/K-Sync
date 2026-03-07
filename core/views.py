@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 import requests
 from openai import OpenAI
-from .models import Ranking, ComebackData, KPopGroup, LivePoll
+from .models import Ranking, ComebackData, KPopGroup, LivePoll, BlogArticle
 
 # ── DeepSeek client ──────────────────────────────────────────────────────────
 def _ds_client():
@@ -24,7 +24,7 @@ def _chat(prompt, system="You are an expert K-Pop radio assistant."):
             {'role': 'system', 'content': system},
             {'role': 'user',   'content': prompt},
         ],
-        max_tokens=4000,
+        max_tokens=8000,
         temperature=0.8,
     )
     return resp.choices[0].message.content.strip()
@@ -145,29 +145,7 @@ def home(request):
             })
 
     # Mock News Articles for Brutalist Section
-    news_articles = [
-        {
-            'category': 'Exclusive',
-            'title': "BLACKPINK's Lisa Announces Global Fan-Meet Tour",
-            'excerpt': "The 'Lalisa' star is set to hit 12 cities across Asia and Europe starting next month.",
-            'date': 'Oct 24, 2025',
-            'image': 'https://images.unsplash.com/photo-1514525253361-bee8a48740d0?auto=format&fit=crop&q=80&w=800'
-        },
-        {
-            'category': 'Charts',
-            'title': "Stray Kids 'ATE' Remains #1 on World Albums Chart",
-            'excerpt': "The group continues their dominant streak on global charts for the 5th consecutive week.",
-            'date': 'Oct 22, 2025',
-            'image': 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=800'
-        },
-        {
-            'category': 'New Release',
-            'title': "LE SSERAFIM Drops Teaser for Japan Debut Single",
-            'excerpt': "Fearless as ever, the quintet prepares for a massive Japanese market expansion.",
-            'date': 'Oct 20, 2025',
-            'image': 'https://images.unsplash.com/photo-1526218626217-dc65a29bb444?auto=format&fit=crop&q=80&w=800'
-        }
-    ]
+    news_articles = BlogArticle.objects.order_by('-created_at')[:3]
 
     # Get the active LivePoll
     active_poll = LivePoll.objects.filter(is_active=True).first()
@@ -330,23 +308,20 @@ def profile(request):
 _news_cache = {'articles': [], 'ts': 0}
 
 def news(request):
-    articles = _fetch_kpop_news()
-    featured = articles[0] if articles else None
-    remaining = articles[1:] if len(articles) > 1 else []
+    all_blog = BlogArticle.objects.order_by('-created_at')
+    featured = all_blog.first()
+    remaining = list(all_blog[1:]) if all_blog.count() > 1 else []
 
-    cats = []
-    seen = set()
-    for a in articles:
-        if a['category'] not in seen:
-            seen.add(a['category'])
-            cats.append(a['category'])
+    cats = list(
+        all_blog.values_list('category', flat=True).distinct()
+    )
 
     return render(request, 'core/news.html', {
         'featured': featured,
         'articles': remaining,
-        'all_articles': articles,
+        'all_articles': list(all_blog),
         'categories': cats,
-        'total_count': len(articles),
+        'total_count': all_blog.count(),
     })
 
 
@@ -647,7 +622,183 @@ def d_day_comeback_notification(request):
     return render(request, 'core/d_day_comeback_notification.html')
 
 def blog_page(request):
-    return render(request, 'core/blog_page.html')
+    articles = BlogArticle.objects.all()[:30]
+    cats = list(
+        BlogArticle.objects.values_list('category', flat=True)
+        .distinct()
+    )
+    return render(request, 'core/blog_page.html', {
+        'articles': articles,
+        'categories': cats,
+    })
+
+
+def blog_article_read(request, slug):
+    from django.shortcuts import get_object_or_404
+    article = get_object_or_404(BlogArticle, slug=slug)
+    related = (
+        BlogArticle.objects
+        .filter(category=article.category)
+        .exclude(pk=article.pk)[:3]
+    )
+    return render(request, 'core/blog_article.html', {
+        'article': article,
+        'related': related,
+    })
+
+
+def _generate_blog_image(prompt):
+    """Call GetImg Seedream 4.0 API; save result to media/blog/; return URL."""
+    import base64
+    import uuid
+    import os
+
+    url = "https://api.getimg.ai/v1/seedream-v4/text-to-image"
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "authorization": f"Bearer {settings.GETIMG_API_KEY}",
+    }
+    payload = {
+        "prompt": prompt,
+        "aspect_ratio": "16:9",
+        "response_format": "b64",
+    }
+    resp = requests.post(url, json=payload, headers=headers, timeout=60)
+    if resp.status_code != 200:
+        return ''
+    b64 = resp.json().get('image', '')
+    if not b64:
+        return ''
+    img_dir = os.path.join(settings.MEDIA_ROOT, 'blog')
+    os.makedirs(img_dir, exist_ok=True)
+    fname = f"{uuid.uuid4().hex[:12]}.png"
+    fpath = os.path.join(img_dir, fname)
+    with open(fpath, 'wb') as f:
+        f.write(base64.b64decode(b64))
+    return f"{settings.MEDIA_URL}blog/{fname}"
+
+
+def blog_generate(request):
+    """Generate articles from RSS feed via DeepSeek + GetImg."""
+    import re
+    from django.utils.text import slugify
+    from django.shortcuts import redirect
+
+    articles = _fetch_kpop_news()
+    created = 0
+
+    for item in articles[:6]:
+        title = item.get('title', '').strip()
+        if not title:
+            continue
+
+        base_slug = slugify(title)[:180]
+        if BlogArticle.objects.filter(slug=base_slug).exists():
+            continue
+
+        source = item.get('source', '')
+        link = item.get('link', '')
+        category = item.get('category', 'News')
+        excerpt = item.get('excerpt', '')
+
+        # ── DeepSeek article ──
+        prompt = (
+            f"Write an original, in-depth K-Pop news article based "
+            f"on this headline:\n\n"
+            f"Title: {title}\n"
+            f"Source: {source}\n"
+            f"Summary: {excerpt}\n\n"
+            f"Write as a professional K-Pop journalist for K-Beats, "
+            f"a major K-Pop media outlet. The article MUST be at "
+            f"least 1,000 words — aim for 1,000-1,200 words. Make "
+            f"it informative, entertaining, and thorough.\n\n"
+            f"Structure your response EXACTLY as follows:\n"
+            f"SUBTITLE: (one catchy subtitle line)\n"
+            f"---\n"
+            f"(article body in HTML using <p>, <h3>, <strong>, <em>"
+            f", <blockquote> tags — no <h1> or <h2>)\n\n"
+            f"Important:\n"
+            f"- Write original content, do NOT copy the source\n"
+            f"- Include context about the artist/group history\n"
+            f"- Add fan reaction / community perspective\n"
+            f"- Discuss industry impact and significance\n"
+            f"- End with a forward-looking statement\n"
+            f"- Use proper HTML paragraph tags\n"
+            f"- Do NOT include the title in the body\n"
+            f"- Do NOT mention AI anywhere in the article\n"
+            f"- Write as a human journalist, not an AI"
+        )
+
+        try:
+            raw = _chat(
+                prompt,
+                system=(
+                    "You are a senior K-Pop journalist at K-Beats, "
+                    "a leading K-Pop news outlet. Write engaging, "
+                    "original long-form articles with insider knowledge. "
+                    "Always use HTML tags for formatting. Never mention "
+                    "AI, never reveal you are an AI."
+                ),
+            )
+        except Exception:
+            continue
+
+        subtitle = ''
+        body = raw
+        if '---' in raw:
+            header, body = raw.split('---', 1)
+            for line in header.strip().splitlines():
+                if line.upper().startswith('SUBTITLE:'):
+                    subtitle = line.split(':', 1)[1].strip()
+                    break
+
+        body = body.strip()
+        if not body.startswith('<'):
+            paras = body.split('\n\n')
+            body = ''.join(
+                f'<p>{p.strip()}</p>' for p in paras if p.strip()
+            )
+
+        word_count = len(re.sub(r'<[^>]+>', '', body).split())
+        reading_time = max(1, word_count // 200)
+
+        # ── GetImg images ──
+        img_prompt_base = (
+            f"Professional editorial photo for K-Pop article: "
+            f"{title}. Vibrant concert/stage lighting, neon pink "
+            f"and cyan tones, dramatic composition, editorial "
+            f"magazine quality. No text, no logos, no faces."
+        )
+        try:
+            image_1 = _generate_blog_image(img_prompt_base)
+        except Exception:
+            image_1 = ''
+        try:
+            image_2 = _generate_blog_image(
+                f"Abstract K-Pop aesthetic: {category} theme, "
+                f"neon lights, music stage atmosphere, futuristic "
+                f"concert vibes. No text, no logos, no faces."
+            )
+        except Exception:
+            image_2 = ''
+
+        BlogArticle.objects.create(
+            slug=base_slug,
+            title=title,
+            subtitle=subtitle,
+            category=category,
+            source_title=title,
+            source_url=link,
+            source_name=source,
+            image=image_1,
+            image_2=image_2,
+            body_html=body,
+            reading_time=reading_time,
+        )
+        created += 1
+
+    return redirect('news')
 
 def new_release_spotlight(request):
     return render(request, 'core/new_release_spotlight.html')
