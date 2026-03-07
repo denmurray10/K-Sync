@@ -208,15 +208,9 @@
 
                             <!-- Name -->
                             <h1
-                                class="text-7xl sm:text-8xl md:text-[9rem] lg:text-[12rem] font-black text-white leading-[0.8] tracking-tighter uppercase"
+                                class="text-5xl sm:text-6xl md:text-[5rem] lg:text-[7rem] font-black text-white leading-[0.85] tracking-tighter uppercase whitespace-nowrap"
                             >
-                                {% for word in group.name.split %}
-                                {% if forloop.last and not forloop.first %}
-                                <span class="block text-transparent" style="-webkit-text-stroke: 2px {{ accent_color }};">{{ word }}</span>
-                                {% else %}
-                                <span class="block">{{ word }}</span>
-                                {% endif %}
-                                {% endfor %}
+                                {{ group.name }}
                             </h1>
 
                             <!-- Label -->
