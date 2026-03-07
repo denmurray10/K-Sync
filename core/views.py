@@ -733,17 +733,82 @@ def idol_page(request, slug):
     # Get 3 related groups of the same type
     related = KPopGroup.objects.filter(group_type=group.group_type).exclude(pk=group.pk).order_by('rank')[:3]
 
+    # Pull real releases, birthdays, and anniversaries from ComebackData
+    now = timezone.now()
+    months = [
+        (now.year, now.month),
+        (now.year if now.month < 12 else now.year + 1, now.month + 1 if now.month < 12 else 1),
+    ]
+    today_str = now.strftime('%Y-%m-%d')
+    name_lower = group.name.lower()
+
+    albums = []
+    events = []
+    for y, m in months:
+        data_obj = ComebackData.objects.filter(year=y, month=m).first()
+        if not data_obj:
+            continue
+        for date_key, day_data in data_obj.data.items():
+            # Releases matching this group
+            for r in day_data.get('releases', []):
+                if name_lower in r.get('artist', '').lower():
+                    albums.append({
+                        'title': r.get('title', ''),
+                        'image': r.get('image', ''),
+                        'type': r.get('type', 'Release'),
+                        'date_str': date_key,
+                    })
+                    if date_key >= today_str:
+                        events.append({
+                            'type': 'Release',
+                            'title': r.get('title', 'New Release'),
+                            'date': date_key,
+                            'iso_date': f"{date_key}T09:00:00Z",
+                        })
+            # Birthdays matching this group
+            for b in day_data.get('birthdays', []):
+                if name_lower in (b.get('group', '') or '').lower() or name_lower in (b.get('name', '') or '').lower():
+                    events.append({
+                        'type': 'Birthday',
+                        'title': f"{b.get('name', 'Member')} Birthday",
+                        'date': date_key,
+                        'iso_date': f"{date_key}T00:00:00Z" if date_key >= today_str else '',
+                    })
+            # Anniversaries matching this group
+            for a in day_data.get('anniversaries', []):
+                if name_lower in (a.get('group', '') or '').lower():
+                    events.append({
+                        'type': 'Anniversary',
+                        'title': f"{group.name} Debut Anniversary",
+                        'date': date_key,
+                        'iso_date': f"{date_key}T00:00:00Z" if date_key >= today_str else '',
+                    })
+
+    albums.sort(key=lambda x: x['date_str'], reverse=True)
+    events.sort(key=lambda x: x['date'])
+
+    # Pull charted tracks if this group appears in the daily ranking
+    tracks = []
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    if daily_rank and daily_rank.ranking_data:
+        for item in daily_rank.ranking_data:
+            if name_lower in item.get('artist', '').lower():
+                tracks.append({
+                    'title': item.get('track', ''),
+                    'image': item.get('artwork_url', ''),
+                    'album': item.get('album', ''),
+                })
+
     context = {
         'group': group,
         'accent_color': accent_map.get(group.group_type, '#FF8EAF'),
         'accent_rgb': accent_rgb_map.get(group.group_type, '255,142,175'),
         'related_groups': related,
-        # Placeholder data — will be populated later per group
-        'description': f"Explore the world of {group.name} — members, discography, top tracks, and more.",
+        'description': f"Explore the world of {group.name} — members, discography, top tracks, and more. Stay updated with the latest releases, events, and everything about {group.name} on K-Beats.",
         'members': [],
-        'albums': [],
-        'tracks': [],
-        'events': [],
+        'albums': albums,
+        'tracks': tracks,
+        'events': events,
         'gallery': [],
     }
     return render(request, 'core/idol_band_page.html', context)

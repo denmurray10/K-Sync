@@ -1,0 +1,1019 @@
+{% load static %}
+<!doctype html>
+<html class="dark" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>K-Beats — {{ group.name }}</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+        ></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet"
+        />
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: "#f425c0",
+                            "background-light": "#f8f5f8",
+                            "background-dark": "#000000",
+                            secondary: "#00f0ff",
+                            accent: "{{ accent_color }}",
+                        },
+                        fontFamily: {
+                            display: ["Montserrat", "sans-serif"],
+                        },
+                        borderRadius: {
+                            DEFAULT: "0px",
+                            sm: "0px",
+                            md: "0px",
+                            lg: "0px",
+                            xl: "0px",
+                            "2xl": "0px",
+                            "3xl": "0px",
+                            full: "9999px",
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            .glass-panel {
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+            .neon-text {
+                text-shadow:
+                    0 0 10px rgba({{accent_rgb}}, 0.7),
+                    0 0 20px rgba({{accent_rgb}}, 0.5);
+            }
+            .neon-border {
+                box-shadow: 0 0 10px rgba({{accent_rgb}}, 0.4);
+            }
+            /* Scroll Reveal Animations */
+            .reveal-up {
+                opacity: 0;
+                transform: translateY(40px);
+                transition:
+                    opacity 1.5s ease-out,
+                    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .reveal-left {
+                opacity: 0;
+                transform: translateX(-50px);
+                transition:
+                    opacity 1.5s ease-out,
+                    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .reveal-up.is-visible,
+            .reveal-left.is-visible {
+                opacity: 1;
+                transform: translate(0);
+            }
+            body {
+                zoom: 0.9;
+                -moz-transform: scale(0.9);
+                -moz-transform-origin: 0 0;
+            }
+            [x-cloak] {
+                display: none !important;
+            }
+            /* Member card hover */
+            .member-card {
+                transition:
+                    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.3s ease;
+            }
+            .member-card:hover {
+                transform: translateY(-6px);
+            }
+            /* Ticker */
+            @keyframes ticker-scroll {
+                0% {
+                    transform: translateX(0);
+                }
+                100% {
+                    transform: translateX(-50%);
+                }
+            }
+            .animate-ticker {
+                width: max-content;
+                animation: ticker-scroll 30s linear infinite;
+            }
+        </style>
+    </head>
+    <body
+        class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden"
+    >
+        {% include 'core/header.html' %}
+
+        <main class="flex-grow pt-0">
+            <!-- ═══════════════════════════════════════════════════════════════════
+         HERO SECTION — Full-width cinematic banner
+         ═══════════════════════════════════════════════════════════════════ -->
+            <section
+                class="relative h-[85vh] min-h-[600px] w-full overflow-hidden flex items-end border-b border-white/10"
+            >
+                <!-- Background Image -->
+                <div class="absolute inset-0 z-0 bg-black">
+                    {% if group.logo_path %}
+                    <div
+                        class="w-full h-full bg-cover bg-center opacity-30 grayscale mix-blend-luminosity"
+                        style="
+                            background-image: url(&quot;{% static group.logo_path %}&quot;);
+                        "
+                    ></div>
+                    {% endif %}
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30"
+                    ></div>
+                </div>
+
+                <!-- Ghost text background -->
+                <div
+                    class="absolute inset-0 z-0 pointer-events-none overflow-hidden"
+                >
+                    <div
+                        class="absolute -top-10 -right-20 text-[10rem] md:text-[20rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap select-none tracking-tighter"
+                    >
+                        {{ group.name }}
+                    </div>
+                </div>
+
+                <!-- Accent glow -->
+                <div
+                    class="absolute bottom-0 left-0 w-full h-1/3 z-0 pointer-events-none"
+                    style="background: linear-gradient(to top, rgba({{ accent_rgb }}, 0.08), transparent);"
+                ></div>
+
+                <div
+                    class="relative z-20 container mx-auto px-6 max-w-[1400px] pb-16 md:pb-24 w-full"
+                >
+                    <div
+                        class="flex flex-col md:flex-row items-end justify-between gap-8"
+                    >
+                        <!-- Left: Artist Identity -->
+                        <div class="flex flex-col gap-0 max-w-4xl reveal-left">
+                            <!-- Breadcrumb -->
+                            <div class="flex items-center gap-2 mb-6">
+                                <a
+                                    href="{% url 'idols' %}"
+                                    class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors"
+                                    >Idols</a
+                                >
+                                <span class="text-slate-600">/</span>
+                                <span
+                                    class="font-mono text-[10px] tracking-widest uppercase"
+                                    style="color: {{ accent_color }};"
+                                    >{{ group.name }}</span
+                                >
+                            </div>
+
+                            <!-- Type + Rank Badge -->
+                            <div class="flex items-center gap-3 mb-6">
+                                <div
+                                    class="inline-flex items-center gap-2 px-3 py-1 border text-[10px] font-black tracking-[0.2em] uppercase"
+                                    style="border-color: {{ accent_color }}; color: {{ accent_color }}; background: rgba({{ accent_rgb }}, 0.1);"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-sm"
+                                        >{% if group.group_type == 'BOY'
+                                        %}groups{% elif group.group_type ==
+                                        'GIRL' %}favorite{% else %}person{%
+                                        endif %}</span
+                                    >
+                                    {% if group.group_type == 'BOY' %}Boy
+                                    Group{% elif group.group_type == 'GIRL'
+                                    %}Girl Group{% else %}Soloist{% endif %}
+                                </div>
+                                {% if group.rank %}
+                                <div
+                                    class="inline-flex items-center gap-2 px-3 py-1 border border-white/20 bg-white/5 text-[10px] font-black tracking-[0.2em] uppercase text-white"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-sm"
+                                        >leaderboard</span
+                                    >
+                                    Global Rank #{{ group.rank }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Name -->
+                            <h1
+                                class="text-7xl sm:text-8xl md:text-[9rem] lg:text-[12rem] font-black text-white leading-[0.8] tracking-tighter uppercase"
+                            >
+                                {% for word in group.name.split %} {% if
+                                forloop.last and not forloop.first %}
+                                <span
+                                    class="block text-transparent"
+                                    style="-webkit-text-stroke: 2px {{ accent_color }};"
+                                    >{{ word }}</span
+                                >
+                                {% else %}
+                                <span class="block">{{ word }}</span>
+                                {% endif %} {% endfor %}
+                            </h1>
+
+                            <!-- Label -->
+                            <p
+                                class="font-mono text-xs tracking-widest uppercase text-slate-500 mt-6"
+                            >
+                                {{ group.label }}
+                            </p>
+                        </div>
+
+                        <!-- Right: Logo / Avatar -->
+                        <div
+                            class="hidden md:block w-[200px] h-[200px] border border-white/10 bg-black overflow-hidden shrink-0 reveal-up"
+                            style="transition-delay: 300ms"
+                        >
+                            {% if group.logo_path %}
+                            <img
+                                src="{% static group.logo_path %}"
+                                alt="{{ group.name }}"
+                                class="w-full h-full object-cover opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-500"
+                            />
+                            {% else %}
+                            <img
+                                src="https://api.dicebear.com/7.x/initials/svg?seed={{ group.name|urlencode }}&backgroundColor=111111&textColor=ffffff"
+                                alt="{{ group.name }}"
+                                class="w-full h-full object-cover opacity-40"
+                            />
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+         STATS BAR — Primary color accent bar with key data
+         ═══════════════════════════════════════════════════════════════════ -->
+            <div
+                class="relative w-full border-b border-white/20 h-20 flex items-center overflow-hidden"
+                style="background: {{ accent_color }};"
+            >
+                <div
+                    class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"
+                ></div>
+                <div
+                    class="container mx-auto max-w-[1400px] px-6 flex items-center justify-between w-full relative z-10"
+                >
+                    <div class="flex items-center gap-8 md:gap-16">
+                        {% if group.rank %}
+                        <div class="flex flex-col items-center">
+                            <span
+                                class="font-black text-2xl md:text-3xl text-black leading-none"
+                                >#{{ group.rank }}</span
+                            >
+                            <span
+                                class="font-mono text-[9px] tracking-widest uppercase text-black/60 mt-1"
+                                >Global Rank</span
+                            >
+                        </div>
+                        {% endif %}
+                        <div class="flex flex-col items-center">
+                            <span
+                                class="font-black text-2xl md:text-3xl text-black leading-none"
+                                >{{ members|length|default:"—" }}</span
+                            >
+                            <span
+                                class="font-mono text-[9px] tracking-widest uppercase text-black/60 mt-1"
+                                >Members</span
+                            >
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span
+                                class="font-black text-2xl md:text-3xl text-black leading-none"
+                                >{{ albums|length|default:"—" }}</span
+                            >
+                            <span
+                                class="font-mono text-[9px] tracking-widest uppercase text-black/60 mt-1"
+                                >Releases</span
+                            >
+                        </div>
+                        <div class="flex flex-col items-center hidden md:flex">
+                            <span
+                                class="font-black text-2xl md:text-3xl text-black leading-none"
+                                >{{ events|length|default:"—" }}</span
+                            >
+                            <span
+                                class="font-mono text-[9px] tracking-widest uppercase text-black/60 mt-1"
+                                >Events</span
+                            >
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span
+                            class="font-mono text-[10px] tracking-widest uppercase font-bold text-black"
+                            >{{ group.label }}</span
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+         ABOUT SECTION
+         ═══════════════════════════════════════════════════════════════════ -->
+            <section
+                class="w-full bg-black py-20 md:py-28 border-b border-white/10"
+            >
+                <div class="container mx-auto px-6 max-w-[1400px]">
+                    <div class="flex flex-col lg:flex-row gap-16 items-start">
+                        <!-- Left: Section Header -->
+                        <div class="lg:w-1/3 reveal-left">
+                            <div
+                                class="inline-flex items-center gap-2 px-3 py-1 border border-white/20 bg-white/5 mb-6"
+                            >
+                                <span
+                                    class="material-symbols-outlined text-sm"
+                                    style="color: {{ accent_color }};"
+                                    >info</span
+                                >
+                                <span
+                                    class="font-mono text-[10px] tracking-widest uppercase font-bold text-white"
+                                    >About</span
+                                >
+                            </div>
+                            <h2
+                                class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none"
+                            >
+                                THE <br /><span
+                                    class="text-transparent"
+                                    style="-webkit-text-stroke: 1.5px {{ accent_color }};"
+                                    >STORY</span
+                                >
+                            </h2>
+                        </div>
+
+                        <!-- Right: Description -->
+                        <div
+                            class="lg:w-2/3 reveal-up"
+                            style="transition-delay: 200ms"
+                        >
+                            <p
+                                class="text-slate-300 text-lg md:text-xl leading-relaxed font-light"
+                            >
+                                {{ description }}
+                            </p>
+                            <div
+                                class="grid grid-cols-2 md:grid-cols-3 gap-6 mt-12 pt-8 border-t border-white/10"
+                            >
+                                <div>
+                                    <span
+                                        class="font-mono text-[9px] tracking-widest uppercase text-slate-500 block mb-1"
+                                        >Type</span
+                                    >
+                                    <span
+                                        class="font-black text-white uppercase tracking-tight"
+                                        >{{ group.get_group_type_display
+                                        }}</span
+                                    >
+                                </div>
+                                <div>
+                                    <span
+                                        class="font-mono text-[9px] tracking-widest uppercase text-slate-500 block mb-1"
+                                        >Label</span
+                                    >
+                                    <span
+                                        class="font-black text-white uppercase tracking-tight"
+                                        >{{ group.label }}</span
+                                    >
+                                </div>
+                                {% if group.rank %}
+                                <div>
+                                    <span
+                                        class="font-mono text-[9px] tracking-widest uppercase text-slate-500 block mb-1"
+                                        >Ranking</span
+                                    >
+                                    <span
+                                        class="font-black text-white uppercase tracking-tight"
+                                        >#{{ group.rank }} Worldwide</span
+                                    >
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+         MEMBERS SECTION
+         ═══════════════════════════════════════════════════════════════════ -->
+            {% if members %}
+            <section
+                class="w-full bg-black py-20 md:py-28 border-b border-white/10"
+            >
+                <div class="container mx-auto px-6 max-w-[1400px]">
+                    <!-- Section Header -->
+                    <div
+                        class="flex items-end justify-between mb-12 pb-4 border-b border-white/20 reveal-left"
+                    >
+                        <div>
+                            <h2
+                                class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none"
+                            >
+                                MEET THE
+                                <span
+                                    class="text-transparent"
+                                    style="-webkit-text-stroke: 1.5px {{ accent_color }};"
+                                    >MEMBERS</span
+                                >
+                            </h2>
+                            <p
+                                class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-2"
+                            >
+                                The lineup that defines a generation
+                            </p>
+                        </div>
+                        <span
+                            class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hidden md:block"
+                            >{{ members|length }} Members</span
+                        >
+                    </div>
+
+                    <!-- Members Grid -->
+                    <div
+                        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-0 reveal-up"
+                    >
+                        {% for member in members %}
+                        <div
+                            class="member-card group relative border border-white/10 bg-black hover:border-[{{ accent_color }}] overflow-hidden flex flex-col"
+                        >
+                            <!-- Avatar -->
+                            <div
+                                class="w-full aspect-square bg-white/[0.03] flex items-center justify-center relative overflow-hidden"
+                            >
+                                {% if member.image %}
+                                <img
+                                    src="{{ member.image }}"
+                                    alt="{{ member.name }}"
+                                    class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                                />
+                                {% else %}
+                                <img
+                                    src="https://api.dicebear.com/7.x/initials/svg?seed={{ member.name|urlencode }}&backgroundColor=111111&textColor=ffffff"
+                                    alt="{{ member.name }}"
+                                    class="w-20 h-20 opacity-40 group-hover:opacity-70 transition-opacity duration-300"
+                                />
+                                {% endif %}
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"
+                                ></div>
+                                <div
+                                    class="absolute inset-0 opacity-0 group-hover:opacity-15 transition-opacity duration-500"
+                                    style="background: {{ accent_color }};"
+                                ></div>
+                            </div>
+                            <!-- Info -->
+                            <div class="p-4 border-t border-white/10 bg-black">
+                                <h3
+                                    class="font-black text-sm uppercase tracking-tight text-white group-hover:text-[{{ accent_color }}] transition-colors leading-tight"
+                                >
+                                    {{ member.name }}
+                                </h3>
+                                {% if member.position %}
+                                <span
+                                    class="font-mono text-[9px] tracking-widest uppercase text-slate-500 mt-1 block"
+                                    >{{ member.position }}</span
+                                >
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+         DISCOGRAPHY / RELEASES SECTION
+         ═══════════════════════════════════════════════════════════════════ -->
+            {% if albums %}
+            <section
+                class="w-full bg-black py-20 md:py-28 border-b border-white/10"
+            >
+                <div class="container mx-auto px-6 max-w-[1400px]">
+                    <!-- Section Header -->
+                    <div
+                        class="flex items-end justify-between mb-12 pb-4 border-b border-white/20 reveal-left"
+                    >
+                        <div>
+                            <h2
+                                class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none"
+                            >
+                                DISCO<span
+                                    class="text-transparent"
+                                    style="-webkit-text-stroke: 1.5px {{ accent_color }};"
+                                    >GRAPHY</span
+                                >
+                            </h2>
+                            <p
+                                class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-2"
+                            >
+                                Albums, singles &amp; special releases
+                            </p>
+                        </div>
+                        <span
+                            class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hidden md:block"
+                            >{{ albums|length }} Releases</span
+                        >
+                    </div>
+
+                    <!-- Album Grid -->
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0 reveal-up"
+                    >
+                        {% for album in albums %}
+                        <div
+                            class="group relative border border-white/10 bg-black hover:border-[{{ accent_color }}] overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1"
+                        >
+                            <!-- Artwork -->
+                            <div
+                                class="w-full aspect-square bg-white/[0.03] relative overflow-hidden"
+                            >
+                                {% if album.image %}
+                                <img
+                                    src="{{ album.image }}"
+                                    alt="{{ album.title }}"
+                                    class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 opacity-80 group-hover:opacity-100"
+                                />
+                                {% else %}
+                                <div
+                                    class="w-full h-full flex items-center justify-center"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-6xl text-white/10"
+                                        >album</span
+                                    >
+                                </div>
+                                {% endif %}
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"
+                                ></div>
+                                <!-- Type Badge -->
+                                <div
+                                    class="absolute top-0 left-0 z-10 px-3 py-1.5"
+                                    style="background: {{ accent_color }};"
+                                >
+                                    <span
+                                        class="font-mono text-[9px] tracking-widest uppercase font-black text-black"
+                                        >{{ album.type|default:"Album" }}</span
+                                    >
+                                </div>
+                                <!-- Hover Play -->
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    style="background: rgba({{ accent_rgb }}, 0.3);"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-5xl text-white"
+                                        >play_circle</span
+                                    >
+                                </div>
+                            </div>
+                            <!-- Info -->
+                            <div class="p-5 border-t border-white/10 bg-black">
+                                <h3
+                                    class="font-black text-lg uppercase tracking-tight text-white leading-tight group-hover:text-[{{ accent_color }}] transition-colors truncate"
+                                >
+                                    {{ album.title }}
+                                </h3>
+                                <span
+                                    class="font-mono text-[9px] tracking-widest uppercase text-slate-500 mt-1 block"
+                                    >{{ album.date_str|default:"" }}</span
+                                >
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+         TOP TRACKS SECTION — Brutalist list style like index.html
+         ═══════════════════════════════════════════════════════════════════ -->
+            {% if tracks %}
+            <section
+                class="w-full bg-black py-20 md:py-28 border-b border-white/10"
+            >
+                <div class="container mx-auto px-6 max-w-[1400px]">
+                    <!-- Section Header -->
+                    <div
+                        class="flex items-end justify-between pb-4 border-b border-white/20 reveal-left"
+                    >
+                        <div>
+                            <h2
+                                class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase"
+                            >
+                                TOP <br /><span
+                                    class="text-transparent"
+                                    style="-webkit-text-stroke: 1px {{ accent_color }};"
+                                    >TRACKS</span
+                                >
+                            </h2>
+                            <p
+                                class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase"
+                            >
+                                Fan-favourite hits from {{ group.name }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Track List -->
+                    <div
+                        class="flex flex-col border-t border-white/20 reveal-up"
+                    >
+                        {% for track in tracks %}
+                        <div
+                            class="group flex items-center justify-between border-b border-white/20 hover:bg-white hover:text-black transition-colors cursor-pointer p-4 sm:p-6"
+                        >
+                            <div
+                                class="flex items-center gap-6 md:gap-8 w-full"
+                            >
+                                <!-- Rank -->
+                                <div
+                                    class="flex flex-col items-center justify-center w-12 md:w-16 shrink-0"
+                                >
+                                    <span
+                                        class="font-black text-3xl md:text-4xl text-white group-hover:text-black leading-none tracking-tighter transition-colors"
+                                        >{{ forloop.counter }}</span
+                                    >
+                                </div>
+                                <!-- Artwork -->
+                                <div
+                                    class="relative w-16 h-16 md:w-20 md:h-20 shrink-0 overflow-hidden bg-black/50 border border-white/20 group-hover:border-black/20 transition-colors"
+                                >
+                                    {% if track.image %}
+                                    <img
+                                        src="{{ track.image }}"
+                                        alt="{{ track.title }}"
+                                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500"
+                                    />
+                                    {% else %}
+                                    <div
+                                        class="w-full h-full flex items-center justify-center bg-white/5"
+                                    >
+                                        <span
+                                            class="material-symbols-outlined text-2xl text-white/20"
+                                            >music_note</span
+                                        >
+                                    </div>
+                                    {% endif %}
+                                    <div
+                                        class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+                                        style="background: rgba({{ accent_rgb }}, 0.8);"
+                                    >
+                                        <span
+                                            class="material-symbols-outlined text-black text-3xl"
+                                            >play_arrow</span
+                                        >
+                                    </div>
+                                </div>
+                                <!-- Track Info -->
+                                <div
+                                    class="flex flex-col justify-center flex-1 min-w-0 pr-4"
+                                >
+                                    <h3
+                                        class="font-black text-white group-hover:text-black text-xl md:text-2xl uppercase tracking-tighter truncate transition-colors"
+                                    >
+                                        {{ track.title }}
+                                    </h3>
+                                    <p
+                                        class="font-mono text-slate-400 group-hover:text-black text-[10px] md:text-xs tracking-widest uppercase transition-colors truncate"
+                                    >
+                                        {{ track.album|default:group.name }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+         UPCOMING EVENTS / COMEBACKS
+         ═══════════════════════════════════════════════════════════════════ -->
+            {% if events %}
+            <section
+                class="w-full bg-black py-20 md:py-28 border-b border-white/10"
+            >
+                <div class="container mx-auto px-6 max-w-[1400px]">
+                    <!-- Section Header -->
+                    <div
+                        class="flex items-end justify-between pb-4 border-b border-white/20 reveal-left"
+                    >
+                        <div>
+                            <h2
+                                class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase"
+                            >
+                                UPCOMING <br /><span
+                                    class="text-transparent"
+                                    style="-webkit-text-stroke: 1px {{ accent_color }};"
+                                    >EVENTS</span
+                                >
+                            </h2>
+                            <p
+                                class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase"
+                            >
+                                Releases, anniversaries &amp; milestones for {{
+                                group.name }}
+                            </p>
+                        </div>
+                        <a
+                            href="{% url 'comeback_timeline' %}"
+                            class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-[{{ accent_color }}] transition-colors gap-2 pb-2 uppercase"
+                        >
+                            Full Calendar
+                            <span class="material-symbols-outlined text-sm"
+                                >arrow_forward</span
+                            >
+                        </a>
+                    </div>
+
+                    <!-- Events List -->
+                    <div
+                        class="flex flex-col border-t border-white/20 reveal-up"
+                    >
+                        {% for event in events %}
+                        <div
+                            class="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-6 border-b border-white/10 hover:bg-white/5 transition-colors"
+                        >
+                            <div
+                                class="flex items-center gap-6 w-full md:w-auto mb-4 md:mb-0"
+                            >
+                                <!-- Event Icon -->
+                                <div
+                                    class="w-16 h-16 flex items-center justify-center border border-white/10 bg-white/5 shrink-0"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-2xl"
+                                        style="color: {{ accent_color }};"
+                                    >
+                                        {% if event.type == 'Release' %}album{%
+                                        elif event.type == 'Anniversary'
+                                        %}celebration{% elif event.type ==
+                                        'Birthday' %}cake{% else %}event{% endif
+                                        %}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span
+                                        class="inline-block text-[10px] font-black px-2 py-0.5 mb-2 uppercase tracking-widest w-max text-black"
+                                        style="background: {{ accent_color }};"
+                                        >{{ event.type }}</span
+                                    >
+                                    <h4
+                                        class="text-white font-black text-xl leading-tight uppercase tracking-tight group-hover:text-[{{ accent_color }}] transition-colors"
+                                    >
+                                        {{ event.title }}
+                                    </h4>
+                                </div>
+                            </div>
+                            <div
+                                class="flex flex-col md:items-end w-full md:w-auto"
+                            >
+                                <span
+                                    class="text-slate-400 text-xs font-mono tracking-widest uppercase flex items-center gap-2"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-[14px]"
+                                        >schedule</span
+                                    >
+                                    {{ event.date }}
+                                </span>
+                                {% if event.iso_date %}
+                                <span
+                                    class="text-white text-lg font-black font-mono tracking-wider mt-1"
+                                    data-countdown="{{ event.iso_date }}"
+                                    >--d --h --m</span
+                                >
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+         RELATED ARTISTS
+         ═══════════════════════════════════════════════════════════════════ -->
+            {% if related_groups %}
+            <section
+                class="w-full bg-black py-20 md:py-28 border-b border-white/10"
+            >
+                <div class="container mx-auto px-6 max-w-[1400px]">
+                    <!-- Section Header -->
+                    <div
+                        class="flex items-end justify-between mb-12 pb-4 border-b border-white/20 reveal-left"
+                    >
+                        <div>
+                            <h2
+                                class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none"
+                            >
+                                SIMILAR
+                                <span
+                                    class="text-transparent [-webkit-text-stroke:1.5px_white]"
+                                    >ARTISTS</span
+                                >
+                            </h2>
+                            <p
+                                class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-2"
+                            >
+                                More {{ group.get_group_type_display|lower }}s
+                                you might enjoy
+                            </p>
+                        </div>
+                        <a
+                            href="{% url 'idols' %}"
+                            class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase"
+                        >
+                            All Artists
+                            <span class="material-symbols-outlined text-sm"
+                                >arrow_forward</span
+                            >
+                        </a>
+                    </div>
+
+                    <!-- Related Grid -->
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 reveal-up"
+                    >
+                        {% for rg in related_groups %}
+                        <a
+                            href="{% url 'idol_page' slug=rg.slug %}"
+                            class="group relative border border-white/10 bg-black hover:border-{% if rg.group_type == 'GIRL' %}[#FF8EAF]{% elif rg.group_type == 'BOY' %}secondary{% else %}[#c084fc]{% endif %} overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1"
+                        >
+                            <!-- Rank Badge -->
+                            <div
+                                class="absolute top-0 left-0 z-20 bg-black border-r border-b border-white/10 px-3 py-2"
+                            >
+                                <span class="font-black text-lg text-white/40"
+                                    >#{{ rg.rank }}</span
+                                >
+                            </div>
+                            <!-- Avatar -->
+                            <div
+                                class="w-full aspect-[4/3] bg-white/[0.03] flex items-center justify-center relative overflow-hidden"
+                            >
+                                {% if rg.logo_path %}
+                                <img
+                                    src="{% static rg.logo_path %}"
+                                    alt="{{ rg.name }}"
+                                    class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                                />
+                                {% else %}
+                                <img
+                                    src="https://api.dicebear.com/7.x/initials/svg?seed={{ rg.name|urlencode }}&backgroundColor=111111&textColor=ffffff"
+                                    alt="{{ rg.name }}"
+                                    class="w-24 h-24 opacity-40 group-hover:opacity-70 transition-opacity duration-300"
+                                />
+                                {% endif %}
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"
+                                ></div>
+                            </div>
+                            <!-- Info Bar -->
+                            <div
+                                class="p-5 border-t border-white/10 flex items-start justify-between gap-2 bg-black"
+                            >
+                                <div>
+                                    <h3
+                                        class="font-black text-lg uppercase tracking-tight text-white leading-tight group-hover:text-primary transition-colors"
+                                    >
+                                        {{ rg.name }}
+                                    </h3>
+                                    <span
+                                        class="font-mono text-[9px] tracking-widest uppercase text-slate-500"
+                                        >{{ rg.label }}</span
+                                    >
+                                </div>
+                                <span
+                                    class="material-symbols-outlined text-white/20 group-hover:text-primary group-hover:translate-x-1 transition-all text-lg shrink-0 mt-0.5"
+                                    >arrow_forward</span
+                                >
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+         BOTTOM CTA — Newsletter-style bar
+         ═══════════════════════════════════════════════════════════════════ -->
+            <section
+                class="border-t border-b border-white/20 overflow-hidden"
+                style="background: {{ accent_color }};"
+            >
+                <div
+                    class="container mx-auto px-6 py-16 md:py-20 max-w-[1400px] flex flex-col md:flex-row items-center justify-between gap-8"
+                >
+                    <div class="reveal-left">
+                        <h2
+                            class="text-4xl md:text-5xl font-black text-black leading-none tracking-tighter uppercase"
+                        >
+                            EXPLORE MORE <br />ARTISTS
+                        </h2>
+                        <p
+                            class="text-black/70 text-sm font-mono tracking-widest uppercase mt-3"
+                        >
+                            Dive into the full K-Beats idol directory.
+                        </p>
+                    </div>
+                    <div
+                        class="flex items-center gap-4 reveal-left"
+                        style="transition-delay: 200ms"
+                    >
+                        <a
+                            href="{% url 'idols' %}"
+                            class="bg-black text-white font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
+                        >
+                            All Artists
+                            <span
+                                class="material-symbols-outlined text-sm align-middle ml-1"
+                                >groups</span
+                            >
+                        </a>
+                        <a
+                            href="{% url 'charts' %}"
+                            class="bg-transparent text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border-2 border-black hover:bg-black hover:text-white transition-colors"
+                        >
+                            View Charts
+                            <span
+                                class="material-symbols-outlined text-sm align-middle ml-1"
+                                >trending_up</span
+                            >
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        {% include 'core/footer.html' %}
+
+        <script>
+            // ── Countdown Timers ───────────────────────────────────────────
+            function updateCountdowns() {
+                document.querySelectorAll("[data-countdown]").forEach((el) => {
+                    const target = new Date(el.dataset.countdown).getTime();
+                    const now = Date.now();
+                    const diff = target - now;
+                    if (diff <= 0) {
+                        el.textContent = "🎉 RELEASED!";
+                        el.classList.add("text-primary");
+                        return;
+                    }
+                    const d = Math.floor(diff / 86400000);
+                    const h = Math.floor((diff % 86400000) / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    el.textContent = `${d}d ${h}h ${m}m`;
+                });
+            }
+            updateCountdowns();
+            setInterval(updateCountdowns, 60000);
+
+            // ── Scroll Reveal Animations ─────────────────────────────────────
+            const observerOptions = {
+                root: null,
+                rootMargin: "0px",
+                threshold: 0.1,
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("is-visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.addEventListener("DOMContentLoaded", () => {
+                document
+                    .querySelectorAll(".reveal-up, .reveal-left")
+                    .forEach((el) => {
+                        observer.observe(el);
+                    });
+            });
+        </script>
+    </body>
+</html>
