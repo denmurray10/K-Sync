@@ -225,6 +225,7 @@ def charts(request):
             'trend_icon': trend_icon,
             'trend_class': trend_class,
             'trend_value': trend_value,
+            'metric_support': item.get('primary_metric_support', ''),
         })
     
     chart_types = [
