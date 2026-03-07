@@ -1,13 +1,16 @@
 import json
+import logging
 from django.utils import timezone
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
 import requests
 from openai import OpenAI
 from .models import Ranking, ComebackData, KPopGroup, LivePoll, BlogArticle
+
+logger = logging.getLogger(__name__)
 
 # ── DeepSeek client ──────────────────────────────────────────────────────────
 def _ds_client():
@@ -622,7 +625,7 @@ def d_day_comeback_notification(request):
     return render(request, 'core/d_day_comeback_notification.html')
 
 def blog_page(request):
-    articles = BlogArticle.objects.all()[:30]
+    articles = BlogArticle.objects.order_by('-created_at')[:30]
     cats = list(
         BlogArticle.objects.values_list('category', flat=True)
         .distinct()
@@ -772,7 +775,12 @@ def blog_generate(request):
         )
         try:
             image_1 = _generate_blog_image(img_prompt_base)
-        except Exception:
+        except Exception as e:
+            logger.exception(
+                "Blog image_1 generation failed for title=%r: %s",
+                title,
+                e,
+            )
             image_1 = ''
         try:
             image_2 = _generate_blog_image(
@@ -780,7 +788,12 @@ def blog_generate(request):
                 f"neon lights, music stage atmosphere, futuristic "
                 f"concert vibes. No text, no logos, no faces."
             )
-        except Exception:
+        except Exception as e:
+            logger.exception(
+                "Blog image_2 generation failed for title=%r: %s",
+                title,
+                e,
+            )
             image_2 = ''
 
         BlogArticle.objects.create(
@@ -1278,54 +1291,76 @@ def album_detail(request, slug, collection_id):
     # Lookup album + tracks from iTunes
     url = (
         f"https://itunes.apple.com/lookup"
-        f"?id={int(collection_id)}&entity=song"
+        f"?id={urllib.parse.quote_plus(str(collection_id))}&entity=song"
     )
     req = urllib.request.Request(
         url, headers={'User-Agent': 'Mozilla/5.0'}
     )
     album_info = {}
     tracks = []
+    response_status = None
+    response_body = ''
     try:
         with urllib.request.urlopen(req, timeout=8) as resp:
-            data = json.loads(resp.read().decode())
-            for item in data.get('results', []):
-                wt = item.get('wrapperType', '')
-                if wt == 'collection':
-                    art = item.get(
+            response_status = getattr(resp, 'status', resp.getcode())
+            response_body = resp.read().decode()
+
+        if response_status != 200:
+            raise ValueError(f"Non-200 iTunes response: {response_status}")
+
+        data = json.loads(response_body)
+        results = data.get('results')
+        if not isinstance(results, list) or not results:
+            raise ValueError("Missing or empty iTunes results")
+
+        for item in results:
+            wt = item.get('wrapperType', '')
+            if wt == 'collection':
+                art = item.get(
+                    'artworkUrl100', ''
+                ).replace('100x100bb', '1200x1200bb')
+                album_info = {
+                    'title': item.get('collectionName', ''),
+                    'artist': item.get('artistName', ''),
+                    'image': art,
+                    'release_date': (
+                        item.get('releaseDate', '') or ''
+                    )[:10],
+                    'track_count': item.get('trackCount', 0),
+                    'genre': item.get('primaryGenreName', ''),
+                    'copyright': item.get('copyright', ''),
+                    'itunes_url': item.get(
+                        'collectionViewUrl', ''
+                    ),
+                }
+            elif wt == 'track':
+                dur_ms = item.get('trackTimeMillis', 0) or 0
+                mins, secs = divmod(dur_ms // 1000, 60)
+                tracks.append({
+                    'number': item.get('trackNumber', 0),
+                    'title': item.get('trackName', ''),
+                    'duration': f"{mins}:{secs:02d}",
+                    'duration_ms': dur_ms,
+                    'preview_url': item.get('previewUrl', ''),
+                    'image': item.get(
                         'artworkUrl100', ''
-                    ).replace('100x100bb', '1200x1200bb')
-                    album_info = {
-                        'title': item.get('collectionName', ''),
-                        'artist': item.get('artistName', ''),
-                        'image': art,
-                        'release_date': (
-                            item.get('releaseDate', '') or ''
-                        )[:10],
-                        'track_count': item.get('trackCount', 0),
-                        'genre': item.get('primaryGenreName', ''),
-                        'copyright': item.get('copyright', ''),
-                        'itunes_url': item.get(
-                            'collectionViewUrl', ''
-                        ),
-                    }
-                elif wt == 'track':
-                    dur_ms = item.get('trackTimeMillis', 0) or 0
-                    mins, secs = divmod(dur_ms // 1000, 60)
-                    tracks.append({
-                        'number': item.get('trackNumber', 0),
-                        'title': item.get('trackName', ''),
-                        'duration': f"{mins}:{secs:02d}",
-                        'duration_ms': dur_ms,
-                        'preview_url': item.get('previewUrl', ''),
-                        'image': item.get(
-                            'artworkUrl100', ''
-                        ).replace('100x100bb', '600x600bb'),
-                    })
+                    ).replace('100x100bb', '600x600bb'),
+                })
+
+        if not album_info:
+            raise ValueError("Missing collection metadata in iTunes results")
     except Exception as e:
         logger.warning(
-            "iTunes album lookup failed for %s: %s",
-            collection_id, e
+            (
+                "iTunes album lookup failed for collection_id=%s "
+                "status=%s error=%s response_preview=%r"
+            ),
+            collection_id,
+            response_status,
+            e,
+            response_body[:200],
         )
+        raise Http404("Album not found")
 
     tracks.sort(key=lambda x: x['number'])
 

@@ -332,7 +332,11 @@
                         <div
                             class="group flex items-center justify-between border-b border-white/10 hover:bg-white/[0.04] transition-colors p-4 sm:p-5"
                             {% if track.preview_url %}
-                            @click="play({{ track.number }}, '{{ track.preview_url }}')"
+                            @click="play(parseInt('{{ track.number|escapejs }}', 10) || 0, '{{ track.preview_url|escapejs }}')"
+                            @keydown.enter="play(parseInt('{{ track.number|escapejs }}', 10) || 0, '{{ track.preview_url|escapejs }}')"
+                            @keydown.space.prevent="play(parseInt('{{ track.number|escapejs }}', 10) || 0, '{{ track.preview_url|escapejs }}')"
+                            role="button"
+                            tabindex="0"
                             style="cursor: pointer;"
                             {% endif %}
                         >

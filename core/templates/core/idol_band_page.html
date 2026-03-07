@@ -641,11 +641,34 @@
                                     audio.pause(); playing = null;
                                 } else {
                                     if (audio) audio.pause();
-                                    audio = new Audio('{{ track.preview_url }}');
+                                    audio = new Audio('{{ track.preview_url|escapejs }}');
                                     audio.play(); playing = {{ forloop.counter }};
                                     audio.onended = () => { playing = null; };
                                 }
                             "
+                            @keydown.enter="
+                                if (playing === {{ forloop.counter }}) {
+                                    audio.pause(); playing = null;
+                                } else {
+                                    if (audio) audio.pause();
+                                    audio = new Audio('{{ track.preview_url|escapejs }}');
+                                    audio.play(); playing = {{ forloop.counter }};
+                                    audio.onended = () => { playing = null; };
+                                }
+                            "
+                            @keydown.space.prevent="
+                                if (playing === {{ forloop.counter }}) {
+                                    audio.pause(); playing = null;
+                                } else {
+                                    if (audio) audio.pause();
+                                    audio = new Audio('{{ track.preview_url|escapejs }}');
+                                    audio.play(); playing = {{ forloop.counter }};
+                                    audio.onended = () => { playing = null; };
+                                }
+                            "
+                            role="button"
+                            tabindex="0"
+                            aria-label="Play preview for {{ track.title|default:track.name|escape }}"
                             style="cursor: pointer;"
                             {% endif %}
                         >

@@ -1,4 +1,5 @@
 from django.db import models
+import bleach
 
 class Ranking(models.Model):
     TIMEFRAME_CHOICES = (
@@ -91,6 +92,14 @@ class LivePollOption(models.Model):
 
 
 class BlogArticle(models.Model):
+    ALLOWED_TAGS = [
+        'p', 'h3', 'strong', 'em', 'blockquote',
+        'a', 'ul', 'ol', 'li', 'br',
+    ]
+    ALLOWED_ATTRIBUTES = {
+        'a': ['href', 'title', 'target', 'rel'],
+    }
+
     slug = models.SlugField(max_length=200, unique=True)
     title = models.CharField(max_length=300)
     subtitle = models.CharField(max_length=500, blank=True)
@@ -106,6 +115,16 @@ class BlogArticle(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        html = self.body_html or ''
+        self.body_html = bleach.clean(
+            html,
+            tags=self.ALLOWED_TAGS,
+            attributes=self.ALLOWED_ATTRIBUTES,
+            strip=True,
+        )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
