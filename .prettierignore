@@ -1,0 +1,3 @@
+# Django templates contain Python template tags ({% %}) that
+# HTML formatters will break by splitting them across lines.
+**/templates/**/*.html

@@ -337,15 +337,8 @@
                             </div>
 
                             <!-- Type Badge -->
-                            <div class="absolute top-0 right-0 z-20 px-3 py-2">
-                                <span
-                                    class="font-mono text-[9px] tracking-widest uppercase font-bold {% if group.group_type == 'GIRL' %}text-[#FF8EAF]{% elif group.group_type == 'BOY' %}text-secondary{% else %}text-[#c084fc]{% endif %}"
-                                    >{% if group.group_type == 'BOY' %}BOY
-                                    GROUP{% elif group.group_type == 'GIRL'
-                                    %}GIRL GROUP{% else %}SOLOIST{% endif
-                                    %}</span
-                                >
-                            </div>
+                            <!-- prettier-ignore -->
+                            <div class="absolute top-0 right-0 z-20 px-3 py-2"><span class="font-mono text-[9px] tracking-widest uppercase font-bold {% if group.group_type == 'GIRL' %}text-[#FF8EAF]{% elif group.group_type == 'BOY' %}text-secondary{% else %}text-[#c084fc]{% endif %}">{% if group.group_type == 'BOY' %}BOY GROUP{% elif group.group_type == 'GIRL' %}GIRL GROUP{% else %}SOLOIST{% endif %}</span></div>
 
                             <!-- Logo / Avatar Area -->
                             <div

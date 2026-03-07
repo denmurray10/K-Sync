@@ -186,16 +186,9 @@
                                     class="inline-flex items-center gap-2 px-3 py-1 border text-[10px] font-black tracking-[0.2em] uppercase"
                                     style="border-color: {{ accent_color }}; color: {{ accent_color }}; background: rgba({{ accent_rgb }}, 0.1);"
                                 >
-                                    <span
-                                        class="material-symbols-outlined text-sm"
-                                        >{% if group.group_type == 'BOY'
-                                        %}groups{% elif group.group_type ==
-                                        'GIRL' %}favorite{% else %}person{%
-                                        endif %}</span
-                                    >
-                                    {% if group.group_type == 'BOY' %}Boy
-                                    Group{% elif group.group_type == 'GIRL'
-                                    %}Girl Group{% else %}Soloist{% endif %}
+                                    <!-- prettier-ignore -->
+                                    <span class="material-symbols-outlined text-sm">{% if group.group_type == 'BOY' %}groups{% elif group.group_type == 'GIRL' %}favorite{% else %}person{% endif %}</span>
+                                    {% if group.group_type == 'BOY' %}Boy Group{% elif group.group_type == 'GIRL' %}Girl Group{% else %}Soloist{% endif %}
                                 </div>
                                 {% if group.rank %}
                                 <div
@@ -214,16 +207,13 @@
                             <h1
                                 class="text-7xl sm:text-8xl md:text-[9rem] lg:text-[12rem] font-black text-white leading-[0.8] tracking-tighter uppercase"
                             >
-                                {% for word in group.name.split %} {% if
-                                forloop.last and not forloop.first %}
-                                <span
-                                    class="block text-transparent"
-                                    style="-webkit-text-stroke: 2px {{ accent_color }};"
-                                    >{{ word }}</span
-                                >
+                                {% for word in group.name.split %}
+                                {% if forloop.last and not forloop.first %}
+                                <span class="block text-transparent" style="-webkit-text-stroke: 2px {{ accent_color }};">{{ word }}</span>
                                 {% else %}
                                 <span class="block">{{ word }}</span>
-                                {% endif %} {% endfor %}
+                                {% endif %}
+                                {% endfor %}
                             </h1>
 
                             <!-- Label -->
@@ -765,11 +755,7 @@
                                         class="material-symbols-outlined text-2xl"
                                         style="color: {{ accent_color }};"
                                     >
-                                        {% if event.type == 'Release' %}album{%
-                                        elif event.type == 'Anniversary'
-                                        %}celebration{% elif event.type ==
-                                        'Birthday' %}cake{% else %}event{% endif
-                                        %}
+                                        {% if event.type == 'Release' %}album{% elif event.type == 'Anniversary' %}celebration{% elif event.type == 'Birthday' %}cake{% else %}event{% endif %}
                                     </span>
                                 </div>
                                 <div class="flex flex-col">

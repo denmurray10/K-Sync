@@ -1,0 +1,22 @@
+{
+    // ─── Django HTML Templates ───────────────────────────────────────────────────
+    // Formatters (Prettier, Beautify, built-in HTML) split long lines, which
+    // breaks Django template tags like {% if %}...{% elif %} across line boundaries.
+    // Django's parser cannot handle block tags that span multiple lines, causing
+    // TemplateSyntaxError at runtime. Disabling format-on-save for these files
+    // is the permanent fix.
+    "[html]": {
+        "editor.formatOnSave": false,
+        "editor.defaultFormatter": null
+    },
+    "[django-html]": {
+        "editor.formatOnSave": false,
+        "editor.defaultFormatter": null
+    },
+
+    // Associate .html files inside templates/ directories as django-html
+    // so VS Code uses the correct language mode (requires the Django extension).
+    "files.associations": {
+        "**/templates/**/*.html": "django-html"
+    }
+}
