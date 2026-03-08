@@ -140,14 +140,19 @@
 
                 <!-- Bias Picker -->
                 <div x-show="showPicker" x-transition class="mb-12 reveal-up">
-                    <div class="mb-4">
-                        <input x-model="search" type="text" placeholder="Search artists..."
+                    <div class="flex items-center gap-4 mb-4">
+                        <input x-model="search" type="text" placeholder="Search all artists by name..."
                                class="w-full md:w-96 bg-white/[0.03] border border-white/10 py-3 px-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" />
+                        <span x-show="!search" class="font-mono text-[9px] tracking-widest uppercase text-slate-500 shrink-0">
+                            Hot Picks &mdash; Top 20
+                        </span>
+                        <span x-show="search" class="font-mono text-[9px] tracking-widest uppercase text-slate-500 shrink-0" x-text="'Search Results'">
+                        </span>
                     </div>
-                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-0 max-h-[320px] overflow-y-auto border border-white/10">
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-0 border border-white/10">
                         {% for aid, aname, aimg, atype in all_artists %}
                         <button @click="setBias({{ aid }})"
-                                x-show="'{{ aname|escapejs }}'.toLowerCase().includes(search.toLowerCase())"
+                                x-show="search ? '{{ aname|escapejs }}'.toLowerCase().includes(search.toLowerCase()) : hotPickIds.includes({{ aid }})"
                                 class="group flex flex-col items-center gap-2 p-4 border border-white/5 hover:border-primary hover:bg-white/[0.02] transition-all">
                             <div class="w-14 h-14 overflow-hidden border border-white/10 group-hover:border-primary transition-colors">
                                 {% if aimg %}
@@ -525,10 +530,69 @@
                             {% endif %}
                         </div>
 
+                        <!-- Game Scores -->
+                        <div class="mb-12 reveal-up">
+                            <div class="flex items-center justify-between mb-6 pb-3 border-b border-white/20">
+                                <h3 class="font-black text-sm uppercase tracking-widest text-white flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-base">videogame_asset</span>
+                                    Song Game Scores
+                                </h3>
+                                <a href="{% url 'song_game' %}" class="font-mono text-[9px] tracking-widest uppercase text-slate-500 hover:text-primary transition-colors">Play</a>
+                            </div>
+
+                            {% if game_scores %}
+                            <!-- Best score highlight -->
+                            {% if best_score %}
+                            <div class="flex items-center justify-between p-3 mb-3 border border-primary/20 bg-primary/5">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-sm">emoji_events</span>
+                                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400">Best</span>
+                                </div>
+                                <span class="font-black text-lg text-primary">{{ best_score.score }}</span>
+                                <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600">{{ best_score.correct }}/{{ best_score.total }} correct</span>
+                            </div>
+                            {% endif %}
+
+                            <!-- Score history -->
+                            <div class="flex flex-col">
+                                {% for gs in game_scores %}
+                                <div class="flex items-center gap-3 py-2.5 border-b border-white/5 group">
+                                    <span class="font-mono text-[8px] tracking-widest text-slate-600 w-16 shrink-0">{{ gs.played_at|date:"M d" }}</span>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-black text-sm text-white">{{ gs.score }}</span>
+                                            <span class="font-mono text-[8px] tracking-widest text-slate-600">pts</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600">{{ gs.correct }}/{{ gs.total }}</span>
+                                            {% if gs.best_streak >= 3 %}
+                                            <span class="font-mono text-[8px] text-secondary">{{ gs.best_streak }}🔥</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- Score bar -->
+                                    <div class="w-16 h-1 bg-white/5 shrink-0">
+                                        <div class="h-full bg-primary"
+                                             style="width: {{ gs.correct|add:0 }}%; max-width:100%;"
+                                             data-pct="{{ gs.correct }}{{ gs.total }}"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-6">
+                                <span class="material-symbols-outlined text-3xl text-white/10 mb-2 block">sports_esports</span>
+                                <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-4">No scores yet</p>
+                                <a href="{% url 'song_game' %}" class="inline-flex items-center gap-1.5 bg-primary text-black px-4 py-2.5 font-black uppercase tracking-[0.2em] text-[9px] hover:bg-white transition-colors">
+                                    <span class="material-symbols-outlined text-sm">play_arrow</span> Play Now
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+
                         <!-- Quick Navigation -->
                         <div class="mb-12 reveal-up">
-                            <h3 class="font-black text-sm uppercase tracking-widest text-white mb-6 pb-3 border-b border-white/20">Quick Access</h3>
-                            <div class="grid grid-cols-2 gap-0">
+                            <h3 class="font-black text-sm uppercase tracking-widest text-white mb-6 pb-3 border-b border-white/20">Quick Access</h3>                            <div class="grid grid-cols-2 gap-0">
                                 <a href="{% url 'idols' %}" class="group flex flex-col items-center gap-3 p-6 border border-white/10 hover:border-primary hover:bg-white/[0.02] transition-all">
                                     <span class="material-symbols-outlined text-2xl text-slate-500 group-hover:text-primary transition-colors">groups</span>
                                     <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500 group-hover:text-white transition-colors">Idols</span>
@@ -654,6 +718,19 @@
             </div>
         </section>
 
+    <!-- Log Out -->
+    <div class="w-full bg-black border-t border-white/10 py-8">
+        <div class="container mx-auto px-6 max-w-[1400px] flex items-center justify-between">
+            <div>
+                <span class="text-white font-black text-sm uppercase tracking-tight">{{ user.username }}</span>
+                <span class="text-slate-600 font-mono text-[9px] tracking-widest uppercase block mt-0.5">Signed in</span>
+            </div>
+            <a href="{% url 'logout' %}" class="flex items-center gap-2 text-slate-400 hover:text-red-400 transition-colors font-mono text-[10px] tracking-[0.2em] uppercase">
+                <span class="material-symbols-outlined text-base">logout</span> Log Out
+            </a>
+        </div>
+    </div>
+
     </main>
 
     {% include 'core/footer.html' %}
@@ -678,6 +755,7 @@
         return {
             showPicker: false,
             search: '',
+            hotPickIds: {{ hot_pick_ids|safe }},
             async setBias(artistId) {
                 const fd = new FormData();
                 fd.append('artist_id', artistId);

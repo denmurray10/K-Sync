@@ -61,8 +61,9 @@
             </button>
             <!-- Auth -->
             {% if user.is_authenticated %}
-            <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'dashboard' %}">Dashboard</a>
-            <a class="hidden md:block nav-cinzel text-slate-400 hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'logout' %}">Log Out</a>
+            <a href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
+                <span class="material-symbols-outlined text-xl">account_circle</span>
+            </a>
             {% else %}
             <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
             {% endif %}
@@ -89,15 +90,16 @@
         <div class="flex items-center gap-6">
             <form action="{% url 'results' %}" method="GET" class="hidden lg:flex items-center relative group">
                 <span class="material-symbols-outlined absolute left-3 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
-                <input name="q" class="bg-black/30 border border-primary/30 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-64 placeholder:text-slate-500" placeholder="Search artist, song..." type="text"/>
+                <input name="q" class="bg-black/30 border border-primary/30 py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-64 placeholder:text-slate-500" placeholder="Search artist, song..." type="text"/>
             </form>
             <div class="flex gap-4 items-center">
                 <button class="bg-primary text-black font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs px-4 py-3 md:px-8 md:py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]" onclick="window.location.href='{% url 'live' %}'">
                     Start Listening
                 </button>
                 {% if user.is_authenticated %}
-                <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'dashboard' %}">Dashboard</a>
-                <a class="hidden md:block nav-cinzel text-slate-400 hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'logout' %}">Log Out</a>
+                <a href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                </a>
                 {% else %}
                 <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
                 {% endif %}

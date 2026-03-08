@@ -169,3 +169,26 @@ class FavouriteSong(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ♥ {self.title}"
+
+
+class GameScore(models.Model):
+    GAME_CHOICES = [
+        ('song_game', 'Song Game'),
+    ]
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='game_scores',
+    )
+    game = models.CharField(max_length=50, choices=GAME_CHOICES, default='song_game')
+    score = models.IntegerField()
+    correct = models.IntegerField(default=0)
+    total = models.IntegerField(default=0)
+    best_streak = models.IntegerField(default=0)
+    played_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-played_at']
+
+    def __str__(self):
+        return f"{self.user.username} — {self.get_game_display()} {self.score}pts"

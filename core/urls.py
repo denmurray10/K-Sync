@@ -20,6 +20,7 @@ urlpatterns = [
     path('api/set-bias/', views.set_bias, name='set_bias'),
     path('api/toggle-favourite/', views.toggle_favourite, name='toggle_favourite'),
     path('api/remove-favourite/<int:pk>/', views.remove_favourite, name='remove_favourite'),
+    path('api/save-game-score/', views.save_game_score, name='save_game_score'),
     path('request/', views.request_track, name='request_track'),
     path('game/', views.song_game, name='song_game'),
     path('contests/', views.contests, name='contests'),

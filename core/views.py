@@ -15,6 +15,7 @@ from openai import OpenAI
 from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
+    GameScore,
 )
 
 logger = logging.getLogger(__name__)
@@ -679,10 +680,18 @@ def dashboard(request):
     )
 
     # All artists (for bias selector)
+    from django.db.models import Count
     all_artists = list(
         KPopGroup.objects.order_by('name').values_list(
             'id', 'name', 'image_url', 'group_type'
         )
+    )
+
+    # Hot pick artists — top 20 most chosen as bias
+    hot_pick_ids = list(
+        KPopGroup.objects.annotate(
+            bias_count=Count('biased_by')
+        ).order_by('-bias_count', 'name')[:20].values_list('id', flat=True)
     )
 
     # Trending tracks (top 5)
@@ -755,6 +764,16 @@ def dashboard(request):
         'member_since': user.date_joined,
     }
 
+    # Game scores
+    game_scores = list(
+        GameScore.objects.filter(user=user)[:10]
+    )
+    best_score = (
+        GameScore.objects.filter(user=user)
+        .order_by('-score')
+        .first()
+    )
+
     return render(request, 'core/dashboard.html', {
         'trending': trending,
         'upcoming': upcoming,
@@ -769,7 +788,10 @@ def dashboard(request):
         'bias_comebacks': bias_comebacks,
         'favourites': favourites,
         'all_artists': all_artists,
+        'hot_pick_ids': hot_pick_ids,
         'total_favourites': stats['total_favourites'],
+        'game_scores': game_scores,
+        'best_score': best_score,
     })
 
 
@@ -852,8 +874,84 @@ def remove_favourite(request, pk):
 def request_track(request):
     return render(request, 'core/request_track.html')
 
+
+@login_required
+@require_POST
+def save_game_score(request):
+    """Save a game score from the song game."""
+    try:
+        data = json.loads(request.body)
+        GameScore.objects.create(
+            user=request.user,
+            game=data.get('game', 'song_game'),
+            score=int(data.get('score', 0)),
+            correct=int(data.get('correct', 0)),
+            total=int(data.get('total', 0)),
+            best_streak=int(data.get('best_streak', 0)),
+        )
+        return JsonResponse({'ok': True})
+    except (ValueError, KeyError, TypeError):
+        return JsonResponse({'ok': False}, status=400)
+
 def song_game(request):
-    return render(request, 'core/song_game.html')
+    import random
+    import urllib.request
+    import urllib.parse
+
+    daily_rank = Ranking.objects.filter(
+        timeframe='daily'
+    ).first()
+    tracks = []
+    if daily_rank and daily_rank.ranking_data:
+        for item in daily_rank.ranking_data[:40]:
+            artist = item.get('artist', '')
+            title = item.get('track', '')
+            if not artist or not title:
+                continue
+            tracks.append({
+                'artist': artist,
+                'title': title,
+                'artwork_url': item.get('artwork_url', ''),
+            })
+
+    # Enrich tracks with iTunes preview URLs
+    for t in tracks:
+        try:
+            q = urllib.parse.quote(
+                f"{t['artist']} {t['title']}"
+            )
+            url = (
+                f"https://itunes.apple.com/search?term={q}"
+                "&entity=song&limit=1"
+            )
+            req = urllib.request.Request(
+                url,
+                headers={'User-Agent': 'Mozilla/5.0'}
+            )
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                data = json.loads(resp.read().decode())
+                results = data.get('results', [])
+                if results:
+                    t['preview_url'] = results[0].get(
+                        'previewUrl', ''
+                    )
+                    if not t['artwork_url']:
+                        t['artwork_url'] = results[0].get(
+                            'artworkUrl100', ''
+                        ).replace('100x100bb', '600x600bb')
+        except Exception:
+            pass
+
+    # Keep only tracks that have a preview URL
+    tracks = [t for t in tracks if t.get('preview_url')]
+
+    # Shuffle and pick up to 10 rounds
+    random.shuffle(tracks)
+    game_tracks = tracks[:10]
+
+    return render(request, 'core/song_game.html', {
+        'game_tracks_json': json.dumps(game_tracks),
+    })
 
 def contests(request):
     return render(request, 'core/contests.html')

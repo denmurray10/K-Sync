@@ -1,0 +1,438 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Song Game — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(244,37,192,0.3); } 50% { box-shadow: 0 0 40px rgba(244,37,192,0.6); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes score-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes countdown-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-score-pop { animation: score-pop 0.3s ease-out; }
+        .animate-slide-up { animation: slide-up 0.5s ease-out both; }
+        .animate-countdown { animation: countdown-pulse 1s ease-in-out infinite; }
+        @keyframes wave { from { height: 6px; } to { height: 32px; } }
+        .option-correct { border-color: #22c55e !important; background: rgba(34, 197, 94, 0.1) !important; }
+        .option-wrong { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.1) !important; }
+        .option-btn { transition: all 0.2s ease; }
+        .option-btn:hover:not(:disabled) { border-color: #f425c0; background: rgba(244, 37, 192, 0.05); transform: translateY(-2px); }
+    </style>
+</head>
+<body class="font-sans text-white" x-data="songGame()">
+
+    <!-- Full-screen modal overlay -->
+    <div class="fixed inset-0 z-50 bg-black flex flex-col">
+
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </a>
+                <div>
+                    <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Song Game</h1>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600">Guess the Artist</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <!-- Round -->
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Round</span>
+                    <span class="font-black text-lg text-white" x-text="(currentRound + 1) + '/' + totalRounds"></span>
+                </div>
+                <!-- Score -->
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Score</span>
+                    <span class="font-black text-lg text-primary" :class="scoreAnimating && 'animate-score-pop'" x-text="score"></span>
+                </div>
+                <!-- Streak -->
+                <div class="text-center" x-show="streak >= 2">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Streak</span>
+                    <span class="font-black text-lg text-secondary" x-text="streak + '🔥'"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full h-1 bg-white/5 shrink-0">
+            <div class="h-full bg-primary transition-all duration-500 ease-out"
+                 :style="'width:' + ((currentRound) / totalRounds * 100) + '%'"></div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+
+            <!-- Intro Screen -->
+            <div x-show="state === 'intro'" x-transition class="text-center px-6 max-w-lg">
+                <span class="material-symbols-outlined text-7xl text-primary mb-6 block">headphones</span>
+                <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-4">
+                    GUESS THE<br/><span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]">ARTIST</span>
+                </h2>
+                <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-3">
+                    <span x-text="totalRounds"></span> Rounds &bull; 4 Choices per Round &bull; 15s Timer
+                </p>
+                <p class="text-slate-400 text-sm mb-10 max-w-sm mx-auto">
+                    Listen to the audio clip and pick the correct artist. Score bonus points for streaks!
+                </p>
+                <button @click="startGame()"
+                        class="inline-flex items-center gap-3 bg-primary text-black px-10 py-4 font-black uppercase tracking-[0.2em] text-xs border border-primary hover:bg-white hover:border-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    <span class="material-symbols-outlined text-lg">play_arrow</span> Start Game
+                </button>
+            </div>
+
+            <!-- Playing Screen -->
+            <div x-show="state === 'playing'" x-transition class="w-full max-w-3xl px-6 animate-slide-up" :key="currentRound">
+
+                <!-- Timer Bar -->
+                <div class="flex items-center justify-center gap-3 mb-8">
+                    <span class="material-symbols-outlined text-lg" :class="timeLeft <= 5 ? 'text-red-400 animate-countdown' : 'text-slate-600'">timer</span>
+                    <div class="w-48 h-2 bg-white/10">
+                        <div class="h-full transition-all duration-1000 ease-linear"
+                             :class="timeLeft <= 5 ? 'bg-red-400' : 'bg-secondary'"
+                             :style="'width:' + (timeLeft / 15 * 100) + '%'"></div>
+                    </div>
+                    <span class="font-mono text-sm font-bold w-6 text-right" :class="timeLeft <= 5 ? 'text-red-400' : 'text-slate-500'" x-text="timeLeft"></span>
+                </div>
+
+                <!-- Audio Player + Song Title -->
+                <div class="text-center mb-12" :class="answered && !wasCorrect && 'animate-shake'">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-4 block">Listen &amp; guess the artist...</span>
+
+                    <!-- Audio visualiser / play button -->
+                    <div class="flex items-center justify-center gap-4 mb-6">
+                        <button @click="toggleAudio()" class="w-16 h-16 border-2 flex items-center justify-center transition-all"
+                                :class="isPlaying ? 'border-primary text-primary' : 'border-white/30 text-white/60 hover:border-primary hover:text-primary'">
+                            <span class="material-symbols-outlined text-3xl" x-text="isPlaying ? 'pause' : 'play_arrow'"></span>
+                        </button>
+                        <!-- Waveform bars -->
+                        <div class="flex items-end gap-1 h-10">
+                            <template x-for="bar in 12">
+                                <div class="w-1.5 bg-primary/60 transition-all duration-150"
+                                     :style="isPlaying ? 'height:' + (8 + Math.random() * 32) + 'px; animation: wave ' + (0.3 + Math.random() * 0.4) + 's ease-in-out infinite alternate' : 'height:4px'"></div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Song title revealed after answering -->
+                    <div x-show="answered" x-transition class="mb-2">
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block mb-1">Song</span>
+                        <h2 class="text-2xl md:text-4xl font-black text-white tracking-tighter uppercase leading-none"
+                            x-text="currentQuestion.title"></h2>
+                    </div>
+                    <div x-show="!answered" class="mb-2">
+                        <span class="text-5xl text-white/10">?</span>
+                    </div>
+                </div>
+
+                <!-- Options Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-0">
+                    <template x-for="(opt, i) in currentQuestion.options" :key="i">
+                        <button @click="answer(i)"
+                                :disabled="answered"
+                                class="option-btn group flex items-center gap-4 p-5 border border-white/10 bg-black"
+                                :class="{
+                                    'option-correct': answered && i === currentQuestion.correctIndex,
+                                    'option-wrong': answered && selectedIndex === i && i !== currentQuestion.correctIndex,
+                                    'opacity-40': answered && i !== currentQuestion.correctIndex && selectedIndex !== i
+                                }">
+                            <!-- Letter badge -->
+                            <div class="w-10 h-10 border shrink-0 flex items-center justify-center font-black text-sm transition-colors"
+                                 :class="answered && i === currentQuestion.correctIndex ? 'border-green-500 text-green-500' : answered && selectedIndex === i && i !== currentQuestion.correctIndex ? 'border-red-500 text-red-500' : 'border-white/20 text-white/40 group-hover:border-primary group-hover:text-primary'"
+                                 x-text="['A','B','C','D'][i]"></div>
+                            <!-- Artist artwork + name -->
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="w-12 h-12 shrink-0 overflow-hidden border border-white/10">
+                                    <template x-if="opt.artwork_url">
+                                        <img :src="opt.artwork_url" :alt="opt.artist" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                                    </template>
+                                    <template x-if="!opt.artwork_url">
+                                        <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-lg text-white/10">person</span>
+                                        </div>
+                                    </template>
+                                </div>
+                                <span class="text-white text-sm font-black uppercase tracking-tight truncate group-hover:text-primary transition-colors"
+                                      x-text="opt.artist"></span>
+                            </div>
+                            <!-- Result icon -->
+                            <template x-if="answered && i === currentQuestion.correctIndex">
+                                <span class="material-symbols-outlined text-green-500 text-xl shrink-0">check_circle</span>
+                            </template>
+                            <template x-if="answered && selectedIndex === i && i !== currentQuestion.correctIndex">
+                                <span class="material-symbols-outlined text-red-500 text-xl shrink-0">cancel</span>
+                            </template>
+                        </button>
+                    </template>
+                </div>
+
+                <!-- Feedback -->
+                <div x-show="answered" x-transition class="mt-6 text-center">
+                    <p class="font-mono text-[10px] tracking-widest uppercase mb-4"
+                       :class="wasCorrect ? 'text-green-400' : 'text-red-400'"
+                       x-text="wasCorrect ? (streak >= 3 ? '🔥 ' + streak + 'x STREAK! +' + lastPoints + ' PTS' : '✓ CORRECT! +' + lastPoints + ' PTS') : '✗ WRONG — IT WAS ' + currentQuestion.options[currentQuestion.correctIndex].artist.toUpperCase()">
+                    </p>
+                    <button @click="nextRound()"
+                            class="inline-flex items-center gap-2 border border-white/20 text-white px-6 py-3 font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
+                        <span x-text="currentRound < totalRounds - 1 ? 'Next Round' : 'See Results'"></span>
+                        <span class="material-symbols-outlined text-sm">east</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div x-show="state === 'results'" x-transition class="text-center px-6 max-w-lg animate-slide-up">
+                <template x-if="score >= totalRounds * 80">
+                    <span class="text-6xl mb-4 block">🏆</span>
+                </template>
+                <template x-if="score < totalRounds * 80 && score >= totalRounds * 40">
+                    <span class="text-6xl mb-4 block">⭐</span>
+                </template>
+                <template x-if="score < totalRounds * 40">
+                    <span class="text-6xl mb-4 block">💪</span>
+                </template>
+
+                <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-3">
+                    GAME<br/><span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]">OVER</span>
+                </h2>
+
+                <div class="grid grid-cols-3 gap-0 border border-white/10 my-8">
+                    <div class="p-5 border-r border-white/10">
+                        <span class="text-3xl font-black text-primary block" x-text="score"></span>
+                        <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">Points</span>
+                    </div>
+                    <div class="p-5 border-r border-white/10">
+                        <span class="text-3xl font-black text-white block" x-text="correctCount + '/' + totalRounds"></span>
+                        <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">Correct</span>
+                    </div>
+                    <div class="p-5">
+                        <span class="text-3xl font-black text-secondary block" x-text="bestStreak + '🔥'"></span>
+                        <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">Best Streak</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button @click="resetGame()"
+                            class="inline-flex items-center gap-2 bg-primary text-black px-8 py-4 font-black uppercase tracking-[0.2em] text-[10px] border border-primary hover:bg-white hover:border-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        <span class="material-symbols-outlined text-sm">replay</span> Play Again
+                    </button>
+                    <a href="{% url 'dashboard' %}"
+                       class="inline-flex items-center gap-2 border border-white/20 text-white px-8 py-4 font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-sm">arrow_back</span> Dashboard
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+    function songGame() {
+        const allTracks = {{ game_tracks_json|safe }};
+
+        function buildQuestions(tracks) {
+            const questions = [];
+            for (let i = 0; i < tracks.length; i++) {
+                const correct = tracks[i];
+                // Pick 3 random wrong answers
+                const others = tracks.filter((_, j) => j !== i);
+                const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
+                const options = [...shuffled, correct].sort(() => Math.random() - 0.5);
+                const correctIndex = options.findIndex(o => o.artist === correct.artist && o.title === correct.title);
+                questions.push({
+                    title: correct.title,
+                    preview_url: correct.preview_url || '',
+                    correctIndex,
+                    options: options.map(o => ({ artist: o.artist, artwork_url: o.artwork_url }))
+                });
+            }
+            return questions;
+        }
+
+        return {
+            state: 'intro',
+            questions: [],
+            currentRound: 0,
+            totalRounds: allTracks.length,
+            score: 0,
+            streak: 0,
+            bestStreak: 0,
+            correctCount: 0,
+            answered: false,
+            selectedIndex: -1,
+            wasCorrect: false,
+            scoreAnimating: false,
+            lastPoints: 0,
+            timeLeft: 15,
+            timerInterval: null,
+            audio: null,
+            isPlaying: false,
+            waveInterval: null,
+
+            get currentQuestion() {
+                return this.questions[this.currentRound] || { title: '', options: [], correctIndex: 0 };
+            },
+
+            startGame() {
+                this.questions = buildQuestions(allTracks);
+                this.currentRound = 0;
+                this.score = 0;
+                this.streak = 0;
+                this.bestStreak = 0;
+                this.correctCount = 0;
+                this.answered = false;
+                this.selectedIndex = -1;
+                this.state = 'playing';
+                this.startTimer();
+                this.playClip();
+            },
+
+            startTimer() {
+                this.timeLeft = 15;
+                clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => {
+                    this.timeLeft--;
+                    if (this.timeLeft <= 0) {
+                        clearInterval(this.timerInterval);
+                        if (!this.answered) {
+                            this.answer(-1); // Time's up
+                        }
+                    }
+                }, 1000);
+            },
+
+            answer(idx) {
+                if (this.answered) return;
+                clearInterval(this.timerInterval);
+                this.answered = true;
+                this.selectedIndex = idx;
+                this.stopClip();
+
+                const correct = idx === this.currentQuestion.correctIndex;
+                this.wasCorrect = correct;
+
+                if (correct) {
+                    this.streak++;
+                    if (this.streak > this.bestStreak) this.bestStreak = this.streak;
+                    this.correctCount++;
+
+                    // Points: base 100 + time bonus + streak bonus
+                    const timeBonus = Math.round(this.timeLeft * 5);
+                    const streakBonus = Math.max(0, (this.streak - 1) * 25);
+                    this.lastPoints = 100 + timeBonus + streakBonus;
+                    this.score += this.lastPoints;
+
+                    this.scoreAnimating = true;
+                    setTimeout(() => this.scoreAnimating = false, 400);
+                } else {
+                    this.streak = 0;
+                    this.lastPoints = 0;
+                }
+            },
+
+            nextRound() {
+                if (this.currentRound < this.totalRounds - 1) {
+                    this.currentRound++;
+                    this.answered = false;
+                    this.selectedIndex = -1;
+                    this.wasCorrect = false;
+                    this.startTimer();
+                    this.playClip();
+                } else {
+                    clearInterval(this.timerInterval);
+                    this.stopClip();
+                    this.saveScore();
+                    this.state = 'results';
+                }
+            },
+
+            playClip() {
+                this.stopClip();
+                const url = this.currentQuestion.preview_url;
+                if (!url) return;
+                this.audio = new Audio(url);
+                this.audio.volume = 0.7;
+                this.audio.play().catch(() => {});
+                this.isPlaying = true;
+                // Animate waveform bars
+                clearInterval(this.waveInterval);
+                this.waveInterval = setInterval(() => {
+                    // Trigger Alpine reactivity for visual bars
+                    this.isPlaying = true;
+                }, 200);
+            },
+
+            stopClip() {
+                if (this.audio) {
+                    this.audio.pause();
+                    this.audio.currentTime = 0;
+                    this.audio = null;
+                }
+                this.isPlaying = false;
+                clearInterval(this.waveInterval);
+            },
+
+            toggleAudio() {
+                if (!this.audio) {
+                    this.playClip();
+                    return;
+                }
+                if (this.audio.paused) {
+                    this.audio.play().catch(() => {});
+                    this.isPlaying = true;
+                } else {
+                    this.audio.pause();
+                    this.isPlaying = false;
+                }
+            },
+
+            resetGame() {
+                this.state = 'intro';
+                this.stopClip();
+                clearInterval(this.timerInterval);
+            },
+
+            async saveScore() {
+                try {
+                    await fetch('{% url "save_game_score" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({
+                            game: 'song_game',
+                            score: this.score,
+                            correct: this.correctCount,
+                            total: this.totalRounds,
+                            best_streak: this.bestStreak,
+                        }),
+                    });
+                } catch (e) {
+                    // silent — score saving is non-critical
+                }
+            }
+        };
+    }
+    </script>
+</body>
+</html>
