@@ -171,6 +171,20 @@ class FavouriteSong(models.Model):
         return f"{self.user.username} ♥ {self.title}"
 
 
+class SongRequest(models.Model):
+    song_title = models.CharField(max_length=300)
+    artist = models.CharField(max_length=200)
+    listener_name = models.CharField(max_length=100, blank=True)
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.artist} – {self.song_title}"
+
+
 class GameScore(models.Model):
     GAME_CHOICES = [
         ('song_game', 'Song Game'),

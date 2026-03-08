@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     LivePoll, LivePollOption, UserProfile, FavouriteSong,
-    GameScore,
+    GameScore, SongRequest,
 )
 
 
@@ -35,3 +35,10 @@ class GameScoreAdmin(admin.ModelAdmin):
     list_display = ('user', 'game', 'score', 'correct', 'total', 'best_streak', 'played_at')
     list_filter = ('game', 'played_at')
     raw_id_fields = ('user',)
+
+
+@admin.register(SongRequest)
+class SongRequestAdmin(admin.ModelAdmin):
+    list_display = ('song_title', 'artist', 'listener_name', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('song_title', 'artist', 'listener_name')

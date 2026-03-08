@@ -15,7 +15,7 @@ from openai import OpenAI
 from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
-    GameScore,
+    GameScore, SongRequest,
 )
 
 logger = logging.getLogger(__name__)
@@ -879,7 +879,25 @@ def remove_favourite(request, pk):
 
 
 def request_track(request):
-    return render(request, 'core/request_track.html')
+    if request.method == 'POST':
+        song_title = request.POST.get('song_title', '').strip()[:300]
+        artist = request.POST.get('artist', '').strip()[:200]
+        listener_name = request.POST.get('listener_name', '').strip()[:100]
+        message = request.POST.get('message', '').strip()[:500]
+        if song_title and artist:
+            SongRequest.objects.create(
+                song_title=song_title,
+                artist=artist,
+                listener_name=listener_name,
+                message=message,
+            )
+            return JsonResponse({'success': True})
+        return JsonResponse({'success': False, 'error': 'Missing fields'}, status=400)
+
+    recent_requests = SongRequest.objects.all()[:10]
+    return render(request, 'core/request_track.html', {
+        'recent_requests': recent_requests,
+    })
 
 
 @login_required

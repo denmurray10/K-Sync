@@ -1,0 +1,369 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Request a Song – K-Beats</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f425c0",
+                    "background-light": "#f8f5f8",
+                    "background-dark": "#000000",
+                    "secondary": "#00f0ff",
+                },
+                fontFamily: {
+                    "display": ["Montserrat", "sans-serif"]
+                },
+                borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+                backgroundImage: {
+                    'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                }
+            },
+        },
+    }
+</script>
+<style>
+    .glass-panel {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    .neon-text {
+        text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+    }
+    .neon-border {
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    }
+    .reveal-up {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-left {
+        opacity: 0;
+        transform: translateX(-50px);
+        transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-up.is-visible, .reveal-left.is-visible {
+        opacity: 1;
+        transform: translate(0);
+    }
+    body {
+        zoom: 0.9;
+        -moz-transform: scale(0.9);
+        -moz-transform-origin: 0 0;
+    }
+    @keyframes equalize {
+        0% { height: 20%; }
+        50% { height: 100%; }
+        100% { height: 20%; }
+    }
+    .bar-animate {
+        animation: equalize 1s ease-in-out infinite;
+        transform-origin: bottom;
+    }
+    @keyframes float-note {
+        0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
+        50% { transform: translateY(-30px) rotate(15deg); opacity: 0.3; }
+    }
+    .float-note {
+        animation: float-note 4s ease-in-out infinite;
+    }
+</style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+{% include 'core/header.html' %}
+
+<main class="flex-grow pt-0">
+
+<!-- Hero Section -->
+<section class="relative min-h-[60vh] w-full overflow-hidden flex items-center justify-center border-b border-white/10">
+    <div class="absolute inset-0 z-0 bg-black">
+        <div class="w-full h-full bg-cover bg-center bg-fixed opacity-30 grayscale mix-blend-luminosity" style="background-image: url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+    </div>
+
+    <!-- Floating music notes decoration -->
+    <div class="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+        <span class="material-symbols-outlined absolute text-primary/20 text-6xl float-note" style="top: 20%; left: 10%; animation-delay: 0s;">music_note</span>
+        <span class="material-symbols-outlined absolute text-secondary/15 text-5xl float-note" style="top: 40%; right: 15%; animation-delay: 1.5s;">queue_music</span>
+        <span class="material-symbols-outlined absolute text-primary/10 text-7xl float-note" style="bottom: 25%; left: 25%; animation-delay: 3s;">audiotrack</span>
+        <span class="material-symbols-outlined absolute text-secondary/10 text-4xl float-note" style="top: 30%; right: 35%; animation-delay: 2s;">headphones</span>
+    </div>
+
+    <div class="relative z-20 container mx-auto px-6 max-w-[1400px] pt-40 pb-20">
+        <div class="max-w-3xl reveal-left">
+            <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 mb-6">
+                <span class="material-symbols-outlined text-sm">radio</span>
+                <span class="text-[10px] font-black tracking-[0.2em] uppercase">Live Requests</span>
+            </div>
+            <h1 class="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase">
+                <span class="block">REQUEST</span>
+                <span class="block text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">A SONG</span>
+            </h1>
+            <p class="text-slate-300 font-mono text-xs md:text-sm tracking-widest uppercase leading-relaxed mt-8 max-w-lg">
+                Tell us what you want to hear on K-Beats Radio. Drop your song, your name, and a shoutout — our DJs will play it live on air.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Request Form Section -->
+<section class="w-full bg-black py-20 md:py-32 border-b border-white/10 relative overflow-hidden"
+         x-data="{ submitted: false, sending: false }">
+
+    <!-- Decorative Background Text -->
+    <div class="absolute -top-10 -right-10 text-[10rem] md:text-[15rem] font-black text-white/[0.03] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+        REQUEST
+    </div>
+
+    <div class="container mx-auto px-6 max-w-[1400px] relative z-10 flex flex-col lg:flex-row gap-16 items-start">
+
+        <!-- Left: Context & Info -->
+        <div class="flex-1 w-full lg:max-w-md reveal-left">
+            <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none mb-6 text-white">
+                YOUR SONG,<br/><span class="text-primary">ON AIR</span>
+            </h2>
+            <p class="font-mono text-sm tracking-widest uppercase opacity-70 mb-10 max-w-md leading-relaxed">
+                Fill out the form and our DJs will queue your request during the next live show. Dedicate it to someone special or just vibe with the station.
+            </p>
+
+            <!-- How it works -->
+            <div class="flex flex-col gap-6 border-t border-white/10 pt-8">
+                <div class="flex items-start gap-4 group">
+                    <div class="w-10 h-10 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-black transition-colors">
+                        <span class="font-mono text-xs font-black text-primary group-hover:text-black">01</span>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-black uppercase tracking-tight text-sm">Submit Your Request</h4>
+                        <p class="text-slate-500 text-xs font-mono tracking-wider mt-1">Enter the song, artist & optional message.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 group">
+                    <div class="w-10 h-10 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-black transition-colors">
+                        <span class="font-mono text-xs font-black text-primary group-hover:text-black">02</span>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-black uppercase tracking-tight text-sm">DJ Reviews Queue</h4>
+                        <p class="text-slate-500 text-xs font-mono tracking-wider mt-1">Requests are seen live by our on-air hosts.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 group">
+                    <div class="w-10 h-10 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-black transition-colors">
+                        <span class="font-mono text-xs font-black text-primary group-hover:text-black">03</span>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-black uppercase tracking-tight text-sm">Hear It On Air</h4>
+                        <p class="text-slate-500 text-xs font-mono tracking-wider mt-1">Tune in and listen for your shoutout.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live status indicator -->
+            <div class="flex items-center gap-4 border-t border-white/20 pt-6 mt-8">
+                <span class="material-symbols-outlined text-primary text-3xl">cell_tower</span>
+                <div>
+                    <div class="font-black text-lg tracking-tighter text-white flex items-center gap-2">
+                        Accepting Requests
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                        </span>
+                    </div>
+                    <div class="font-mono text-[10px] tracking-widest uppercase opacity-50">Live queue open 24/7</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Brutalist Form -->
+        <div class="flex-1 w-full border border-white/20 bg-black/50 backdrop-blur-md p-6 md:p-10 reveal-up">
+
+            <!-- Success state -->
+            <div x-show="submitted" x-transition class="flex flex-col items-center justify-center py-16 text-center gap-6">
+                <div class="w-20 h-20 bg-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-black text-4xl">check</span>
+                </div>
+                <h3 class="text-3xl font-black uppercase tracking-tighter text-white">Request Sent!</h3>
+                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase max-w-sm">
+                    Your song has been added to the queue. Tune in to hear it on the next live show.
+                </p>
+                <a href="{% url 'live' %}" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] mt-4">
+                    Listen Live
+                </a>
+                <button @click="submitted = false" class="text-slate-500 font-mono text-[10px] tracking-widest uppercase hover:text-white transition-colors mt-2">
+                    Submit Another Request
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form x-show="!submitted" method="POST" action="{% url 'request_track' %}"
+                  @submit.prevent="
+                    sending = true;
+                    const formData = new FormData($el);
+                    fetch('{% url 'request_track' %}', {
+                        method: 'POST',
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) submitted = true;
+                        sending = false;
+                    })
+                    .catch(() => { sending = false; });
+                  "
+                  class="flex flex-col gap-6">
+
+                <div class="border-b border-white/20 pb-6 mb-2">
+                    <h3 class="text-2xl font-black uppercase tracking-tighter text-white flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-2xl">queue_music</span>
+                        Song Request Form
+                    </h3>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-2">All fields marked * are required</p>
+                </div>
+
+                <!-- Song Title -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-sm">music_note</span>
+                        Song Title *
+                    </label>
+                    <input name="song_title" required maxlength="300"
+                           class="w-full bg-white/5 border border-white/20 px-6 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-medium tracking-tight placeholder:font-mono placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+                           placeholder="e.g. S-Class" type="text"/>
+                </div>
+
+                <!-- Artist -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-sm">person</span>
+                        Artist / Group *
+                    </label>
+                    <input name="artist" required maxlength="200"
+                           class="w-full bg-white/5 border border-white/20 px-6 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-medium tracking-tight placeholder:font-mono placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+                           placeholder="e.g. Stray Kids" type="text"/>
+                </div>
+
+                <!-- Listener Name -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-sm">badge</span>
+                        Your Name (optional)
+                    </label>
+                    <input name="listener_name" maxlength="100"
+                           class="w-full bg-white/5 border border-white/20 px-6 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-medium tracking-tight placeholder:font-mono placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+                           placeholder="How should we shout you out?" type="text"/>
+                </div>
+
+                <!-- Message / Dedication -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-sm">chat</span>
+                        Message / Dedication (optional)
+                    </label>
+                    <textarea name="message" rows="4" maxlength="500"
+                              class="w-full bg-white/5 border border-white/20 px-6 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-medium tracking-tight placeholder:font-mono placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest resize-none"
+                              placeholder="Dedicate this song to someone or leave a message for the DJ..."></textarea>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" :disabled="sending"
+                        :class="sending ? 'opacity-50 cursor-wait' : ''"
+                        class="w-full bg-primary text-black font-black uppercase tracking-[0.2em] text-sm px-8 py-5 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] flex items-center justify-center gap-3 mt-2">
+                    <span class="material-symbols-outlined text-xl" x-show="!sending">send</span>
+                    <span x-show="!sending">Submit Request</span>
+                    <span x-show="sending" x-cloak>Sending...</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Requests Section -->
+{% if recent_requests %}
+<section class="w-full bg-black py-20 border-b border-white/10">
+    <div class="container mx-auto px-6 max-w-[1400px]">
+        <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-0 reveal-left">
+            <div>
+                <h2 class="text-4xl md:text-5xl font-black text-white leading-none tracking-tighter uppercase">RECENT <span class="text-primary">REQUESTS</span></h2>
+                <p class="text-slate-400 mt-3 font-mono text-xs tracking-widest uppercase">What fans are requesting right now.</p>
+            </div>
+        </div>
+
+        <div class="flex flex-col border-t border-white/20 reveal-up">
+            {% for req in recent_requests %}
+            <div class="group flex items-center justify-between border-b border-white/10 hover:bg-white/5 transition-colors p-4 sm:p-6">
+                <div class="flex items-center gap-6 w-full">
+                    <!-- Icon -->
+                    <div class="w-12 h-12 bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:border-transparent transition-colors">
+                        <span class="material-symbols-outlined text-primary group-hover:text-black text-xl transition-colors">music_note</span>
+                    </div>
+                    <!-- Track Info -->
+                    <div class="flex flex-col flex-1 min-w-0">
+                        <h3 class="font-black text-white text-lg uppercase tracking-tighter truncate group-hover:text-primary transition-colors">{{ req.song_title }}</h3>
+                        <p class="font-mono text-slate-400 text-[10px] tracking-widest uppercase truncate">{{ req.artist }}</p>
+                    </div>
+                    <!-- Requester & Time -->
+                    <div class="hidden md:flex flex-col items-end shrink-0">
+                        {% if req.listener_name %}
+                        <span class="text-white text-xs font-bold tracking-tight">{{ req.listener_name }}</span>
+                        {% endif %}
+                        <span class="text-slate-600 font-mono text-[10px] tracking-widest uppercase">{{ req.created_at|timesince }} ago</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="border-t border-b border-white/20 bg-primary overflow-hidden">
+    <div class="container mx-auto px-6 py-24 max-w-5xl flex flex-col md:flex-row items-center justify-between gap-12">
+        <div class="w-full md:w-1/2 reveal-left">
+            <h2 class="text-5xl md:text-7xl font-black text-black leading-none tracking-tighter uppercase mb-4">LISTEN<br/>LIVE NOW</h2>
+            <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-4">Hear your requested songs played on air. K-Beats Radio — 24/7 non-stop K-Pop.</p>
+        </div>
+        <div class="w-full md:w-1/2 flex flex-col sm:flex-row gap-4 reveal-left" style="transition-delay: 200ms;">
+            <a href="{% url 'live' %}" class="bg-black text-white font-black px-10 py-5 transition-colors uppercase tracking-[0.2em] text-sm border border-black hover:bg-white hover:text-black shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] text-center">
+                Start Listening
+            </a>
+            <a href="{% url 'charts' %}" class="bg-transparent text-black font-black px-10 py-5 transition-colors uppercase tracking-[0.2em] text-sm border border-black hover:bg-black hover:text-primary text-center">
+                View Charts
+            </a>
+        </div>
+    </div>
+</section>
+
+</main>
+
+{% include 'core/footer.html' %}
+
+<script>
+// Scroll reveal
+const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => observer.observe(el));
+});
+</script>
+</body>
+</html>
