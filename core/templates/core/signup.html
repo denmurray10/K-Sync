@@ -136,7 +136,16 @@
                                     <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mt-2">Start your journey</p>
                                 </div>
 
-                                <form class="space-y-5" action="{% url 'home' %}" method="get">
+                                <form class="space-y-5" action="{% url 'signup' %}" method="post">
+                                    {% csrf_token %}
+
+                                    {% if error %}
+                                    <div class="flex items-center gap-3 p-4 border border-red-500/30 bg-red-500/10">
+                                        <span class="material-symbols-outlined text-red-400 text-lg">error</span>
+                                        <span class="font-mono text-[10px] tracking-widest uppercase text-red-400">{{ error }}</span>
+                                    </div>
+                                    {% endif %}
+
                                     <!-- Username -->
                                     <div>
                                         <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-2" for="username">Username</label>
@@ -144,7 +153,7 @@
                                             <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">person</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-secondary transition-colors font-mono text-sm"
-                                                id="username" placeholder="your_username" type="text" />
+                                                id="username" name="username" placeholder="your_username" type="text" required />
                                         </div>
                                     </div>
 
@@ -155,7 +164,7 @@
                                             <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">mail</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-secondary transition-colors font-mono text-sm"
-                                                id="email" placeholder="you@example.com" type="email" />
+                                                id="email" name="email" placeholder="you@example.com" type="email" required />
                                         </div>
                                     </div>
 
@@ -166,7 +175,7 @@
                                             <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">lock</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-secondary transition-colors font-mono text-sm"
-                                                id="password" placeholder="Min 8 characters" type="password" />
+                                                id="password" name="password" placeholder="Min 8 characters" type="password" required />
                                         </div>
                                     </div>
 
@@ -177,14 +186,14 @@
                                             <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">verified_user</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-secondary transition-colors font-mono text-sm"
-                                                id="password2" placeholder="Re-enter password" type="password" />
+                                                id="password2" name="password2" placeholder="Re-enter password" type="password" required />
                                         </div>
                                     </div>
 
                                     <!-- Terms -->
                                     <div class="flex items-start gap-3 pt-1">
-                                        <input type="checkbox" id="terms"
-                                            class="mt-1 w-4 h-4 bg-white/[0.03] border border-white/20 text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer" />
+                                        <input type="checkbox" id="terms" name="terms"
+                                            class="mt-1 w-4 h-4 bg-white/[0.03] border border-white/20 text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer" required />
                                         <label for="terms" class="font-mono text-[10px] tracking-wide text-slate-500 leading-relaxed cursor-pointer">
                                             I agree to the <a href="#" class="text-primary hover:text-white transition-colors">Terms of Service</a>
                                             and <a href="#" class="text-primary hover:text-white transition-colors">Privacy Policy</a>

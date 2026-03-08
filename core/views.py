@@ -1,8 +1,10 @@
 import json
 import logging
 from django.utils import timezone
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
@@ -558,13 +560,144 @@ def achievement_popup(request):
     return render(request, 'core/achievement_popup.html')
 
 def login_page(request):
-    return render(request, 'core/login.html')
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    error = ''
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+        # Look up user by email
+        try:
+            user_obj = User.objects.get(email=email)
+            username = user_obj.username
+        except User.DoesNotExist:
+            username = None
+        if username:
+            user = authenticate(
+                request, username=username, password=password
+            )
+            if user is not None:
+                login(request, user)
+                nxt = request.GET.get('next', 'dashboard')
+                return redirect(nxt)
+            else:
+                error = 'Invalid email or password.'
+        else:
+            error = 'Invalid email or password.'
+    return render(request, 'core/login.html', {'error': error})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
 
 def promo(request):
     return render(request, 'core/promo.html')
 
 def signup(request):
-    return render(request, 'core/signup.html')
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    error = ''
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+        password2 = request.POST.get('password2', '')
+        if not username or not email or not password:
+            error = 'All fields are required.'
+        elif password != password2:
+            error = 'Passwords do not match.'
+        elif len(password) < 8:
+            error = 'Password must be at least 8 characters.'
+        elif User.objects.filter(username=username).exists():
+            error = 'Username is already taken.'
+        elif User.objects.filter(email=email).exists():
+            error = 'An account with this email already exists.'
+        else:
+            user = User.objects.create_user(
+                username=username, email=email, password=password
+            )
+            login(request, user)
+            return redirect('dashboard')
+    return render(request, 'core/signup.html', {'error': error})
+
+
+def dashboard(request):
+    now = timezone.now()
+    today_str = now.strftime('%Y-%m-%d')
+
+    # Trending tracks (top 5)
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    trending = []
+    if daily_rank and daily_rank.ranking_data:
+        for idx, item in enumerate(daily_rank.ranking_data[:5]):
+            img = item.get('artwork_url') or (
+                "https://api.dicebear.com/7.x/initials/svg"
+                f"?seed={item.get('artist')}&backgroundColor=f425c0"
+            )
+            trending.append({
+                'rank': idx + 1,
+                'artist': item.get('artist'),
+                'title': item.get('track'),
+                'image': img,
+            })
+
+    # Upcoming comebacks (next 6)
+    upcoming = []
+    y, m = now.year, now.month
+    months = []
+    for _ in range(3):
+        months.append((y, m))
+        m += 1
+        if m > 12:
+            m, y = 1, y + 1
+    for cb_y, cb_m in months:
+        cb_obj = ComebackData.objects.filter(
+            year=cb_y, month=cb_m
+        ).first()
+        if not cb_obj:
+            continue
+        for date_key, day in cb_obj.data.items():
+            if date_key >= today_str:
+                for r in day.get('releases', []):
+                    r['date_str'] = date_key
+                    upcoming.append(r)
+    upcoming.sort(key=lambda x: x['date_str'])
+    upcoming = upcoming[:6]
+
+    # Latest articles
+    articles = list(
+        BlogArticle.objects.order_by('-created_at')[:4]
+    )
+
+    # Top artists
+    top_artists = list(
+        KPopGroup.objects.filter(
+            rank__isnull=False
+        ).order_by('rank')[:8]
+    )
+
+    # Stats
+    stats = {
+        'total_artists': KPopGroup.objects.count(),
+        'total_articles': BlogArticle.objects.count(),
+        'total_tracks': sum(
+            len(r.ranking_data or [])
+            for r in Ranking.objects.all()[:6]
+        ),
+        'upcoming_count': len(upcoming),
+    }
+
+    return render(request, 'core/dashboard.html', {
+        'trending': trending,
+        'upcoming': upcoming,
+        'articles': articles,
+        'top_artists': top_artists,
+        'stats': stats,
+        'current_month': now.strftime('%B %Y'),
+    })
+
 
 def request_track(request):
     return render(request, 'core/request_track.html')
