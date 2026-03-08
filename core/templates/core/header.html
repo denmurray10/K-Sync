@@ -59,8 +59,13 @@
             <button class="w-9 h-9 rounded-full glass-bright flex items-center justify-center text-slate-300 hover:text-white transition-colors border border-white/10">
                 <span class="material-symbols-outlined text-xl">settings</span>
             </button>
-            <!-- Log In -->
+            <!-- Auth -->
+            {% if user.is_authenticated %}
+            <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'dashboard' %}">Dashboard</a>
+            <a class="hidden md:block nav-cinzel text-slate-400 hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'logout' %}">Log Out</a>
+            {% else %}
             <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
+            {% endif %}
         </div>
     </div>
 </header>
@@ -90,7 +95,12 @@
                 <button class="bg-primary text-black font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs px-4 py-3 md:px-8 md:py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]" onclick="window.location.href='{% url 'live' %}'">
                     Start Listening
                 </button>
+                {% if user.is_authenticated %}
+                <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'dashboard' %}">Dashboard</a>
+                <a class="hidden md:block nav-cinzel text-slate-400 hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'logout' %}">Log Out</a>
+                {% else %}
                 <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
+                {% endif %}
             </div>
         </div>
     </div>

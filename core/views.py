@@ -5,12 +5,17 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
 import requests
 from openai import OpenAI
-from .models import Ranking, ComebackData, KPopGroup, KPopMember, LivePoll, BlogArticle
+from .models import (
+    Ranking, ComebackData, KPopGroup, KPopMember,
+    LivePoll, BlogArticle, UserProfile, FavouriteSong,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -623,18 +628,76 @@ def signup(request):
     return render(request, 'core/signup.html', {'error': error})
 
 
+@login_required
 def dashboard(request):
     now = timezone.now()
     today_str = now.strftime('%Y-%m-%d')
+    user = request.user
+
+    # Ensure profile exists
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+
+    # Time-aware greeting
+    hour = now.hour
+    if hour < 12:
+        greeting = 'Good Morning'
+    elif hour < 18:
+        greeting = 'Good Afternoon'
+    else:
+        greeting = 'Good Evening'
+
+    # Bias data
+    bias = profile.bias
+    bias_members = []
+    bias_comebacks = []
+    if bias:
+        bias_members = list(bias.members.all()[:6])
+        # Bias comebacks from ComebackData
+        y, m = now.year, now.month
+        for _ in range(3):
+            cb = ComebackData.objects.filter(
+                year=y, month=m
+            ).first()
+            if cb:
+                for dk, day in cb.data.items():
+                    for r in day.get('releases', []):
+                        art = (r.get('artist') or '').lower()
+                        ttl = (r.get('title') or '').lower()
+                        bn = bias.name.lower()
+                        if bn in art or bn in ttl:
+                            r['date_str'] = dk
+                            bias_comebacks.append(r)
+            m += 1
+            if m > 12:
+                m, y = 1, y + 1
+        bias_comebacks.sort(key=lambda x: x['date_str'])
+        bias_comebacks = bias_comebacks[:4]
+
+    # Favourites
+    favourites = list(
+        FavouriteSong.objects.filter(user=user)[:8]
+    )
+
+    # All artists (for bias selector)
+    all_artists = list(
+        KPopGroup.objects.order_by('name').values_list(
+            'id', 'name', 'image_url', 'group_type'
+        )
+    )
 
     # Trending tracks (top 5)
-    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    daily_rank = Ranking.objects.filter(
+        timeframe='daily'
+    ).first()
     trending = []
     if daily_rank and daily_rank.ranking_data:
-        for idx, item in enumerate(daily_rank.ranking_data[:5]):
+        for idx, item in enumerate(
+            daily_rank.ranking_data[:5]
+        ):
             img = item.get('artwork_url') or (
                 "https://api.dicebear.com/7.x/initials/svg"
-                f"?seed={item.get('artist')}&backgroundColor=f425c0"
+                f"?seed={item.get('artist')}"
+                "&backgroundColor=f425c0"
             )
             trending.append({
                 'rank': idx + 1,
@@ -678,15 +741,18 @@ def dashboard(request):
         ).order_by('rank')[:8]
     )
 
-    # Stats
+    # Stats — mix platform + personal
     stats = {
         'total_artists': KPopGroup.objects.count(),
-        'total_articles': BlogArticle.objects.count(),
+        'total_favourites': FavouriteSong.objects.filter(
+            user=user
+        ).count(),
         'total_tracks': sum(
             len(r.ranking_data or [])
             for r in Ranking.objects.all()[:6]
         ),
         'upcoming_count': len(upcoming),
+        'member_since': user.date_joined,
     }
 
     return render(request, 'core/dashboard.html', {
@@ -696,7 +762,91 @@ def dashboard(request):
         'top_artists': top_artists,
         'stats': stats,
         'current_month': now.strftime('%B %Y'),
+        'greeting': greeting,
+        'profile': profile,
+        'bias': bias,
+        'bias_members': bias_members,
+        'bias_comebacks': bias_comebacks,
+        'favourites': favourites,
+        'all_artists': all_artists,
+        'total_favourites': stats['total_favourites'],
     })
+
+
+@login_required
+@require_POST
+def set_bias(request):
+    """Set or clear the user's bias artist."""
+    artist_id = request.POST.get('artist_id')
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user
+    )
+    if artist_id:
+        try:
+            group = KPopGroup.objects.get(pk=int(artist_id))
+            profile.bias = group
+            profile.save()
+            return JsonResponse({
+                'ok': True,
+                'name': group.name,
+                'image': group.image_url or '',
+            })
+        except (KPopGroup.DoesNotExist, ValueError):
+            return JsonResponse(
+                {'ok': False, 'error': 'Artist not found'},
+                status=404,
+            )
+    else:
+        profile.bias = None
+        profile.save()
+        return JsonResponse({'ok': True, 'name': None})
+
+
+@login_required
+@require_POST
+def toggle_favourite(request):
+    """Add or remove a song from favourites."""
+    title = request.POST.get('title', '').strip()
+    artist = request.POST.get('artist', '').strip()
+    if not title or not artist:
+        return JsonResponse(
+            {'ok': False, 'error': 'Missing title/artist'},
+            status=400,
+        )
+    fav, created = FavouriteSong.objects.get_or_create(
+        user=request.user,
+        title=title,
+        artist=artist,
+        defaults={
+            'artwork_url': request.POST.get(
+                'artwork_url', ''
+            ),
+            'preview_url': request.POST.get(
+                'preview_url', ''
+            ),
+            'itunes_url': request.POST.get(
+                'itunes_url', ''
+            ),
+        },
+    )
+    if not created:
+        fav.delete()
+    return JsonResponse({
+        'ok': True,
+        'added': created,
+        'title': title,
+        'artist': artist,
+    })
+
+
+@login_required
+def remove_favourite(request, pk):
+    """Remove a specific favourite song."""
+    if request.method == 'POST':
+        FavouriteSong.objects.filter(
+            pk=pk, user=request.user
+        ).delete()
+    return redirect('dashboard')
 
 
 def request_track(request):

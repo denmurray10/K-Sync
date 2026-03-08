@@ -31,38 +31,12 @@
         };
     </script>
     <style>
-        .reveal-up {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal-left {
-            opacity: 0;
-            transform: translateX(-50px);
-            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal-up.is-visible, .reveal-left.is-visible {
-            opacity: 1;
-            transform: translate(0);
-        }
-        body {
-            zoom: 0.9;
-            -moz-transform: scale(0.9);
-            -moz-transform-origin: 0 0;
-        }
-        @keyframes ticker-scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .animate-ticker {
-            width: max-content;
-            animation: ticker-scroll 40s linear infinite;
-        }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-        .pulse-ring { animation: pulse-ring 2s ease-out infinite; }
+        .reveal-up { opacity:0; transform:translateY(40px); transition:opacity 1.5s ease-out, transform 1s cubic-bezier(.16,1,.3,1); }
+        .reveal-left { opacity:0; transform:translateX(-50px); transition:opacity 1.5s ease-out, transform 1s cubic-bezier(.16,1,.3,1); }
+        .reveal-up.is-visible, .reveal-left.is-visible { opacity:1; transform:translate(0); }
+        body { zoom:0.9; -moz-transform:scale(0.9); -moz-transform-origin:0 0; }
+        @keyframes pulse-ring { 0%{transform:scale(.8);opacity:1} 100%{transform:scale(2);opacity:0} }
+        .pulse-ring { animation:pulse-ring 2s ease-out infinite; }
     </style>
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
@@ -70,17 +44,15 @@
 
     <main class="flex-grow pt-0">
         <!-- ══════════════════════════════════════════════════════════════
-             HERO — Welcome Banner
+             HERO — Personalized Welcome
              ══════════════════════════════════════════════════════════════ -->
         <section class="relative w-full bg-black border-b border-white/10 overflow-hidden">
-            <!-- Background gradient -->
             <div class="absolute inset-0 z-0">
                 <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-black to-secondary/5"></div>
                 <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent"></div>
             </div>
 
             <div class="container mx-auto px-6 max-w-[1400px] pt-48 pb-20 md:pb-28 relative z-10">
-                <!-- Breadcrumb -->
                 <div class="flex items-center gap-2 mb-6 reveal-left">
                     <a href="{% url 'home' %}" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors">Home</a>
                     <span class="text-slate-600">/</span>
@@ -91,23 +63,24 @@
                     <div>
                         <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 mb-6">
                             <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                            <span class="text-[10px] font-black tracking-[0.2em] uppercase">Live Dashboard</span>
+                            <span class="text-[10px] font-black tracking-[0.2em] uppercase">{{ greeting }}</span>
                         </div>
                         <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase reveal-left">
-                            WELCOME <span class="text-transparent [-webkit-text-stroke:2px_#f425c0]">BACK</span>
+                            {{ user.username|upper }}
                         </h1>
-                        <p class="text-slate-400 mt-6 font-mono text-sm tracking-widest uppercase max-w-xl reveal-left" style="transition-delay: 100ms">
-                            Your personalized K-Pop command center
+                        <p class="text-slate-400 mt-6 font-mono text-sm tracking-widest uppercase max-w-xl reveal-left" style="transition-delay:100ms">
+                            {% if greeting == 'Good Morning' %}Rise and shine — here's your K-Pop briefing
+                            {% elif greeting == 'Good Afternoon' %}Afternoon vibes — catch up on what's trending
+                            {% else %}Evening mode — wind down with your favourites{% endif %}
                         </p>
                     </div>
 
-                    <!-- Quick Actions -->
-                    <div class="flex items-center gap-3 reveal-left" style="transition-delay: 200ms">
+                    <div class="flex items-center gap-3 reveal-left" style="transition-delay:200ms">
                         <a href="{% url 'live' %}" class="flex items-center gap-2 bg-primary text-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-primary hover:bg-white hover:border-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                             <span class="material-symbols-outlined text-sm">radio</span> Live Radio
                         </a>
-                        <a href="{% url 'charts' %}" class="flex items-center gap-2 border border-white/20 text-slate-400 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:border-primary hover:text-primary transition-colors">
-                            <span class="material-symbols-outlined text-sm">trending_up</span> Charts
+                        <a href="{% url 'logout' %}" class="flex items-center gap-2 border border-white/20 text-slate-400 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:border-red-500 hover:text-red-400 transition-colors">
+                            <span class="material-symbols-outlined text-sm">logout</span> Log Out
                         </a>
                     </div>
                 </div>
@@ -115,15 +88,15 @@
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════
-             STATS BAR
+             STATS BAR — Mix of platform + personal
              ══════════════════════════════════════════════════════════════ -->
         <section class="w-full bg-black border-b border-white/10">
             <div class="container mx-auto px-6 max-w-[1400px]">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-0 reveal-up">
                     <div class="p-6 md:p-8 border-r border-b md:border-b-0 border-white/10 group hover:bg-white/[0.02] transition-colors">
-                        <span class="material-symbols-outlined text-primary text-3xl mb-3 block">groups</span>
-                        <div class="font-black text-3xl md:text-4xl tracking-tighter text-white">{{ stats.total_artists }}</div>
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1 block">Artists Tracked</span>
+                        <span class="material-symbols-outlined text-primary text-3xl mb-3 block">favorite</span>
+                        <div class="font-black text-3xl md:text-4xl tracking-tighter text-white">{{ stats.total_favourites }}</div>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1 block">Your Favourites</span>
                     </div>
                     <div class="p-6 md:p-8 md:border-r border-b md:border-b-0 border-white/10 group hover:bg-white/[0.02] transition-colors">
                         <span class="material-symbols-outlined text-secondary text-3xl mb-3 block">music_note</span>
@@ -136,11 +109,234 @@
                         <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1 block">Upcoming Releases</span>
                     </div>
                     <div class="p-6 md:p-8 group hover:bg-white/[0.02] transition-colors">
-                        <span class="material-symbols-outlined text-secondary text-3xl mb-3 block">article</span>
-                        <div class="font-black text-3xl md:text-4xl tracking-tighter text-white">{{ stats.total_articles }}</div>
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1 block">News Articles</span>
+                        <span class="material-symbols-outlined text-secondary text-3xl mb-3 block">badge</span>
+                        <div class="font-black text-3xl md:text-4xl tracking-tighter text-white">{{ stats.member_since|date:"M Y" }}</div>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1 block">Member Since</span>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             BIAS SECTION — Dedicated to bias artist
+             ══════════════════════════════════════════════════════════════ -->
+        <section class="w-full bg-black py-16 md:py-24 border-b border-white/10" x-data="biasSelector()">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            YOUR<span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]"> BIAS</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">
+                            {% if bias %}Dedicated to {{ bias.name }}{% else %}Choose your ultimate bias{% endif %}
+                        </p>
+                    </div>
+                    <button @click="showPicker = !showPicker"
+                            class="flex items-center text-white text-[10px] tracking-[0.2em] font-black hover:text-primary transition-colors gap-1 uppercase pb-1">
+                        <span class="material-symbols-outlined text-sm">swap_horiz</span>
+                        <span x-text="showPicker ? 'Close' : 'Change Bias'"></span>
+                    </button>
+                </div>
+
+                <!-- Bias Picker -->
+                <div x-show="showPicker" x-transition class="mb-12 reveal-up">
+                    <div class="mb-4">
+                        <input x-model="search" type="text" placeholder="Search artists..."
+                               class="w-full md:w-96 bg-white/[0.03] border border-white/10 py-3 px-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" />
+                    </div>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-0 max-h-[320px] overflow-y-auto border border-white/10">
+                        {% for aid, aname, aimg, atype in all_artists %}
+                        <button @click="setBias({{ aid }})"
+                                x-show="'{{ aname|escapejs }}'.toLowerCase().includes(search.toLowerCase())"
+                                class="group flex flex-col items-center gap-2 p-4 border border-white/5 hover:border-primary hover:bg-white/[0.02] transition-all">
+                            <div class="w-14 h-14 overflow-hidden border border-white/10 group-hover:border-primary transition-colors">
+                                {% if aimg %}
+                                <img src="{{ aimg }}" alt="{{ aname }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"/>
+                                {% else %}
+                                <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-lg text-white/10">person</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 group-hover:text-white transition-colors text-center truncate w-full">{{ aname }}</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if bias %}
+                <!-- Bias Hero Card -->
+                <div class="reveal-up">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-0 border border-white/10">
+                        <div class="relative aspect-square lg:aspect-auto overflow-hidden">
+                            {% if bias.image_url %}
+                            <img src="{{ bias.image_url }}" alt="{{ bias.name }}" class="w-full h-full object-cover" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center min-h-[300px]">
+                                <span class="material-symbols-outlined text-7xl text-white/10">person</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+                            <div class="absolute bottom-0 left-0 p-6">
+                                <span class="bg-primary text-black text-[8px] font-black px-2 py-1 uppercase tracking-widest">{{ bias.get_group_type_display }}</span>
+                                <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase mt-3">{{ bias.name }}</h3>
+                                {% if bias.label %}
+                                <span class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mt-1 block">{{ bias.label }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="p-8 border-l border-white/10">
+                            <h4 class="font-black text-sm uppercase tracking-widest text-white mb-6 pb-3 border-b border-white/20">Members</h4>
+                            {% if bias_members %}
+                            <div class="flex flex-col gap-0">
+                                {% for member in bias_members %}
+                                <div class="group flex items-center gap-4 py-3 border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                    <div class="w-10 h-10 shrink-0 overflow-hidden border border-white/10 group-hover:border-primary transition-colors">
+                                        {% if member.image_url %}
+                                        <img src="{{ member.image_url }}" alt="{{ member.stage_name|default:member.name }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                                        {% else %}
+                                        <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-sm text-white/10">person</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h5 class="text-white text-xs font-black uppercase tracking-tight truncate group-hover:text-primary transition-colors">{{ member.stage_name|default:member.name }}</h5>
+                                        {% if member.position %}
+                                        <span class="text-slate-600 font-mono text-[8px] tracking-widest uppercase">{{ member.position }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600">No member data available</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="p-8 border-l border-white/10">
+                            <h4 class="font-black text-sm uppercase tracking-widest text-white mb-6 pb-3 border-b border-white/20">Upcoming Releases</h4>
+                            {% if bias_comebacks %}
+                            <div class="flex flex-col gap-0">
+                                {% for r in bias_comebacks %}
+                                <div class="group flex items-center gap-4 py-3 border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                    <div class="relative w-12 h-12 shrink-0 overflow-hidden border border-white/10">
+                                        {% if r.image %}
+                                        <img src="{{ r.image }}" alt="{{ r.title }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                                        {% else %}
+                                        <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-sm text-white/10">album</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2 mb-0.5">
+                                            <span class="bg-secondary text-black text-[7px] font-black px-1.5 py-0.5 uppercase tracking-widest">{{ r.type }}</span>
+                                        </div>
+                                        <h5 class="text-white text-xs font-black uppercase tracking-tight truncate group-hover:text-secondary transition-colors">{{ r.title }}</h5>
+                                        <span class="text-slate-600 font-mono text-[8px] tracking-widest">{{ r.date_str }}</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="py-6 text-center">
+                                <span class="material-symbols-outlined text-3xl text-white/10">event_busy</span>
+                                <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mt-3">No upcoming releases for {{ bias.name }}</p>
+                            </div>
+                            {% endif %}
+
+                            <a href="{% url 'idol_page' slug=bias.slug %}" class="mt-6 flex items-center justify-center gap-2 w-full border border-primary text-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-primary hover:text-black transition-colors">
+                                <span class="material-symbols-outlined text-sm">open_in_new</span> View Full Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="border border-dashed border-white/20 p-12 md:p-16 text-center reveal-up">
+                    <span class="material-symbols-outlined text-6xl text-white/10 mb-4 block">favorite</span>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-tight mb-2">No Bias Selected</h3>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-6 max-w-md mx-auto">
+                        Choose your ultimate bias artist to get a dedicated section with their members, comebacks, and more.
+                    </p>
+                    <button @click="showPicker = true" class="inline-flex items-center gap-2 bg-primary text-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-primary hover:bg-white hover:border-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        <span class="material-symbols-outlined text-sm">favorite</span> Choose Your Bias
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             FAVOURITES SECTION
+             ══════════════════════════════════════════════════════════════ -->
+        <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            YOUR<span class="text-transparent [-webkit-text-stroke:1.5px_#00f0ff]"> FAVOURITES</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">Songs you've saved from the live player</p>
+                    </div>
+                    {% if favourites %}
+                    <a href="{% url 'live' %}" class="hidden sm:flex items-center text-white text-[10px] tracking-[0.2em] font-black hover:text-secondary transition-colors gap-1 uppercase pb-1">
+                        Discover More <span class="material-symbols-outlined text-sm">east</span>
+                    </a>
+                    {% endif %}
+                </div>
+
+                {% if favourites %}
+                <div class="flex flex-col border-t border-white/20 reveal-up">
+                    {% for fav in favourites %}
+                    <div class="group flex items-center gap-5 py-4 border-b border-white/10 hover:bg-white/[0.03] transition-colors">
+                        <div class="relative w-14 h-14 shrink-0 overflow-hidden border border-white/10">
+                            {% if fav.artwork_url %}
+                            <img src="{{ fav.artwork_url }}" alt="{{ fav.title }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-xl text-white/10">music_note</span>
+                            </div>
+                            {% endif %}
+                            {% if fav.preview_url %}
+                            <div class="absolute inset-0 bg-secondary/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                 onclick="event.stopPropagation(); new Audio('{{ fav.preview_url }}').play()">
+                                <span class="material-symbols-outlined text-black text-xl">play_arrow</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-white text-sm font-black uppercase tracking-tight truncate group-hover:text-secondary transition-colors">{{ fav.title }}</h3>
+                            <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">{{ fav.artist }}</span>
+                        </div>
+                        <span class="font-mono text-[9px] tracking-widest text-slate-600 shrink-0 hidden sm:block">{{ fav.added_at|date:"M d" }}</span>
+                        <form method="post" action="{% url 'remove_favourite' pk=fav.pk %}" class="shrink-0">
+                            {% csrf_token %}
+                            <button type="submit" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
+                                <span class="material-symbols-outlined text-lg">close</span>
+                            </button>
+                        </form>
+                        {% if fav.itunes_url %}
+                        <a href="{{ fav.itunes_url }}" target="_blank" rel="noopener" class="text-slate-600 hover:text-secondary transition-colors shrink-0">
+                            <span class="material-symbols-outlined text-lg">open_in_new</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="border border-dashed border-white/20 p-12 md:p-16 text-center reveal-up">
+                    <span class="material-symbols-outlined text-6xl text-white/10 mb-4 block">library_music</span>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-tight mb-2">No Favourites Yet</h3>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-6 max-w-md mx-auto">
+                        Head to the live player and tap the heart icon on songs you love to build your collection.
+                    </p>
+                    <a href="{% url 'live' %}" class="inline-flex items-center gap-2 bg-secondary text-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-secondary hover:bg-white hover:border-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        <span class="material-symbols-outlined text-sm">radio</span> Go to Live Player
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </section>
 
@@ -300,6 +496,35 @@
                     <!-- ──────── RIGHT SIDEBAR (1/3) ──────── -->
                     <div class="pl-0 lg:pl-12 pt-12 lg:pt-0">
 
+                        <!-- Profile Card -->
+                        <div class="mb-12 border border-white/10 p-6 reveal-up">
+                            <div class="flex items-center gap-4 mb-6 pb-4 border-b border-white/10">
+                                <div class="w-14 h-14 bg-primary flex items-center justify-center shrink-0">
+                                    <span class="text-black text-xl font-black">{{ user.username|first|upper }}</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-white text-sm font-black uppercase tracking-tight truncate">{{ user.username }}</h3>
+                                    <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">{{ user.email|default:'No email' }}</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-0">
+                                <div class="p-3 border border-white/5 text-center">
+                                    <span class="text-xl font-black text-primary block">{{ total_favourites }}</span>
+                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">Favourites</span>
+                                </div>
+                                <div class="p-3 border border-white/5 text-center">
+                                    <span class="text-[11px] font-black text-white block mt-1">{{ user.date_joined|date:'M Y' }}</span>
+                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">Joined</span>
+                                </div>
+                            </div>
+                            {% if profile.bias %}
+                            <div class="mt-4 flex items-center gap-2 p-3 border border-white/5">
+                                <span class="material-symbols-outlined text-primary text-sm">favorite</span>
+                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400">Bias: <span class="text-white">{{ profile.bias.name }}</span></span>
+                            </div>
+                            {% endif %}
+                        </div>
+
                         <!-- Quick Navigation -->
                         <div class="mb-12 reveal-up">
                             <h3 class="font-black text-sm uppercase tracking-widest text-white mb-6 pb-3 border-b border-white/20">Quick Access</h3>
@@ -386,15 +611,15 @@
                                 </div>
                             </a>
 
-                            <!-- Pulse Point Store -->
-                            <a href="{% url 'pulse_point_store' %}" class="group block border border-white/10 hover:border-primary p-6 transition-all hover:bg-white/[0.02]">
+                            <!-- Comeback Calendar -->
+                            <a href="{% url 'comeback_timeline' %}" class="group block border border-white/10 hover:border-primary p-6 transition-all hover:bg-white/[0.02]">
                                 <div class="flex items-center gap-4">
                                     <div class="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-                                        <span class="material-symbols-outlined text-primary text-xl">store</span>
+                                        <span class="material-symbols-outlined text-primary text-xl">calendar_month</span>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Pulse Store</h4>
-                                        <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Spend your earned points</p>
+                                        <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Comeback Calendar</h4>
+                                        <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Upcoming releases &amp; dates</p>
                                     </div>
                                     <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">east</span>
                                 </div>
@@ -406,70 +631,24 @@
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════
-             TOP ARTISTS SHOWCASE (Full-width grid)
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px]">
-                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
-                    <div>
-                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
-                            YOUR<span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]"> ARTISTS</span>
-                        </h2>
-                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">Explore the most popular artists on K-Beats</p>
-                    </div>
-                    <a href="{% url 'idols' %}" class="hidden sm:flex items-center text-white text-[10px] tracking-[0.2em] font-black hover:text-primary transition-colors gap-1 uppercase pb-1">
-                        Browse All <span class="material-symbols-outlined text-sm">east</span>
-                    </a>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-0 reveal-up">
-                    {% for artist in top_artists %}
-                    <a href="{% url 'idol_page' slug=artist.slug %}" class="group border border-white/10 bg-black hover:border-primary overflow-hidden transition-all duration-300 hover:-translate-y-1">
-                        <div class="relative aspect-square overflow-hidden">
-                            {% if artist.image_url %}
-                            <img src="{{ artist.image_url }}" alt="{{ artist.name }}" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-70 group-hover:opacity-100" />
-                            {% else %}
-                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
-                                <span class="material-symbols-outlined text-5xl text-white/10">person</span>
-                            </div>
-                            {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
-                            <!-- Rank badge -->
-                            <div class="absolute top-0 left-0 bg-primary text-black px-3 py-1.5">
-                                <span class="font-mono text-[10px] font-black tracking-widest">#{{ artist.rank }}</span>
-                            </div>
-                            <!-- Type badge -->
-                            <span class="absolute bottom-2 right-2 bg-black/80 text-slate-400 text-[8px] font-black px-2 py-1 uppercase tracking-widest">{{ artist.get_group_type_display }}</span>
-                        </div>
-                        <div class="p-4 border-t border-white/10 bg-black">
-                            <h3 class="font-black text-sm uppercase tracking-tight text-white group-hover:text-primary transition-colors leading-tight truncate">{{ artist.name }}</h3>
-                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block">{{ artist.label }}</span>
-                        </div>
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-        </section>
-
-        <!-- ══════════════════════════════════════════════════════════════
-             CTA BANNER
+             CTA BANNER — TEST YOUR KNOWLEDGE
              ══════════════════════════════════════════════════════════════ -->
         <section class="border-b border-white/20 bg-primary overflow-hidden">
             <div class="container mx-auto px-6 py-16 md:py-20 max-w-[1400px] flex flex-col md:flex-row items-center justify-between gap-8">
                 <div class="reveal-left">
                     <h2 class="text-4xl md:text-5xl font-black text-black leading-none tracking-tighter uppercase">
-                        NEVER MISS<br/>A BEAT
+                        TEST YOUR<br/>KNOWLEDGE
                     </h2>
                     <p class="text-black/70 font-mono text-[10px] tracking-widest uppercase mt-4 max-w-md">
-                        Tune into K-Beats Live Radio for 24/7 non-stop K-Pop hits, exclusive interviews, and live performances.
+                        Think you know K-Pop? Challenge yourself with our Song Game and prove you're the ultimate fan.
                     </p>
                 </div>
                 <div class="flex items-center gap-4 reveal-left" style="transition-delay: 200ms">
-                    <a href="{% url 'live' %}" class="bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
-                        Open Live Radio
+                    <a href="{% url 'song_game' %}" class="bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        Play Song Game
                     </a>
-                    <a href="{% url 'news' %}" class="border border-black text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 hover:bg-black hover:text-white transition-colors">
-                        Read News
+                    <a href="{% url 'live' %}" class="border border-black text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 hover:bg-black hover:text-white transition-colors">
+                        Live Radio
                     </a>
                 </div>
             </div>
@@ -493,6 +672,21 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => observer.observe(el));
     });
+
+    // ── Bias Selector (Alpine.js) ────────────────────────────────
+    function biasSelector() {
+        return {
+            showPicker: false,
+            search: '',
+            async setBias(artistId) {
+                const fd = new FormData();
+                fd.append('artist_id', artistId);
+                fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                const res = await fetch('{% url "set_bias" %}', { method: 'POST', body: fd });
+                if (res.ok) window.location.reload();
+            }
+        };
+    }
     </script>
 </body>
 </html>

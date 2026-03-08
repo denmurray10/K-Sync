@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 import bleach
 
 class Ranking(models.Model):
@@ -129,3 +130,42 @@ class BlogArticle(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='profile',
+    )
+    bias = models.ForeignKey(
+        KPopGroup,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='biased_by',
+    )
+
+    def __str__(self):
+        return f"{self.user.username}'s profile"
+
+
+class FavouriteSong(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='favourite_songs',
+    )
+    title = models.CharField(max_length=300)
+    artist = models.CharField(max_length=200)
+    artwork_url = models.URLField(max_length=500, blank=True)
+    preview_url = models.URLField(max_length=500, blank=True)
+    itunes_url = models.URLField(max_length=500, blank=True)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-added_at']
+        unique_together = ['user', 'title', 'artist']
+
+    def __str__(self):
+        return f"{self.user.username} ♥ {self.title}"
