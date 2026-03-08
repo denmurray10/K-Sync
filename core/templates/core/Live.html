@@ -325,65 +325,80 @@
 
                 <div class="flex flex-col gap-3">
                     <!-- Track 1 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'magnetic' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <span class="text-slate-600 font-mono text-xs w-6 text-center">01</span>
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Magnetic</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Magnetic</p>
+                                {% if 'magnetic' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">ILLIT</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:12</span>
                     </div>
 
                     <!-- Track 2 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'supernova' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <span class="text-slate-600 font-mono text-xs w-6 text-center">02</span>
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Supernova</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Supernova</p>
+                                {% if 'supernova' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">AESPA</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:30</span>
                     </div>
 
                     <!-- Track 3 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'chk chk boom' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <span class="text-slate-600 font-mono text-xs w-6 text-center">03</span>
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Chk Chk Boom</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Chk Chk Boom</p>
+                                {% if 'chk chk boom' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">STRAY KIDS</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:18</span>
                     </div>
 
                     <!-- Track 4 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'how sweet' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <span class="text-slate-600 font-mono text-xs w-6 text-center">04</span>
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">How Sweet</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">How Sweet</p>
+                                {% if 'how sweet' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">NEWJEANS</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:08</span>
                     </div>
 
                     <!-- Track 5 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'armageddon' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <span class="text-slate-600 font-mono text-xs w-6 text-center">05</span>
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Armageddon</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Armageddon</p>
+                                {% if 'armageddon' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">AESPA</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:45</span>
@@ -403,60 +418,75 @@
 
                 <div class="flex flex-col gap-3">
                     <!-- Recent 1 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'flower' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Flower</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Flower</p>
+                                {% if 'flower' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">JISOO</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">2 min ago</span>
                     </div>
 
                     <!-- Recent 2 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'super shy' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Super Shy</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Super Shy</p>
+                                {% if 'super shy' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">NEWJEANS</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">6 min ago</span>
                     </div>
 
                     <!-- Recent 3 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'unforgiven' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">UNFORGIVEN</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">UNFORGIVEN</p>
+                                {% if 'unforgiven' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">LE SSERAFIM</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">10 min ago</span>
                     </div>
 
                     <!-- Recent 4 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'love dive' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Love Dive</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Love Dive</p>
+                                {% if 'love dive' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">IVE</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">14 min ago</span>
                     </div>
 
                     <!-- Recent 5 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer">
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'ditto' in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Ditto</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Ditto</p>
+                                {% if 'ditto' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                            </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">NEWJEANS</p>
                         </div>
                         <span class="text-[10px] font-mono text-slate-600 tracking-wider">18 min ago</span>

@@ -892,12 +892,63 @@ def request_track(request):
                 message=message,
             )
             return JsonResponse({'success': True})
-        return JsonResponse({'success': False, 'error': 'Missing fields'}, status=400)
+        return JsonResponse(
+            {'success': False, 'error': 'Missing fields'},
+            status=400,
+        )
 
+    groups = KPopGroup.objects.order_by('name')
+    groups_json = json.dumps([
+        {'slug': g.slug, 'name': g.name}
+        for g in groups
+    ])
     recent_requests = SongRequest.objects.all()[:10]
     return render(request, 'core/request_track.html', {
+        'groups': groups,
+        'groups_json': groups_json,
         'recent_requests': recent_requests,
     })
+
+
+def api_group_songs(request, slug):
+    """Return songs from iTunes for a given KPopGroup slug."""
+    import urllib.request
+    import urllib.parse
+
+    group = KPopGroup.objects.filter(slug=slug).first()
+    if not group:
+        return JsonResponse({'songs': []})
+
+    ITUNES_NAME_MAP = {
+        '(G)I-DLE': 'G I-DLE',
+    }
+    itunes_term = ITUNES_NAME_MAP.get(group.name, group.name)
+    encoded = urllib.parse.quote_plus(itunes_term)
+    url = (
+        f"https://itunes.apple.com/search?term={encoded}"
+        f"&entity=song&attribute=artistTerm&limit=50"
+    )
+    req = urllib.request.Request(
+        url, headers={'User-Agent': 'Mozilla/5.0'}
+    )
+    songs = []
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read().decode())
+            for item in data.get('results', []):
+                songs.append(item.get('trackName', ''))
+    except Exception:
+        pass
+
+    # Deduplicate while preserving order
+    seen = set()
+    unique = []
+    for s in songs:
+        if s and s not in seen:
+            seen.add(s)
+            unique.append(s)
+
+    return JsonResponse({'songs': unique})
 
 
 @login_required
@@ -1331,7 +1382,15 @@ def bias_quiz_result(request):
         )
 
 def live(request):
-    return render(request, 'core/Live.html')
+    from datetime import timedelta
+    cutoff = timezone.now() - timedelta(hours=24)
+    requested = SongRequest.objects.filter(
+        created_at__gte=cutoff
+    ).values_list('song_title', flat=True)
+    requested_titles = [t.lower() for t in requested]
+    return render(request, 'core/Live.html', {
+        'requested_titles': requested_titles,
+    })
 
 def top_cheerleader_badges(request):
     return render(request, 'core/top_cheerleader_badges.html')

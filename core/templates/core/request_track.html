@@ -118,9 +118,34 @@
     </div>
 </section>
 
+<!-- Groups data for Alpine -->
+<script>window.__kbeatsGroups = {{ groups_json|safe }};</script>
+
 <!-- Request Form Section -->
 <section class="w-full bg-black py-20 md:py-32 border-b border-white/10 relative overflow-hidden"
-         x-data="{ submitted: false, sending: false }">
+         x-data="{
+            submitted: false,
+            sending: false,
+            selectedGroup: '',
+            selectedGroupName: '',
+            selectedSong: '',
+            songs: [],
+            loadingSongs: false,
+            groups: window.__kbeatsGroups,
+            async fetchSongs() {
+                if (!this.selectedGroup) { this.songs = []; this.selectedSong = ''; return; }
+                const g = this.groups.find(g => g.slug === this.selectedGroup);
+                this.selectedGroupName = g ? g.name : '';
+                this.selectedSong = '';
+                this.loadingSongs = true;
+                try {
+                    const res = await fetch('/api/group-songs/' + this.selectedGroup + '/');
+                    const data = await res.json();
+                    this.songs = data.songs || [];
+                } catch(e) { this.songs = []; }
+                this.loadingSongs = false;
+            }
+         }">
 
     <!-- Decorative Background Text -->
     <div class="absolute -top-10 -right-10 text-[10rem] md:text-[15rem] font-black text-white/[0.03] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
@@ -232,27 +257,60 @@
                     <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-2">All fields marked * are required</p>
                 </div>
 
+                <!-- Artist / Group -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-sm">person</span>
+                        Artist / Group *
+                    </label>
+                    <div class="relative">
+                        <select name="_artist_slug" required x-model="selectedGroup" @change="fetchSongs()"
+                                class="w-full appearance-none bg-white/5 border border-white/20 px-6 py-4 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-medium tracking-tight cursor-pointer">
+                            <option value="" disabled selected class="bg-black text-slate-500">Select an artist or group...</option>
+                            {% for group in groups %}
+                            <option value="{{ group.slug }}" class="bg-black text-white">{{ group.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+
                 <!-- Song Title -->
                 <div class="flex flex-col gap-2">
                     <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary text-sm">music_note</span>
                         Song Title *
                     </label>
-                    <input name="song_title" required maxlength="300"
-                           class="w-full bg-white/5 border border-white/20 px-6 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-medium tracking-tight placeholder:font-mono placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
-                           placeholder="e.g. S-Class" type="text"/>
+                    <div class="relative">
+                        <!-- Loading state -->
+                        <div x-show="loadingSongs" class="w-full bg-white/5 border border-white/20 px-6 py-4 text-slate-500 text-sm font-mono tracking-widest uppercase flex items-center gap-3">
+                            <svg class="animate-spin h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            Loading songs...
+                        </div>
+                        <!-- Disabled state -->
+                        <div x-show="!selectedGroup && !loadingSongs" class="w-full bg-white/[0.02] border border-white/10 px-6 py-4 text-slate-600 text-sm font-mono tracking-widest uppercase">
+                            Select an artist first
+                        </div>
+                        <!-- Song dropdown -->
+                        <div x-show="selectedGroup && !loadingSongs">
+                            <select name="song_title" required x-model="selectedSong"
+                                    class="w-full appearance-none bg-white/5 border border-white/20 px-6 py-4 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-medium tracking-tight cursor-pointer">
+                                <option value="" disabled selected class="bg-black text-slate-500" x-text="songs.length ? 'Choose a song...' : 'No songs found'"></option>
+                                <template x-for="song in songs" :key="song">
+                                    <option :value="song" class="bg-black text-white" x-text="song"></option>
+                                </template>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+                    <p x-show="selectedGroup && !loadingSongs && songs.length > 0" class="text-slate-600 font-mono text-[10px] tracking-widest uppercase" x-text="songs.length + ' songs available'"></p>
                 </div>
 
-                <!-- Artist -->
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary text-sm">person</span>
-                        Artist / Group *
-                    </label>
-                    <input name="artist" required maxlength="200"
-                           class="w-full bg-white/5 border border-white/20 px-6 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm font-medium tracking-tight placeholder:font-mono placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
-                           placeholder="e.g. Stray Kids" type="text"/>
-                </div>
+                <!-- Hidden field to pass group name instead of slug -->
+                <input type="hidden" name="artist" :value="selectedGroupName" />
 
                 <!-- Listener Name -->
                 <div class="flex flex-col gap-2">
