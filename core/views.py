@@ -799,7 +799,14 @@ def dashboard(request):
 @require_POST
 def set_bias(request):
     """Set or clear the user's bias artist."""
+    # Accept both form-encoded and JSON bodies
     artist_id = request.POST.get('artist_id')
+    if not artist_id:
+        try:
+            body = json.loads(request.body)
+            artist_id = body.get('artist_id')
+        except (json.JSONDecodeError, AttributeError):
+            pass
     profile, _ = UserProfile.objects.get_or_create(
         user=request.user
     )
@@ -1181,7 +1188,129 @@ def search_api(request):
     return JsonResponse({'results': results})
 
 def bias_selector(request):
-    return render(request, 'core/bias_selector.html')
+    import random
+    import urllib.request
+    import urllib.parse
+
+    # Gather a diverse pool of artists
+    artists = list(
+        KPopGroup.objects.filter(
+            rank__isnull=False
+        ).order_by('rank')[:30]
+    )
+    random.shuffle(artists)
+
+    # Enrich with an iTunes preview URL per artist
+    pool = []
+    for a in artists:
+        preview_url = ''
+        try:
+            q = urllib.parse.quote(a.name)
+            url = (
+                f"https://itunes.apple.com/search?term={q}"
+                "&entity=song&attribute=artistTerm&limit=1"
+                "&genreId=51"
+            )
+            req = urllib.request.Request(
+                url,
+                headers={'User-Agent': 'Mozilla/5.0'}
+            )
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                data = json.loads(resp.read().decode())
+                results = data.get('results', [])
+                if results:
+                    preview_url = results[0].get(
+                        'previewUrl', ''
+                    )
+        except Exception:
+            pass
+
+        pool.append({
+            'id': a.id,
+            'name': a.name,
+            'slug': a.slug,
+            'group_type': a.group_type,
+            'group_type_display': a.get_group_type_display(),
+            'label': a.label or '',
+            'image_url': a.image_url or '',
+            'preview_url': preview_url,
+            'member_count': a.members.count(),
+        })
+
+    return render(request, 'core/bias_selector.html', {
+        'pool_json': json.dumps(pool),
+    })
+
+
+@login_required
+@require_POST
+def bias_quiz_result(request):
+    """Use DeepSeek to match quiz answers to an artist."""
+    data = json.loads(request.body)
+    answers = data.get('answers', {})
+    pool_names = data.get('pool_names', [])
+
+    prompt = (
+        "You are a K-Pop bias matchmaker. "
+        "Based on the following quiz answers, pick the BEST matching "
+        "K-Pop artist from the provided list. You MUST pick exactly "
+        "one name from the list — do not invent new names.\n\n"
+        f"Available artists: {', '.join(pool_names)}\n\n"
+        "Quiz answers:\n"
+    )
+    for key, val in answers.items():
+        prompt += f"- {key}: {val}\n"
+    prompt += (
+        "\nRespond with ONLY a JSON object: "
+        "{\"artist\": \"<exact name from list>\", "
+        "\"reason\": \"<2-3 sentence explanation>\"}"
+    )
+
+    try:
+        raw = _chat(
+            prompt,
+            system="You are a K-Pop expert matchmaker."
+        )
+        # Extract JSON from the response
+        import re
+        m = re.search(r'\{.*\}', raw, re.DOTALL)
+        if m:
+            result = json.loads(m.group())
+        else:
+            result = json.loads(raw)
+        # Validate the artist exists in pool
+        name = result.get('artist', '')
+        try:
+            group = KPopGroup.objects.get(name__iexact=name)
+            result['id'] = group.id
+            result['artist'] = group.name
+            result['slug'] = group.slug
+            result['image_url'] = group.image_url or ''
+            result['group_type'] = group.get_group_type_display()
+            result['label'] = group.label or ''
+        except KPopGroup.DoesNotExist:
+            # Fallback — pick first in pool
+            if pool_names:
+                fb = KPopGroup.objects.filter(
+                    name__in=pool_names
+                ).first()
+                if fb:
+                    result = {
+                        'artist': fb.name,
+                        'id': fb.id,
+                        'slug': fb.slug,
+                        'image_url': fb.image_url or '',
+                        'group_type': fb.get_group_type_display(),
+                        'label': fb.label or '',
+                        'reason': 'Matched based on your preferences.',
+                    }
+        return JsonResponse({'ok': True, 'result': result})
+    except Exception as e:
+        logger.warning("Bias quiz DeepSeek error: %s", e)
+        return JsonResponse(
+            {'ok': False, 'error': 'Could not determine match'},
+            status=500,
+        )
 
 def live(request):
     return render(request, 'core/Live.html')
@@ -1802,38 +1931,116 @@ def ai_generate_ranking(request):
 
 
 def comeback_timeline(request):
+    import calendar as py_calendar
+
     now = timezone.now()
-    # Get current and next month to ensure we have enough upcoming comebacks
-    data_current = ComebackData.objects.filter(year=now.year, month=now.month).first()
-    data_next = ComebackData.objects.filter(year=now.year if now.month < 12 else now.year + 1, 
-                                            month=now.month + 1 if now.month < 12 else 1).first()
-    
-    all_releases = []
-    if data_current:
-        # Extract releases and add date info
-        for date_key, details in data_current.data.items():
-            if 'releases' in details:
-                for r in details['releases']:
-                    r['date_str'] = date_key
-                    all_releases.append(r)
-    
-    if data_next:
-        for date_key, details in data_next.data.items():
-            if 'releases' in details:
-                for r in details['releases']:
-                    r['date_str'] = date_key
-                    all_releases.append(r)
-
-    # Sort by date (descending for timeline usually? Let's check the template's vibe. 
-    # Usually, a timeline shows upcoming ones.)
-    # Let's sort ascending for "upcoming"
-    all_releases.sort(key=lambda x: x['date_str'])
-    
-    # Filter for today or later
     today_str = now.strftime('%Y-%m-%d')
-    upcoming = [r for r in all_releases if r['date_str'] >= today_str]
 
-    return render(request, 'core/comeback_timeline.html', {'comebacks': upcoming})
+    # Allow month navigation via query params
+    try:
+        nav_year = int(request.GET.get('year', now.year))
+        nav_month = int(request.GET.get('month', now.month))
+    except (ValueError, TypeError):
+        nav_year, nav_month = now.year, now.month
+
+    # Clamp to reasonable range
+    if nav_month < 1 or nav_month > 12:
+        nav_month = now.month
+    if nav_year < 2020 or nav_year > 2030:
+        nav_year = now.year
+
+    # Previous / next month for nav links
+    if nav_month == 1:
+        prev_year, prev_month = nav_year - 1, 12
+    else:
+        prev_year, prev_month = nav_year, nav_month - 1
+    if nav_month == 12:
+        next_year, next_month = nav_year + 1, 1
+    else:
+        next_year, next_month = nav_year, nav_month + 1
+
+    # ── Build calendar grid ──────────────────────────────
+    first_weekday, num_days = py_calendar.monthrange(nav_year, nav_month)
+    empty_cells = (first_weekday + 1) % 7  # Sunday-start
+
+    data_obj = ComebackData.objects.filter(
+        year=nav_year, month=nav_month
+    ).first()
+    cal_data = data_obj.data if data_obj else {}
+
+    days = []
+    for _ in range(empty_cells):
+        days.append({'empty': True})
+
+    for d in range(1, num_days + 1):
+        day_key = f"{nav_year}-{nav_month:02d}-{d:02d}"
+        dd = cal_data.get(day_key, {})
+        days.append({
+            'num': d,
+            'empty': False,
+            'releases': dd.get('releases', []),
+            'birthdays': dd.get('birthdays', []),
+            'anniversaries': dd.get('anniversaries', []),
+            'is_today': (
+                nav_year == now.year
+                and nav_month == now.month
+                and d == now.day
+            ),
+            'is_past': day_key < today_str,
+        })
+
+    # ── Build upcoming timeline (current + next 2 months) ──
+    months_to_check = []
+    for offset in range(3):
+        m = nav_month + offset
+        y = nav_year
+        while m > 12:
+            m -= 12
+            y += 1
+        months_to_check.append((y, m))
+
+    all_releases = []
+    for y, m in months_to_check:
+        cb = ComebackData.objects.filter(year=y, month=m).first()
+        if not cb:
+            continue
+        for date_key, details in cb.data.items():
+            for r in details.get('releases', []):
+                r['date_str'] = date_key
+                r['iso_date'] = f"{date_key}T09:00:00Z"
+                all_releases.append(r)
+
+    all_releases.sort(key=lambda x: x['date_str'])
+    upcoming = [r for r in all_releases if r['date_str'] >= today_str]
+    recent = sorted(
+        [r for r in all_releases if r['date_str'] < today_str],
+        key=lambda x: x['date_str'],
+        reverse=True,
+    )[:6]
+
+    # Stats
+    total_upcoming = len(upcoming)
+    types_count = {}
+    for r in upcoming:
+        t = r.get('type', 'Release')
+        types_count[t] = types_count.get(t, 0) + 1
+
+    month_label = py_calendar.month_name[nav_month]
+
+    return render(request, 'core/comebacks.html', {
+        'days': days,
+        'month_label': month_label,
+        'nav_year': nav_year,
+        'nav_month': nav_month,
+        'prev_year': prev_year,
+        'prev_month': prev_month,
+        'next_year': next_year,
+        'next_month': next_month,
+        'upcoming': upcoming[:20],
+        'recent': recent,
+        'total_upcoming': total_upcoming,
+        'types_count': types_count,
+    })
 
 
 def calendar(request):

@@ -27,6 +27,7 @@ urlpatterns = [
     path('results/', views.results, name='results'),
     path('api/search/', views.search_api, name='search_api'),
     path('bias-selector/', views.bias_selector, name='bias_selector'),
+    path('api/bias-quiz-result/', views.bias_quiz_result, name='bias_quiz_result'),
     path('live/', views.live, name='live'),
     path('comeback-timeline/', views.comeback_timeline, name='comeback_timeline'),
     path('calendar/', views.calendar, name='calendar'),

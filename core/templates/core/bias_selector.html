@@ -1,0 +1,645 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bias Selector — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(244,37,192,0.3); } 50% { box-shadow: 0 0 40px rgba(244,37,192,0.6); } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes reveal { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes wave { from { height: 6px; } to { height: 32px; } }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-slide-up { animation: slide-up 0.5s ease-out both; }
+        .animate-reveal { animation: reveal 0.6s ease-out both; }
+        .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        .option-btn { transition: all 0.2s ease; }
+        .option-btn:hover:not(:disabled) { border-color: #f425c0; background: rgba(244, 37, 192, 0.05); transform: translateY(-2px); }
+        .vs-divider { position: relative; }
+        .vs-divider::before { content: 'VS'; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); font-weight: 900; font-size: 12px; letter-spacing: 0.2em; color: #f425c0; background: #000; padding: 6px 12px; z-index: 1; }
+        .audio-card { transition: all 0.3s ease; cursor: pointer; }
+        .audio-card:hover { border-color: #f425c0; }
+        .audio-card.selected { border-color: #f425c0; background: rgba(244,37,192,0.08); }
+    </style>
+</head>
+<body class="font-sans text-white" x-data="biasQuiz()">
+
+    <div class="fixed inset-0 z-50 bg-black flex flex-col">
+
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </a>
+                <div>
+                    <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Bias Selector</h1>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600">Find Your Perfect Match</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Step</span>
+                    <span class="font-black text-lg text-white" x-text="(currentStep + 1) + '/' + totalSteps"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full h-1 bg-white/5 shrink-0">
+            <div class="h-full bg-primary transition-all duration-500 ease-out"
+                 :style="'width:' + ((currentStep) / totalSteps * 100) + '%'"></div>
+        </div>
+
+        <!-- Quiz Area -->
+        <div class="flex-1 flex items-center justify-center overflow-y-auto">
+
+            <!-- ================= INTRO SCREEN ================= -->
+            <div x-show="state === 'intro'" x-transition class="text-center px-6 max-w-lg">
+                <span class="material-symbols-outlined text-7xl text-primary mb-6 block">favorite</span>
+                <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-4">
+                    FIND YOUR<br/><span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]">BIAS</span>
+                </h2>
+                <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-3">
+                    <span x-text="totalSteps"></span> Steps &bull; Multiple Question Types &bull; AI-Powered Match
+                </p>
+                <p class="text-slate-400 text-sm mb-10 max-w-sm mx-auto">
+                    Answer a series of questions — from blind audio picks to style preferences — and we'll match you with your perfect K-Pop bias.
+                </p>
+                <button @click="startQuiz()"
+                        class="inline-flex items-center gap-3 bg-primary text-black px-10 py-4 font-black uppercase tracking-[0.2em] text-xs border border-primary hover:bg-white hover:border-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    <span class="material-symbols-outlined text-lg">play_arrow</span> Start Quiz
+                </button>
+            </div>
+
+            <!-- ================= QUESTION SCREEN ================= -->
+            <div x-show="state === 'playing'" x-transition class="w-full max-w-3xl px-6 animate-slide-up" :key="'step-'+currentStep">
+
+                <!-- AUDIO COMPARISON (blind pick) -->
+                <template x-if="currentQ && currentQ.type === 'audio'">
+                    <div class="text-center">
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-2 block">Blind Listen</span>
+                        <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase mb-8"
+                            x-text="currentQ.question"></h3>
+
+                        <div class="grid grid-cols-2 gap-0 relative">
+                            <!-- Artist A -->
+                            <div class="audio-card border border-white/10 p-8 flex flex-col items-center gap-5"
+                                 :class="selectedAudio === 0 && 'selected'"
+                                 @click="selectAudioOption(0)">
+                                <div class="w-20 h-20 border-2 flex items-center justify-center"
+                                     :class="playingIdx === 0 ? 'border-primary text-primary' : 'border-white/20 text-white/40'">
+                                    <span class="material-symbols-outlined text-4xl">music_note</span>
+                                </div>
+                                <button @click.stop="playPreview(0)"
+                                        class="inline-flex items-center gap-2 border border-white/20 px-4 py-2 font-black uppercase tracking-[0.15em] text-[9px] hover:border-primary hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-sm" x-text="playingIdx === 0 ? 'pause' : 'play_arrow'"></span>
+                                    <span x-text="playingIdx === 0 ? 'Pause' : 'Play A'"></span>
+                                </button>
+                                <!-- Waveform -->
+                                <div class="flex items-end gap-0.5 h-6">
+                                    <template x-for="b in 8">
+                                        <div class="w-1 bg-primary/50 transition-all duration-150"
+                                             :style="playingIdx === 0 ? 'height:' + (4 + Math.random() * 20) + 'px; animation: wave ' + (0.3 + Math.random() * 0.4) + 's ease-in-out infinite alternate' : 'height:3px'"></div>
+                                    </template>
+                                </div>
+                                <span class="font-black text-xl tracking-tight"
+                                      :class="selectedAudio === 0 ? 'text-primary' : 'text-white/30'">A</span>
+                            </div>
+
+                            <!-- VS divider -->
+                            <div class="vs-divider absolute inset-y-0 left-1/2 w-px bg-white/10 -translate-x-1/2"></div>
+
+                            <!-- Artist B -->
+                            <div class="audio-card border border-white/10 p-8 flex flex-col items-center gap-5"
+                                 :class="selectedAudio === 1 && 'selected'"
+                                 @click="selectAudioOption(1)">
+                                <div class="w-20 h-20 border-2 flex items-center justify-center"
+                                     :class="playingIdx === 1 ? 'border-secondary text-secondary' : 'border-white/20 text-white/40'">
+                                    <span class="material-symbols-outlined text-4xl">music_note</span>
+                                </div>
+                                <button @click.stop="playPreview(1)"
+                                        class="inline-flex items-center gap-2 border border-white/20 px-4 py-2 font-black uppercase tracking-[0.15em] text-[9px] hover:border-secondary hover:text-secondary transition-colors">
+                                    <span class="material-symbols-outlined text-sm" x-text="playingIdx === 1 ? 'pause' : 'play_arrow'"></span>
+                                    <span x-text="playingIdx === 1 ? 'Pause' : 'Play B'"></span>
+                                </button>
+                                <div class="flex items-end gap-0.5 h-6">
+                                    <template x-for="b in 8">
+                                        <div class="w-1 bg-secondary/50 transition-all duration-150"
+                                             :style="playingIdx === 1 ? 'height:' + (4 + Math.random() * 20) + 'px; animation: wave ' + (0.3 + Math.random() * 0.4) + 's ease-in-out infinite alternate' : 'height:3px'"></div>
+                                    </template>
+                                </div>
+                                <span class="font-black text-xl tracking-tight"
+                                      :class="selectedAudio === 1 ? 'text-secondary' : 'text-white/30'">B</span>
+                            </div>
+                        </div>
+
+                        <!-- Confirm button -->
+                        <button x-show="selectedAudio !== null" @click="confirmAudioPick()"
+                                class="mt-8 inline-flex items-center gap-2 bg-primary text-black px-8 py-3 font-black uppercase tracking-[0.2em] text-[10px] border border-primary hover:bg-white hover:border-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                            <span class="material-symbols-outlined text-sm">check</span> Lock In
+                        </button>
+                    </div>
+                </template>
+
+                <!-- MULTIPLE CHOICE -->
+                <template x-if="currentQ && currentQ.type === 'choice'">
+                    <div class="text-center">
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-2 block" x-text="currentQ.label || 'Choose One'"></span>
+                        <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase mb-10"
+                            x-text="currentQ.question"></h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-0">
+                            <template x-for="(opt, i) in currentQ.options" :key="i">
+                                <button @click="pickChoice(i)"
+                                        class="option-btn group flex items-center gap-4 p-5 border border-white/10 bg-black">
+                                    <div class="w-10 h-10 border shrink-0 flex items-center justify-center font-black text-sm border-white/20 text-white/40 group-hover:border-primary group-hover:text-primary"
+                                         x-text="['A','B','C','D'][i]"></div>
+                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <template x-if="opt.icon">
+                                            <span class="material-symbols-outlined text-xl text-white/40 group-hover:text-primary" x-text="opt.icon"></span>
+                                        </template>
+                                        <span class="text-white text-sm font-black uppercase tracking-tight truncate group-hover:text-primary transition-colors"
+                                              x-text="opt.text"></span>
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- IMAGE COMPARISON (two images, no names) -->
+                <template x-if="currentQ && currentQ.type === 'image'">
+                    <div class="text-center">
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-2 block">Visual Vibe</span>
+                        <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase mb-8"
+                            x-text="currentQ.question"></h3>
+
+                        <div class="grid grid-cols-2 gap-0 relative max-w-2xl mx-auto">
+                            <template x-for="(img, i) in currentQ.images" :key="i">
+                                <div class="audio-card border border-white/10 p-4 flex flex-col items-center gap-4 cursor-pointer"
+                                     :class="selectedImage === i && 'selected'"
+                                     @click="pickImage(i)">
+                                    <div class="w-full aspect-square overflow-hidden border border-white/10">
+                                        <img :src="img.url" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" alt=""/>
+                                    </div>
+                                    <span class="font-black text-lg tracking-tight"
+                                          :class="selectedImage === i ? 'text-primary' : 'text-white/30'"
+                                          x-text="['A','B'][i]"></span>
+                                </div>
+                            </template>
+                            <div class="vs-divider absolute inset-y-0 left-1/2 w-px bg-white/10 -translate-x-1/2"></div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- SLIDER / SPECTRUM QUESTION -->
+                <template x-if="currentQ && currentQ.type === 'spectrum'">
+                    <div class="text-center max-w-xl mx-auto">
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-2 block">Preference Scale</span>
+                        <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase mb-10"
+                            x-text="currentQ.question"></h3>
+
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500" x-text="currentQ.labelLeft"></span>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500" x-text="currentQ.labelRight"></span>
+                        </div>
+
+                        <input type="range" min="0" max="100" x-model="spectrumValue"
+                               class="w-full h-2 bg-white/10 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:cursor-pointer"/>
+
+                        <div class="mt-3 text-center">
+                            <span class="font-black text-2xl text-primary" x-text="spectrumValue"></span>
+                        </div>
+
+                        <button @click="confirmSpectrum()"
+                                class="mt-8 inline-flex items-center gap-2 bg-primary text-black px-8 py-3 font-black uppercase tracking-[0.2em] text-[10px] border border-primary hover:bg-white hover:border-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                            <span class="material-symbols-outlined text-sm">check</span> Confirm
+                        </button>
+                    </div>
+                </template>
+
+            </div>
+
+            <!-- ================= LOADING SCREEN ================= -->
+            <div x-show="state === 'loading'" x-transition class="text-center px-6">
+                <div class="inline-block w-16 h-16 border-4 border-primary border-t-transparent rounded-full" style="animation: spin-slow 1s linear infinite"></div>
+                <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-6">Analyzing your preferences...</p>
+                <p class="text-slate-600 text-xs mt-2">Our AI is finding your perfect match</p>
+            </div>
+
+            <!-- ================= RESULT SCREEN ================= -->
+            <div x-show="state === 'result'" x-transition class="text-center px-6 max-w-lg animate-slide-up">
+                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-4 block">Your Perfect Bias Is</span>
+
+                <!-- Artist Image -->
+                <div class="mx-auto w-48 h-48 md:w-56 md:h-56 border-2 border-primary overflow-hidden mb-6 animate-reveal animate-pulse-glow">
+                    <template x-if="result.image_url">
+                        <img :src="result.image_url" :alt="result.artist" class="w-full h-full object-cover"/>
+                    </template>
+                    <template x-if="!result.image_url">
+                        <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-6xl text-white/10">person</span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Artist Name -->
+                <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-2"
+                    x-text="result.artist"></h2>
+
+                <!-- Tags -->
+                <div class="flex items-center justify-center gap-3 mt-3 mb-6">
+                    <template x-if="result.group_type">
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-primary border border-primary/30 px-3 py-1" x-text="result.group_type"></span>
+                    </template>
+                    <template x-if="result.label">
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500 border border-white/10 px-3 py-1" x-text="result.label"></span>
+                    </template>
+                </div>
+
+                <!-- Reason -->
+                <p class="text-slate-400 text-sm max-w-md mx-auto mb-8" x-text="result.reason"></p>
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    {% if user.is_authenticated %}
+                    <button @click="setAsBias()"
+                            class="inline-flex items-center gap-2 bg-primary text-black px-8 py-4 font-black uppercase tracking-[0.2em] text-[10px] border border-primary hover:bg-white hover:border-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
+                            :class="biasSet && 'opacity-50 pointer-events-none'"
+                            x-text="biasSet ? '✓ Bias Set!' : 'Set as My Bias'">
+                    </button>
+                    {% endif %}
+                    <button @click="resetQuiz()"
+                            class="inline-flex items-center gap-2 border border-white/20 text-white px-8 py-4 font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-sm">replay</span> Try Again
+                    </button>
+                    <a href="{% url 'dashboard' %}"
+                       class="inline-flex items-center gap-2 border border-white/20 text-white px-8 py-4 font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-sm">arrow_back</span> Dashboard
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+    function biasQuiz() {
+        const pool = {{ pool_json|safe }};
+
+        // Separate artists by type for diverse questions
+        const withAudio = pool.filter(a => a.preview_url);
+        const boyGroups = pool.filter(a => a.group_type === 'BOY');
+        const girlGroups = pool.filter(a => a.group_type === 'GIRL');
+        const soloists = pool.filter(a => a.group_type === 'SOLO');
+
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function pickRandom(arr, n) {
+            return shuffle(arr).slice(0, n);
+        }
+
+        function buildQuestions() {
+            const questions = [];
+
+            // Q1: Group type preference
+            questions.push({
+                type: 'choice',
+                key: 'group_type',
+                label: 'Getting Started',
+                question: 'What type of K-Pop act do you gravitate towards?',
+                options: [
+                    { text: 'Boy Groups', value: 'BOY', icon: 'group' },
+                    { text: 'Girl Groups', value: 'GIRL', icon: 'group' },
+                    { text: 'Solo Artists', value: 'SOLO', icon: 'person' },
+                    { text: 'No Preference', value: 'ANY', icon: 'shuffle' },
+                ]
+            });
+
+            // Q2: Era preference
+            questions.push({
+                type: 'choice',
+                key: 'era_preference',
+                label: 'Musical Era',
+                question: 'Which K-Pop era speaks to you?',
+                options: [
+                    { text: '2nd Gen (2005–2012)', value: '2nd_gen', icon: 'history' },
+                    { text: '3rd Gen (2013–2017)', value: '3rd_gen', icon: 'trending_up' },
+                    { text: '4th Gen (2018–2023)', value: '4th_gen', icon: 'bolt' },
+                    { text: '5th Gen (2024+)', value: '5th_gen', icon: 'new_releases' },
+                ]
+            });
+
+            // Q3: Concept preference
+            questions.push({
+                type: 'choice',
+                key: 'concept_preference',
+                label: 'Style & Concept',
+                question: 'Which concept gets you hyped?',
+                options: [
+                    { text: 'Powerful & Intense', value: 'powerful', icon: 'local_fire_department' },
+                    { text: 'Cute & Bright', value: 'cute', icon: 'favorite' },
+                    { text: 'Dark & Edgy', value: 'dark', icon: 'visibility_off' },
+                    { text: 'Elegant & Classy', value: 'elegant', icon: 'diamond' },
+                ]
+            });
+
+            // Q4: Energy spectrum
+            questions.push({
+                type: 'spectrum',
+                key: 'energy_level',
+                question: 'What energy level do you prefer in music?',
+                labelLeft: 'Chill & Smooth',
+                labelRight: 'Hype & Explosive',
+            });
+
+            // Q5: Audio comparison (blind) — if we have enough artists with audio
+            if (withAudio.length >= 2) {
+                const pair = pickRandom(withAudio, 2);
+                questions.push({
+                    type: 'audio',
+                    key: 'audio_pick_1',
+                    question: 'Which sound do you prefer?',
+                    artists: [pair[0], pair[1]],
+                    previews: [pair[0].preview_url, pair[1].preview_url],
+                });
+            }
+
+            // Q6: Performance style
+            questions.push({
+                type: 'choice',
+                key: 'performance_style',
+                label: 'Stage Presence',
+                question: 'What matters most to you in a performance?',
+                options: [
+                    { text: 'Jaw-dropping Choreography', value: 'dance', icon: 'sports_gymnastics' },
+                    { text: 'Incredible Vocals', value: 'vocal', icon: 'mic' },
+                    { text: 'Rap & Flow', value: 'rap', icon: 'record_voice_over' },
+                    { text: 'All-round Entertainment', value: 'allround', icon: 'star' },
+                ]
+            });
+
+            // Q7: Image comparison — if we have artists with images
+            const withImages = pool.filter(a => a.image_url);
+            if (withImages.length >= 2) {
+                const imgPair = pickRandom(withImages, 2);
+                questions.push({
+                    type: 'image',
+                    key: 'image_pick',
+                    question: 'Which aesthetic draws you in?',
+                    images: [
+                        { url: imgPair[0].image_url, artistId: imgPair[0].id },
+                        { url: imgPair[1].image_url, artistId: imgPair[1].id },
+                    ]
+                });
+            }
+
+            // Q8: Second audio comparison if possible
+            if (withAudio.length >= 4) {
+                const pair2 = pickRandom(withAudio, 2);
+                questions.push({
+                    type: 'audio',
+                    key: 'audio_pick_2',
+                    question: 'One more listen — which vibe wins?',
+                    artists: [pair2[0], pair2[1]],
+                    previews: [pair2[0].preview_url, pair2[1].preview_url],
+                });
+            }
+
+            // Q9: Group size preference
+            questions.push({
+                type: 'choice',
+                key: 'group_size',
+                label: 'Formation',
+                question: 'What group size do you prefer?',
+                options: [
+                    { text: 'Duo / Trio (2-3)', value: 'small', icon: 'people' },
+                    { text: 'Mid-size (4-6)', value: 'medium', icon: 'groups' },
+                    { text: 'Large (7+)', value: 'large', icon: 'groups_3' },
+                    { text: 'Doesn\'t Matter', value: 'any', icon: 'shuffle' },
+                ]
+            });
+
+            // Q10: Vibe spectrum
+            questions.push({
+                type: 'spectrum',
+                key: 'vibe_spectrum',
+                question: 'Where do you fall on this scale?',
+                labelLeft: 'Emotional & Deep',
+                labelRight: 'Fun & Carefree',
+            });
+
+            return questions;
+        }
+
+        return {
+            state: 'intro',
+            questions: [],
+            currentStep: 0,
+            totalSteps: 10,
+            answers: {},
+            audio: null,
+            playingIdx: -1,
+            selectedAudio: null,
+            selectedImage: null,
+            spectrumValue: 50,
+            result: {},
+            biasSet: false,
+            waveInterval: null,
+
+            get currentQ() {
+                return this.questions[this.currentStep] || null;
+            },
+
+            startQuiz() {
+                this.questions = buildQuestions();
+                this.totalSteps = this.questions.length;
+                this.currentStep = 0;
+                this.answers = {};
+                this.state = 'playing';
+            },
+
+            /* ----- Audio comparison helpers ----- */
+            playPreview(idx) {
+                if (this.playingIdx === idx) {
+                    this.stopAudio();
+                    return;
+                }
+                this.stopAudio();
+                const url = this.currentQ.previews[idx];
+                if (!url) return;
+                this.audio = new Audio(url);
+                this.audio.volume = 0.7;
+                this.audio.play().catch(() => {});
+                this.playingIdx = idx;
+                clearInterval(this.waveInterval);
+                this.waveInterval = setInterval(() => { this.playingIdx = this.playingIdx; }, 200);
+            },
+
+            stopAudio() {
+                if (this.audio) {
+                    this.audio.pause();
+                    this.audio.currentTime = 0;
+                    this.audio = null;
+                }
+                this.playingIdx = -1;
+                clearInterval(this.waveInterval);
+            },
+
+            selectAudioOption(idx) {
+                this.selectedAudio = idx;
+            },
+
+            confirmAudioPick() {
+                if (this.selectedAudio === null) return;
+                const chosen = this.currentQ.artists[this.selectedAudio];
+                this.answers[this.currentQ.key] = chosen.name;
+                this.stopAudio();
+                this.selectedAudio = null;
+                this.advance();
+            },
+
+            /* ----- Choice helpers ----- */
+            pickChoice(idx) {
+                const opt = this.currentQ.options[idx];
+                this.answers[this.currentQ.key] = opt.value;
+                this.advance();
+            },
+
+            /* ----- Image helpers ----- */
+            pickImage(idx) {
+                this.selectedImage = idx;
+                const img = this.currentQ.images[idx];
+                this.answers[this.currentQ.key] = img.artistId;
+                // Small delay so user sees the selection
+                setTimeout(() => {
+                    this.selectedImage = null;
+                    this.advance();
+                }, 400);
+            },
+
+            /* ----- Spectrum helpers ----- */
+            confirmSpectrum() {
+                this.answers[this.currentQ.key] = parseInt(this.spectrumValue);
+                this.spectrumValue = 50;
+                this.advance();
+            },
+
+            /* ----- Navigation ----- */
+            advance() {
+                if (this.currentStep < this.questions.length - 1) {
+                    this.currentStep++;
+                } else {
+                    this.submitQuiz();
+                }
+            },
+
+            async submitQuiz() {
+                this.state = 'loading';
+                this.stopAudio();
+
+                // Build human-readable answers for DeepSeek
+                const readable = {};
+                for (const [k, v] of Object.entries(this.answers)) {
+                    readable[k] = String(v);
+                }
+
+                try {
+                    const resp = await fetch('{% url "bias_quiz_result" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({
+                            answers: readable,
+                            pool_names: pool.map(a => a.name),
+                        }),
+                    });
+                    const data = await resp.json();
+                    if (data.ok && data.result) {
+                        this.result = data.result;
+                    } else {
+                        // Fallback: pick a random artist from pool
+                        const fb = pool[Math.floor(Math.random() * pool.length)];
+                        this.result = {
+                            artist: fb.name,
+                            id: fb.id,
+                            slug: fb.slug,
+                            image_url: fb.image_url,
+                            group_type: fb.group_type_display,
+                            label: fb.label,
+                            reason: 'Matched based on your preferences!',
+                        };
+                    }
+                } catch (e) {
+                    const fb = pool[Math.floor(Math.random() * pool.length)];
+                    this.result = {
+                        artist: fb.name,
+                        id: fb.id,
+                        slug: fb.slug,
+                        image_url: fb.image_url,
+                        group_type: fb.group_type_display,
+                        label: fb.label,
+                        reason: 'Matched based on your preferences!',
+                    };
+                }
+                this.state = 'result';
+            },
+
+            async setAsBias() {
+                if (!this.result.id) return;
+                try {
+                    const resp = await fetch('{% url "set_bias" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({ artist_id: this.result.id }),
+                    });
+                    const data = await resp.json();
+                    if (data.ok) {
+                        this.biasSet = true;
+                    }
+                } catch (e) {
+                    // silent
+                }
+            },
+
+            resetQuiz() {
+                this.state = 'intro';
+                this.stopAudio();
+                this.biasSet = false;
+                this.result = {};
+            },
+        };
+    }
+    </script>
+</body>
+</html>
