@@ -1,0 +1,482 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>K-Beats Schedule</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#000000",
+                        "secondary": "#00f0ff",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        .neon-border {
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.is-visible, .reveal-left.is-visible {
+            opacity: 1;
+            transform: translate(0);
+        }
+        body {
+            zoom: 0.9;
+            -moz-transform: scale(0.9);
+            -moz-transform-origin: 0 0;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+{% include 'core/header.html' %}
+
+<main class="flex-grow pt-0" x-data="scheduleApp()">
+
+    <!-- Hero Banner -->
+    <section class="relative w-full h-[50vh] min-h-[400px] flex items-end overflow-hidden border-b border-white/10 bg-black">
+        <div class="absolute inset-0 z-0">
+            <div class="w-full h-full bg-cover bg-center opacity-30 grayscale mix-blend-luminosity" style="background-image: url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        </div>
+        <div class="container mx-auto px-6 max-w-[1400px] relative z-10 pb-16">
+            <div class="reveal-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 mb-6">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    <span class="text-[10px] font-black tracking-[0.2em] uppercase">Broadcasting 24/7</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tighter leading-[0.85]">
+                    <span>WEEKLY </span><span class="text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">SCHEDULE</span>
+                </h1>
+                <p class="text-slate-300 font-mono text-xs md:text-sm tracking-widest uppercase leading-relaxed max-w-lg mt-6">
+                    Your complete guide to every show on K-Beats Global Studio 1. All times in KST.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Day Selector Tabs (Brutalist) -->
+    <section class="w-full bg-white text-black border-b border-white/20 sticky top-0 z-40">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex overflow-x-auto scrollbar-hide">
+                <template x-for="(day, index) in days" :key="day.key">
+                    <button
+                        @click="activeDay = day.key"
+                        :class="activeDay === day.key
+                            ? 'bg-black text-white border-black'
+                            : 'bg-white text-black border-black/20 hover:bg-black/5'"
+                        class="flex-1 min-w-[100px] md:min-w-0 px-6 py-5 text-center border-r last:border-r-0 border-b-4 transition-colors duration-200 shrink-0"
+                    >
+                        <span class="block font-black text-sm md:text-base uppercase tracking-tighter" x-text="day.short"></span>
+                        <span class="block font-mono text-[10px] tracking-widest uppercase mt-1 opacity-60" x-text="day.label"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+    </section>
+
+    <!-- Now Playing Banner -->
+    <div class="relative w-full bg-primary border-b border-white/20 overflow-hidden">
+        <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
+        <div class="container mx-auto max-w-[1400px] px-6 py-5 flex items-center justify-between relative z-10">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-black"></span>
+                    </span>
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-black">On Air Now</span>
+                </div>
+                <span class="text-black font-black text-lg md:text-xl uppercase tracking-tighter" x-text="currentShow.name">—</span>
+                <span class="hidden md:inline text-black/60 font-mono text-xs uppercase tracking-widest" x-text="'with ' + currentShow.host">—</span>
+            </div>
+            <a href="{% url 'live' %}" class="bg-black text-white px-4 py-2 md:px-6 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                Listen Live
+            </a>
+        </div>
+    </div>
+
+    <!-- Schedule Grid -->
+    <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+
+            <!-- Day Title -->
+            <div class="flex items-end justify-between mb-12 pb-4 border-b border-white/20 reveal-left">
+                <div>
+                    <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none" x-text="activeDayLabel"></h2>
+                    <p class="text-slate-400 mt-3 font-mono text-xs tracking-widest uppercase">Full programming lineup · KST timezone</p>
+                </div>
+                <div class="hidden sm:flex items-center gap-3 text-slate-400 font-mono text-xs uppercase tracking-widest">
+                    <span class="material-symbols-outlined text-primary text-base">schedule</span>
+                    <span>7 Shows</span>
+                </div>
+            </div>
+
+            <!-- Schedule Rows -->
+            <div class="flex flex-col border-t border-white/20">
+                <template x-for="(show, idx) in activeShows" :key="idx">
+                    <div
+                        class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white hover:text-black transition-colors cursor-pointer"
+                        :class="show.live ? 'bg-white/5' : ''"
+                    >
+                        <!-- Time Column -->
+                        <div class="w-full md:w-56 p-6 border-b md:border-b-0 md:border-r border-white/10 group-hover:border-black/20 flex flex-col justify-center shrink-0 transition-colors">
+                            <template x-if="show.live">
+                                <span class="font-mono text-xs tracking-widest uppercase font-bold text-primary group-hover:text-black mb-1 flex items-center gap-2">
+                                    <span class="relative flex h-2 w-2">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary group-hover:bg-black opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary group-hover:bg-black"></span>
+                                    </span>
+                                    On Air
+                                </span>
+                            </template>
+                            <template x-if="!show.live && show.upcoming">
+                                <span class="font-mono text-xs tracking-widest uppercase opacity-50 group-hover:opacity-100 transition-opacity mb-1">Up Next</span>
+                            </template>
+                            <span class="font-black text-2xl tracking-tighter text-white group-hover:text-black transition-colors" x-text="show.time"></span>
+                            <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 group-hover:text-black/50 mt-1 transition-colors" x-text="show.duration"></span>
+                        </div>
+
+                        <!-- Show Info -->
+                        <div class="flex-1 p-6 flex flex-col justify-center">
+                            <div class="flex items-center gap-3 mb-2 flex-wrap">
+                                <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-black transition-colors" x-text="show.name"></h3>
+                                <span
+                                    class="inline-block text-[9px] font-black px-2 py-0.5 uppercase tracking-widest border"
+                                    :class="show.genre === 'LIVE'
+                                        ? 'bg-primary text-black border-primary'
+                                        : show.genre === 'INTERVIEW'
+                                            ? 'bg-secondary text-black border-secondary'
+                                            : 'bg-white/10 text-white border-white/20 group-hover:bg-black/10 group-hover:text-black group-hover:border-black/20'"
+                                    x-text="show.genre"
+                                ></span>
+                            </div>
+                            <p class="font-mono text-[10px] md:text-xs tracking-widest uppercase text-slate-400 group-hover:text-black/60 transition-colors" x-text="'Hosted by ' + show.host + ' · ' + show.description"></p>
+                        </div>
+
+                        <!-- Live Icon Column -->
+                        <template x-if="show.live">
+                            <div class="hidden md:flex p-6 border-l border-white/10 group-hover:border-black/20 items-center justify-center shrink-0 w-32 bg-primary group-hover:bg-primary/80 transition-colors">
+                                <span class="material-symbols-outlined text-4xl text-black">graphic_eq</span>
+                            </div>
+                        </template>
+                        <template x-if="!show.live">
+                            <div class="hidden md:flex p-6 border-l border-white/10 group-hover:border-black/20 items-center justify-center shrink-0 w-32 transition-colors">
+                                <span class="material-symbols-outlined text-3xl text-white/20 group-hover:text-black/30 transition-colors" x-text="show.icon"></span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Weekly Highlights -->
+    <section class="w-full bg-black py-24 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between mb-12 pb-4 border-b border-white/20">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">FEATURED<br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">SHOWS</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Don't miss these flagship programmes this week.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10 reveal-up">
+                <!-- Highlight Card 1 -->
+                <div class="group relative border-b md:border-b-0 md:border-r border-white/10 p-8 md:p-10 hover:bg-white/5 transition-colors cursor-pointer">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="w-3 h-3 bg-primary"></span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-primary font-bold">Saturday Special</span>
+                    </div>
+                    <h3 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter leading-none mb-4 group-hover:text-primary transition-colors">K-POP UNPLUGGED</h3>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed mb-6">Acoustic reimaginings of chart-topping hits, performed live in-studio. Intimate, raw, unforgettable.</p>
+                    <div class="flex items-center justify-between border-t border-white/10 pt-6">
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">SAT · 20:00 KST</span>
+                        <span class="material-symbols-outlined text-white/30 group-hover:text-primary transition-colors">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- Highlight Card 2 -->
+                <div class="group relative border-b md:border-b-0 md:border-r border-white/10 p-8 md:p-10 hover:bg-white/5 transition-colors cursor-pointer">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="w-3 h-3 bg-secondary"></span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-secondary font-bold">Wednesday</span>
+                    </div>
+                    <h3 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter leading-none mb-4 group-hover:text-secondary transition-colors">IDOL SPOTLIGHT</h3>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed mb-6">Deep-dive interview series featuring the biggest names in K-Pop. Candid conversations and exclusive stories.</p>
+                    <div class="flex items-center justify-between border-t border-white/10 pt-6">
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">WED · 16:00 KST</span>
+                        <span class="material-symbols-outlined text-white/30 group-hover:text-secondary transition-colors">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- Highlight Card 3 -->
+                <div class="group relative p-8 md:p-10 hover:bg-white/5 transition-colors cursor-pointer">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="w-3 h-3 bg-white"></span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-white font-bold">Daily</span>
+                    </div>
+                    <h3 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter leading-none mb-4 group-hover:text-primary transition-colors">SEOUL NIGHTS</h3>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed mb-6">Late-night vibes with the smoothest R&B, chill hip-hop, and lo-fi beats straight from Seoul's underground scene.</p>
+                    <div class="flex items-center justify-between border-t border-white/10 pt-6">
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">DAILY · 00:00 KST</span>
+                        <span class="material-symbols-outlined text-white/30 group-hover:text-primary transition-colors">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Show Hosts Section -->
+    <section class="w-full bg-black py-24">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between mb-12 pb-4 border-b border-white/20">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">MEET YOUR<br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">HOSTS</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">The voices behind your favourite shows.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-0 border border-white/10 reveal-up">
+                <!-- Host 1 -->
+                <div class="group border-r border-b border-white/10 p-6 hover:bg-white/5 transition-colors text-center">
+                    <div class="w-24 h-24 mx-auto mb-4 bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                        <span class="material-symbols-outlined text-5xl text-white/20 group-hover:text-primary transition-colors">mic</span>
+                    </div>
+                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-primary transition-colors">DJ Hype</h4>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">The Morning Wave</p>
+                </div>
+                <!-- Host 2 -->
+                <div class="group border-r border-b border-white/10 p-6 hover:bg-white/5 transition-colors text-center">
+                    <div class="w-24 h-24 mx-auto mb-4 bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                        <span class="material-symbols-outlined text-5xl text-white/20 group-hover:text-secondary transition-colors">headphones</span>
+                    </div>
+                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-secondary transition-colors">MC Juno</h4>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">Comeback Hour</p>
+                </div>
+                <!-- Host 3 -->
+                <div class="group border-r border-b border-white/10 p-6 hover:bg-white/5 transition-colors text-center">
+                    <div class="w-24 h-24 mx-auto mb-4 bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                        <span class="material-symbols-outlined text-5xl text-white/20 group-hover:text-primary transition-colors">record_voice_over</span>
+                    </div>
+                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-primary transition-colors">Sora Lee</h4>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">Idol Spotlight</p>
+                </div>
+                <!-- Host 4 -->
+                <div class="group border-b border-white/10 p-6 hover:bg-white/5 transition-colors text-center">
+                    <div class="w-24 h-24 mx-auto mb-4 bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                        <span class="material-symbols-outlined text-5xl text-white/20 group-hover:text-secondary transition-colors">nightlife</span>
+                    </div>
+                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-secondary transition-colors">Luna K</h4>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">Seoul Nights</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Bar -->
+    <section class="border-t border-b border-white/20 bg-primary overflow-hidden">
+        <div class="container mx-auto px-6 py-16 max-w-[1400px] flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="reveal-left">
+                <h2 class="text-4xl md:text-5xl font-black text-black leading-none tracking-tighter uppercase">DON'T MISS A SHOW</h2>
+                <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-3">Subscribe to get schedule updates and show reminders delivered to your inbox.</p>
+            </div>
+            <div class="flex gap-4 reveal-left" style="transition-delay: 200ms;">
+                <a href="{% url 'live' %}" class="bg-black text-white font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    Start Listening
+                </a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+{% include 'core/footer.html' %}
+
+<script>
+function scheduleApp() {
+    const dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    const dayLabels = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const now = new Date();
+    // Convert to KST (UTC+9)
+    const kstOffset = 9 * 60;
+    const kstDate = new Date(now.getTime() + (kstOffset + now.getTimezoneOffset()) * 60000);
+    const todayIndex = kstDate.getDay();
+    const currentHourKST = kstDate.getHours();
+
+    const days = dayNames.map((short, i) => ({
+        key: short,
+        short: short,
+        label: dayLabels[i]
+    }));
+
+    // Full weekly schedule data
+    const scheduleData = {
+        MON: [
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "K-Pop's freshest morning hits to start your day.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'Chart Attack', host: 'MC Juno', description: 'Breaking down the weekly chart movers.', genre: 'CHARTS', icon: 'trending_up', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Non-stop fan favourites and requests.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'New releases, fan requests, and charting tracks.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Sora Lee', description: 'You pick the playlist. Call in your favourites.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'Evening Mixtape', host: 'Luna K', description: 'Deep cuts, B-sides, and hidden gems.', genre: 'MUSIC', icon: 'album', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'R&B, chill hip-hop, and late-night vibes.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+        ],
+        TUE: [
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "Rise and shine with K-Pop's biggest hits.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'Throwback Tuesday', host: 'Sora Lee', description: 'Classic K-Pop anthems from every generation.', genre: 'THROWBACK', icon: 'history', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Midday energy boost with your favourites.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'New releases and trending tracks.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Global Wave', host: 'MC Juno', description: 'K-Pop acts charting around the world.', genre: 'CHARTS', icon: 'public', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'Studio Sessions', host: 'Sora Lee', description: 'Live acoustic performances and interviews.', genre: 'LIVE', icon: 'mic', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'Midnight synthwave, R&B and chill vibes.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+        ],
+        WED: [
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "Your midweek morning K-Pop fix.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'Chart Attack', host: 'MC Juno', description: 'Midweek chart update and analysis.', genre: 'CHARTS', icon: 'trending_up', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Non-stop hits over your lunch break.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'Fresh releases and fan favourites.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Idol Spotlight', host: 'Sora Lee', description: 'In-depth interviews with top K-Pop idols.', genre: 'INTERVIEW', icon: 'record_voice_over', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'K-Pop Unplugged', host: 'Sora Lee', description: 'Stripped-back acoustic performances.', genre: 'LIVE', icon: 'piano', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'Late-night lo-fi and smooth R&B.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+        ],
+        THU: [
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "Energise your Thursday morning.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'New Music Thursday', host: 'MC Juno', description: 'First plays of the week\'s biggest releases.', genre: 'MUSIC', icon: 'library_music', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Your favourite K-Pop hits on rotation.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'Comebacks, debuts and chart risers.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Sora Lee', description: 'Listener picks and shout-outs.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'Evening Mixtape', host: 'Luna K', description: 'B-sides, deep cuts, and curated playlists.', genre: 'MUSIC', icon: 'album', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'Smooth late-night vibes from Seoul.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+        ],
+        FRI: [
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "Friday energy! Weekend starts here.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'Chart Attack', host: 'MC Juno', description: 'End-of-week chart countdown.', genre: 'CHARTS', icon: 'trending_up', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Pre-weekend party mix.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'Friday releases and chart dominators.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Idol Spotlight', host: 'Sora Lee', description: 'Exclusive Friday interview special.', genre: 'INTERVIEW', icon: 'record_voice_over', live: false, upcoming: false },
+            { time: '20:00', duration: '4 Hours', name: 'Friday Night Live', host: 'Luna K', description: 'The ultimate weekend warm-up party mix.', genre: 'LIVE', icon: 'celebration', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'Friday night fever — dance and R&B.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+        ],
+        SAT: [
+            { time: '08:00', duration: '4 Hours', name: 'Weekend Wake-Up', host: 'DJ Hype', description: "Easy Saturday morning grooves.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'K-Pop Rewind', host: 'Sora Lee', description: 'Iconic tracks from K-Pop history.', genre: 'THROWBACK', icon: 'history', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Global Wave', host: 'MC Juno', description: 'K-Pop conquering the world charts.', genre: 'CHARTS', icon: 'public', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Sora Lee', description: 'Saturday special fan dedications.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
+            { time: '18:00', duration: '2 Hours', name: 'Idol Spotlight', host: 'Sora Lee', description: 'Weekend long-form interview special.', genre: 'INTERVIEW', icon: 'record_voice_over', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'K-Pop Unplugged', host: 'Sora Lee', description: 'Live acoustic performances in the studio.', genre: 'LIVE', icon: 'piano', live: false, upcoming: false },
+            { time: '00:00', duration: '8 Hours', name: 'Seoul Nights Extended', host: 'Luna K', description: 'Extended midnight session — deep vibes all night.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+        ],
+        SUN: [
+            { time: '08:00', duration: '4 Hours', name: 'Sunday Slow Jams', host: 'Luna K', description: "Easy listening to start your Sunday.", genre: 'MUSIC', icon: 'self_improvement', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'K-Pop Top 40', host: 'MC Juno', description: 'The definitive weekly countdown.', genre: 'CHARTS', icon: 'emoji_events', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'DJ Hype', description: 'Sunday listener favourites.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Comeback Preview', host: 'MC Juno', description: "Sneak peeks at next week's releases.", genre: 'MUSIC', icon: 'preview', live: false, upcoming: false },
+            { time: '18:00', duration: '2 Hours', name: 'Studio Sessions', host: 'Sora Lee', description: 'Live performances and behind-the-scenes stories.', genre: 'LIVE', icon: 'mic', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'Evening Mixtape', host: 'Luna K', description: 'Wind down with curated deep cuts.', genre: 'MUSIC', icon: 'album', live: false, upcoming: false },
+            { time: '00:00', duration: '8 Hours', name: 'Seoul Nights Extended', host: 'Luna K', description: 'Sunday night chill — smooth vibes until dawn.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+        ],
+    };
+
+    // Mark live / upcoming based on current KST time & day
+    const todayKey = dayNames[todayIndex];
+    if (scheduleData[todayKey]) {
+        let foundLive = false;
+        for (let i = 0; i < scheduleData[todayKey].length; i++) {
+            const showHour = parseInt(scheduleData[todayKey][i].time.split(':')[0]);
+            const nextHour = i + 1 < scheduleData[todayKey].length
+                ? parseInt(scheduleData[todayKey][i + 1].time.split(':')[0])
+                : 24;
+            if (!foundLive && currentHourKST >= showHour && currentHourKST < nextHour) {
+                scheduleData[todayKey][i].live = true;
+                foundLive = true;
+                if (i + 1 < scheduleData[todayKey].length) {
+                    scheduleData[todayKey][i + 1].upcoming = true;
+                }
+            }
+        }
+    }
+
+    // Find the current show for the "Now Playing" banner
+    let currentShow = { name: 'K-Beats Radio', host: 'Auto DJ' };
+    if (scheduleData[todayKey]) {
+        for (let i = scheduleData[todayKey].length - 1; i >= 0; i--) {
+            const h = parseInt(scheduleData[todayKey][i].time.split(':')[0]);
+            if (currentHourKST >= h) {
+                currentShow = scheduleData[todayKey][i];
+                break;
+            }
+        }
+    }
+
+    return {
+        days,
+        activeDay: todayKey,
+        scheduleData,
+        currentShow,
+        get activeDayLabel() {
+            const d = this.days.find(d => d.key === this.activeDay);
+            return d ? d.label.toUpperCase() + ' LINEUP' : '';
+        },
+        get activeShows() {
+            return this.scheduleData[this.activeDay] || [];
+        }
+    };
+}
+
+// Scroll reveal
+const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => observer.observe(el));
+});
+</script>
+</body>
+</html>
