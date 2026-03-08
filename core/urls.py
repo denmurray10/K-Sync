@@ -19,6 +19,7 @@ urlpatterns = [
     path('game/', views.song_game, name='song_game'),
     path('contests/', views.contests, name='contests'),
     path('results/', views.results, name='results'),
+    path('api/search/', views.search_api, name='search_api'),
     path('bias-selector/', views.bias_selector, name='bias_selector'),
     path('live/', views.live, name='live'),
     path('comeback-timeline/', views.comeback_timeline, name='comeback_timeline'),

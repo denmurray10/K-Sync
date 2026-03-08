@@ -241,26 +241,6 @@
                             <div class="article-body">
                                 {{ article.body_html|safe }}
                             </div>
-
-                            {% if article.image_2 %}
-                            <div class="w-full aspect-video my-12 overflow-hidden border border-white/10">
-                                <img
-                                    src="{{ article.image_2 }}"
-                                    alt=""
-                                    class="w-full h-full object-cover"
-                                />
-                            </div>
-                            {% endif %}
-
-                            {% if article.image_3 %}
-                            <div class="w-full aspect-video my-12 overflow-hidden border border-white/10">
-                                <img
-                                    src="{{ article.image_3 }}"
-                                    alt=""
-                                    class="w-full h-full object-cover"
-                                />
-                            </div>
-                            {% endif %}
                         </article>
 
                         <!-- Sidebar -->
@@ -339,6 +319,7 @@
                                     News Feed
                                 </a>
                             </div>
+                        </div>
                         </aside>
                     </div>
                 </div>

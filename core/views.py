@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 import requests
 from openai import OpenAI
-from .models import Ranking, ComebackData, KPopGroup, LivePoll, BlogArticle
+from .models import Ranking, ComebackData, KPopGroup, KPopMember, LivePoll, BlogArticle
 
 logger = logging.getLogger(__name__)
 
@@ -331,7 +331,9 @@ def news(request):
     remaining = list(all_blog[1:]) if all_blog.count() > 1 else []
 
     cats = list(
-        all_blog.values_list('category', flat=True).distinct()
+        all_blog.order_by()
+        .values_list('category', flat=True)
+        .distinct()
     )
 
     return render(request, 'core/news.html', {
@@ -573,8 +575,229 @@ def song_game(request):
 def contests(request):
     return render(request, 'core/contests.html')
 
+def _search_all(q):
+    """Run search across all content types. Returns dict of results."""
+    import urllib.request
+    import urllib.parse
+
+    from django.db.models import Q
+
+    artists = list(KPopGroup.objects.filter(name__icontains=q)[:12])
+    members = list(
+        KPopMember.objects.select_related('group').filter(
+            Q(name__icontains=q) | Q(stage_name__icontains=q)
+        )[:12]
+    )
+    articles = list(
+        BlogArticle.objects.filter(
+            Q(title__icontains=q) | Q(subtitle__icontains=q)
+        )[:12]
+    )
+
+    # Songs from ranking data
+    songs = []
+    for r in Ranking.objects.all()[:6]:
+        for item in (r.ranking_data or []):
+            track = item.get('track', '')
+            artist = item.get('artist', '')
+            if q.lower() in track.lower() or q.lower() in artist.lower():
+                art = item.get('artwork_url', '')
+                if not art:
+                    art = f"https://api.dicebear.com/7.x/initials/svg?seed={artist}&backgroundColor=f425c0"
+                songs.append({
+                    'title': track,
+                    'artist': artist,
+                    'image': art,
+                })
+    seen_songs = set()
+    unique_songs = []
+    for s in songs:
+        key = (s['title'].lower(), s['artist'].lower())
+        if key not in seen_songs:
+            seen_songs.add(key)
+            unique_songs.append(s)
+    songs = unique_songs[:12]
+
+    # Albums & tracks from iTunes
+    itunes_albums = []
+    itunes_tracks = []
+    try:
+        encoded = urllib.parse.quote_plus(q)
+        url = (
+            f"https://itunes.apple.com/search?term={encoded}"
+            f"&entity=album&attribute=artistTerm&limit=8&genreId=51"
+        )
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            for item in json.loads(resp.read().decode()).get('results', []):
+                art = item.get('artworkUrl100', '').replace('100x100bb', '600x600bb')
+                artist_name = item.get('artistName', '')
+                # Try to resolve a local KPopGroup slug so we can link to album_detail
+                group_match = KPopGroup.objects.filter(
+                    name__iexact=artist_name
+                ).first() or KPopGroup.objects.filter(
+                    name__icontains=artist_name.split('(')[0].strip()
+                ).first()
+                itunes_albums.append({
+                    'title': item.get('collectionName', ''),
+                    'artist': artist_name,
+                    'image': art,
+                    'track_count': item.get('trackCount', 0),
+                    'collection_id': item.get('collectionId', ''),
+                    'slug': group_match.slug if group_match else '',
+                    'itunes_url': item.get('collectionViewUrl', ''),
+                })
+    except Exception:
+        pass
+
+    try:
+        encoded = urllib.parse.quote_plus(q)
+        url = (
+            f"https://itunes.apple.com/search?term={encoded}"
+            f"&entity=song&attribute=artistTerm&limit=10&genreId=51"
+        )
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            for item in json.loads(resp.read().decode()).get('results', []):
+                art = item.get('artworkUrl100', '').replace('100x100bb', '600x600bb')
+                duration_ms = item.get('trackTimeMillis', 0) or 0
+                mins, secs = divmod(duration_ms // 1000, 60)
+                itunes_tracks.append({
+                    'title': item.get('trackName', ''),
+                    'artist': item.get('artistName', ''),
+                    'album': item.get('collectionName', ''),
+                    'image': art,
+                    'duration': f"{mins}:{secs:02d}",
+                    'preview_url': item.get('previewUrl', ''),
+                    'itunes_url': item.get('trackViewUrl', ''),
+                })
+    except Exception:
+        pass
+
+    # Merge ranking songs with iTunes tracks (iTunes takes priority)
+    if itunes_tracks:
+        all_songs = itunes_tracks
+    elif songs:
+        all_songs = songs
+    else:
+        all_songs = []
+
+    # Comebacks from ComebackData (current + next 2 months)
+    comebacks = []
+    now_cb = timezone.now()
+    today_str_cb = now_cb.strftime('%Y-%m-%d')
+    months_to_check = []
+    y, m = now_cb.year, now_cb.month
+    for _ in range(3):
+        months_to_check.append((y, m))
+        m += 1
+        if m > 12:
+            m, y = 1, y + 1
+    for cb_y, cb_m in months_to_check:
+        cb_obj = ComebackData.objects.filter(
+            year=cb_y, month=cb_m
+        ).first()
+        if not cb_obj:
+            continue
+        for date_key, day_data in cb_obj.data.items():
+            for r in day_data.get('releases', []):
+                artist_n = r.get('artist', '')
+                title_n = r.get('title', '')
+                if (
+                    q.lower() in artist_n.lower()
+                    or q.lower() in title_n.lower()
+                ):
+                    # Resolve slug for internal linking
+                    cb_group = KPopGroup.objects.filter(
+                        name__iexact=artist_n
+                    ).first() or KPopGroup.objects.filter(
+                        name__icontains=artist_n.split('(')[0].strip()
+                    ).first()
+                    comebacks.append({
+                        'artist': artist_n,
+                        'title': title_n,
+                        'image': r.get('image', ''),
+                        'type': r.get('type', ''),
+                        'date_str': date_key,
+                        'is_upcoming': date_key >= today_str_cb,
+                        'slug': cb_group.slug if cb_group else '',
+                    })
+    # Sort: upcoming first, then most recent
+    comebacks.sort(
+        key=lambda x: (not x['is_upcoming'], x['date_str'])
+    )
+    comebacks = comebacks[:12]
+
+    return {
+        'artists': artists,
+        'members': members,
+        'articles': articles,
+        'albums': itunes_albums,
+        'songs': all_songs,
+        'comebacks': comebacks,
+    }
+
+
 def results(request):
-    return render(request, 'core/results.html')
+    q = request.GET.get('q', '').strip()
+    data = _search_all(q) if q else {}
+    trending_artists = []
+    latest_articles = []
+    if not q:
+        trending_artists = list(
+            KPopGroup.objects.filter(rank__isnull=False).order_by('rank')[:6]
+        )
+        latest_articles = list(BlogArticle.objects.order_by('-created_at')[:3])
+    return render(request, 'core/results.html', {
+        'q': q,
+        'artists': data.get('artists', []),
+        'members': data.get('members', []),
+        'articles': data.get('articles', []),
+        'albums': data.get('albums', []),
+        'songs': data.get('songs', []),
+        'comebacks': data.get('comebacks', []),
+        'trending_artists': trending_artists,
+        'latest_articles': latest_articles,
+    })
+
+
+def search_api(request):
+    """JSON endpoint for live search suggestions."""
+    from django.db.models import Q
+    q = request.GET.get('q', '').strip()
+    if not q or len(q) < 2:
+        return JsonResponse({'results': []})
+
+    results = []
+    for g in KPopGroup.objects.filter(name__icontains=q)[:5]:
+        results.append({
+            'type': 'artist',
+            'name': g.name,
+            'image': g.image_url or '',
+            'url': f'/idols/{g.slug}/',
+            'sub': g.get_group_type_display(),
+        })
+    for m in KPopMember.objects.select_related('group').filter(
+        Q(name__icontains=q) | Q(stage_name__icontains=q)
+    )[:4]:
+        results.append({
+            'type': 'member',
+            'name': m.stage_name or m.name,
+            'image': m.image_url or '',
+            'url': f'/idols/{m.group.slug}/',
+            'sub': m.group.name,
+        })
+    for a in BlogArticle.objects.filter(
+        Q(title__icontains=q) | Q(subtitle__icontains=q)
+    )[:3]:
+        results.append({
+            'type': 'article',
+            'name': a.title,
+            'image': a.image or '',
+            'url': f'/blog/{a.slug}/',
+            'sub': a.category,
+        })
+    return JsonResponse({'results': results})
 
 def bias_selector(request):
     return render(request, 'core/bias_selector.html')
@@ -642,7 +865,8 @@ def d_day_comeback_notification(request):
 def blog_page(request):
     articles = BlogArticle.objects.order_by('-created_at')[:30]
     cats = list(
-        BlogArticle.objects.values_list('category', flat=True)
+        BlogArticle.objects.order_by()
+        .values_list('category', flat=True)
         .distinct()
     )
     return render(request, 'core/blog_page.html', {
@@ -895,22 +1119,12 @@ def blog_generate(request):
         word_count = len(re.sub(r'<[^>]+>', '', body).split())
         reading_time = max(1, word_count // 200)
 
-        # ── Fetch 3 images via Serper ──
+        # ── Fetch image via Serper ──
         try:
             image_1 = _fetch_blog_image(title, category, excerpt, variant=1)
         except Exception as e:
             logger.exception("Blog image_1 fetch failed for title=%r: %s", title, e)
             image_1 = ''
-        try:
-            image_2 = _fetch_blog_image(title, category, excerpt, variant=2)
-        except Exception as e:
-            logger.exception("Blog image_2 fetch failed for title=%r: %s", title, e)
-            image_2 = ''
-        try:
-            image_3 = _fetch_blog_image(title, category, excerpt, variant=3)
-        except Exception as e:
-            logger.exception("Blog image_3 fetch failed for title=%r: %s", title, e)
-            image_3 = ''
 
         BlogArticle.objects.create(
             slug=base_slug,
@@ -921,8 +1135,6 @@ def blog_generate(request):
             source_url=link,
             source_name=source,
             image=image_1,
-            image_2=image_2,
-            image_3=image_3,
             body_html=body,
             reading_time=reading_time,
         )

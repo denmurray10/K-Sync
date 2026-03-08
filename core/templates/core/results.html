@@ -1,0 +1,714 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>K-Beats — Search{% if q %}: {{ q }}{% endif %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f425c0",
+                        "background-dark": "#000000",
+                        secondary: "#00f0ff",
+                    },
+                    fontFamily: {
+                        display: ["Montserrat", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0px", sm: "0px", md: "0px", lg: "0px",
+                        xl: "0px", "2xl": "0px", "3xl": "0px", full: "9999px",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.is-visible, .reveal-left.is-visible {
+            opacity: 1;
+            transform: translate(0);
+        }
+        body {
+            zoom: 0.9;
+            -moz-transform: scale(0.9);
+            -moz-transform-origin: 0 0;
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+    {% include 'core/header.html' %}
+
+    <main class="flex-grow pt-0"
+          x-data="{
+              filter: 'all',
+              setFilter(f) { this.filter = f; },
+              show(section) { return this.filter === 'all' || this.filter === section; },
+              liveQuery: '',
+              liveResults: [],
+              liveOpen: false,
+              liveTimeout: null,
+              doLiveSearch() {
+                  clearTimeout(this.liveTimeout);
+                  if (this.liveQuery.length < 2) { this.liveResults = []; this.liveOpen = false; return; }
+                  this.liveTimeout = setTimeout(() => {
+                      fetch('/api/search/?q=' + encodeURIComponent(this.liveQuery))
+                          .then(r => r.json())
+                          .then(d => { this.liveResults = d.results || []; this.liveOpen = this.liveResults.length > 0; });
+                  }, 300);
+              },
+              typeIcon(t) {
+                  return {artist:'groups', member:'person', article:'article', song:'music_note', album:'album'}[t] || 'search';
+              }
+          }">
+
+        <!-- ══════════════════════════════════════════════════════════════
+             HERO — Search Header
+             ══════════════════════════════════════════════════════════════ -->
+        <section class="relative w-full bg-black border-b border-white/10 overflow-hidden">
+            <div class="container mx-auto px-6 max-w-[1400px] pt-48 pb-20 md:pb-28">
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 mb-6 reveal-left">
+                    <a href="{% url 'home' %}" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors">Home</a>
+                    <span class="text-slate-600">/</span>
+                    <span class="font-mono text-[10px] tracking-widest uppercase text-primary">Search</span>
+                </div>
+
+                <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase reveal-left">
+                    {% if q %}
+                    RESULTS <span class="text-transparent [-webkit-text-stroke:2px_#f425c0]">FOR</span>
+                    {% else %}
+                    SEARCH <span class="text-transparent [-webkit-text-stroke:2px_#f425c0]">K-BEATS</span>
+                    {% endif %}
+                </h1>
+
+                {% if q %}
+                <p class="text-slate-400 mt-6 font-mono text-sm tracking-widest uppercase max-w-xl reveal-left" style="transition-delay: 100ms">
+                    Showing results for "<span class="text-primary">{{ q }}</span>"
+                </p>
+                {% endif %}
+
+                <!-- Search bar with live suggestions -->
+                <form action="{% url 'results' %}" method="GET" class="mt-10 max-w-2xl reveal-left relative" style="transition-delay: 200ms"
+                      @click.outside="liveOpen = false">
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">search</span>
+                        <input
+                            name="q"
+                            value="{{ q }}"
+                            x-model="liveQuery"
+                            @input="doLiveSearch()"
+                            @focus="if (liveResults.length) liveOpen = true"
+                            class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-32 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm"
+                            placeholder="Search artists, songs, albums, articles..."
+                            type="text"
+                            autocomplete="off"
+                            autofocus
+                        />
+                        <button
+                            type="submit"
+                            class="absolute right-0 top-0 h-full bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 border border-primary hover:bg-white hover:text-black hover:border-white transition-colors"
+                        >
+                            Search
+                        </button>
+                    </div>
+
+                    <!-- Live search dropdown -->
+                    <div x-show="liveOpen" x-cloak x-transition
+                         class="absolute left-0 right-0 top-full mt-1 bg-black border border-white/10 z-50 max-h-80 overflow-y-auto">
+                        <template x-for="(r, i) in liveResults" :key="i">
+                            <a :href="r.url" class="flex items-center gap-4 px-5 py-3 hover:bg-white/5 border-b border-white/5 transition-colors">
+                                <template x-if="r.image">
+                                    <img :src="r.image" class="w-10 h-10 object-cover shrink-0 grayscale" />
+                                </template>
+                                <template x-if="!r.image">
+                                    <div class="w-10 h-10 bg-white/5 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-white/20" x-text="typeIcon(r.type)"></span>
+                                    </div>
+                                </template>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-white text-sm font-bold truncate block" x-text="r.name"></span>
+                                    <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase" x-text="r.sub"></span>
+                                </div>
+                                <span class="shrink-0 bg-white/5 text-slate-500 text-[8px] font-black uppercase tracking-widest px-2 py-1" x-text="r.type"></span>
+                            </a>
+                        </template>
+                        <a :href="'/results/?q=' + encodeURIComponent(liveQuery)"
+                           class="block text-center py-3 font-mono text-[10px] tracking-widest uppercase text-primary hover:text-white transition-colors border-t border-white/10">
+                            View all results
+                        </a>
+                    </div>
+                </form>
+
+                {% if q %}
+                <!-- Stats row -->
+                <div class="flex items-center gap-6 md:gap-8 mt-8 flex-wrap reveal-left" style="transition-delay: 300ms">
+                    {% if artists %}
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-2xl text-primary">{{ artists|length }}</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Artists</span>
+                    </div>
+                    {% endif %}
+                    {% if members %}
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-2xl text-white">{{ members|length }}</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Members</span>
+                    </div>
+                    {% endif %}
+                    {% if songs %}
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-2xl text-secondary">{{ songs|length }}</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Songs</span>
+                    </div>
+                    {% endif %}
+                    {% if albums %}
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-2xl text-primary">{{ albums|length }}</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Albums</span>
+                    </div>
+                    {% endif %}
+                    {% if articles %}
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-2xl text-white">{{ articles|length }}</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Articles</span>
+                    </div>
+                    {% endif %}
+                    {% if comebacks %}
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-2xl text-primary">{{ comebacks|length }}</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Comebacks</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        {% if q %}
+        <!-- ══════════════════════════════════════════════════════════════
+             FILTER TABS
+             ══════════════════════════════════════════════════════════════ -->
+        <section class="sticky top-0 z-40 w-full bg-black/90 backdrop-blur-lg border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px] flex items-center gap-0 overflow-x-auto">
+                <button @click="setFilter('all')"
+                    class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
+                    :class="filter === 'all' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'">
+                    All
+                </button>
+                {% if artists %}
+                <button @click="setFilter('artists')"
+                    class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
+                    :class="filter === 'artists' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'">
+                    Artists
+                </button>
+                {% endif %}
+                {% if members %}
+                <button @click="setFilter('members')"
+                    class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
+                    :class="filter === 'members' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'">
+                    Members
+                </button>
+                {% endif %}
+                {% if songs %}
+                <button @click="setFilter('songs')"
+                    class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
+                    :class="filter === 'songs' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'">
+                    Songs
+                </button>
+                {% endif %}
+                {% if albums %}
+                <button @click="setFilter('albums')"
+                    class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
+                    :class="filter === 'albums' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'">
+                    Albums
+                </button>
+                {% endif %}
+                {% if articles %}
+                <button @click="setFilter('articles')"
+                    class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
+                    :class="filter === 'articles' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'">
+                    Articles
+                </button>
+                {% endif %}
+                {% if comebacks %}
+                <button @click="setFilter('comebacks')"
+                    class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
+                    :class="filter === 'comebacks' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'">
+                    Comebacks
+                </button>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ARTISTS
+             ══════════════════════════════════════════════════════════════ -->
+        {% if artists %}
+        <section x-show="show('artists')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            ARTISTS<span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]"> FOUND</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">{{ artists|length }} match{{ artists|length|pluralize:"es" }}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-0 reveal-up">
+                    {% for artist in artists %}
+                    <a href="{% url 'idol_page' slug=artist.slug %}" class="group border border-white/10 bg-black hover:border-primary overflow-hidden transition-all duration-300">
+                        <div class="relative aspect-square overflow-hidden">
+                            {% if artist.image_url %}
+                            <img src="{{ artist.image_url }}" alt="{{ artist.name }}" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-5xl text-white/10">person</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                            <span class="absolute top-0 left-0 bg-primary text-black text-[9px] font-black px-2 py-1 uppercase tracking-widest">{{ artist.get_group_type_display }}</span>
+                        </div>
+                        <div class="p-4 border-t border-white/10">
+                            <h3 class="text-white text-sm font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors truncate">{{ artist.name }}</h3>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block">{{ artist.label }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════
+             MEMBERS
+             ══════════════════════════════════════════════════════════════ -->
+        {% if members %}
+        <section x-show="show('members')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            MEMBERS<span class="text-transparent [-webkit-text-stroke:1.5px_#00f0ff]"> MATCHED</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">{{ members|length }} match{{ members|length|pluralize:"es" }}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-0 reveal-up">
+                    {% for member in members %}
+                    <a href="{% url 'idol_page' slug=member.group.slug %}" class="group border border-white/10 bg-black hover:border-secondary overflow-hidden transition-all duration-300">
+                        <div class="relative aspect-square overflow-hidden">
+                            {% if member.image_url %}
+                            <img src="{{ member.image_url }}" alt="{{ member.stage_name|default:member.name }}" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-5xl text-white/10">person</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                            <span class="absolute top-0 left-0 bg-secondary text-black text-[9px] font-black px-2 py-1 uppercase tracking-widest">{{ member.group.name }}</span>
+                        </div>
+                        <div class="p-4 border-t border-white/10">
+                            <h3 class="text-white text-sm font-black uppercase tracking-tight leading-tight group-hover:text-secondary transition-colors truncate">{{ member.stage_name|default:member.name }}</h3>
+                            {% if member.position %}<span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block truncate">{{ member.position }}</span>{% endif %}
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════
+             SONGS
+             ══════════════════════════════════════════════════════════════ -->
+        {% if songs %}
+        <section x-show="show('songs')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            SONGS<span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]"> FOUND</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">{{ songs|length }} track{{ songs|length|pluralize:"s" }}</p>
+                    </div>
+                </div>
+                <div class="flex flex-col border-t border-white/20 reveal-up">
+                    {% for song in songs %}
+                    <div class="group flex items-center gap-5 py-4 px-4 border-b border-white/10 hover:bg-white/[0.03] transition-colors"
+                         x-data="{ playing: false }"
+                         {% if song.preview_url %}@click="
+                             if (!$refs.audio{{ forloop.counter }}) return;
+                             if (playing) { $refs.audio{{ forloop.counter }}.pause(); playing = false; }
+                             else { document.querySelectorAll('audio').forEach(a => { a.pause(); }); $refs.audio{{ forloop.counter }}.play(); playing = true; }
+                         "{% endif %}>
+                        <!-- # -->
+                        <span class="text-slate-600 font-black text-lg w-8 text-right shrink-0">{{ forloop.counter }}</span>
+                        <!-- Artwork -->
+                        <div class="relative w-12 h-12 shrink-0 overflow-hidden border border-white/10">
+                            {% if song.image %}
+                            <img src="{{ song.image }}" alt="{{ song.title }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-xl text-white/10">music_note</span>
+                            </div>
+                            {% endif %}
+                            {% if song.preview_url %}
+                            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                <span class="material-symbols-outlined text-white text-lg" x-text="playing ? 'pause' : 'play_arrow'"></span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <!-- Info -->
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-white text-sm font-black uppercase tracking-tight truncate group-hover:text-primary transition-colors">{{ song.title }}</h3>
+                            <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">{{ song.artist }}</span>
+                        </div>
+                        <!-- Album name -->
+                        {% if song.album %}
+                        <span class="hidden md:block text-slate-600 font-mono text-[9px] tracking-widest uppercase truncate max-w-[200px]">{{ song.album }}</span>
+                        {% endif %}
+                        <!-- Duration -->
+                        {% if song.duration %}
+                        <span class="text-slate-600 font-mono text-[10px] tracking-wider shrink-0">{{ song.duration }}</span>
+                        {% endif %}
+                        <!-- iTunes link -->
+                        {% if song.itunes_url %}
+                        <a href="{{ song.itunes_url }}" target="_blank" rel="noopener" class="shrink-0 text-slate-600 hover:text-primary transition-colors" @click.stop>
+                            <span class="material-symbols-outlined text-lg">open_in_new</span>
+                        </a>
+                        {% endif %}
+                        {% if song.preview_url %}
+                        <audio x-ref="audio{{ forloop.counter }}" src="{{ song.preview_url }}" preload="none" @ended="playing = false"></audio>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ALBUMS
+             ══════════════════════════════════════════════════════════════ -->
+        {% if albums %}
+        <section x-show="show('albums')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            ALBUMS<span class="text-transparent [-webkit-text-stroke:1.5px_#00f0ff]"> MATCHED</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">{{ albums|length }} album{{ albums|length|pluralize:"s" }}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-0 reveal-up">
+                    {% for album in albums %}
+                    <a {% if album.slug and album.collection_id %}href="{% url 'album_detail' slug=album.slug collection_id=album.collection_id %}"{% elif album.itunes_url %}href="{{ album.itunes_url }}" target="_blank" rel="noopener"{% else %}href="#"{% endif %}
+                       class="group border border-white/10 bg-black hover:border-primary overflow-hidden transition-all duration-300">
+                        <div class="relative aspect-square overflow-hidden">
+                            {% if album.image %}
+                            <img src="{{ album.image }}" alt="{{ album.title }}" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-5xl text-white/10">album</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
+                            {% if album.track_count %}
+                            <span class="absolute bottom-0 right-0 bg-black/80 text-slate-500 text-[9px] font-mono px-2 py-1 tracking-widest">{{ album.track_count }} tracks</span>
+                            {% endif %}
+                        </div>
+                        <div class="p-4 border-t border-white/10">
+                            <h3 class="text-white text-sm font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors truncate">{{ album.title }}</h3>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block truncate">{{ album.artist }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════
+             COMEBACKS
+             ══════════════════════════════════════════════════════════════ -->
+        {% if comebacks %}
+        <section x-show="show('comebacks')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            COMEBACKS<span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]"> &amp; RELEASES</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">{{ comebacks|length }} release{{ comebacks|length|pluralize:"s" }}</p>
+                    </div>
+                </div>
+                <div class="flex flex-col border-t border-white/20 reveal-up">
+                    {% for cb in comebacks %}
+                    {% if cb.slug %}
+                    <a href="{% url 'idol_page' slug=cb.slug %}"
+                    {% else %}
+                    <div
+                    {% endif %}
+                       class="group flex items-center gap-5 py-4 px-4 border-b border-white/10 hover:bg-white/[0.03] transition-colors">
+                        <!-- Artwork -->
+                        <div class="relative w-16 h-16 shrink-0 overflow-hidden border border-white/10">
+                            {% if cb.image %}
+                            <img src="{{ cb.image }}" alt="{{ cb.title }}" class="w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-2xl text-white/10">album</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <!-- Info -->
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-white text-sm font-black uppercase tracking-tight truncate group-hover:text-primary transition-colors">{{ cb.title }}</h3>
+                            <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">{{ cb.artist }}</span>
+                        </div>
+                        <!-- Type badge -->
+                        {% if cb.type %}
+                        <span class="hidden sm:block shrink-0 bg-white/5 text-slate-400 text-[9px] font-black uppercase tracking-widest px-3 py-1">{{ cb.type }}</span>
+                        {% endif %}
+                        <!-- Date + status -->
+                        <div class="shrink-0 text-right">
+                            <span class="font-mono text-[10px] tracking-widest text-slate-400 block">{{ cb.date_str }}</span>
+                            {% if cb.is_upcoming %}
+                            <span class="inline-block mt-1 bg-primary text-black text-[8px] font-black uppercase tracking-widest px-2 py-0.5">Upcoming</span>
+                            {% else %}
+                            <span class="inline-block mt-1 border border-white/10 text-slate-500 text-[8px] font-black uppercase tracking-widest px-2 py-0.5">Recent</span>
+                            {% endif %}
+                        </div>
+                        <!-- Arrow (only if linkable) -->
+                        {% if cb.slug %}
+                        <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors shrink-0">east</span>
+                        {% endif %}
+                    {% if cb.slug %}</a>{% else %}</div>{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════
+             ARTICLES
+             ══════════════════════════════════════════════════════════════ -->
+        {% if articles %}
+        <section x-show="show('articles')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            ARTICLES<span class="text-transparent [-webkit-text-stroke:1.5px_#00f0ff]"> MATCHED</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">{{ articles|length }} result{{ articles|length|pluralize:"s" }}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-0 reveal-up">
+                    {% for article in articles %}
+                    <a href="{% url 'blog_article_read' slug=article.slug %}" class="group border border-white/10 bg-black hover:border-primary overflow-hidden flex flex-col transition-all duration-300">
+                        <div class="relative aspect-[16/10] overflow-hidden">
+                            {% if article.image %}
+                            <img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-6xl text-white/10">article</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
+                            <span class="absolute top-0 left-0 bg-primary text-black text-[10px] font-black px-3 py-1.5 uppercase tracking-widest">{{ article.category }}</span>
+                            <span class="absolute bottom-0 right-0 bg-black/80 text-slate-500 text-[9px] font-mono px-3 py-1.5 tracking-widest">{{ article.reading_time }} min read</span>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow border-t border-white/10">
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">{{ article.created_at|date:"M d, Y" }}</span>
+                            <h3 class="text-white text-lg font-black uppercase tracking-tight leading-tight mt-2 group-hover:text-primary transition-colors line-clamp-2">{{ article.title }}</h3>
+                            {% if article.subtitle %}
+                            <p class="text-slate-400 text-sm leading-relaxed mt-3 line-clamp-2">{{ article.subtitle }}</p>
+                            {% endif %}
+                            <div class="mt-auto pt-6 flex items-center gap-2 text-white text-[10px] font-black uppercase tracking-[0.2em] group-hover:gap-4 transition-all">
+                                Read Story <span class="material-symbols-outlined text-sm">east</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════════════
+             NO RESULTS
+             ══════════════════════════════════════════════════════════════ -->
+        {% if not artists and not members and not songs and not albums and not articles and not comebacks %}
+        <section class="w-full bg-black py-32 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px] text-center reveal-up">
+                <span class="material-symbols-outlined text-8xl text-white/10 mb-6 block">search_off</span>
+                <h2 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
+                    No results for "<span class="text-primary">{{ q }}</span>"
+                </h2>
+                <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-4 max-w-md mx-auto">
+                    Try another search term or browse our content
+                </p>
+                <div class="flex items-center justify-center gap-4 mt-10">
+                    <a href="{% url 'idols' %}"
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-black text-[10px] font-black tracking-[0.2em] uppercase border border-primary hover:bg-white hover:border-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        <span class="material-symbols-outlined text-sm">groups</span> Browse Artists
+                    </a>
+                    <a href="{% url 'news' %}"
+                       class="inline-flex items-center gap-2 px-6 py-3 border border-white/20 text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase hover:border-primary hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-sm">newspaper</span> Read News
+                    </a>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% else %}
+        <!-- ══════════════════════════════════════════════════════════════
+             EMPTY STATE — Trending + Latest (no query)
+             ══════════════════════════════════════════════════════════════ -->
+
+        {% if trending_artists %}
+        <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            TRENDING<span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]"> ARTISTS</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">Top ranked on K-Beats right now</p>
+                    </div>
+                    <a href="{% url 'idols' %}" class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase">
+                        View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-0 reveal-up">
+                    {% for artist in trending_artists %}
+                    <a href="{% url 'idol_page' slug=artist.slug %}" class="group border border-white/10 bg-black hover:border-primary overflow-hidden transition-all duration-300">
+                        <div class="relative aspect-square overflow-hidden">
+                            {% if artist.image_url %}
+                            <img src="{{ artist.image_url }}" alt="{{ artist.name }}" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-5xl text-white/10">person</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                            <span class="absolute top-0 left-0 bg-primary text-black text-[9px] font-black px-2 py-1 uppercase tracking-widest">#{{ artist.rank }}</span>
+                        </div>
+                        <div class="p-4 border-t border-white/10">
+                            <h3 class="text-white text-sm font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors truncate">{{ artist.name }}</h3>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block">{{ artist.get_group_type_display }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if latest_articles %}
+        <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                            LATEST<span class="text-transparent [-webkit-text-stroke:1.5px_#00f0ff]"> ARTICLES</span>
+                        </h2>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">Fresh from the K-Beats editorial desk</p>
+                    </div>
+                    <a href="{% url 'blog_page' %}" class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase">
+                        All Articles <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-0 reveal-up">
+                    {% for article in latest_articles %}
+                    <a href="{% url 'blog_article_read' slug=article.slug %}" class="group border border-white/10 bg-black hover:border-primary overflow-hidden flex flex-col transition-all duration-300">
+                        <div class="relative aspect-[16/10] overflow-hidden">
+                            {% if article.image %}
+                            <img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-6xl text-white/10">article</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
+                            <span class="absolute top-0 left-0 bg-primary text-black text-[10px] font-black px-3 py-1.5 uppercase tracking-widest">{{ article.category }}</span>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow border-t border-white/10">
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">{{ article.created_at|date:"M d, Y" }}</span>
+                            <h3 class="text-white text-lg font-black uppercase tracking-tight leading-tight mt-2 group-hover:text-primary transition-colors line-clamp-2">{{ article.title }}</h3>
+                            <div class="mt-auto pt-6 flex items-center gap-2 text-white text-[10px] font-black uppercase tracking-[0.2em] group-hover:gap-4 transition-all">
+                                Read Story <span class="material-symbols-outlined text-sm">east</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if not trending_artists and not latest_articles %}
+        <!-- Fallback quick links -->
+        <section class="w-full bg-black py-32 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px] text-center reveal-up">
+                <span class="material-symbols-outlined text-8xl text-white/10 mb-6 block">manage_search</span>
+                <h2 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight">Search the K-Pop universe</h2>
+                <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-4 max-w-md mx-auto">Find your favourite artists, groups, songs, albums, and articles</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-0 max-w-3xl mx-auto mt-16">
+                    <a href="{% url 'idols' %}" class="group border border-white/10 bg-black hover:border-primary p-8 transition-all duration-300 flex flex-col items-center gap-3">
+                        <span class="material-symbols-outlined text-3xl text-slate-600 group-hover:text-primary transition-colors">groups</span>
+                        <span class="font-black text-xs uppercase tracking-tight text-white group-hover:text-primary transition-colors">Artists</span>
+                    </a>
+                    <a href="{% url 'charts' %}" class="group border border-white/10 bg-black hover:border-primary p-8 transition-all duration-300 flex flex-col items-center gap-3">
+                        <span class="material-symbols-outlined text-3xl text-slate-600 group-hover:text-primary transition-colors">trending_up</span>
+                        <span class="font-black text-xs uppercase tracking-tight text-white group-hover:text-primary transition-colors">Charts</span>
+                    </a>
+                    <a href="{% url 'news' %}" class="group border border-white/10 bg-black hover:border-primary p-8 transition-all duration-300 flex flex-col items-center gap-3">
+                        <span class="material-symbols-outlined text-3xl text-slate-600 group-hover:text-primary transition-colors">newspaper</span>
+                        <span class="font-black text-xs uppercase tracking-tight text-white group-hover:text-primary transition-colors">News</span>
+                    </a>
+                    <a href="{% url 'live' %}" class="group border border-white/10 bg-black hover:border-primary p-8 transition-all duration-300 flex flex-col items-center gap-3">
+                        <span class="material-symbols-outlined text-3xl text-slate-600 group-hover:text-primary transition-colors">radio</span>
+                        <span class="font-black text-xs uppercase tracking-tight text-white group-hover:text-primary transition-colors">Live Radio</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% endif %}
+    </main>
+
+    {% include 'core/footer.html' %}
+
+    <!-- Scroll reveal -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new IntersectionObserver(
+                (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("is-visible"); }),
+                { threshold: 0.15 }
+            );
+            document.querySelectorAll(".reveal-up, .reveal-left").forEach((el) => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
