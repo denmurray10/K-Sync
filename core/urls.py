@@ -43,8 +43,12 @@ urlpatterns = [
     path('calendar/', views.calendar, name='calendar'),
     path('fan-clubs/', views.fan_clubs, name='fan_clubs'),
     path('fan-clubs/start/', views.start_club_view, name='start_club'),
+    path('fan-clubs/polish-mission/', views.polish_mission_statement, name='polish_mission'),
     path('api/fan-club/join/', views.api_fan_club_join, name='api_fan_club_join'),
     path('api/fan-club/leave/', views.api_fan_club_leave, name='api_fan_club_leave'),
+    path('api/artist-stats/', views.get_artist_stats, name='artist_stats'),
+    path('api/notifications/', views.get_notifications, name='get_notifications'),
+    path('api/notifications/<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),
     
     # New Stitch Export Pages
     path('top-cheerleader-badges/', views.top_cheerleader_badges, name='top_cheerleader_badges'),

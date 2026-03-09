@@ -65,7 +65,66 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden" 
+      x-data="{ 
+        name: '', 
+        artist: '', 
+        description: '', 
+        banner_url: '',
+        isPolishing: false,
+        artistStats: null,
+        archetype: 'vanguard',
+        founders: [],
+        newFounder: '',
+        addFounder() {
+            if (!this.newFounder || this.founders.length >= 5) return;
+            if (this.founders.includes(this.newFounder)) return;
+            this.founders.push(this.newFounder);
+            this.newFounder = '';
+        },
+        removeFounder(index) {
+            this.founders.splice(index, 1);
+        },
+        async polishDescription() {
+            if (!this.description || this.isPolishing) return;
+            this.isPolishing = true;
+            try {
+                const response = await fetch('{% url 'polish_mission' %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ description: this.description })
+                });
+                const data = await response.json();
+                if (data.refined_text) {
+                    this.description = data.refined_text;
+                }
+            } catch (error) {
+                console.error('Brutalizer failed:', error);
+            } finally {
+                this.isPolishing = false;
+            }
+        },
+        async fetchArtistStats() {
+            if (!this.artist || this.artist.length < 2) {
+                this.artistStats = null;
+                return;
+            }
+            try {
+                const response = await fetch(`{% url 'artist_stats' %}?artist=${encodeURIComponent(this.artist)}`);
+                const data = await response.json();
+                this.artistStats = data;
+            } catch (error) {
+                console.error('Stats fetch failed:', error);
+            }
+        }
+      }"
+      x-init="$watch('artist', value => {
+          clearTimeout(window.statsTimeout);
+          window.statsTimeout = setTimeout(() => fetchArtistStats(), 500);
+      })">
 
 {% include 'core/header.html' %}
 
@@ -130,9 +189,78 @@
                         </div>
                     </div>
 
-                    <div class="mt-12 p-8 border border-white/10 bg-white/5 reveal-up">
-                        <h4 class="text-primary font-black text-sm uppercase tracking-widest mb-4">Pro Tip:</h4>
-                        <p class="text-slate-300 text-xs leading-relaxed italic">"Clubs with clear, high-quality banner images and detailed descriptions have a 70% higher chance of instant approval."</p>
+                    <!-- Live Preview Card Integration -->
+                    <div class="mt-12 pt-12 border-t border-white/10 hide-on-success" x-show="!status">
+                        <h4 class="text-primary font-black text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <span class="w-2 h-2 bg-primary animate-pulse"></span>
+                            Live Preview
+                        </h4>
+                        
+                        <!-- The Card (Mimicking Fan Club Cards) -->
+                        <div class="group relative border border-white/20 bg-black/60 backdrop-blur-md overflow-hidden transition-all duration-500 max-w-sm mx-auto lg:mx-0">
+                            <!-- Image -->
+                            <div class="relative aspect-[4/3] overflow-hidden bg-white/5">
+                                <template x-if="banner_url">
+                                    <img :src="banner_url" class="w-full h-full object-cover grayscale opacity-60 transition-all duration-700">
+                                </template>
+                                <template x-if="!banner_url">
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-6xl text-white/10">upload_file</span>
+                                    </div>
+                                </template>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+
+                                <!-- Badge -->
+                                <div class="absolute top-4 left-4 flex items-center gap-2">
+                                    <span class="bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">New Club</span>
+                                    
+                                    <!-- Archetype Tag -->
+                                    <span class="text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest"
+                                        :class="{
+                                            'bg-secondary shadow-[0_0_10px_rgba(0,240,255,0.4)]': archetype === 'vanguard',
+                                            'bg-[#ffd700] shadow-[0_0_10px_rgba(255,215,0,0.4)]': archetype === 'archive',
+                                            'bg-primary shadow-[0_0_10px_rgba(244,37,192,0.4)]': archetype === 'hype',
+                                            'bg-[#7b2cbf] shadow-[0_0_10px_rgba(123,44,191,0.4)]': archetype === 'satellite'
+                                        }"
+                                        x-text="archetype === 'hype' ? 'Hype Train' : archetype">
+                                    </span>
+
+                                    <!-- Satellite Count (Founders) -->
+                                    <span x-show="founders.length > 0" x-cloak class="bg-slate-900/80 backdrop-blur-sm text-secondary text-[9px] font-black px-2 py-0.5 uppercase tracking-widest border border-secondary/30 flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[10px]">satellite_alt</span>
+                                        <span x-text="founders.length"></span> Satellites
+                                    </span>
+
+                                    <span class="bg-white/10 backdrop-blur-sm text-white text-[9px] font-black px-2 py-0.5 uppercase tracking-widest border border-white/20">
+                                        <span class="material-symbols-outlined text-[10px] align-middle mr-0.5">verified</span> Pending
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="p-6 border-t border-white/10">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h3 class="text-white font-black text-2xl uppercase tracking-tight leading-tight" x-text="name || 'Your Club Name'">Your Club Name</h3>
+                                        <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1" x-text="artist || 'Artist/Music Group'">Artist/Music Group</p>
+                                    </div>
+                                    <div class="flex flex-col items-center shrink-0 ml-4">
+                                        <span class="text-white/20 font-black text-xl leading-none">--</span>
+                                        <span class="text-slate-500 font-mono text-[8px] tracking-widest uppercase">Rank</span>
+                                    </div>
+                                </div>
+                                <p class="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4 h-8" x-text="description || 'Provide a compelling description for your future members...'"></p>
+                                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-7 h-7 rounded-full border-2 border-black bg-white/10 flex items-center justify-center text-[9px] font-bold text-white/60">0</div>
+                                    </div>
+                                    <span class="text-white/30 text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-1">
+                                        Join <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-[9px] font-mono text-slate-600 mt-4 uppercase tracking-widest text-center lg:text-left italic">Preview updates as you type</p>
                     </div>
                 </div>
 
@@ -145,7 +273,9 @@
                             </div>
                             <h3 class="text-4xl font-black text-white uppercase tracking-tighter mb-4">Application Received!</h3>
                             <p class="text-slate-300 text-sm mb-8 leading-relaxed max-w-sm">
-                                Your request to launch this club has been beamed to our coordinators. We'll review your mission statement and get back to you within 48 hours.
+                                Your request to launch this <span class="text-primary font-bold uppercase tracking-widest">{% if archetype %}{{ archetype }}{% else %}Club{% endif %}</span> 
+                                {% if founders_count %}with <span class="text-secondary font-bold">{{ founders_count }}</span> founding members{% endif %}
+                                has been beamed to our coordinators. We'll review your mission statement and get back to you within 48 hours.
                             </p>
                             <a href="{% url 'fan_clubs' %}" class="bg-white text-black font-black uppercase tracking-[0.2em] text-xs px-10 py-4 border border-white hover:bg-black hover:text-white transition-colors shadow-[4px_4px_0px_theme(colors.primary)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                 Back to Clubs
@@ -160,25 +290,201 @@
                                     <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Club Name <span class="text-primary">*</span></label>
                                     <div class="relative">
                                         <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg">groups</span>
-                                        <input type="text" name="name" required class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" placeholder="e.g. Bangtan Elite">
+                                        <input type="text" name="name" x-model="name" required class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" placeholder="e.g. Bangtan Elite">
                                     </div>
                                 </div>
                                 <!-- Associated Artist -->
                                 <div class="flex flex-col gap-2">
-                                    <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Target Group / Artist <span class="text-primary">*</span></label>
-                                    <div class="relative">
-                                        <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg">star</span>
-                                        <input type="text" name="artist" required class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" placeholder="e.g. BTS">
+                                    <div class="flex items-center justify-between">
+                                        <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Target Group / Artist <span class="text-primary">*</span></label>
+                                        
+                                        <!-- Power Pulse Badge -->
+                                        <div x-show="artistStats" x-cloak x-transition class="flex items-center gap-2">
+                                            <span class="flex h-1.5 w-1.5 rounded-full bg-secondary animate-pulse"></span>
+                                            <span class="font-mono text-[8px] uppercase tracking-widest text-secondary" x-text="'Power Pulse: ' + (artistStats?.rank || 'N/A') + ' | ' + (artistStats?.news_count || 0) + ' News Hits'"></span>
+                                        </div>
                                     </div>
+                                    <div class="relative">
+                                        <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg" :class="artistStats && 'text-secondary animate-pulse'">star</span>
+                                        <input type="text" name="artist" x-model="artist" required class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-all duration-300 font-mono text-sm" placeholder="e.g. BTS">
+                                    </div>
+                                    <template x-if="artistStats?.reach_potential">
+                                        <p class="text-[8px] font-mono text-slate-600 mt-1 uppercase tracking-widest">
+                                            Growth Potential: <span class="text-white" x-text="artistStats.reach_potential.toLocaleString()"></span> Fans
+                                        </p>
+                                    </template>
                                 </div>
                             </div>
 
                             <!-- Description -->
                             <div class="flex flex-col gap-2 mb-8">
-                                <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Mission Statement / Description <span class="text-primary">*</span></label>
+                                <div class="flex items-center justify-between">
+                                    <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Mission Statement / Description <span class="text-primary">*</span></label>
+                                    <button 
+                                        type="button"
+                                        @click="polishDescription"
+                                        :disabled="!description || isPolishing"
+                                        class="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest transition-all duration-300"
+                                        :class="isPolishing ? 'text-primary animate-pulse' : 'text-slate-500 hover:text-primary'"
+                                    >
+                                        <span class="material-symbols-outlined text-xs" :class="isPolishing && 'animate-spin'">bolt</span>
+                                        <span x-text="isPolishing ? 'Brutalizing...' : 'Brutalize By AI'"></span>
+                                    </button>
+                                </div>
                                 <div class="relative">
-                                    <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg">description</span>
-                                    <textarea name="description" rows="5" required class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm resize-none" placeholder="Describe the purpose of your club..."></textarea>
+                                    <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg" :class="isPolishing && 'text-primary'">description</span>
+                                    <textarea 
+                                        name="description" 
+                                        x-model="description" 
+                                        rows="5" 
+                                        required 
+                                        class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-all duration-500 font-mono text-sm resize-none"
+                                        :class="isPolishing && 'border-primary ring-1 ring-primary/20 bg-primary/5'"
+                                        placeholder="Describe the purpose of your club..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Club Archetype Selection -->
+                            <div class="flex flex-col gap-4 mb-12">
+                                <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Club Archetype <span class="text-primary">*</span></label>
+                                <input type="hidden" name="archetype" :value="archetype">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <!-- Vanguard -->
+                                    <div class="relative group/tip">
+                                        <button type="button" @click="archetype = 'vanguard'" 
+                                            class="w-full p-4 border transition-all duration-300 flex flex-col items-center gap-3 group"
+                                            :class="archetype === 'vanguard' ? 'border-secondary bg-secondary/10' : 'border-white/10 bg-white/[0.02] hover:border-white/30'">
+                                            <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform" :class="archetype === 'vanguard' ? 'text-secondary' : 'text-slate-500'">newspaper</span>
+                                            <div class="text-center">
+                                                <div class="text-[10px] font-black uppercase tracking-tighter" :class="archetype === 'vanguard' ? 'text-white' : 'text-slate-400'">Vanguard</div>
+                                                <div class="text-[8px] font-mono text-slate-600 uppercase mt-1 leading-none text-[7px]">News & Leaks</div>
+                                            </div>
+                                        </button>
+                                        <!-- Q-Tip -->
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 p-4 bg-black/90 border border-secondary backdrop-blur-xl opacity-0 translate-y-2 pointer-events-none group-hover/tip:opacity-100 group-hover/tip:translate-y-0 transition-all duration-300 z-50">
+                                            <div class="text-[10px] font-black text-secondary uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-[10px]">bolt</span> Pro Tip
+                                            </div>
+                                            <p class="text-[9px] font-mono text-slate-300 leading-relaxed uppercase">Perfect for reporters and leakers. Focuses on being first to break global news.</p>
+                                            <div class="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-secondary rotate-45 -translate-y-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Archive -->
+                                    <div class="relative group/tip">
+                                        <button type="button" @click="archetype = 'archive'" 
+                                            class="w-full p-4 border transition-all duration-300 flex flex-col items-center gap-3 group"
+                                            :class="archetype === 'archive' ? 'border-[#ffd700] bg-[#ffd700]/10' : 'border-white/10 bg-white/[0.02] hover:border-white/30'">
+                                            <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform" :class="archetype === 'archive' ? 'text-[#ffd700]' : 'text-slate-500'">inventory_2</span>
+                                            <div class="text-center">
+                                                <div class="text-[10px] font-black uppercase tracking-tighter" :class="archetype === 'archive' ? 'text-white' : 'text-slate-400'">Archive</div>
+                                                <div class="text-[8px] font-mono text-slate-600 uppercase mt-1 leading-none text-[7px]">Media Vault</div>
+                                            </div>
+                                        </button>
+                                        <!-- Q-Tip -->
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 p-4 bg-black/90 border border-[#ffd700] backdrop-blur-xl opacity-0 translate-y-2 pointer-events-none group-hover/tip:opacity-100 group-hover/tip:translate-y-0 transition-all duration-300 z-50">
+                                            <div class="text-[10px] font-black text-[#ffd700] uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-[10px]">history</span> Pro Tip
+                                            </div>
+                                            <p class="text-[9px] font-mono text-slate-300 leading-relaxed uppercase">A digital museum for high-res media, discographies, and fandom history.</p>
+                                            <div class="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-[#ffd700] rotate-45 -translate-y-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hype Train -->
+                                    <div class="relative group/tip">
+                                        <button type="button" @click="archetype = 'hype'" 
+                                            class="w-full p-4 border transition-all duration-300 flex flex-col items-center gap-3 group"
+                                            :class="archetype === 'hype' ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/[0.02] hover:border-white/30'">
+                                            <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform" :class="archetype === 'hype' ? 'text-primary' : 'text-slate-500'">train</span>
+                                            <div class="text-center">
+                                                <div class="text-[10px] font-black uppercase tracking-tighter" :class="archetype === 'hype' ? 'text-white' : 'text-slate-400'">Hype Train</div>
+                                                <div class="text-[8px] font-mono text-slate-600 uppercase mt-1 leading-none text-[7px]">Voting & Events</div>
+                                            </div>
+                                        </button>
+                                        <!-- Q-Tip -->
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 p-4 bg-black/90 border border-primary backdrop-blur-xl opacity-0 translate-y-2 pointer-events-none group-hover/tip:opacity-100 group-hover/tip:translate-y-0 transition-all duration-300 z-50">
+                                            <div class="text-[10px] font-black text-primary uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-[10px]">campaign</span> Pro Tip
+                                            </div>
+                                            <p class="text-[9px] font-mono text-slate-300 leading-relaxed uppercase">Built for coordinators. Focuses on streaming, voting, and real-time hype events.</p>
+                                            <div class="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rotate-45 -translate-y-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Satellite -->
+                                    <div class="relative group/tip">
+                                        <button type="button" @click="archetype = 'satellite'" 
+                                            class="w-full p-4 border transition-all duration-300 flex flex-col items-center gap-3 group"
+                                            :class="archetype === 'satellite' ? 'border-[#7b2cbf] bg-[#7b2cbf]/10' : 'border-white/10 bg-white/[0.02] hover:border-white/30'">
+                                            <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform" :class="archetype === 'satellite' ? 'text-[#7b2cbf]' : 'text-slate-500'">satellite_alt</span>
+                                            <div class="text-center">
+                                                <div class="text-[10px] font-black uppercase tracking-tighter" :class="archetype === 'satellite' ? 'text-white' : 'text-slate-400'">Satellite</div>
+                                                <div class="text-[8px] font-mono text-slate-600 uppercase mt-1 leading-none text-[7px]">Solo/Sub-unit</div>
+                                            </div>
+                                        </button>
+                                        <!-- Q-Tip -->
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 p-4 bg-black/90 border border-[#7b2cbf] backdrop-blur-xl opacity-0 translate-y-2 pointer-events-none group-hover/tip:opacity-100 group-hover/tip:translate-y-0 transition-all duration-300 z-50">
+                                            <div class="text-[10px] font-black text-[#7b2cbf] uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-[10px]">star_rate</span> Pro Tip
+                                            </div>
+                                            <p class="text-[9px] font-mono text-slate-300 leading-relaxed uppercase">For niche, specialized projects. Ideal for solo stans or sub-unit fan bases.</p>
+                                            <div class="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-[#7b2cbf] rotate-45 -translate-y-1"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Launch Team / Founding Members -->
+                            <div class="flex flex-col gap-6 mb-12">
+                                <div class="flex items-center justify-between">
+                                    <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Launch Team / Founding Members <span class="text-slate-700">(Max 5)</span></label>
+                                    <span class="text-[9px] font-mono text-slate-600 uppercase tracking-widest">
+                                        <span x-text="founders.length"></span>/5 Slots Active
+                                    </span>
+                                </div>
+                                
+                                <input type="hidden" name="founders" :value="JSON.stringify(founders)">
+                                
+                                <div class="flex flex-col gap-4">
+                                    <!-- Simple Input -->
+                                    <div class="relative flex gap-2">
+                                        <div class="relative flex-1">
+                                            <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg">person_add</span>
+                                            <input 
+                                                type="text" 
+                                                x-model="newFounder" 
+                                                @keydown.enter.prevent="addFounder"
+                                                class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-secondary transition-colors font-mono text-sm" 
+                                                placeholder="Enter username or email...">
+                                        </div>
+                                        <button 
+                                            type="button" 
+                                            @click="addFounder"
+                                            :disabled="!newFounder || founders.length >= 5"
+                                            class="bg-secondary/10 border border-secondary text-secondary hover:bg-secondary hover:text-black px-6 py-4 transition-all duration-300 disabled:opacity-30 disabled:hover:bg-secondary/10 disabled:hover:text-secondary">
+                                            <span class="material-symbols-outlined">add</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Tags List -->
+                                    <div class="flex flex-wrap gap-2">
+                                        <template x-for="(founder, index) in founders" :key="index">
+                                            <div class="flex items-center gap-2 bg-secondary/10 border border-secondary/30 px-3 py-2 group">
+                                                <span class="text-[10px] font-mono text-white tracking-wider" x-text="founder"></span>
+                                                <button type="button" @click="removeFounder(index)" class="text-secondary hover:text-white transition-colors">
+                                                    <span class="material-symbols-outlined text-xs">close</span>
+                                                </button>
+                                            </div>
+                                        </template>
+                                        
+                                        <!-- Placeholders -->
+                                        <template x-for="n in (5 - founders.length)" :key="'empty-'+n">
+                                            <div class="border border-white/5 border-dashed px-3 py-2">
+                                                <span class="text-[10px] font-mono text-slate-800 tracking-wider">EMPTY SLOT</span>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
 
@@ -187,7 +493,7 @@
                                 <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Banner Image URL</label>
                                 <div class="relative">
                                     <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg">link</span>
-                                    <input type="url" name="banner_url" class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" placeholder="https://example.com/banner.jpg">
+                                    <input type="url" name="banner_url" x-model="banner_url" class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" placeholder="https://example.com/banner.jpg">
                                 </div>
                                 <p class="text-[9px] font-mono text-slate-600 mt-2 uppercase tracking-widest">Recommended: 1200x400 or higher</p>
                             </div>

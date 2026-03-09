@@ -1,5 +1,6 @@
 import json
 import logging
+from django.db import models
 from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
@@ -19,7 +20,7 @@ from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
-    FanClubMembership,
+    FanClubMembership, UserNotification, ClubInvitation
 )
 
 logger = logging.getLogger(__name__)
@@ -2693,11 +2694,76 @@ def fan_clubs(request):
     })
 
 
+@login_required
 def start_club_view(request):
     if request.method == 'POST':
-        # Simple thank you / success state for now
-        return render(request, 'core/start_club.html', {'status': 'success'})
+        club_name = request.POST.get('club_name', 'New Club')
+        archetype = request.POST.get('archetype', 'vanguard')
+        founders_raw = request.POST.get('founders', '[]')
+        
+        try:
+            founders_list = json.loads(founders_raw)
+        except:
+            founders_list = []
+            
+        # Create Real Invitations and Notifications
+        for identifier in founders_list:
+            # Try to find by username first, then email
+            user = User.objects.filter(models.Q(username__iexact=identifier) | models.Q(email__iexact=identifier)).first()
+            
+            # Create Invitation Record
+            invitation = ClubInvitation.objects.create(
+                sender=request.user,
+                invitee=user,
+                invitee_email=identifier if not user else None,
+                club_name=club_name,
+                archetype=archetype
+            )
+            
+            # Create Notification if user exists
+            if user:
+                UserNotification.objects.create(
+                    user=user,
+                    message=f"You've been invited by {request.user.username} to join the Launch Team for {club_name}!",
+                    type='INVITE',
+                    link=f"/fan-clubs/invitation/{invitation.id}/" # Placeholder link
+                )
+            
+        # Success state
+        return render(request, 'core/start_club.html', {
+            'status': 'success',
+            'archetype': archetype,
+            'founders_count': len(founders_list)
+        })
     return render(request, 'core/start_club.html')
+
+@login_required
+def get_notifications(request):
+    notifications = UserNotification.objects.filter(user=request.user, is_read=False)[:5]
+    data = [{
+        'id': n.id,
+        'message': n.message,
+        'type': n.type,
+        'created_at': n.created_at.strftime("%b %d, %H:%M"),
+        'link': n.link
+    } for n in notifications]
+    
+    return JsonResponse({
+        'status': 'success',
+        'notifications': data,
+        'unread_count': UserNotification.objects.filter(user=request.user, is_read=False).count()
+    })
+
+@login_required
+@require_POST
+def mark_notification_read(request, notification_id):
+    try:
+        notification = UserNotification.objects.get(id=notification_id, user=request.user)
+        notification.is_read = True
+        notification.save()
+        return JsonResponse({'status': 'success'})
+    except UserNotification.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Notification not found'}, status=404)
 
 
 @require_POST
@@ -2739,4 +2805,75 @@ def api_fan_club_leave(request):
         'success': True,
         'joined': False,
         'member_count': count,
+    })
+
+@csrf_exempt
+@require_POST
+def polish_mission_statement(request):
+    """
+    Use DeepSeek to turn a basic club description into a brutalist, 
+    high-energy, cinematic K-Pop mission statement.
+    """
+    try:
+        data = json.loads(request.body)
+        raw_description = data.get('description', '').strip()
+        
+        if not raw_description:
+            return JsonResponse({'error': 'Description is required'}, status=400)
+
+        system_prompt = (
+            "You are a premium K-Pop creative director. "
+            "Your task is to rewrite a fan club description into a cinematic, high-energy, "
+            "brutalist mission statement. Use punchy, evocative language. "
+            "Avoid generic marketing fluff. Make it sound like a call to action for a global fandom. "
+            "CRITICAL: Keep it strictly under 250 characters. "
+            "Output ONLY the refined text."
+        )
+        
+        refined_text = _chat(raw_description, system=system_prompt)
+        
+        return JsonResponse({'refined_text': refined_text})
+        
+    except Exception as e:
+        logger.error("AI Brutalizer error: %s", e)
+        return JsonResponse({'error': str(e)}, status=500)
+
+def get_artist_stats(request):
+    """
+    Retrieves real-time statistics for a specific artist/group.
+    Used for the 'Power Pulse' feature on the Start A Club page.
+    """
+    artist_name = request.GET.get('artist', '').strip()
+    if not artist_name:
+        return JsonResponse({'error': 'Artist name required'}, status=400)
+    
+    # 1. Try to find the group
+    group = KPopGroup.objects.filter(name__icontains=artist_name).first()
+    
+    # 2. Count news articles (BlogArticles) mentioning the artist
+    # We search the title and subtitle for the name
+    news_count = BlogArticle.objects.filter(
+        models.Q(title__icontains=artist_name) | 
+        models.Q(subtitle__icontains=artist_name)
+    ).count()
+    
+    # 3. Calculate reach potential (Fan club members or a random 'momentum' factor)
+    reach = 0
+    rank = "N/A"
+    
+    if group:
+        rank = f"#{group.rank}" if group.rank else "Unranked"
+        # Reach potential = current members + a "fandom gravity" multiplier
+        base_fans = group.fan_club_members.count()
+        reach = base_fans * 1.5 + 500  # Example logic: current fans + projected growth
+    else:
+        # Fallback for groups not in our DB yet
+        reach = 1000  # Default starter potential
+        
+    return JsonResponse({
+        'artist': artist_name,
+        'rank': rank,
+        'news_count': news_count,
+        'reach_potential': int(reach),
+        'found': group is not None
     })

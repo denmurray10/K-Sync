@@ -280,3 +280,56 @@ class FanClubMembership(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ∈ {self.group.name}"
+
+class UserNotification(models.Model):
+    NOTIFICATION_TYPES = (
+        ('INVITE', 'Club Invitation'),
+        ('ALERT', 'System Alert'),
+        ('SOCIAL', 'Social Interaction'),
+    )
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='notifications'
+    )
+    message = models.TextField()
+    type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default='ALERT')
+    is_read = models.BooleanField(default=False)
+    link = models.CharField(max_length=500, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.message[:30]}..."
+
+class ClubInvitation(models.Model):
+    INVITATION_STATUS = (
+        ('PENDING', 'Pending'),
+        ('ACCEPTED', 'Accepted'),
+        ('DECLINED', 'Declined'),
+    )
+
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='sent_invitations'
+    )
+    invitee_email = models.EmailField(null=True, blank=True)
+    invitee = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='club_invitations'
+    )
+    club_name = models.CharField(max_length=255)
+    archetype = models.CharField(max_length=50, default='vanguard')
+    status = models.CharField(max_length=20, choices=INVITATION_STATUS, default='PENDING')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        target = self.invitee.username if self.invitee else self.invitee_email
+        return f"Invite to {target} for {self.club_name}"
