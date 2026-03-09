@@ -815,32 +815,22 @@
                             </div>
                             {% endif %}
 
-                            <!-- Score history -->
-                            <div class="flex flex-col">
-                                {% for gs in game_scores %}
-                                <div class="flex items-center gap-3 py-2.5 border-b border-white/5 group">
-                                    <span class="font-mono text-[8px] tracking-widest text-slate-600 w-16 shrink-0">{{ gs.played_at|date:"M d" }}</span>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="font-black text-sm text-white">{{ gs.score }}</span>
-                                            <span class="font-mono text-[8px] tracking-widest text-slate-600">pts</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 mt-0.5">
-                                            <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600">{{ gs.correct }}/{{ gs.total }}</span>
-                                            {% if gs.best_streak >= 3 %}
-                                            <span class="font-mono text-[8px] text-secondary">{{ gs.best_streak }}🔥</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <!-- Score bar -->
-                                    <div class="w-16 h-1 bg-white/5 shrink-0">
-                                        <div class="h-full bg-primary"
-                                             style="width: {{ gs.correct|add:0 }}%; max-width:100%;"
-                                             data-pct="{{ gs.correct }}{{ gs.total }}"></div>
-                                    </div>
+                            <!-- Latest score -->
+                            {% if game_scores %}
+                            {% with latest=game_scores.0 %}
+                            <div class="flex items-center justify-between p-3 border border-white/10 bg-white/[0.02]">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-slate-500 text-sm">history</span>
+                                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Latest</span>
                                 </div>
-                                {% endfor %}
+                                <div class="flex items-center gap-3">
+                                    <span class="font-black text-lg text-white">{{ latest.score }}</span>
+                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600">{{ latest.correct }}/{{ latest.total }} correct</span>
+                                    <span class="font-mono text-[8px] tracking-widest text-slate-600 ml-2">{{ latest.played_at|date:"M d" }}</span>
+                                </div>
                             </div>
+                            {% endwith %}
+                            {% endif %}
                             {% else %}
                             <div class="text-center py-6">
                                 <span class="material-symbols-outlined text-3xl text-white/10 mb-2 block">sports_esports</span>

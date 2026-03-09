@@ -77,10 +77,12 @@ tailwind.config = {
                     <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">Upcoming</span>
                 </div>
                 {% for type, count in types_count.items %}
+                {% if type != 'Anniversary' %}
                 <div class="px-6 py-5 {% if not forloop.last %}border-r border-white/20{% endif %} text-center">
                     <span class="font-black text-3xl text-white block">{{ count }}</span>
                     <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">{{ type }}</span>
                 </div>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -94,19 +96,17 @@ tailwind.config = {
     <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
     <div class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
         {% for r in upcoming %}
-        <span class="inline-flex items-center gap-3 shrink-0">
+        <span class="inline-flex items-center gap-2 shrink-0">
             <span class="font-black text-primary">{{ r.date_str|slice:"5:" }}</span>
-            <span class="font-black text-xs uppercase tracking-tighter text-white">{{ r.title }}</span>
-            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">{{ r.artist }}</span>
+            <span class="text-[10px] uppercase font-bold text-white tracking-tight"><span class="text-primary/80 font-mono text-[9px] tracking-widest mr-1.5">{{ r.artist }}</span>{{ r.title }}</span>
             <span class="inline-block bg-white/10 text-white text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest">{{ r.type }}</span>
             <span class="text-white/20 mx-4">/</span>
         </span>
         {% endfor %}
         {% for r in upcoming %}
-        <span class="inline-flex items-center gap-3 shrink-0">
+        <span class="inline-flex items-center gap-2 shrink-0">
             <span class="font-black text-primary">{{ r.date_str|slice:"5:" }}</span>
-            <span class="font-black text-xs uppercase tracking-tighter text-white">{{ r.title }}</span>
-            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">{{ r.artist }}</span>
+            <span class="text-[10px] uppercase font-bold text-white tracking-tight"><span class="text-primary/80 font-mono text-[9px] tracking-widest mr-1.5">{{ r.artist }}</span>{{ r.title }}</span>
             <span class="inline-block bg-white/10 text-white text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest">{{ r.type }}</span>
             <span class="text-white/20 mx-4">/</span>
         </span>
@@ -189,13 +189,7 @@ tailwind.config = {
                 {% for bday in day.birthdays %}
                 <div class="group/ev flex items-center gap-1.5 cursor-default">
                     <span class="cal-dot bg-secondary shrink-0"></span>
-                    <span class="hidden md:block text-[9px] font-bold text-white/60 uppercase tracking-tight truncate group-hover/ev:text-secondary transition-colors">{{ bday.name }}</span>
-                </div>
-                {% endfor %}
-                {% for ann in day.anniversaries %}
-                <div class="group/ev flex items-center gap-1.5 cursor-default">
-                    <span class="cal-dot bg-yellow-400 shrink-0"></span>
-                    <span class="hidden md:block text-[9px] font-bold text-white/60 uppercase tracking-tight truncate">{{ ann.group }}</span>
+                    <span class="hidden md:block text-[9px] font-bold text-white/60 uppercase tracking-tight truncate group-hover/ev:text-secondary transition-colors">{{ bday.name }}{% if bday.group %} ({{ bday.group }}){% endif %}</span>
                 </div>
                 {% endfor %}
             </div>
@@ -208,7 +202,6 @@ tailwind.config = {
     <div class="flex items-center gap-6 mt-6 reveal-up" style="transition-delay:200ms;">
         <div class="flex items-center gap-2"><span class="cal-dot bg-primary"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Release</span></div>
         <div class="flex items-center gap-2"><span class="cal-dot bg-secondary"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Birthday</span></div>
-        <div class="flex items-center gap-2"><span class="cal-dot bg-yellow-400"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Anniversary</span></div>
     </div>
 </div>
 </section>
@@ -247,8 +240,10 @@ tailwind.config = {
                 <!-- Info -->
                 <div class="flex flex-col">
                     <span class="inline-block bg-primary text-black text-[10px] font-black px-2 py-0.5 mb-2 uppercase tracking-widest w-max">{{ r.type }}</span>
-                    <h4 class="text-white font-black text-xl leading-tight uppercase tracking-tight group-hover:text-primary transition-colors truncate max-w-[200px] sm:max-w-xs md:max-w-md">{{ r.title }}</h4>
-                    <p class="text-slate-400 text-sm font-mono tracking-widest uppercase mt-1">{{ r.artist }}</p>
+                    <div class="flex flex-col">
+                        <span class="text-primary font-mono text-[10px] tracking-widest uppercase mb-1">{{ r.artist }}</span>
+                        <h4 class="text-white font-black text-xl leading-tight uppercase tracking-tight group-hover:text-primary transition-colors truncate max-w-[200px] sm:max-w-xs md:max-w-md">{{ r.title }}</h4>
+                    </div>
                 </div>
             </div>
 
@@ -297,9 +292,9 @@ tailwind.config = {
                 {% endif %}
                 <div class="absolute top-0 left-0 bg-primary text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">{{ r.type }}</div>
             </div>
-            <div class="p-4">
+            <div class="p-4 flex flex-col">
+                <span class="text-primary font-mono text-[9px] tracking-widest uppercase mb-1 truncate">{{ r.artist }}</span>
                 <h4 class="text-white font-black text-sm uppercase tracking-tight truncate group-hover:text-primary transition-colors">{{ r.title }}</h4>
-                <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-1 truncate">{{ r.artist }}</p>
                 <span class="text-slate-600 font-mono text-[8px] tracking-widest uppercase mt-2 block">{{ r.date_str }}</span>
             </div>
         </div>

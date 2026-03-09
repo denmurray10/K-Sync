@@ -27,8 +27,10 @@
     <div class="container mx-auto flex items-center justify-between">
         <!-- Logo + Nav -->
         <div class="flex items-center gap-8">
-            <a href="{% url 'home' %}" class="flex items-center gap-2 group shrink-0">
-                <img src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/logo" alt="K-Beats Logo" class="h-16 md:h-24 w-auto -ml-4 md:-ml-[58px] -my-2 md:-my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
+            <a href="{% url 'home' %}" class="flex items-center gap-0 group shrink-0 py-2">
+                <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
+                <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
+                <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
             </a>
             <nav class="hidden md:flex items-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'live' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
@@ -37,8 +39,6 @@
                 <a class="{% if request.resolver_match.url_name == 'comeback_timeline' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
                 <a class="{% if request.resolver_match.url_name == 'news' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
                 <a class="{% if request.resolver_match.url_name == 'shop' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'shop' %}">Shop</a>
-                <a class="{% if request.resolver_match.url_name == 'fan_clubs' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'fan_clubs' %}">Fan Clubs</a>
-                <a class="{% if request.resolver_match.url_name == 'presenters' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'presenters' %}">Presenters</a>
             </nav>
         </div>
 
@@ -138,8 +138,10 @@
 <header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 px-6 py-8 border-none">
     <div class="container mx-auto flex items-center justify-between">
         <div class="flex items-center gap-10">
-            <a class="flex items-center gap-3 text-primary hover:text-secondary transition-colors duration-300 group" href="{% url 'home' %}">
-                <img src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/logo" alt="K-Beats Logo" class="h-16 md:h-24 w-auto -ml-4 md:-ml-[58px] -my-2 md:-my-7 object-contain drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all">
+            <a class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2" href="{% url 'home' %}">
+                <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
+                <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
+                <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
             </a>
             <nav class="hidden md:flex items-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
@@ -148,8 +150,6 @@
                 <a class="{% if request.resolver_match.url_name == 'comeback_timeline' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
                 <a class="{% if request.resolver_match.url_name == 'news' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
                 <a class="{% if request.resolver_match.url_name == 'shop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'shop' %}">Shop</a>
-                <a class="{% if request.resolver_match.url_name == 'fan_clubs' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'fan_clubs' %}">Fan Clubs</a>
-                <a class="{% if request.resolver_match.url_name == 'presenters' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'presenters' %}">Presenters</a>
             </nav>
         </div>
         <div class="flex items-center gap-6">
