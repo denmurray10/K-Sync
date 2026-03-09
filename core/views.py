@@ -12,10 +12,14 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 import requests
 from openai import OpenAI
+import bleach
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_http_methods
 from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
-    GameScore, SongRequest,
+    GameScore, SongRequest, Contest, ContestEntry,
+    FanClubMembership,
 )
 
 logger = logging.getLogger(__name__)
@@ -792,6 +796,12 @@ def dashboard(request):
         'total_favourites': stats['total_favourites'],
         'game_scores': game_scores,
         'best_score': best_score,
+        'all_contests': list(Contest.objects.all()) if request.user.is_staff else [],
+        'my_fan_clubs': list(
+            FanClubMembership.objects.filter(
+                user=user
+            ).select_related('group')[:8]
+        ),
     })
 
 
@@ -1030,7 +1040,45 @@ def song_game(request):
     })
 
 def contests(request):
-    return render(request, 'core/contests.html')
+    all_contests = Contest.objects.filter(is_active=True)
+    featured = all_contests.filter(is_featured=True).first()
+    if featured:
+        grid = all_contests.exclude(pk=featured.pk)
+    else:
+        grid = all_contests
+    return render(request, 'core/contests.html', {
+        'featured': featured,
+        'grid': grid,
+    })
+
+
+@require_http_methods(["GET", "POST"])
+def contest_entry(request, slug):
+    contest = get_object_or_404(Contest, slug=slug, is_active=True)
+    if request.method == 'POST':
+        name = bleach.clean(request.POST.get('name', '').strip(), tags=[], strip=True)
+        email = bleach.clean(request.POST.get('email', '').strip(), tags=[], strip=True)
+        country = bleach.clean(request.POST.get('country', '').strip(), tags=[], strip=True)
+        username = bleach.clean(request.POST.get('username', '').strip(), tags=[], strip=True)
+        answer = bleach.clean(request.POST.get('answer', '').strip(), tags=[], strip=True)
+        if not name or not email or not answer:
+            return JsonResponse({'error': 'Required fields missing.'}, status=400)
+        ContestEntry.objects.create(
+            contest=contest,
+            name=name,
+            email=email,
+            country=country,
+            username=username,
+            answer=answer,
+        )
+        return JsonResponse({'success': True, 'entry_number': contest.entry_count})
+    prizes = contest.prizes if isinstance(contest.prizes, list) else []
+    rules = [r.strip() for r in contest.rules.splitlines() if r.strip()]
+    return render(request, 'core/contest_entry.html', {
+        'contest': contest,
+        'prizes': prizes,
+        'rules': rules,
+    })
 
 def _search_all(q):
     """Run search across all content types. Returns dict of results."""
@@ -2468,3 +2516,176 @@ def vote_poll(request):
         return JsonResponse({'success': True, 'total_votes': total_votes, 'results': results})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+# ────────────────────────────────────────────────────────────────────
+#  STAFF-ONLY CONTEST MANAGEMENT API
+# ────────────────────────────────────────────────────────────────────
+
+def _staff_required(request):
+    """Return a 403 JsonResponse if the user is not staff, else None."""
+    if not request.user.is_authenticated or not request.user.is_staff:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    return None
+
+
+@require_POST
+@login_required
+def api_contest_create(request):
+    denied = _staff_required(request)
+    if denied:
+        return denied
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, ValueError):
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    title = bleach.clean(data.get('title', '').strip(), tags=[], strip=True)
+    slug = bleach.clean(data.get('slug', '').strip(), tags=[], strip=True)
+    if not title or not slug:
+        return JsonResponse({'error': 'title and slug are required'}, status=400)
+    if Contest.objects.filter(slug=slug).exists():
+        return JsonResponse({'error': 'A contest with that slug already exists'}, status=400)
+
+    contest = Contest.objects.create(
+        title=title,
+        slug=slug,
+        subtitle=bleach.clean(data.get('subtitle', ''), tags=[], strip=True),
+        description=bleach.clean(data.get('description', ''), tags=[], strip=True),
+        image=bleach.clean(data.get('image', ''), tags=[], strip=True),
+        artist=bleach.clean(data.get('artist', ''), tags=[], strip=True),
+        prizes=data.get('prizes', []),
+        rules=bleach.clean(data.get('rules', ''), tags=[], strip=True),
+        entry_question=bleach.clean(data.get('entry_question', ''), tags=[], strip=True),
+        deadline=data.get('deadline'),
+        is_active=bool(data.get('is_active', True)),
+        is_featured=bool(data.get('is_featured', False)),
+        contest_number=bleach.clean(data.get('contest_number', ''), tags=[], strip=True),
+    )
+    return JsonResponse({'success': True, 'id': contest.pk, 'slug': contest.slug})
+
+
+@require_POST
+@login_required
+def api_contest_edit(request, contest_id):
+    denied = _staff_required(request)
+    if denied:
+        return denied
+    contest = get_object_or_404(Contest, pk=contest_id)
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, ValueError):
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    if 'title' in data:
+        contest.title = bleach.clean(data['title'], tags=[], strip=True)
+    if 'subtitle' in data:
+        contest.subtitle = bleach.clean(data['subtitle'], tags=[], strip=True)
+    if 'description' in data:
+        contest.description = bleach.clean(data['description'], tags=[], strip=True)
+    if 'image' in data:
+        contest.image = bleach.clean(data['image'], tags=[], strip=True)
+    if 'artist' in data:
+        contest.artist = bleach.clean(data['artist'], tags=[], strip=True)
+    if 'prizes' in data:
+        contest.prizes = data['prizes']
+    if 'rules' in data:
+        contest.rules = bleach.clean(data['rules'], tags=[], strip=True)
+    if 'entry_question' in data:
+        contest.entry_question = bleach.clean(data['entry_question'], tags=[], strip=True)
+    if 'deadline' in data:
+        contest.deadline = data['deadline']
+    if 'is_active' in data:
+        contest.is_active = bool(data['is_active'])
+    if 'is_featured' in data:
+        contest.is_featured = bool(data['is_featured'])
+    if 'contest_number' in data:
+        contest.contest_number = bleach.clean(data['contest_number'], tags=[], strip=True)
+    contest.save()
+    return JsonResponse({'success': True})
+
+
+@require_POST
+@login_required
+def api_contest_toggle(request, contest_id):
+    denied = _staff_required(request)
+    if denied:
+        return denied
+    contest = get_object_or_404(Contest, pk=contest_id)
+    field = request.POST.get('field', 'is_active')
+    if field not in ('is_active', 'is_featured'):
+        return JsonResponse({'error': 'Invalid field'}, status=400)
+    setattr(contest, field, not getattr(contest, field))
+    contest.save(update_fields=[field])
+    return JsonResponse({'success': True, 'value': getattr(contest, field)})
+
+
+@require_POST
+@login_required
+def api_contest_delete(request, contest_id):
+    denied = _staff_required(request)
+    if denied:
+        return denied
+    contest = get_object_or_404(Contest, pk=contest_id)
+    contest.delete()
+    return JsonResponse({'success': True})
+
+
+def fan_clubs(request):
+    groups = KPopGroup.objects.prefetch_related(
+        'members'
+    ).order_by('rank', 'name')
+    joined_ids = set()
+    if request.user.is_authenticated:
+        joined_ids = set(
+            FanClubMembership.objects.filter(
+                user=request.user
+            ).values_list('group_id', flat=True)
+        )
+    return render(request, 'core/fan_clubs.html', {
+        'fan_clubs': groups,
+        'total_clubs': groups.count(),
+        'joined_ids': joined_ids,
+    })
+
+
+@require_POST
+@login_required
+def api_fan_club_join(request):
+    try:
+        data = json.loads(request.body)
+        group_id = int(data.get('group_id', 0))
+    except (ValueError, TypeError):
+        return JsonResponse({'error': 'Invalid data'}, status=400)
+    group = get_object_or_404(KPopGroup, pk=group_id)
+    _, created = FanClubMembership.objects.get_or_create(
+        user=request.user, group=group,
+    )
+    count = group.fan_club_members.count()
+    return JsonResponse({
+        'success': True,
+        'joined': True,
+        'created': created,
+        'member_count': count,
+        'group_name': group.name,
+    })
+
+
+@require_POST
+@login_required
+def api_fan_club_leave(request):
+    try:
+        data = json.loads(request.body)
+        group_id = int(data.get('group_id', 0))
+    except (ValueError, TypeError):
+        return JsonResponse({'error': 'Invalid data'}, status=400)
+    group = get_object_or_404(KPopGroup, pk=group_id)
+    deleted, _ = FanClubMembership.objects.filter(
+        user=request.user, group=group,
+    ).delete()
+    count = group.fan_club_members.count()
+    return JsonResponse({
+        'success': True,
+        'joined': False,
+        'member_count': count,
+    })

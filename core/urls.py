@@ -25,6 +25,11 @@ urlpatterns = [
     path('api/group-songs/<slug:slug>/', views.api_group_songs, name='api_group_songs'),
     path('game/', views.song_game, name='song_game'),
     path('contests/', views.contests, name='contests'),
+    path('contests/<slug:slug>/enter/', views.contest_entry, name='contest_entry'),
+    path('api/contests/create/', views.api_contest_create, name='api_contest_create'),
+    path('api/contests/<int:contest_id>/edit/', views.api_contest_edit, name='api_contest_edit'),
+    path('api/contests/<int:contest_id>/toggle/', views.api_contest_toggle, name='api_contest_toggle'),
+    path('api/contests/<int:contest_id>/delete/', views.api_contest_delete, name='api_contest_delete'),
     path('results/', views.results, name='results'),
     path('api/search/', views.search_api, name='search_api'),
     path('bias-selector/', views.bias_selector, name='bias_selector'),
@@ -32,6 +37,9 @@ urlpatterns = [
     path('live/', views.live, name='live'),
     path('comeback-timeline/', views.comeback_timeline, name='comeback_timeline'),
     path('calendar/', views.calendar, name='calendar'),
+    path('fan-clubs/', views.fan_clubs, name='fan_clubs'),
+    path('api/fan-club/join/', views.api_fan_club_join, name='api_fan_club_join'),
+    path('api/fan-club/leave/', views.api_fan_club_leave, name='api_fan_club_leave'),
     
     # New Stitch Export Pages
     path('top-cheerleader-badges/', views.top_cheerleader_badges, name='top_cheerleader_badges'),

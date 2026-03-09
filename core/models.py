@@ -206,3 +206,74 @@ class GameScore(models.Model):
 
     def __str__(self):
         return f"{self.user.username} — {self.get_game_display()} {self.score}pts"
+
+
+class Contest(models.Model):
+    slug = models.SlugField(unique=True, max_length=200)
+    title = models.CharField(max_length=300)
+    subtitle = models.CharField(max_length=500, blank=True)
+    description = models.TextField(blank=True)
+    image = models.URLField(max_length=500, blank=True)
+    artist = models.CharField(max_length=200, blank=True)
+    prizes = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='List of {"icon": "...", "title": "...", "subtitle": "..."} objects',
+    )
+    rules = models.TextField(
+        blank=True,
+        help_text='One rule per line',
+    )
+    entry_question = models.CharField(max_length=500, blank=True)
+    deadline = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
+    contest_number = models.CharField(max_length=20, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-is_featured', 'deadline']
+
+    @property
+    def entry_count(self):
+        return self.entries.count()
+
+    def __str__(self):
+        return self.title
+
+
+class ContestEntry(models.Model):
+    contest = models.ForeignKey(Contest, related_name='entries', on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    country = models.CharField(max_length=100, blank=True)
+    username = models.CharField(max_length=100, blank=True)
+    answer = models.TextField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-submitted_at']
+
+    def __str__(self):
+        return f"{self.name} → {self.contest.title}"
+
+
+class FanClubMembership(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='fan_club_memberships',
+    )
+    group = models.ForeignKey(
+        KPopGroup,
+        on_delete=models.CASCADE,
+        related_name='fan_club_members',
+    )
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'group']
+        ordering = ['-joined_at']
+
+    def __str__(self):
+        return f"{self.user.username} ∈ {self.group.name}"

@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     LivePoll, LivePollOption, UserProfile, FavouriteSong,
-    GameScore, SongRequest,
+    GameScore, SongRequest, Contest, ContestEntry,
+    FanClubMembership,
 )
 
 
@@ -42,3 +43,34 @@ class SongRequestAdmin(admin.ModelAdmin):
     list_display = ('song_title', 'artist', 'listener_name', 'created_at')
     list_filter = ('created_at',)
     search_fields = ('song_title', 'artist', 'listener_name')
+
+
+class ContestEntryInline(admin.TabularInline):
+    model = ContestEntry
+    extra = 0
+    readonly_fields = ('name', 'email', 'country', 'username', 'answer', 'submitted_at')
+    can_delete = False
+
+
+@admin.register(Contest)
+class ContestAdmin(admin.ModelAdmin):
+    list_display = ('title', 'contest_number', 'artist', 'deadline', 'is_active', 'is_featured', 'entry_count')
+    list_filter = ('is_active', 'is_featured')
+    search_fields = ('title', 'artist')
+    prepopulated_fields = {'slug': ('title',)}
+    inlines = [ContestEntryInline]
+
+
+@admin.register(ContestEntry)
+class ContestEntryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'contest', 'country', 'submitted_at')
+    list_filter = ('contest', 'submitted_at')
+    search_fields = ('name', 'email', 'username')
+    readonly_fields = ('submitted_at',)
+
+
+@admin.register(FanClubMembership)
+class FanClubMembershipAdmin(admin.ModelAdmin):
+    list_display = ('user', 'group', 'joined_at')
+    list_filter = ('group', 'joined_at')
+    raw_id_fields = ('user', 'group')

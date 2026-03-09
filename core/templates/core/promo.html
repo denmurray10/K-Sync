@@ -1,90 +1,464 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K-Beats - Coming Soon</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #22101e;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: #fff;
-            overflow: hidden;
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>K-Beats — Mobile App</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#000000",
+                        "secondary": "#00f0ff",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
         }
-        .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(244, 37, 192, 0.3);
-            border-radius: 24px;
-            padding: 60px 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(244, 37, 192, 0.2);
-            text-align: center;
-            max-width: 600px;
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        .neon-border {
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.is-visible, .reveal-left.is-visible {
+            opacity: 1;
+            transform: translate(0);
+        }
+        body {
+            zoom: 0.9;
+            -moz-transform: scale(0.9);
+            -moz-transform-origin: 0 0;
+        }
+        /* Phone mockup */
+        .phone-mockup {
+            width: 280px;
+            height: 560px;
+            border: 4px solid rgba(255,255,255,0.15);
+            border-radius: 40px !important;
+            background: #111;
             position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(244, 37, 192, 0.3), 0 40px 80px rgba(0,0,0,0.6);
+        }
+        .phone-mockup::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 24px;
+            background: #000;
+            border-radius: 20px !important;
             z-index: 10;
         }
-        h1 {
-            color: #fff;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            word-break: break-word;
-            font-weight: 900;
-            font-style: italic;
-        }
-        h1 span { color: #f425c0; }
-        p {
-            color: #bbb;
-            font-size: 1.2em;
-            line-height: 1.6;
-        }
-        .emoji {
-            font-size: 4em;
-            margin-bottom: 20px;
-        }
-        .bg-glow {
+        .phone-screen {
             position: absolute;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(244, 37, 192, 0.3) 0%, transparent 70%);
-            filter: blur(50px);
-            z-index: 0;
-            border-radius: 50%;
+            inset: 0;
+            border-radius: 36px !important;
+            overflow: hidden;
         }
-        .btn {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 12px 30px;
-            background: #f425c0;
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(244, 37, 192, 0.4);
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
         }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 25px rgba(244, 37, 192, 0.6);
-            background: #ff4bc7;
+        .float-animate {
+            animation: float 4s ease-in-out infinite;
         }
     </style>
 </head>
-<body>
-    <div class="bg-glow" style="top: -100px; left: -100px;"></div>
-    <div class="bg-glow" style="bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(0, 240, 255, 0.3) 0%, transparent 70%);"></div>
-    
-    <div class="container">
-        <div class="emoji">🚀</div>
-        <h1>K-POP<span>PULSE</span></h1>
-        <p>We're polishing this feature for the ultimate fan experience. Stay tuned!</p>
-        <a href="{% url 'home' %}" class="btn">Back to Home</a>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+{% include 'core/header.html' %}
+
+<main class="flex-grow pt-0">
+
+    <!-- Hero Section -->
+    <section class="relative w-full bg-black pt-40 md:pt-48 pb-24 md:pb-32 overflow-hidden border-b border-white/10">
+        <!-- Background glow effects -->
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <div class="absolute top-1/4 -left-40 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-1/4 -right-40 w-[400px] h-[400px] bg-secondary/15 rounded-full blur-[100px]"></div>
+            <div class="absolute -top-10 -right-20 text-[10rem] md:text-[18rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap select-none">APP</div>
+        </div>
+
+        <div class="container mx-auto px-6 max-w-[1400px] relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+            <!-- Left: Text Content -->
+            <div class="flex-1 reveal-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 mb-6">
+                    <span class="material-symbols-outlined text-sm">phone_iphone</span>
+                    <span class="text-[10px] font-black tracking-[0.2em] uppercase">Download Now</span>
+                </div>
+                <h1 class="text-6xl md:text-8xl lg:text-9xl font-black text-white uppercase tracking-tighter leading-[0.85]">
+                    <span class="block">K-BEATS</span>
+                    <span class="block text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">IN YOUR POCKET</span>
+                </h1>
+                <p class="text-slate-300 font-mono text-xs md:text-sm tracking-widest uppercase leading-relaxed max-w-md mt-8">
+                    24/7 live radio, real-time charts, comebacks, and fan voting — all in one app. Your ultimate K-Pop companion.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 mt-10">
+                    <a href="#" class="group flex items-center gap-4 bg-white text-black px-6 py-4 border border-white hover:bg-black hover:text-white hover:border-white/20 transition-all shadow-[4px_4px_0px_rgba(244,37,192,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        <span class="material-symbols-outlined text-3xl">apple</span>
+                        <div class="flex flex-col">
+                            <span class="font-mono text-[9px] uppercase tracking-widest opacity-60">Download on the</span>
+                            <span class="font-black text-lg uppercase tracking-tighter leading-none">App Store</span>
+                        </div>
+                    </a>
+                    <a href="#" class="group flex items-center gap-4 bg-transparent text-white px-6 py-4 border border-white/20 hover:bg-white hover:text-black transition-all shadow-[4px_4px_0px_rgba(0,240,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                        <div class="flex flex-col">
+                            <span class="font-mono text-[9px] uppercase tracking-widest opacity-60">Get it on</span>
+                            <span class="font-black text-lg uppercase tracking-tighter leading-none">Google Play</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Phone Mockup -->
+            <div class="flex-shrink-0 reveal-up float-animate">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <img src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner" alt="K-Beats App Preview" class="w-full h-full object-cover opacity-80">
+                        <!-- App UI overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="relative flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                </span>
+                                <span class="text-[9px] font-black tracking-widest uppercase text-primary">Live</span>
+                            </div>
+                            <p class="text-white font-black text-lg uppercase tracking-tighter leading-none">The Morning Wave</p>
+                            <p class="text-slate-400 font-mono text-[9px] tracking-widest uppercase mt-1">DJ Hype · On Air Now</p>
+                            <div class="flex items-center gap-3 mt-4">
+                                <div class="w-10 h-10 bg-primary flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-black text-xl">play_arrow</span>
+                                </div>
+                                <div class="flex-1 h-1 bg-white/20 overflow-hidden">
+                                    <div class="h-full bg-primary w-1/3"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <div class="relative w-full bg-primary border-b border-white/20 overflow-hidden">
+        <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
+        <div class="container mx-auto max-w-[1400px] px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
+            <div class="text-center">
+                <div class="font-black text-3xl md:text-4xl text-black tracking-tighter">500K+</div>
+                <div class="font-mono text-[10px] tracking-widest uppercase text-black/60 mt-1">Downloads</div>
+            </div>
+            <div class="text-center">
+                <div class="font-black text-3xl md:text-4xl text-black tracking-tighter">4.9</div>
+                <div class="font-mono text-[10px] tracking-widest uppercase text-black/60 mt-1">App Rating</div>
+            </div>
+            <div class="text-center">
+                <div class="font-black text-3xl md:text-4xl text-black tracking-tighter">24/7</div>
+                <div class="font-mono text-[10px] tracking-widest uppercase text-black/60 mt-1">Live Radio</div>
+            </div>
+            <div class="text-center">
+                <div class="font-black text-3xl md:text-4xl text-black tracking-tighter">50K+</div>
+                <div class="font-mono text-[10px] tracking-widest uppercase text-black/60 mt-1">Daily Listeners</div>
+            </div>
+        </div>
     </div>
+
+    <!-- Features Grid -->
+    <section class="w-full bg-black py-24 md:py-32 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">PACKED WITH<br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">FEATURES</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Everything a K-Pop fan needs. Nothing you don't.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-white/10 reveal-up">
+                <!-- Feature 1 -->
+                <div class="group border-b lg:border-r border-white/10 p-8 md:p-10 hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-2xl text-primary group-hover:text-black transition-colors">radio</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-3 group-hover:text-primary transition-colors">Live Radio</h3>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed">Stream K-Beats 24/7 with studio-quality audio. Background playback, lock screen controls, and CarPlay support.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="group border-b lg:border-r border-white/10 p-8 md:p-10 hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-secondary/10 border border-secondary/30 flex items-center justify-center mb-6 group-hover:bg-secondary group-hover:border-secondary transition-colors">
+                        <span class="material-symbols-outlined text-2xl text-secondary group-hover:text-black transition-colors">trending_up</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-3 group-hover:text-secondary transition-colors">Real-Time Charts</h3>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed">Track daily, weekly, and monthly chart movements synced from iChart. Push alerts when your bias tops the charts.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="group border-b border-white/10 p-8 md:p-10 hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-2xl text-primary group-hover:text-black transition-colors">how_to_vote</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-3 group-hover:text-primary transition-colors">Fan Voting</h3>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed">Vote in live polls, support your favourites, and influence what gets played on air. Your voice matters.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="group border-b lg:border-b-0 lg:border-r border-white/10 p-8 md:p-10 hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-secondary/10 border border-secondary/30 flex items-center justify-center mb-6 group-hover:bg-secondary group-hover:border-secondary transition-colors">
+                        <span class="material-symbols-outlined text-2xl text-secondary group-hover:text-black transition-colors">calendar_month</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-3 group-hover:text-secondary transition-colors">Comeback Alerts</h3>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed">Never miss a release. Get countdowns and push notifications for every comeback, debut, and album drop.</p>
+                </div>
+                <!-- Feature 5 -->
+                <div class="group border-b lg:border-b-0 lg:border-r border-white/10 p-8 md:p-10 hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-2xl text-primary group-hover:text-black transition-colors">groups</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-3 group-hover:text-primary transition-colors">Idol Profiles</h3>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed">Browse every group and member. Set your bias, track their discography, and explore their complete universe.</p>
+                </div>
+                <!-- Feature 6 -->
+                <div class="group p-8 md:p-10 hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 bg-secondary/10 border border-secondary/30 flex items-center justify-center mb-6 group-hover:bg-secondary group-hover:border-secondary transition-colors">
+                        <span class="material-symbols-outlined text-2xl text-secondary group-hover:text-black transition-colors">newspaper</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-3 group-hover:text-secondary transition-colors">Breaking News</h3>
+                    <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed">AI-curated K-Pop news, editorials, and exclusive stories. Always be in the know, wherever you are.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- App Experience Showcase -->
+    <section class="w-full bg-black py-24 md:py-32 border-b border-white/10 overflow-hidden">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">THE<br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">EXPERIENCE</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Designed for fans. Built for obsession.</p>
+                </div>
+            </div>
+
+            <!-- Feature Rows (Brutalist alternating layout) -->
+            <div class="flex flex-col border-t border-white/20 reveal-up">
+                <!-- Row 1 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white hover:text-black transition-colors cursor-pointer">
+                    <div class="w-full md:w-20 p-6 border-b md:border-b-0 md:border-r border-white/10 group-hover:border-black/20 flex items-center justify-center shrink-0 transition-colors">
+                        <span class="font-black text-3xl text-white/30 group-hover:text-black/30 tracking-tighter transition-colors">01</span>
+                    </div>
+                    <div class="hidden md:flex p-6 border-r border-white/10 group-hover:border-black/20 items-center justify-center shrink-0 w-20 transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-primary group-hover:text-black transition-colors">dark_mode</span>
+                    </div>
+                    <div class="flex-1 p-6 flex flex-col justify-center">
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-black transition-colors mb-1">Dark Mode First</h3>
+                        <p class="font-mono text-[10px] md:text-xs tracking-widest uppercase text-slate-400 group-hover:text-black/60 transition-colors">Pure OLED black interface with neon accents. Designed to look stunning at any hour. Easy on the eyes, hard on the hype.</p>
+                    </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white hover:text-black transition-colors cursor-pointer">
+                    <div class="w-full md:w-20 p-6 border-b md:border-b-0 md:border-r border-white/10 group-hover:border-black/20 flex items-center justify-center shrink-0 transition-colors">
+                        <span class="font-black text-3xl text-white/30 group-hover:text-black/30 tracking-tighter transition-colors">02</span>
+                    </div>
+                    <div class="hidden md:flex p-6 border-r border-white/10 group-hover:border-black/20 items-center justify-center shrink-0 w-20 transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-secondary group-hover:text-black transition-colors">bolt</span>
+                    </div>
+                    <div class="flex-1 p-6 flex flex-col justify-center">
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-black transition-colors mb-1">Instant Playback</h3>
+                        <p class="font-mono text-[10px] md:text-xs tracking-widest uppercase text-slate-400 group-hover:text-black/60 transition-colors">One tap to stream. Zero buffering with adaptive bitrate. Lock screen controls, AirPlay, and Bluetooth support out of the box.</p>
+                    </div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white hover:text-black transition-colors cursor-pointer">
+                    <div class="w-full md:w-20 p-6 border-b md:border-b-0 md:border-r border-white/10 group-hover:border-black/20 flex items-center justify-center shrink-0 transition-colors">
+                        <span class="font-black text-3xl text-white/30 group-hover:text-black/30 tracking-tighter transition-colors">03</span>
+                    </div>
+                    <div class="hidden md:flex p-6 border-r border-white/10 group-hover:border-black/20 items-center justify-center shrink-0 w-20 transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-primary group-hover:text-black transition-colors">notifications_active</span>
+                    </div>
+                    <div class="flex-1 p-6 flex flex-col justify-center">
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-black transition-colors mb-1">Smart Notifications</h3>
+                        <p class="font-mono text-[10px] md:text-xs tracking-widest uppercase text-slate-400 group-hover:text-black/60 transition-colors">Get notified when your bias tops the chart, drops a comeback, or goes live. Customise alerts by group, genre, or event type.</p>
+                    </div>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white hover:text-black transition-colors cursor-pointer">
+                    <div class="w-full md:w-20 p-6 border-b md:border-b-0 md:border-r border-white/10 group-hover:border-black/20 flex items-center justify-center shrink-0 transition-colors">
+                        <span class="font-black text-3xl text-white/30 group-hover:text-black/30 tracking-tighter transition-colors">04</span>
+                    </div>
+                    <div class="hidden md:flex p-6 border-r border-white/10 group-hover:border-black/20 items-center justify-center shrink-0 w-20 transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-secondary group-hover:text-black transition-colors">gamepad</span>
+                    </div>
+                    <div class="flex-1 p-6 flex flex-col justify-center">
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-black transition-colors mb-1">Mini Games</h3>
+                        <p class="font-mono text-[10px] md:text-xs tracking-widest uppercase text-slate-400 group-hover:text-black/60 transition-colors">Test your K-Pop knowledge with the song guessing game. Compete on the leaderboard and earn rewards while you wait for comebacks.</p>
+                    </div>
+                </div>
+
+                <!-- Row 5 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-stretch hover:bg-white hover:text-black transition-colors cursor-pointer">
+                    <div class="w-full md:w-20 p-6 border-b md:border-b-0 md:border-r border-white/10 group-hover:border-black/20 flex items-center justify-center shrink-0 transition-colors">
+                        <span class="font-black text-3xl text-white/30 group-hover:text-black/30 tracking-tighter transition-colors">05</span>
+                    </div>
+                    <div class="hidden md:flex p-6 border-r border-white/10 group-hover:border-black/20 items-center justify-center shrink-0 w-20 transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-primary group-hover:text-black transition-colors">language</span>
+                    </div>
+                    <div class="flex-1 p-6 flex flex-col justify-center">
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-black transition-colors mb-1">Multi-Language</h3>
+                        <p class="font-mono text-[10px] md:text-xs tracking-widest uppercase text-slate-400 group-hover:text-black/60 transition-colors">Available in English, Korean, Japanese, and more. K-Pop is global — so is K-Beats.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials / Reviews -->
+    <section class="w-full bg-black py-24 md:py-32 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">FAN<br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">REVIEWS</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">What the community is saying.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10 reveal-up">
+                <!-- Review 1 -->
+                <div class="group border-b md:border-b-0 md:border-r border-white/10 p-8 md:p-10 hover:bg-white/5 transition-colors">
+                    <div class="flex items-center gap-1 mb-4">
+                        <span class="text-primary text-lg">★★★★★</span>
+                    </div>
+                    <p class="text-white text-lg font-bold leading-snug mb-6">"Finally an app that gets K-Pop fans. The live radio is incredible and the chart tracking is addictive."</p>
+                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div class="w-8 h-8 bg-primary/20 border border-primary/30 flex items-center justify-center">
+                            <span class="text-primary text-xs font-black">JK</span>
+                        </div>
+                        <div>
+                            <span class="text-white text-sm font-bold block">Jimin_Stan97</span>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">App Store Review</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="group border-b md:border-b-0 md:border-r border-white/10 p-8 md:p-10 hover:bg-white/5 transition-colors">
+                    <div class="flex items-center gap-1 mb-4">
+                        <span class="text-primary text-lg">★★★★★</span>
+                    </div>
+                    <p class="text-white text-lg font-bold leading-snug mb-6">"The comeback countdown notifications are everything. I never miss a release day anymore. Best K-Pop app hands down."</p>
+                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div class="w-8 h-8 bg-secondary/20 border border-secondary/30 flex items-center justify-center">
+                            <span class="text-secondary text-xs font-black">SY</span>
+                        </div>
+                        <div>
+                            <span class="text-white text-sm font-bold block">SKZ_Stay4Ever</span>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Google Play Review</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="group p-8 md:p-10 hover:bg-white/5 transition-colors">
+                    <div class="flex items-center gap-1 mb-4">
+                        <span class="text-primary text-lg">★★★★★</span>
+                    </div>
+                    <p class="text-white text-lg font-bold leading-snug mb-6">"The dark mode interface is gorgeous. I love voting in live polls and competing in the song guessing game. So well made."</p>
+                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div class="w-8 h-8 bg-primary/20 border border-primary/30 flex items-center justify-center">
+                            <span class="text-primary text-xs font-black">MJ</span>
+                        </div>
+                        <div>
+                            <span class="text-white text-sm font-bold block">NCT_MoonChild</span>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">App Store Review</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download CTA -->
+    <section class="border-t border-b border-white/20 bg-primary overflow-hidden">
+        <div class="container mx-auto px-6 py-24 max-w-5xl flex flex-col md:flex-row items-center justify-between gap-12">
+            <div class="w-full md:w-1/2 reveal-left">
+                <h2 class="text-5xl md:text-7xl font-black text-black leading-none tracking-tighter uppercase mb-4">GET THE<br/>APP NOW</h2>
+                <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-4">Free to download. No ads. No subscriptions. Just pure K-Pop energy in your pocket.</p>
+            </div>
+            <div class="w-full md:w-1/2 flex flex-col gap-4 reveal-left" style="transition-delay: 200ms;">
+                <a href="#" class="flex items-center gap-4 bg-black text-white px-6 py-5 border border-black hover:bg-white hover:text-black transition-all shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    <span class="material-symbols-outlined text-3xl">apple</span>
+                    <div class="flex flex-col">
+                        <span class="font-mono text-[9px] uppercase tracking-widest opacity-60">Download on the</span>
+                        <span class="font-black text-xl uppercase tracking-tighter leading-none">App Store</span>
+                    </div>
+                </a>
+                <a href="#" class="flex items-center gap-4 bg-white text-black px-6 py-5 border border-black hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_#000000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    <span class="material-symbols-outlined text-3xl">play_arrow</span>
+                    <div class="flex flex-col">
+                        <span class="font-mono text-[9px] uppercase tracking-widest opacity-60">Get it on</span>
+                        <span class="font-black text-xl uppercase tracking-tighter leading-none">Google Play</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+{% include 'core/footer.html' %}
+
+<script>
+// Scroll reveal
+const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => observer.observe(el));
+});
+</script>
 </body>
 </html>

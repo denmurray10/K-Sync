@@ -1,0 +1,391 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>K-Beats Contests</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#000000",
+                        "secondary": "#00f0ff",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        .neon-border {
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.is-visible, .reveal-left.is-visible {
+            opacity: 1;
+            transform: translate(0);
+        }
+        body {
+            zoom: 0.9;
+            -moz-transform: scale(0.9);
+            -moz-transform-origin: 0 0;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(244, 37, 192, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(244, 37, 192, 0.6), 0 0 60px rgba(0, 240, 255, 0.2); }
+        }
+        .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+        @keyframes countdown-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .countdown-pulse { animation: countdown-pulse 2s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+{% include 'core/header.html' %}
+
+<main class="flex-grow pt-0">
+
+    <!-- Hero Section -->
+    <section class="relative h-[70vh] min-h-[500px] w-full overflow-hidden flex items-center justify-center border-b border-white/10">
+        <div class="absolute inset-0 z-0 bg-black">
+            <div class="w-full h-full bg-cover bg-center bg-fixed opacity-30 grayscale mix-blend-luminosity" style="background-image: url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        </div>
+
+        <div class="relative z-20 container mx-auto px-6 max-w-[1400px] text-center flex flex-col items-center justify-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 border border-primary text-primary bg-primary/10 mb-8">
+                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                <span class="text-[10px] font-black tracking-[0.2em] uppercase">Win Exclusive Prizes</span>
+            </div>
+            <h1 class="text-[9vw] sm:text-5xl md:text-[5rem] lg:text-[6.5rem] font-black text-white leading-[0.95] tracking-tighter uppercase whitespace-nowrap">
+                <span>CONTESTS <span class="text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">&amp; GIVEAWAYS</span></span>
+            </h1>
+            <p class="text-base md:text-lg text-slate-300 max-w-lg font-light leading-relaxed mt-8 tracking-wide">
+                Compete, vote, and win. From signed albums to concert tickets — your next prize is one click away.
+            </p>
+        </div>
+    </section>
+
+    <!-- Active Contests Section -->
+    <section class="w-full bg-black py-24 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">ACTIVE <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">CONTESTS</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Enter now before time runs out.</p>
+                </div>
+            </div>
+
+            {% if featured %}
+            <!-- Featured Contest (Full Width) -->
+            <div class="group relative border border-white/20 hover:border-primary bg-black overflow-hidden transition-all duration-500 mb-8 reveal-up pulse-glow">
+                <div class="flex flex-col lg:flex-row">
+                    <!-- Image -->
+                    <div class="relative w-full lg:w-1/2 aspect-video lg:aspect-auto overflow-hidden">
+                        {% if featured.image %}
+                        <img src="{{ featured.image }}" alt="{{ featured.title }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 opacity-70 group-hover:opacity-100">
+                        {% else %}
+                        <div class="w-full h-full bg-white/5 flex items-center justify-center min-h-[300px]">
+                            <span class="material-symbols-outlined text-8xl text-white/10">emoji_events</span>
+                        </div>
+                        {% endif %}
+                        <div class="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent lg:block hidden"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent lg:hidden"></div>
+                        <div class="absolute top-6 left-6 flex items-center gap-2">
+                            <span class="bg-primary text-black text-[10px] font-black px-3 py-1.5 uppercase tracking-widest">Featured</span>
+                            <span class="bg-white/10 backdrop-blur-sm text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest border border-white/20">
+                                <span class="inline-block w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5 animate-pulse"></span>Open
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Content -->
+                    <div class="flex-1 p-8 lg:p-12 flex flex-col justify-between">
+                        <div>
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">
+                                {% if featured.contest_number %}{{ featured.contest_number }} · {% endif %}Closes {{ featured.deadline|date:"M j, Y" }}
+                            </span>
+                            <h3 class="text-3xl md:text-4xl lg:text-5xl font-black text-white uppercase tracking-tighter leading-none mt-4 group-hover:text-primary transition-colors">{{ featured.title }}</h3>
+                            {% if featured.description %}
+                            <p class="text-slate-400 text-sm leading-relaxed mt-6 max-w-md">{{ featured.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 mt-8 pt-6 border-t border-white/10">
+                            <div class="flex items-center gap-8">
+                                <div class="flex flex-col">
+                                    <span class="font-black text-2xl text-white tracking-tighter countdown-pulse" data-countdown="{{ featured.deadline|date:'c' }}">--d --h --m</span>
+                                    <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">Time Remaining</span>
+                                </div>
+                                <div class="flex flex-col border-l border-white/10 pl-8">
+                                    <span class="font-black text-2xl text-primary tracking-tighter">{{ featured.entry_count }}</span>
+                                    <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">Entries</span>
+                                </div>
+                            </div>
+                            <a href="{% url 'contest_entry' slug=featured.slug %}" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] sm:ml-auto">
+                                Enter Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Contest Grid -->
+            {% if grid %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal-up" style="transition-delay: 200ms;">
+                {% for contest in grid %}
+                <div class="group border border-white/20 hover:border-primary bg-black overflow-hidden transition-all duration-500">
+                    <div class="relative aspect-video overflow-hidden">
+                        {% if contest.image %}
+                        <img src="{{ contest.image }}" alt="{{ contest.title }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 opacity-70 group-hover:opacity-100">
+                        {% else %}
+                        <div class="relative w-full h-full bg-white/5 flex items-center justify-center">
+                            <div class="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/20"></div>
+                            <span class="material-symbols-outlined text-8xl text-white/10 group-hover:text-primary/30 transition-colors">emoji_events</span>
+                        </div>
+                        {% endif %}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                        <span class="absolute top-4 left-4 bg-green-500 text-black text-[9px] font-black px-2.5 py-1 uppercase tracking-widest">Open</span>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">Closes {{ contest.deadline|date:"M j, Y" }}</span>
+                        <h3 class="text-xl font-black text-white uppercase tracking-tighter mt-2 group-hover:text-primary transition-colors">{{ contest.title }}</h3>
+                        {% if contest.description %}
+                        <p class="text-slate-400 text-xs leading-relaxed mt-3">{{ contest.description|truncatechars:120 }}</p>
+                        {% endif %}
+                        <div class="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">group</span>
+                                <span class="font-mono text-[10px] text-slate-400 tracking-widest uppercase">{{ contest.entry_count }} entries</span>
+                            </div>
+                            <a href="{% url 'contest_entry' slug=contest.slug %}" class="text-white text-[10px] font-black uppercase tracking-[0.2em] border border-white/20 px-4 py-2 hover:bg-primary hover:text-black hover:border-primary transition-colors">Enter</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if not featured and not grid %}
+            <!-- Empty state -->
+            <div class="flex flex-col items-center justify-center py-24 border border-white/10">
+                <span class="material-symbols-outlined text-6xl text-white/10 mb-4">event_busy</span>
+                <h3 class="text-2xl font-black text-white/30 uppercase tracking-tighter">No Active Contests</h3>
+                <p class="font-mono text-xs tracking-widest uppercase text-slate-600 mt-3">Check back soon for new contests and giveaways.</p>
+            </div>
+            {% endif %}
+
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="w-full bg-white text-black py-16 md:py-24 border-b border-white/20">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between mb-16">
+                <div class="reveal-left">
+                    <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">HOW IT<br/>WORKS</h2>
+                    <p class="font-mono text-xs uppercase tracking-widest mt-3 text-black/60">Three steps to your next prize.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border-t border-black reveal-up">
+                <!-- Step 1 -->
+                <div class="group flex flex-col p-8 md:p-10 border-b md:border-b-0 md:border-r border-black hover:bg-black hover:text-white transition-colors">
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="bg-primary text-black w-12 h-12 flex items-center justify-center font-black text-xl">01</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase opacity-50">Step One</span>
+                    </div>
+                    <h3 class="text-2xl font-black uppercase tracking-tighter mb-3">Choose a Contest</h3>
+                    <p class="font-mono text-xs tracking-widest leading-relaxed opacity-70 uppercase">Browse active contests and giveaways. Each has unique prizes and entry criteria.</p>
+                    <span class="material-symbols-outlined text-5xl mt-auto pt-6 text-primary">trophy</span>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="group flex flex-col p-8 md:p-10 border-b md:border-b-0 md:border-r border-black hover:bg-black hover:text-white transition-colors">
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="bg-primary text-black w-12 h-12 flex items-center justify-center font-black text-xl">02</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase opacity-50">Step Two</span>
+                    </div>
+                    <h3 class="text-2xl font-black uppercase tracking-tighter mb-3">Complete the Entry</h3>
+                    <p class="font-mono text-xs tracking-widest leading-relaxed opacity-70 uppercase">Follow, share, or submit your entry. Some contests require creative submissions.</p>
+                    <span class="material-symbols-outlined text-5xl mt-auto pt-6 text-primary">edit_note</span>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="group flex flex-col p-8 md:p-10 border-b md:border-b-0 border-black hover:bg-black hover:text-white transition-colors">
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="bg-primary text-black w-12 h-12 flex items-center justify-center font-black text-xl">03</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase opacity-50">Step Three</span>
+                    </div>
+                    <h3 class="text-2xl font-black uppercase tracking-tighter mb-3">Win &amp; Celebrate</h3>
+                    <p class="font-mono text-xs tracking-widest leading-relaxed opacity-70 uppercase">Winners announced live on air. Prizes shipped worldwide — no hidden costs.</p>
+                    <span class="material-symbols-outlined text-5xl mt-auto pt-6 text-primary">celebration</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Past Winners Section -->
+    <section class="w-full bg-black py-24 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">PAST <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">WINNERS</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Recent K-Beats contest winners.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col border-t border-white/20 reveal-up">
+                <!-- Winner Row 1 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 hover:bg-white/5 transition-colors py-6 px-2">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-primary text-3xl">emoji_events</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <h4 class="text-white font-black text-lg uppercase tracking-tight">BLACKPINK Concert Tickets</h4>
+                            <p class="text-slate-400 text-xs font-mono tracking-widest uppercase mt-1">Won by <span class="text-primary">@sakura_fan92</span> · Feb 2026</p>
+                        </div>
+                    </div>
+                    <span class="inline-block bg-white/10 text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest mt-4 md:mt-0">Completed</span>
+                </div>
+
+                <!-- Winner Row 2 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 hover:bg-white/5 transition-colors py-6 px-2">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-primary text-3xl">emoji_events</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <h4 class="text-white font-black text-lg uppercase tracking-tight">Signed NewJeans Album Set</h4>
+                            <p class="text-slate-400 text-xs font-mono tracking-widest uppercase mt-1">Won by <span class="text-primary">@bunny_beats</span> · Jan 2026</p>
+                        </div>
+                    </div>
+                    <span class="inline-block bg-white/10 text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest mt-4 md:mt-0">Completed</span>
+                </div>
+
+                <!-- Winner Row 3 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 hover:bg-white/5 transition-colors py-6 px-2">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-primary text-3xl">emoji_events</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <h4 class="text-white font-black text-lg uppercase tracking-tight">K-Beats Merch Mega Bundle</h4>
+                            <p class="text-slate-400 text-xs font-mono tracking-widest uppercase mt-1">Won by <span class="text-primary">@kpop_cornwall</span> · Dec 2025</p>
+                        </div>
+                    </div>
+                    <span class="inline-block bg-white/10 text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest mt-4 md:mt-0">Completed</span>
+                </div>
+
+                <!-- Winner Row 4 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 hover:bg-white/5 transition-colors py-6 px-2">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-primary text-3xl">emoji_events</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <h4 class="text-white font-black text-lg uppercase tracking-tight">Exclusive Fan-Sign Video Call</h4>
+                            <p class="text-slate-400 text-xs font-mono tracking-widest uppercase mt-1">Won by <span class="text-primary">@twice_lover</span> · Nov 2025</p>
+                        </div>
+                    </div>
+                    <span class="inline-block bg-white/10 text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest mt-4 md:mt-0">Completed</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter / CTA -->
+    <section class="border-t border-b border-white/20 bg-primary overflow-hidden">
+        <div class="container mx-auto px-6 py-24 max-w-5xl flex flex-col md:flex-row items-center justify-between gap-12">
+            <div class="w-full md:w-1/2 reveal-left">
+                <h2 class="text-5xl md:text-7xl font-black text-black leading-none tracking-tighter uppercase mb-4">NEVER MISS <br/>A CONTEST</h2>
+                <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-4">Get notified the moment a new contest drops. Be the first to enter and increase your chances of winning.</p>
+            </div>
+            <div class="w-full md:w-1/2 reveal-left" style="transition-delay: 200ms;">
+                <form class="flex flex-col w-full gap-4">
+                    <input class="w-full bg-black border border-black px-6 py-4 text-white placeholder:text-slate-500 focus:outline-none placeholder:font-mono placeholder:uppercase placeholder:text-xs placeholder:tracking-widest rounded-none text-sm" placeholder="Enter your email address" type="email"/>
+                    <button class="w-full bg-white hover:bg-black hover:text-white text-black font-black px-10 py-5 rounded-none transition-colors uppercase tracking-[0.2em] text-sm border border-black" type="button">
+                        Get Contest Alerts
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+{% include 'core/footer.html' %}
+
+<script>
+// Countdown Timers
+function updateCountdowns() {
+    document.querySelectorAll('[data-countdown]').forEach(el => {
+        const target = new Date(el.dataset.countdown).getTime();
+        const now = Date.now();
+        const diff = target - now;
+        if (diff <= 0) {
+            el.textContent = 'CLOSED';
+            el.classList.add('text-primary');
+            return;
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        el.textContent = `${d}d ${h}h ${m}m`;
+    });
+}
+updateCountdowns();
+setInterval(updateCountdowns, 60000);
+
+// Scroll Reveal
+const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => observer.observe(el));
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,811 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Fan Clubs — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#000000",
+                        "secondary": "#00f0ff",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        .neon-border {
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.is-visible, .reveal-left.is-visible {
+            opacity: 1;
+            transform: translate(0);
+        }
+        body {
+            zoom: 0.9;
+            -moz-transform: scale(0.9);
+            -moz-transform-origin: 0 0;
+        }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-ticker {
+            width: max-content;
+            animation: ticker-scroll 30s linear infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(244, 37, 192, 0.4); }
+            50% { box-shadow: 0 0 20px 4px rgba(244, 37, 192, 0.2); }
+        }
+        .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+{% include 'core/header.html' %}
+
+<main class="flex-grow pt-0" x-data="fanClubApp()">
+
+    <!-- Hero Section -->
+    <section class="relative h-[70vh] min-h-[550px] w-full overflow-hidden flex items-end border-b border-white/10 bg-black">
+        <!-- Background -->
+        <div class="absolute inset-0 z-0">
+            <div class="w-full h-full bg-cover bg-center opacity-30 grayscale mix-blend-luminosity" style="background-image: url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        </div>
+        <!-- Decorative Background Text -->
+        <div class="absolute top-1/2 -translate-y-1/2 -right-10 text-[12rem] md:text-[18rem] font-black text-white/[0.03] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+            FANDOM
+        </div>
+
+        <div class="container mx-auto px-6 max-w-[1400px] relative z-20 pb-16 md:pb-24">
+            <div class="flex flex-col max-w-3xl reveal-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 self-start mb-6">
+                    <span class="material-symbols-outlined text-sm">groups</span>
+                    <span class="text-[10px] font-black tracking-[0.2em] uppercase">Community Hub</span>
+                </div>
+                <h1 class="text-6xl md:text-8xl lg:text-9xl font-black text-white uppercase tracking-tighter leading-[0.85] mb-6">
+                    <span class="block">FAN</span>
+                    <span class="block text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">CLUBS</span>
+                </h1>
+                <p class="text-slate-300 font-mono text-xs md:text-sm tracking-widest uppercase leading-relaxed max-w-lg">
+                    Unite with your fandom. Rep your bias. Join the global K-Pop community and connect with fans who share your passion.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Ticker Bar -->
+    <div class="relative w-full bg-primary border-t border-b border-white/20 h-16 flex items-center z-40 overflow-hidden">
+        <div class="container mx-auto max-w-[1400px] px-6 flex items-center justify-between w-full">
+            <div class="flex items-center gap-8 md:gap-16 w-full justify-between md:justify-start">
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-2xl text-black tracking-tighter">{{ total_clubs|default:"24" }}</span>
+                    <span class="font-mono text-[9px] text-black/70 tracking-widest uppercase">Active Clubs</span>
+                </div>
+                <div class="hidden sm:block w-px h-8 bg-black/30"></div>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-2xl text-black tracking-tighter">{{ total_members|default:"12.4K" }}</span>
+                    <span class="font-mono text-[9px] text-black/70 tracking-widest uppercase">Total Members</span>
+                </div>
+                <div class="hidden sm:block w-px h-8 bg-black/30"></div>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-2xl text-black tracking-tighter">{{ active_events|default:"8" }}</span>
+                    <span class="font-mono text-[9px] text-black/70 tracking-widest uppercase">Live Events</span>
+                </div>
+                <div class="hidden md:flex flex-1 items-center justify-end">
+                    <span class="bg-black text-white px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors cursor-pointer shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        Start a Club
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Fan Clubs Section -->
+    <section class="w-full bg-black py-24 md:py-32 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">OFFICIAL <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">CLUBS</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Verified fan communities for your favourite groups.</p>
+                </div>
+                <a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase reveal-left" style="transition-delay: 200ms;" href="#">
+                    Browse All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            </div>
+
+            <!-- Fan Club Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-white/10 reveal-up">
+
+                {% for group in fan_clubs %}
+                <div class="group relative border border-white/10 bg-black hover:bg-white/5 transition-all duration-500 cursor-pointer overflow-hidden">
+                    <!-- Image -->
+                    <div class="relative aspect-[4/3] overflow-hidden" onclick="window.location.href='{% url 'idol_page' slug=group.slug %}'">
+                        {% if group.image_url %}
+                        <img src="{{ group.image_url }}" alt="{{ group.name }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 opacity-60 group-hover:opacity-90">
+                        {% else %}
+                        <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-6xl text-white/10">music_note</span>
+                        </div>
+                        {% endif %}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+
+                        <!-- Badge -->
+                        <div class="absolute top-4 left-4 flex items-center gap-2">
+                            <span class="bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">{{ group.get_group_type_display }}</span>
+                            <span class="bg-white/10 backdrop-blur-sm text-white text-[9px] font-black px-2 py-0.5 uppercase tracking-widest border border-white/20">
+                                <span class="material-symbols-outlined text-[10px] align-middle mr-0.5">verified</span> Official
+                            </span>
+                        </div>
+
+                        <!-- Member Count Overlay -->
+                        <div class="absolute bottom-4 right-4 flex items-center gap-1.5 bg-black/70 backdrop-blur-sm px-3 py-1.5 border border-white/10">
+                            <span class="material-symbols-outlined text-primary text-sm">group</span>
+                            <span class="text-white font-black text-xs" x-text="(memberCounts[{{ group.id }}] || {{ group.fan_club_members.count }}) + ' Fans'">{{ group.fan_club_members.count }} Fans</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-6 border-t border-white/10">
+                        <div class="flex items-start justify-between mb-3" onclick="window.location.href='{% url 'idol_page' slug=group.slug %}'">
+                            <div>
+                                <h3 class="text-white font-black text-2xl uppercase tracking-tight group-hover:text-primary transition-colors leading-tight">{{ group.name }}</h3>
+                                <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">{{ group.label }}</p>
+                            </div>
+                            {% if group.rank %}
+                            <div class="flex flex-col items-center shrink-0 ml-4">
+                                <span class="text-primary font-black text-xl leading-none">#{{ group.rank }}</span>
+                                <span class="text-slate-500 font-mono text-[8px] tracking-widest uppercase">Rank</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if group.description %}
+                        <p class="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4">{{ group.description }}</p>
+                        {% endif %}
+                        <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                            <div class="flex -space-x-2">
+                                {% for member in group.members.all|slice:":4" %}
+                                <div class="w-7 h-7 rounded-full border-2 border-black overflow-hidden bg-white/10">
+                                    {% if member.image_url %}
+                                    <img src="{{ member.image_url }}" alt="{{ member.stage_name|default:member.name }}" class="w-full h-full object-cover">
+                                    {% else %}
+                                    <div class="w-full h-full flex items-center justify-center text-[8px] font-bold text-white/50">{{ member.name|first }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                {% if group.members.count > 4 %}
+                                <div class="w-7 h-7 rounded-full border-2 border-black bg-white/10 flex items-center justify-center text-[9px] font-bold text-white/60">+{{ group.members.count|add:"-4" }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Join / Joined Button -->
+                            <button
+                                x-show="!joinedClubs.has({{ group.id }})"
+                                @click.stop="openJoinModal({{ group.id }}, '{{ group.name|escapejs }}', '{{ group.image_url|default:''|escapejs }}', '{{ group.get_group_type_display|escapejs }}', '{{ group.label|escapejs }}')"
+                                class="text-white text-[10px] font-black uppercase tracking-[0.2em] hover:text-primary transition-colors flex items-center gap-1 z-10 relative">
+                                Join <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </button>
+                            <span
+                                x-show="joinedClubs.has({{ group.id }})"
+                                x-cloak
+                                class="text-primary text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">check_circle</span> Joined
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <!-- Placeholder clubs when no data -->
+                {% for i in "123456" %}
+                <div class="group relative border border-white/10 bg-black hover:bg-white/5 transition-all duration-500 cursor-pointer overflow-hidden">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-white/5">
+                        <div class="w-full h-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-6xl text-white/10">music_note</span>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                        <div class="absolute top-4 left-4 flex items-center gap-2">
+                            <span class="bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">{% cycle "Boy Group" "Girl Group" "Boy Group" "Girl Group" "Soloist" "Girl Group" %}</span>
+                            <span class="bg-white/10 backdrop-blur-sm text-white text-[9px] font-black px-2 py-0.5 uppercase tracking-widest border border-white/20">
+                                <span class="material-symbols-outlined text-[10px] align-middle mr-0.5">verified</span> Official
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-6 border-t border-white/10">
+                        <h3 class="text-white/30 font-black text-2xl uppercase tracking-tight leading-tight">{% cycle "STRAY KIDS" "BLACKPINK" "BTS" "TWICE" "IU" "aespa" %}</h3>
+                        <p class="text-slate-600 font-mono text-[10px] tracking-widest uppercase mt-1">{% cycle "JYP Entertainment" "YG Entertainment" "BIGHIT" "JYP Entertainment" "EDAM" "SM Entertainment" %}</p>
+                        <div class="flex items-center justify-between pt-4 mt-4 border-t border-white/10">
+                            <div class="flex items-center gap-1.5 text-slate-600 text-xs">
+                                <span class="material-symbols-outlined text-sm">group</span>
+                                <span class="font-mono text-[10px]">{% cycle "2.1K" "3.8K" "5.2K" "1.9K" "2.4K" "1.7K" %} fans</span>
+                            </div>
+                            <span class="text-white/30 text-[10px] font-black uppercase tracking-[0.2em] group-hover:text-primary transition-colors flex items-center gap-1">
+                                Join <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Fan Activity Feed (Brutalist List) -->
+    <section class="w-full bg-black py-24 md:py-32 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex flex-col lg:flex-row gap-16">
+
+                <!-- Left: Activity Feed -->
+                <div class="flex-1">
+                    <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-0 reveal-left">
+                        <div>
+                            <h2 class="text-4xl md:text-5xl font-black text-white leading-none tracking-tighter uppercase">COMMUNITY <br/><span class="text-primary">FEED</span></h2>
+                            <p class="text-slate-400 mt-3 font-mono text-xs tracking-widest uppercase">Real-time fan activity across all clubs.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col border-t border-white/20 reveal-up">
+                        <!-- Activity Item 1 -->
+                        <div class="group flex items-center gap-6 py-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer px-4">
+                            <div class="w-10 h-10 bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xl">celebration</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-bold truncate"><span class="text-primary">ARMY</span> fan club reached 5,000 members</p>
+                                <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">2 hours ago</span>
+                            </div>
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase hidden md:block">Milestone</span>
+                        </div>
+                        <!-- Activity Item 2 -->
+                        <div class="group flex items-center gap-6 py-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer px-4">
+                            <div class="w-10 h-10 bg-secondary/20 border border-secondary/40 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-secondary text-xl">edit_note</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-bold truncate"><span class="text-secondary">BLINK</span> posted a new fan art collection</p>
+                                <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">4 hours ago</span>
+                            </div>
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase hidden md:block">Fan Art</span>
+                        </div>
+                        <!-- Activity Item 3 -->
+                        <div class="group flex items-center gap-6 py-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer px-4">
+                            <div class="w-10 h-10 bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xl">how_to_vote</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-bold truncate"><span class="text-primary">STAY</span> started a voting rally for MAMA Awards</p>
+                                <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">6 hours ago</span>
+                            </div>
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase hidden md:block">Voting</span>
+                        </div>
+                        <!-- Activity Item 4 -->
+                        <div class="group flex items-center gap-6 py-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer px-4">
+                            <div class="w-10 h-10 bg-secondary/20 border border-secondary/40 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-secondary text-xl">local_activity</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-bold truncate"><span class="text-secondary">ONCE</span> organized a cupsleeve event in Seoul</p>
+                                <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">8 hours ago</span>
+                            </div>
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase hidden md:block">Event</span>
+                        </div>
+                        <!-- Activity Item 5 -->
+                        <div class="group flex items-center gap-6 py-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer px-4">
+                            <div class="w-10 h-10 bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xl">trending_up</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-bold truncate"><span class="text-primary">MY</span> trended #aespa_Supernova worldwide on X</p>
+                                <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">12 hours ago</span>
+                            </div>
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase hidden md:block">Trending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Top Fan Clubs Leaderboard -->
+                <div class="w-full lg:w-96 shrink-0">
+                    <div class="border border-white/10 bg-black reveal-up" style="transition-delay: 200ms;">
+                        <div class="p-6 border-b border-white/20 flex items-center justify-between">
+                            <h3 class="text-white font-black text-xl uppercase tracking-tight">Leaderboard</h3>
+                            <span class="material-symbols-outlined text-primary text-2xl">emoji_events</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <!-- Rank 1 -->
+                            <div class="group flex items-center gap-4 p-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+                                <div class="w-10 h-10 bg-primary text-black flex items-center justify-center font-black text-lg shrink-0">1</div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-white font-black text-sm uppercase tracking-tight truncate group-hover:text-primary transition-colors">ARMY</h4>
+                                    <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">BTS · 5.2K Fans</span>
+                                </div>
+                                <div class="flex items-center gap-1 text-green-400 font-mono text-[10px] font-bold">
+                                    <span class="material-symbols-outlined text-[12px]">arrow_upward</span> 12%
+                                </div>
+                            </div>
+                            <!-- Rank 2 -->
+                            <div class="group flex items-center gap-4 p-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+                                <div class="w-10 h-10 border border-white/30 text-white flex items-center justify-center font-black text-lg shrink-0">2</div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-white font-black text-sm uppercase tracking-tight truncate group-hover:text-primary transition-colors">BLINK</h4>
+                                    <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">BLACKPINK · 3.8K Fans</span>
+                                </div>
+                                <div class="flex items-center gap-1 text-green-400 font-mono text-[10px] font-bold">
+                                    <span class="material-symbols-outlined text-[12px]">arrow_upward</span> 8%
+                                </div>
+                            </div>
+                            <!-- Rank 3 -->
+                            <div class="group flex items-center gap-4 p-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+                                <div class="w-10 h-10 border border-white/30 text-white flex items-center justify-center font-black text-lg shrink-0">3</div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-white font-black text-sm uppercase tracking-tight truncate group-hover:text-primary transition-colors">STAY</h4>
+                                    <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">Stray Kids · 2.1K Fans</span>
+                                </div>
+                                <div class="flex items-center gap-1 text-green-400 font-mono text-[10px] font-bold">
+                                    <span class="material-symbols-outlined text-[12px]">arrow_upward</span> 15%
+                                </div>
+                            </div>
+                            <!-- Rank 4 -->
+                            <div class="group flex items-center gap-4 p-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+                                <div class="w-10 h-10 border border-white/20 text-white/60 flex items-center justify-center font-black text-lg shrink-0">4</div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-white font-black text-sm uppercase tracking-tight truncate group-hover:text-primary transition-colors">ONCE</h4>
+                                    <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">TWICE · 1.9K Fans</span>
+                                </div>
+                                <div class="flex items-center gap-1 text-red-400 font-mono text-[10px] font-bold">
+                                    <span class="material-symbols-outlined text-[12px]">arrow_downward</span> 3%
+                                </div>
+                            </div>
+                            <!-- Rank 5 -->
+                            <div class="group flex items-center gap-4 p-5 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+                                <div class="w-10 h-10 border border-white/20 text-white/60 flex items-center justify-center font-black text-lg shrink-0">5</div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-white font-black text-sm uppercase tracking-tight truncate group-hover:text-primary transition-colors">MY</h4>
+                                    <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">aespa · 1.7K Fans</span>
+                                </div>
+                                <div class="flex items-center gap-1 text-green-400 font-mono text-[10px] font-bold">
+                                    <span class="material-symbols-outlined text-[12px]">arrow_upward</span> 22%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Fan Events Section -->
+    <section class="w-full bg-black py-24 md:py-32 border-b border-white/10">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-0">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">FAN <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">EVENTS</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Community-organized meetups, events, and celebrations.</p>
+                </div>
+            </div>
+
+            <!-- Events Ticker -->
+            <div class="relative w-full overflow-hidden bg-black border-y border-white/10 h-12 flex items-center reveal-up" style="transition-delay: 100ms;">
+                <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
+                <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
+                <div class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">MAR 15</span><span class="font-black text-xs uppercase tracking-tighter text-white">ARMY Global Streaming Party</span><span class="text-white/20 mx-4">/</span></span>
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">MAR 22</span><span class="font-black text-xs uppercase tracking-tighter text-white">BLINK Cupsleeve Event</span><span class="text-white/20 mx-4">/</span></span>
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 01</span><span class="font-black text-xs uppercase tracking-tighter text-white">STAY Anniversary Celebration</span><span class="text-white/20 mx-4">/</span></span>
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 10</span><span class="font-black text-xs uppercase tracking-tighter text-white">ONCE Fan Art Exhibition</span><span class="text-white/20 mx-4">/</span></span>
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 18</span><span class="font-black text-xs uppercase tracking-tighter text-white">MY aespa Listening Party</span><span class="text-white/20 mx-4">/</span></span>
+                    <!-- Duplicate for seamless loop -->
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">MAR 15</span><span class="font-black text-xs uppercase tracking-tighter text-white">ARMY Global Streaming Party</span><span class="text-white/20 mx-4">/</span></span>
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">MAR 22</span><span class="font-black text-xs uppercase tracking-tighter text-white">BLINK Cupsleeve Event</span><span class="text-white/20 mx-4">/</span></span>
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 01</span><span class="font-black text-xs uppercase tracking-tighter text-white">STAY Anniversary Celebration</span><span class="text-white/20 mx-4">/</span></span>
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 10</span><span class="font-black text-xs uppercase tracking-tighter text-white">ONCE Fan Art Exhibition</span><span class="text-white/20 mx-4">/</span></span>
+                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 18</span><span class="font-black text-xs uppercase tracking-tighter text-white">MY aespa Listening Party</span><span class="text-white/20 mx-4">/</span></span>
+                </div>
+            </div>
+
+            <!-- Events List -->
+            <div class="flex flex-col border-t border-white/20 reveal-up">
+                <!-- Event Row 1 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+                    <div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center shrink-0">
+                        <span class="font-mono text-xs tracking-widest uppercase font-bold text-primary mb-1">Upcoming</span>
+                        <span class="font-black text-2xl tracking-tighter text-white">MAR 15</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">20:00 KST</span>
+                    </div>
+                    <div class="flex-1 p-6 flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Streaming</span>
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">ARMY</span>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors mb-1">Global Streaming Party</h3>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Synchronized streaming event for BTS's new single across all platforms.</p>
+                    </div>
+                    <div class="hidden md:flex p-6 border-l border-white/10 items-center justify-center shrink-0 w-32 bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                        <span class="material-symbols-outlined text-4xl text-primary">live_tv</span>
+                    </div>
+                </div>
+                <!-- Event Row 2 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+                    <div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center shrink-0">
+                        <span class="font-black text-2xl tracking-tighter text-white">MAR 22</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">14:00 KST</span>
+                    </div>
+                    <div class="flex-1 p-6 flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="bg-secondary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Meetup</span>
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">BLINK</span>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors mb-1">Cupsleeve Event — Seoul</h3>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Fan-organized cupsleeve event at Hongdae celebrating BLACKPINK's anniversary.</p>
+                    </div>
+                    <div class="hidden md:flex p-6 border-l border-white/10 items-center justify-center shrink-0 w-32">
+                        <span class="material-symbols-outlined text-4xl text-white/20">local_cafe</span>
+                    </div>
+                </div>
+                <!-- Event Row 3 -->
+                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+                    <div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center shrink-0">
+                        <span class="font-black text-2xl tracking-tighter text-white">APR 01</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">All Day</span>
+                    </div>
+                    <div class="flex-1 p-6 flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Anniversary</span>
+                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">STAY</span>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors mb-1">STAY Anniversary Celebration</h3>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Global fan projects, hashtag trending, and video compilations for Stray Kids.</p>
+                    </div>
+                    <div class="hidden md:flex p-6 border-l border-white/10 items-center justify-center shrink-0 w-32">
+                        <span class="material-symbols-outlined text-4xl text-white/20">celebration</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fandom Perks Section -->
+    <section class="relative w-full bg-black py-24 md:py-32 border-b border-white/10 overflow-hidden">
+        <!-- Decorative Background Text -->
+        <div class="absolute -top-10 -left-10 text-[12rem] md:text-[16rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+            PERKS
+        </div>
+        <div class="container mx-auto px-6 max-w-[1400px] relative z-10">
+            <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-16">
+                <div class="reveal-left">
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">MEMBER <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">PERKS</span></h2>
+                    <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Exclusive benefits for joining our fan clubs.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border border-white/10 reveal-up">
+                <!-- Perk 1 -->
+                <div class="group border border-white/10 p-8 hover:bg-white/5 transition-all duration-500 cursor-pointer">
+                    <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center mb-6 pulse-glow">
+                        <span class="material-symbols-outlined text-primary text-3xl">local_activity</span>
+                    </div>
+                    <h3 class="text-white font-black text-lg uppercase tracking-tight mb-3 group-hover:text-primary transition-colors">Early Access</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed">Get first dibs on concert tickets, fan-sign events, and exclusive merchandise drops before anyone else.</p>
+                </div>
+                <!-- Perk 2 -->
+                <div class="group border border-white/10 p-8 hover:bg-white/5 transition-all duration-500 cursor-pointer">
+                    <div class="w-14 h-14 bg-secondary/10 border border-secondary/30 flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-secondary text-3xl">badge</span>
+                    </div>
+                    <h3 class="text-white font-black text-lg uppercase tracking-tight mb-3 group-hover:text-primary transition-colors">Exclusive Badges</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed">Unlock unique profile badges and flair that showcase your dedication and fandom loyalty level.</p>
+                </div>
+                <!-- Perk 3 -->
+                <div class="group border border-white/10 p-8 hover:bg-white/5 transition-all duration-500 cursor-pointer">
+                    <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-primary text-3xl">forum</span>
+                    </div>
+                    <h3 class="text-white font-black text-lg uppercase tracking-tight mb-3 group-hover:text-primary transition-colors">Private Forums</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed">Access members-only discussion boards, fan theory threads, and interact directly with club leaders.</p>
+                </div>
+                <!-- Perk 4 -->
+                <div class="group border border-white/10 p-8 hover:bg-white/5 transition-all duration-500 cursor-pointer">
+                    <div class="w-14 h-14 bg-secondary/10 border border-secondary/30 flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-secondary text-3xl">redeem</span>
+                    </div>
+                    <h3 class="text-white font-black text-lg uppercase tracking-tight mb-3 group-hover:text-primary transition-colors">Giveaways</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed">Monthly raffles for signed albums, photo cards, concert tickets, and limited-edition K-Beats merch.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="border-t border-b border-white/20 bg-primary overflow-hidden">
+        <div class="container mx-auto px-6 py-24 max-w-5xl flex flex-col md:flex-row items-center justify-between gap-12">
+            <div class="w-full md:w-1/2 reveal-left">
+                <h2 class="text-5xl md:text-7xl font-black text-black leading-none tracking-tighter uppercase mb-4">FIND YOUR <br/>FANDOM</h2>
+                <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-4">Join a fan club today and connect with thousands of K-Pop fans worldwide. Your community is waiting.</p>
+            </div>
+            <div class="w-full md:w-1/2 reveal-left" style="transition-delay: 200ms;">
+                <div class="flex flex-col w-full gap-4">
+                    <a href="{% url 'idols' %}" class="w-full bg-white hover:bg-black hover:text-white text-black font-black px-10 py-5 transition-colors uppercase tracking-[0.2em] text-sm border border-black text-center">
+                        Browse All Groups
+                    </a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="w-full bg-black hover:bg-white hover:text-black text-white font-black px-10 py-5 transition-colors uppercase tracking-[0.2em] text-sm border border-black text-center">
+                        Go to Dashboard
+                    </a>
+                    {% else %}
+                    <a href="{% url 'signup' %}" class="w-full bg-black hover:bg-white hover:text-black text-white font-black px-10 py-5 transition-colors uppercase tracking-[0.2em] text-sm border border-black text-center">
+                        Create Account
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         JOIN CONFIRMATION MODAL
+         ══════════════════════════════════════════════════════════════ -->
+    <div x-show="showModal" x-cloak
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="closeModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="relative z-10 w-full max-w-md border border-white/20 bg-black overflow-hidden"
+             x-transition:enter="transition ease-out duration-300 delay-100"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
+
+            <!-- Success State -->
+            <template x-if="modalState === 'success'">
+                <div class="flex flex-col items-center text-center p-10">
+                    <div class="w-20 h-20 bg-primary/20 border border-primary flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-primary text-5xl">celebration</span>
+                    </div>
+                    <h3 class="text-3xl font-black text-white uppercase tracking-tighter mb-2">Welcome!</h3>
+                    <p class="text-slate-300 text-sm mb-1">You're now a member of</p>
+                    <p class="text-primary text-2xl font-black uppercase tracking-tight mb-6" x-text="modalGroup.name"></p>
+                    <div class="w-full border-t border-white/10 pt-6 flex flex-col gap-3">
+                        <p class="text-slate-400 font-mono text-[10px] tracking-widest uppercase">Your personalized fan experience is now active on your Dashboard.</p>
+                        <div class="flex gap-3 w-full mt-2">
+                            <a href="{% url 'dashboard' %}" class="flex-1 bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-4 py-3 border border-primary hover:bg-black hover:text-primary transition-colors text-center">
+                                Dashboard
+                            </a>
+                            <button @click="closeModal()" class="flex-1 bg-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] px-4 py-3 border border-white/20 hover:bg-white/20 transition-colors">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Confirm State -->
+            <template x-if="modalState === 'confirm'">
+                <div>
+                    <!-- Group Image Header -->
+                    <div class="relative h-40 overflow-hidden">
+                        <template x-if="modalGroup.image">
+                            <img :src="modalGroup.image" :alt="modalGroup.name" class="w-full h-full object-cover grayscale opacity-50">
+                        </template>
+                        <template x-if="!modalGroup.image">
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-6xl text-white/10">music_note</span>
+                            </div>
+                        </template>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+                        <div class="absolute top-4 right-4">
+                            <button @click="closeModal()" class="w-8 h-8 bg-black/50 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors">
+                                <span class="material-symbols-outlined text-lg">close</span>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-4 left-6 flex items-center gap-2">
+                            <span class="bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest" x-text="modalGroup.type"></span>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="p-8">
+                        <h3 class="text-3xl font-black text-white uppercase tracking-tighter leading-none mb-1" x-text="'Join ' + modalGroup.name + '?'"></h3>
+                        <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mb-6" x-text="modalGroup.label"></p>
+
+                        <div class="border border-white/10 p-4 mb-6">
+                            <h4 class="text-white font-black text-xs uppercase tracking-widest mb-3">You'll unlock:</h4>
+                            <div class="flex flex-col gap-2.5">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-primary text-lg">local_activity</span>
+                                    <span class="text-slate-300 text-xs">Early access to concert tickets & fan-signs</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-secondary text-lg">badge</span>
+                                    <span class="text-slate-300 text-xs">Exclusive fandom badge on your profile</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-primary text-lg">forum</span>
+                                    <span class="text-slate-300 text-xs">Access to members-only discussion boards</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-secondary text-lg">notifications_active</span>
+                                    <span class="text-slate-300 text-xs">Personalized comeback & event alerts</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button @click="confirmJoin()"
+                                    :disabled="joining"
+                                    class="flex-1 bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-6 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] disabled:opacity-50">
+                                <span x-show="!joining">Join Now</span>
+                                <span x-show="joining">Joining...</span>
+                            </button>
+                            <button @click="closeModal()" class="bg-white/10 text-white font-black uppercase tracking-[0.2em] text-xs px-6 py-4 border border-white/20 hover:bg-white/20 transition-colors">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Login Required Modal -->
+    <div x-show="showLoginModal" x-cloak
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+         x-transition>
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="showLoginModal = false"></div>
+        <div class="relative z-10 w-full max-w-sm border border-white/20 bg-black p-8 text-center" x-transition>
+            <div class="w-16 h-16 bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-6">
+                <span class="material-symbols-outlined text-white text-3xl">lock</span>
+            </div>
+            <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-2">Sign In Required</h3>
+            <p class="text-slate-400 text-sm mb-6">Log in or create an account to join fan clubs and unlock personalized features.</p>
+            <div class="flex gap-3">
+                <a href="{% url 'login' %}" class="flex-1 bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-4 py-3 border border-primary hover:bg-black hover:text-primary transition-colors text-center">Log In</a>
+                <a href="{% url 'signup' %}" class="flex-1 bg-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] px-4 py-3 border border-white/20 hover:bg-white/20 transition-colors text-center">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+{% include 'core/footer.html' %}
+
+<style>[x-cloak] { display: none !important; }</style>
+<script>
+function fanClubApp() {
+    return {
+        joinedClubs: new Set([{% for gid in joined_ids %}{{ gid }},{% endfor %}]),
+        memberCounts: {},
+        showModal: false,
+        showLoginModal: false,
+        modalState: 'confirm',  // 'confirm' | 'success'
+        joining: false,
+        modalGroup: { id: null, name: '', image: '', type: '', label: '' },
+
+        openJoinModal(id, name, image, type, label) {
+            {% if user.is_authenticated %}
+            this.modalGroup = { id, name, image, type, label };
+            this.modalState = 'confirm';
+            this.joining = false;
+            this.showModal = true;
+            {% else %}
+            this.showLoginModal = true;
+            {% endif %}
+        },
+
+        closeModal() {
+            this.showModal = false;
+        },
+
+        async confirmJoin() {
+            if (this.joining) return;
+            this.joining = true;
+            try {
+                const res = await fetch('{% url "api_fan_club_join" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ group_id: this.modalGroup.id })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.joinedClubs.add(this.modalGroup.id);
+                    this.memberCounts[this.modalGroup.id] = data.member_count;
+                    this.modalState = 'success';
+                }
+            } catch (e) {
+                console.error('Join failed:', e);
+            } finally {
+                this.joining = false;
+            }
+        },
+
+        async leaveClub(groupId) {
+            try {
+                const res = await fetch('{% url "api_fan_club_leave" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ group_id: groupId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.joinedClubs.delete(groupId);
+                    this.memberCounts[groupId] = data.member_count;
+                }
+            } catch (e) {
+                console.error('Leave failed:', e);
+            }
+        }
+    };
+}
+
+// ── Scroll Reveal Animations ─────────────────────────────────────
+const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.15
+};
+const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => {
+        observer.observe(el);
+    });
+});
+</script>
+</body>
+</html>
