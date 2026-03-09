@@ -1,0 +1,311 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>MV Matcher — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(0,240,255,0.3); } 50% { box-shadow: 0 0 40px rgba(0,240,255,0.6); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes score-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes countdown-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-score-pop { animation: score-pop 0.3s ease-out; }
+        .animate-slide-up { animation: slide-up 0.5s ease-out both; }
+        .animate-countdown { animation: countdown-pulse 1s ease-in-out infinite; }
+        .option-correct { border-color: #22c55e !important; background: rgba(34, 197, 94, 0.1) !important; }
+        .option-wrong { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.1) !important; }
+        .option-btn { transition: all 0.2s ease; }
+        .option-btn:hover:not(:disabled) { border-color: #00f0ff; background: rgba(0, 240, 255, 0.05); transform: translateY(-2px); }
+        .frame-blur { filter: blur(20px); transition: filter 0.5s ease; }
+        .frame-clear { filter: blur(0); }
+    </style>
+</head>
+<body class="font-sans text-white" x-data="mvMatcher()">
+
+    <!-- Full-screen modal overlay -->
+    <div class="fixed inset-0 z-50 bg-black flex flex-col">
+
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </a>
+                <div>
+                    <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">MV Matcher</h1>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600">Exclusive Frames</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <!-- Round -->
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Round</span>
+                    <span class="font-black text-lg text-white" x-text="(currentRound + 1) + '/' + totalRounds"></span>
+                </div>
+                <!-- Score -->
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Score</span>
+                    <span class="font-black text-lg text-secondary" :class="scoreAnimating && 'animate-score-pop'" x-text="score"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full h-1 bg-white/5 shrink-0">
+            <div class="h-full bg-secondary transition-all duration-500 ease-out"
+                 :style="'width:' + ((currentRound) / totalRounds * 100) + '%'"></div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+
+            <!-- Intro Screen -->
+            <div x-show="state === 'intro'" x-transition class="text-center px-6 max-w-lg">
+                <span class="material-symbols-outlined text-7xl text-secondary mb-6 block">movie</span>
+                <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-4">
+                    MV<br/><span class="text-transparent [-webkit-text-stroke:1.5px_#00f0ff]">MATCHER</span>
+                </h2>
+                <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-3">
+                    <span x-text="totalRounds"></span> Rounds &bull; 10s Reveal Time
+                </p>
+                <p class="text-slate-400 text-sm mb-10 max-w-sm mx-auto">
+                    Identify the K-Pop group or member from a single frame. The faster you guess, the more points you earn!
+                </p>
+                <button @click="startGame()"
+                        class="inline-flex items-center gap-3 bg-secondary text-black px-10 py-4 font-black uppercase tracking-[0.2em] text-xs border border-secondary hover:bg-white hover:border-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    <span class="material-symbols-outlined text-lg">play_arrow</span> Start Game
+                </button>
+            </div>
+
+            <!-- Playing Screen -->
+            <div x-show="state === 'playing'" x-transition class="w-full max-w-4xl px-6 animate-slide-up" :key="currentRound">
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <!-- Image Area -->
+                    <div class="relative aspect-video border border-white/10 bg-white/[0.02] overflow-hidden group">
+                         <img :src="currentRoundData.image" 
+                              class="w-full h-full object-cover transition-all duration-700"
+                              :class="answered ? 'frame-clear scale-100' : 'frame-blur scale-110'" />
+                         
+                         <!-- Scanline/VFX overlay -->
+                         <div class="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]"></div>
+                         
+                         <!-- Hint hidden until answered or hint requested? -->
+                         <div x-show="answered" x-transition class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 border border-white/10">
+                             <span class="font-mono text-[8px] tracking-widest uppercase text-secondary block mb-1">Clue</span>
+                             <p class="text-[10px] font-bold uppercase text-white" x-text="currentRoundData.hint"></p>
+                         </div>
+                    </div>
+
+                    <!-- HUD & Options -->
+                    <div>
+                        <!-- Timer -->
+                        <div class="flex items-center gap-3 mb-8">
+                            <span class="material-symbols-outlined text-lg" :class="timeLeft <= 3 ? 'text-red-400 animate-countdown' : 'text-slate-600'">timer_3</span>
+                            <div class="flex-1 h-1 bg-white/10">
+                                <div class="h-full transition-all duration-1000 ease-linear"
+                                     :class="timeLeft <= 3 ? 'bg-red-400' : 'bg-secondary'"
+                                     :style="'width:' + (timeLeft / 10 * 100) + '%'"></div>
+                            </div>
+                            <span class="font-mono text-xs font-bold w-6 text-right" :class="timeLeft <= 3 ? 'text-red-400' : 'text-slate-500'" x-text="timeLeft"></span>
+                        </div>
+
+                        <h3 class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mb-6 block">Identify the subject...</h3>
+
+                        <div class="grid grid-cols-1 gap-3">
+                            <template x-for="(opt, i) in currentRoundData.options" :key="i">
+                                <button @click="answer(opt)"
+                                        :disabled="answered"
+                                        class="option-btn group flex items-center justify-between p-5 border border-white/10 bg-white/[0.02] text-left"
+                                        :class="{
+                                            'option-correct': answered && opt === currentRoundData.answer,
+                                            'option-wrong': answered && selectedOption === opt && opt !== currentRoundData.answer,
+                                            'opacity-40': answered && opt !== currentRoundData.answer && selectedOption !== opt
+                                        }">
+                                    <span class="text-white text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors"
+                                          x-text="opt"></span>
+                                    <template x-if="answered && opt === currentRoundData.answer">
+                                        <span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+                                    </template>
+                                </button>
+                            </template>
+                        </div>
+
+                        <!-- Round Feedback -->
+                        <div x-show="answered" x-transition class="mt-8 pt-8 border-t border-white/5 flex items-center justify-between">
+                            <div class="text-left">
+                                <p class="font-mono text-[10px] tracking-widest uppercase"
+                                   :class="wasCorrect ? 'text-green-400' : 'text-red-400'"
+                                   x-text="wasCorrect ? '✓ MISSION PASSED' : '✗ MISSION FAILED'">
+                                </p>
+                                <p class="text-white font-black uppercase text-xl mt-1" x-text="wasCorrect ? '+' + lastPoints + ' PTS' : 'TARGET: ' + currentRoundData.answer.toUpperCase()"></p>
+                            </div>
+                            <button @click="nextRound()"
+                                    class="bg-white text-black px-6 py-3 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-secondary transition-colors">
+                                <span x-text="currentRound < totalRounds - 1 ? 'Next Frame' : 'Results'"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div x-show="state === 'results'" x-transition class="text-center px-6 max-w-lg animate-slide-up">
+                <span class="text-6xl mb-6 block">🎬</span>
+                <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-3">
+                    MATCH<br/><span class="text-transparent [-webkit-text-stroke:1.5px_#00f0ff]">OVER</span>
+                </h2>
+
+                <div class="flex items-center justify-center gap-1 my-10 border-y border-white/10 py-10">
+                    <div class="text-center px-10">
+                        <span class="text-5xl font-black text-secondary block" x-text="score"></span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-600 block mt-2">Total Score</span>
+                    </div>
+                    <div class="w-px h-16 bg-white/10"></div>
+                    <div class="text-center px-10">
+                        <span class="text-5xl font-black text-white block" x-text="correctCount + '/' + totalRounds"></span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-600 block mt-2">Accuracy</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button @click="resetGame()"
+                            class="inline-flex items-center gap-2 bg-secondary text-black px-10 py-5 font-black uppercase tracking-[0.2em] text-[10px] border border-secondary hover:bg-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        <span class="material-symbols-outlined text-sm">replay</span> Retake
+                    </button>
+                    <a href="{% url 'dashboard' %}"
+                       class="inline-flex items-center gap-2 border border-white/20 text-white px-10 py-5 font-black uppercase tracking-[0.2em] text-[10px] hover:border-secondary hover:text-secondary transition-colors">
+                        <span class="material-symbols-outlined text-sm">arrow_back</span> Dashboard
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+    function mvMatcher() {
+        const rounds = {{ rounds_json|safe }};
+
+        return {
+            state: 'intro',
+            rounds: rounds,
+            currentRound: 0,
+            totalRounds: rounds.length,
+            score: 0,
+            correctCount: 0,
+            answered: false,
+            selectedOption: null,
+            wasCorrect: false,
+            scoreAnimating: false,
+            lastPoints: 0,
+            timeLeft: 10,
+            timerInterval: null,
+
+            get currentRoundData() {
+                return this.rounds[this.currentRound] || { image: '', options: [], answer: '', hint: '' };
+            },
+
+            startGame() {
+                this.currentRound = 0;
+                this.score = 0;
+                this.correctCount = 0;
+                this.answered = false;
+                this.selectedOption = null;
+                this.state = 'playing';
+                this.startTimer();
+            },
+
+            startTimer() {
+                this.timeLeft = 10;
+                clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => {
+                    this.timeLeft--;
+                    if (this.timeLeft <= 0) {
+                        clearInterval(this.timerInterval);
+                        if (!this.answered) {
+                            this.answer(null); 
+                        }
+                    }
+                }, 1000);
+            },
+
+            answer(opt) {
+                if (this.answered) return;
+                clearInterval(this.timerInterval);
+                this.answered = true;
+                this.selectedOption = opt;
+
+                const correct = opt === this.currentRoundData.answer;
+                this.wasCorrect = correct;
+
+                if (correct) {
+                    this.correctCount++;
+                    const timeBonus = Math.round(this.timeLeft * 15);
+                    this.lastPoints = 150 + timeBonus;
+                    this.score += this.lastPoints;
+                    this.scoreAnimating = true;
+                    setTimeout(() => this.scoreAnimating = false, 400);
+                } else {
+                    this.lastPoints = 0;
+                }
+            },
+
+            nextRound() {
+                if (this.currentRound < this.totalRounds - 1) {
+                    this.currentRound++;
+                    this.answered = false;
+                    this.selectedOption = null;
+                    this.wasCorrect = false;
+                    this.startTimer();
+                } else {
+                    this.saveScore();
+                    this.state = 'results';
+                }
+            },
+
+            resetGame() {
+                location.reload(); 
+            },
+
+            async saveScore() {
+                try {
+                    await fetch('{% url "save_game_score" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({
+                            game: 'mv_matcher',
+                            score: this.score,
+                            correct: this.correctCount,
+                            total: this.totalRounds,
+                        }),
+                    });
+                } catch (e) {}
+            }
+        };
+    }
+    </script>
+</body>
+</html>

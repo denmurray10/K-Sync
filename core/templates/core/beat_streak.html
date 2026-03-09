@@ -1,0 +1,217 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Beat Streak — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        @keyframes beat-pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+        .beat-tile { width: 80px; height: 80px; border: 2px solid #00f0ff; display: flex; items-center; justify-center; transition: all 0.1s ease; cursor: pointer; }
+        .beat-tile:active { transform: scale(0.9); background: rgba(0,240,255,0.2); }
+        .lane { height: 100%; border-right: 1px solid rgba(255,255,255,0.05); }
+        @keyframes drop { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(600px); opacity: 1; } }
+        .note { position: absolute; width: 60px; height: 20px; border-radius: 2px; }
+        .perfect { color: #22c55e; font-weight: 900; animation: bounce 0.5s ease-out; }
+        @keyframes bounce { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-20px); } 100% { opacity: 0; transform: translateY(-40px); } }
+    </style>
+</head>
+<body class="font-sans text-white overflow-hidden" x-data="beatStreak()">
+
+    <!-- Header -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md px-6 py-4 flex items-center justify-between border-b border-white/10">
+        <div class="flex items-center gap-4">
+            <a href="{% url 'dashboard' %}" class="text-slate-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">close</span>
+            </a>
+            <div>
+                <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Beat Streak</h1>
+                <p class="font-mono text-[9px] tracking-widest uppercase text-secondary" x-text="currentTrack ? currentTrack.title + ' — ' + currentTrack.artist : 'Select a track'"></p>
+            </div>
+        </div>
+        <div class="flex items-center gap-8">
+            <div class="text-right">
+                <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block">Score</span>
+                <span class="text-xl font-black text-secondary" x-text="score"></span>
+            </div>
+            <div class="text-right">
+                <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block">Combo</span>
+                <span class="text-xl font-black text-primary" x-text="combo + 'x'"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <main class="h-screen flex items-center justify-center relative">
+        
+        <!-- Intro / Track Select -->
+        <div x-show="state === 'intro'" x-transition class="text-center max-w-2xl px-6">
+            <span class="material-symbols-outlined text-7xl text-secondary mb-6 block animate-pulse">speed</span>
+            <h2 class="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none mb-8 italic">BEAT<br/><span class="text-transparent [-webkit-text-stroke:1px_#00f0ff]">STREAK</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-10 overflow-y-auto max-h-64 pr-2">
+                <template x-for="track in tracks" :key="track.title">
+                    <button @click="startTrack(track)" 
+                            class="p-4 border border-white/10 hover:border-secondary transition-all flex items-center gap-4 bg-white/[0.02] text-left">
+                        <img :src="track.artwork_url" class="w-10 h-10 border border-white/10 shrink-0" />
+                        <div class="flex-1 truncate">
+                            <h4 class="font-black uppercase text-[10px]" x-text="track.title"></h4>
+                            <p class="text-[8px] font-mono text-slate-500 uppercase" x-text="track.artist"></p>
+                        </div>
+                    </button>
+                </template>
+            </div>
+            
+            <p class="text-slate-500 font-mono text-[10px] uppercase mb-8 tracking-widest">Select a track to begin the rhythm challenge</p>
+        </div>
+
+        <!-- Playing State (Rhythm HUD) -->
+        <div x-show="state === 'playing'" x-transition class="w-full h-full flex items-center justify-center">
+             <!-- Tap Zone -->
+             <div class="absolute bottom-20 left-0 right-0 flex justify-center gap-8">
+                  <div class="beat-tile" @mousedown="tap(0)" :class="activeTile === 0 && 'border-primary'"><span class="font-black text-xs text-secondary opacity-20">S</span></div>
+                  <div class="beat-tile" @mousedown="tap(1)" :class="activeTile === 1 && 'border-primary'"><span class="font-black text-xs text-secondary opacity-20">D</span></div>
+                  <div class="beat-tile" @mousedown="tap(2)" :class="activeTile === 2 && 'border-primary'"><span class="font-black text-xs text-secondary opacity-20">K</span></div>
+                  <div class="beat-tile" @mousedown="tap(3)" :class="activeTile === 3 && 'border-primary'"><span class="font-black text-xs text-secondary opacity-20">L</span></div>
+             </div>
+             
+             <!-- Floating Score Text -->
+             <template x-for="f in floatingText" :key="f.id">
+                  <div class="absolute perfect left-1/2 -translate-x-1/2" :style="'bottom:' + (200 + f.offset) + 'px'" x-text="f.text"></div>
+             </template>
+
+             <div class="text-center animate-pulse">
+                  <p class="font-mono text-[10px] text-slate-500 tracking-[0.5em] uppercase">Catch the beat...</p>
+             </div>
+        </div>
+
+        <!-- Finished State -->
+        <div x-show="state === 'finished'" x-transition class="text-center max-w-lg px-6">
+            <h2 class="text-5xl md:text-7xl font-black tracking-tighter uppercase leading-none mb-6 italic">STREAK<br/><span class="text-transparent [-webkit-text-stroke:1px_#00f0ff]">OVER</span></h2>
+            
+            <div class="grid grid-cols-2 gap-0 border border-white/10 my-10">
+                <div class="p-8 border-r border-white/10 bg-white/5">
+                    <span class="text-4xl font-black text-secondary block" x-text="score"></span>
+                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block mt-1">Final Score</span>
+                </div>
+                <div class="p-8 bg-white/5 tabular-nums">
+                    <span class="text-4xl font-black text-white block" x-text="maxCombo + 'x'"></span>
+                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block mt-1">Best Combo</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center gap-4">
+                 <button @click="state = 'intro'; stopAudio();" class="bg-secondary text-black px-10 py-5 font-black uppercase tracking-[0.2em] text-[10px] shadow-[4px_4px_0px_white] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">Pick New Song</button>
+                 <a href="{% url 'dashboard' %}" class="border border-white/20 px-10 py-5 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white hover:text-black transition-all">Back to Home</a>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+    function beatStreak() {
+        const tracks = {{ game_tracks_json|safe }};
+
+        return {
+            state: 'intro',
+            tracks: tracks,
+            currentTrack: null,
+            score: 0,
+            combo: 0,
+            maxCombo: 0,
+            activeTile: -1,
+            audio: null,
+            beatInterval: null,
+            floatingText: [],
+            textId: 0,
+
+            startTrack(track) {
+                this.currentTrack = track;
+                this.score = 0;
+                this.combo = 0;
+                this.maxCombo = 0;
+                this.state = 'playing';
+                
+                this.audio = new Audio(track.preview_url);
+                this.audio.play();
+
+                // Mock Beat detection (random intervals for simplicity in MVP)
+                this.beatInterval = setInterval(() => {
+                    this.activeTile = Math.floor(Math.random() * 4);
+                    setTimeout(() => { this.activeTile = -1; }, 400);
+                }, 800);
+
+                this.audio.onended = () => this.finish();
+            },
+
+            tap(idx) {
+                if (this.state !== 'playing') return;
+                
+                if (this.activeTile === idx) {
+                    this.score += 50 + (this.combo * 10);
+                    this.combo++;
+                    if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+                    this.showText('PERFECT');
+                } else {
+                    this.combo = 0;
+                    this.showText('MISS');
+                }
+            },
+
+            showText(txt) {
+                const id = this.textId++;
+                this.floatingText.push({ id, text: txt, offset: 0 });
+                setTimeout(() => {
+                    this.floatingText = this.floatingText.filter(f => f.id !== id);
+                }, 500);
+            },
+
+            finish() {
+                clearInterval(this.beatInterval);
+                this.state = 'finished';
+                this.saveScore();
+            },
+
+            stopAudio() {
+                if(this.audio) {
+                    this.audio.pause();
+                    this.audio.currentTime = 0;
+                }
+            },
+
+            async saveScore() {
+                try {
+                    await fetch('{% url "save_game_score" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({
+                            game: 'beat_streak',
+                            score: this.score,
+                            total: this.maxCombo,
+                        }),
+                    });
+                } catch (e) {}
+            }
+        };
+    }
+    </script>
+</body>
+</html>

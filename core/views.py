@@ -1001,6 +1001,139 @@ def idol_scramble(request):
 def lyric_drop(request):
     return render(request, 'core/lyric_drop.html')
 
+def fandom_trivia(request):
+    import random
+    groups = list(KPopGroup.objects.exclude(label='').exclude(fandom_name=''))
+    if len(groups) < 10:
+        groups = list(KPopGroup.objects.all())
+    
+    questions = []
+    # Mix of questions: Fandom Names, Labels, Member Counts
+    for g in random.sample(groups, min(len(groups), 20)):
+        q_type = random.choice(['fandom', 'label', 'count'])
+        if q_type == 'fandom' and g.fandom_name:
+            questions.append({
+                'question': f"What is the official fandom name for {g.name}?",
+                'answer': g.fandom_name,
+                'options': random.sample([g.fandom_name] + [other.fandom_name for other in random.sample(groups, 3) if other.fandom_name and other.fandom_name != g.fandom_name], 4) if g.fandom_name else [g.fandom_name, 'Army', 'Blink', 'Once']
+            })
+        elif q_type == 'label' and g.label:
+             questions.append({
+                'question': f"Which label is {g.name} signed to?",
+                'answer': g.label,
+                'options': random.sample([g.label] + list(set([other.label for other in random.sample(groups, 5) if other.label and other.label != g.label]))[:3], 4)
+            })
+        else:
+            count = g.members.count()
+            if count > 0:
+                questions.append({
+                    'question': f"How many members are in {g.name}?",
+                    'answer': str(count),
+                    'options': random.sample([str(count), str(count+2), str(max(1, count-1)), str(count+5)], 4)
+                })
+
+    random.shuffle(questions)
+    return render(request, 'core/fandom_trivia.html', {
+        'questions_json': json.dumps(questions[:10]),
+    })
+
+def mv_matcher(request):
+    import random
+    members = list(KPopMember.objects.select_related('group').exclude(image_url=''))
+    groups = list(KPopGroup.objects.exclude(image_url=''))
+    
+    rounds = []
+    # Mix members and groups
+    pool = []
+    for m in members:
+        pool.append({'image': m.image_url, 'answer': m.stage_name or m.name, 'hint': f"Member of {m.group.name}"})
+    for g in groups:
+        pool.append({'image': g.image_url, 'answer': g.name, 'hint': f"{g.get_group_type_display()} Group"})
+
+    if len(pool) < 10:
+        return redirect('dashboard') # Not enough data
+
+    selected = random.sample(pool, min(len(pool), 15))
+    for item in selected:
+        # Generate 3 wrong options
+        others = [x['answer'] for x in pool if x['answer'] != item['answer']]
+        options = random.sample(list(set(others)), 3) + [item['answer']]
+        random.shuffle(options)
+        rounds.append({
+            'image': item['image'],
+            'answer': item['answer'],
+            'hint': item['hint'],
+            'options': options
+        })
+
+    return render(request, 'core/mv_matcher.html', {
+        'rounds_json': json.dumps(rounds[:10]),
+    })
+
+def draft_day(request):
+    import random
+    members = list(KPopMember.objects.select_related('group').all())
+    if not members:
+        return redirect('dashboard')
+        
+    pool = []
+    for m in random.sample(members, min(len(members), 40)):
+        pool.append({
+            'name': m.stage_name or m.name,
+            'group': m.group.name,
+            'image': m.image_url or (m.group.image_url if m.group.image_url else ''),
+            'stats': {
+                'vocal': random.randint(70, 99),
+                'dance': random.randint(70, 99),
+                'rap': random.randint(60, 99),
+                'visual': random.randint(80, 99),
+            },
+            'cost': random.randint(10, 50)
+        })
+        
+    return render(request, 'core/draft_day.html', {
+        'draft_pool_json': json.dumps(pool),
+    })
+
+def beat_streak(request):
+    import random
+    import urllib.request
+    import urllib.parse
+
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    tracks = []
+    if daily_rank and daily_rank.ranking_data:
+        for item in daily_rank.ranking_data[:50]:
+            tracks.append({
+                'artist': item.get('artist', ''),
+                'title': item.get('track', ''),
+                'artwork_url': item.get('artwork_url', ''),
+            })
+
+    # Pick 10 random tracks to try and get previews for
+    random.shuffle(tracks)
+    game_tracks = []
+    for t in tracks:
+        if len(game_tracks) >= 8: break
+        try:
+            q = urllib.parse.quote(f"{t['artist']} {t['title']}")
+            url = f"https://itunes.apple.com/search?term={q}&entity=song&limit=1"
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                data = json.loads(resp.read().decode())
+                results = data.get('results', [])
+                if results:
+                    t['preview_url'] = results[0].get('previewUrl', '')
+                    if not t['artwork_url']:
+                        t['artwork_url'] = results[0].get('artworkUrl100', '').replace('100x100bb', '600x600bb')
+                    game_tracks.append(t)
+        except Exception:
+            pass
+
+    return render(request, 'core/beat_streak.html', {
+        'game_tracks_json': json.dumps(game_tracks),
+    })
+
 
 def chart_clash(request):
     daily_rank = Ranking.objects.filter(
