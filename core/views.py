@@ -20,7 +20,7 @@ from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
-    FanClubMembership, UserNotification, ClubInvitation
+    FanClubMembership, UserNotification, ClubInvitation, ClubLaunch, UserBadge
 )
 
 logger = logging.getLogger(__name__)
@@ -806,6 +806,7 @@ def dashboard(request):
                 user=user
             ).select_related('group')[:8]
         ),
+        'badges': list(user.badges.all()),
     })
 
 
@@ -2687,10 +2688,12 @@ def fan_clubs(request):
                 user=request.user
             ).values_list('group_id', flat=True)
         )
+    launches = ClubLaunch.objects.all()[:10]
     return render(request, 'core/fan_clubs.html', {
         'fan_clubs': groups,
         'total_clubs': groups.count(),
         'joined_ids': joined_ids,
+        'launches': launches
     })
 
 
@@ -2698,13 +2701,31 @@ def fan_clubs(request):
 def start_club_view(request):
     if request.method == 'POST':
         club_name = request.POST.get('club_name', 'New Club')
+        artist = request.POST.get('target_artist', 'Unknown Artist')
         archetype = request.POST.get('archetype', 'vanguard')
+        mission_statement = request.POST.get('mission_statement', '')
         founders_raw = request.POST.get('founders', '[]')
         
         try:
             founders_list = json.loads(founders_raw)
         except:
             founders_list = []
+
+        # Create Club Launch Record for the Hype Ticker
+        ClubLaunch.objects.create(
+            name=club_name,
+            artist=artist,
+            mission_statement=mission_statement,
+            archetype=archetype,
+            creator=request.user
+        )
+
+        # Award Genesis Badge to Creator
+        UserBadge.objects.get_or_create(
+            user=request.user,
+            name=f"Genesis - {club_name}",
+            badge_type='GENESIS'
+        )
             
         # Create Real Invitations and Notifications
         for identifier in founders_list:
@@ -2775,9 +2796,23 @@ def api_fan_club_join(request):
     except (ValueError, TypeError):
         return JsonResponse({'error': 'Invalid data'}, status=400)
     group = get_object_or_404(KPopGroup, pk=group_id)
-    _, created = FanClubMembership.objects.get_or_create(
+    membership, created = FanClubMembership.objects.get_or_create(
         user=request.user, group=group,
     )
+    
+    # Award Genesis Badge if among first 5
+    if created:
+        count = group.fan_club_members.count()
+        if count <= 5:
+            membership.is_genesis = True
+            membership.save()
+            UserBadge.objects.get_or_create(
+                user=request.user,
+                name=f"Genesis - {group.name}",
+                badge_type='GENESIS',
+                group=group
+            )
+
     count = group.fan_club_members.count()
     return JsonResponse({
         'success': True,

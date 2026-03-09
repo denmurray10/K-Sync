@@ -273,6 +273,7 @@ class FanClubMembership(models.Model):
         related_name='fan_club_members',
     )
     joined_at = models.DateTimeField(auto_now_add=True)
+    is_genesis = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ['user', 'group']
@@ -333,3 +334,44 @@ class ClubInvitation(models.Model):
     def __str__(self):
         target = self.invitee.username if self.invitee else self.invitee_email
         return f"Invite to {target} for {self.club_name}"
+
+class ClubLaunch(models.Model):
+    name = models.CharField(max_length=255)
+    artist = models.CharField(max_length=255)
+    mission_statement = models.TextField()
+    archetype = models.CharField(max_length=50, default='vanguard')
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='club_launches'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Launch: {self.name} ({self.artist})"
+
+class UserBadge(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='badges'
+    )
+    name = models.CharField(max_length=255)
+    badge_type = models.CharField(max_length=50, default='GENESIS')
+    group = models.ForeignKey(
+        KPopGroup,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    is_glowing = models.BooleanField(default=True)
+    awarded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-awarded_at']
+
+    def __str__(self):
+        return f"{self.name} awarded to {self.user.username}"

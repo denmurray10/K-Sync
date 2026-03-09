@@ -83,6 +83,44 @@
 
 <main class="flex-grow pt-0" x-data="fanClubApp()">
 
+    <!-- Global Hype Ticker (Phase 7.1) -->
+    <div class="w-full bg-black/80 backdrop-blur-md border-b border-primary/30 h-10 flex items-center overflow-hidden z-50">
+        <div class="bg-primary text-black px-4 h-full flex items-center font-black text-[10px] uppercase tracking-widest shrink-0">
+            Hype Tracker
+        </div>
+        <div class="flex-1 overflow-hidden relative">
+            <div class="whitespace-nowrap flex items-center gap-12 animate-ticker hover:[animation-play-state:paused] py-2">
+                {% if launches %}
+                    {% for launch in launches %}
+                    <div class="flex items-center gap-3">
+                        <span class="text-primary font-mono text-[9px] uppercase tracking-tighter">[{{ launch.archetype }}]</span>
+                        <span class="text-white font-black text-xs uppercase tracking-tighter">{{ launch.name }} Just Launched</span>
+                        <span class="text-slate-500 font-mono text-[10px] uppercase italic">"{{ launch.mission_statement|truncatechars:60 }}"</span>
+                        <span class="text-white/20 px-4">/</span>
+                    </div>
+                    {% endfor %}
+                    <!-- Duplicate for loop -->
+                    {% for launch in launches %}
+                    <div class="flex items-center gap-3">
+                        <span class="text-primary font-mono text-[9px] uppercase tracking-tighter">[{{ launch.archetype }}]</span>
+                        <span class="text-white font-black text-xs uppercase tracking-tighter">{{ launch.name }} Just Launched</span>
+                        <span class="text-slate-500 font-mono text-[10px] uppercase italic">"{{ launch.mission_statement|truncatechars:60 }}"</span>
+                        <span class="text-white/20 px-4">/</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="flex items-center gap-6">
+                        <span class="text-slate-500 font-mono text-[10px] uppercase tracking-widest">Scanning global frequency...</span>
+                        <span class="text-white/20 px-4">/</span>
+                        <span class="text-slate-500 font-mono text-[10px] uppercase tracking-widest">Monitoring fandom pulses...</span>
+                        <span class="text-white/20 px-4">/</span>
+                        <span class="text-slate-500 font-mono text-[10px] uppercase tracking-widest">Waiting for next transmission...</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="relative h-[70vh] min-h-[550px] w-full overflow-hidden flex items-end border-b border-white/10 bg-black">
         <!-- Background -->

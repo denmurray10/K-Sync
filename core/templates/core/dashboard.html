@@ -37,6 +37,13 @@
         body { zoom:0.9; -moz-transform:scale(0.9); -moz-transform-origin:0 0; }
         @keyframes pulse-ring { 0%{transform:scale(.8);opacity:1} 100%{transform:scale(2);opacity:0} }
         .pulse-ring { animation:pulse-ring 2s ease-out infinite; }
+        
+        /* Genesis Badge Glow */
+        @keyframes badge-glow {
+            0%, 100% { filter: drop-shadow(0 0 5px #f425c0) drop-shadow(0 0 10px #f425c0); }
+            50% { filter: drop-shadow(0 0 15px #f425c0) drop-shadow(0 0 30px #f425c0); }
+        }
+        .animate-badge-glow { animation: badge-glow 3s ease-in-out infinite; }
     </style>
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
@@ -696,6 +703,49 @@
                             <div class="mt-4 flex items-center gap-2 p-3 border border-white/5">
                                 <span class="material-symbols-outlined text-primary text-sm">favorite</span>
                                 <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400">Bias: <span class="text-white">{{ profile.bias.name }}</span></span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Digital Badges (Phase 7.2) -->
+                        <div class="mb-12 reveal-up" style="transition-delay: 150ms">
+                            <div class="flex items-center justify-between mb-6 pb-3 border-b border-white/20">
+                                <h3 class="font-black text-sm uppercase tracking-widest text-white flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-base">military_tech</span>
+                                    Digital Badges
+                                </h3>
+                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">{{ badges|length }} Earned</span>
+                            </div>
+
+                            {% if badges %}
+                            <div class="grid grid-cols-2 gap-3">
+                                {% for badge in badges %}
+                                <div class="relative group p-4 border border-white/10 bg-white/[0.02] flex flex-col items-center text-center overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    
+                                    <!-- Badge Icon -->
+                                    <div class="w-12 h-12 mb-3 relative flex items-center justify-center">
+                                        <div class="absolute inset-0 bg-primary/20 rounded-full {% if badge.is_glowing %}animate-pulse{% endif %}"></div>
+                                        <span class="material-symbols-outlined text-3xl {% if badge.is_glowing %}text-primary animate-badge-glow{% else %}text-white/40{% endif %}">
+                                            {% if badge.badge_type == 'GENESIS' %}rocket_launch{% else %}workspace_premium{% endif %}
+                                        </span>
+                                    </div>
+                                    
+                                    <h4 class="text-[10px] font-black text-white uppercase tracking-tight leading-tight mb-1">{{ badge.name }}</h4>
+                                    <span class="text-[8px] font-mono text-slate-500 tracking-widest uppercase">{{ badge.awarded_at|date:"M Y" }}</span>
+                                    
+                                    {% if badge.is_glowing %}
+                                    <div class="absolute top-0 right-0 p-1">
+                                        <span class="w-1 h-1 rounded-full bg-primary block"></span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="border border-dashed border-white/10 p-8 text-center">
+                                <span class="material-symbols-outlined text-white/10 text-3xl mb-3 block">lock</span>
+                                <p class="font-mono text-[8px] tracking-widest uppercase text-slate-600">No badges earned yet. Join a launch team to unlock.</p>
                             </div>
                             {% endif %}
                         </div>
