@@ -2693,6 +2693,13 @@ def fan_clubs(request):
     })
 
 
+def start_club_view(request):
+    if request.method == 'POST':
+        # Simple thank you / success state for now
+        return render(request, 'core/start_club.html', {'status': 'success'})
+    return render(request, 'core/start_club.html')
+
+
 @require_POST
 @login_required
 def api_fan_club_join(request):

@@ -42,6 +42,7 @@ urlpatterns = [
     path('comeback-timeline/', views.comeback_timeline, name='comeback_timeline'),
     path('calendar/', views.calendar, name='calendar'),
     path('fan-clubs/', views.fan_clubs, name='fan_clubs'),
+    path('fan-clubs/start/', views.start_club_view, name='start_club'),
     path('api/fan-club/join/', views.api_fan_club_join, name='api_fan_club_join'),
     path('api/fan-club/leave/', views.api_fan_club_leave, name='api_fan_club_leave'),
     

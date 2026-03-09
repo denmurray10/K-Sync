@@ -1,0 +1,237 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Start A Club — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "background-light": "#f8f5f8",
+                        "background-dark": "#000000",
+                        "secondary": "#00f0ff",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+                    backgroundImage: {
+                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
+        }
+        .neon-border {
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.is-visible, .reveal-left.is-visible {
+            opacity: 1;
+            transform: translate(0);
+        }
+        body {
+            zoom: 0.9;
+            -moz-transform: scale(0.9);
+            -moz-transform-origin: 0 0;
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+{% include 'core/header.html' %}
+
+<main class="flex-grow pt-0">
+    <!-- Hero Section -->
+    <section class="relative h-[60vh] min-h-[500px] w-full overflow-hidden flex items-end border-b border-white/10 bg-black">
+        <!-- Background -->
+        <div class="absolute inset-0 z-0">
+            <div class="w-full h-full bg-cover bg-center opacity-30 grayscale mix-blend-luminosity" style="background-image: url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        </div>
+        <!-- Decorative Background Text -->
+        <div class="absolute top-1/2 -translate-y-1/2 -right-10 text-[12rem] md:text-[18rem] font-black text-white/[0.03] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+            LAUNCH
+        </div>
+
+        <div class="container mx-auto px-6 max-w-[1400px] relative z-20 pb-16 md:pb-24">
+            <div class="flex flex-col max-w-3xl reveal-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 self-start mb-6">
+                    <span class="material-symbols-outlined text-sm">rocket_launch</span>
+                    <span class="text-[10px] font-black tracking-[0.2em] uppercase">Club Accelerator</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tighter leading-none mb-6">
+                    START A <span class="text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">CLUB</span>
+                </h1>
+                <p class="text-slate-300 font-mono text-xs md:text-sm tracking-widest uppercase leading-relaxed max-w-lg">
+                    Build your community. Lead your fandom. Start an official recognized fan club on K-Sync and connect with the world.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form Section -->
+    <section class="w-full bg-black py-24 md:py-32">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex flex-col lg:flex-row gap-16">
+                <!-- Left: Instructions -->
+                <div class="w-full lg:w-1/3 reveal-left">
+                    <h2 class="text-4xl font-black text-white uppercase tracking-tighter mb-8 pb-4 border-b border-white/20">The Rules of <span class="text-primary text-transparent [-webkit-text-stroke:1px_theme(colors.primary)]">THE CLUB</span></h2>
+                    
+                    <div class="space-y-8">
+                        <div class="flex gap-6">
+                            <span class="font-black text-5xl text-white/10 tabular-nums">01</span>
+                            <div>
+                                <h3 class="text-white font-black text-lg uppercase tracking-tight mb-2">Unique Identity</h3>
+                                <p class="text-slate-400 text-xs leading-relaxed">Choose a name that resonates with your fandom but remains distinct and professional for the global stage.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-6">
+                            <span class="font-black text-5xl text-white/10 tabular-nums">02</span>
+                            <div>
+                                <h3 class="text-white font-black text-lg uppercase tracking-tight mb-2">Commitment</h3>
+                                <p class="text-slate-400 text-xs leading-relaxed">Official clubs are moderated. You'll need to demonstrate regular activity and a community-first mindset.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-6">
+                            <span class="font-black text-5xl text-white/10 tabular-nums">03</span>
+                            <div>
+                                <h3 class="text-white font-black text-lg uppercase tracking-tight mb-2">Verification</h3>
+                                <p class="text-slate-400 text-xs leading-relaxed">Once submitted, our team will review your application. If approved, your club goes live within 48 hours.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 p-8 border border-white/10 bg-white/5 reveal-up">
+                        <h4 class="text-primary font-black text-sm uppercase tracking-widest mb-4">Pro Tip:</h4>
+                        <p class="text-slate-300 text-xs leading-relaxed italic">"Clubs with clear, high-quality banner images and detailed descriptions have a 70% higher chance of instant approval."</p>
+                    </div>
+                </div>
+
+                <!-- Right: Form -->
+                <div class="flex-1 reveal-up" style="transition-delay: 200ms;">
+                    {% if status == 'success' %}
+                        <div class="glass-panel p-12 border border-primary bg-primary/10 flex flex-col items-center text-center">
+                            <div class="w-20 h-20 bg-primary/20 border border-primary flex items-center justify-center mb-8">
+                                <span class="material-symbols-outlined text-primary text-5xl">celebration</span>
+                            </div>
+                            <h3 class="text-4xl font-black text-white uppercase tracking-tighter mb-4">Application Received!</h3>
+                            <p class="text-slate-300 text-sm mb-8 leading-relaxed max-w-sm">
+                                Your request to launch this club has been beamed to our coordinators. We'll review your mission statement and get back to you within 48 hours.
+                            </p>
+                            <a href="{% url 'fan_clubs' %}" class="bg-white text-black font-black uppercase tracking-[0.2em] text-xs px-10 py-4 border border-white hover:bg-black hover:text-white transition-colors shadow-[4px_4px_0px_theme(colors.primary)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                Back to Clubs
+                            </a>
+                        </div>
+                    {% else %}
+                        <form method="POST" action="." class="glass-panel p-8 md:p-12 border border-white/10 bg-black/40 backdrop-blur-md">
+                            {% csrf_token %}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <!-- Club Name -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Club Name <span class="text-primary">*</span></label>
+                                    <div class="relative">
+                                        <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg">groups</span>
+                                        <input type="text" name="name" required class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" placeholder="e.g. Bangtan Elite">
+                                    </div>
+                                </div>
+                                <!-- Associated Artist -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Target Group / Artist <span class="text-primary">*</span></label>
+                                    <div class="relative">
+                                        <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg">star</span>
+                                        <input type="text" name="artist" required class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" placeholder="e.g. BTS">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="flex flex-col gap-2 mb-8">
+                                <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Mission Statement / Description <span class="text-primary">*</span></label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg">description</span>
+                                    <textarea name="description" rows="5" required class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm resize-none" placeholder="Describe the purpose of your club..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Banner URL -->
+                            <div class="flex flex-col gap-2 mb-12">
+                                <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Banner Image URL</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-4 top-4 text-slate-600 text-lg">link</span>
+                                    <input type="url" name="banner_url" class="w-full bg-white/[0.03] border border-white/10 py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm" placeholder="https://example.com/banner.jpg">
+                                </div>
+                                <p class="text-[9px] font-mono text-slate-600 mt-2 uppercase tracking-widest">Recommended: 1200x400 or higher</p>
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-white/10">
+                                <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase max-w-[200px]">By submitting this request, you agree to our Community Guidelines.</p>
+                                <button type="submit" class="w-full md:w-auto bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-12 py-5 border border-primary hover:bg-white hover:text-black hover:border-white transition-all duration-300 shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                    Submit Application
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+{% include 'core/footer.html' %}
+
+<script>
+    // ── Scroll Reveal Animations ─────────────────────────────────────
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15
+    };
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => {
+            observer.observe(el);
+        });
+    });
+</script>
+
+</body>
+</html>
