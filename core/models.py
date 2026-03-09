@@ -188,6 +188,9 @@ class SongRequest(models.Model):
 class GameScore(models.Model):
     GAME_CHOICES = [
         ('song_game', 'Song Game'),
+        ('idol_scramble', 'Idol Scramble'),
+        ('lyric_drop', 'Lyric Drop'),
+        ('chart_clash', 'Chart Clash'),
     ]
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

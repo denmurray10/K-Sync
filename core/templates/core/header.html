@@ -38,6 +38,7 @@
                 <a class="{% if request.resolver_match.url_name == 'news' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
                 <a class="{% if request.resolver_match.url_name == 'shop' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'shop' %}">Shop</a>
                 <a class="{% if request.resolver_match.url_name == 'fan_clubs' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'fan_clubs' %}">Fan Clubs</a>
+                <a class="{% if request.resolver_match.url_name == 'presenters' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'presenters' %}">Presenters</a>
             </nav>
         </div>
 
@@ -87,6 +88,7 @@
                 <a class="{% if request.resolver_match.url_name == 'news' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
                 <a class="{% if request.resolver_match.url_name == 'shop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'shop' %}">Shop</a>
                 <a class="{% if request.resolver_match.url_name == 'fan_clubs' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'fan_clubs' %}">Fan Clubs</a>
+                <a class="{% if request.resolver_match.url_name == 'presenters' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'presenters' %}">Presenters</a>
             </nav>
         </div>
         <div class="flex items-center gap-6">

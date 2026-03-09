@@ -343,6 +343,107 @@
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════
+             EXPLORE SECTION
+             ══════════════════════════════════════════════════════════════ -->
+        <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="pb-4 border-b border-white/20 mb-12 reveal-left">
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                        EXPLORE<span class="text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)]"> &amp; PLAY</span>
+                    </h2>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">Games, tools and more to fuel your fandom</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 reveal-up">
+
+                    <!-- Song Game -->
+                    <a href="{% url 'song_game' %}" class="group border border-white/10 hover:border-primary p-6 transition-all hover:bg-white/[0.02]">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xl">videogame_asset</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Song Game</h4>
+                                <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Test your K-Pop knowledge</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">play_arrow</span>
+                        </div>
+                    </a>
+
+                    <!-- Idol Scramble -->
+                    <a href="{% url 'idol_scramble' %}" class="group border border-white/10 hover:border-primary p-6 transition-all hover:bg-white/[0.02]">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xl">extension</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Idol Scramble</h4>
+                                <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Unscramble idol &amp; group names</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">play_arrow</span>
+                        </div>
+                    </a>
+
+                    <!-- Lyric Drop -->
+                    <a href="{% url 'lyric_drop' %}" class="group border border-white/10 hover:border-secondary p-6 transition-all hover:bg-white/[0.02]">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-secondary/10 border border-secondary/30 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-secondary text-xl">lyrics</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors">Lyric Drop</h4>
+                                <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Fill in the missing lyric</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-600 group-hover:text-secondary transition-colors">play_arrow</span>
+                        </div>
+                    </a>
+
+                    <!-- Chart Clash -->
+                    <a href="{% url 'chart_clash' %}" class="group border border-white/10 hover:border-primary p-6 transition-all hover:bg-white/[0.02]">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xl">trending_up</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Chart Clash</h4>
+                                <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Which song charted higher?</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">play_arrow</span>
+                        </div>
+                    </a>
+
+                    <!-- Bias Selector -->
+                    <a href="{% url 'bias_selector' %}" class="group border border-white/10 hover:border-secondary p-6 transition-all hover:bg-white/[0.02]">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-secondary/10 border border-secondary/30 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-secondary text-xl">favorite</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors">Bias Selector</h4>
+                                <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Find your perfect match</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-600 group-hover:text-secondary transition-colors">east</span>
+                        </div>
+                    </a>
+
+                    <!-- Comeback Calendar -->
+                    <a href="{% url 'comeback_timeline' %}" class="group border border-white/10 hover:border-primary p-6 transition-all hover:bg-white/[0.02]">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xl">calendar_month</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Comeback Calendar</h4>
+                                <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Upcoming releases &amp; dates</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">east</span>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
              FAVOURITES SECTION
              ══════════════════════════════════════════════════════════════ -->
         <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
@@ -712,52 +813,6 @@
                             </div>
                         </div>
 
-                        <!-- Activity Feed / Quick Link Cards -->
-                        <div class="reveal-up" style="transition-delay: 200ms">
-                            <h3 class="font-black text-sm uppercase tracking-widest text-white mb-6 pb-3 border-b border-white/20">Explore</h3>
-
-                            <!-- Song Game -->
-                            <a href="{% url 'song_game' %}" class="group block border border-white/10 hover:border-primary p-6 mb-4 transition-all hover:bg-white/[0.02]">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-                                        <span class="material-symbols-outlined text-primary text-xl">videogame_asset</span>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Song Game</h4>
-                                        <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Test your K-Pop knowledge</p>
-                                    </div>
-                                    <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">play_arrow</span>
-                                </div>
-                            </a>
-
-                            <!-- Bias Selector -->
-                            <a href="{% url 'bias_selector' %}" class="group block border border-white/10 hover:border-secondary p-6 mb-4 transition-all hover:bg-white/[0.02]">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-secondary/10 border border-secondary/30 flex items-center justify-center shrink-0">
-                                        <span class="material-symbols-outlined text-secondary text-xl">favorite</span>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors">Bias Selector</h4>
-                                        <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Find your perfect match</p>
-                                    </div>
-                                    <span class="material-symbols-outlined text-slate-600 group-hover:text-secondary transition-colors">east</span>
-                                </div>
-                            </a>
-
-                            <!-- Comeback Calendar -->
-                            <a href="{% url 'comeback_timeline' %}" class="group block border border-white/10 hover:border-primary p-6 transition-all hover:bg-white/[0.02]">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-                                        <span class="material-symbols-outlined text-primary text-xl">calendar_month</span>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Comeback Calendar</h4>
-                                        <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Upcoming releases &amp; dates</p>
-                                    </div>
-                                    <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">east</span>
-                                </div>
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>

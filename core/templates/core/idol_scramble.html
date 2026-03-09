@@ -1,0 +1,347 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Idol Scramble — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes score-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes countdown-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+        @keyframes tile-pop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-score-pop { animation: score-pop 0.3s ease-out; }
+        .animate-slide-up { animation: slide-up 0.5s ease-out both; }
+        .animate-countdown { animation: countdown-pulse 1s ease-in-out infinite; }
+        .tile-pop { animation: tile-pop 0.2s ease-out both; }
+    </style>
+</head>
+<body class="font-sans text-white" x-data="idolScramble()">
+
+    <div class="fixed inset-0 z-50 bg-black flex flex-col">
+
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </a>
+                <div>
+                    <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Idol Scramble</h1>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600">Unscramble the Name</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Round</span>
+                    <span class="font-black text-lg text-white" x-text="`${currentRound}/${totalRounds}`">0/0</span>
+                </div>
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Score</span>
+                    <span class="font-black text-lg text-primary" :class="{'animate-score-pop': scorePop}" x-text="score">0</span>
+                </div>
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Time</span>
+                    <span class="font-black text-lg" :class="timer <= 5 ? 'text-red-500 animate-countdown' : 'text-secondary'" x-text="timer + 's'">0s</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="flex-1 flex items-center justify-center p-6 overflow-auto">
+
+            <!-- Start Screen -->
+            <div x-show="state === 'start'" x-transition class="text-center max-w-lg mx-auto animate-slide-up">
+                <div class="w-20 h-20 bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-8">
+                    <span class="material-symbols-outlined text-primary text-4xl">extension</span>
+                </div>
+                <h2 class="text-4xl font-black uppercase tracking-tighter mb-4">IDOL SCRAMBLE</h2>
+                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase mb-2">Unscramble the K-Pop idol or group name</p>
+                <p class="text-slate-500 text-sm mb-10 max-w-md mx-auto">Each round shows you a scrambled name. Tap the letters in the right order. The faster you solve it, the more points you earn!</p>
+                <button @click="startGame()" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-10 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    Start Game
+                </button>
+            </div>
+
+            <!-- Playing Screen -->
+            <div x-show="state === 'playing'" x-transition class="text-center max-w-2xl w-full mx-auto">
+                <!-- Hint -->
+                <div class="mb-6">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 border border-white/20 text-slate-400 bg-white/5 font-mono text-[10px] tracking-widest uppercase">
+                        <span class="material-symbols-outlined text-xs">lightbulb</span>
+                        <span x-text="hint"></span>
+                    </span>
+                </div>
+
+                <!-- Answer Slots -->
+                <div class="flex flex-wrap justify-center gap-2 mb-10 min-h-[60px]">
+                    <template x-for="(letter, i) in answerSlots" :key="'ans-'+i">
+                        <div @click="removeFromAnswer(i)"
+                             class="w-11 h-12 border-2 flex items-center justify-center text-xl font-black uppercase cursor-pointer transition-all"
+                             :class="letter ? 'border-primary bg-primary/10 text-white hover:bg-primary/20' : 'border-white/20 bg-white/5 text-transparent'"
+                             :style="letter ? 'animation: tile-pop 0.15s ease-out both' : ''">
+                            <span x-text="letter || '·'"></span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Scrambled Letters -->
+                <div class="flex flex-wrap justify-center gap-2 mb-8">
+                    <template x-for="(letter, i) in scrambledLetters" :key="'scr-'+i">
+                        <button @click="pickLetter(i)"
+                                :disabled="usedIndices.includes(i)"
+                                class="w-11 h-12 border-2 border-white/30 bg-white/5 flex items-center justify-center text-xl font-black uppercase transition-all"
+                                :class="usedIndices.includes(i) ? 'opacity-20 cursor-not-allowed' : 'hover:border-secondary hover:bg-secondary/10 cursor-pointer text-white'">
+                            <span x-text="letter"></span>
+                        </button>
+                    </template>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-center gap-4">
+                    <button @click="clearAnswer()" class="px-6 py-3 border border-white/20 text-slate-400 hover:text-white hover:border-white/40 font-black uppercase tracking-[0.2em] text-[10px] transition-colors">
+                        Clear
+                    </button>
+                    <button @click="skipRound()" class="px-6 py-3 border border-white/20 text-slate-400 hover:text-white hover:border-white/40 font-black uppercase tracking-[0.2em] text-[10px] transition-colors">
+                        Skip
+                    </button>
+                </div>
+
+                <!-- Feedback -->
+                <div x-show="feedback" x-transition class="mt-6">
+                    <span class="font-black uppercase tracking-widest text-sm" :class="feedbackCorrect ? 'text-green-400' : 'text-red-400'" x-text="feedback"></span>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div x-show="state === 'results'" x-transition class="text-center max-w-lg mx-auto animate-slide-up">
+                <div class="w-20 h-20 bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-primary text-4xl">emoji_events</span>
+                </div>
+                <h2 class="text-5xl font-black uppercase tracking-tighter mb-2">GAME OVER</h2>
+                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase mb-8">Here's how you did</p>
+
+                <div class="grid grid-cols-3 gap-4 mb-10 border border-white/10 p-6">
+                    <div>
+                        <span class="block text-3xl font-black text-primary" x-text="score">0</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Points</span>
+                    </div>
+                    <div>
+                        <span class="block text-3xl font-black text-secondary" x-text="`${correct}/${totalRounds}`">0/0</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Correct</span>
+                    </div>
+                    <div>
+                        <span class="block text-3xl font-black text-white" x-text="bestStreak">0</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Best Streak</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center gap-4">
+                    <button @click="startGame()" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        Play Again
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="px-8 py-4 border border-white/20 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
+                        Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const RAW_NAMES = {{ scramble_names_json|safe }};
+
+function idolScramble() {
+    return {
+        state: 'start',
+        names: [],
+        currentRound: 0,
+        totalRounds: 10,
+        score: 0,
+        scorePop: false,
+        correct: 0,
+        bestStreak: 0,
+        streak: 0,
+        timer: 15,
+        timerInterval: null,
+        currentName: '',
+        hint: '',
+        scrambledLetters: [],
+        answerSlots: [],
+        usedIndices: [],
+        feedback: '',
+        feedbackCorrect: false,
+
+        startGame() {
+            let pool = [...RAW_NAMES];
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            this.names = pool.slice(0, this.totalRounds);
+            this.currentRound = 0;
+            this.score = 0;
+            this.correct = 0;
+            this.bestStreak = 0;
+            this.streak = 0;
+            this.state = 'playing';
+            this.nextRound();
+        },
+
+        nextRound() {
+            if (this.currentRound >= this.totalRounds || this.currentRound >= this.names.length) {
+                this.endGame();
+                return;
+            }
+            this.feedback = '';
+            const entry = this.names[this.currentRound];
+            this.currentName = entry.name.toUpperCase();
+            this.hint = entry.hint;
+
+            // Scramble letters (excluding spaces)
+            const letters = this.currentName.replace(/\s/g, '').split('');
+            for (let i = letters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [letters[i], letters[j]] = [letters[j], letters[i]];
+            }
+            // Ensure it's not the same as the answer
+            if (letters.join('') === this.currentName.replace(/\s/g, '')) {
+                [letters[0], letters[letters.length - 1]] = [letters[letters.length - 1], letters[0]];
+            }
+            this.scrambledLetters = letters;
+            this.answerSlots = new Array(letters.length).fill('');
+            this.usedIndices = [];
+            this.currentRound++;
+            this.startTimer();
+        },
+
+        pickLetter(i) {
+            if (this.usedIndices.includes(i)) return;
+            this.usedIndices.push(i);
+            const nextEmpty = this.answerSlots.indexOf('');
+            if (nextEmpty !== -1) {
+                this.answerSlots[nextEmpty] = this.scrambledLetters[i];
+            }
+            // Auto check when all slots filled
+            if (!this.answerSlots.includes('')) {
+                this.checkAnswer();
+            }
+        },
+
+        removeFromAnswer(i) {
+            if (!this.answerSlots[i]) return;
+            const letter = this.answerSlots[i];
+            this.answerSlots[i] = '';
+            // Find matching used index and free it
+            const srcIdx = this.usedIndices.find(idx => this.scrambledLetters[idx] === letter && this.usedIndices.includes(idx));
+            if (srcIdx !== undefined) {
+                this.usedIndices = this.usedIndices.filter(idx => idx !== srcIdx);
+            }
+        },
+
+        clearAnswer() {
+            this.answerSlots = new Array(this.scrambledLetters.length).fill('');
+            this.usedIndices = [];
+        },
+
+        checkAnswer() {
+            const guess = this.answerSlots.join('');
+            const answer = this.currentName.replace(/\s/g, '');
+            this.clearTimer();
+
+            if (guess === answer) {
+                const timeBonus = this.timer * 10;
+                const roundScore = 100 + timeBonus;
+                this.score += roundScore;
+                this.correct++;
+                this.streak++;
+                if (this.streak > this.bestStreak) this.bestStreak = this.streak;
+                this.scorePop = true;
+                setTimeout(() => this.scorePop = false, 300);
+                this.feedback = `+${roundScore} pts!`;
+                this.feedbackCorrect = true;
+            } else {
+                this.streak = 0;
+                this.feedback = `It was ${this.currentName}`;
+                this.feedbackCorrect = false;
+            }
+
+            setTimeout(() => this.nextRound(), 1500);
+        },
+
+        skipRound() {
+            this.clearTimer();
+            this.streak = 0;
+            this.feedback = `It was ${this.currentName}`;
+            this.feedbackCorrect = false;
+            setTimeout(() => this.nextRound(), 1500);
+        },
+
+        startTimer() {
+            this.timer = 15;
+            this.clearTimer();
+            this.timerInterval = setInterval(() => {
+                this.timer--;
+                if (this.timer <= 0) {
+                    this.clearTimer();
+                    this.streak = 0;
+                    this.feedback = `Time's up! It was ${this.currentName}`;
+                    this.feedbackCorrect = false;
+                    setTimeout(() => this.nextRound(), 1500);
+                }
+            }, 1000);
+        },
+
+        clearTimer() {
+            if (this.timerInterval) {
+                clearInterval(this.timerInterval);
+                this.timerInterval = null;
+            }
+        },
+
+        endGame() {
+            this.clearTimer();
+            this.state = 'results';
+            this.saveScore();
+        },
+
+        async saveScore() {
+            try {
+                await fetch('{% url "save_game_score" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        game: 'idol_scramble',
+                        score: this.score,
+                        correct: this.correct,
+                        total: this.totalRounds,
+                        best_streak: this.bestStreak
+                    })
+                });
+            } catch(e) { console.error('Save failed', e); }
+        }
+    };
+}
+</script>
+</body>
+</html>

@@ -566,6 +566,9 @@ def shop(request):
 def about_us(request):
     return render(request, 'core/about_us.html')
 
+def presenters(request):
+    return render(request, 'core/presenters.html')
+
 def achievement_popup(request):
     return render(request, 'core/achievement_popup.html')
 
@@ -978,6 +981,47 @@ def save_game_score(request):
         return JsonResponse({'ok': True})
     except (ValueError, KeyError, TypeError):
         return JsonResponse({'ok': False}, status=400)
+
+def idol_scramble(request):
+    names = []
+    for g in KPopGroup.objects.all()[:60]:
+        hint = f"{g.get_group_type_display()} · {g.label}"
+        names.append({'name': g.name, 'hint': hint})
+    for m in KPopMember.objects.select_related('group').all()[:60]:
+        hint = f"Member of {m.group.name}"
+        sn = m.stage_name or m.name
+        names.append({'name': sn, 'hint': hint})
+    return render(request, 'core/idol_scramble.html', {
+        'scramble_names_json': json.dumps(names),
+    })
+
+
+def lyric_drop(request):
+    return render(request, 'core/lyric_drop.html')
+
+
+def chart_clash(request):
+    daily_rank = Ranking.objects.filter(
+        timeframe='daily'
+    ).first()
+    tracks = []
+    if daily_rank and daily_rank.ranking_data:
+        for i, item in enumerate(daily_rank.ranking_data[:30]):
+            artist = item.get('artist', '')
+            title = item.get('track', '')
+            image = item.get('artwork_url', '')
+            if not artist or not title:
+                continue
+            tracks.append({
+                'title': title,
+                'artist': artist,
+                'rank': i + 1,
+                'image': image or '',
+            })
+    return render(request, 'core/chart_clash.html', {
+        'chart_tracks_json': json.dumps(tracks),
+    })
+
 
 def song_game(request):
     import random

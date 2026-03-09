@@ -1,0 +1,326 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lyric Drop — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes score-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes countdown-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-score-pop { animation: score-pop 0.3s ease-out; }
+        .animate-slide-up { animation: slide-up 0.5s ease-out both; }
+        .animate-countdown { animation: countdown-pulse 1s ease-in-out infinite; }
+        .option-correct { border-color: #22c55e !important; background: rgba(34, 197, 94, 0.1) !important; }
+        .option-wrong { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.1) !important; }
+        .option-btn { transition: all 0.2s ease; }
+        .option-btn:hover:not(:disabled) { border-color: #f425c0; background: rgba(244, 37, 192, 0.05); transform: translateY(-2px); }
+    </style>
+</head>
+<body class="font-sans text-white" x-data="lyricDrop()">
+
+    <div class="fixed inset-0 z-50 bg-black flex flex-col">
+
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </a>
+                <div>
+                    <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Lyric Drop</h1>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600">Fill in the Blank</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Round</span>
+                    <span class="font-black text-lg text-white" x-text="`${currentRound}/${totalRounds}`">0/0</span>
+                </div>
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Score</span>
+                    <span class="font-black text-lg text-primary" :class="{'animate-score-pop': scorePop}" x-text="score">0</span>
+                </div>
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Time</span>
+                    <span class="font-black text-lg" :class="timer <= 5 ? 'text-red-500 animate-countdown' : 'text-secondary'" x-text="timer + 's'">0s</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="flex-1 flex items-center justify-center p-6 overflow-auto">
+
+            <!-- Start Screen -->
+            <div x-show="state === 'start'" x-transition class="text-center max-w-lg mx-auto animate-slide-up">
+                <div class="w-20 h-20 bg-secondary/10 border border-secondary/30 flex items-center justify-center mx-auto mb-8">
+                    <span class="material-symbols-outlined text-secondary text-4xl">lyrics</span>
+                </div>
+                <h2 class="text-4xl font-black uppercase tracking-tighter mb-4">LYRIC DROP</h2>
+                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase mb-2">Complete the missing lyric</p>
+                <p class="text-slate-500 text-sm mb-10 max-w-md mx-auto">We'll show you a line from a famous K-Pop song with a missing word. Pick the correct word from four options. Quick answers earn bonus points!</p>
+                <button @click="startGame()" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-10 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    Start Game
+                </button>
+            </div>
+
+            <!-- Playing Screen -->
+            <div x-show="state === 'playing'" x-transition class="text-center max-w-2xl w-full mx-auto">
+                <!-- Song & Artist -->
+                <div class="mb-4">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 border border-primary/30 text-primary bg-primary/10 font-mono text-[10px] tracking-widest uppercase">
+                        <span class="material-symbols-outlined text-xs">music_note</span>
+                        <span x-text="currentSong"></span>
+                    </span>
+                </div>
+
+                <!-- Lyric Line -->
+                <div class="border border-white/10 bg-white/[0.02] px-8 py-10 mb-10">
+                    <p class="text-2xl md:text-3xl font-bold text-white leading-relaxed tracking-tight">
+                        <span x-text="lyricBefore"></span>
+                        <span class="inline-block border-b-4 border-primary px-3 min-w-[100px] text-primary font-black mx-1" x-text="answered ? correctWord : '______'"></span>
+                        <span x-text="lyricAfter"></span>
+                    </p>
+                </div>
+
+                <!-- Options -->
+                <div class="grid grid-cols-2 gap-3 max-w-xl mx-auto">
+                    <template x-for="(option, i) in options" :key="i">
+                        <button @click="selectAnswer(i)"
+                                :disabled="answered"
+                                class="option-btn border-2 border-white/20 bg-white/[0.02] p-4 text-left font-black uppercase tracking-tight text-sm transition-all"
+                                :class="{
+                                    'option-correct': answered && i === correctIndex,
+                                    'option-wrong': answered && selectedIndex === i && i !== correctIndex,
+                                    'hover:border-primary': !answered
+                                }">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 border border-white/30 flex items-center justify-center font-mono text-xs shrink-0"
+                                      :class="{
+                                          'border-green-500 bg-green-500/20 text-green-400': answered && i === correctIndex,
+                                          'border-red-500 bg-red-500/20 text-red-400': answered && selectedIndex === i && i !== correctIndex
+                                      }"
+                                      x-text="String.fromCharCode(65 + i)"></span>
+                                <span x-text="option"></span>
+                            </div>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div x-show="state === 'results'" x-transition class="text-center max-w-lg mx-auto animate-slide-up">
+                <div class="w-20 h-20 bg-secondary/10 border border-secondary/30 flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-secondary text-4xl">emoji_events</span>
+                </div>
+                <h2 class="text-5xl font-black uppercase tracking-tighter mb-2">GAME OVER</h2>
+                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase mb-8">Here's how you did</p>
+
+                <div class="grid grid-cols-3 gap-4 mb-10 border border-white/10 p-6">
+                    <div>
+                        <span class="block text-3xl font-black text-primary" x-text="score">0</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Points</span>
+                    </div>
+                    <div>
+                        <span class="block text-3xl font-black text-secondary" x-text="`${correct}/${totalRounds}`">0/0</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Correct</span>
+                    </div>
+                    <div>
+                        <span class="block text-3xl font-black text-white" x-text="bestStreak">0</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Best Streak</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center gap-4">
+                    <button @click="startGame()" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        Play Again
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="px-8 py-4 border border-white/20 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
+                        Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const LYRIC_DATA = [
+    { song: "BTS — Dynamite", lyric: "Cause I-I-I'm in the stars tonight so watch me bring the ___ the heat", word: "fire", decoys: ["light", "night", "vibe"] },
+    { song: "BLACKPINK — How You Like That", lyric: "Look up in the sky it's a bird it's a ___ ", word: "plane", decoys: ["star", "sign", "dream"] },
+    { song: "BTS — Butter", lyric: "Smooth like ___ like a criminal undercover", word: "butter", decoys: ["honey", "sugar", "water"] },
+    { song: "TWICE — What is Love?", lyric: "I wanna know know know ___ what is love", word: "know", decoys: ["now", "how", "show"] },
+    { song: "Stray Kids — God's Menu", lyric: "Doo doo doo doo doo doo doo got the recipe for you to ___", word: "follow", decoys: ["swallow", "borrow", "holler"] },
+    { song: "BLACKPINK — Pink Venom", lyric: "Taste that ___ venom that pink venom", word: "pink", decoys: ["dark", "sweet", "cold"] },
+    { song: "BTS — Boy With Luv", lyric: "Oh my my my oh my my my I've waited all my ___ ", word: "life", decoys: ["time", "days", "love"] },
+    { song: "IVE — LOVE DIVE", lyric: "Narcissistic my god I ___ it", word: "love", decoys: ["want", "need", "feel"] },
+    { song: "aespa — Next Level", lyric: "Watch me go to the next ___", word: "level", decoys: ["world", "stage", "round"] },
+    { song: "NewJeans — Hype Boy", lyric: "And you got me like a ___ boy", word: "hype", decoys: ["cool", "wild", "rude"] },
+    { song: "Jung Kook — Seven", lyric: "Monday Tuesday Wednesday ___ every day", word: "Thursday", decoys: ["Friday", "Sunday", "always"] },
+    { song: "BLACKPINK — Kill This Love", lyric: "Let's ___ this love yeah yeah yeah yeah", word: "kill", decoys: ["feel", "heal", "steal"] },
+    { song: "Stray Kids — MANIAC", lyric: "I'm a ___ maniac I can't help it", word: "little", decoys: ["crazy", "wild", "total"] },
+    { song: "EXO — Love Shot", lyric: "It's a love ___ call me anytime", word: "shot", decoys: ["game", "song", "call"] },
+    { song: "TWICE — Fancy", lyric: "I ___ you fancy you fancy", word: "fancy", decoys: ["love", "want", "miss"] },
+    { song: "Red Velvet — Psycho", lyric: "You're so ___ for my love", word: "psycho", decoys: ["crazy", "ready", "thirsty"] },
+    { song: "BTS — DNA", lyric: "It's in my ___ DNA DNA", word: "blood", decoys: ["soul", "heart", "mind"] },
+    { song: "SEVENTEEN — Super", lyric: "Going ___ I can do this all day", word: "super", decoys: ["crazy", "higher", "harder"] },
+    { song: "Stray Kids — S-Class", lyric: "We're ___ class we're on top of the game", word: "S", decoys: ["A", "first", "top"] },
+    { song: "LE SSERAFIM — FEARLESS", lyric: "What you looking at I'm ___", word: "fearless", decoys: ["flawless", "endless", "priceless"] },
+];
+
+function lyricDrop() {
+    return {
+        state: 'start',
+        questions: [],
+        currentRound: 0,
+        totalRounds: 10,
+        score: 0,
+        scorePop: false,
+        correct: 0,
+        bestStreak: 0,
+        streak: 0,
+        timer: 12,
+        timerInterval: null,
+        currentSong: '',
+        lyricBefore: '',
+        lyricAfter: '',
+        correctWord: '',
+        options: [],
+        correctIndex: -1,
+        selectedIndex: -1,
+        answered: false,
+
+        startGame() {
+            let pool = [...LYRIC_DATA];
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            this.questions = pool.slice(0, this.totalRounds);
+            this.currentRound = 0;
+            this.score = 0;
+            this.correct = 0;
+            this.bestStreak = 0;
+            this.streak = 0;
+            this.state = 'playing';
+            this.nextRound();
+        },
+
+        nextRound() {
+            if (this.currentRound >= this.totalRounds || this.currentRound >= this.questions.length) {
+                this.endGame();
+                return;
+            }
+            const q = this.questions[this.currentRound];
+            this.currentSong = q.song;
+            this.correctWord = q.word;
+            this.answered = false;
+            this.selectedIndex = -1;
+
+            // Split lyric around the blank
+            const parts = q.lyric.split('___');
+            this.lyricBefore = parts[0] || '';
+            this.lyricAfter = parts[1] || '';
+
+            // Shuffle options
+            const opts = [q.word, ...q.decoys];
+            for (let i = opts.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [opts[i], opts[j]] = [opts[j], opts[i]];
+            }
+            this.options = opts;
+            this.correctIndex = opts.indexOf(q.word);
+
+            this.currentRound++;
+            this.startTimer();
+        },
+
+        selectAnswer(i) {
+            if (this.answered) return;
+            this.answered = true;
+            this.selectedIndex = i;
+            this.clearTimer();
+
+            if (i === this.correctIndex) {
+                const timeBonus = this.timer * 10;
+                const roundScore = 100 + timeBonus;
+                this.score += roundScore;
+                this.correct++;
+                this.streak++;
+                if (this.streak > this.bestStreak) this.bestStreak = this.streak;
+                this.scorePop = true;
+                setTimeout(() => this.scorePop = false, 300);
+            } else {
+                this.streak = 0;
+            }
+
+            setTimeout(() => this.nextRound(), 1800);
+        },
+
+        startTimer() {
+            this.timer = 12;
+            this.clearTimer();
+            this.timerInterval = setInterval(() => {
+                this.timer--;
+                if (this.timer <= 0) {
+                    this.clearTimer();
+                    this.answered = true;
+                    this.streak = 0;
+                    setTimeout(() => this.nextRound(), 1800);
+                }
+            }, 1000);
+        },
+
+        clearTimer() {
+            if (this.timerInterval) {
+                clearInterval(this.timerInterval);
+                this.timerInterval = null;
+            }
+        },
+
+        endGame() {
+            this.clearTimer();
+            this.state = 'results';
+            this.saveScore();
+        },
+
+        async saveScore() {
+            try {
+                await fetch('{% url "save_game_score" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        game: 'lyric_drop',
+                        score: this.score,
+                        correct: this.correct,
+                        total: this.totalRounds,
+                        best_streak: this.bestStreak
+                    })
+                });
+            } catch(e) { console.error('Save failed', e); }
+        }
+    };
+}
+</script>
+</body>
+</html>

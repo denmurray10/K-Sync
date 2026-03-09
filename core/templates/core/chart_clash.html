@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Chart Clash — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes score-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes countdown-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-score-pop { animation: score-pop 0.3s ease-out; }
+        .animate-slide-up { animation: slide-up 0.5s ease-out both; }
+        .animate-countdown { animation: countdown-pulse 1s ease-in-out infinite; }
+        .card-correct { border-color: #22c55e !important; box-shadow: 0 0 30px rgba(34,197,94,0.2) !important; }
+        .card-wrong { border-color: #ef4444 !important; box-shadow: 0 0 30px rgba(239,68,68,0.2) !important; }
+    </style>
+</head>
+<body class="font-sans text-white" x-data="chartClash()">
+
+    <div class="fixed inset-0 z-50 bg-black flex flex-col">
+
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </a>
+                <div>
+                    <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Chart Clash</h1>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600">Which Charted Higher?</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Round</span>
+                    <span class="font-black text-lg text-white" x-text="`${currentRound}/${totalRounds}`">0/0</span>
+                </div>
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Score</span>
+                    <span class="font-black text-lg text-primary" :class="{'animate-score-pop': scorePop}" x-text="score">0</span>
+                </div>
+                <div class="text-center">
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Streak</span>
+                    <span class="font-black text-lg text-secondary" x-text="streak">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="flex-1 flex items-center justify-center p-6 overflow-auto">
+
+            <!-- Start Screen -->
+            <div x-show="state === 'start'" x-transition class="text-center max-w-lg mx-auto animate-slide-up">
+                <div class="w-20 h-20 bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-8">
+                    <span class="material-symbols-outlined text-primary text-4xl">trending_up</span>
+                </div>
+                <h2 class="text-4xl font-black uppercase tracking-tighter mb-4">CHART CLASH</h2>
+                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase mb-2">Which K-Pop song charted higher?</p>
+                <p class="text-slate-500 text-sm mb-10 max-w-md mx-auto">You'll see two songs from the K-Beats charts. Pick the one that peaked at a higher position. Streaks multiply your score!</p>
+                <button @click="startGame()" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-10 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    Start Game
+                </button>
+            </div>
+
+            <!-- Playing Screen -->
+            <div x-show="state === 'playing'" x-transition class="w-full max-w-4xl mx-auto">
+                <p class="text-center font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-6">Tap the song that charted higher</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-0 items-stretch">
+                    <!-- Card A -->
+                    <button @click="pickSong('a')" :disabled="answered"
+                            class="group border-2 border-white/20 bg-white/[0.02] p-8 text-center transition-all duration-300"
+                            :class="{
+                                'card-correct': answered && songACorrect,
+                                'card-wrong': answered && pickedSide === 'a' && !songACorrect,
+                                'hover:border-primary hover:bg-primary/5 cursor-pointer': !answered
+                            }">
+                        <div class="relative w-32 h-32 mx-auto mb-6 overflow-hidden border border-white/10">
+                            <img :src="songA.image" :alt="songA.title" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        </div>
+                        <h3 class="text-xl font-black uppercase tracking-tighter mb-1 text-white" x-text="songA.title"></h3>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500" x-text="songA.artist"></p>
+                        <div x-show="answered" x-transition class="mt-4 inline-flex items-center gap-2 px-3 py-1 border text-sm font-black"
+                             :class="songA.rank < songB.rank ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-white/10 text-slate-400'">
+                            <span class="material-symbols-outlined text-sm">leaderboard</span>
+                            #<span x-text="songA.rank"></span>
+                        </div>
+                    </button>
+
+                    <!-- VS Divider -->
+                    <div class="flex items-center justify-center py-4 md:py-0 md:px-6">
+                        <div class="w-16 h-16 border-2 border-primary bg-primary/10 flex items-center justify-center font-black text-primary text-xl tracking-tighter">
+                            VS
+                        </div>
+                    </div>
+
+                    <!-- Card B -->
+                    <button @click="pickSong('b')" :disabled="answered"
+                            class="group border-2 border-white/20 bg-white/[0.02] p-8 text-center transition-all duration-300"
+                            :class="{
+                                'card-correct': answered && !songACorrect,
+                                'card-wrong': answered && pickedSide === 'b' && songACorrect,
+                                'hover:border-primary hover:bg-primary/5 cursor-pointer': !answered
+                            }">
+                        <div class="relative w-32 h-32 mx-auto mb-6 overflow-hidden border border-white/10">
+                            <img :src="songB.image" :alt="songB.title" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        </div>
+                        <h3 class="text-xl font-black uppercase tracking-tighter mb-1 text-white" x-text="songB.title"></h3>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500" x-text="songB.artist"></p>
+                        <div x-show="answered" x-transition class="mt-4 inline-flex items-center gap-2 px-3 py-1 border text-sm font-black"
+                             :class="songB.rank < songA.rank ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-white/10 text-slate-400'">
+                            <span class="material-symbols-outlined text-sm">leaderboard</span>
+                            #<span x-text="songB.rank"></span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div x-show="state === 'results'" x-transition class="text-center max-w-lg mx-auto animate-slide-up">
+                <div class="w-20 h-20 bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-primary text-4xl">emoji_events</span>
+                </div>
+                <h2 class="text-5xl font-black uppercase tracking-tighter mb-2">GAME OVER</h2>
+                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase mb-8">Here's how you did</p>
+
+                <div class="grid grid-cols-3 gap-4 mb-10 border border-white/10 p-6">
+                    <div>
+                        <span class="block text-3xl font-black text-primary" x-text="score">0</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Points</span>
+                    </div>
+                    <div>
+                        <span class="block text-3xl font-black text-secondary" x-text="`${correct}/${totalRounds}`">0/0</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Correct</span>
+                    </div>
+                    <div>
+                        <span class="block text-3xl font-black text-white" x-text="bestStreak">0</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Best Streak</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center gap-4">
+                    <button @click="startGame()" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        Play Again
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="px-8 py-4 border border-white/20 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
+                        Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const CHART_TRACKS = {{ chart_tracks_json|safe }};
+
+function chartClash() {
+    return {
+        state: 'start',
+        pairs: [],
+        currentRound: 0,
+        totalRounds: 10,
+        score: 0,
+        scorePop: false,
+        correct: 0,
+        bestStreak: 0,
+        streak: 0,
+        songA: { title: '', artist: '', rank: 0, image: '' },
+        songB: { title: '', artist: '', rank: 0, image: '' },
+        songACorrect: false,
+        answered: false,
+        pickedSide: '',
+
+        startGame() {
+            // Generate pairs from chart data
+            let tracks = [...CHART_TRACKS];
+            // Shuffle
+            for (let i = tracks.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [tracks[i], tracks[j]] = [tracks[j], tracks[i]];
+            }
+            this.pairs = [];
+            for (let i = 0; i + 1 < tracks.length && this.pairs.length < this.totalRounds; i += 2) {
+                // Only pair tracks with different ranks
+                if (tracks[i].rank !== tracks[i + 1].rank) {
+                    this.pairs.push([tracks[i], tracks[i + 1]]);
+                }
+            }
+            this.totalRounds = Math.min(this.totalRounds, this.pairs.length);
+            this.currentRound = 0;
+            this.score = 0;
+            this.correct = 0;
+            this.bestStreak = 0;
+            this.streak = 0;
+            this.state = 'playing';
+            this.nextRound();
+        },
+
+        nextRound() {
+            if (this.currentRound >= this.totalRounds) {
+                this.endGame();
+                return;
+            }
+            const [a, b] = this.pairs[this.currentRound];
+            this.songA = a;
+            this.songB = b;
+            this.songACorrect = a.rank < b.rank; // Lower rank number = higher chart position
+            this.answered = false;
+            this.pickedSide = '';
+            this.currentRound++;
+        },
+
+        pickSong(side) {
+            if (this.answered) return;
+            this.answered = true;
+            this.pickedSide = side;
+
+            const isCorrect = (side === 'a' && this.songACorrect) || (side === 'b' && !this.songACorrect);
+
+            if (isCorrect) {
+                this.streak++;
+                if (this.streak > this.bestStreak) this.bestStreak = this.streak;
+                const multiplier = Math.min(this.streak, 5);
+                const roundScore = 100 * multiplier;
+                this.score += roundScore;
+                this.correct++;
+                this.scorePop = true;
+                setTimeout(() => this.scorePop = false, 300);
+            } else {
+                this.streak = 0;
+            }
+
+            setTimeout(() => this.nextRound(), 2000);
+        },
+
+        endGame() {
+            this.state = 'results';
+            this.saveScore();
+        },
+
+        async saveScore() {
+            try {
+                await fetch('{% url "save_game_score" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        game: 'chart_clash',
+                        score: this.score,
+                        correct: this.correct,
+                        total: this.totalRounds,
+                        best_streak: this.bestStreak
+                    })
+                });
+            } catch(e) { console.error('Save failed', e); }
+        }
+    };
+}
+</script>
+</body>
+</html>
