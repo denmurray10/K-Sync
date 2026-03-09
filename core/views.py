@@ -1003,25 +1003,25 @@ def lyric_drop(request):
 
 def fandom_trivia(request):
     import random
-    groups = list(KPopGroup.objects.exclude(label='').exclude(fandom_name=''))
-    if len(groups) < 10:
-        groups = list(KPopGroup.objects.all())
+    groups = list(KPopGroup.objects.exclude(label='').all())
+    if not groups:
+        return redirect('dashboard')
     
     questions = []
-    # Mix of questions: Fandom Names, Labels, Member Counts
+    # Mix of questions: Labels, Member Counts, Group Types
     for g in random.sample(groups, min(len(groups), 20)):
-        q_type = random.choice(['fandom', 'label', 'count'])
-        if q_type == 'fandom' and g.fandom_name:
+        q_type = random.choice(['type', 'label', 'count'])
+        if q_type == 'type':
             questions.append({
-                'question': f"What is the official fandom name for {g.name}?",
-                'answer': g.fandom_name,
-                'options': random.sample([g.fandom_name] + [other.fandom_name for other in random.sample(groups, 3) if other.fandom_name and other.fandom_name != g.fandom_name], 4) if g.fandom_name else [g.fandom_name, 'Army', 'Blink', 'Once']
+                'question': f"What type of artist is {g.name}?",
+                'answer': g.get_group_type_display(),
+                'options': random.sample([g.get_group_type_display(), 'Boy Group', 'Girl Group', 'Soloist'], 4)
             })
         elif q_type == 'label' and g.label:
              questions.append({
                 'question': f"Which label is {g.name} signed to?",
                 'answer': g.label,
-                'options': random.sample([g.label] + list(set([other.label for other in random.sample(groups, 5) if other.label and other.label != g.label]))[:3], 4)
+                'options': random.sample(list(set([g.label] + [other.label for other in random.sample(groups, 10) if other.label and other.label != g.label]))[:4], 4)
             })
         else:
             count = g.members.count()
@@ -1029,7 +1029,7 @@ def fandom_trivia(request):
                 questions.append({
                     'question': f"How many members are in {g.name}?",
                     'answer': str(count),
-                    'options': random.sample([str(count), str(count+2), str(max(1, count-1)), str(count+5)], 4)
+                    'options': random.sample(list(set([str(count), str(count+1), str(max(1, count-1)), str(random.randint(1, 13))]))[:4], 4)
                 })
 
     random.shuffle(questions)

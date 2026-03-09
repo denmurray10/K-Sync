@@ -9,6 +9,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -67,13 +68,13 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden" 
       x-data="{ 
-        name: '', 
-        artist: '', 
-        description: '', 
-        banner_url: '',
+        name: '{{ club_name|default:''|escapejs }}', 
+        artist: '{{ artist_name|default:''|escapejs }}', 
+        description: '{{ description|default:''|escapejs }}', 
+        banner_url: '{{ banner_url|default:''|escapejs }}',
+        archetype: '{{ archetype|default:'vanguard'|escapejs }}',
         isPolishing: false,
         artistStats: null,
-        archetype: 'vanguard',
         founders: [],
         newFounder: '',
         addFounder() {
@@ -119,6 +120,28 @@
             } catch (error) {
                 console.error('Stats fetch failed:', error);
             }
+        },
+        async downloadPoster() {
+            const poster = document.getElementById('promo-poster');
+            if (!poster) return;
+            
+            // Add a temporary class to ensure full quality
+            poster.style.transform = 'scale(2)';
+            poster.style.transformOrigin = 'top left';
+            
+            const canvas = await html2canvas(poster, {
+                useCORS: true,
+                scale: 2,
+                backgroundColor: '#000000',
+                logging: false,
+            });
+            
+            poster.style.transform = '';
+            
+            const link = document.createElement('a');
+            link.download = `ksync-promo-${this.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         }
       }"
       x-init="$watch('artist', value => {
@@ -267,19 +290,95 @@
                 <!-- Right: Form -->
                 <div class="flex-1 reveal-up" style="transition-delay: 200ms;">
                     {% if status == 'success' %}
-                        <div class="glass-panel p-12 border border-primary bg-primary/10 flex flex-col items-center text-center">
-                            <div class="w-20 h-20 bg-primary/20 border border-primary flex items-center justify-center mb-8">
-                                <span class="material-symbols-outlined text-primary text-5xl">celebration</span>
+                        <div class="flex flex-col lg:flex-row gap-12 items-start justify-center animate-slide-up">
+                            <!-- Left: Success Message -->
+                            <div class="glass-panel p-10 border border-primary bg-primary/10 flex flex-col items-center text-center lg:w-1/2">
+                                <div class="w-20 h-20 bg-primary/20 border border-primary flex items-center justify-center mb-8">
+                                    <span class="material-symbols-outlined text-primary text-5xl">celebration</span>
+                                </div>
+                                <h3 class="text-4xl font-black text-white uppercase tracking-tighter mb-4">Application Received!</h3>
+                                <p class="text-slate-300 text-sm mb-8 leading-relaxed max-w-sm">
+                                    Your request to launch <span class="text-white font-bold">{{ club_name }}</span> 
+                                    (Archetype: <span class="text-primary font-bold uppercase tracking-widest">{{ archetype }}</span>) 
+                                    has been beamed to our coordinators.
+                                </p>
+                                <div class="flex flex-col gap-4 w-full">
+                                    <button @click="downloadPoster()" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-10 py-4 border border-primary hover:bg-white hover:border-white transition-all shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
+                                        Download Promo Poster
+                                    </button>
+                                    <a href="{% url 'fan_clubs' %}" class="border border-white/20 text-white font-black uppercase tracking-[0.2em] text-[10px] px-10 py-4 hover:border-primary hover:text-primary transition-all">
+                                        Back to Hub
+                                    </a>
+                                </div>
                             </div>
-                            <h3 class="text-4xl font-black text-white uppercase tracking-tighter mb-4">Application Received!</h3>
-                            <p class="text-slate-300 text-sm mb-8 leading-relaxed max-w-sm">
-                                Your request to launch this <span class="text-primary font-bold uppercase tracking-widest">{% if archetype %}{{ archetype }}{% else %}Club{% endif %}</span> 
-                                {% if founders_count %}with <span class="text-secondary font-bold">{{ founders_count }}</span> founding members{% endif %}
-                                has been beamed to our coordinators. We'll review your mission statement and get back to you within 48 hours.
-                            </p>
-                            <a href="{% url 'fan_clubs' %}" class="bg-white text-black font-black uppercase tracking-[0.2em] text-xs px-10 py-4 border border-white hover:bg-black hover:text-white transition-colors shadow-[4px_4px_0px_theme(colors.primary)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
-                                Back to Clubs
-                            </a>
+
+                            <!-- Right: Poster Preview -->
+                            <div class="lg:w-1/2 flex flex-col items-center">
+                                <span class="font-mono text-[9px] text-slate-500 uppercase tracking-[0.3em] mb-4">Social Media Promo (9:16)</span>
+                                
+                                <div id="promo-poster" class="relative w-[320px] h-[568px] bg-black border-[12px] border-white/5 overflow-hidden flex flex-col shadow-2xl">
+                                    <!-- Dynamic Background -->
+                                    <div class="absolute inset-0 z-0">
+                                        {% if banner_url %}
+                                            <img src="{{ banner_url }}" class="w-full h-full object-cover grayscale opacity-40 mix-blend-overlay">
+                                        {% else %}
+                                            <div class="w-full h-full bg-gradient-to-br from-primary/20 via-black to-secondary/20"></div>
+                                        {% endif %}
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                                    </div>
+
+                                    <!-- Content -->
+                                    <div class="relative z-10 flex flex-col h-full p-8">
+                                        <!-- Header -->
+                                        <div class="flex justify-between items-start mb-12">
+                                            <div class="bg-primary text-black font-black text-[8px] px-2 py-1 uppercase tracking-widest">K-SYNC EXCLUSIVE</div>
+                                            <div class="text-white font-black text-[10px] tracking-tighter">09 / 03 / 26</div>
+                                        </div>
+
+                                        <!-- Title Area -->
+                                        <div class="mb-4">
+                                            <p class="text-primary font-mono text-[9px] uppercase tracking-[0.5em] mb-2 px-1 border-l-2 border-primary">LAUNCH INITIATED</p>
+                                            <h2 class="text-5xl font-black text-white uppercase tracking-tighter leading-[0.85] italic">
+                                                {{ club_name }}
+                                            </h2>
+                                        </div>
+
+                                        <div class="mb-auto">
+                                            <span class="text-[10px] font-mono text-secondary uppercase tracking-widest block mb-4">— MISSION: {{ artist_name }}</span>
+                                            <p class="text-slate-400 text-[10px] uppercase leading-relaxed font-medium line-clamp-4">
+                                                {{ description|truncatechars:120 }}
+                                            </p>
+                                        </div>
+
+                                        <!-- Footer -->
+                                        <div class="mt-auto border-t border-white/20 pt-6">
+                                            <div class="flex items-end justify-between">
+                                                <div>
+                                                    <span class="text-slate-500 font-mono text-[7px] uppercase tracking-widest block mb-1">FOUNDER</span>
+                                                    <span class="text-white font-black text-xs uppercase">{{ user.username }}</span>
+                                                </div>
+                                                <div class="text-right">
+                                                     <span class="text-slate-500 font-mono text-[7px] uppercase tracking-widest block mb-1">ACCESS</span>
+                                                     <span class="text-secondary font-black text-xs uppercase">SATELLITE-V1</span>
+                                                </div>
+                                            </div>
+                                            <!-- Brutalist Accents -->
+                                            <div class="mt-6 flex gap-1">
+                                                <div class="h-1 flex-grow bg-primary"></div>
+                                                <div class="h-1 w-8 bg-white/20"></div>
+                                                <div class="h-1 w-4 bg-secondary"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Corner scanlines/glitch -->
+                                    <div class="absolute inset-0 pointer-events-none border border-white/5"></div>
+                                    <div class="absolute top-0 right-0 p-2 text-white/5 font-mono text-[6px] tracking-tighter leading-none text-right">
+                                        SYSTEM-SYNC-INIT<br>ENCRYPTED-PKT-772<br>HYPE-ENGINE-STATUS: GO
+                                    </div>
+                                </div>
+                                <p class="text-[9px] font-mono text-slate-600 mt-6 uppercase tracking-widest">Generated by K-Sync Hype Engine</p>
+                            </div>
                         </div>
                     {% else %}
                         <form method="POST" action="." class="glass-panel p-8 md:p-12 border border-white/10 bg-black/40 backdrop-blur-md">
