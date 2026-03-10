@@ -1,0 +1,602 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>K-Beats — Coming Soon</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f425c0",
+                    "secondary": "#00f0ff",
+                    "background-dark": "#000000",
+                },
+                fontFamily: { "display": ["Montserrat", "sans-serif"] },
+                borderRadius: { "DEFAULT":"0px","sm":"0px","md":"0px","lg":"0px","xl":"0px","2xl":"0px","3xl":"0px","full":"9999px" },
+                backgroundImage: { 'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)' }
+            }
+        }
+    };
+    </script>
+    <style>
+        .glass-panel { background:rgba(0,0,0,0.7); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+        .neon-text { text-shadow:0 0 10px rgba(244,37,192,0.7), 0 0 20px rgba(244,37,192,0.5); }
+        .neon-border { box-shadow:0 0 10px rgba(0,240,255,0.4); }
+
+        @keyframes ticker-scroll {
+            0% { transform:translateX(0); }
+            100% { transform:translateX(-50%); }
+        }
+        .animate-ticker { width:max-content; animation:ticker-scroll 30s linear infinite; }
+
+        @keyframes equalize {
+            0% { height:20%; }
+            50% { height:100%; }
+            100% { height:20%; }
+        }
+        .bar-animate { animation:equalize 1s ease-in-out infinite; transform-origin:bottom; }
+
+        @keyframes float-particle {
+            0%   { transform:translateY(100vh) scale(0); opacity:0; }
+            10%  { opacity:0.6; }
+            90%  { opacity:0.6; }
+            100% { transform:translateY(-20vh) scale(1); opacity:0; }
+        }
+        .bg-particle {
+            position:absolute; border-radius:50%; pointer-events:none;
+            animation:float-particle var(--dur) linear infinite;
+            animation-delay:var(--delay);
+        }
+
+        @keyframes pulse-ring {
+            0%   { transform:scale(1); opacity:0.5; }
+            100% { transform:scale(2.5); opacity:0; }
+        }
+        .pulse-ring {
+            animation:pulse-ring 2s ease-out infinite;
+        }
+
+        @keyframes glow-breathe {
+            0%, 100% { opacity:0.4; }
+            50%      { opacity:1; }
+        }
+        .glow-breathe { animation:glow-breathe 3s ease-in-out infinite; }
+
+        /* Progress bar stripe animation */
+        @keyframes stripe-move {
+            0% { background-position:0 0; }
+            100% { background-position:40px 0; }
+        }
+        .stripe-animate {
+            background-image:linear-gradient(
+                45deg,
+                rgba(255,255,255,0.08) 25%, transparent 25%,
+                transparent 50%, rgba(255,255,255,0.08) 50%,
+                rgba(255,255,255,0.08) 75%, transparent 75%
+            );
+            background-size:40px 40px;
+            animation:stripe-move 1s linear infinite;
+        }
+
+        /* Countdown card flip */
+        @keyframes count-pulse {
+            0%, 100% { transform:scale(1); }
+            50%      { transform:scale(1.05); }
+        }
+
+        body { zoom:0.9; -moz-transform:scale(0.9); -moz-transform-origin:0 0; }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+<main class="flex-grow pt-0">
+
+    <!-- ══════════════════════════════════════════════════════════════
+         HERO — Coming Soon
+         ══════════════════════════════════════════════════════════ -->
+    <section class="relative min-h-[100vh] w-full overflow-hidden flex items-center justify-center border-b border-white/10">
+        <!-- Background -->
+        <div class="absolute inset-0 z-0 bg-black">
+            <div class="w-full h-full bg-cover bg-center bg-fixed opacity-20 grayscale mix-blend-luminosity" style="background-image:url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        </div>
+
+        <!-- Floating Particles -->
+        <div class="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
+            <div class="bg-particle w-1 h-1 bg-primary/40" style="left:8%; --dur:9s; --delay:0s;"></div>
+            <div class="bg-particle w-1.5 h-1.5 bg-secondary/30" style="left:22%; --dur:13s; --delay:2s;"></div>
+            <div class="bg-particle w-1 h-1 bg-primary/20" style="left:42%; --dur:11s; --delay:4s;"></div>
+            <div class="bg-particle w-2 h-2 bg-secondary/20" style="left:58%; --dur:15s; --delay:1s;"></div>
+            <div class="bg-particle w-1 h-1 bg-primary/30" style="left:75%; --dur:10s; --delay:3s;"></div>
+            <div class="bg-particle w-1.5 h-1.5 bg-secondary/25" style="left:88%; --dur:12s; --delay:5s;"></div>
+        </div>
+
+        <!-- Decorative BG Text -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-[1]">
+            <span class="text-[25vw] font-black text-white/[0.015] uppercase tracking-tighter leading-none whitespace-nowrap">SOON</span>
+        </div>
+
+        <div class="relative z-20 container mx-auto px-6 max-w-[1400px] flex flex-col items-center text-center py-32 md:py-44">
+            <!-- Live Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 border border-primary/40 bg-primary/10 mb-10 backdrop-blur-sm">
+                <span class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+                </span>
+                <span class="text-[10px] font-black tracking-[0.3em] uppercase text-primary">Signal Incoming</span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-[14vw] sm:text-6xl md:text-[8rem] lg:text-[10rem] font-black text-white leading-[0.85] tracking-tighter uppercase mb-2">
+                <span class="block">K-BEATS</span>
+                <span class="block text-transparent [-webkit-text-stroke:2px_#00f0ff]">IS COMING</span>
+            </h1>
+
+            <div class="w-40 h-1 bg-neon-gradient my-8"></div>
+
+            <p class="text-lg md:text-xl text-slate-300 font-light max-w-2xl leading-relaxed tracking-wide mb-6">
+                The UK's first dedicated 24/7 K-Pop radio station — built by fans, for fans.
+                Broadcasting online, on your phone, and everywhere in between.
+            </p>
+            <p class="font-mono text-[10px] uppercase tracking-[0.4em] text-white/30 mb-14">Launching Soon · Truro, Cornwall</p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <a href="https://www.gofundme.com/f/kbeats-help-us-build-the-uks-first-kpop-radio-station" target="_blank" rel="noopener noreferrer"
+                   class="bg-primary text-black px-10 py-5 font-black uppercase tracking-[0.2em] text-xs border border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_white] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                    Support on GoFundMe
+                </a>
+                <a href="{% url 'games' %}"
+                   class="border border-secondary/40 bg-secondary/10 backdrop-blur-sm px-10 py-5 font-black uppercase tracking-[0.2em] text-xs hover:bg-secondary hover:text-black transition-all text-secondary">
+                    <span class="inline-flex items-center gap-2"><span class="material-symbols-outlined text-sm">sports_esports</span> Play Games</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         TICKER BAR
+         ══════════════════════════════════════════════════════════ -->
+    <div class="relative w-full bg-primary border-t border-b border-white/20 h-16 flex items-center overflow-hidden z-40">
+        <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
+        <div class="animate-ticker flex items-center gap-24 text-black font-black text-sm uppercase tracking-[0.15em] whitespace-nowrap">
+            <span>Coming Soon</span><span class="text-black/40">★</span>
+            <span>24/7 K-Pop Radio</span><span class="text-black/40">★</span>
+            <span>Built by Fans</span><span class="text-black/40">★</span>
+            <span>Isabelle's Dream</span><span class="text-black/40">★</span>
+            <span>UK's First K-Pop Station</span><span class="text-black/40">★</span>
+            <span>Become a Founder</span><span class="text-black/40">★</span>
+            <span>Support the Mission</span><span class="text-black/40 px-12">★</span>
+            <span>Coming Soon</span><span class="text-black/40">★</span>
+            <span>24/7 K-Pop Radio</span><span class="text-black/40">★</span>
+            <span>Built by Fans</span><span class="text-black/40">★</span>
+            <span>Isabelle's Dream</span><span class="text-black/40">★</span>
+            <span>UK's First K-Pop Station</span><span class="text-black/40">★</span>
+            <span>Become a Founder</span><span class="text-black/40">★</span>
+            <span>Support the Mission</span>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ISABELLE'S STORY
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-black py-28 md:py-36 border-b border-white/10 relative overflow-hidden">
+        <!-- Decorative BG -->
+        <div class="absolute -top-10 -right-10 text-[12rem] md:text-[18rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+            ISABELLE
+        </div>
+
+        <div class="container mx-auto px-6 max-w-[1400px] relative z-10">
+            <div class="flex flex-col lg:flex-row gap-16 lg:gap-24 items-start">
+                <!-- Left: Story -->
+                <div class="flex-1 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 border border-secondary text-secondary bg-secondary/10 mb-8">
+                        <span class="material-symbols-outlined text-sm">favorite</span>
+                        <span class="text-[10px] font-black tracking-[0.2em] uppercase">The Origin Story</span>
+                    </div>
+
+                    <h2 class="text-5xl md:text-7xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-10">
+                        IT STARTED<br/>
+                        <span class="text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">IN THE<br/>BACK SEAT</span>
+                    </h2>
+
+                    <div class="space-y-6 text-slate-300 text-base leading-relaxed font-light">
+                        <p>
+                            This idea didn't start in a boardroom. It started on the A30.
+                        </p>
+                        <p>
+                            On a drive back from Exeter, my 11-year-old daughter <span class="text-white font-bold">Isabelle</span> was flicking through every DAB and FM radio station she could find. She was searching for K-Pop — the music that has quite literally changed her life.
+                        </p>
+                        <p>
+                            After going through channel after channel and finding everything but, she turned to me and asked:
+                        </p>
+                        <blockquote class="border-l-4 border-primary pl-6 py-3 text-2xl md:text-3xl font-black text-white tracking-tight leading-snug italic">
+                            "Dad, why isn't there anything for K-Pop?"
+                        </blockquote>
+                        <p>
+                            I didn't have an answer. So she gave me one.
+                        </p>
+                        <blockquote class="border-l-4 border-secondary pl-6 py-3 text-2xl md:text-3xl font-black text-secondary tracking-tight leading-snug italic">
+                            "Let's build one ourselves."
+                        </blockquote>
+                        <p>And here we are.</p>
+                    </div>
+                </div>
+
+                <!-- Right: Feature Highlights -->
+                <div class="flex-1 w-full lg:max-w-md space-y-6">
+                    <h3 class="font-black text-[10px] uppercase tracking-[0.5em] text-white/30 mb-6">Who Is Isabelle</h3>
+
+                    <div class="border border-white/10 bg-white/[0.02] p-8">
+                        <span class="material-symbols-outlined text-3xl text-primary mb-4 block">neurology</span>
+                        <h4 class="font-black text-xl uppercase tracking-tight mb-3 text-white">A Bridge to the World</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed font-light">
+                            Isabelle is 11 years old and was diagnosed with Autism. As dysregulation grew, K-Pop became her genuine anchor — helping her regulate, connect, and find confidence with others.
+                        </p>
+                    </div>
+
+                    <div class="border border-white/10 bg-white/[0.02] p-8">
+                        <span class="material-symbols-outlined text-3xl text-secondary mb-4 block">music_note</span>
+                        <h4 class="font-black text-xl uppercase tracking-tight mb-3 text-white">6am, Every Morning</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed font-light">
+                            From <span class="text-white font-semibold">Stray Kids</span> (her bias!) to <span class="text-white font-semibold">BLACKPINK</span> and beyond — K-Pop fills their home every single day. They even saw BLACKPINK live, a night they'll never forget.
+                        </p>
+                    </div>
+
+                    <div class="border border-white/10 bg-white/[0.02] p-8">
+                        <span class="material-symbols-outlined text-3xl text-primary mb-4 block">groups</span>
+                        <h4 class="font-black text-xl uppercase tracking-tight mb-3 text-white">Not Just Isabelle</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed font-light">
+                            The K-Pop community is full of neurodivergent children and adults who feel exactly the same way. The music, the fandom culture, the shared passion — it connects people in a genuinely unique way.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         SIGNUP — Stay in the Loop
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-black py-28 md:py-36 border-b border-white/10 relative overflow-hidden" x-data="signupForm()">
+        <div class="absolute -top-10 -right-10 text-[12rem] md:text-[18rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">NOTIFY</div>
+
+        <div class="container mx-auto px-6 max-w-[600px] text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 mb-8">
+                <span class="material-symbols-outlined text-sm">notifications_active</span>
+                <span class="text-[10px] font-black tracking-[0.2em] uppercase">Stay in the Loop</span>
+            </div>
+
+            <h2 class="text-4xl md:text-6xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-6">
+                BE THE<br/>
+                <span class="text-transparent [-webkit-text-stroke:2px_#f425c0]">FIRST</span>
+                TO KNOW
+            </h2>
+
+            <p class="text-lg md:text-xl text-slate-300 font-light max-w-xl mx-auto leading-relaxed tracking-wide mb-10">
+                Sign up to get the latest updates on K-Beats and be the first to know when we go live.
+            </p>
+
+            <!-- Success State -->
+            <template x-if="success">
+                <div class="border border-secondary bg-secondary/10 p-8 text-center">
+                    <span class="material-symbols-outlined text-5xl text-secondary block mb-4">celebration</span>
+                    <p class="text-xl font-black text-white uppercase tracking-tight mb-2">You&rsquo;re In!</p>
+                    <p class="text-slate-400 font-light">We&rsquo;ll let you know as soon as K-Beats goes live.</p>
+                </div>
+            </template>
+
+            <!-- Form -->
+            <template x-if="!success">
+                <form @submit.prevent="submit" class="text-left space-y-4">
+                    <div>
+                        <label class="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Your Name</label>
+                        <input x-model="name" type="text" required placeholder="e.g. Isabelle"
+                               class="w-full bg-white/5 border border-white/10 text-white px-5 py-4 font-display text-sm placeholder-white/20 focus:border-primary focus:ring-0 focus:outline-none transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Email</label>
+                        <input x-model="email" type="email" required placeholder="you@example.com"
+                               class="w-full bg-white/5 border border-white/10 text-white px-5 py-4 font-display text-sm placeholder-white/20 focus:border-primary focus:ring-0 focus:outline-none transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Age</label>
+                        <input x-model="age" type="number" required min="5" max="120" placeholder="11"
+                               class="w-full bg-white/5 border border-white/10 text-white px-5 py-4 font-display text-sm placeholder-white/20 focus:border-primary focus:ring-0 focus:outline-none transition-colors" />
+                    </div>
+
+                    <p x-show="error" x-text="error" class="text-primary font-mono text-xs uppercase tracking-wide"></p>
+
+                    <button type="submit" :disabled="loading"
+                            class="w-full bg-primary text-black px-10 py-5 font-black uppercase tracking-[0.2em] text-xs border border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_white] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] disabled:opacity-50 disabled:cursor-wait mt-4">
+                        <span x-show="!loading">Notify Me</span>
+                        <span x-show="loading">Signing Up&hellip;</span>
+                    </button>
+                    <p class="font-mono text-[9px] uppercase tracking-widest text-white/20 text-center mt-4">No spam &middot; Unsubscribe anytime</p>
+                </form>
+            </template>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         GOFUNDME CAMPAIGN DATA
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-black py-28 md:py-36 border-b border-white/10 relative overflow-hidden">
+        <div class="absolute -bottom-20 -left-10 text-[12rem] md:text-[18rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+            FUND
+        </div>
+
+        <div class="container mx-auto px-6 max-w-[1400px] relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 mb-8">
+                    <span class="material-symbols-outlined text-sm">volunteer_activism</span>
+                    <span class="text-[10px] font-black tracking-[0.2em] uppercase">GoFundMe Campaign</span>
+                </div>
+                <h2 class="text-5xl md:text-7xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-6">
+                    HELP US<br/>
+                    <span class="text-primary neon-text">BUILD IT</span>
+                </h2>
+                <p class="font-mono text-sm tracking-widest uppercase text-white/40 max-w-xl mx-auto">Every penny goes directly into building K-Beats from the ground up.</p>
+            </div>
+
+            <!-- Campaign Progress -->
+            <div class="max-w-3xl mx-auto mb-20">
+                <div class="border border-white/20 bg-black/50 backdrop-blur-md p-8 md:p-12">
+                    <!-- Goal Stats -->
+                    <div class="flex items-end justify-between mb-6">
+                        <div>
+                            <span class="font-black text-[9px] uppercase tracking-[0.3em] text-white/30 block mb-2">Raised So Far</span>
+                            <span class="text-5xl md:text-6xl font-black text-primary neon-text tracking-tighter">&pound;10</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-black text-[9px] uppercase tracking-[0.3em] text-white/30 block mb-2">Goal</span>
+                            <span class="text-3xl md:text-4xl font-black text-white/60 tracking-tighter">&pound;2,200</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="h-4 bg-white/[0.06] overflow-hidden mb-4 relative">
+                        <div class="h-full bg-neon-gradient relative stripe-animate" style="width:0.45%;">
+                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-6 bg-white"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-[10px] uppercase tracking-widest text-white/30">2 donors</span>
+                        <span class="font-mono text-[10px] uppercase tracking-widest text-primary">~1% funded</span>
+                    </div>
+
+                    <!-- Donate CTA -->
+                    <div class="mt-10 pt-8 border-t border-white/10 text-center">
+                        <a href="https://www.gofundme.com/f/kbeats-help-us-build-the-uks-first-kpop-radio-station" target="_blank" rel="noopener noreferrer"
+                           class="inline-block bg-primary text-black px-14 py-5 font-black uppercase tracking-[0.2em] text-xs border border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_white] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                            Donate Now
+                        </a>
+                        <p class="font-mono text-[10px] uppercase tracking-widest text-white/20 mt-4">Protected by GoFundMe Giving Guarantee</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What Donations Get Us — Brutalist Grid -->
+            <div class="mb-20">
+                <h3 class="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white mb-12 text-center">WHERE YOUR<br/><span class="text-transparent [-webkit-text-stroke:1px_#00f0ff]">MONEY GOES</span></h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-white/10">
+                    <div class="p-8 border-b md:border-r border-white/10 group hover:bg-white/[0.03] transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-primary mb-4 block group-hover:scale-110 transition-transform">mic</span>
+                        <h4 class="font-black uppercase tracking-tight text-lg mb-2 text-white">Pro Microphones &amp; Broadcasting Equipment</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Studio-grade hardware to deliver crystal clear audio across every stream.</p>
+                    </div>
+                    <div class="p-8 border-b lg:border-r border-white/10 group hover:bg-white/[0.03] transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-secondary mb-4 block group-hover:scale-110 transition-transform">computer</span>
+                        <h4 class="font-black uppercase tracking-tight text-lg mb-2 text-white">Computer &amp; Broadcasting Software</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">A dedicated system to run 24/7 broadcasting without interruption.</p>
+                    </div>
+                    <div class="p-8 border-b border-white/10 group hover:bg-white/[0.03] transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-primary mb-4 block group-hover:scale-110 transition-transform">license</span>
+                        <h4 class="font-black uppercase tracking-tight text-lg mb-2 text-white">Music Licensing</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Legal licenses so we can play all your favourite K-Pop artists properly.</p>
+                    </div>
+                    <div class="p-8 border-b md:border-b-0 md:border-r border-white/10 group hover:bg-white/[0.03] transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-secondary mb-4 block group-hover:scale-110 transition-transform">devices</span>
+                        <h4 class="font-black uppercase tracking-tight text-lg mb-2 text-white">Website &amp; Mobile App</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Designed and built in-house to keep costs down — designs already underway!</p>
+                    </div>
+                    <div class="p-8 border-b md:border-b-0 lg:border-r border-white/10 group hover:bg-white/[0.03] transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-primary mb-4 block group-hover:scale-110 transition-transform">location_on</span>
+                        <h4 class="font-black uppercase tracking-tight text-lg mb-2 text-white">Studio Location Rental</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Securing our first year at a dedicated studio location in Cornwall.</p>
+                    </div>
+                    <div class="p-8 group hover:bg-white/[0.03] transition-colors">
+                        <span class="material-symbols-outlined text-3xl text-secondary mb-4 block group-hover:scale-110 transition-transform">campaign</span>
+                        <h4 class="font-black uppercase tracking-tight text-lg mb-2 text-white">Advertising &amp; Launch</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Initial advertising to spread the K-Pop word across the UK airwaves.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donor Rewards -->
+            <div class="max-w-3xl mx-auto">
+                <h3 class="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white mb-12 text-center">FOUNDER<br/><span class="text-primary neon-text">REWARDS</span></h3>
+
+                <div class="flex flex-col md:flex-row gap-0 border border-white/20">
+                    <div class="flex-1 p-10 border-b md:border-b-0 md:border-r border-white/20 text-center">
+                        <div class="w-16 h-16 mx-auto mb-6 border-2 border-primary bg-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-3xl text-primary">verified</span>
+                        </div>
+                        <h4 class="font-black uppercase tracking-tight text-xl mb-3 text-white">Founders Badge</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">An exclusive "Founders" badge on your K-Beats profile — a permanent mark of honour for the people who made this possible.</p>
+                    </div>
+                    <div class="flex-1 p-10 text-center">
+                        <div class="w-16 h-16 mx-auto mb-6 border-2 border-secondary bg-secondary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-3xl text-secondary">star</span>
+                        </div>
+                        <h4 class="font-black uppercase tracking-tight text-xl mb-3 text-white">1 Year Premium Free</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">One full year of Premium membership completely free when the station launches. You're not just donating — you're becoming a Founder.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         WHAT IS K-BEATS — Feature Grid
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-white text-black py-20 md:py-28 border-b border-white/20">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex flex-col lg:flex-row items-start gap-16">
+                <!-- Left -->
+                <div class="flex-1 max-w-xl">
+                    <h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85] mb-6">
+                        WHAT IS<br/>K-BEATS?
+                    </h2>
+                    <p class="font-mono text-xs uppercase tracking-widest text-black/60 mb-8">The UK's first dedicated 24/7 K-Pop radio station</p>
+                    <div class="w-20 h-1 bg-primary mb-10"></div>
+                    <p class="text-lg text-black/70 leading-relaxed font-light">
+                        Available to everyone, everywhere. We're building a home for K-Pop on UK airwaves — and with your help, we can make it happen.
+                    </p>
+                </div>
+
+                <!-- Right: Feature Rows (Brutalist) -->
+                <div class="flex-1 w-full flex flex-col border-t border-black">
+                    <div class="group flex items-stretch border-b border-black hover:bg-black hover:text-white transition-colors cursor-default">
+                        <div class="w-16 p-4 border-r border-black flex items-center justify-center shrink-0 bg-primary group-hover:bg-primary/80 transition-colors">
+                            <span class="material-symbols-outlined text-2xl text-black">radio</span>
+                        </div>
+                        <div class="flex-1 p-6">
+                            <h3 class="text-xl font-black uppercase tracking-tighter mb-1">24/7 Streaming</h3>
+                            <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">Web &amp; mobile app · Everywhere in the UK</p>
+                        </div>
+                    </div>
+                    <div class="group flex items-stretch border-b border-black hover:bg-black hover:text-white transition-colors cursor-default">
+                        <div class="w-16 p-4 border-r border-black flex items-center justify-center shrink-0 bg-primary group-hover:bg-primary/80 transition-colors">
+                            <span class="material-symbols-outlined text-2xl text-black">child_care</span>
+                        </div>
+                        <div class="flex-1 p-6">
+                            <h3 class="text-xl font-black uppercase tracking-tighter mb-1">Isabelle's Weekend Show</h3>
+                            <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">Hosted by Isabelle herself every weekend</p>
+                        </div>
+                    </div>
+                    <div class="group flex items-stretch border-b border-black hover:bg-black hover:text-white transition-colors cursor-default">
+                        <div class="w-16 p-4 border-r border-black flex items-center justify-center shrink-0 bg-primary group-hover:bg-primary/80 transition-colors">
+                            <span class="material-symbols-outlined text-2xl text-black">school</span>
+                        </div>
+                        <div class="flex-1 p-6">
+                            <h3 class="text-xl font-black uppercase tracking-tighter mb-1">Open Studio Mornings</h3>
+                            <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">Children can visit, learn radio, and be inspired</p>
+                        </div>
+                    </div>
+                    <div class="group flex items-stretch border-b border-black hover:bg-black hover:text-white transition-colors cursor-default">
+                        <div class="w-16 p-4 border-r border-black flex items-center justify-center shrink-0 bg-primary group-hover:bg-primary/80 transition-colors">
+                            <span class="material-symbols-outlined text-2xl text-black">public</span>
+                        </div>
+                        <div class="flex-1 p-6">
+                            <h3 class="text-xl font-black uppercase tracking-tighter mb-1">International Expansion</h3>
+                            <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">Long-term vision to grow through digital channels</p>
+                        </div>
+                    </div>
+                    <div class="group flex items-stretch hover:bg-black hover:text-white transition-colors cursor-default">
+                        <div class="w-16 p-4 border-r border-black flex items-center justify-center shrink-0 bg-primary group-hover:bg-primary/80 transition-colors">
+                            <span class="material-symbols-outlined text-2xl text-black">diversity_3</span>
+                        </div>
+                        <div class="flex-1 p-6">
+                            <h3 class="text-xl font-black uppercase tracking-tighter mb-1">Neurodivergent at Heart</h3>
+                            <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">A welcoming space for the whole community</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         GAMES CALLOUT
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-black py-28 md:py-36 border-b border-white/10 relative overflow-hidden">
+        <div class="absolute -top-10 -left-10 text-[12rem] md:text-[18rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+            PLAY
+        </div>
+
+        <div class="container mx-auto px-6 max-w-[900px] text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 border border-secondary text-secondary bg-secondary/10 mb-8">
+                <span class="material-symbols-outlined text-sm">sports_esports</span>
+                <span class="text-[10px] font-black tracking-[0.2em] uppercase">K-Beats Arcade</span>
+            </div>
+
+            <h2 class="text-4xl md:text-6xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-6">
+                WHILE YOU<br/>
+                <span class="text-transparent [-webkit-text-stroke:2px_#00f0ff]">WAIT</span>
+            </h2>
+
+            <p class="text-lg md:text-xl text-slate-300 font-light max-w-xl mx-auto leading-relaxed tracking-wide mb-4">
+                The website is still being built &mdash; but that doesn&rsquo;t mean you can&rsquo;t have fun.
+                Try out our games and test your K-Pop knowledge while we get everything ready.
+            </p>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-white/30 mb-12">9 games &middot; Free to play &middot; No account needed</p>
+
+            <a href="{% url 'games' %}"
+               class="inline-block bg-secondary text-black px-14 py-5 font-black uppercase tracking-[0.2em] text-xs border border-secondary hover:bg-black hover:text-secondary transition-all shadow-[6px_6px_0px_white] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                Enter the Arcade
+            </a>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         CLOSING QUOTE — Full Width
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-black py-32 md:py-40 border-b border-white/10 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-primary/[0.03] via-transparent to-transparent pointer-events-none"></div>
+
+        <div class="container mx-auto px-6 max-w-[900px] text-center relative z-10">
+            <span class="text-[8rem] leading-none font-black text-primary/10 block mb-[-2rem]">&ldquo;</span>
+            <p class="text-2xl md:text-4xl font-black text-white leading-snug tracking-tight">
+                Because a shy girl on a car journey had an idea that could help thousands of people just like her.
+            </p>
+            <div class="w-16 h-1 bg-neon-gradient mx-auto my-10"></div>
+            <p class="font-mono text-[10px] uppercase tracking-[0.4em] text-white/30">— Isabelle &amp; Family, Truro, Cornwall</p>
+
+            <div class="mt-14">
+                <a href="https://www.gofundme.com/f/kbeats-help-us-build-the-uks-first-kpop-radio-station" target="_blank" rel="noopener noreferrer"
+                   class="inline-block bg-primary text-black px-14 py-5 font-black uppercase tracking-[0.2em] text-xs border border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_white] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                    Help Make It Real
+                </a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+function signupForm() {
+    return {
+        name: '', email: '', age: '', loading: false, error: '', success: false,
+        async submit() {
+            this.error = '';
+            this.loading = true;
+            try {
+                const res = await fetch('{% url "prelaunch_signup" %}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: this.name, email: this.email, age: this.age })
+                });
+                const data = await res.json();
+                if (data.ok) { this.success = true; }
+                else { this.error = data.error || 'Something went wrong.'; }
+            } catch { this.error = 'Network error. Please try again.'; }
+            this.loading = false;
+        }
+    };
+}
+</script>
+
+</body>
+</html>

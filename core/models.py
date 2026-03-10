@@ -375,3 +375,16 @@ class UserBadge(models.Model):
 
     def __str__(self):
         return f"{self.name} awarded to {self.user.username}"
+
+
+class PreLaunchSignup(models.Model):
+    name = models.CharField(max_length=150)
+    email = models.EmailField(unique=True)
+    age = models.PositiveIntegerField()
+    signed_up_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-signed_up_at']
+
+    def __str__(self):
+        return f"{self.name} ({self.email})"

@@ -38,7 +38,7 @@
     <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
         <div class="px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <a href="{% url 'dashboard' %}" class="text-slate-400 hover:text-white transition-colors">
+                <a href="{% url 'games' %}" class="text-slate-400 hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-2xl">close</span>
                 </a>
                 <div>
@@ -50,7 +50,7 @@
             <div class="flex items-center gap-10">
                 <div class="text-right">
                     <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500 block">Remaining Budget</span>
-                    <span class="text-xl font-black text-white" :class="budget < 50 ? 'text-red-400' : 'text-accent'" x-text="'$' + budget + 'M'"></span>
+                    <span class="text-xl font-black text-white" :class="budget < 50 ? 'text-red-400' : 'text-accent'" x-text="'£' + budget + 'M'"></span>
                 </div>
                 <div class="text-right">
                     <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500 block">Team Power</span>
@@ -69,17 +69,34 @@
         
         <!-- Selection Pool -->
         <div class="flex-1">
-            <div class="mb-6 flex items-center justify-between">
+            <div class="mb-4 flex items-center justify-between">
                 <h2 class="font-black uppercase tracking-tight text-2xl">Idol Pool</h2>
-                <span class="text-slate-500 font-mono text-[10px] uppercase" x-text="pool.length + ' Available Today'"></span>
+                <span class="text-slate-500 font-mono text-[10px] uppercase" x-text="filteredPool.length + ' Available'"></span>
             </div>
-            
+
+            <!-- Search Filter -->
+            <div class="mb-6 relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg pointer-events-none">search</span>
+                <input x-model="search" type="text" placeholder="Search by idol or group name…"
+                       class="w-full bg-white/5 border border-white/10 text-white pl-11 pr-4 py-3 font-sans text-sm placeholder-slate-600 focus:border-accent focus:ring-0 focus:outline-none transition-colors" />
+                <button x-show="search" @click="search = ''" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+
+            <template x-if="filteredPool.length === 0">
+                <div class="py-20 text-center">
+                    <span class="material-symbols-outlined text-4xl text-white/10 block mb-3">search_off</span>
+                    <p class="text-slate-600 font-mono text-[10px] uppercase tracking-widest">No idols match &ldquo;<span x-text="search"></span>&rdquo;</p>
+                </div>
+            </template>
+
             <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
-                <template x-for="idol in pool" :key="idol.name">
+                <template x-for="idol in filteredPool" :key="idol.name">
                     <div class="glass-card group p-4 border border-white/5 hover:border-accent/30 transition-all flex gap-4">
                         <div class="w-24 h-24 shrink-0 bg-white/5 border border-white/10 overflow-hidden relative">
                             <img :src="idol.image" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                            <div class="absolute bottom-0 left-0 right-0 bg-accent text-black text-center font-black text-[9px] py-0.5" x-text="'$' + idol.cost + 'M'"></div>
+                            <div class="absolute bottom-0 left-0 right-0 bg-accent text-black text-center font-black text-[9px] py-0.5" x-text="'£' + idol.cost + 'M'"></div>
                         </div>
                         
                         <div class="flex-1 flex flex-col justify-between">
@@ -101,7 +118,7 @@
                             </div>
                             
                             <button @click="addToTeam(idol)" 
-                                    :disabled="isAlreadyInTeam(idol) || myTeam.length >= 5 || budget < idol.cost"
+                                    :disabled="isAlreadyInTeam(idol) || myTeam.length >= 9 || budget < idol.cost"
                                     class="mt-3 w-full border border-white/10 py-1.5 font-black uppercase text-[9px] hover:bg-white hover:text-black transition-all disabled:opacity-10"
                                     x-text="isAlreadyInTeam(idol) ? 'Drafted' : 'Add to Team'">
                             </button>
@@ -116,7 +133,7 @@
             <div class="sticky top-24">
                 <div class="mb-6">
                     <h2 class="font-black uppercase tracking-tight text-2xl">My Lineup</h2>
-                    <p class="text-slate-500 font-mono text-[10px] uppercase mt-1">Select 3-5 Idols</p>
+                    <p class="text-slate-500 font-mono text-[10px] uppercase mt-1">Select 3–9 Idols</p>
                 </div>
 
                 <div class="space-y-4">
@@ -128,7 +145,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-black uppercase text-xs" x-text="idol.name"></h4>
-                                    <p class="text-[8px] font-mono text-accent" x-text="'$' + idol.cost + 'M'"></p>
+                                    <p class="text-[8px] font-mono text-accent" x-text="'£' + idol.cost + 'M'"></p>
                                 </div>
                             </div>
                             <button @click="removeFromTeam(index)" class="text-slate-600 hover:text-red-400 transition-colors">
@@ -183,7 +200,7 @@
                         <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block mt-1">Team Power</span>
                     </div>
                     <div class="p-6 border border-white/10 bg-white/5">
-                        <span class="text-2xl font-black text-white block" x-text="'$' + spentBudget + 'M'"></span>
+                        <span class="text-2xl font-black text-white block" x-text="'£' + spentBudget + 'M'"></span>
                         <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block mt-1">Total Cost</span>
                     </div>
                     <div class="p-6 border border-white/10 bg-white/5">
@@ -198,7 +215,7 @@
 
                 <div class="flex items-center justify-center gap-4">
                      <button @click="reset()" class="bg-accent text-black px-10 py-5 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-all shadow-[4px_4px_0px_white] hover:shadow-none hover:translate-x-1 hover:translate-y-1">Start New Draft</button>
-                     <a href="{% url 'dashboard' %}" class="border border-white/20 px-10 py-5 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white hover:text-black transition-all">Exit to Hub</a>
+                     <a href="{% url 'games' %}" class="border border-white/20 px-10 py-5 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white hover:text-black transition-all">Back to Games</a>
                 </div>
             </div>
         </div>
@@ -211,8 +228,18 @@
         return {
             state: 'intro',
             pool: poolData,
+            search: '',
             myTeam: [],
             budget: 150,
+
+            get filteredPool() {
+                const q = this.search.toLowerCase().trim();
+                if (!q) return this.pool;
+                return this.pool.filter(i =>
+                    i.name.toLowerCase().includes(q) ||
+                    (i.group && i.group.toLowerCase().includes(q))
+                );
+            },
             
             get teamPower() {
                 if (this.myTeam.length === 0) return 0;
@@ -220,7 +247,7 @@
                 this.myTeam.forEach(i => {
                     total += (i.stats.vocal + i.stats.dance + i.stats.rap + i.stats.visual) / 4;
                 });
-                return Math.round(total / this.myTeam.length * (this.myTeam.length / 5 * 1.5) * 10);
+                return Math.round(total / this.myTeam.length * (this.myTeam.length / 9 * 1.5) * 10);
             },
 
             get spentBudget() {
@@ -232,7 +259,7 @@
             },
 
             addToTeam(idol) {
-                if (this.myTeam.length >= 5 || this.budget < idol.cost) return;
+                if (this.myTeam.length >= 9 || this.budget < idol.cost) return;
                 this.myTeam.push(idol);
                 this.budget -= idol.cost;
             },

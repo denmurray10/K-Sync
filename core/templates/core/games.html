@@ -1,0 +1,505 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>K-Beats — Games</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f425c0",
+                    "secondary": "#00f0ff",
+                    "background-light": "#f8f5f8",
+                    "background-dark": "#000000",
+                },
+                fontFamily: { "display": ["Montserrat", "sans-serif"] },
+                borderRadius: { "DEFAULT":"0px","sm":"0px","md":"0px","lg":"0px","xl":"0px","2xl":"0px","3xl":"0px","full":"9999px" },
+                backgroundImage: { 'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)' }
+            }
+        }
+    };
+    </script>
+    <style>
+        .glass-panel { background:rgba(0,0,0,0.7); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+        .neon-text { text-shadow:0 0 10px rgba(244,37,192,0.7), 0 0 20px rgba(244,37,192,0.5); }
+        .neon-border { box-shadow:0 0 10px rgba(0,240,255,0.4); }
+
+        @keyframes ticker-scroll {
+            0% { transform:translateX(0); }
+            100% { transform:translateX(-50%); }
+        }
+        .animate-ticker { width:max-content; animation:ticker-scroll 30s linear infinite; }
+
+        .reveal-up {
+            opacity:0; transform:translateY(40px);
+            transition:opacity 1.5s ease-out, transform 1s cubic-bezier(0.16,1,0.3,1);
+        }
+        .reveal-left {
+            opacity:0; transform:translateX(-50px);
+            transition:opacity 1.5s ease-out, transform 1s cubic-bezier(0.16,1,0.3,1);
+        }
+        .reveal-up.is-visible, .reveal-left.is-visible { opacity:1; transform:translate(0); }
+
+        @keyframes float-particle {
+            0%   { transform:translateY(100vh) scale(0); opacity:0; }
+            10%  { opacity:0.6; }
+            90%  { opacity:0.6; }
+            100% { transform:translateY(-20vh) scale(1); opacity:0; }
+        }
+        .bg-particle {
+            position:absolute; border-radius:50%; pointer-events:none;
+            animation:float-particle var(--dur) linear infinite;
+            animation-delay:var(--delay);
+        }
+
+        body { zoom:0.9; -moz-transform:scale(0.9); -moz-transform-origin:0 0; }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+<!-- Top Nav Bar -->
+<div class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 px-6 py-3 flex items-center justify-between">
+    <a href="{% url 'coming_soon' %}" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-black text-[10px] uppercase tracking-[0.2em]">
+        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to K-Beats
+    </a>
+    <span class="font-black text-[10px] uppercase tracking-[0.3em] text-white/20">K-Beats Arcade</span>
+    <a href="https://www.gofundme.com/f/kbeats-help-us-build-the-uks-first-kpop-radio-station" target="_blank" rel="noopener noreferrer"
+       class="inline-flex items-center gap-2 bg-primary text-black px-4 py-2 font-black text-[9px] uppercase tracking-[0.2em] hover:bg-white transition-colors">
+        <span class="material-symbols-outlined text-sm">volunteer_activism</span> Support Us
+    </a>
+</div>
+
+<main class="flex-grow pt-14">
+
+    <!-- ══════════════════════════════════════════════════════════════
+         HERO
+         ══════════════════════════════════════════════════════════ -->
+    <section class="relative min-h-[60vh] w-full overflow-hidden flex items-center justify-center border-b border-white/10">
+        <!-- Background -->
+        <div class="absolute inset-0 z-0 bg-black">
+            <div class="w-full h-full bg-cover bg-center bg-fixed opacity-20 grayscale mix-blend-luminosity" style="background-image:url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        </div>
+
+        <!-- Particles -->
+        <div class="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
+            <div class="bg-particle w-1 h-1 bg-primary/40" style="left:12%; --dur:10s; --delay:0s;"></div>
+            <div class="bg-particle w-1.5 h-1.5 bg-secondary/30" style="left:35%; --dur:14s; --delay:2s;"></div>
+            <div class="bg-particle w-1 h-1 bg-primary/20" style="left:55%; --dur:11s; --delay:4s;"></div>
+            <div class="bg-particle w-2 h-2 bg-secondary/20" style="left:78%; --dur:13s; --delay:1s;"></div>
+            <div class="bg-particle w-1 h-1 bg-primary/30" style="left:90%; --dur:9s; --delay:3s;"></div>
+        </div>
+
+        <!-- Decorative BG text -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-[1]">
+            <span class="text-[25vw] font-black text-white/[0.015] uppercase tracking-tighter leading-none whitespace-nowrap">PLAY</span>
+        </div>
+
+        <div class="relative z-20 container mx-auto px-6 max-w-[1400px] flex flex-col items-center text-center py-32 md:py-40">
+            <div class="inline-flex items-center gap-2 px-4 py-2 border border-secondary/40 bg-secondary/10 mb-10 backdrop-blur-sm">
+                <span class="material-symbols-outlined text-secondary text-sm">sports_esports</span>
+                <span class="text-[10px] font-black tracking-[0.3em] uppercase text-secondary">Arcade</span>
+            </div>
+
+            <h1 class="text-[14vw] sm:text-6xl md:text-[8rem] lg:text-[10rem] font-black text-white leading-[0.85] tracking-tighter uppercase mb-2">
+                <span class="block">K-BEATS</span>
+                <span class="block text-transparent [-webkit-text-stroke:2px_#00f0ff]">GAMES</span>
+            </h1>
+
+            <div class="w-40 h-1 bg-neon-gradient my-8"></div>
+
+            <p class="text-lg md:text-xl text-slate-300 font-light max-w-2xl leading-relaxed tracking-wide">
+                Test your knowledge, flex your reflexes, and prove you're the ultimate K-Pop fan.
+                9 games. Infinite replays.
+            </p>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         TICKER BAR
+         ══════════════════════════════════════════════════════════ -->
+    <div class="relative w-full bg-primary border-t border-b border-white/20 h-16 flex items-center overflow-hidden z-40">
+        <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
+        <div class="animate-ticker flex items-center gap-24 text-black font-black text-sm uppercase tracking-[0.15em] whitespace-nowrap">
+            <span>Song Game</span><span class="text-black/40">★</span>
+            <span>Idol Scramble</span><span class="text-black/40">★</span>
+            <span>Lyric Drop</span><span class="text-black/40">★</span>
+            <span>Chart Clash</span><span class="text-black/40">★</span>
+            <span>Bias Selector</span><span class="text-black/40">★</span>
+            <span>Fandom Trivia</span><span class="text-black/40">★</span>
+            <span>MV Matcher</span><span class="text-black/40">★</span>
+            <span>Draft Day</span><span class="text-black/40">★</span>
+            <span>Beat Streak</span><span class="text-black/40 px-12">★</span>
+            <span>Song Game</span><span class="text-black/40">★</span>
+            <span>Idol Scramble</span><span class="text-black/40">★</span>
+            <span>Lyric Drop</span><span class="text-black/40">★</span>
+            <span>Chart Clash</span><span class="text-black/40">★</span>
+            <span>Bias Selector</span><span class="text-black/40">★</span>
+            <span>Fandom Trivia</span><span class="text-black/40">★</span>
+            <span>MV Matcher</span><span class="text-black/40">★</span>
+            <span>Draft Day</span><span class="text-black/40">★</span>
+            <span>Beat Streak</span>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         FEATURED GAMES — Large brutalist cards
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-black py-28 md:py-36 border-b border-white/10 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 text-[12rem] md:text-[18rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">
+            ARCADE
+        </div>
+
+        <div class="container mx-auto px-6 max-w-[1400px] relative z-10">
+            <!-- Section Header -->
+            <div class="pb-4 border-b border-white/20 mb-16 reveal-left">
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
+                    EXPLORE<span class="text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)]"> &amp; PLAY</span>
+                </h2>
+                <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">Games, tools and more to fuel your fandom</p>
+            </div>
+
+            <!-- Featured Row: 3 big cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10 mb-16 reveal-up">
+                <!-- Beat Streak -->
+                <a href="{% url 'beat_streak' %}" class="group relative border border-white/10 bg-black hover:bg-white/[0.03] transition-all overflow-hidden">
+                    <div class="aspect-[4/3] relative flex items-center justify-center bg-gradient-to-br from-secondary/10 via-black to-primary/5">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
+                        <span class="material-symbols-outlined text-[8rem] text-secondary/10 group-hover:text-secondary/20 transition-colors z-0">speed</span>
+                    </div>
+                    <div class="p-8 border-t border-white/10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="bg-secondary text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Featured</span>
+                            <span class="bg-white/5 text-white/40 text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Rhythm</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-tighter group-hover:text-secondary transition-colors mb-2">Beat Streak</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Tap to the rhythm of the latest K-Pop hits. Choose your difficulty and chase the perfect score.</p>
+                        <div class="mt-6 flex items-center gap-2 text-secondary font-black text-[10px] uppercase tracking-[0.2em]">
+                            Play Now <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Chart Clash -->
+                <a href="{% url 'chart_clash' %}" class="group relative border border-white/10 bg-black hover:bg-white/[0.03] transition-all overflow-hidden">
+                    <div class="aspect-[4/3] relative flex items-center justify-center bg-gradient-to-br from-primary/10 via-black to-secondary/5">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
+                        <span class="material-symbols-outlined text-[8rem] text-primary/10 group-hover:text-primary/20 transition-colors z-0">trending_up</span>
+                    </div>
+                    <div class="p-8 border-t border-white/10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="bg-primary text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Featured</span>
+                            <span class="bg-white/5 text-white/40 text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Trivia</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-tighter group-hover:text-primary transition-colors mb-2">Chart Clash</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Two songs face off — which one charted higher? Test your chart knowledge in rapid-fire rounds.</p>
+                        <div class="mt-6 flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-[0.2em]">
+                            Play Now <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Draft Day -->
+                <a href="{% url 'draft_day' %}" class="group relative border border-white/10 bg-black hover:bg-white/[0.03] transition-all overflow-hidden">
+                    <div class="aspect-[4/3] relative flex items-center justify-center bg-gradient-to-br from-secondary/10 via-black to-primary/5">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
+                        <span class="material-symbols-outlined text-[8rem] text-secondary/10 group-hover:text-secondary/20 transition-colors z-0">stars</span>
+                    </div>
+                    <div class="p-8 border-t border-white/10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="bg-secondary text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Featured</span>
+                            <span class="bg-white/5 text-white/40 text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Strategy</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-tighter group-hover:text-secondary transition-colors mb-2">Draft Day</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Build your ultimate fantasy idol group. Draft members from real groups and create your dream lineup.</p>
+                        <div class="mt-6 flex items-center gap-2 text-secondary font-black text-[10px] uppercase tracking-[0.2em]">
+                            Play Now <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════════
+                 ALL GAMES — Brutalist list rows
+                 ══════════════════════════════════════════════════════════ -->
+            <div class="reveal-up">
+                <h3 class="font-black text-[10px] uppercase tracking-[0.5em] text-white/30 mb-8">All Games</h3>
+
+                <div class="border border-white/10 divide-y divide-white/10">
+                    <!-- Song Game -->
+                    <a href="{% url 'song_game' %}" class="group flex items-center gap-6 p-6 md:p-8 hover:bg-white/[0.03] transition-all">
+                        <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                            <span class="material-symbols-outlined text-primary text-2xl">videogame_asset</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white text-lg font-black uppercase tracking-tight group-hover:text-primary transition-colors">Song Game</h4>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">Test your K-Pop knowledge · Guess the song from audio clips</p>
+                        </div>
+                        <span class="hidden sm:block bg-white/5 text-white/30 text-[9px] font-black px-3 py-1 uppercase tracking-widest">Knowledge</span>
+                        <span class="material-symbols-outlined text-2xl text-slate-700 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>
+
+                    <!-- Idol Scramble -->
+                    <a href="{% url 'idol_scramble' %}" class="group flex items-center gap-6 p-6 md:p-8 hover:bg-white/[0.03] transition-all">
+                        <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                            <span class="material-symbols-outlined text-primary text-2xl">extension</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white text-lg font-black uppercase tracking-tight group-hover:text-primary transition-colors">Idol Scramble</h4>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">Unscramble idol &amp; group names before the clock runs out</p>
+                        </div>
+                        <span class="hidden sm:block bg-white/5 text-white/30 text-[9px] font-black px-3 py-1 uppercase tracking-widest">Puzzle</span>
+                        <span class="material-symbols-outlined text-2xl text-slate-700 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>
+
+                    <!-- Lyric Drop -->
+                    <a href="{% url 'lyric_drop' %}" class="group flex items-center gap-6 p-6 md:p-8 hover:bg-white/[0.03] transition-all">
+                        <div class="w-14 h-14 bg-secondary/10 border border-secondary/30 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                            <span class="material-symbols-outlined text-secondary text-2xl">lyrics</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white text-lg font-black uppercase tracking-tight group-hover:text-secondary transition-colors">Lyric Drop</h4>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">Fill in the missing lyric · How well do you really know the words?</p>
+                        </div>
+                        <span class="hidden sm:block bg-white/5 text-white/30 text-[9px] font-black px-3 py-1 uppercase tracking-widest">Lyrics</span>
+                        <span class="material-symbols-outlined text-2xl text-slate-700 group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>
+
+                    <!-- Chart Clash -->
+                    <a href="{% url 'chart_clash' %}" class="group flex items-center gap-6 p-6 md:p-8 hover:bg-white/[0.03] transition-all">
+                        <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                            <span class="material-symbols-outlined text-primary text-2xl">trending_up</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white text-lg font-black uppercase tracking-tight group-hover:text-primary transition-colors">Chart Clash</h4>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">Which song charted higher? · Rapid‑fire chart trivia</p>
+                        </div>
+                        <span class="hidden sm:block bg-white/5 text-white/30 text-[9px] font-black px-3 py-1 uppercase tracking-widest">Trivia</span>
+                        <span class="material-symbols-outlined text-2xl text-slate-700 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>
+
+                    <!-- Bias Selector -->
+                    <a href="{% url 'bias_selector' %}" class="group flex items-center gap-6 p-6 md:p-8 hover:bg-white/[0.03] transition-all">
+                        <div class="w-14 h-14 bg-secondary/10 border border-secondary/30 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                            <span class="material-symbols-outlined text-secondary text-2xl">favorite</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white text-lg font-black uppercase tracking-tight group-hover:text-secondary transition-colors">Bias Selector</h4>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">Find your perfect idol match through a series of choices</p>
+                        </div>
+                        <span class="hidden sm:block bg-white/5 text-white/30 text-[9px] font-black px-3 py-1 uppercase tracking-widest">Personality</span>
+                        <span class="material-symbols-outlined text-2xl text-slate-700 group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>
+
+                    <!-- Fandom Trivia -->
+                    <a href="{% url 'fandom_trivia' %}" class="group flex items-center gap-6 p-6 md:p-8 hover:bg-white/[0.03] transition-all">
+                        <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                            <span class="material-symbols-outlined text-primary text-2xl">quiz</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white text-lg font-black uppercase tracking-tight group-hover:text-primary transition-colors">Fandom Trivia</h4>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">Test your mastery of K-Pop history, debuts &amp; milestones</p>
+                        </div>
+                        <span class="hidden sm:block bg-white/5 text-white/30 text-[9px] font-black px-3 py-1 uppercase tracking-widest">Trivia</span>
+                        <span class="material-symbols-outlined text-2xl text-slate-700 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>
+
+                    <!-- MV Matcher -->
+                    <a href="{% url 'mv_matcher' %}" class="group flex items-center gap-6 p-6 md:p-8 hover:bg-white/[0.03] transition-all">
+                        <div class="w-14 h-14 bg-secondary/10 border border-secondary/30 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                            <span class="material-symbols-outlined text-secondary text-2xl">movie</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white text-lg font-black uppercase tracking-tight group-hover:text-secondary transition-colors">MV Matcher</h4>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">Identify the music video from a single frame · Visual memory test</p>
+                        </div>
+                        <span class="hidden sm:block bg-white/5 text-white/30 text-[9px] font-black px-3 py-1 uppercase tracking-widest">Visual</span>
+                        <span class="material-symbols-outlined text-2xl text-slate-700 group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>
+
+                    <!-- Draft Day -->
+                    <a href="{% url 'draft_day' %}" class="group flex items-center gap-6 p-6 md:p-8 hover:bg-white/[0.03] transition-all">
+                        <div class="w-14 h-14 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                            <span class="material-symbols-outlined text-primary text-2xl">stars</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white text-lg font-black uppercase tracking-tight group-hover:text-primary transition-colors">Draft Day</h4>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">Build your fantasy idol group · Draft members from real groups</p>
+                        </div>
+                        <span class="hidden sm:block bg-white/5 text-white/30 text-[9px] font-black px-3 py-1 uppercase tracking-widest">Strategy</span>
+                        <span class="material-symbols-outlined text-2xl text-slate-700 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>
+
+                    <!-- Beat Streak -->
+                    <a href="{% url 'beat_streak' %}" class="group flex items-center gap-6 p-6 md:p-8 hover:bg-white/[0.03] transition-all">
+                        <div class="w-14 h-14 bg-secondary/10 border border-secondary/30 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
+                            <span class="material-symbols-outlined text-secondary text-2xl">speed</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white text-lg font-black uppercase tracking-tight group-hover:text-secondary transition-colors">Beat Streak</h4>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-1">Tap to the rhythm of the latest hits · 3 difficulty levels</p>
+                        </div>
+                        <span class="hidden sm:block bg-white/5 text-white/30 text-[9px] font-black px-3 py-1 uppercase tracking-widest">Rhythm</span>
+                        <span class="material-symbols-outlined text-2xl text-slate-700 group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         STATS SECTION — White invert
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-white text-black py-20 md:py-28 border-b border-white/20">
+        <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-12">
+                <div class="max-w-xl">
+                    <h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85] mb-6">
+                        PLAY.<br/>COMPETE.<br/>REPEAT.
+                    </h2>
+                    <p class="font-mono text-xs uppercase tracking-widest text-black/40">Every game builds your K-Beats profile</p>
+                </div>
+                <div class="grid grid-cols-3 gap-0 border border-black">
+                    <div class="p-8 md:p-12 border-r border-black text-center">
+                        <span class="text-4xl md:text-6xl font-black text-primary block tracking-tighter">9</span>
+                        <span class="font-mono text-[9px] uppercase tracking-widest text-black/50 mt-2 block">Games</span>
+                    </div>
+                    <div class="p-8 md:p-12 border-r border-black text-center">
+                        <span class="text-4xl md:text-6xl font-black text-black block tracking-tighter">∞</span>
+                        <span class="font-mono text-[9px] uppercase tracking-widest text-black/50 mt-2 block">Replays</span>
+                    </div>
+                    <div class="p-8 md:p-12 text-center">
+                        <span class="text-4xl md:text-6xl font-black text-primary block tracking-tighter">1</span>
+                        <span class="font-mono text-[9px] uppercase tracking-widest text-black/50 mt-2 block">Goal</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         SIGNUP — Stay in the Loop
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-black py-28 md:py-36 border-b border-white/10 relative overflow-hidden" x-data="signupForm()">
+        <div class="absolute -top-10 -right-10 text-[12rem] md:text-[18rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap pointer-events-none select-none z-0">NOTIFY</div>
+
+        <div class="container mx-auto px-6 max-w-[600px] text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 border border-secondary text-secondary bg-secondary/10 mb-8">
+                <span class="material-symbols-outlined text-sm">notifications_active</span>
+                <span class="text-[10px] font-black tracking-[0.2em] uppercase">Stay in the Loop</span>
+            </div>
+
+            <h2 class="text-4xl md:text-6xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-6">
+                BE THE<br/>
+                <span class="text-transparent [-webkit-text-stroke:2px_#00f0ff]">FIRST</span>
+                TO KNOW
+            </h2>
+
+            <p class="text-lg md:text-xl text-slate-300 font-light max-w-xl mx-auto leading-relaxed tracking-wide mb-10">
+                Sign up to get the latest updates on K-Beats and be the first to know when we go live.
+            </p>
+
+            <!-- Success State -->
+            <template x-if="success">
+                <div class="border border-secondary bg-secondary/10 p-8 text-center">
+                    <span class="material-symbols-outlined text-5xl text-secondary block mb-4">celebration</span>
+                    <p class="text-xl font-black text-white uppercase tracking-tight mb-2">You&rsquo;re In!</p>
+                    <p class="text-slate-400 font-light">We&rsquo;ll let you know as soon as K-Beats goes live.</p>
+                </div>
+            </template>
+
+            <!-- Form -->
+            <template x-if="!success">
+                <form @submit.prevent="submit" class="text-left space-y-4">
+                    <div>
+                        <label class="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Your Name</label>
+                        <input x-model="name" type="text" required placeholder="e.g. Isabelle"
+                               class="w-full bg-white/5 border border-white/10 text-white px-5 py-4 font-display text-sm placeholder-white/20 focus:border-secondary focus:ring-0 focus:outline-none transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Email</label>
+                        <input x-model="email" type="email" required placeholder="you@example.com"
+                               class="w-full bg-white/5 border border-white/10 text-white px-5 py-4 font-display text-sm placeholder-white/20 focus:border-secondary focus:ring-0 focus:outline-none transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Age</label>
+                        <input x-model="age" type="number" required min="5" max="120" placeholder="11"
+                               class="w-full bg-white/5 border border-white/10 text-white px-5 py-4 font-display text-sm placeholder-white/20 focus:border-secondary focus:ring-0 focus:outline-none transition-colors" />
+                    </div>
+
+                    <p x-show="error" x-text="error" class="text-primary font-mono text-xs uppercase tracking-wide"></p>
+
+                    <button type="submit" :disabled="loading"
+                            class="w-full bg-secondary text-black px-10 py-5 font-black uppercase tracking-[0.2em] text-xs border border-secondary hover:bg-black hover:text-secondary transition-all shadow-[6px_6px_0px_white] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] disabled:opacity-50 disabled:cursor-wait mt-4">
+                        <span x-show="!loading">Notify Me</span>
+                        <span x-show="loading">Signing Up&hellip;</span>
+                    </button>
+                    <p class="font-mono text-[9px] uppercase tracking-widest text-white/20 text-center mt-4">No spam &middot; Unsubscribe anytime</p>
+                </form>
+            </template>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         CTA — Bottom
+         ══════════════════════════════════════════════════════════ -->
+    <section class="w-full bg-black py-32 md:py-40 border-b border-white/10 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-primary/[0.03] via-transparent to-transparent pointer-events-none"></div>
+        <div class="container mx-auto px-6 max-w-[900px] text-center relative z-10">
+            <span class="material-symbols-outlined text-6xl text-primary/20 block mb-6">volunteer_activism</span>
+            <h2 class="text-3xl md:text-5xl font-black text-white leading-snug tracking-tighter uppercase mb-4">
+                HELP US<br/><span class="text-primary neon-text">BUILD K-BEATS</span>
+            </h2>
+            <p class="text-slate-400 font-light text-lg max-w-md mx-auto mb-4">K-Beats is being built by Isabelle, an 11-year-old with a dream to create the UK&rsquo;s first 24/7 K-Pop radio station.</p>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-white/30 mb-10">Every donation helps make it real</p>
+            <div class="w-16 h-1 bg-neon-gradient mx-auto mb-10"></div>
+            <a href="https://www.gofundme.com/f/kbeats-help-us-build-the-uks-first-kpop-radio-station" target="_blank" rel="noopener noreferrer"
+               class="inline-block bg-primary text-black px-14 py-5 font-black uppercase tracking-[0.2em] text-xs border border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_white] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                Support on GoFundMe
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<!-- Scroll Reveal Observer -->
+<script>
+function signupForm() {
+    return {
+        name: '', email: '', age: '', loading: false, error: '', success: false,
+        async submit() {
+            this.error = '';
+            this.loading = true;
+            try {
+                const res = await fetch('{% url "prelaunch_signup" %}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: this.name, email: this.email, age: this.age })
+                });
+                const data = await res.json();
+                if (data.ok) { this.success = true; }
+                else { this.error = data.error || 'Something went wrong.'; }
+            } catch { this.error = 'Network error. Please try again.'; }
+            this.loading = false;
+        }
+    };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => obs.observe(el));
+});
+</script>
+
+</body>
+</html>

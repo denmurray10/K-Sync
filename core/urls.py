@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', views.coming_soon, name='home'),          # PRE-LAUNCH: was views.home
     path('charts/', views.charts, name='charts'),
     path('idols/', views.idols, name='idols'),
     path('idols/universe/', views.idol_universe, name='idol_universe'),
@@ -11,6 +11,9 @@ urlpatterns = [
     path('news/', views.news, name='news'),
     path('shop/', views.shop, name='shop'),
     path('about/', views.about_us, name='about_us'),
+    path('coming-soon/', views.coming_soon, name='coming_soon'),
+    path('games/', views.games, name='games'),
+    path('api/prelaunch-signup/', views.prelaunch_signup, name='prelaunch_signup'),
     path('presenters/', views.presenters, name='presenters'),
     path('achievement/', views.achievement_popup, name='achievement_popup'),
     path('login/', views.login_page, name='login'),

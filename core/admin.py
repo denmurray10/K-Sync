@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     LivePoll, LivePollOption, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
-    FanClubMembership,
+    FanClubMembership, PreLaunchSignup,
 )
 
 
@@ -74,3 +74,10 @@ class FanClubMembershipAdmin(admin.ModelAdmin):
     list_display = ('user', 'group', 'joined_at')
     list_filter = ('group', 'joined_at')
     raw_id_fields = ('user', 'group')
+
+
+@admin.register(PreLaunchSignup)
+class PreLaunchSignupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'age', 'signed_up_at')
+    list_filter = ('signed_up_at',)
+    search_fields = ('name', 'email')

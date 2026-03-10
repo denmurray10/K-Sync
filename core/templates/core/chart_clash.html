@@ -40,7 +40,7 @@
         <!-- Top Bar -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
             <div class="flex items-center gap-4">
-                <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                <a href="{% url 'games' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-xl">close</span>
                 </a>
                 <div>
@@ -161,8 +161,8 @@
                     <button @click="startGame()" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                         Play Again
                     </button>
-                    <a href="{% url 'dashboard' %}" class="px-8 py-4 border border-white/20 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
-                        Dashboard
+                    <a href="{% url 'games' %}" class="px-8 py-4 border border-white/20 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
+                        Games
                     </a>
                 </div>
             </div>

@@ -567,6 +567,35 @@ def shop(request):
 def about_us(request):
     return render(request, 'core/about_us.html')
 
+def coming_soon(request):
+    return render(request, 'core/coming_soon.html')
+
+def games(request):
+    return render(request, 'core/games.html')
+
+@csrf_exempt
+@require_POST
+def prelaunch_signup(request):
+    import json
+    from .models import PreLaunchSignup
+    from django.db import IntegrityError
+    try:
+        data = json.loads(request.body)
+        name = data.get('name', '').strip()
+        email = data.get('email', '').strip()
+        age = data.get('age')
+        if not name or not email or not age:
+            return JsonResponse({'ok': False, 'error': 'All fields are required.'}, status=400)
+        age = int(age)
+        if age < 5 or age > 120:
+            return JsonResponse({'ok': False, 'error': 'Please enter a valid age.'}, status=400)
+        PreLaunchSignup.objects.create(name=name, email=email, age=age)
+        return JsonResponse({'ok': True})
+    except IntegrityError:
+        return JsonResponse({'ok': False, 'error': 'This email is already signed up!'})
+    except (ValueError, TypeError):
+        return JsonResponse({'ok': False, 'error': 'Invalid data.'}, status=400)
+
 def presenters(request):
     return render(request, 'core/presenters.html')
 
