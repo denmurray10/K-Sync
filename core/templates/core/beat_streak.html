@@ -245,7 +245,23 @@
 </head>
 <body class="font-display text-white overflow-hidden" x-data="beatStreak()" @keydown.window="onKeyDown($event)" @keyup.window="onKeyUp($event)">
 
-    <div class="game-layout">
+    <!-- ══════════════════════════════════════════════════════════════
+         MOBILE BLOCKER — hidden on md+ screens
+         ══════════════════════════════════════════════════════════ -->
+    <div class="md:hidden fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center text-center px-8">
+        <span class="material-symbols-outlined text-6xl text-primary/40 block mb-6">desktop_windows</span>
+        <h1 class="text-3xl font-black uppercase tracking-tighter text-white mb-4">Desktop Only</h1>
+        <p class="text-slate-400 font-light text-base leading-relaxed max-w-xs mb-8">
+            Beat Streak uses keyboard controls and needs a bigger screen to play properly.<br/>
+            Jump on a laptop or desktop to give it a go!
+        </p>
+        <a href="{% url 'games' %}" class="inline-flex items-center gap-2 bg-primary text-black px-8 py-4 font-black uppercase tracking-[0.2em] text-[10px]">
+            <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Games
+        </a>
+    </div>
+
+    <!-- Game — hidden on mobile -->
+    <div class="hidden md:contents">
 
         <!-- ══════════════════════════════════════════════════════════════
              LEFT SIDEBAR — Leaderboard (Glass Panel Style)
@@ -1093,5 +1109,6 @@
         };
     }
     </script>
+    </div><!-- end desktop-only wrapper -->
 </body>
 </html>

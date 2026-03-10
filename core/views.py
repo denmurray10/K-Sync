@@ -596,6 +596,71 @@ def prelaunch_signup(request):
     except (ValueError, TypeError):
         return JsonResponse({'ok': False, 'error': 'Invalid data.'}, status=400)
 
+def signups_login_view(request):
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect('signups_dashboard')
+    error = ''
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+        try:
+            user_obj = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user_obj = None
+        if user_obj:
+            user = authenticate(request, username=user_obj.username, password=password)
+            if user is not None and user.is_staff:
+                login(request, user)
+                return redirect('signups_dashboard')
+            elif user is not None:
+                error = 'You do not have staff access.'
+            else:
+                error = 'Invalid email or password.'
+        else:
+            error = 'Invalid email or password.'
+    return render(request, 'core/signups_login.html', {'error': error})
+
+@login_required(login_url='/staff/login/')
+def signups_dashboard_view(request):
+    if not request.user.is_staff:
+        return redirect('signups_login')
+    from .models import PreLaunchSignup
+    from django.db.models import Avg
+    from datetime import timedelta
+    now = timezone.now()
+    signups = PreLaunchSignup.objects.all()
+    total = signups.count()
+    today_count = signups.filter(signed_up_at__date=now.date()).count()
+    week_count = signups.filter(signed_up_at__gte=now - timedelta(days=7)).count()
+    avg_age = signups.aggregate(avg=Avg('age'))['avg']
+    avg_age = round(avg_age) if avg_age else 0
+    return render(request, 'core/signups_dashboard.html', {
+        'signups': signups,
+        'total': total,
+        'today_count': today_count,
+        'week_count': week_count,
+        'avg_age': avg_age,
+    })
+
+@login_required(login_url='/staff/login/')
+def signups_export_view(request):
+    if not request.user.is_staff:
+        return redirect('signups_login')
+    import csv
+    from django.http import HttpResponse
+    from .models import PreLaunchSignup
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="kbeats_signups.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Email', 'Age', 'Signed Up'])
+    for s in PreLaunchSignup.objects.all():
+        writer.writerow([s.name, s.email, s.age, s.signed_up_at.strftime('%Y-%m-%d %H:%M')])
+    return response
+
+def signups_logout_view(request):
+    logout(request)
+    return redirect('signups_login')
+
 def presenters(request):
     return render(request, 'core/presenters.html')
 
@@ -1034,31 +1099,46 @@ def fandom_trivia(request):
     import random
     groups = list(KPopGroup.objects.exclude(label='').all())
     if not groups:
-        return redirect('dashboard')
+        return redirect('games')
     
+    all_labels = list(set(g.label for g in groups if g.label))
+    type_choices = ['Boy Group', 'Girl Group', 'Soloist']
+
     questions = []
     # Mix of questions: Labels, Member Counts, Group Types
     for g in random.sample(groups, min(len(groups), 20)):
         q_type = random.choice(['type', 'label', 'count'])
         if q_type == 'type':
+            answer = g.get_group_type_display()
+            wrong = [t for t in type_choices if t != answer]
+            opts = [answer] + random.sample(wrong, min(3, len(wrong)))
+            random.shuffle(opts)
             questions.append({
                 'question': f"What type of artist is {g.name}?",
-                'answer': g.get_group_type_display(),
-                'options': random.sample([g.get_group_type_display(), 'Boy Group', 'Girl Group', 'Soloist'], 4)
+                'answer': answer,
+                'options': opts,
             })
         elif q_type == 'label' and g.label:
-             questions.append({
+            wrong_labels = [l for l in all_labels if l != g.label]
+            if len(wrong_labels) < 3:
+                continue
+            opts = [g.label] + random.sample(wrong_labels, 3)
+            random.shuffle(opts)
+            questions.append({
                 'question': f"Which label is {g.name} signed to?",
                 'answer': g.label,
-                'options': random.sample(list(set([g.label] + [other.label for other in random.sample(groups, 10) if other.label and other.label != g.label]))[:4], 4)
+                'options': opts,
             })
         else:
             count = g.members.count()
             if count > 0:
+                wrong = list(set([str(count+1), str(max(1, count-1)), str(random.randint(1, 13))]) - {str(count)})
+                opts = [str(count)] + random.sample(wrong, min(3, len(wrong)))
+                random.shuffle(opts)
                 questions.append({
                     'question': f"How many members are in {g.name}?",
                     'answer': str(count),
-                    'options': random.sample(list(set([str(count), str(count+1), str(max(1, count-1)), str(random.randint(1, 13))]))[:4], 4)
+                    'options': opts,
                 })
 
     random.shuffle(questions)
@@ -1101,23 +1181,25 @@ def mv_matcher(request):
 
 def draft_day(request):
     import random
-    members = list(KPopMember.objects.select_related('group').all())
+    members = list(KPopMember.objects.select_related('group').order_by('group__name', 'name'))
     if not members:
-        return redirect('dashboard')
-        
+        return redirect('games')
+
     pool = []
-    for m in random.sample(members, min(len(members), 40)):
+    for m in members:
+        # Seed by member name so stats/cost are consistent across refreshes
+        rng = random.Random(m.name)
         pool.append({
             'name': m.stage_name or m.name,
             'group': m.group.name,
             'image': m.image_url or (m.group.image_url if m.group.image_url else ''),
             'stats': {
-                'vocal': random.randint(70, 99),
-                'dance': random.randint(70, 99),
-                'rap': random.randint(60, 99),
-                'visual': random.randint(80, 99),
+                'vocal': rng.randint(70, 99),
+                'dance': rng.randint(70, 99),
+                'rap': rng.randint(60, 99),
+                'visual': rng.randint(80, 99),
             },
-            'cost': random.randint(10, 50)
+            'cost': rng.randint(10, 50)
         })
         
     return render(request, 'core/draft_day.html', {

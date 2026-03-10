@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>K-Beats — Staff Login</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: { primary: "#f425c0", secondary: "#00f0ff", "background-dark": "#000000" },
+                fontFamily: { display: ["Montserrat", "sans-serif"] },
+                borderRadius: { DEFAULT:"0px",sm:"0px",md:"0px",lg:"0px",xl:"0px","2xl":"0px","3xl":"0px",full:"9999px" },
+                backgroundImage: { 'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)' }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { zoom: 0.9; }
+    </style>
+</head>
+<body class="bg-black text-white font-display min-h-screen flex items-center justify-center px-6">
+
+    <div class="w-full max-w-md">
+        <!-- Logo / Brand -->
+        <div class="text-center mb-12">
+            <span class="material-symbols-outlined text-5xl text-primary/30 block mb-4">admin_panel_settings</span>
+            <h1 class="text-3xl font-black uppercase tracking-tighter">Staff Area</h1>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-white/30 mt-2">K-Beats Signup Dashboard</p>
+        </div>
+
+        {% if error %}
+        <div class="border border-red-400/30 bg-red-400/10 text-red-300 px-5 py-3 mb-6 font-mono text-xs uppercase tracking-wide text-center">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+            <div>
+                <label class="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Email</label>
+                <input type="email" name="email" required autofocus placeholder="you@kbeats.co.uk"
+                       class="w-full bg-white/5 border border-white/10 text-white px-5 py-4 font-display text-sm placeholder-white/20 focus:border-primary focus:ring-0 focus:outline-none transition-colors" />
+            </div>
+            <div>
+                <label class="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Password</label>
+                <input type="password" name="password" required placeholder="••••••••"
+                       class="w-full bg-white/5 border border-white/10 text-white px-5 py-4 font-display text-sm placeholder-white/20 focus:border-primary focus:ring-0 focus:outline-none transition-colors" />
+            </div>
+            <button type="submit"
+                    class="w-full bg-primary text-black px-10 py-5 font-black uppercase tracking-[0.2em] text-xs border border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_white] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                Sign In
+            </button>
+        </form>
+
+        <p class="text-center mt-10">
+            <a href="{% url 'home' %}" class="font-mono text-[10px] uppercase tracking-widest text-white/20 hover:text-white/50 transition-colors">← Back to site</a>
+        </p>
+    </div>
+
+</body>
+</html>

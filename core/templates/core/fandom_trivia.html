@@ -42,7 +42,7 @@
     <div class="fixed inset-0 z-50 bg-black flex flex-col">
 
         <!-- Top Bar -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+        <div class="flex items-center justify-between px-3 py-2 md:px-6 md:py-4 border-b border-white/10 shrink-0">
             <div class="flex items-center gap-4">
                 <a href="{% url 'games' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-xl">close</span>
@@ -74,7 +74,7 @@
         </div>
 
         <!-- Game Area -->
-        <div class="flex-1 flex items-center justify-center overflow-hidden">
+        <div class="flex-1 flex items-center justify-center overflow-auto">
 
             <!-- Intro Screen -->
             <div x-show="state === 'intro'" x-transition class="text-center px-6 max-w-lg">
@@ -95,10 +95,10 @@
             </div>
 
             <!-- Playing Screen -->
-            <div x-show="state === 'playing'" x-transition class="w-full max-w-3xl px-6 animate-slide-up" :key="currentRound">
+            <div x-show="state === 'playing'" x-transition class="w-full max-w-3xl px-4 md:px-6 py-4 md:py-0 animate-slide-up" :key="currentRound">
 
                 <!-- Timer Bar -->
-                <div class="flex items-center justify-center gap-3 mb-12">
+                <div class="flex items-center justify-center gap-3 mb-4 md:mb-12">
                     <span class="material-symbols-outlined text-lg" :class="timeLeft <= 5 ? 'text-red-400 animate-countdown' : 'text-slate-600'">timer</span>
                     <div class="w-48 h-2 bg-white/10">
                         <div class="h-full transition-all duration-1000 ease-linear"
@@ -109,40 +109,40 @@
                 </div>
 
                 <!-- Question -->
-                <div class="text-center mb-16" :class="answered && !wasCorrect && 'animate-shake'">
-                    <span class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mb-4 block">Question <span x-text="currentRound+1"></span></span>
-                    <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase leading-tight"
+                <div class="text-center mb-5 md:mb-16" :class="answered && !wasCorrect && 'animate-shake'">
+                    <span class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mb-2 md:mb-4 block">Question <span x-text="currentRound+1"></span></span>
+                    <h2 class="text-xl md:text-5xl font-black text-white tracking-tighter uppercase leading-tight"
                         x-text="currentQuestion.question"></h2>
                 </div>
 
                 <!-- Options -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-4">
                     <template x-for="(opt, i) in currentQuestion.options" :key="i">
                         <button @click="answer(opt)"
                                 :disabled="answered"
-                                class="option-btn group flex items-center gap-4 p-6 border border-white/10 bg-white/[0.02] text-left"
+                                class="option-btn group flex items-center gap-2 md:gap-4 p-3 md:p-6 border border-white/10 bg-white/[0.02] text-left"
                                 :class="{
                                     'option-correct': answered && opt === currentQuestion.answer,
                                     'option-wrong': answered && selectedOption === opt && opt !== currentQuestion.answer,
                                     'opacity-40': answered && opt !== currentQuestion.answer && selectedOption !== opt
                                 }">
-                            <div class="w-10 h-10 border shrink-0 flex items-center justify-center font-black text-sm transition-colors"
+                            <div class="w-7 h-7 md:w-10 md:h-10 border shrink-0 flex items-center justify-center font-black text-xs md:text-sm transition-colors"
                                  :class="answered && opt === currentQuestion.answer ? 'border-green-500 text-green-500' : answered && selectedOption === opt && opt !== currentQuestion.answer ? 'border-red-500 text-red-500' : 'border-white/20 text-white/40 group-hover:border-primary group-hover:text-primary'"
                                  x-text="['A','B','C','D'][i]"></div>
-                            <span class="text-white text-base font-bold uppercase tracking-tight group-hover:text-primary transition-colors"
+                            <span class="text-white text-xs md:text-base font-bold uppercase tracking-tight group-hover:text-primary transition-colors"
                                   x-text="opt"></span>
                         </button>
                     </template>
                 </div>
 
                 <!-- Correct Answer Reveal -->
-                <div x-show="answered" x-transition class="mt-10 text-center">
-                    <p class="font-mono text-[12px] tracking-widest uppercase mb-6"
+                <div x-show="answered" x-transition class="mt-4 md:mt-10 text-center">
+                    <p class="font-mono text-[11px] md:text-[12px] tracking-widest uppercase mb-3 md:mb-6"
                        :class="wasCorrect ? 'text-green-400' : 'text-red-400'"
                        x-text="wasCorrect ? '✓ CORRECT! +' + lastPoints + ' PTS' : '✗ WRONG — THE ANSWER IS ' + currentQuestion.answer.toUpperCase()">
                     </p>
                     <button @click="nextRound()"
-                            class="inline-flex items-center gap-2 border border-white/20 text-white px-8 py-4 font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
+                            class="inline-flex items-center gap-2 border border-white/20 text-white px-6 py-3 md:px-8 md:py-4 font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
                         <span x-text="currentRound < totalRounds - 1 ? 'Next Question' : 'See Results'"></span>
                         <span class="material-symbols-outlined text-sm">east</span>
                     </button>

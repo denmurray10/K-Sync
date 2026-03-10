@@ -44,7 +44,7 @@
     <div class="fixed inset-0 z-50 bg-black flex flex-col">
 
         <!-- Top Bar -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+        <div class="flex items-center justify-between px-3 py-2 md:px-6 md:py-4 border-b border-white/10 shrink-0">
             <div class="flex items-center gap-4">
                 <a href="{% url 'games' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-xl">close</span>
@@ -76,7 +76,7 @@
         </div>
 
         <!-- Game Area -->
-        <div class="flex-1 flex items-center justify-center overflow-hidden">
+        <div class="flex-1 flex items-center justify-center overflow-auto py-4">
 
             <!-- Intro Screen -->
             <div x-show="state === 'intro'" x-transition class="text-center px-6 max-w-lg">
@@ -97,11 +97,11 @@
             </div>
 
             <!-- Playing Screen -->
-            <div x-show="state === 'playing'" x-transition class="w-full max-w-4xl px-6 animate-slide-up" :key="currentRound">
+            <div x-show="state === 'playing'" x-transition class="w-full max-w-4xl px-3 md:px-6 py-3 md:py-0 animate-slide-up" :key="currentRound">
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-12 items-center">
                     <!-- Image Area -->
-                    <div class="relative aspect-video border border-white/10 bg-white/[0.02] overflow-hidden group">
+                    <div class="relative border border-white/10 bg-white/[0.02] overflow-hidden group" style="aspect-ratio:16/7">
                          <img :src="currentRoundData.image" 
                               class="w-full h-full object-cover transition-all duration-700"
                               :class="answered ? 'frame-clear scale-100' : 'frame-blur scale-110'" />
@@ -119,7 +119,7 @@
                     <!-- HUD & Options -->
                     <div>
                         <!-- Timer -->
-                        <div class="flex items-center gap-3 mb-8">
+                        <div class="flex items-center gap-3 mb-3 md:mb-8">
                             <span class="material-symbols-outlined text-lg" :class="timeLeft <= 3 ? 'text-red-400 animate-countdown' : 'text-slate-600'">timer_3</span>
                             <div class="flex-1 h-1 bg-white/10">
                                 <div class="h-full transition-all duration-1000 ease-linear"
@@ -129,19 +129,19 @@
                             <span class="font-mono text-xs font-bold w-6 text-right" :class="timeLeft <= 3 ? 'text-red-400' : 'text-slate-500'" x-text="timeLeft"></span>
                         </div>
 
-                        <h3 class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mb-6 block">Identify the subject...</h3>
+                        <h3 class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mb-2 md:mb-6 block">Identify the subject...</h3>
 
-                        <div class="grid grid-cols-1 gap-3">
+                        <div class="grid grid-cols-1 gap-1.5 md:gap-3">
                             <template x-for="(opt, i) in currentRoundData.options" :key="i">
                                 <button @click="answer(opt)"
                                         :disabled="answered"
-                                        class="option-btn group flex items-center justify-between p-5 border border-white/10 bg-white/[0.02] text-left"
+                                        class="option-btn group flex items-center justify-between p-2.5 md:p-5 border border-white/10 bg-white/[0.02] text-left"
                                         :class="{
                                             'option-correct': answered && opt === currentRoundData.answer,
                                             'option-wrong': answered && selectedOption === opt && opt !== currentRoundData.answer,
                                             'opacity-40': answered && opt !== currentRoundData.answer && selectedOption !== opt
                                         }">
-                                    <span class="text-white text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors"
+                                    <span class="text-white text-xs md:text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors"
                                           x-text="opt"></span>
                                     <template x-if="answered && opt === currentRoundData.answer">
                                         <span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
@@ -151,16 +151,16 @@
                         </div>
 
                         <!-- Round Feedback -->
-                        <div x-show="answered" x-transition class="mt-8 pt-8 border-t border-white/5 flex items-center justify-between">
+                        <div x-show="answered" x-transition class="mt-3 md:mt-8 pt-3 md:pt-8 border-t border-white/5 flex items-center justify-between">
                             <div class="text-left">
                                 <p class="font-mono text-[10px] tracking-widest uppercase"
                                    :class="wasCorrect ? 'text-green-400' : 'text-red-400'"
                                    x-text="wasCorrect ? '✓ MISSION PASSED' : '✗ MISSION FAILED'">
                                 </p>
-                                <p class="text-white font-black uppercase text-xl mt-1" x-text="wasCorrect ? '+' + lastPoints + ' PTS' : 'TARGET: ' + currentRoundData.answer.toUpperCase()"></p>
+                                <p class="text-white font-black uppercase text-sm md:text-xl mt-0.5" x-text="wasCorrect ? '+' + lastPoints + ' PTS' : 'TARGET: ' + currentRoundData.answer.toUpperCase()"></p>
                             </div>
                             <button @click="nextRound()"
-                                    class="bg-white text-black px-6 py-3 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-secondary transition-colors">
+                                    class="bg-white text-black px-4 py-2.5 md:px-6 md:py-3 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-secondary transition-colors shrink-0 ml-4">
                                 <span x-text="currentRound < totalRounds - 1 ? 'Next Frame' : 'Results'"></span>
                             </button>
                         </div>

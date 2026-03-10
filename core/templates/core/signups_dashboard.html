@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>K-Beats — Signup Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: { primary: "#f425c0", secondary: "#00f0ff", accent: "#fbbf24", "background-dark": "#000000" },
+                fontFamily: { display: ["Montserrat", "sans-serif"] },
+                borderRadius: { DEFAULT:"0px",sm:"0px",md:"0px",lg:"0px",xl:"0px","2xl":"0px","3xl":"0px",full:"9999px" },
+                backgroundImage: { 'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)' }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { zoom: 0.9; }
+    </style>
+</head>
+<body class="bg-black text-white font-display min-h-screen" x-data="dashboardApp()">
+
+    <!-- Top Bar -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-primary text-xl">admin_panel_settings</span>
+            <div>
+                <h1 class="text-[11px] font-black uppercase tracking-[0.2em] text-white">Signup Dashboard</h1>
+                <p class="font-mono text-[8px] tracking-widest uppercase text-white/20">K-Beats Staff Area</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <span class="font-mono text-[9px] uppercase tracking-widest text-white/30">{{ user.email }}</span>
+            <a href="{% url 'signups_logout' %}" class="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors font-black text-[9px] uppercase tracking-[0.15em]">
+                <span class="material-symbols-outlined text-sm">logout</span> Sign Out
+            </a>
+        </div>
+    </header>
+
+    <main class="pt-20 pb-16 px-6 max-w-[1400px] mx-auto">
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+            <div class="border border-white/10 bg-white/[0.02] p-6">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Total Signups</span>
+                <span class="text-4xl font-black text-primary">{{ total }}</span>
+            </div>
+            <div class="border border-white/10 bg-white/[0.02] p-6">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Today</span>
+                <span class="text-4xl font-black text-secondary">{{ today_count }}</span>
+            </div>
+            <div class="border border-white/10 bg-white/[0.02] p-6">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">This Week</span>
+                <span class="text-4xl font-black text-accent">{{ week_count }}</span>
+            </div>
+            <div class="border border-white/10 bg-white/[0.02] p-6">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Avg Age</span>
+                <span class="text-4xl font-black text-white">{{ avg_age }}</span>
+            </div>
+        </div>
+
+        <!-- Search & Export -->
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+            <div class="relative flex-1 max-w-md">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg pointer-events-none">search</span>
+                <input x-model="search" type="text" placeholder="Search by name or email…"
+                       class="w-full bg-white/5 border border-white/10 text-white pl-11 pr-4 py-3 font-display text-sm placeholder-slate-600 focus:border-primary focus:ring-0 focus:outline-none transition-colors" />
+            </div>
+            <a href="{% url 'signups_export' %}"
+               class="inline-flex items-center gap-2 border border-white/10 text-white/60 px-5 py-3 font-black text-[9px] uppercase tracking-[0.15em] hover:bg-white hover:text-black transition-all">
+                <span class="material-symbols-outlined text-sm">download</span> Export CSV
+            </a>
+        </div>
+
+        <!-- Table -->
+        <div class="border border-white/10 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-white/10 bg-white/[0.03]">
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">#</th>
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">Name</th>
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">Email</th>
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">Age</th>
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">Signed Up</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in signups %}
+                        <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors signup-row"
+                            data-name="{{ s.name|lower }}" data-email="{{ s.email|lower }}">
+                            <td class="px-6 py-4 font-mono text-[10px] text-white/20">{{ forloop.counter }}</td>
+                            <td class="px-6 py-4 font-black text-sm uppercase tracking-tight">{{ s.name }}</td>
+                            <td class="px-6 py-4 text-sm text-slate-400">{{ s.email }}</td>
+                            <td class="px-6 py-4 font-mono text-sm text-center">{{ s.age }}</td>
+                            <td class="px-6 py-4 font-mono text-[10px] text-white/30 uppercase tracking-wide">{{ s.signed_up_at|date:"d M Y · H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-20 text-center">
+                                <span class="material-symbols-outlined text-4xl text-white/10 block mb-3">inbox</span>
+                                <p class="font-mono text-[10px] uppercase tracking-widest text-white/20">No signups yet</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="font-mono text-[9px] uppercase tracking-widest text-white/15 text-center mt-8">{{ total }} total entries</p>
+    </main>
+
+    <script>
+    function dashboardApp() {
+        return {
+            search: '',
+            init() {
+                this.$watch('search', (q) => {
+                    const term = q.toLowerCase().trim();
+                    document.querySelectorAll('.signup-row').forEach(row => {
+                        const name = row.dataset.name || '';
+                        const email = row.dataset.email || '';
+                        row.style.display = (!term || name.includes(term) || email.includes(term)) ? '' : 'none';
+                    });
+                });
+            }
+        };
+    }
+    </script>
+
+</body>
+</html>

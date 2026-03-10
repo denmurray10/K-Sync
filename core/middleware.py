@@ -12,7 +12,10 @@ class PreLaunchMiddleware:
         '/coming-soon/',
         '/games/',
         '/game/',       # all individual game pages
+        '/bias-selector/',
         '/api/prelaunch-signup/',
+        '/api/bias-quiz-result/',
+        '/staff/',      # staff dashboard
         '/admin/',      # keep admin accessible
         '/static/',
         '/media/',

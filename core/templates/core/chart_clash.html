@@ -38,7 +38,7 @@
     <div class="fixed inset-0 z-50 bg-black flex flex-col">
 
         <!-- Top Bar -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+        <div class="flex items-center justify-between px-3 py-2 md:px-6 md:py-4 border-b border-white/10 shrink-0">
             <div class="flex items-center gap-4">
                 <a href="{% url 'games' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-xl">close</span>
@@ -65,7 +65,7 @@
         </div>
 
         <!-- Game Area -->
-        <div class="flex-1 flex items-center justify-center p-6 overflow-auto">
+        <div class="flex-1 flex items-center justify-center p-3 md:p-6 overflow-auto">
 
             <!-- Start Screen -->
             <div x-show="state === 'start'" x-transition class="text-center max-w-lg mx-auto animate-slide-up">
@@ -82,21 +82,21 @@
 
             <!-- Playing Screen -->
             <div x-show="state === 'playing'" x-transition class="w-full max-w-4xl mx-auto">
-                <p class="text-center font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-6">Tap the song that charted higher</p>
+                <p class="text-center font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-3 md:mb-6">Tap the song that charted higher</p>
 
                 <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-0 items-stretch">
                     <!-- Card A -->
                     <button @click="pickSong('a')" :disabled="answered"
-                            class="group border-2 border-white/20 bg-white/[0.02] p-8 text-center transition-all duration-300"
+                            class="group border-2 border-white/20 bg-white/[0.02] p-4 md:p-8 text-center transition-all duration-300"
                             :class="{
                                 'card-correct': answered && songACorrect,
                                 'card-wrong': answered && pickedSide === 'a' && !songACorrect,
                                 'hover:border-primary hover:bg-primary/5 cursor-pointer': !answered
                             }">
-                        <div class="relative w-32 h-32 mx-auto mb-6 overflow-hidden border border-white/10">
+                        <div class="relative w-20 h-20 md:w-32 md:h-32 mx-auto mb-3 md:mb-6 overflow-hidden border border-white/10">
                             <img :src="songA.image" :alt="songA.title" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
                         </div>
-                        <h3 class="text-xl font-black uppercase tracking-tighter mb-1 text-white" x-text="songA.title"></h3>
+                        <h3 class="text-base md:text-xl font-black uppercase tracking-tighter mb-1 text-white" x-text="songA.title"></h3>
                         <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500" x-text="songA.artist"></p>
                         <div x-show="answered" x-transition class="mt-4 inline-flex items-center gap-2 px-3 py-1 border text-sm font-black"
                              :class="songA.rank < songB.rank ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-white/10 text-slate-400'">
@@ -106,24 +106,24 @@
                     </button>
 
                     <!-- VS Divider -->
-                    <div class="flex items-center justify-center py-4 md:py-0 md:px-6">
-                        <div class="w-16 h-16 border-2 border-primary bg-primary/10 flex items-center justify-center font-black text-primary text-xl tracking-tighter">
+                    <div class="flex items-center justify-center py-2 md:py-0 md:px-6">
+                        <div class="w-12 h-12 md:w-16 md:h-16 border-2 border-primary bg-primary/10 flex items-center justify-center font-black text-primary text-base md:text-xl tracking-tighter">
                             VS
                         </div>
                     </div>
 
                     <!-- Card B -->
                     <button @click="pickSong('b')" :disabled="answered"
-                            class="group border-2 border-white/20 bg-white/[0.02] p-8 text-center transition-all duration-300"
+                            class="group border-2 border-white/20 bg-white/[0.02] p-4 md:p-8 text-center transition-all duration-300"
                             :class="{
                                 'card-correct': answered && !songACorrect,
                                 'card-wrong': answered && pickedSide === 'b' && songACorrect,
                                 'hover:border-primary hover:bg-primary/5 cursor-pointer': !answered
                             }">
-                        <div class="relative w-32 h-32 mx-auto mb-6 overflow-hidden border border-white/10">
+                        <div class="relative w-20 h-20 md:w-32 md:h-32 mx-auto mb-3 md:mb-6 overflow-hidden border border-white/10">
                             <img :src="songB.image" :alt="songB.title" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
                         </div>
-                        <h3 class="text-xl font-black uppercase tracking-tighter mb-1 text-white" x-text="songB.title"></h3>
+                        <h3 class="text-base md:text-xl font-black uppercase tracking-tighter mb-1 text-white" x-text="songB.title"></h3>
                         <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500" x-text="songB.artist"></p>
                         <div x-show="answered" x-transition class="mt-4 inline-flex items-center gap-2 px-3 py-1 border text-sm font-black"
                              :class="songB.rank < songA.rank ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-white/10 text-slate-400'">
