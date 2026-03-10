@@ -20,195 +20,786 @@
     };
     </script>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
-        @keyframes beat-pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
-        .beat-tile { width: 80px; height: 80px; border: 2px solid #00f0ff; display: flex; items-center; justify-center; transition: all 0.1s ease; cursor: pointer; }
-        .beat-tile:active { transform: scale(0.9); background: rgba(0,240,255,0.2); }
-        .lane { height: 100%; border-right: 1px solid rgba(255,255,255,0.05); }
-        @keyframes drop { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(600px); opacity: 1; } }
-        .note { position: absolute; width: 60px; height: 20px; border-radius: 2px; }
-        .perfect { color: #22c55e; font-weight: 900; animation: bounce 0.5s ease-out; }
-        @keyframes bounce { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-20px); } 100% { opacity: 0; transform: translateY(-40px); } }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr 380px;
+            height: 100vh;
+            width: 100vw;
+            background: #000;
+        }
+
+        /* 3D Highway */
+        .highway-container {
+            position: relative;
+            height: 100%;
+            perspective: 1000px;
+            overflow: hidden;
+            background: radial-gradient(circle at bottom, #111 0%, #000 70%);
+            padding-top: 40px;
+        }
+
+        .highway {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            width: 900px;
+            height: 160%;
+            transform: translateX(-50%) rotateX(65deg);
+            transform-origin: bottom center;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 100%);
+            border-left: 2px solid rgba(255,255,255,0.1);
+            border-right: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .lane-divider {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .fret-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255,255,255,0.05);
+            box-shadow: 0 0 10px rgba(255,255,255,0.05);
+        }
+
+        /* ── Hit Zone / Receptors ─────────────────────────────────────────
+           The hit-zone is still 3D-transformed so the receptor boxes look
+           correctly perspective-skewed at the bottom of the highway.
+           Receptors are 120×120 squares. ─────────────────────────────── */
+        .hit-zone {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            width: 900px;
+            transform: translateX(-50%) rotateX(65deg);
+            transform-origin: bottom center;
+            display: flex;
+            justify-content: space-around;
+            padding: 0;
+            pointer-events: none;
+        }
+
+        .receptor-box {
+            width: 120px;
+            height: 120px;
+            border: 4px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.85);
+            transition: all 0.05s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .lane-0-color { border-color: rgba(34, 197, 94, 0.4); }
+        .lane-1-color { border-color: rgba(244, 37, 192, 0.4); }
+        .lane-2-color { border-color: rgba(234, 179, 8, 0.4); }
+        .lane-3-color { border-color: rgba(0, 240, 255, 0.4); }
+
+        .receptor-box.active-0 { border-color: #22c55e; background: rgba(34, 197, 94, 0.3); box-shadow: 0 0 40px rgba(34, 197, 94, 0.8); }
+        .receptor-box.active-1 { border-color: #f425c0; background: rgba(244, 37, 192, 0.3); box-shadow: 0 0 40px rgba(244, 37, 192, 0.8); }
+        .receptor-box.active-2 { border-color: #eab308; background: rgba(234, 179, 8, 0.3); box-shadow: 0 0 40px rgba(234, 179, 8, 0.8); }
+        .receptor-box.active-3 { border-color: #00f0ff; background: rgba(0, 240, 255, 0.3); box-shadow: 0 0 40px rgba(0, 240, 255, 0.8); }
+
+        .receptor-label {
+            position: absolute;
+            bottom: -36px;
+            left: 50%;
+            transform: translateX(-50%) rotateX(-65deg);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 16px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* ── Notes ──────────────────────────────────────────────────────────
+           Notes are rendered in #note-layer which sits OUTSIDE the 3D-
+           transformed highway, in the same flat coordinate space as the
+           viewport. This means CSS width===height always gives a true
+           visual square — no perspective distortion. ──────────────────── */
+        #note-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .note {
+            position: absolute;
+            /* Size is set dynamically in JS to match receptor visual width */
+            box-sizing: border-box;
+            border: 4px solid rgba(255,255,255,0.85);
+        }
+
+        .n-0 { background: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.7); }
+        .n-1 { background: #f425c0; box-shadow: 0 0 20px rgba(244, 37, 192, 0.7); }
+        .n-2 { background: #eab308; box-shadow: 0 0 20px rgba(234, 179, 8, 0.7); }
+        .n-3 { background: #00f0ff; box-shadow: 0 0 20px rgba(0, 240, 255, 0.7); }
+
+        /* ── Extended / hold notes ──────────────────────────────────────────
+           A hold note has a square head + a coloured tail that extends
+           upward. The tail is a separate DOM element inserted behind the head. */
+        .note-tail {
+            position: absolute;
+            width: 40%;         /* thinner than the head */
+            left: 30%;          /* centred within head width */
+            box-sizing: border-box;
+            opacity: 0.7;
+        }
+        .tail-0 { background: #22c55e; }
+        .tail-1 { background: #f425c0; }
+        .tail-2 { background: #eab308; }
+        .tail-3 { background: #00f0ff; }
+
+        /* Sidebars */
+        .sidebar {
+            padding: 2rem;
+            background: #000;
+            border-left: 2px solid rgba(255,255,255,0.1);
+            border-right: 2px solid rgba(255,255,255,0.1);
+            z-index: 10;
+            overflow-y: auto;
+            height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brutal-card {
+            background: #000;
+            border: 2px solid #fff;
+            box-shadow: 6px 6px 0px #f425c0;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .brutal-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 10px 10px 0px #00f0ff;
+            border-color: #00f0ff;
+        }
+
+        .neon-text-glow {
+            text-shadow: 0 0 10px rgba(244, 37, 192, 0.8), 0 0 20px rgba(244, 37, 192, 0.4);
+        }
+
+        /* ── Feedback text ──────────────────────────────────────────────────
+           MISS is always bright red (#ef4444) regardless of lane colour.
+           PERFECT/GREAT use the lane colour. ──────────────────────────── */
+        .feedback-text {
+            position: absolute;
+            z-index: 60;
+            pointer-events: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            animation: feedback-float 0.65s ease-out forwards;
+            white-space: nowrap;
+            transform: translateX(-50%);
+        }
+        .feedback-perfect { font-size: 2rem; letter-spacing: -2px; font-style: italic; }
+        .feedback-great    { font-size: 1.5rem; font-style: italic; }
+        .feedback-miss     { font-size: 1.4rem; font-weight: 900; }  /* red set in JS */
+
+        @keyframes feedback-float {
+            0%   { opacity: 0; transform: translateX(-50%) translateY(0px)    scale(0.8); }
+            25%  { opacity: 1; transform: translateX(-50%) translateY(-55px)  scale(1.2); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-150px) scale(1);   }
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        .track-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 1rem;
+            width: 100%;
+            max-width: 900px;
+        }
     </style>
 </head>
-<body class="font-sans text-white overflow-hidden" x-data="beatStreak()">
+<body class="font-sans text-white overflow-hidden" x-data="beatStreak()" @keydown.window="onKeyDown($event)" @keyup.window="onKeyUp($event)">
 
-    <!-- Header -->
-    <div class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md px-6 py-4 flex items-center justify-between border-b border-white/10">
-        <div class="flex items-center gap-4">
-            <a href="{% url 'dashboard' %}" class="text-slate-400 hover:text-white transition-colors">
-                <span class="material-symbols-outlined text-2xl">close</span>
-            </a>
-            <div>
-                <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Beat Streak</h1>
-                <p class="font-mono text-[9px] tracking-widest uppercase text-secondary" x-text="currentTrack ? currentTrack.title + ' — ' + currentTrack.artist : 'Select a track'"></p>
+    <div class="game-layout">
+
+        <!-- ══ LEFT SIDEBAR — Leaderboard ══════════════════════════════════ -->
+        <aside class="sidebar">
+            <div class="mb-12">
+                <h3 class="font-black text-[10px] uppercase tracking-[0.5em] text-white/30 mb-8 underline decoration-primary decoration-2 underline-offset-8">Hall of Fame</h3>
+
+                {% for hs in high_scores %}
+                    {% if forloop.first %}
+                    <div class="mb-12 group">
+                        <div class="flex items-center gap-5 mb-4">
+                             <div class="w-16 h-16 bg-white/5 border-2 border-primary flex items-center justify-center italic font-black text-4xl text-primary shadow-[6px_6px_0px_white]">01</div>
+                             <div class="flex-1 min-w-0">
+                                 <span class="font-black uppercase text-xl leading-none block truncate">{{ hs.user.username }}</span>
+                                 <span class="text-primary font-black text-[10px] uppercase tracking-[0.3em] mt-1 block">Rhythmic Vanguard</span>
+                             </div>
+                        </div>
+                        <div class="text-right border-b-2 border-white/10 pb-2 relative">
+                             <span class="text-3xl font-black italic tracking-tighter text-white">{{ hs.score }}</span>
+                             <span class="text-[10px] font-black opacity-30 ml-2 uppercase tracking-widest text-primary">PTS</span>
+                             <div class="absolute bottom-[-2px] left-0 w-full h-[2px] bg-primary shadow-[0_0_10px_#f425c0]"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                    {% else %}
+                    <div class="flex items-center justify-between py-3 border-b border-white/5 hover:bg-white/[0.02] px-2 group transition-all">
+                        <div class="flex items-center gap-4">
+                            <span class="font-black text-white/20 text-[10px] w-6 group-hover:text-primary transition-colors italic">#{{ forloop.counter }}</span>
+                            <span class="font-black uppercase text-[11px] tracking-tight text-white/70 group-hover:text-white transition-colors">{{ hs.user.username }}</span>
+                        </div>
+                        <span class="font-black text-xs text-secondary tabular-nums tracking-tighter">{{ hs.score }}</span>
+                    </div>
+                    {% endif %}
+                    {% if forloop.last and not forloop.first %}
+                    </div>
+                    {% endif %}
+                {% empty %}
+                    <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Awaiting the first legend...</p>
+                {% endfor %}
             </div>
-        </div>
-        <div class="flex items-center gap-8">
-            <div class="text-right">
-                <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block">Score</span>
-                <span class="text-xl font-black text-secondary" x-text="score"></span>
+
+            <div class="mt-auto pt-10">
+                <div class="p-8 brutal-card border-primary bg-primary/5">
+                    <span class="font-black text-[9px] tracking-[0.3em] uppercase text-white/40 block mb-2">Personal Best</span>
+                    <!-- ✅ FIX: bound to reactive personalBest, updated live after saveScore -->
+                    <span id="personal-best-display" class="text-4xl font-black text-primary neon-text-glow" x-text="personalBest">{% if best_score %}{{ best_score.score }}{% else %}0{% endif %}</span>
+                </div>
             </div>
-            <div class="text-right">
-                <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block">Combo</span>
-                <span class="text-xl font-black text-primary" x-text="combo + 'x'"></span>
+        </aside>
+
+        <!-- ══ CENTRE — Gameplay ════════════════════════════════════════════ -->
+        <main class="highway-container relative">
+            <!-- HUD -->
+            <div class="absolute top-0 left-0 right-0 z-50 p-10 flex justify-between items-start">
+                <div class="flex flex-col gap-6">
+                    <div class="p-6 border-l-4 border-primary bg-black/80 backdrop-blur-sm">
+                        <span class="font-black text-[10px] tracking-[0.4em] uppercase text-primary block mb-2">Score</span>
+                        <span class="text-5xl font-black text-white tabular-nums tracking-tighter" x-text="score"></span>
+                    </div>
+                    <div class="p-6 border-l-4 border-secondary bg-black/80 backdrop-blur-sm">
+                        <span class="font-black text-[10px] tracking-[0.4em] uppercase text-secondary block mb-2">Streak</span>
+                        <span class="text-5xl font-black text-white tabular-nums tracking-tighter" x-text="combo + 'x'"></span>
+                    </div>
+                </div>
+                <div class="p-4 bg-primary text-black font-black text-[10px] uppercase tracking-widest shadow-[4px_4px_0px_white]">
+                    Live Rhythmic Sync
+                </div>
             </div>
-        </div>
+
+            <!-- Intro Screen -->
+            <div x-show="state === 'intro'" x-transition class="absolute inset-0 z-40 bg-black flex flex-col items-center justify-center text-center px-10">
+                <h1 class="text-[6vw] font-black tracking-tighter uppercase leading-[0.8] mb-12 italic text-white flex flex-col items-center">
+                    BEAT<span class="text-transparent [-webkit-text-stroke:2px_#00f0ff]">STREAK</span>
+                </h1>
+                <div class="track-grid mb-12">
+                    <template x-for="track in tracks.slice(0, 15)" :key="track.title">
+                        <button @click="startTrack(track)"
+                                class="aspect-square border border-white/20 hover:border-secondary transition-all group overflow-hidden relative">
+                            <img :src="track.artwork_url" class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100" />
+                            <div class="absolute inset-0 bg-black/60 opacity-100 group-hover:opacity-0 transition-opacity flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white/40 group-hover:text-secondary group-hover:scale-125 transition-all text-4xl">play_arrow</span>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 p-2 bg-black border-t border-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+                                <h4 class="font-black uppercase text-[8px] tracking-widest truncate text-secondary" x-text="track.artist"></h4>
+                            </div>
+                        </button>
+                    </template>
+                </div>
+                <p class="font-black text-[10px] uppercase tracking-[0.5em] text-white/20">Select your frequency</p>
+            </div>
+
+            <!-- Highway Display -->
+            <div x-show="state === 'playing'" class="absolute inset-0">
+                <!-- 3D road lines only — NO notes inside here -->
+                <div class="highway">
+                    <div class="lane-divider" style="left: 25%"></div>
+                    <div class="lane-divider" style="left: 50%"></div>
+                    <div class="lane-divider" style="left: 75%"></div>
+                    <div id="fret-renderer" class="absolute inset-0 pointer-events-none"></div>
+                </div>
+
+                <!-- ✅ Notes rendered OUTSIDE the 3D highway so they are true squares -->
+                <div id="note-layer"></div>
+
+                <!-- Receptor boxes (still 3D-transformed for depth feel) -->
+                <div class="hit-zone">
+                    <template x-for="(k, i) in ['S', 'D', 'K', 'L']" :key="k">
+                        <div class="receptor-box" :class="['lane-'+i+'-color', keysPressed[i] && 'active-'+i]">
+                            <div class="receptor-label" x-text="k"></div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Feedback floats -->
+                <div id="feedback-container" class="absolute inset-0 pointer-events-none z-50"></div>
+            </div>
+
+            <!-- Streak Over -->
+            <div x-show="state === 'finished'" x-transition class="absolute inset-0 z-50 bg-black/98 flex flex-col items-center justify-center text-center px-6">
+                <h2 class="text-7xl md:text-9xl font-black tracking-tighter uppercase leading-none mb-10 italic text-white">STREAK<br/><span class="text-transparent [-webkit-text-stroke:2px_#00f0ff]">OVER</span></h2>
+                <div class="flex items-center gap-4 mb-16">
+                    <div class="px-12 py-8 brutal-card border-white/10">
+                        <span class="text-6xl font-black text-secondary block" x-text="score"></span>
+                        <span class="font-black text-[10px] tracking-widest uppercase text-slate-500 mt-2 block">Score</span>
+                    </div>
+                    <div class="px-12 py-8 brutal-card border-white/10">
+                        <span class="text-6xl font-black text-white block" x-text="maxCombo + 'x'"></span>
+                        <span class="font-black text-[10px] tracking-widest uppercase text-slate-500 mt-2 block">Max Streak</span>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                     <button @click="shuffleTracks(); state = 'intro'; stopAudio();" class="bg-secondary text-black px-16 py-6 font-black uppercase tracking-[0.3em] text-sm shadow-[10px_10px_0px_white] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">Encore</button>
+                     <a href="{% url 'dashboard' %}" class="border-2 border-white/20 px-16 py-6 font-black uppercase tracking-[0.3em] text-sm hover:bg-white hover:text-black transition-all">Egress</a>
+                </div>
+            </div>
+        </main>
+
+        <!-- ══ RIGHT SIDEBAR ════════════════════════════════════════════════ -->
+        <aside class="sidebar">
+            <div class="mb-8">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 text-slate-500 hover:text-white transition-colors uppercase font-black text-[10px] tracking-widest">
+                    <span class="material-symbols-outlined text-sm">arrow_back</span> Dashboard
+                </a>
+            </div>
+
+            <!-- Game Rules (Intro) -->
+            <div x-show="state === 'intro'" x-transition class="flex-1 flex flex-col">
+                <div class="mb-12">
+                     <h3 class="font-black text-[10px] uppercase tracking-[0.5em] text-white/30 mb-10 underline decoration-secondary decoration-2 underline-offset-8">Engagement Protocol</h3>
+                     <div class="space-y-8">
+                         <div class="flex gap-4">
+                             <div class="w-10 h-10 border border-white/20 flex items-center justify-center font-black text-secondary shrink-0 italic">01</div>
+                             <div>
+                                 <h4 class="font-black uppercase text-xs tracking-widest mb-2 text-white">Select Frequency</h4>
+                                 <p class="text-[10px] text-slate-500 uppercase leading-relaxed font-bold">Choose a transmission from the grid to initiate the sync.</p>
+                             </div>
+                         </div>
+                         <div class="flex gap-4">
+                             <div class="w-10 h-10 border border-white/20 flex items-center justify-center font-black text-secondary shrink-0 italic">02</div>
+                             <div>
+                                 <h4 class="font-black uppercase text-xs tracking-widest mb-2 text-white">Rhythmic Input</h4>
+                                 <p class="text-[10px] text-slate-500 uppercase leading-relaxed font-bold">Use <span class="text-white bg-white/10 px-1">S</span> <span class="text-white bg-white/10 px-1">D</span> <span class="text-white bg-white/10 px-1">K</span> <span class="text-white bg-white/10 px-1">L</span> keys. Hold for extended notes.</p>
+                             </div>
+                         </div>
+                         <div class="flex gap-4">
+                             <div class="w-10 h-10 border border-white/20 flex items-center justify-center font-black text-secondary shrink-0 italic">03</div>
+                             <div>
+                                 <h4 class="font-black uppercase text-xs tracking-widest mb-2 text-white">Streak Multiplier</h4>
+                                 <p class="text-[10px] text-slate-500 uppercase leading-relaxed font-bold">Maintain consecutive hits to hyper-charge your score progression.</p>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+                <div class="mt-auto p-6 bg-secondary/5 border border-secondary/20">
+                    <span class="font-black text-[8px] uppercase tracking-widest text-secondary block mb-2">Sync Status</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-secondary animate-pulse rounded-full"></div>
+                        <span class="text-[9px] font-black uppercase text-white tracking-widest">Optimized for Desktop Input</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Track Info -->
+            <template x-if="currentTrack">
+                <div class="flex-1 flex flex-col">
+                    <div class="mb-12">
+                        <div class="relative mb-8 p-1 bg-white/5 border border-white/10">
+                            <img :src="currentTrack.group_image" class="w-full aspect-square object-cover grayscale hover:grayscale-0 transition-all duration-500" />
+                            <div class="absolute inset-0 border border-white/20"></div>
+                        </div>
+                        <h2 class="text-4xl font-black uppercase tracking-tighter text-white mb-2" x-text="currentTrack.artist"></h2>
+                        <h3 class="text-secondary uppercase font-black text-xs tracking-[0.3em] mb-6" x-text="currentTrack.title"></h3>
+                        <p class="text-[11px] leading-relaxed text-slate-400 font-medium italic border-l-2 border-white/20 pl-4 py-2" x-text="currentTrack.group_desc"></p>
+                    </div>
+                    <div class="mt-auto pt-6 opacity-40">
+                        <div class="p-6 border border-white/10 bg-white/[0.02]">
+                            <span class="font-black text-[8px] uppercase tracking-[0.4em] block mb-4">Transmission Pulse</span>
+                            <div class="h-2 bg-white/10 overflow-hidden">
+                                 <div class="h-full bg-secondary transition-all duration-500" :style="'width: ' + progress + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template x-if="!currentTrack">
+                <div class="flex-1 flex flex-col items-center justify-center text-center opacity-20">
+                    <span class="material-symbols-outlined text-8xl mb-4">sync</span>
+                    <p class="font-black text-[12px] uppercase tracking-[0.5em]">Sync Pending</p>
+                </div>
+            </template>
+        </aside>
     </div>
 
-    <!-- Game Screen -->
-    <main class="h-screen flex items-center justify-center relative">
-        
-        <!-- Intro / Track Select -->
-        <div x-show="state === 'intro'" x-transition class="text-center max-w-2xl px-6">
-            <span class="material-symbols-outlined text-7xl text-secondary mb-6 block animate-pulse">speed</span>
-            <h2 class="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none mb-8 italic">BEAT<br/><span class="text-transparent [-webkit-text-stroke:1px_#00f0ff]">STREAK</span></h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-10 overflow-y-auto max-h-64 pr-2">
-                <template x-for="track in tracks" :key="track.title">
-                    <button @click="startTrack(track)" 
-                            class="p-4 border border-white/10 hover:border-secondary transition-all flex items-center gap-4 bg-white/[0.02] text-left">
-                        <img :src="track.artwork_url" class="w-10 h-10 border border-white/10 shrink-0" />
-                        <div class="flex-1 truncate">
-                            <h4 class="font-black uppercase text-[10px]" x-text="track.title"></h4>
-                            <p class="text-[8px] font-mono text-slate-500 uppercase" x-text="track.artist"></p>
-                        </div>
-                    </button>
-                </template>
-            </div>
-            
-            <p class="text-slate-500 font-mono text-[10px] uppercase mb-8 tracking-widest">Select a track to begin the rhythm challenge</p>
-        </div>
-
-        <!-- Playing State (Rhythm HUD) -->
-        <div x-show="state === 'playing'" x-transition class="w-full h-full flex items-center justify-center">
-             <!-- Tap Zone -->
-             <div class="absolute bottom-20 left-0 right-0 flex justify-center gap-8">
-                  <div class="beat-tile" @mousedown="tap(0)" :class="activeTile === 0 && 'border-primary'"><span class="font-black text-xs text-secondary opacity-20">S</span></div>
-                  <div class="beat-tile" @mousedown="tap(1)" :class="activeTile === 1 && 'border-primary'"><span class="font-black text-xs text-secondary opacity-20">D</span></div>
-                  <div class="beat-tile" @mousedown="tap(2)" :class="activeTile === 2 && 'border-primary'"><span class="font-black text-xs text-secondary opacity-20">K</span></div>
-                  <div class="beat-tile" @mousedown="tap(3)" :class="activeTile === 3 && 'border-primary'"><span class="font-black text-xs text-secondary opacity-20">L</span></div>
-             </div>
-             
-             <!-- Floating Score Text -->
-             <template x-for="f in floatingText" :key="f.id">
-                  <div class="absolute perfect left-1/2 -translate-x-1/2" :style="'bottom:' + (200 + f.offset) + 'px'" x-text="f.text"></div>
-             </template>
-
-             <div class="text-center animate-pulse">
-                  <p class="font-mono text-[10px] text-slate-500 tracking-[0.5em] uppercase">Catch the beat...</p>
-             </div>
-        </div>
-
-        <!-- Finished State -->
-        <div x-show="state === 'finished'" x-transition class="text-center max-w-lg px-6">
-            <h2 class="text-5xl md:text-7xl font-black tracking-tighter uppercase leading-none mb-6 italic">STREAK<br/><span class="text-transparent [-webkit-text-stroke:1px_#00f0ff]">OVER</span></h2>
-            
-            <div class="grid grid-cols-2 gap-0 border border-white/10 my-10">
-                <div class="p-8 border-r border-white/10 bg-white/5">
-                    <span class="text-4xl font-black text-secondary block" x-text="score"></span>
-                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block mt-1">Final Score</span>
-                </div>
-                <div class="p-8 bg-white/5 tabular-nums">
-                    <span class="text-4xl font-black text-white block" x-text="maxCombo + 'x'"></span>
-                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500 block mt-1">Best Combo</span>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-center gap-4">
-                 <button @click="state = 'intro'; stopAudio();" class="bg-secondary text-black px-10 py-5 font-black uppercase tracking-[0.2em] text-[10px] shadow-[4px_4px_0px_white] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">Pick New Song</button>
-                 <a href="{% url 'dashboard' %}" class="border border-white/20 px-10 py-5 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white hover:text-black transition-all">Back to Home</a>
-            </div>
-        </div>
-
-    </main>
-
     <script>
+    // Lane colours
+    const LANE_COLORS = ['#22c55e', '#f425c0', '#eab308', '#00f0ff'];
+    const MISS_COLOR  = '#ef4444';   // always bright red for misses
+
     function beatStreak() {
-        const tracks = {{ game_tracks_json|safe }};
+        const tracks   = {{ game_tracks_json|safe }};
+        const LANE_KEYS = ['KeyS', 'KeyD', 'KeyK', 'KeyL'];
+
+        // NOTE_SIZE: visual square size in px for notes (must match receptor feel).
+        // Set dynamically on first frame from receptor bounding rect, fallback 56.
+        let NOTE_SIZE = 56;
+
+        // Lane X centres in screen-space (px from main left edge), populated on first frame.
+        let laneCentresX = [null, null, null, null];
+
+        // targetY in screen-space px from main top — where the receptor boxes sit.
+        let targetScreenY = null;
 
         return {
             state: 'intro',
-            tracks: tracks,
+            tracks,
             currentTrack: null,
             score: 0,
             combo: 0,
             maxCombo: 0,
-            activeTile: -1,
             audio: null,
-            beatInterval: null,
-            floatingText: [],
-            textId: 0,
+            feedbackId: 0,
+            keysPressed: [false, false, false, false],
+            progress: 0,
+            // ✅ FIX: reactive personal best — initialised from Django, updated after save
+            personalBest: {% if best_score %}{{ best_score.score }}{% else %}0{% endif %},
 
-            startTrack(track) {
-                this.currentTrack = track;
-                this.score = 0;
-                this.combo = 0;
-                this.maxCombo = 0;
-                this.state = 'playing';
-                
-                this.audio = new Audio(track.preview_url);
-                this.audio.play();
+            notes: [],
+            frets: [],
+            gameLoop: null,
+            lastFrameTime: 0,
+            noteSpeed: 400,     // px per second in screen space
+            fretInterval: 300,
+            lastFretSpawn: 0,
 
-                // Mock Beat detection (random intervals for simplicity in MVP)
-                this.beatInterval = setInterval(() => {
-                    this.activeTile = Math.floor(Math.random() * 4);
-                    setTimeout(() => { this.activeTile = -1; }, 400);
-                }, 800);
+            init() { this.shuffleTracks(); },
 
-                this.audio.onended = () => this.finish();
+            shuffleTracks() {
+                this.tracks = [...this.tracks].sort(() => Math.random() - 0.5);
             },
 
-            tap(idx) {
-                if (this.state !== 'playing') return;
-                
-                if (this.activeTile === idx) {
-                    this.score += 50 + (this.combo * 10);
-                    this.combo++;
-                    if (this.combo > this.maxCombo) this.maxCombo = this.combo;
-                    this.showText('PERFECT');
-                } else {
-                    this.combo = 0;
-                    this.showText('MISS');
+            // ── Measure receptor positions once the DOM is painted ──────────
+            measureLanes() {
+                const receptors = document.querySelectorAll('.receptor-box');
+                const main      = document.querySelector('main');
+                if (!main || receptors.length < 4) return;
+                const mainRect  = main.getBoundingClientRect();
+
+                receptors.forEach((r, i) => {
+                    const rect = r.getBoundingClientRect();
+                    laneCentresX[i] = rect.left + rect.width / 2 - mainRect.left;
+                    if (i === 0) {
+                        NOTE_SIZE      = Math.round(rect.width * 0.75); // note slightly smaller than receptor
+                        targetScreenY  = rect.top - mainRect.top + rect.height / 2;
+                    }
+                });
+            },
+
+            onKeyDown(e) {
+                const idx = LANE_KEYS.indexOf(e.code);
+                if (idx === -1) return;
+                if (!this.keysPressed[idx]) {
+                    this.keysPressed[idx] = true;
+                    this.checkHit(idx);
                 }
             },
 
-            showText(txt) {
-                const id = this.textId++;
-                this.floatingText.push({ id, text: txt, offset: 0 });
-                setTimeout(() => {
-                    this.floatingText = this.floatingText.filter(f => f.id !== id);
-                }, 500);
+            onKeyUp(e) {
+                const idx = LANE_KEYS.indexOf(e.code);
+                if (idx === -1) return;
+                this.keysPressed[idx] = false;
+                // Resolve any active hold note in this lane
+                this.releaseHold(idx);
+            },
+
+            startTrack(track) {
+                this.currentTrack = track;
+                this.score        = 0;
+                this.combo        = 0;
+                this.maxCombo     = 0;
+                this.state        = 'playing';
+                this.notes        = [];
+                this.frets        = [];
+                this.progress     = 0;
+                this.lastFretSpawn = 0;
+
+                document.getElementById('note-layer').innerHTML   = '';
+                document.getElementById('fret-renderer').innerHTML = '';
+                document.getElementById('feedback-container').innerHTML = '';
+
+                this.audio          = new Audio(track.preview_url);
+                this.audio.play();
+                this.audio.onended  = () => this.finish();
+
+                this.lastFrameTime  = performance.now();
+                this.gameLoop       = requestAnimationFrame(t => this.loop(t));
+
+                // Measure after next paint so hit-zone is visible
+                requestAnimationFrame(() => this.measureLanes());
+            },
+
+            loop(timestamp) {
+                if (this.state !== 'playing') return;
+
+                const dt = (timestamp - this.lastFrameTime) / 1000; // seconds
+                this.lastFrameTime = timestamp;
+
+                if (this.audio) this.progress = (this.audio.currentTime / this.audio.duration) * 100;
+
+                if (Math.random() < 0.04) this.spawnNote();
+                if (timestamp - this.lastFretSpawn > this.fretInterval) {
+                    this.spawnFret();
+                    this.lastFretSpawn = timestamp;
+                }
+
+                const noteLayer   = document.getElementById('note-layer');
+                const fretRenderer = document.getElementById('fret-renderer');
+                const main         = document.querySelector('main');
+                const mainH        = main ? main.getBoundingClientRect().height : window.innerHeight;
+
+                // ── Update frets (inside 3D highway, percentage-based) ──────
+                this.frets.forEach(f => {
+                    f.y += this.noteSpeed * dt * 0.035 / 0.035; // keep fret speed relative
+                    // Actually let's keep frets simple: just use old pct-based logic
+                    f.yPct = (f.yPct || -10) + 0.035 * dt * 1000 / mainH * 100;
+                    if (!f.el) {
+                        f.el = document.createElement('div');
+                        f.el.className = 'fret-line';
+                        fretRenderer.appendChild(f.el);
+                    }
+                    f.el.style.top = `${f.yPct}%`;
+                    if (f.yPct > 110) { f.dead = true; f.el.remove(); }
+                });
+                this.frets = this.frets.filter(f => !f.dead);
+
+                // ── Update notes (screen-space px, outside 3D) ──────────────
+                this.notes.forEach(note => {
+                    note.screenY += this.noteSpeed * dt;
+
+                    if (!note.el && laneCentresX[note.lane] !== null) {
+                        // Head square
+                        note.el = document.createElement('div');
+                        note.el.className = `note n-${note.lane}`;
+                        note.el.style.width  = NOTE_SIZE + 'px';
+                        note.el.style.height = NOTE_SIZE + 'px';
+                        note.el.style.left   = (laneCentresX[note.lane] - NOTE_SIZE / 2) + 'px';
+                        noteLayer.appendChild(note.el);
+
+                        // Hold tail (only for hold notes)
+                        if (note.isHold) {
+                            note.tailEl = document.createElement('div');
+                            note.tailEl.className = `note-tail tail-${note.lane}`;
+                            note.tailEl.style.width  = Math.round(NOTE_SIZE * 0.4) + 'px';
+                            note.tailEl.style.left   = (laneCentresX[note.lane] - Math.round(NOTE_SIZE * 0.2)) + 'px';
+                            noteLayer.insertBefore(note.tailEl, note.el); // tail behind head
+                        }
+                    }
+
+                    if (note.el) {
+                        note.el.style.top = (note.screenY - NOTE_SIZE / 2) + 'px';
+
+                        // Render hold tail: stretches from note's spawn start down to head top
+                        if (note.tailEl && note.isHold) {
+                            const tailTop    = note.tailStartY;
+                            const tailBottom = note.screenY - NOTE_SIZE / 2;
+                            const tailHeight = Math.max(0, tailBottom - tailTop);
+                            note.tailEl.style.top    = tailTop + 'px';
+                            note.tailEl.style.height = tailHeight + 'px';
+                            // Animate tail brightness while held
+                            if (note.holding) {
+                                note.tailEl.style.opacity = '1';
+                                note.tailEl.style.boxShadow = `0 0 12px ${LANE_COLORS[note.lane]}`;
+                            }
+                        }
+                    }
+
+                    // Auto-miss if scrolled off screen
+                    if (note.screenY > mainH + NOTE_SIZE && !note.hit) {
+                        this.missNote(note);
+                    }
+
+                    // Hold scoring: award points while key is held and note is in zone
+                    if (note.isHold && note.holding && !note.holdFinished) {
+                        const inZone = Math.abs(note.screenY - targetScreenY) < NOTE_SIZE * 1.5;
+                        if (inZone) {
+                            note.holdPoints = (note.holdPoints || 0) + this.noteSpeed * dt;
+                            if (note.holdPoints > 80) {
+                                this.score += 10 + this.combo;
+                                note.holdPoints -= 80;
+                            }
+                        }
+                        // End hold note when tail fully passes
+                        if (note.screenY > targetScreenY + NOTE_SIZE * 2) {
+                            note.holdFinished = true;
+                            note.dead = true;
+                            this.showFeedback('HELD', 'great', note.lane);
+                            if (note.el) { note.el.style.opacity = '0'; setTimeout(() => { note.el && note.el.remove(); note.tailEl && note.tailEl.remove(); }, 100); }
+                        }
+                    }
+                });
+                this.notes = this.notes.filter(n => !n.dead);
+
+                this.gameLoop = requestAnimationFrame(t => this.loop(t));
+            },
+
+            spawnNote() {
+                if (targetScreenY === null) return;
+                const lane      = Math.floor(Math.random() * 4);
+                const laneNotes = this.notes.filter(n => n.lane === lane && !n.dead);
+                const topmost   = laneNotes.reduce((min, n) => n.screenY < min ? n.screenY : min, Infinity);
+
+                // Minimum gap: NOTE_SIZE * 2.5 (≈2.5 note-heights between notes)
+                if (topmost === Infinity || topmost > NOTE_SIZE * 2.5) {
+                    // ~20% chance of spawning a hold note
+                    const isHold = Math.random() < 0.2;
+                    this.notes.push({
+                        lane,
+                        screenY: -NOTE_SIZE,          // start just above viewport
+                        tailStartY: -NOTE_SIZE * 3,   // tail origin (visual)
+                        hit: false,
+                        dead: false,
+                        el: null,
+                        tailEl: null,
+                        isHold,
+                        holding: false,
+                        holdFinished: false,
+                        holdPoints: 0,
+                    });
+                }
+            },
+
+            spawnFret() {
+                this.frets.push({ yPct: -10, dead: false, el: null });
+            },
+
+            checkHit(lane) {
+                if (targetScreenY === null) return;
+                const hitWindow = NOTE_SIZE * 0.9;
+                const note      = this.notes.find(n =>
+                    n.lane === lane && !n.hit && Math.abs(n.screenY - targetScreenY) < hitWindow
+                );
+
+                if (note) {
+                    const diff = Math.abs(note.screenY - targetScreenY);
+                    note.hit = true;
+
+                    if (note.isHold) {
+                        // Activate hold — keep the note alive, mark as holding
+                        note.holding = true;
+                        note.hit     = false;  // re-open so loop can score it
+                        this.showFeedback('HOLD!', 'great', note.lane);
+                        return;
+                    }
+
+                    if (diff < hitWindow * 0.4) this.addScore(100, 'PERFECT', lane);
+                    else                         this.addScore(50,  'GREAT',   lane);
+
+                    note.el.style.opacity = '0';
+                    setTimeout(() => { note.dead = true; note.el && note.el.remove(); }, 100);
+                }
+            },
+
+            releaseHold(lane) {
+                const note = this.notes.find(n => n.lane === lane && n.isHold && n.holding && !n.holdFinished);
+                if (note) {
+                    note.holding      = false;
+                    note.holdFinished = true;
+                    note.dead         = true;
+                    // Award combo bump for releasing
+                    this.combo++;
+                    if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+                    if (note.el)    { note.el.style.opacity = '0'; setTimeout(() => { note.el && note.el.remove(); note.tailEl && note.tailEl.remove(); }, 100); }
+                }
+            },
+
+            missNote(note) {
+                note.hit  = true;
+                note.dead = true;
+                if (note.el)    note.el.remove();
+                if (note.tailEl) note.tailEl.remove();
+                this.combo = 0;
+                this.showFeedback('MISS', 'miss', note.lane);
+            },
+
+            addScore(pts, txt, lane) {
+                this.score += pts + (this.combo * 15);
+                this.combo++;
+                if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+                this.showFeedback(txt, txt.toLowerCase(), lane);
+            },
+
+            showFeedback(text, type, lane) {
+                const container = document.getElementById('feedback-container');
+                const main      = document.querySelector('main');
+                if (!container || !main) return;
+
+                // ✅ MISS is always red; hits use lane colour
+                const color = (type === 'miss') ? MISS_COLOR : LANE_COLORS[lane];
+
+                let leftPx = '50%';
+                const receptors = document.querySelectorAll('.receptor-box');
+                if (receptors[lane]) {
+                    const rect     = receptors[lane].getBoundingClientRect();
+                    const mainRect = main.getBoundingClientRect();
+                    leftPx = (rect.left + rect.width / 2 - mainRect.left) + 'px';
+                }
+
+                const el = document.createElement('div');
+                el.className   = `feedback-text feedback-${type}`;
+                el.textContent = text;
+                el.style.color      = color;
+                el.style.textShadow = `0 0 14px ${color}, 0 0 28px ${color}`;
+                el.style.left       = leftPx;
+                el.style.bottom     = '220px';
+
+                container.appendChild(el);
+                setTimeout(() => el.remove(), 680);
             },
 
             finish() {
-                clearInterval(this.beatInterval);
                 this.state = 'finished';
+                cancelAnimationFrame(this.gameLoop);
                 this.saveScore();
             },
 
             stopAudio() {
-                if(this.audio) {
-                    this.audio.pause();
-                    this.audio.currentTime = 0;
-                }
+                if (this.audio) { this.audio.pause(); this.audio.currentTime = 0; }
             },
 
             async saveScore() {
                 try {
-                    await fetch('{% url "save_game_score" %}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}',
-                        },
-                        body: JSON.stringify({
-                            game: 'beat_streak',
-                            score: this.score,
-                            total: this.maxCombo,
-                        }),
+                    const res  = await fetch('{% url "save_game_score" %}', {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                        body:    JSON.stringify({ game: 'beat_streak', score: this.score, total: this.maxCombo }),
                     });
-                } catch (e) {}
+                    const data = await res.json();
+                    // ✅ FIX: update reactive personalBest if server confirms a new best
+                    if (data.personal_best !== undefined) {
+                        this.personalBest = data.personal_best;
+                    } else if (this.score > this.personalBest) {
+                        // Fallback: update locally if score beats current displayed best
+                        this.personalBest = this.score;
+                    }
+                } catch (e) {
+                    // Fallback even on network error
+                    if (this.score > this.personalBest) this.personalBest = this.score;
+                }
             }
         };
     }

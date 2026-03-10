@@ -1099,6 +1099,7 @@ def beat_streak(request):
     import random
     import urllib.request
     import urllib.parse
+    from .models import GameScore, KPopGroup
 
     daily_rank = Ranking.objects.filter(timeframe='daily').first()
     tracks = []
@@ -1110,11 +1111,12 @@ def beat_streak(request):
                 'artwork_url': item.get('artwork_url', ''),
             })
 
-    # Pick 10 random tracks to try and get previews for
+    # Pick tracks with previews
     random.shuffle(tracks)
     game_tracks = []
+    # Poll up to 30 tracks to ensure we have enough for a random grid + rotation
     for t in tracks:
-        if len(game_tracks) >= 8: break
+        if len(game_tracks) >= 30: break
         try:
             q = urllib.parse.quote(f"{t['artist']} {t['title']}")
             url = f"https://itunes.apple.com/search?term={q}&entity=song&limit=1"
@@ -1126,12 +1128,28 @@ def beat_streak(request):
                     t['preview_url'] = results[0].get('previewUrl', '')
                     if not t['artwork_url']:
                         t['artwork_url'] = results[0].get('artworkUrl100', '').replace('100x100bb', '600x600bb')
+                    
+                    # Try to get group info
+                    group = KPopGroup.objects.filter(name__icontains=t['artist']).first()
+                    if group:
+                        t['group_desc'] = group.description[:200] + '...' if group.description else ''
+                        t['group_image'] = group.image_url
+                    else:
+                        t['group_desc'] = "K-Pop sensation taking the charts by storm."
+                        t['group_image'] = t['artwork_url']
+                    
                     game_tracks.append(t)
-        except Exception:
-            pass
+        except:
+            continue
+    
+    # Shuffle AGAIN before sending to ensure the grid is truly random every time
+    random.shuffle(game_tracks)
+
+    high_scores = GameScore.objects.filter(game='beat_streak').order_by('-score')[:10]
 
     return render(request, 'core/beat_streak.html', {
         'game_tracks_json': json.dumps(game_tracks),
+        'high_scores': high_scores,
     })
 
 
