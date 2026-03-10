@@ -32,6 +32,7 @@ urlpatterns = [
     path('game/mv-matcher/', views.mv_matcher, name='mv_matcher'),
     path('game/draft-day/', views.draft_day, name='draft_day'),
     path('game/beat-streak/', views.beat_streak, name='beat_streak'),
+    path('game/beat-streak-v2/', views.beat_streak_v2, name='beat_streak_v2'),
     path('contests/', views.contests, name='contests'),
     path('contests/<slug:slug>/enter/', views.contest_entry, name='contest_entry'),
     path('api/contests/create/', views.api_contest_create, name='api_contest_create'),

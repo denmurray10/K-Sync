@@ -1153,6 +1153,59 @@ def beat_streak(request):
     })
 
 
+def beat_streak_v2(request):
+    """Beat Streak v2 — same data pipeline, upgraded template."""
+    import random
+    import urllib.request
+    import urllib.parse
+    from .models import GameScore, KPopGroup
+
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    tracks = []
+    if daily_rank and daily_rank.ranking_data:
+        for item in daily_rank.ranking_data[:50]:
+            tracks.append({
+                'artist': item.get('artist', ''),
+                'title': item.get('track', ''),
+                'artwork_url': item.get('artwork_url', ''),
+            })
+
+    random.shuffle(tracks)
+    game_tracks = []
+    for t in tracks:
+        if len(game_tracks) >= 30:
+            break
+        try:
+            q = urllib.parse.quote(f"{t['artist']} {t['title']}")
+            url = f"https://itunes.apple.com/search?term={q}&entity=song&limit=1"
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                data = json.loads(resp.read().decode())
+                results = data.get('results', [])
+                if results:
+                    t['preview_url'] = results[0].get('previewUrl', '')
+                    if not t['artwork_url']:
+                        t['artwork_url'] = results[0].get('artworkUrl100', '').replace('100x100bb', '600x600bb')
+                    group = KPopGroup.objects.filter(name__icontains=t['artist']).first()
+                    if group:
+                        t['group_desc'] = group.description[:200] + '...' if group.description else ''
+                        t['group_image'] = group.image_url
+                    else:
+                        t['group_desc'] = "K-Pop sensation taking the charts by storm."
+                        t['group_image'] = t['artwork_url']
+                    game_tracks.append(t)
+        except Exception:
+            continue
+
+    random.shuffle(game_tracks)
+    high_scores = GameScore.objects.filter(game='beat_streak').order_by('-score')[:10]
+
+    return render(request, 'core/beat_streak_v2.html', {
+        'game_tracks_json': json.dumps(game_tracks),
+        'high_scores': high_scores,
+    })
+
+
 def chart_clash(request):
     daily_rank = Ranking.objects.filter(
         timeframe='daily'
