@@ -35,6 +35,7 @@ urlpatterns = [
     path('game/idol-scramble/', views.idol_scramble, name='idol_scramble'),
     path('game/lyric-drop/', views.lyric_drop, name='lyric_drop'),
     path('game/chart-clash/', views.chart_clash, name='chart_clash'),
+    path('game/chart-clash/promo/', views.chart_clash_promo, name='chart_clash_promo'),
     path('game/fandom-trivia/', views.fandom_trivia, name='fandom_trivia'),
     path('game/mv-matcher/', views.mv_matcher, name='mv_matcher'),
     path('game/draft-day/', views.draft_day, name='draft_day'),

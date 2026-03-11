@@ -1,0 +1,428 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Chart Clash — K-Beats Games</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] },
+                borderRadius: { DEFAULT: '0px', sm: '0px', md: '0px', lg: '0px', xl: '0px', '2xl': '0px', '3xl': '0px', full: '9999px' },
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; background: #000; zoom: 0.9; }
+
+        /* Scroll reveal */
+        .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .reveal-left.visible { opacity: 1; transform: translateX(0); }
+        .reveal-right { opacity: 0; transform: translateX(40px); transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+        /* Animations */
+        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(244,37,192,0.4); } 70% { box-shadow: 0 0 0 20px rgba(244,37,192,0); } 100% { box-shadow: 0 0 0 0 rgba(244,37,192,0); } }
+        @keyframes scan { 0% { top: -100%; } 100% { top: 200%; } }
+        @keyframes counter { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+
+        .animate-ticker { animation: ticker 22s linear infinite; }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        .btn-pulse { animation: pulse-ring 2s infinite; }
+
+        /* Grid noise texture */
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(244,37,192,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(244,37,192,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Scanline effect on cards */
+        .scanline::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; height: 2px;
+            background: rgba(0,240,255,0.15);
+            animation: scan 3s linear infinite;
+        }
+
+        /* Neon glow */
+        .neon-pink { text-shadow: 0 0 20px rgba(244,37,192,0.8), 0 0 40px rgba(244,37,192,0.4); }
+        .neon-cyan { text-shadow: 0 0 20px rgba(0,240,255,0.8), 0 0 40px rgba(0,240,255,0.4); }
+        .glow-border { box-shadow: 0 0 30px rgba(244,37,192,0.2), inset 0 0 30px rgba(244,37,192,0.02); }
+        .glow-border-cyan { box-shadow: 0 0 30px rgba(0,240,255,0.2), inset 0 0 30px rgba(0,240,255,0.02); }
+
+        /* VS card flip hint */
+        @keyframes vs-bounce { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+        .vs-badge { animation: vs-bounce 2s ease-in-out infinite; }
+    </style>
+</head>
+<body class="font-sans text-white">
+
+    <!-- ── NAV ── -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="{% url 'games' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-lg">arrow_back</span>
+                <span class="font-mono text-[10px] uppercase tracking-widest">K-Beats Games</span>
+            </a>
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">trending_up</span>
+                <span class="font-black uppercase tracking-[0.15em] text-xs text-white">Chart Clash</span>
+            </div>
+            <a href="{% url 'chart_clash' %}"
+               class="bg-primary text-black font-black uppercase tracking-[0.15em] text-[10px] px-5 py-2 hover:bg-white transition-colors">
+                Play Now
+            </a>
+        </div>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <section class="relative min-h-screen grid-bg flex items-center justify-center overflow-hidden" style="padding-top: 100px;">
+
+        <!-- Background glow blobs -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 blur-[120px] pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+
+            <!-- Label -->
+            <div class="inline-flex items-center gap-2 border border-primary/30 bg-primary/5 px-4 py-2 mb-8">
+                <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-primary">K-Beats Arcade · Game</span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-[clamp(4rem,15vw,12rem)] font-black uppercase leading-none tracking-tighter mb-4">
+                <span class="block text-white neon-pink">CHART</span>
+                <span class="block text-transparent" style="-webkit-text-stroke: 2px #f425c0;">CLASH</span>
+            </h1>
+
+            <p class="text-slate-300 text-lg md:text-xl font-medium mb-3 max-w-xl mx-auto">
+                Two songs. One question.
+            </p>
+            <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-slate-500 mb-12">
+                Which K-Pop song charted higher?
+            </p>
+
+            <!-- CTA -->
+            <a href="{% url 'chart_clash' %}"
+               class="btn-pulse inline-flex items-center gap-3 bg-primary text-black font-black uppercase tracking-[0.2em] text-sm px-12 py-5 border-2 border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                <span class="material-symbols-outlined">play_arrow</span>
+                Start Playing
+            </a>
+
+            <p class="mt-6 font-mono text-[10px] text-slate-600 uppercase tracking-widest">10 rounds · free to play · no login needed</p>
+
+            <!-- Floating VS mock -->
+            <div class="mt-20 flex items-center justify-center gap-4 md:gap-8 animate-float" style="padding-bottom: 50px;">
+                <!-- Card A -->
+                <div class="glow-border border border-white/10 bg-white/[0.03] p-5 md:p-8 text-center w-36 md:w-48 relative scanline">
+                    <div class="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 bg-white/5 border border-white/10 overflow-hidden">
+                        {% if track_a %}
+                        <img src="{{ track_a.image }}" class="w-full h-full object-cover" alt="{{ track_a.title }}" />
+                        {% endif %}
+                    </div>
+                    <p class="font-black uppercase text-xs tracking-tight text-white truncate">{{ track_a.title|default:"—" }}</p>
+                    <p class="font-mono text-[9px] text-slate-500 mt-0.5">{{ track_a.artist|default:"" }}</p>
+                    <div class="mt-3 font-mono text-[9px] border border-white/10 px-2 py-1 text-slate-500">#{{ track_a.rank }} CHART</div>
+                </div>
+
+                <!-- VS -->
+                <div class="vs-badge w-14 h-14 md:w-20 md:h-20 border-2 border-primary bg-primary/10 flex items-center justify-center font-black text-primary text-lg md:text-2xl tracking-tighter shrink-0">
+                    VS
+                </div>
+
+                <!-- Card B -->
+                <div class="glow-border-cyan border border-secondary/30 bg-secondary/[0.03] p-5 md:p-8 text-center w-36 md:w-48 relative scanline">
+                    <div class="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 bg-white/5 border border-white/10 overflow-hidden">
+                        {% if track_b %}
+                        <img src="{{ track_b.image }}" class="w-full h-full object-cover" alt="{{ track_b.title }}" />
+                        {% endif %}
+                    </div>
+                    <p class="font-black uppercase text-xs tracking-tight text-white truncate">{{ track_b.title|default:"—" }}</p>
+                    <p class="font-mono text-[9px] text-slate-500 mt-0.5">{{ track_b.artist|default:"" }}</p>
+                    <div class="mt-3 font-mono text-[9px] border border-secondary/30 px-2 py-1 text-secondary">#{{ track_b.rank }} CHART</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Scroll hint -->
+        <div class="absolute bottom-8 left-0 right-0 flex justify-center">
+            <div class="flex flex-col items-center gap-2 text-slate-600">
+                <span class="font-mono text-[9px] uppercase tracking-widest">Scroll to explore</span>
+                <span class="material-symbols-outlined text-sm animate-bounce">keyboard_arrow_down</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── TICKER ── -->
+    <div class="bg-primary/10 border-y border-primary/20 py-3 overflow-hidden">
+        <div class="animate-ticker whitespace-nowrap flex gap-16 text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
+            <span>Chart Clash</span><span class="text-primary/30">·</span>
+            <span>10 Rounds</span><span class="text-primary/30">·</span>
+            <span>Streak Multipliers</span><span class="text-primary/30">·</span>
+            <span>K-Pop Charts</span><span class="text-primary/30">·</span>
+            <span>Beat Your Score</span><span class="text-primary/30">·</span>
+            <span>Free to Play</span><span class="text-primary/30">·</span>
+            <span>Chart Clash</span><span class="text-primary/30">·</span>
+            <span>10 Rounds</span><span class="text-primary/30">·</span>
+            <span>Streak Multipliers</span><span class="text-primary/30">·</span>
+            <span>K-Pop Charts</span><span class="text-primary/30">·</span>
+            <span>Beat Your Score</span><span class="text-primary/30">·</span>
+            <span>Free to Play</span><span class="text-primary/30">·</span>
+        </div>
+    </div>
+
+    <!-- ── HOW TO PLAY ── -->
+    <section class="py-24 md:py-32 px-6 max-w-6xl mx-auto">
+
+        <div class="reveal text-center mb-16">
+            <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">How It Works</p>
+            <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter">Three Steps.<br/><span class="text-transparent" style="-webkit-text-stroke:1.5px #f425c0;">That's It.</span></h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10">
+
+            <div class="reveal p-10 md:p-12 border-b md:border-b-0 md:border-r border-white/10 relative group hover:bg-white/[0.02] transition-colors">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6 group-hover:text-primary/10 transition-colors">01</div>
+                <div class="w-12 h-12 border border-primary/30 bg-primary/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-primary">queue_music</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">See Two Songs</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Two K-Pop tracks with their album art appear side by side. Both are real songs from the K-Beats charts.</p>
+            </div>
+
+            <div class="reveal p-10 md:p-12 border-b md:border-b-0 md:border-r border-white/10 relative group hover:bg-white/[0.02] transition-colors" style="transition-delay:0.1s">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6 group-hover:text-secondary/10 transition-colors">02</div>
+                <div class="w-12 h-12 border border-secondary/30 bg-secondary/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-secondary">touch_app</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Pick the Higher</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Tap whichever song you think peaked at a higher chart position. Trust your instincts — you've got 10 seconds.</p>
+            </div>
+
+            <div class="reveal p-10 md:p-12 relative group hover:bg-white/[0.02] transition-colors" style="transition-delay:0.2s">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6 group-hover:text-white/10 transition-colors">03</div>
+                <div class="w-12 h-12 border border-white/20 bg-white/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-white">local_fire_department</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Build a Streak</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Get it right consecutively and your score multiplier climbs. A 5× streak can turn 100pts into 500pts.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ── SCORING SYSTEM ── -->
+    <section class="py-16 px-6 bg-white/[0.02] border-y border-white/5">
+        <div class="max-w-6xl mx-auto">
+
+            <div class="reveal text-center mb-16">
+                <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary mb-3">The Scoring System</p>
+                <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter">Streaks = <span class="text-secondary neon-cyan">Multipliers</span></h2>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-0 border border-white/10 mb-8">
+                <div class="reveal p-8 text-center border-r border-white/10 last:border-r-0">
+                    <span class="block text-3xl md:text-4xl font-black text-white mb-1">×1</span>
+                    <span class="block font-mono text-[9px] uppercase tracking-widest text-slate-500 mb-2">Streak 1</span>
+                    <span class="block text-primary font-black text-lg">100 pts</span>
+                </div>
+                <div class="reveal p-8 text-center border-r border-white/10" style="transition-delay:0.05s">
+                    <span class="block text-3xl md:text-4xl font-black text-white mb-1">×2</span>
+                    <span class="block font-mono text-[9px] uppercase tracking-widest text-slate-500 mb-2">Streak 2</span>
+                    <span class="block text-primary font-black text-lg">200 pts</span>
+                </div>
+                <div class="reveal p-8 text-center border-r border-white/10" style="transition-delay:0.1s">
+                    <span class="block text-3xl md:text-4xl font-black text-white mb-1">×3</span>
+                    <span class="block font-mono text-[9px] uppercase tracking-widest text-slate-500 mb-2">Streak 3</span>
+                    <span class="block text-primary font-black text-lg">300 pts</span>
+                </div>
+                <div class="reveal p-8 text-center border-r border-white/10" style="transition-delay:0.15s">
+                    <span class="block text-3xl md:text-4xl font-black text-white mb-1">×4</span>
+                    <span class="block font-mono text-[9px] uppercase tracking-widest text-slate-500 mb-2">Streak 4</span>
+                    <span class="block text-primary font-black text-lg">400 pts</span>
+                </div>
+                <div class="reveal p-8 text-center col-span-2 md:col-span-1" style="transition-delay:0.2s">
+                    <span class="block text-3xl md:text-4xl font-black text-secondary mb-1 neon-cyan">×5</span>
+                    <span class="block font-mono text-[9px] uppercase tracking-widest text-slate-500 mb-2">Max Streak</span>
+                    <span class="block text-secondary font-black text-lg neon-cyan">500 pts</span>
+                </div>
+            </div>
+
+            <p class="reveal text-center font-mono text-[10px] text-slate-600 uppercase tracking-widest">
+                Perfect game = 10 correct answers at ×5 = <span class="text-primary font-black">4,500 points</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- ── FEATURES ── -->
+    <section class="py-24 md:py-32 px-6 max-w-6xl mx-auto">
+
+        <div class="reveal text-center mb-16">
+            <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">Why You'll Play Again</p>
+            <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter">Built to Be<br/><span class="text-transparent" style="-webkit-text-stroke:1.5px #00f0ff;">Replayed</span></h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div class="reveal-left glow-border border border-white/10 bg-white/[0.02] p-8 flex gap-6 group hover:border-primary/40 transition-colors">
+                <div class="w-14 h-14 border border-primary/20 bg-primary/5 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-primary text-2xl">shuffle</span>
+                </div>
+                <div>
+                    <h3 class="font-black uppercase tracking-tight text-lg mb-2">Different Every Time</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Rounds are randomly generated from the K-Beats chart library, so no two games are ever the same. New songs get added as the charts update.</p>
+                </div>
+            </div>
+
+            <div class="reveal-right glow-border border border-white/10 bg-white/[0.02] p-8 flex gap-6 group hover:border-secondary/40 transition-colors" style="transition-delay:0.1s">
+                <div class="w-14 h-14 border border-secondary/20 bg-secondary/5 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-secondary text-2xl">leaderboard</span>
+                </div>
+                <div>
+                    <h3 class="font-black uppercase tracking-tight text-lg mb-2">Real Chart Data</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Every matchup is based on actual peak chart positions from K-Beats' real-time K-Pop rankings. No guesses — facts only.</p>
+                </div>
+            </div>
+
+            <div class="reveal-left glow-border border border-white/10 bg-white/[0.02] p-8 flex gap-6 group hover:border-primary/40 transition-colors" style="transition-delay:0.15s">
+                <div class="w-14 h-14 border border-primary/20 bg-primary/5 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-primary text-2xl">bolt</span>
+                </div>
+                <div>
+                    <h3 class="font-black uppercase tracking-tight text-lg mb-2">Instant to Play</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">No downloads, no accounts, no loading screens. Open it, tap Start, and you're in the game within seconds — on any device.</p>
+                </div>
+            </div>
+
+            <div class="reveal-right glow-border border border-white/10 bg-white/[0.02] p-8 flex gap-6 group hover:border-secondary/40 transition-colors" style="transition-delay:0.2s">
+                <div class="w-14 h-14 border border-secondary/20 bg-secondary/5 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-secondary text-2xl">groups</span>
+                </div>
+                <div>
+                    <h3 class="font-black uppercase tracking-tight text-lg mb-2">Play with Friends</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Share your score and challenge your friends. Who really knows their K-Pop charts? Pass the phone and find out.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ── CTA BANNER ── -->
+    <section class="relative py-24 md:py-32 px-6 overflow-hidden border-y border-primary/20">
+
+        <div class="absolute inset-0 grid-bg opacity-50"></div>
+        <div class="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b from-black via-transparent to-black"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-primary/10 blur-[100px] pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-3xl mx-auto text-center">
+            <p class="font-mono text-[10px] uppercase tracking-[0.4em] text-primary mb-6">Think You Know K-Pop Charts?</p>
+            <h2 class="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none mb-8 neon-pink">
+                PROVE IT.
+            </h2>
+            <p class="text-slate-400 mb-12 max-w-md mx-auto">
+                10 rounds. 10 matchups. One question each time — which song charted higher? Easy to learn, nearly impossible to perfect.
+            </p>
+            <a href="{% url 'chart_clash' %}"
+               class="inline-flex items-center gap-3 bg-primary text-black font-black uppercase tracking-[0.2em] text-sm px-14 py-6 border-2 border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                <span class="material-symbols-outlined">trending_up</span>
+                Play Chart Clash
+            </a>
+            <div class="mt-8 flex items-center justify-center gap-8 text-center">
+                <div>
+                    <span class="block font-black text-2xl text-white">10</span>
+                    <span class="font-mono text-[9px] uppercase tracking-widest text-slate-600">Rounds</span>
+                </div>
+                <div class="w-px h-8 bg-white/10"></div>
+                <div>
+                    <span class="block font-black text-2xl text-primary">×5</span>
+                    <span class="font-mono text-[9px] uppercase tracking-widest text-slate-600">Max Multiplier</span>
+                </div>
+                <div class="w-px h-8 bg-white/10"></div>
+                <div>
+                    <span class="block font-black text-2xl text-secondary">4,500</span>
+                    <span class="font-mono text-[9px] uppercase tracking-widest text-slate-600">Max Score</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── EXPLORE MORE GAMES ── -->
+    <section class="py-20 px-6 max-w-6xl mx-auto">
+        <div class="reveal flex items-center justify-between mb-10">
+            <h2 class="font-black uppercase tracking-tighter text-2xl">More Games</h2>
+            <a href="{% url 'games' %}" class="font-mono text-[10px] uppercase tracking-widest text-slate-500 hover:text-primary transition-colors flex items-center gap-1">
+                View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <a href="{% url 'mv_matcher' %}" class="reveal group border border-white/10 bg-white/[0.02] p-6 hover:border-secondary/40 transition-all hover:bg-white/[0.04]">
+                <div class="w-10 h-10 border border-secondary/20 bg-secondary/5 flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-secondary text-lg">movie</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight mb-1">MV Matcher</h3>
+                <p class="text-slate-500 text-xs">Identify the group from a single MV frame.</p>
+            </a>
+
+            <a href="{% url 'fandom_trivia' %}" class="reveal group border border-white/10 bg-white/[0.02] p-6 hover:border-primary/40 transition-all hover:bg-white/[0.04]" style="transition-delay:0.1s">
+                <div class="w-10 h-10 border border-primary/20 bg-primary/5 flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary text-lg">quiz</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight mb-1">Fandom Trivia</h3>
+                <p class="text-slate-500 text-xs">Test your knowledge of groups, labels and fandoms.</p>
+            </a>
+
+            <a href="{% url 'draft_day' %}" class="reveal group border border-white/10 bg-white/[0.02] p-6 hover:border-yellow-400/40 transition-all hover:bg-white/[0.04]" style="transition-delay:0.2s">
+                <div class="w-10 h-10 border border-yellow-400/20 bg-yellow-400/5 flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-yellow-400 text-lg">groups</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight mb-1">Draft Day</h3>
+                <p class="text-slate-500 text-xs">Build your ultimate K-Pop lineup on a budget.</p>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer class="border-t border-white/5 py-8 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="font-mono text-[9px] uppercase tracking-widest text-slate-700">© 2026 K-Beats · Chart Clash</p>
+            <div class="flex items-center gap-6">
+                <a href="{% url 'games' %}" class="font-mono text-[9px] uppercase tracking-widest text-slate-700 hover:text-primary transition-colors">All Games</a>
+                <a href="{% url 'coming_soon' %}" class="font-mono text-[9px] uppercase tracking-widest text-slate-700 hover:text-primary transition-colors">K-Beats Home</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

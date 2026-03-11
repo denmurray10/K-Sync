@@ -703,6 +703,26 @@ def logout_view(request):
 def promo(request):
     return render(request, 'core/promo.html')
 
+def chart_clash_promo(request):
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    tracks = []
+    if daily_rank and daily_rank.ranking_data:
+        for item in daily_rank.ranking_data:
+            if item.get('artwork_url') and item.get('track') and item.get('artist'):
+                tracks.append({
+                    'title': item['track'],
+                    'artist': item['artist'],
+                    'rank': item.get('rank', '?'),
+                    'image': item['artwork_url'],
+                })
+            if len(tracks) >= 2:
+                break
+    return render(request, 'core/chart_clash_promo.html', {
+        'track_a': tracks[0] if len(tracks) > 0 else None,
+        'track_b': tracks[1] if len(tracks) > 1 else None,
+    })
+
+
 def signup(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
