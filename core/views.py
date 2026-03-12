@@ -2318,7 +2318,7 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         f"{hashtags}"
     )
 
-    payload = {
+    feed_payload = {
         'message': message,
         'link': article_url,
         'published': 'false',
@@ -2326,12 +2326,40 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         'access_token': token,
     }
 
+    # Prefer photo posts so the image is guaranteed in the scheduled post.
+    photo_payload = {
+        'caption': message,
+        'url': article.image,
+        'published': 'false',
+        'scheduled_publish_time': str(scheduled_unix_ts),
+        'access_token': token,
+    }
+
     try:
-        resp = requests.post(
-            f'https://graph.facebook.com/v19.0/{page_id}/feed',
-            data=payload,
-            timeout=15,
-        )
+        if article.image:
+            resp = requests.post(
+                f'https://graph.facebook.com/v19.0/{page_id}/photos',
+                data=photo_payload,
+                timeout=20,
+            )
+            result = resp.json()
+            if not (resp.status_code == 200 and 'id' in result):
+                logger.warning(
+                    "[facebook] Photo schedule failed, falling back to feed for %r — %s",
+                    article.title,
+                    result,
+                )
+                resp = requests.post(
+                    f'https://graph.facebook.com/v19.0/{page_id}/feed',
+                    data=feed_payload,
+                    timeout=15,
+                )
+        else:
+            resp = requests.post(
+                f'https://graph.facebook.com/v19.0/{page_id}/feed',
+                data=feed_payload,
+                timeout=15,
+            )
         result = resp.json()
         if resp.status_code == 200 and 'id' in result:
             BlogArticle.objects.filter(pk=article.pk).update(
@@ -2492,6 +2520,22 @@ def _social_hook(article):
     return "🔥 New K-Pop update"
 
 
+def _x_teaser_line(article, max_chars=120):
+    """Generate an X-specific teaser line in a conversational style."""
+    excerpt = _article_opening_excerpt(article, max_chars=max_chars)
+    if not excerpt:
+        return "In a move that has fans talking, this story is one to watch."
+
+    # Avoid doubling if the excerpt already starts similarly
+    low = excerpt.lower()
+    if low.startswith('in a move') or low.startswith('as '):
+        return excerpt
+
+    if excerpt and excerpt[0].isalpha():
+        excerpt = excerpt[0].lower() + excerpt[1:]
+    return f"In a move that {excerpt}"
+
+
 def _x_oauth1_auth_header(
     method,
     url,
@@ -2583,13 +2627,13 @@ def _post_to_x(article):
         title_text = title_text[:max(10, title_budget - 1)].rstrip() + '…'
 
     excerpt_budget = max(25, budget - len(title_text) - 2)  # 2 for "\n\n"
-    excerpt = _article_opening_excerpt(article, max_chars=excerpt_budget)
+    excerpt = _x_teaser_line(article, max_chars=excerpt_budget)
 
     tweet_text = f"{title_text}\n\n{excerpt}{fixed_tail}"
     if len(tweet_text) > 280:
         overflow = len(tweet_text) - 280
         trimmed_budget = max(20, excerpt_budget - overflow - 1)
-        excerpt = _article_opening_excerpt(article, max_chars=trimmed_budget)
+        excerpt = _x_teaser_line(article, max_chars=trimmed_budget)
         tweet_text = f"{title_text}\n\n{excerpt}{fixed_tail}"
 
     media_id = None
