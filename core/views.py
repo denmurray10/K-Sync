@@ -2250,11 +2250,29 @@ def _do_blog_generate():
         created += 1
         db_titles.append(title)
 
-        # Post to Facebook Page as an unpublished draft
+        # Post to Facebook Page as a scheduled post
         try:
             _post_to_facebook_draft(article)
         except Exception as e:
             logger.warning("[facebook] Draft post failed for %r: %s", title, e)
+
+        # Post to Instagram
+        try:
+            _post_to_instagram(article)
+        except Exception as e:
+            logger.warning("[instagram] Post failed for %r: %s", title, e)
+
+        # Post to X (Twitter)
+        try:
+            _post_to_x(article)
+        except Exception as e:
+            logger.warning("[x] Post failed for %r: %s", title, e)
+
+        # Post to Pinterest
+        try:
+            _post_to_pinterest(article)
+        except Exception as e:
+            logger.warning("[pinterest] Post failed for %r: %s", title, e)
 
         # Keep inter-linking list current for subsequent articles
         existing_articles.append({'slug': base_slug, 'title': title})
@@ -2322,6 +2340,195 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
             )
     except Exception as e:
         logger.warning("[facebook] Request error for %r: %s", article.title, e)
+
+
+def _post_to_instagram(article):
+    """
+    Publishes the article as an Instagram post via the Facebook Graph API.
+    Requires the Instagram Business account to be linked to the Facebook Page.
+    Enable by setting INSTAGRAM_POST_ENABLED=true in settings/env.
+    """
+    import re as _re
+
+    if not getattr(settings, 'INSTAGRAM_POST_ENABLED', False):
+        return
+
+    page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
+    token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
+    if not page_id or not token:
+        return
+
+    if not article.image:
+        logger.warning("[instagram] No image for %r — skipping.", article.title)
+        return
+
+    # Resolve linked Instagram Business Account ID
+    resp = requests.get(
+        f'https://graph.facebook.com/v19.0/{page_id}',
+        params={'fields': 'instagram_business_account', 'access_token': token},
+        timeout=10,
+    )
+    ig_id = resp.json().get('instagram_business_account', {}).get('id')
+    if not ig_id:
+        logger.warning("[instagram] No linked Instagram Business account.")
+        return
+
+    site_url = getattr(settings, 'SITE_URL', 'https://kbeatsradio.co.uk')
+    article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
+    plain = _re.sub(r'<[^>]+>', '', article.subtitle or '')[:300].strip()
+    caption = (
+        f"{article.title}\n\n"
+        f"{plain}\n\n"
+        f"Read the full article: {article_url}\n\n"
+        f"#KBeats #KPop #KPopNews #KPopMusic"
+    )
+
+    # Step 1: Create media container
+    container = requests.post(
+        f'https://graph.facebook.com/v19.0/{ig_id}/media',
+        data={'image_url': article.image, 'caption': caption,
+              'access_token': token},
+        timeout=15,
+    ).json()
+    if 'id' not in container:
+        logger.warning("[instagram] Container creation failed: %s", container)
+        return
+
+    # Step 2: Publish the container
+    result = requests.post(
+        f'https://graph.facebook.com/v19.0/{ig_id}/media_publish',
+        data={'creation_id': container['id'], 'access_token': token},
+        timeout=15,
+    ).json()
+    if 'id' in result:
+        logger.info("[instagram] Posted %r — id: %s", article.title, result['id'])
+    else:
+        logger.warning("[instagram] Publish failed: %s", result)
+
+
+def _post_to_x(article):
+    """
+    Posts a tweet to X (Twitter) via API v2 using OAuth 1.0a.
+    Requires X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET.
+    """
+    import hmac
+    import hashlib
+    import base64
+    import secrets as _secrets
+    import time as _time
+    import urllib.parse
+
+    api_key = getattr(settings, 'X_API_KEY', '')
+    api_secret = getattr(settings, 'X_API_SECRET', '')
+    access_token = getattr(settings, 'X_ACCESS_TOKEN', '')
+    access_secret = getattr(settings, 'X_ACCESS_TOKEN_SECRET', '')
+    if not all([api_key, api_secret, access_token, access_secret]):
+        logger.debug("[x] Credentials not configured — skipping.")
+        return
+
+    site_url = getattr(settings, 'SITE_URL', 'https://kbeatsradio.co.uk')
+    article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
+    title = article.title[:200]
+    tweet_text = f"{title}\n\n{article_url}\n\n#KPop #KBeats #KPopNews"
+
+    url = 'https://api.twitter.com/2/tweets'
+    ts = str(int(_time.time()))
+    nonce = _secrets.token_hex(16)
+
+    oauth_params = {
+        'oauth_consumer_key': api_key,
+        'oauth_nonce': nonce,
+        'oauth_signature_method': 'HMAC-SHA1',
+        'oauth_timestamp': ts,
+        'oauth_token': access_token,
+        'oauth_version': '1.0',
+    }
+    param_string = '&'.join(
+        f"{urllib.parse.quote(k, safe='')}={urllib.parse.quote(v, safe='')}"
+        for k, v in sorted(oauth_params.items())
+    )
+    base_string = (
+        'POST&'
+        + urllib.parse.quote(url, safe='')
+        + '&'
+        + urllib.parse.quote(param_string, safe='')
+    )
+    signing_key = (
+        urllib.parse.quote(api_secret, safe='')
+        + '&'
+        + urllib.parse.quote(access_secret, safe='')
+    )
+    sig = base64.b64encode(
+        hmac.new(signing_key.encode(), base_string.encode(), hashlib.sha1).digest()
+    ).decode()
+    oauth_params['oauth_signature'] = sig
+
+    auth_header = 'OAuth ' + ', '.join(
+        f'{urllib.parse.quote(k, safe="")}="{urllib.parse.quote(v, safe="")}"'
+        for k, v in sorted(oauth_params.items())
+    )
+
+    result = requests.post(
+        url,
+        headers={
+            'Authorization': auth_header,
+            'Content-Type': 'application/json',
+        },
+        json={'text': tweet_text},
+        timeout=15,
+    ).json()
+
+    if 'data' in result:
+        logger.info("[x] Tweeted %r — id: %s", article.title, result['data']['id'])
+    else:
+        logger.warning("[x] Tweet failed: %s", result)
+
+
+def _post_to_pinterest(article):
+    """
+    Creates a Pinterest Pin for the article.
+    Requires PINTEREST_ACCESS_TOKEN and PINTEREST_BOARD_ID in settings.
+    """
+    import re as _re
+
+    access_token = getattr(settings, 'PINTEREST_ACCESS_TOKEN', '')
+    board_id = getattr(settings, 'PINTEREST_BOARD_ID', '')
+    if not access_token or not board_id:
+        logger.debug("[pinterest] Credentials not configured — skipping.")
+        return
+
+    if not article.image:
+        logger.warning("[pinterest] No image for %r — skipping.", article.title)
+        return
+
+    site_url = getattr(settings, 'SITE_URL', 'https://kbeatsradio.co.uk')
+    article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
+    plain = _re.sub(r'<[^>]+>', '', article.subtitle or '')[:500].strip()
+
+    result = requests.post(
+        'https://api.pinterest.com/v5/pins',
+        headers={
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json',
+        },
+        json={
+            'title': article.title,
+            'description': plain,
+            'link': article_url,
+            'board_id': board_id,
+            'media_source': {
+                'source_type': 'image_url',
+                'url': article.image,
+            },
+        },
+        timeout=15,
+    ).json()
+
+    if 'id' in result:
+        logger.info("[pinterest] Pin created for %r — id: %s",
+                    article.title, result['id'])
+    else:
+        logger.warning("[pinterest] Pin failed: %s", result)
 
 
 def blog_generate(request):
