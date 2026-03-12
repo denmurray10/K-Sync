@@ -152,6 +152,7 @@ SERPER_API_KEY = os.environ.get('SERPER_API_KEY', 'f099f725535455f20dd5a70ca6f81
 # ── Facebook Page integration ────────────────────────────────────────────────
 # Get these from developers.facebook.com → your App → Page Access Token
 # Required permissions: pages_manage_posts, pages_read_engagement
+SITE_URL = os.environ.get('SITE_URL', 'https://kbeatsradio.co.uk')
 FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '966171646586881')
 FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUVcMgjdSoBQ0nyoLLbQTB7i3mrOIleDSuUZCcfL3Y2eEZAHzSnjKnLOeUreOxBtsDv8Wh52T4fgIfpZAn5vKEfVb7bvZC3xmBxTSjZCLXBv79sd0qibQxcNwBVyah8c08UKeyhpDbAClAbB3D0Xy2aNBqmyvUg80Ew811zlHXoYZCVvLlrCSZBfRI9DMbvOUnS2uV6QZDZD')
 
