@@ -2263,36 +2263,43 @@ def _do_blog_generate():
     return created
 
 
-def _post_to_facebook_draft(article):
+def _post_to_facebook_draft(article, scheduled_unix_ts=None):
     """
-    Posts a newly created BlogArticle to the connected Facebook Page
-    as an unpublished draft (visible in Creator Studio → Drafts).
+    Schedules a newly created BlogArticle on the connected Facebook Page.
+    The post appears in Meta Business Suite -> Content -> Scheduled.
+    Defaults to 24 hours from now if no timestamp is provided.
     Requires FACEBOOK_PAGE_ID and FACEBOOK_PAGE_ACCESS_TOKEN in settings.
     """
+    import time as _time
+    import re as _re
+
     page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
     token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
     if not page_id or not token:
-        logger.debug("[facebook] No credentials configured — skipping draft post.")
+        logger.debug("[facebook] No credentials configured — skipping scheduled post.")
         return
+
+    # Default: schedule 24 hours from now
+    if scheduled_unix_ts is None:
+        scheduled_unix_ts = int(_time.time()) + 86400
 
     site_url = getattr(settings, 'SITE_URL', 'https://k-beats.io')
     article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
 
-    # Build a short teaser message for the post body
-    import re as _re
     plain_excerpt = _re.sub(r'<[^>]+>', '', article.subtitle or article.body_html or '')
     plain_excerpt = plain_excerpt.strip()[:280]
 
     message = (
         f"{article.title}\n\n"
         f"{plain_excerpt}\n\n"
-        f"Read the full article on K-Beats 👉 {article_url}"
+        f"Read the full article on K-Beats: {article_url}"
     )
 
     payload = {
         'message': message,
         'link': article_url,
-        'published': 'false',   # creates an unpublished draft
+        'published': 'false',
+        'scheduled_publish_time': str(scheduled_unix_ts),
         'access_token': token,
     }
 
@@ -2305,12 +2312,12 @@ def _post_to_facebook_draft(article):
         result = resp.json()
         if resp.status_code == 200 and 'id' in result:
             logger.info(
-                "[facebook] Draft created for %r — post id: %s",
+                "[facebook] Scheduled post created for %r — post id: %s",
                 article.title, result['id'],
             )
         else:
             logger.warning(
-                "[facebook] Draft failed for %r — %s",
+                "[facebook] Scheduled post failed for %r — %s",
                 article.title, result,
             )
     except Exception as e:
