@@ -2296,17 +2296,22 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         logger.debug("[facebook] No credentials configured — skipping scheduled post.")
         return
 
+    if article.facebook_posted_at:
+        logger.debug("[facebook] Already posted article %r — skipping.", article.slug)
+        return
+
     # Default: schedule 24 hours from now
     if scheduled_unix_ts is None:
         scheduled_unix_ts = int(_time.time()) + 86400
 
-    site_url = getattr(settings, 'SITE_URL', 'https://k-beats.io')
-    article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
+    article_url = _social_article_url(article, source='facebook')
 
+    hook = _social_hook(article)
     plain_excerpt = _article_opening_excerpt(article, max_chars=320)
-    hashtags = "#KPop #KPopNews #KMusic #KPopUpdates #Hallyu #KBeats"
+    hashtags = ' '.join(_social_hashtags('facebook', article))
 
     message = (
+        f"{hook}\n\n"
         f"{article.title}\n\n"
         f"{plain_excerpt}\n\n"
         f"Read the full article on K-Beats: {article_url}\n\n"
@@ -2329,6 +2334,10 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         )
         result = resp.json()
         if resp.status_code == 200 and 'id' in result:
+            BlogArticle.objects.filter(pk=article.pk).update(
+                facebook_post_id=result['id'],
+                facebook_posted_at=timezone.now(),
+            )
             logger.info(
                 "[facebook] Scheduled post created for %r — post id: %s",
                 article.title, result['id'],
@@ -2348,8 +2357,6 @@ def _post_to_instagram(article):
     Requires the Instagram Business account to be linked to the Facebook Page.
     Enable by setting INSTAGRAM_POST_ENABLED=true in settings/env.
     """
-    import re as _re
-
     if not getattr(settings, 'INSTAGRAM_POST_ENABLED', False):
         return
 
@@ -2373,14 +2380,15 @@ def _post_to_instagram(article):
         logger.warning("[instagram] No linked Instagram Business account.")
         return
 
-    site_url = getattr(settings, 'SITE_URL', 'https://kbeatsradio.co.uk')
-    article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
-    plain = _re.sub(r'<[^>]+>', '', article.subtitle or '')[:300].strip()
+    plain = _article_opening_excerpt(article, max_chars=300)
+    hashtags = ' '.join(_social_hashtags('instagram', article))
+    hook = _social_hook(article)
     caption = (
+        f"{hook}\n\n"
         f"{article.title}\n\n"
         f"{plain}\n\n"
-        f"Read the full article: {article_url}\n\n"
-        f"#KBeats #KPop #KPopNews #KPopMusic"
+        f"Read the full article via link in bio.\n\n"
+        f"{hashtags}"
     )
 
     # Step 1: Create media container
@@ -2433,6 +2441,55 @@ def _article_opening_excerpt(article, max_chars=180):
     if ' ' in cut:
         cut = cut.rsplit(' ', 1)[0]
     return cut.rstrip('.,;:!') + '…'
+
+
+def _social_article_url(article, source):
+    """Build article URL with source-specific UTM tags."""
+    import urllib.parse as _up
+
+    site_url = getattr(settings, 'SITE_URL', 'https://kbeatsradio.co.uk')
+    base = f"{site_url.rstrip('/')}/blog/{article.slug}/"
+    qs = _up.urlencode({
+        'utm_source': source,
+        'utm_medium': 'social',
+        'utm_campaign': 'auto_blog',
+    })
+    return f"{base}?{qs}"
+
+
+def _social_hashtags(platform, article):
+    """Return platform-specific hashtag list."""
+    tags = ['#KPop', '#KPopNews', '#KBeats']
+
+    cat = (article.category or '').lower()
+    if 'comeback' in cat:
+        tags.append('#Comeback')
+    elif 'review' in cat:
+        tags.append('#KPopReview')
+    elif 'chart' in cat:
+        tags.append('#KPopCharts')
+    else:
+        tags.append('#KMusic')
+
+    if platform in {'facebook', 'instagram'}:
+        tags.extend(['#KPopUpdates', '#Hallyu'])
+
+    # preserve order, remove duplicates
+    deduped = []
+    for tag in tags:
+        if tag not in deduped:
+            deduped.append(tag)
+    return deduped
+
+
+def _social_hook(article):
+    """Generate a short hook line for social posts."""
+    cat = (article.category or 'news').strip()
+    if cat.lower() == 'review':
+        return "🎧 New review dropped"
+    if cat.lower() == 'comeback':
+        return "🚨 Comeback alert"
+    return "🔥 New K-Pop update"
 
 
 def _x_oauth1_auth_header(
@@ -2505,10 +2562,14 @@ def _post_to_x(article):
         logger.debug("[x] Credentials not configured — skipping.")
         return
 
-    site_url = getattr(settings, 'SITE_URL', 'https://kbeatsradio.co.uk')
-    article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
+    if article.x_posted_at:
+        logger.debug("[x] Already posted article %r — skipping.", article.slug)
+        return
+
+    article_url = _social_article_url(article, source='x')
     title = article.title[:200]
-    hashtags = "#KPop #KPopNews #KMusic #KPopUpdates #Hallyu #KBeats"
+    hook = _social_hook(article)
+    hashtags = ' '.join(_social_hashtags('x', article))
 
     fixed_tail = f"\n\n{article_url}\n\n{hashtags}"
     budget = 280 - len(fixed_tail)
@@ -2516,8 +2577,8 @@ def _post_to_x(article):
         budget = 40
 
     # Reserve room for both title + opening excerpt where possible.
-    title_budget = max(50, int(budget * 0.45))
-    title_text = title
+    title_budget = max(45, int(budget * 0.4))
+    title_text = f"{hook}: {title}"
     if len(title_text) > title_budget:
         title_text = title_text[:max(10, title_budget - 1)].rstrip() + '…'
 
@@ -2604,6 +2665,10 @@ def _post_to_x(article):
     ).json()
 
     if 'data' in result:
+        BlogArticle.objects.filter(pk=article.pk).update(
+            x_post_id=result['data']['id'],
+            x_posted_at=timezone.now(),
+        )
         logger.info("[x] Tweeted %r — id: %s", article.title, result['data']['id'])
     else:
         logger.warning("[x] Tweet failed: %s", result)
@@ -2614,21 +2679,22 @@ def _post_to_pinterest(article):
     Creates a Pinterest Pin for the article.
     Requires PINTEREST_ACCESS_TOKEN and PINTEREST_BOARD_ID in settings.
     """
-    import re as _re
-
     access_token = getattr(settings, 'PINTEREST_ACCESS_TOKEN', '')
     board_id = getattr(settings, 'PINTEREST_BOARD_ID', '')
     if not access_token or not board_id:
         logger.debug("[pinterest] Credentials not configured — skipping.")
         return
 
+    if article.pinterest_posted_at:
+        logger.debug("[pinterest] Already posted article %r — skipping.", article.slug)
+        return
+
     if not article.image:
         logger.warning("[pinterest] No image for %r — skipping.", article.title)
         return
 
-    site_url = getattr(settings, 'SITE_URL', 'https://kbeatsradio.co.uk')
-    article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
-    plain = _re.sub(r'<[^>]+>', '', article.subtitle or '')[:500].strip()
+    article_url = _social_article_url(article, source='pinterest')
+    plain = _article_opening_excerpt(article, max_chars=500)
 
     result = requests.post(
         'https://api.pinterest.com/v5/pins',
@@ -2650,6 +2716,10 @@ def _post_to_pinterest(article):
     ).json()
 
     if 'id' in result:
+        BlogArticle.objects.filter(pk=article.pk).update(
+            pinterest_post_id=result['id'],
+            pinterest_posted_at=timezone.now(),
+        )
         logger.info("[pinterest] Pin created for %r — id: %s",
                     article.title, result['id'])
     else:

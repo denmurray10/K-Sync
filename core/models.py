@@ -113,6 +113,12 @@ class BlogArticle(models.Model):
     image_3 = models.URLField(max_length=500, blank=True)
     body_html = models.TextField()
     reading_time = models.IntegerField(default=3)
+    facebook_post_id = models.CharField(max_length=100, blank=True)
+    facebook_posted_at = models.DateTimeField(null=True, blank=True)
+    x_post_id = models.CharField(max_length=100, blank=True)
+    x_posted_at = models.DateTimeField(null=True, blank=True)
+    pinterest_post_id = models.CharField(max_length=100, blank=True)
+    pinterest_posted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
