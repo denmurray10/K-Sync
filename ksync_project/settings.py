@@ -149,6 +149,12 @@ PEXELS_API_KEY = os.environ.get('PEXELS_API_KEY', 'GPlKuBUuXNxu06VvSJIM4pCSUGtHB
 # Serper.dev — Google image search for blog articles (2,500 free/month)
 SERPER_API_KEY = os.environ.get('SERPER_API_KEY', 'f099f725535455f20dd5a70ca6f817ddc3dc76e5')
 
+# ── Facebook Page integration ────────────────────────────────────────────────
+# Get these from developers.facebook.com → your App → Page Access Token
+# Required permissions: pages_manage_posts, pages_read_engagement
+FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '966171646586881')
+FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUVcMgjdSoBQ0nyoLLbQTB7i3mrOIleDSuUZCcfL3Y2eEZAHzSnjKnLOeUreOxBtsDv8Wh52T4fgIfpZAn5vKEfVb7bvZC3xmBxTSjZCLXBv79sd0qibQxcNwBVyah8c08UKeyhpDbAClAbB3D0Xy2aNBqmyvUg80Ew811zlHXoYZCVvLlrCSZBfRI9DMbvOUnS2uV6QZDZD')
+
 # ── Cloudinary (image CDN) ───────────────────────────────────────────────────
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'diuanqnce')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '285831974678743')

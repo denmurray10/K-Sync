@@ -2235,7 +2235,7 @@ def _do_blog_generate():
             logger.exception("Blog image_1 fetch failed for title=%r: %s", title, e)
             image_1 = ''
 
-        BlogArticle.objects.create(
+        article = BlogArticle.objects.create(
             slug=base_slug,
             title=title,
             subtitle=subtitle,
@@ -2250,11 +2250,71 @@ def _do_blog_generate():
         created += 1
         db_titles.append(title)
 
+        # Post to Facebook Page as an unpublished draft
+        try:
+            _post_to_facebook_draft(article)
+        except Exception as e:
+            logger.warning("[facebook] Draft post failed for %r: %s", title, e)
+
         # Keep inter-linking list current for subsequent articles
         existing_articles.append({'slug': base_slug, 'title': title})
 
     logger.info("[blog] Auto-generate run complete — created %d article(s).", created)
     return created
+
+
+def _post_to_facebook_draft(article):
+    """
+    Posts a newly created BlogArticle to the connected Facebook Page
+    as an unpublished draft (visible in Creator Studio → Drafts).
+    Requires FACEBOOK_PAGE_ID and FACEBOOK_PAGE_ACCESS_TOKEN in settings.
+    """
+    page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
+    token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
+    if not page_id or not token:
+        logger.debug("[facebook] No credentials configured — skipping draft post.")
+        return
+
+    site_url = getattr(settings, 'SITE_URL', 'https://k-beats.io')
+    article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
+
+    # Build a short teaser message for the post body
+    import re as _re
+    plain_excerpt = _re.sub(r'<[^>]+>', '', article.subtitle or article.body_html or '')
+    plain_excerpt = plain_excerpt.strip()[:280]
+
+    message = (
+        f"{article.title}\n\n"
+        f"{plain_excerpt}\n\n"
+        f"Read the full article on K-Beats 👉 {article_url}"
+    )
+
+    payload = {
+        'message': message,
+        'link': article_url,
+        'published': 'false',   # creates an unpublished draft
+        'access_token': token,
+    }
+
+    try:
+        resp = requests.post(
+            f'https://graph.facebook.com/v19.0/{page_id}/feed',
+            data=payload,
+            timeout=15,
+        )
+        result = resp.json()
+        if resp.status_code == 200 and 'id' in result:
+            logger.info(
+                "[facebook] Draft created for %r — post id: %s",
+                article.title, result['id'],
+            )
+        else:
+            logger.warning(
+                "[facebook] Draft failed for %r — %s",
+                article.title, result,
+            )
+    except Exception as e:
+        logger.warning("[facebook] Request error for %r: %s", article.title, e)
 
 
 def blog_generate(request):
