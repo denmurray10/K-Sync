@@ -70,10 +70,12 @@
                 opacity: 1;
                 transform: translate(0);
             }
-            body {
-                zoom: 0.9;
-                -moz-transform: scale(0.9);
-                -moz-transform-origin: 0 0;
+            @media (min-width: 1024px) {
+                body {
+                    zoom: 0.9;
+                    -moz-transform: scale(0.9);
+                    -moz-transform-origin: 0 0;
+                }
             }
             [x-cloak] {
                 display: none !important;
@@ -85,10 +87,12 @@
                 font-size: 1.1rem;
                 line-height: 1.85;
                 margin-bottom: 1.5rem;
+                overflow-wrap: break-word;
+                word-break: break-word;
             }
             .article-body h2 {
                 color: white;
-                font-size: 1.875rem;
+                font-size: 1.4rem;
                 font-weight: 900;
                 text-transform: uppercase;
                 letter-spacing: -0.025em;
@@ -96,10 +100,15 @@
                 margin-bottom: 1.25rem;
                 padding-bottom: 0.5rem;
                 border-bottom: 2px solid #f425c0;
+                overflow-wrap: break-word;
+                word-break: break-word;
+            }
+            @media (min-width: 768px) {
+                .article-body h2 { font-size: 1.875rem; }
             }
             .article-body h3 {
                 color: white;
-                font-size: 1.5rem;
+                font-size: 1.2rem;
                 font-weight: 900;
                 text-transform: uppercase;
                 letter-spacing: -0.025em;
@@ -107,6 +116,11 @@
                 margin-bottom: 1rem;
                 padding-left: 1rem;
                 border-left: 4px solid #f425c0;
+                overflow-wrap: break-word;
+                word-break: break-word;
+            }
+            @media (min-width: 768px) {
+                .article-body h3 { font-size: 1.5rem; }
             }
             .article-body strong {
                 color: white;
@@ -189,8 +203,8 @@
 
                         <!-- Title -->
                         <h1
-                            class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[0.9] tracking-tighter uppercase reveal-left"
-                            style="transition-delay: 100ms"
+                            class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight tracking-tight uppercase reveal-left"
+                            style="transition-delay: 100ms; overflow-wrap: break-word; word-break: break-word;"
                         >
                             {{ article.title }}
                         </h1>
@@ -368,12 +382,20 @@
                         }
                     });
                 },
-                { threshold: 0.1 },
+                { threshold: 0 },
             );
             document.addEventListener("DOMContentLoaded", () => {
                 document
                     .querySelectorAll(".reveal-up, .reveal-left")
-                    .forEach((el) => observer.observe(el));
+                    .forEach((el) => {
+                        // Force-show elements already visible in the viewport
+                        const rect = el.getBoundingClientRect();
+                        if (rect.top < window.innerHeight && rect.bottom > 0) {
+                            el.classList.add("is-visible");
+                        } else {
+                            observer.observe(el);
+                        }
+                    });
             });
         </script>
     </body>
