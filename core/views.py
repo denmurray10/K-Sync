@@ -2289,7 +2289,6 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
     Requires FACEBOOK_PAGE_ID and FACEBOOK_PAGE_ACCESS_TOKEN in settings.
     """
     import time as _time
-    import re as _re
 
     page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
     token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
@@ -2304,13 +2303,14 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
     site_url = getattr(settings, 'SITE_URL', 'https://k-beats.io')
     article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
 
-    plain_excerpt = _re.sub(r'<[^>]+>', '', article.subtitle or article.body_html or '')
-    plain_excerpt = plain_excerpt.strip()[:280]
+    plain_excerpt = _article_opening_excerpt(article, max_chars=320)
+    hashtags = "#KPop #KPopNews #KMusic #KPopUpdates #Hallyu #KBeats"
 
     message = (
         f"{article.title}\n\n"
         f"{plain_excerpt}\n\n"
-        f"Read the full article on K-Beats: {article_url}"
+        f"Read the full article on K-Beats: {article_url}\n\n"
+        f"{hashtags}"
     )
 
     payload = {
@@ -2406,6 +2406,35 @@ def _post_to_instagram(article):
         logger.warning("[instagram] Publish failed: %s", result)
 
 
+def _article_opening_excerpt(article, max_chars=180):
+    """Extract a clean snippet from the article opening paragraph."""
+    import html as _html
+    import re as _re
+
+    body_html = article.body_html or ''
+    match = _re.search(
+        r'<p[^>]*>(.*?)</p>', body_html, flags=_re.IGNORECASE | _re.DOTALL
+    )
+
+    if match:
+        raw = _re.sub(r'<[^>]+>', '', match.group(1))
+    elif article.subtitle:
+        raw = article.subtitle
+    else:
+        raw = _re.sub(r'<[^>]+>', '', body_html)
+
+    text = _html.unescape(' '.join((raw or '').split())).strip()
+    if not text:
+        return ''
+    if len(text) <= max_chars:
+        return text
+
+    cut = text[:max_chars]
+    if ' ' in cut:
+        cut = cut.rsplit(' ', 1)[0]
+    return cut.rstrip('.,;:!') + '…'
+
+
 def _x_oauth1_auth_header(
     method,
     url,
@@ -2479,7 +2508,28 @@ def _post_to_x(article):
     site_url = getattr(settings, 'SITE_URL', 'https://kbeatsradio.co.uk')
     article_url = f"{site_url.rstrip('/')}/blog/{article.slug}/"
     title = article.title[:200]
-    tweet_text = f"{title}\n\n{article_url}\n\n#KPop #KBeats #KPopNews"
+    hashtags = "#KPop #KPopNews #KMusic #KPopUpdates #Hallyu #KBeats"
+
+    fixed_tail = f"\n\n{article_url}\n\n{hashtags}"
+    budget = 280 - len(fixed_tail)
+    if budget < 40:
+        budget = 40
+
+    # Reserve room for both title + opening excerpt where possible.
+    title_budget = max(50, int(budget * 0.45))
+    title_text = title
+    if len(title_text) > title_budget:
+        title_text = title_text[:max(10, title_budget - 1)].rstrip() + '…'
+
+    excerpt_budget = max(25, budget - len(title_text) - 2)  # 2 for "\n\n"
+    excerpt = _article_opening_excerpt(article, max_chars=excerpt_budget)
+
+    tweet_text = f"{title_text}\n\n{excerpt}{fixed_tail}"
+    if len(tweet_text) > 280:
+        overflow = len(tweet_text) - 280
+        trimmed_budget = max(20, excerpt_budget - overflow - 1)
+        excerpt = _article_opening_excerpt(article, max_chars=trimmed_budget)
+        tweet_text = f"{title_text}\n\n{excerpt}{fixed_tail}"
 
     media_id = None
     if article.image:
