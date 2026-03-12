@@ -4,7 +4,7 @@ import json
 import logging
 import re
 from core.models import Ranking
-from core.views import _chat
+from core.views import _chat, _do_blog_generate
 import urllib.request
 import urllib.parse
 
@@ -206,6 +206,16 @@ def sync_ichart_data():
     except Exception as e:
         logger.error(f"Error syncing iChart data: {e}")
 
+def auto_blog_generate():
+    """Background job: fetch RSS feeds and auto-generate new blog articles."""
+    logger.info("[scheduler] Starting auto blog generation...")
+    try:
+        created = _do_blog_generate()
+        logger.info("[scheduler] Auto blog generation done — %d article(s) created.", created)
+    except Exception as e:
+        logger.error("[scheduler] Auto blog generation failed: %s", e)
+
+
 def start_scheduler():
     scheduler = BackgroundScheduler()
     # Schedule Daily: Run every day at 08:00 AM
@@ -231,7 +241,10 @@ def start_scheduler():
     
     # Schedule Calendar Sync: Run every 6 hours
     scheduler.add_job(sync_calendar_data, 'interval', hours=6, id='sync_calendar_data', replace_existing=True)
-    
+
+    # Schedule Blog Auto-Generation: Run every 30 minutes
+    scheduler.add_job(auto_blog_generate, 'interval', minutes=30, id='auto_blog_generate', replace_existing=True)
+
     scheduler.add_job(generate_ranking, 'date', args=['daily'], run_date=timezone.now(), id='initial_daily_sync')
     scheduler.add_job(generate_ranking, 'date', args=['soloists'], run_date=timezone.now(), id='initial_soloists_sync')
     scheduler.add_job(generate_ranking, 'date', args=['groups'], run_date=timezone.now(), id='initial_groups_sync')

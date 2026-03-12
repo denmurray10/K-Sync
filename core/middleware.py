@@ -13,6 +13,8 @@ class PreLaunchMiddleware:
         '/games/',
         '/game/',       # all individual game pages
         '/bias-selector/',
+        '/news/',       # blog / news page
+        '/blog/',       # individual blog articles
         '/api/prelaunch-signup/',
         '/api/bias-quiz-result/',
         '/staff/',      # staff dashboard

@@ -363,6 +363,7 @@ def _fetch_kpop_news():
     import time
     import xml.etree.ElementTree as ET
     from datetime import datetime
+    from difflib import SequenceMatcher
 
     now = time.time()
     if _news_cache['articles'] and (now - _news_cache['ts'] < 1800):
@@ -406,29 +407,97 @@ def _fetch_kpop_news():
             return 'Industry'
         return 'News'
 
-    articles = []
-    feeds = [
-        'https://news.google.com/rss/search?q=kpop+OR+k-pop+when:7d&hl=en-US&gl=US&ceid=US:en',
+    def _is_duplicate_title(new_title, seen_titles, threshold=0.70):
+        """Return True if new_title is too similar to any already-seen title."""
+        nt = new_title.lower()
+        for existing in seen_titles:
+            ratio = SequenceMatcher(None, nt, existing.lower()).ratio()
+            if ratio >= threshold:
+                return True
+        return False
+
+    # Keywords that confirm K-pop relevance
+    KPOP_SIGNALS = [
+        'k-pop', 'kpop', 'idol', 'girl group', 'boy group',
+        'debut', 'comeback', 'mv ', ' mv', 'music video',
+        'album', 'single', 'ep ', ' ep', 'mini album',
+        'melon', 'gaon', 'hanteo', 'billboard', 'chart',
+        'concert', 'world tour', 'fan meeting', 'lightstick',
+        'fandom', 'trainee', 'sm entertainment', 'jyp', 'yg entertainment',
+        'hybe', 'starship', 'cube entertainment', 'pledis',
+        'bts', 'blackpink', 'twice', 'stray kids', 'aespa', 'ive',
+        'newjeans', 'seventeen', 'nct', 'exo', 'got7', 'shinee',
+        'bigbang', '2ne1', 'winner', 'ikon', 'monsta x', 'day6',
+        'txt', 'enhypen', 'itzy', 'red velvet', 'mamamoo', 'apink',
+        'ateez', 'the boyz', 'p1harmony', 'xdinary heroes', 'zerobaseone',
+        'illit', 'kiss of life', 'lesserafim', 'le sserafim', 'gidle',
+        '(g)i-dle', 'kep1er', 'nmixx', 'young k', 'super junior',
+        'solo artist', 'rapper', 'soloist',
     ]
 
-    for url in feeds:
+    # Keywords that indicate K-drama / general celebrity gossip — not K-pop
+    DRAMA_EXCLUSIONS = [
+        'drama recap', 'episode recap', 'k-drama', 'kdrama',
+        'drama review', 'drama cast', 'drama series', 'drama premiere',
+        'drama rating', 'webtoon adaptation', 'netflix series',
+        'disney+ series', ' ep 1', ' ep 2', ' ep 3', ' ep 4',
+        'jtbc drama', 'tvn drama', 'mbc drama', 'kbs drama',
+        'sbs drama', 'ocn drama', 'tving drama',
+        'series finale', 'season finale', 'maintains steady ratings',
+        'ahead of series', 'ratings ahead', 'upcoming drama',
+        'drama viewer', 'drama special', 'drama script',
+    ]
+
+    def _is_kpop_article(title, categories):
+        """Return True only if the item is genuinely K-pop related."""
+        combined = (title + ' ' + ' '.join(categories)).lower()
+
+        # Hard exclude drama/gossip content
+        if any(excl in combined for excl in DRAMA_EXCLUSIONS):
+            return False
+
+        # Must have at least one positive K-pop signal
+        return any(sig in combined for sig in KPOP_SIGNALS)
+
+    # Direct RSS feeds from authoritative K-pop outlets
+    feeds = [
+        ('https://soompi.com/feed', 'Soompi'),
+        ('https://koreaboo.com/feed', 'Koreaboo'),
+        ('https://seoulbeats.com/feed/', 'Seoulbeats'),
+        ('https://thebiaslist.com/feed/', 'The Bias List'),
+    ]
+
+    articles = []
+    seen_titles = []
+
+    for url, source_name in feeds:
         try:
             resp = requests.get(
-                url, timeout=8,
+                url, timeout=10,
                 headers={'User-Agent': 'K-Beats/1.0'},
             )
             if resp.status_code != 200:
+                logger.warning("[RSS] %s returned HTTP %s", source_name, resp.status_code)
                 continue
 
             root = ET.fromstring(resp.content)
             for item in root.iter('item'):
-                title_raw = item.findtext('title', '')
-                parts = title_raw.rsplit(' - ', 1)
-                title = parts[0].strip()
-                source = (
-                    parts[1].strip() if len(parts) > 1
-                    else 'K-Pop News'
-                )
+                title = (item.findtext('title') or '').strip()
+                if not title:
+                    continue
+
+                # K-pop relevance filter — skip drama recaps and non-kpop content
+                categories = [
+                    c.text for c in item.findall('category') if c.text
+                ]
+                if not _is_kpop_article(title, categories):
+                    logger.info("[RSS] Skipping non-kpop: %r", title)
+                    continue
+
+                # Cross-feed duplicate check — skip if very similar title already collected
+                if _is_duplicate_title(title, seen_titles):
+                    logger.info("[RSS] Skipping near-duplicate: %r", title)
+                    continue
 
                 link = item.findtext('link', '')
                 pub_date = item.findtext('pubDate', '')
@@ -473,7 +542,7 @@ def _fetch_kpop_news():
 
                 articles.append({
                     'title': title,
-                    'source': source,
+                    'source': source_name,
                     'link': link,
                     'date': date_str,
                     'time_ago': time_ago,
@@ -481,8 +550,10 @@ def _fetch_kpop_news():
                     'excerpt': excerpt,
                     'image': img,
                 })
-        except Exception:
-            pass
+                seen_titles.append(title)
+
+        except Exception as e:
+            logger.warning("[RSS] Failed fetching %s: %s", source_name, e)
 
     if not articles:
         articles = [
@@ -2017,19 +2088,35 @@ def _fetch_blog_image(title, category, excerpt='', variant=1):
     return ''
 
 
-def blog_generate(request):
-    """Generate articles from RSS feed via DeepSeek Reasoner."""
+def _do_blog_generate():
+    """
+    Core blog generation logic — fetch RSS articles and write new ones via AI.
+    Called by both the blog_generate view and the background scheduler job.
+    Returns the number of articles created.
+    """
     import re
+    from difflib import SequenceMatcher
     from django.utils.text import slugify
-    from django.shortcuts import redirect
 
+    def _title_too_similar_to_db(new_title, db_titles, threshold=0.70):
+        """Return True if new_title is too similar to any already-published title."""
+        nt = new_title.lower()
+        for existing in db_titles:
+            ratio = SequenceMatcher(None, nt, existing.lower()).ratio()
+            if ratio >= threshold:
+                return True
+        return False
+
+    # Force a fresh fetch (bypass cache) so the scheduler always gets new items
+    _news_cache['ts'] = 0
     articles = _fetch_kpop_news()
     created = 0
 
-    # Gather existing article slugs/titles for SEO inter-linking hints
+    # Gather existing article slugs/titles for duplicate detection + SEO links
     existing_articles = list(
-        BlogArticle.objects.values('slug', 'title')[:15]
+        BlogArticle.objects.values('slug', 'title').order_by('-created_at')[:50]
     )
+    db_titles = [a['title'] for a in existing_articles]
 
     for item in articles:
         title = item.get('title', '').strip()
@@ -2037,7 +2124,13 @@ def blog_generate(request):
             continue
 
         base_slug = slugify(title)[:180]
+        # Exact slug match check
         if BlogArticle.objects.filter(slug=base_slug).exists():
+            continue
+
+        # Similarity check against all published titles to prevent near-duplicates
+        if _title_too_similar_to_db(title, db_titles):
+            logger.info("[blog] Skipping near-duplicate DB title: %r", title)
             continue
 
         source = item.get('source', '')
@@ -2155,10 +2248,19 @@ def blog_generate(request):
             reading_time=reading_time,
         )
         created += 1
+        db_titles.append(title)
 
         # Keep inter-linking list current for subsequent articles
         existing_articles.append({'slug': base_slug, 'title': title})
 
+    logger.info("[blog] Auto-generate run complete — created %d article(s).", created)
+    return created
+
+
+def blog_generate(request):
+    """Manual trigger: generate blog articles from RSS feeds and redirect."""
+    from django.shortcuts import redirect
+    _do_blog_generate()
     return redirect('news')
 
 
