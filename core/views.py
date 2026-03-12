@@ -2406,18 +2406,68 @@ def _post_to_instagram(article):
         logger.warning("[instagram] Publish failed: %s", result)
 
 
-def _post_to_x(article):
-    """
-    Posts a tweet to X (Twitter) via API v2 using OAuth 1.0a.
-    Requires X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET.
-    """
+def _x_oauth1_auth_header(
+    method,
+    url,
+    api_key,
+    api_secret,
+    access_token,
+    access_secret,
+    extra_params=None,
+):
+    """Build OAuth1 Authorization header for X API requests."""
     import hmac
     import hashlib
     import base64
     import secrets as _secrets
     import time as _time
-    import urllib.parse
 
+    oauth_params = {
+        'oauth_consumer_key': api_key,
+        'oauth_nonce': _secrets.token_hex(16),
+        'oauth_signature_method': 'HMAC-SHA1',
+        'oauth_timestamp': str(int(_time.time())),
+        'oauth_token': access_token,
+        'oauth_version': '1.0',
+    }
+
+    sig_params = dict(oauth_params)
+    if extra_params:
+        sig_params.update(extra_params)
+
+    import urllib.parse as _up
+    param_string = '&'.join(
+        f"{_up.quote(str(k), safe='')}={_up.quote(str(v), safe='')}"
+        for k, v in sorted(sig_params.items())
+    )
+    base_string = (
+        method.upper()
+        + '&'
+        + _up.quote(url, safe='')
+        + '&'
+        + _up.quote(param_string, safe='')
+    )
+    signing_key = (
+        _up.quote(api_secret, safe='')
+        + '&'
+        + _up.quote(access_secret, safe='')
+    )
+    signature = base64.b64encode(
+        hmac.new(signing_key.encode(), base_string.encode(), hashlib.sha1).digest()
+    ).decode()
+    oauth_params['oauth_signature'] = signature
+
+    return 'OAuth ' + ', '.join(
+        f'{_up.quote(k, safe="")}="{_up.quote(str(v), safe="")}"'
+        for k, v in sorted(oauth_params.items())
+    )
+
+
+def _post_to_x(article):
+    """
+    Posts a tweet to X (Twitter) via API v2 using OAuth 1.0a.
+    Requires X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET.
+    """
     api_key = getattr(settings, 'X_API_KEY', '')
     api_secret = getattr(settings, 'X_API_SECRET', '')
     access_token = getattr(settings, 'X_ACCESS_TOKEN', '')
@@ -2431,42 +2481,67 @@ def _post_to_x(article):
     title = article.title[:200]
     tweet_text = f"{title}\n\n{article_url}\n\n#KPop #KBeats #KPopNews"
 
+    media_id = None
+    if article.image:
+        try:
+            img = requests.get(article.image, timeout=20)
+            if img.status_code == 200 and img.content:
+                upload_url = 'https://upload.twitter.com/1.1/media/upload.json'
+                upload_auth = _x_oauth1_auth_header(
+                    'POST',
+                    upload_url,
+                    api_key,
+                    api_secret,
+                    access_token,
+                    access_secret,
+                )
+                upload_resp = requests.post(
+                    upload_url,
+                    headers={'Authorization': upload_auth},
+                    files={
+                        'media': (
+                            'article.jpg',
+                            img.content,
+                            img.headers.get('Content-Type', 'image/jpeg'),
+                        )
+                    },
+                    timeout=30,
+                )
+                upload_result = upload_resp.json()
+                media_id = upload_result.get('media_id_string') or (
+                    str(upload_result.get('media_id'))
+                    if upload_result.get('media_id')
+                    else None
+                )
+                if not media_id:
+                    logger.warning(
+                        "[x] Media upload failed (tweeting text-only): %s",
+                        upload_result,
+                    )
+            else:
+                logger.warning(
+                    "[x] Could not fetch article image (tweeting text-only): %s",
+                    article.image,
+                )
+        except Exception as e:
+            logger.warning(
+                "[x] Media upload request failed (tweeting text-only): %s",
+                e,
+            )
+
     url = 'https://api.twitter.com/2/tweets'
-    ts = str(int(_time.time()))
-    nonce = _secrets.token_hex(16)
+    auth_header = _x_oauth1_auth_header(
+        'POST',
+        url,
+        api_key,
+        api_secret,
+        access_token,
+        access_secret,
+    )
 
-    oauth_params = {
-        'oauth_consumer_key': api_key,
-        'oauth_nonce': nonce,
-        'oauth_signature_method': 'HMAC-SHA1',
-        'oauth_timestamp': ts,
-        'oauth_token': access_token,
-        'oauth_version': '1.0',
-    }
-    param_string = '&'.join(
-        f"{urllib.parse.quote(k, safe='')}={urllib.parse.quote(v, safe='')}"
-        for k, v in sorted(oauth_params.items())
-    )
-    base_string = (
-        'POST&'
-        + urllib.parse.quote(url, safe='')
-        + '&'
-        + urllib.parse.quote(param_string, safe='')
-    )
-    signing_key = (
-        urllib.parse.quote(api_secret, safe='')
-        + '&'
-        + urllib.parse.quote(access_secret, safe='')
-    )
-    sig = base64.b64encode(
-        hmac.new(signing_key.encode(), base_string.encode(), hashlib.sha1).digest()
-    ).decode()
-    oauth_params['oauth_signature'] = sig
-
-    auth_header = 'OAuth ' + ', '.join(
-        f'{urllib.parse.quote(k, safe="")}="{urllib.parse.quote(v, safe="")}"'
-        for k, v in sorted(oauth_params.items())
-    )
+    payload = {'text': tweet_text}
+    if media_id:
+        payload['media'] = {'media_ids': [media_id]}
 
     result = requests.post(
         url,
@@ -2474,7 +2549,7 @@ def _post_to_x(article):
             'Authorization': auth_header,
             'Content-Type': 'application/json',
         },
-        json={'text': tweet_text},
+        json=payload,
         timeout=15,
     ).json()
 
