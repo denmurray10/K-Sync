@@ -2318,56 +2318,33 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         f"{hashtags}"
     )
 
-    feed_payload = {
+    # Use the Page Feed endpoint for a standard post with a link.
+    # We use a JSON payload and boolean False for 'published' to ensure 
+    # it is correctly scheduled in Meta Business Suite.
+    payload = {
         'message': message,
-        'published': 'false',
-        'scheduled_publish_time': str(scheduled_unix_ts),
-        'access_token': token,
-    }
-
-    # Prefer photo posts so the image is guaranteed in the scheduled post.
-    photo_payload = {
-        'caption': message,
-        'url': article.image,
-        'published': 'false',
-        'scheduled_publish_time': str(scheduled_unix_ts),
-        'backdated_time_granularity': 'none',
-        'access_token': token,
+        'link': article.image,
+        'published': False,
+        'scheduled_publish_time': scheduled_unix_ts,
     }
 
     try:
-        if article.image:
-            resp = requests.post(
-                f'https://graph.facebook.com/v19.0/{page_id}/photos',
-                data=photo_payload,
-                timeout=20,
-            )
-            result = resp.json()
-            if not (resp.status_code == 200 and 'id' in result):
-                logger.warning(
-                    "[facebook] Photo schedule failed, falling back to feed for %r — %s",
-                    article.title,
-                    result,
-                )
-                resp = requests.post(
-                    f'https://graph.facebook.com/v19.0/{page_id}/feed',
-                    data=feed_payload,
-                    timeout=15,
-                )
-        else:
-            resp = requests.post(
-                f'https://graph.facebook.com/v19.0/{page_id}/feed',
-                data=feed_payload,
-                timeout=15,
-            )
+        resp = requests.post(
+            f'https://graph.facebook.com/v22.0/{page_id}/feed',
+            json=payload,
+            params={'access_token': token},
+            timeout=20,
+        )
         result = resp.json()
         if resp.status_code == 200 and 'id' in result:
+            # We don't update facebook_posted_at here because it's scheduled, not posted.
+            # But the model uses it to track if we've handled it. 
+            # Let's update the ID so we can track it.
             BlogArticle.objects.filter(pk=article.pk).update(
                 facebook_post_id=result['id'],
-                facebook_posted_at=timezone.now(),
             )
             logger.info(
-                "[facebook] Scheduled post created for %r — post id: %s",
+                "[facebook] Scheduled link post created for %r — post id: %s",
                 article.title, result['id'],
             )
         else:
@@ -2487,20 +2464,24 @@ def _social_article_url(article, source):
 
 def _social_hashtags(platform, article):
     """Return platform-specific hashtag list."""
-    tags = ['#KPop', '#KPopNews', '#KBeats']
+    tags = [
+        '#KPop', '#KPopNews', '#KPopUpdate', '#KBeats', '#KBeatsRadio',
+        '#Hallyu', '#KoreanMusic', '#KPopWorld', '#KPopFandom',
+        '#IdolNews', '#KPopLife', '#KoreanWave', '#KPopIdol',
+    ]
 
     cat = (article.category or '').lower()
     if 'comeback' in cat:
-        tags.append('#Comeback')
+        tags.extend(['#Comeback', '#NewRelease', '#KPopComeback'])
     elif 'review' in cat:
-        tags.append('#KPopReview')
+        tags.extend(['#KPopReview', '#MusicReview', '#AlbumReview'])
     elif 'chart' in cat:
-        tags.append('#KPopCharts')
+        tags.extend(['#KPopCharts', '#MelonChart', '#Billboard', '#MusicCharts'])
     else:
-        tags.append('#KMusic')
+        tags.extend(['#KMusic', '#KPopDaily', '#Trending'])
 
     if platform in {'facebook', 'instagram'}:
-        tags.extend(['#KPopUpdates', '#Hallyu'])
+        tags.extend(['#KPopCommunity', '#KPopStan', '#ExploringKPop'])
 
     # preserve order, remove duplicates
     deduped = []
