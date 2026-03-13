@@ -2314,13 +2314,12 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         f"{hook}\n\n"
         f"{article.title}\n\n"
         f"{plain_excerpt}\n\n"
-        f"Read the full article on K-Beats: {article_url}\n\n"
+        f"Read the full article on K-Beats:\n{article_url}\n\n"
         f"{hashtags}"
     )
 
     feed_payload = {
         'message': message,
-        'link': article_url,
         'published': 'false',
         'scheduled_publish_time': str(scheduled_unix_ts),
         'access_token': token,
@@ -2332,6 +2331,7 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         'url': article.image,
         'published': 'false',
         'scheduled_publish_time': str(scheduled_unix_ts),
+        'backdated_time_granularity': 'none',
         'access_token': token,
     }
 
@@ -2536,6 +2536,37 @@ def _x_teaser_line(article, max_chars=120):
     return f"In a move that {excerpt}"
 
 
+def _x_text_length(text):
+    """Approximate X character counting (URLs count as 23 chars)."""
+    import re as _re
+
+    urls = _re.findall(r'https?://\S+', text)
+    length = len(text)
+    for u in urls:
+        length -= len(u)
+        length += 23
+    return length
+
+
+def _x_compose_text(title_text, teaser, article_url, hashtags):
+    """Compose tweet text close to 280 chars using URL-aware counting."""
+    core = f"{title_text}\n\n{teaser}\n\n{article_url}\n\n{hashtags}" if teaser else (
+        f"{title_text}\n\n{article_url}\n\n{hashtags}"
+    )
+    if _x_text_length(core) <= 280:
+        return core
+
+    trimmed = teaser
+    while trimmed and _x_text_length(
+        f"{title_text}\n\n{trimmed}\n\n{article_url}\n\n{hashtags}"
+    ) > 280:
+        trimmed = trimmed[:-2].rstrip() + '…' if len(trimmed) > 2 else ''
+
+    if trimmed:
+        return f"{title_text}\n\n{trimmed}\n\n{article_url}\n\n{hashtags}"
+    return f"{title_text}\n\n{article_url}\n\n{hashtags}"
+
+
 def _x_oauth1_auth_header(
     method,
     url,
@@ -2615,26 +2646,15 @@ def _post_to_x(article):
     hook = _social_hook(article)
     hashtags = ' '.join(_social_hashtags('x', article))
 
-    fixed_tail = f"\n\n{article_url}\n\n{hashtags}"
-    budget = 280 - len(fixed_tail)
-    if budget < 40:
-        budget = 40
-
-    # Reserve room for both title + opening excerpt where possible.
-    title_budget = max(45, int(budget * 0.4))
     title_text = f"{hook}: {title}"
-    if len(title_text) > title_budget:
-        title_text = title_text[:max(10, title_budget - 1)].rstrip() + '…'
+    if len(title_text) > 110:
+        title_text = title_text[:109].rstrip() + '…'
 
-    excerpt_budget = max(25, budget - len(title_text) - 2)  # 2 for "\n\n"
-    excerpt = _x_teaser_line(article, max_chars=excerpt_budget)
-
-    tweet_text = f"{title_text}\n\n{excerpt}{fixed_tail}"
-    if len(tweet_text) > 280:
-        overflow = len(tweet_text) - 280
-        trimmed_budget = max(20, excerpt_budget - overflow - 1)
-        excerpt = _x_teaser_line(article, max_chars=trimmed_budget)
-        tweet_text = f"{title_text}\n\n{excerpt}{fixed_tail}"
+    # Reserve room dynamically with URL-aware length counting.
+    base_len = _x_text_length(f"{title_text}\n\n{article_url}\n\n{hashtags}")
+    teaser_budget = max(0, 280 - base_len - 2)  # 2 for extra newline separator
+    excerpt = _x_teaser_line(article, max_chars=max(40, min(220, teaser_budget)))
+    tweet_text = _x_compose_text(title_text, excerpt, article_url, hashtags)
 
     media_id = None
     if article.image:
