@@ -20,12 +20,11 @@ def push_latest():
         print("No articles found in database.")
         return
 
+    if article.facebook_post_id or article.facebook_posted_at:
+        print(f"Article '{article.title}' has already been scheduled or posted (ID: {article.facebook_post_id}). Skipping.")
+        return
+
     print(f"Target Article: {article.title} (ID: {article.id})")
-    
-    # Clear previous post status if any to allow re-pushing for test
-    article.facebook_post_id = ''
-    article.facebook_posted_at = None
-    article.save(update_fields=['facebook_post_id', 'facebook_posted_at'])
     
     # Schedule for 10 minutes from now
     scheduled_ts = int(time.time()) + 600

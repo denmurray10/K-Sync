@@ -13,24 +13,23 @@ from core.views import _post_to_facebook_draft
 def push_all():
     print("--- Starting Batch Facebook Push ---")
     
-    # Get articles that haven't been successfully posted yet
-    # Or to be safe and do "all", we can just fetch all. 
-    # Let's target articles that haven't been posted to avoid duplicates, 
-    # unless they specify otherwise. But the user said "push all".
-    # I'll fetch them in descending order of creation so the newest ones are scheduled sooner.
-    articles = BlogArticle.objects.order_by('-created_at')
+    # Only target articles that don't have a facebook_post_id and haven't been posted yet
+    articles = BlogArticle.objects.filter(
+        facebook_post_id='',
+        facebook_posted_at__isnull=True
+    ).order_by('-created_at')
     
     count = articles.count()
-    print(f"Total Articles Found: {count}")
+    print(f"Total New Articles to Schedule: {count}")
     
     if count == 0:
-        print("No articles found in database.")
+        print("No new articles found to schedule.")
         return
 
-    # Gap in seconds (20 minutes)
-    gap = 20 * 60
-    # Start 10 minutes from now
-    base_time = int(time.time()) + 600
+    # Gap in seconds (1 minute)
+    gap = 60
+    # Start 15 minutes from now to satisfy FB's 10-min minimum
+    base_time = int(time.time()) + 900
     
     success_count = 0
     fail_count = 0
@@ -44,11 +43,6 @@ def push_all():
         print(f"    Target Time: {scheduled_dt.strftime('%Y-%m-%d %H:%M:%S UTC')}")
         
         try:
-            # Clear previous post status if any to allow fresh scheduling
-            article.facebook_post_id = ''
-            article.facebook_posted_at = None
-            article.save(update_fields=['facebook_post_id', 'facebook_posted_at'])
-            
             _post_to_facebook_draft(article, scheduled_unix_ts=scheduled_ts)
             
             # Refresh to verify update() worked inside _post_to_facebook_draft

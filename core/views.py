@@ -2112,11 +2112,11 @@ def _do_blog_generate():
     articles = _fetch_kpop_news()
     created = 0
 
-    # Gather existing article slugs/titles for duplicate detection + SEO links
+    # Gather existing article slugs/source_titles for duplicate detection + SEO links
     existing_articles = list(
-        BlogArticle.objects.values('slug', 'title').order_by('-created_at')[:50]
+        BlogArticle.objects.values('slug', 'title', 'source_title').order_by('-created_at')[:50]
     )
-    db_titles = [a['title'] for a in existing_articles]
+    db_titles = [a['source_title'] if a.get('source_title') else a['title'] for a in existing_articles]
 
     for item in articles:
         title = item.get('title', '').strip()
@@ -2167,6 +2167,7 @@ def _do_blog_generate():
             f"Write as a professional K-Pop journalist for K-Beats, a major K-Pop media outlet. "
             f"The article MUST be at least 1,500 words. Make it deeply informative, engaging, and comprehensive.\n\n"
             f"Structure your response EXACTLY as follows:\n"
+            f"TITLE: (a completely new, engaging, and original headline)\n"
             f"SUBTITLE: (one catchy subtitle line)\n"
             f"---\n"
             f"(article body in HTML)\n\n"
@@ -2210,13 +2211,17 @@ def _do_blog_generate():
             continue
 
         subtitle = ''
+        generated_title = title
         body = raw
         if '---' in raw:
             header, body = raw.split('---', 1)
             for line in header.strip().splitlines():
-                if line.upper().startswith('SUBTITLE:'):
+                if line.upper().startswith('TITLE:'):
+                    generated_title = line.split(':', 1)[1].strip().strip('"').strip("'")
+                elif line.upper().startswith('SUBTITLE:'):
                     subtitle = line.split(':', 1)[1].strip()
-                    break
+                    # We don't break here so we can find both TITLE and SUBTITLE
+
 
         body = body.strip()
         if not body.startswith('<'):
@@ -2237,7 +2242,7 @@ def _do_blog_generate():
 
         article = BlogArticle.objects.create(
             slug=base_slug,
-            title=title,
+            title=generated_title,
             subtitle=subtitle,
             category=category,
             source_title=title,
@@ -2296,41 +2301,39 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         logger.debug("[facebook] No credentials configured — skipping scheduled post.")
         return
 
-    if article.facebook_posted_at:
-        logger.debug("[facebook] Already posted article %r — skipping.", article.slug)
+    if article.facebook_posted_at or article.facebook_post_id:
+        logger.debug("[facebook] Already handled article %r — skipping.", article.slug)
         return
 
     # Default: schedule 24 hours from now
     if scheduled_unix_ts is None:
         scheduled_unix_ts = int(_time.time()) + 86400
 
-    article_url = _social_article_url(article, source='facebook')
-
     hook = _social_hook(article)
-    plain_excerpt = _article_opening_excerpt(article, max_chars=320)
+    plain_excerpt = _article_opening_excerpt(article, max_chars=400)
     hashtags = ' '.join(_social_hashtags('facebook', article))
 
+    # Construct a more substantial message with hook and title first
     message = (
-        f"{hook}\n\n"
-        f"{article.title}\n\n"
+        f"{hook} {article.title}\n\n"
         f"{plain_excerpt}\n\n"
-        f"Read the full article on K-Beats:\n{article_url}\n\n"
+        "Link to the article in the comments\n\n"
         f"{hashtags}"
     )
 
-    # Use the Page Feed endpoint for a standard post with a link.
-    # We use a JSON payload and boolean False for 'published' to ensure 
-    # it is correctly scheduled in Meta Business Suite.
+    # Use the Page Photos endpoint to create a Photo Post.
+    # This avoids the "link preview" box at the bottom (which would show cloudinary.com)
+    # and makes the image the focus of the post.
     payload = {
-        'message': message,
-        'link': article.image,
+        'caption': message,
+        'url': article.image,
         'published': False,
         'scheduled_publish_time': scheduled_unix_ts,
     }
 
     try:
         resp = requests.post(
-            f'https://graph.facebook.com/v22.0/{page_id}/feed',
+            f'https://graph.facebook.com/v22.0/{page_id}/photos',
             json=payload,
             params={'access_token': token},
             timeout=20,
