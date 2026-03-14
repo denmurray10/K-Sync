@@ -33,12 +33,12 @@
                 <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
             </a>
             <nav class="hidden md:flex items-center gap-6">
-                <a class="{% if request.resolver_match.url_name == 'live' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
+                <a class="{% if request.resolver_match.url_name == 'coming_soon' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'coming_soon' %}">Live</a>
                 <a class="{% if request.resolver_match.url_name == 'charts' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
                 <a class="{% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'idols' %}">Idols</a>
                 <a class="{% if request.resolver_match.url_name == 'comeback_timeline' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
                 <a class="{% if request.resolver_match.url_name == 'news' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
-                <a class="{% if request.resolver_match.url_name == 'shop' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'shop' %}">Shop</a>
+                <a class="{% if request.resolver_match.url_name == 'shop' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'coming_soon' %}">Shop</a>
             </nav>
         </div>
 
@@ -144,12 +144,12 @@
                 <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
             </a>
             <nav class="hidden md:flex items-center gap-6">
-                <a class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
+                <a class="{% if request.resolver_match.url_name == 'coming_soon' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'coming_soon' %}">Live</a>
                 <a class="{% if request.resolver_match.url_name == 'charts' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
                 <a class="{% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'idols' %}">Idols</a>
                 <a class="{% if request.resolver_match.url_name == 'comeback_timeline' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
                 <a class="{% if request.resolver_match.url_name == 'news' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
-                <a class="{% if request.resolver_match.url_name == 'shop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'shop' %}">Shop</a>
+                <a class="{% if request.resolver_match.url_name == 'shop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'coming_soon' %}">Shop</a>
             </nav>
         </div>
         <div class="flex items-center gap-6">
@@ -160,7 +160,7 @@
             <div class="flex gap-4 items-center">
                 <button
                     class="group relative flex items-center gap-2 border border-primary px-6 py-3 font-black text-white hover:bg-primary hover:text-black transition-all"
-                    onclick="window.location.href='{% url 'live' %}'"
+                    onclick="window.location.href='{% url 'coming_soon' %}'"
                 >
                     <span class="relative flex h-2.5 w-2.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
