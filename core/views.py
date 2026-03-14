@@ -1922,14 +1922,14 @@ def live(request):
     if state:
         current_track = state.current_track
 
-        # Fetch up_next tracks in order
-        up_next_ids = state.up_next or []
+        # Fetch up_next tracks in order, limit to 6
+        up_next_ids = (state.up_next or [])[:6]
         up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
         # Preserving order from list
         up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
 
-        # Fetch recently_played tracks in order
-        recent_ids = state.recently_played or []
+        # Fetch recently_played tracks in order, limit to 6
+        recent_ids = (state.recently_played or [])[:6]
         recently_played_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
         recently_played_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
 
@@ -2009,11 +2009,11 @@ def api_live_rotate_track(request):
         },
         'up_next': [
             {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
-            for t in up_next_list
+            for t in up_next_list[:6]
         ],
         'recently_played': [
             {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
-            for t in recently_played_list
+            for t in recently_played_list[:6]
         ]
     })
 

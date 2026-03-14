@@ -30,6 +30,70 @@ B2_APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY', 'your_application_key')
 B2_BUCKET_NAME = os.getenv('B2_BUCKET_NAME', 'your_bucket_name')
 B2_ENDPOINT = os.getenv('B2_ENDPOINT', '') # e.g. f000.backblazeb2.com
 
+import io
+import cloudinary
+import cloudinary.uploader
+from mutagen.mp3 import MP3
+from mutagen.id3 import ID3, APIC
+from django.conf import settings
+
+# Configure Cloudinary
+cloudinary.config(
+    cloud_name=getattr(settings, 'CLOUDINARY_CLOUD_NAME', ''),
+    api_key=getattr(settings, 'CLOUDINARY_API_KEY', ''),
+    api_secret=getattr(settings, 'CLOUDINARY_API_SECRET', ''),
+    secure=True,
+)
+
+def extract_metadata(audio_url, track_id):
+    """
+    Attempts to download the beginning of the file to extract ID3 artwork and artist,
+    then uploads artwork to Cloudinary.
+    """
+    metadata = {
+        'album_art': None,
+        'artist': None
+    }
+    try:
+        # Download first 1MB (art and metadata are usually at the start)
+        headers = {'Range': 'bytes=0-1048576'}
+        response = requests.get(audio_url, headers=headers, timeout=10)
+        if response.status_code not in [200, 206]:
+            return metadata
+            
+        file_data = io.BytesIO(response.content)
+        try:
+            tags = ID3(file_data)
+        except Exception:
+            return metadata
+            
+        # Extract Artist (TPE1 is the official tag for Lead Artist)
+        if 'TPE1' in tags:
+            metadata['artist'] = str(tags['TPE1'])
+            print(f"    Found Artist: {metadata['artist']}")
+        elif 'TPE2' in tags:
+            metadata['artist'] = str(tags['TPE2'])
+            print(f"    Found Artist: {metadata['artist']}")
+
+        # Extract Artwork
+        for tag in tags.values():
+            if isinstance(tag, APIC):
+                try:
+                    upload_result = cloudinary.uploader.upload(
+                        tag.data,
+                        folder="radio/album_art",
+                        public_id=f"track_{track_id}",
+                        overwrite=True,
+                        resource_type='image'
+                    )
+                    metadata['album_art'] = upload_result.get('secure_url')
+                except Exception as upload_err:
+                    print(f"Cloudinary upload error: {upload_err}")
+                break
+    except Exception as e:
+        print(f"Metadata extraction error: {e}")
+    return metadata
+
 def get_b2_auth_token():
     """Authenticates with B2 and returns authorization details."""
     id_and_key = f"{B2_KEY_ID}:{B2_APPLICATION_KEY}"
@@ -101,36 +165,24 @@ def sync_tracks_from_b2():
             audio_url = f"{download_url}/file/{B2_BUCKET_NAME}/{safe_filename}"
             print(f"Syncing: {artist} - {title} URL: {audio_url}") # LOGGING
                 
-            # --- ALBUM ART MAPPING ---
-            # Default fallback image (Stray Kids group photo)
-            album_art = "https://res.cloudinary.com/diuanqnce/image/upload/v1710457000/ksync/skz_group_default.jpg"
+            # --- EMBEDDED METADATA EXTRACTION ---
+            # Attempt to extract art and artist from the file on B2
+            metadata = extract_metadata(audio_url, safe_filename.replace('%', '_'))
+            album_art = metadata.get('album_art')
+            extracted_artist = metadata.get('artist')
             
-            # Map common Stray Kids albums
-            album_covers = {
-                "5-STAR": "https://upload.wikimedia.org/wikipedia/en/3/30/Stray_Kids_-_5-Star.png",
-                "ROCK-STAR": "https://upload.wikimedia.org/wikipedia/en/e/e0/Stray_Kids_-_Rock-Star.png",
-                "NOEASY": "https://upload.wikimedia.org/wikipedia/en/b/b5/Stray_Kids_-_Noeasy.png",
-                "ODDINARY": "https://upload.wikimedia.org/wikipedia/en/c/c8/Stray_Kids_-_Oddinary.png",
-                "MAXIDENT": "https://upload.wikimedia.org/wikipedia/en/0/05/Stray_Kids_-_Maxident.png",
-                "IN LIFE": "https://upload.wikimedia.org/wikipedia/en/f/f6/Stray_Kids_-_In_Life.png",
-                "GO LIVE": "https://upload.wikimedia.org/wikipedia/en/8/8c/Stray_Kids_-_Go_Live.png",
-                "CIRCUS": "https://upload.wikimedia.org/wikipedia/en/4/4b/Stray_Kids_-_Circus.png",
-                "THE SOUND": "https://upload.wikimedia.org/wikipedia/en/2/2a/Stray_Kids_-_The_Sound.png",
-                "SKZ-REPLAY": "https://upload.wikimedia.org/wikipedia/en/c/c2/SKZ-Replay_Cover.jpg",
-                "ATE": "https://upload.wikimedia.org/wikipedia/en/6/6f/Stray_Kids_-_Ate.png",
-            }
+            # Use extracted artist if found, otherwise keep title-parsed artist
+            if extracted_artist:
+                artist = extracted_artist
             
-            # Try to match title or artist to an album
-            upper_title = title.upper()
-            for album, url in album_covers.items():
-                if album in upper_title:
-                    album_art = url
-                    break
+            # Default fallback if extraction fails
+            if not album_art:
+                 album_art = "https://res.cloudinary.com/diuanqnce/image/upload/v1710457000/ksync/skz_group_default.jpg"
             
             track, created = RadioTrack.objects.update_or_create(
                 title=title,
-                artist=artist,
                 defaults={
+                    'artist': artist,
                     'audio_url': audio_url,
                     'album_art': album_art,
                     'duration': '3:00', # Default duration
