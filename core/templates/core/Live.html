@@ -98,14 +98,15 @@
     .album-bg {
         animation: ken-burns 30s ease-in-out infinite;
     }
-    /* Album cover glow */
+    /* Album cover glow (Permanent) */
     .album-cover-glow {
-        box-shadow: 0 0 30px rgba(244, 37, 192, 0.3), 0 0 60px rgba(244, 37, 192, 0.15);
+        box-shadow: 0 0 40px rgba(244, 37, 192, 0.5), 0 0 80px rgba(244, 37, 192, 0.25);
+        transform: translateY(-4px);
         transition: box-shadow 0.5s ease, transform 0.5s ease;
     }
     .album-cover-glow:hover {
-        box-shadow: 0 0 40px rgba(244, 37, 192, 0.5), 0 0 80px rgba(244, 37, 192, 0.25);
-        transform: translateY(-4px);
+        box-shadow: 0 0 50px rgba(244, 37, 192, 0.6), 0 0 100px rgba(244, 37, 192, 0.3);
+        transform: translateY(-6px);
     }
     /* Scroll Reveal */
     .reveal-up {
@@ -184,12 +185,14 @@
 
         <!-- Album Art + Track Info Row -->
         <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-12 w-full justify-center">
-            <!-- Album Cover with 20px White Border -->
-            <div class="w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0 bg-white shadow-2xl overflow-hidden relative group p-[30px]">
-                <img id="hero-album-art" src="{% if current_track %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}"
-                     alt="{{ current_track.title }} - {{ current_track.artist }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <!-- Sublte inner shadow on the image area -->
-                <div class="absolute inset-[30px] shadow-[inset_0_0_20px_rgba(0,0,0,0.1)] pointer-events-none"></div>
+            <!-- Album Cover with 20px White Border, Glow & 3D Shadow -->
+            <div class="w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0 bg-white album-cover-glow relative group p-[20px] transition-all duration-500">
+                <div class="w-full h-full shadow-[0_15px_35px_rgba(0,0,0,0.4)] overflow-hidden">
+                    <img id="hero-album-art" src="{% if current_track %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}"
+                         alt="{{ current_track.title }} - {{ current_track.artist }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                </div>
+                <!-- Subtle inner border shadow for depth -->
+                <div class="absolute inset-0 shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] pointer-events-none"></div>
             </div>
 
             <!-- Track Info & Waveforms -->
