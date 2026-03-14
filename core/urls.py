@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.coming_soon, name='home'),          # PRE-LAUNCH: was views.home
+    path('', views.home, name='home'),
     path('charts/', views.charts, name='charts'),
     path('idols/', views.idols, name='idols'),
     path('idols/universe/', views.idol_universe, name='idol_universe'),
@@ -102,4 +102,5 @@ urlpatterns = [
     # ── Dynamic Idol Pages ────────────────────────────────────────────────
     path('idols/<slug:slug>/', views.idol_page, name='idol_page'),
     path('idols/<slug:slug>/album/<int:collection_id>/', views.album_detail, name='album_detail'),
+    path('legal/placeholder/', views.placeholder, name='placeholder'),
 ]

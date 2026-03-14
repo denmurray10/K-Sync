@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="flex items-center gap-3 reveal-left" style="transition-delay:200ms">
-                        <a href="{% url 'live' %}" class="flex items-center gap-2 bg-primary text-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-primary hover:bg-white hover:border-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                        <a href="{% url 'coming_soon' %}" class="flex items-center gap-2 bg-primary text-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-primary hover:bg-white hover:border-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                             <span class="material-symbols-outlined text-sm">radio</span> Live Radio
                         </a>
                         <a href="{% url 'logout' %}" class="flex items-center gap-2 border border-white/20 text-slate-400 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:border-red-500 hover:text-red-400 transition-colors">
@@ -505,7 +505,7 @@
                         <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-3">Songs you've saved from the live player</p>
                     </div>
                     {% if favourites %}
-                    <a href="{% url 'live' %}" class="hidden sm:flex items-center text-white text-[10px] tracking-[0.2em] font-black hover:text-secondary transition-colors gap-1 uppercase pb-1">
+                    <a href="{% url 'coming_soon' %}" class="hidden sm:flex items-center text-white text-[10px] tracking-[0.2em] font-black hover:text-secondary transition-colors gap-1 uppercase pb-1">
                         Discover More <span class="material-symbols-outlined text-sm">east</span>
                     </a>
                     {% endif %}
@@ -556,7 +556,7 @@
                     <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-6 max-w-md mx-auto">
                         Head to the live player and tap the heart icon on songs you love to build your collection.
                     </p>
-                    <a href="{% url 'live' %}" class="inline-flex items-center gap-2 bg-secondary text-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-secondary hover:bg-white hover:border-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    <a href="{% url 'coming_soon' %}" class="inline-flex items-center gap-2 bg-secondary text-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border border-secondary hover:bg-white hover:border-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                         <span class="material-symbols-outlined text-sm">radio</span> Go to Live Player
                     </a>
                 </div>
@@ -1227,7 +1227,7 @@
                     <a href="{% url 'song_game' %}" class="bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                         Play Song Game
                     </a>
-                    <a href="{% url 'live' %}" class="border border-black text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 hover:bg-black hover:text-white transition-colors">
+                    <a href="{% url 'coming_soon' %}" class="border border-black text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 py-4 hover:bg-black hover:text-white transition-colors">
                         Live Radio
                     </a>
                 </div>

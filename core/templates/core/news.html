@@ -102,6 +102,7 @@
     <body
         class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden"
     >
+        {% include 'core/header.html' %}
         <main
             class="flex-grow pt-0"
             x-data="{
@@ -586,5 +587,6 @@
                     });
             });
         </script>
+        {% include 'core/footer.html' %}
     </body>
 </html>

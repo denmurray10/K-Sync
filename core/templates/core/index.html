@@ -218,7 +218,7 @@
 <button class="hover:opacity-60 transition-opacity text-black hidden lg:block">
 <span class="material-symbols-outlined text-3xl">volume_up</span>
 </button>
-<a href="{% url 'live' %}" class="bg-black text-white px-4 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+<a href="{% url 'coming_soon' %}" class="bg-black text-white px-4 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                 Open Studio
             </a>
 </div>
@@ -450,7 +450,7 @@ Cast your vote now.
         
         <!-- Artwork -->
         <div class="relative w-16 h-16 md:w-20 md:h-20 shrink-0 overflow-hidden bg-black/50 border border-white/20 group-hover:border-black/20 transition-colors">
-            <img data-itunes-artist="{{ track.artist }}" data-itunes-track="{{ track.title }}" src="{{ track.image }}" alt="{{ track.title }} - {{ track.artist }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500">
+            <img data-itunes-artist="{{ track.artist }}" data-itunes-track="{{ track.title }}" src="{{ track.image }}" alt="{{ track.title }} - {{ track.artist }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 opacity-80 group-hover:opacity-100">
             <!-- Overlapping Play Icon on Hover -->
             <div class="absolute inset-0 bg-primary/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                 <span class="material-symbols-outlined text-black text-3xl">play_arrow</span>

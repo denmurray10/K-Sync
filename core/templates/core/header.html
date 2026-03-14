@@ -119,9 +119,9 @@
             {% endif %}
 
             <!-- Settings -->
-            <button class="w-9 h-9 rounded-full glass-bright flex items-center justify-center text-slate-300 hover:text-white transition-colors border border-white/10">
+            <a href="{% url 'profile_personalization_settings' %}" class="w-9 h-9 rounded-full glass-bright flex items-center justify-center text-slate-300 hover:text-white transition-colors border border-white/10">
                 <span class="material-symbols-outlined text-xl">settings</span>
-            </button>
+            </a>
             <!-- Auth -->
             {% if user.is_authenticated %}
             <a href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
@@ -158,8 +158,15 @@
                 <input name="q" class="bg-black/30 border border-primary/30 py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-64 placeholder:text-slate-500" placeholder="Search artist, song..." type="text"/>
             </form>
             <div class="flex gap-4 items-center">
-                <button class="bg-primary text-black font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs px-4 py-3 md:px-8 md:py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]" onclick="window.location.href='{% url 'live' %}'">
-                    Start Listening
+                <button
+                    class="group relative flex items-center gap-2 border border-primary px-6 py-3 font-black text-white hover:bg-primary hover:text-black transition-all"
+                    onclick="window.location.href='{% url 'live' %}'"
+                >
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    </span>
+                    <span class="text-[10px] md:text-xs uppercase tracking-widest">Live On Air</span>
                 </button>
                 {% if user.is_authenticated %}
                 <!-- Notifications (Alpine.js) -->

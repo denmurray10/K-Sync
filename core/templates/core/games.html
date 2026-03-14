@@ -124,18 +124,7 @@
     </style>
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-
-<!-- Top Nav Bar -->
-<div class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 px-6 py-3 flex items-center justify-between">
-    <a href="{% url 'coming_soon' %}" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-black text-[10px] uppercase tracking-[0.2em]">
-        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to K-Beats
-    </a>
-    <span class="font-black text-[10px] uppercase tracking-[0.3em] text-white/20">K-Beats Arcade</span>
-    <a href="https://www.gofundme.com/f/kbeats-help-us-build-the-uks-first-kpop-radio-station" target="_blank" rel="noopener noreferrer"
-       class="inline-flex items-center gap-2 bg-primary text-black px-4 py-2 font-black text-[9px] uppercase tracking-[0.2em] hover:bg-white transition-colors">
-        <span class="material-symbols-outlined text-sm">volunteer_activism</span> Support Us
-    </a>
-</div>
+    {% include 'core/header.html' %}
 
 <main class="flex-grow pt-14">
 
@@ -561,5 +550,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+    {% include 'core/footer.html' %}
 </body>
 </html>

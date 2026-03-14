@@ -27,7 +27,7 @@
     };
     </script>
     <style>
-        body { margin:0; overflow:hidden; background:#000; font-family:'Montserrat',sans-serif; }
+        body { margin:0; background:#000; font-family:'Montserrat',sans-serif; }
 
         /* ── Glass & Neon Utilities (from index.html) ─────────────────── */
         .glass-panel  { background:rgba(0,0,0,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); }
@@ -40,7 +40,7 @@
         .game-layout {
             display:grid;
             grid-template-columns:300px 1fr 360px;
-            height:100vh; width:100vw;
+            min-height:90vh; width:100vw;
         }
         @media(max-width:1200px){ .game-layout{ grid-template-columns:1fr; } .sidebar{ display:none!important; } }
 
@@ -238,12 +238,11 @@
             45%  { transform:translate(-3px, 2px); }
             60%  { transform:translate(4px, -2px); }
             75%  { transform:translate(-2px, 1px); }
-            100% { transform:translate(0,0); }
-        }
         .screen-shake { animation:shake 0.35s ease-in-out; }
     </style>
 </head>
-<body class="font-display text-white overflow-hidden" x-data="beatStreak()" @keydown.window="onKeyDown($event)" @keyup.window="onKeyUp($event)">
+<body class="font-display text-white" x-data="beatStreak()" @keydown.window="onKeyDown($event)" @keyup.window="onKeyUp($event)">
+    {% include 'core/header.html' %}
 
     <!-- ══════════════════════════════════════════════════════════════
          MOBILE BLOCKER — hidden on md+ screens
@@ -1108,7 +1107,6 @@
             }
         };
     }
-    </script>
-    </div><!-- end desktop-only wrapper -->
+    {% include 'core/footer.html' %}
 </body>
 </html>

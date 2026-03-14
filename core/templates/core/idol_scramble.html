@@ -20,7 +20,7 @@
     };
     </script>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        body { margin: 0; background: #000; zoom: 0.9; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @keyframes score-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
         @keyframes slide-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
@@ -34,8 +34,8 @@
     </style>
 </head>
 <body class="font-sans text-white" x-data="idolScramble()">
-
-    <div class="fixed inset-0 z-50 bg-black flex flex-col">
+    {% include 'core/header.html' %}
+    <div class="min-h-screen flex flex-col">
 
         <!-- Top Bar -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
@@ -342,6 +342,6 @@ function idolScramble() {
         }
     };
 }
-</script>
+    {% include 'core/footer.html' %}
 </body>
 </html>

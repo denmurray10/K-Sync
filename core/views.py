@@ -272,8 +272,30 @@ def idols(request):
         for b in day_data.get('birthdays', []):
             today_events.append({'type': 'Birthday', 'name': b.get('name'), 'group': b.get('group')})
 
-    groups = KPopGroup.objects.all().order_by('rank')
-    return render(request, 'core/idols.html', {'today_events': today_events, 'groups': groups})
+    group_type = request.GET.get('type')
+    gender = request.GET.get('gender')
+    
+    groups = KPopGroup.objects.all()
+    
+    if group_type == 'solo':
+        groups = groups.filter(group_type='SOLO')
+    elif group_type == 'groups':
+        groups = groups.exclude(group_type='SOLO')
+        
+    if gender == 'male':
+        groups = groups.filter(models.Q(group_type='BOY') | models.Q(group_type='SOLO')) 
+        # Note: Ideally gender would be a separate field, but using group_type for now
+    elif gender == 'female':
+        groups = groups.filter(models.Q(group_type='GIRL') | models.Q(group_type='SOLO'))
+
+    groups = groups.order_by('rank')
+    
+    return render(request, 'core/idols.html', {
+        'today_events': today_events, 
+        'groups': groups,
+        'selected_type': group_type,
+        'selected_gender': gender
+    })
 
 
 def stray_kids(request):
@@ -3866,3 +3888,6 @@ def get_artist_stats(request):
         'reach_potential': int(reach),
         'found': group is not None
     })
+
+def placeholder(request):
+    return render(request, 'core/placeholder.html')
