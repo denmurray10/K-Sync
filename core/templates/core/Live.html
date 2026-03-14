@@ -154,7 +154,7 @@
     <!-- Background: Blurred Album Art -->
     <div class="absolute inset-0 z-0 bg-black overflow-hidden">
         <div class="absolute inset-[-50px] album-bg">
-            <img src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album"
+            <img id="album-bg-img" src="{% if current_track %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}"
                  alt="" class="w-full h-full object-cover blur-[60px] opacity-40 scale-110" />
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/50"></div>
@@ -162,6 +162,13 @@
         <!-- Subtle colour tint overlay -->
         <div class="absolute inset-0 bg-primary/5 mix-blend-overlay"></div>
     </div>
+
+    <!-- Hidden Audio Element -->
+    <audio id="live-audio" preload="auto">
+        {% if current_track and current_track.audio_url %}
+            <source src="{{ current_track.audio_url }}" type="audio/mpeg">
+        {% endif %}
+    </audio>
 
     <!-- Central Player -->
     <div class="relative z-20 flex flex-col items-center text-center px-6 pt-48 pb-24 max-w-5xl mx-auto w-full">
@@ -179,8 +186,8 @@
         <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-12 w-full justify-center">
             <!-- Album Cover -->
             <div class="w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0 border-2 border-white/20 album-cover-glow overflow-hidden relative group">
-                <img src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album"
-                     alt="Seven - Jung Kook" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <img id="hero-album-art" src="{% if current_track %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}"
+                     alt="{{ current_track.title }} - {{ current_track.artist }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <!-- Overlay gradient -->
                 <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
             </div>
@@ -188,11 +195,11 @@
             <!-- Track Info & Waveforms -->
             <div class="flex flex-col items-center md:items-start text-center md:text-left">
                 <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-3">Now Playing</p>
-                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-3">
-                    SEVEN
+                <h1 id="hero-title" class="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase mb-3">
+                    {% if current_track %}{{ current_track.title }}{% else %}RADIO LIVE{% endif %}
                 </h1>
-                <p class="text-lg md:text-xl text-slate-300 font-light tracking-wide uppercase mb-6">
-                    Jung Kook feat. Latto
+                <p id="hero-artist" class="text-lg md:text-xl text-slate-300 font-light tracking-wide uppercase mb-6">
+                    {% if current_track %}{{ current_track.artist }}{% else %}K-BEATS ON AIR{% endif %}
                 </p>
 
                 <!-- Inline Waveform -->
@@ -232,15 +239,15 @@
                 <div class="h-full bg-gradient-to-r from-primary to-secondary progress-animate"></div>
             </div>
             <div class="flex justify-between mt-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-                <span>1:47</span>
-                <span>3:04</span>
+                <span>0:00</span>
+                <span>{% if current_track %}{{ current_track.duration }}{% else %}3:00{% endif %}</span>
             </div>
         </div>
 
         <!-- Volume -->
         <div class="flex items-center gap-3 mt-8">
             <span class="material-symbols-outlined text-slate-400 text-xl">volume_down</span>
-            <input type="range" min="0" max="100" value="75" class="w-32 h-1 accent-primary cursor-pointer bg-white/10 appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer"/>
+            <input type="range" id="volume-slider" min="0" max="100" value="75" class="w-32 h-1 accent-primary cursor-pointer bg-white/10 appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer"/>
             <span class="material-symbols-outlined text-slate-400 text-xl">volume_up</span>
         </div>
     </div>
@@ -262,7 +269,7 @@
                 </span>
                 <span class="hidden sm:flex items-center gap-1.5 text-black/60 text-xs font-medium">
                     <span class="material-symbols-outlined text-base">headphones</span>
-                    <span class="font-bold text-black" id="listener-count-bar">3,847</span> 
+                    <span class="font-bold text-black" id="listener-count-bar">{% if state %}{{ state.listeners_count }}{% else %}3,847{% endif %}</span> 
                     <span class="hidden lg:inline">Listening Now</span>
                 </span>
             </div>
@@ -279,8 +286,8 @@
                     <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.7s;"></div>
                 </div>
                 <div class="text-center truncate min-w-[200px] max-w-sm lg:max-w-md">
-                    <span class="font-black uppercase tracking-tighter text-2xl md:text-3xl leading-none text-black block truncate">SEVEN</span>
-                    <span class="block text-black/70 font-mono text-[10px] tracking-widest uppercase mt-1 truncate">JUNG KOOK FEAT. LATTO</span>
+                    <span class="font-black uppercase tracking-tighter text-2xl md:text-3xl leading-none text-black block truncate">{% if current_track %}{{ current_track.title }}{% else %}RADIO LIVE{% endif %}</span>
+                    <span class="block text-black/70 font-mono text-[10px] tracking-widest uppercase mt-1 truncate">{% if current_track %}{{ current_track.artist }}{% else %}K-BEATS ON AIR{% endif %}</span>
                 </div>
                 <div class="flex gap-1.5 items-end h-10 opacity-90 w-16">
                     <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.7s;"></div>
@@ -318,86 +325,29 @@
                     <span class="material-symbols-outlined text-slate-500 text-3xl">queue_music</span>
                 </div>
 
-                <div class="flex flex-col gap-3">
-                    <!-- Track 1 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'magnetic' in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                        <span class="text-slate-600 font-mono text-xs w-6 text-center">01</span>
+                <div id="up-next-container" class="flex flex-col gap-3">
+                    {% for track in up_next_tracks %}
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
+                        <span class="text-slate-600 font-mono text-xs w-6 text-center">{{ forloop.counter|stringformat:"02d" }}</span>
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            {% if track.album_art %}
+                            <img src="{{ track.album_art }}" class="w-full h-full object-cover">
+                            {% else %}
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
+                            {% endif %}
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Magnetic</p>
-                                {% if 'magnetic' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">{{ track.title }}</p>
+                                {% if track.is_request %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
                             </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">ILLIT</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">{{ track.artist }}</p>
                         </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:12</span>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">{{ track.duration }}</span>
                     </div>
-
-                    <!-- Track 2 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'supernova' in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                        <span class="text-slate-600 font-mono text-xs w-6 text-center">02</span>
-                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Supernova</p>
-                                {% if 'supernova' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
-                            </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">AESPA</p>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:30</span>
-                    </div>
-
-                    <!-- Track 3 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'chk chk boom' in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                        <span class="text-slate-600 font-mono text-xs w-6 text-center">03</span>
-                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Chk Chk Boom</p>
-                                {% if 'chk chk boom' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
-                            </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">STRAY KIDS</p>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:18</span>
-                    </div>
-
-                    <!-- Track 4 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'how sweet' in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                        <span class="text-slate-600 font-mono text-xs w-6 text-center">04</span>
-                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">How Sweet</p>
-                                {% if 'how sweet' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
-                            </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">NEWJEANS</p>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:08</span>
-                    </div>
-
-                    <!-- Track 5 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group cursor-pointer{% if 'armageddon' in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                        <span class="text-slate-600 font-mono text-xs w-6 text-center">05</span>
-                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">Armageddon</p>
-                                {% if 'armageddon' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
-                            </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">AESPA</p>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">3:45</span>
-                    </div>
+                    {% empty %}
+                    <p class="text-slate-500 text-xs text-center py-4 font-mono uppercase tracking-widest">Playlist Loading...</p>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -411,81 +361,28 @@
                     <span class="material-symbols-outlined text-slate-500 text-3xl">history</span>
                 </div>
 
-                <div class="flex flex-col gap-3">
-                    <!-- Recent 1 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'flower' in requested_titles %} border-l-2 border-l-primary{% endif %}">
+                <div id="recently-played-container" class="flex flex-col gap-3">
+                    {% for track in recently_played_tracks %}
+                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
                         <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            {% if track.album_art %}
+                            <img src="{{ track.album_art }}" class="w-full h-full object-cover">
+                            {% else %}
                             <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
+                            {% endif %}
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Flower</p>
-                                {% if 'flower' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
+                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">{{ track.title }}</p>
+                                {% if track.is_request %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
                             </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">JISOO</p>
+                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">{{ track.artist }}</p>
                         </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">2 min ago</span>
+                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">Played</span>
                     </div>
-
-                    <!-- Recent 2 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'super shy' in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Super Shy</p>
-                                {% if 'super shy' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
-                            </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">NEWJEANS</p>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">6 min ago</span>
-                    </div>
-
-                    <!-- Recent 3 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'unforgiven' in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">UNFORGIVEN</p>
-                                {% if 'unforgiven' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
-                            </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">LE SSERAFIM</p>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">10 min ago</span>
-                    </div>
-
-                    <!-- Recent 4 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'love dive' in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Love Dive</p>
-                                {% if 'love dive' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
-                            </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">IVE</p>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">14 min ago</span>
-                    </div>
-
-                    <!-- Recent 5 -->
-                    <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300 group cursor-pointer{% if 'ditto' in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                        <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-secondary transition-colors">Ditto</p>
-                                {% if 'ditto' in requested_titles %}<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest"><span class="material-symbols-outlined text-[10px]">record_voice_over</span>Fan Request</span>{% endif %}
-                            </div>
-                            <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">NEWJEANS</p>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">18 min ago</span>
-                    </div>
+                    {% empty %}
+                    <p class="text-slate-500 text-xs text-center py-4 font-mono uppercase tracking-widest">Broadcast starting...</p>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -605,6 +502,7 @@
 
 <!-- Scroll Reveal Script -->
 <script>
+    // V2: Mute-as-pause and Volume Control
     document.addEventListener('DOMContentLoaded', () => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -618,18 +516,118 @@
 
         // Play button toggle
         const playBtn = document.getElementById('play-btn');
-        if (playBtn) {
+        const audio = document.getElementById('live-audio');
+        
+        if (playBtn && audio) {
             let isPlaying = false;
-            playBtn.addEventListener('click', () => {
-                isPlaying = !isPlaying;
-                playBtn.querySelector('.material-symbols-outlined').textContent = isPlaying ? 'pause' : 'play_arrow';
-                playBtn.classList.toggle('pulse-glow', !isPlaying);
+
+            playBtn.addEventListener('click', async () => {
+                if (isPlaying) {
+                     // Instead of pausing, we mute to keep in sync
+                     audio.muted = !audio.muted;
+                     playBtn.querySelector('.material-symbols-outlined').textContent = audio.muted ? 'play_arrow' : 'pause';
+                     playBtn.classList.toggle('pulse-glow', audio.muted);
+                } else {
+                     try {
+                         // If no source or needs refresh, reload
+                         if (!audio.src || audio.src !== audio.querySelector('source')?.src) {
+                             audio.load();
+                         }
+                         audio.muted = false; // Ensure unmuted on start
+                         await audio.play();
+                     } catch (error) {
+                         if (error.name === 'AbortError') {
+                             console.log("Playback interrupted (AbortError), safe to ignore.");
+                         } else {
+                             console.error("Playback failed:", error);
+                             alert("Please ensure your Backblaze bucket is public or refresh the page.");
+                         }
+                     }
+                }
             });
+
+            // Sync initial state if audio is already playing/paused
+            audio.onplay = () => {
+                isPlaying = true;
+                playBtn.querySelector('.material-symbols-outlined').textContent = audio.muted ? 'play_arrow' : 'pause';
+                playBtn.classList.toggle('pulse-glow', audio.muted);
+            };
+            audio.onpause = () => {
+                isPlaying = false;
+                playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
+                playBtn.classList.add('pulse-glow');
+            };
+
+            // Volume Control
+            const volumeSlider = document.getElementById('volume-slider');
+            if (volumeSlider) {
+                // Set initial volume
+                audio.volume = volumeSlider.value / 100;
+                volumeSlider.addEventListener('input', (e) => {
+                    audio.volume = e.target.value / 100;
+                    // If user moves slider, unmute automatically for better UX
+                    if (audio.muted && audio.volume > 0) {
+                        audio.muted = false;
+                        playBtn.querySelector('.material-symbols-outlined').textContent = 'pause';
+                        playBtn.classList.remove('pulse-glow');
+                    }
+                });
+            }
+        }
+
+        // Handle Track Rotation
+        audio.addEventListener('ended', async () => {
+            console.log("Track ended, rotating...");
+            try {
+                const response = await fetch('/api/live/rotate/');
+                const data = await response.json();
+                
+                if (data.ok) {
+                    const track = data.current_track;
+                    
+                    // Update Audio
+                    audio.src = track.audio_url;
+                    audio.load();
+                    await audio.play();
+                    
+                    // Update Hero UI
+                    document.getElementById('hero-title').textContent = track.title;
+                    document.getElementById('hero-artist').textContent = track.artist;
+                    document.getElementById('hero-album-art').src = track.album_art;
+                    const bgImg = document.getElementById('album-bg-img');
+                    if (bgImg) bgImg.src = track.album_art;
+                    
+                    // Update Up Next & Recently Played
+                    updatePlaylistUI('up-next-container', data.up_next, 'primary');
+                    updatePlaylistUI('recently-played-container', data.recently_played, 'secondary');
+                }
+            } catch (error) {
+                console.error("Rotation failed:", error);
+            }
+        });
+
+        function updatePlaylistUI(containerId, tracks, colorClass) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = tracks.map((track, idx) => `
+                <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-${colorClass}/50 hover:bg-${colorClass}/5 transition-all duration-300 group cursor-pointer">
+                    ${containerId === 'up-next-container' ? `<span class="text-slate-600 font-mono text-xs w-6 text-center">${(idx + 1).toString().padStart(2, '0')}</span>` : ''}
+                    <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        ${track.album_art ? `<img src="${track.album_art}" class="w-full h-full object-cover">` : `<span class="material-symbols-outlined text-slate-500 group-hover:text-${colorClass} transition-colors">album</span>`}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-${colorClass} transition-colors">${track.title}</p>
+                        <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">${track.artist}</p>
+                    </div>
+                    ${containerId === 'up-next-container' ? `<span class="material-symbols-outlined text-slate-600 text-sm">chevron_right</span>` : `<span class="text-[10px] font-mono text-slate-600 tracking-wider">Played</span>`}
+                </div>
+            `).join('');
         }
 
         // Simulate listener count fluctuation
         function updateListeners() {
-            const base = 3847;
+            const base = {% if state %}{{ state.listeners_count }}{% else %}3847{% endif %};
             const variation = Math.floor(Math.random() * 50) - 25;
             const count = (base + variation).toLocaleString();
             

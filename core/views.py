@@ -20,7 +20,8 @@ from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
-    FanClubMembership, UserNotification, ClubInvitation, ClubLaunch, UserBadge
+    FanClubMembership, UserNotification, ClubInvitation, ClubLaunch, UserBadge,
+    RadioTrack, RadioStationState,
 )
 
 logger = logging.getLogger(__name__)
@@ -1910,8 +1911,110 @@ def live(request):
         created_at__gte=cutoff
     ).values_list('song_title', flat=True)
     requested_titles = [t.lower() for t in requested]
+
+    # Fetch Radio Station State
+    state = RadioStationState.objects.first()
+
+    current_track = None
+    up_next_tracks = []
+    recently_played_tracks = []
+
+    if state:
+        current_track = state.current_track
+
+        # Fetch up_next tracks in order
+        up_next_ids = state.up_next or []
+        up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
+        # Preserving order from list
+        up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
+
+        # Fetch recently_played tracks in order
+        recent_ids = state.recently_played or []
+        recently_played_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
+        recently_played_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
+
     return render(request, 'core/Live.html', {
         'requested_titles': requested_titles,
+        'state': state,
+        'current_track': current_track,
+        'up_next_tracks': up_next_tracks,
+        'recently_played_tracks': recently_played_tracks,
+    })
+
+def api_live_rotate_track(request):
+    """
+    Rotates the radio station to the next track in the queue.
+    """
+    from core.models import RadioStationState, RadioTrack
+    import random
+
+    state = RadioStationState.objects.first()
+    if not state:
+        return JsonResponse({'ok': False, 'error': 'No station state found'}, status=404)
+
+    # Move current to history
+    if state.current_track_id:
+        history = list(state.recently_played)
+        if state.current_track_id not in history:
+            history.insert(0, state.current_track_id)
+        state.recently_played = history[:10]  # Keep last 10
+
+    # Rotate song
+    queue = list(state.up_next)
+    if queue:
+        next_id = queue.pop(0)
+        state.current_track_id = next_id
+        state.up_next = queue
+    else:
+        # Emergency refill if queue is empty
+        all_tracks = list(RadioTrack.objects.values_list('id', flat=True))
+        if all_tracks:
+            state.current_track_id = random.choice(all_tracks)
+
+    # Refill queue if low
+    if len(state.up_next) < 3:
+        all_tracks = list(RadioTrack.objects.values_list('id', flat=True))
+        exclude_ids = set([state.current_track_id] + list(state.recently_played) + list(state.up_next))
+        pool = [tid for tid in all_tracks if tid not in exclude_ids]
+        
+        # If pool is empty, just use any tracks not in up_next
+        if not pool:
+            pool = [tid for tid in all_tracks if tid not in set(state.up_next)]
+            
+        if pool:
+            random.shuffle(pool)
+            new_queue = list(state.up_next) + pool[:5]
+            state.up_next = new_queue[:5]
+
+    state.save()
+
+    # Prepare response data
+    current = state.current_track
+    up_next_ids = state.up_next
+    up_next_tracks = RadioTrack.objects.filter(id__in=up_next_ids)
+    up_next_list = sorted(list(up_next_tracks), key=lambda t: up_next_ids.index(t.id))
+
+    recently_played_ids = state.recently_played
+    recently_played_tracks = RadioTrack.objects.filter(id__in=recently_played_ids)
+    recently_played_list = sorted(list(recently_played_tracks), key=lambda t: recently_played_ids.index(t.id))
+
+    return JsonResponse({
+        'ok': True,
+        'current_track': {
+            'title': current.title,
+            'artist': current.artist,
+            'album_art': current.album_art,
+            'audio_url': current.audio_url,
+            'duration': current.duration,
+        },
+        'up_next': [
+            {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
+            for t in up_next_list
+        ],
+        'recently_played': [
+            {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
+            for t in recently_played_list
+        ]
     })
 
 def top_cheerleader_badges(request):

@@ -1,0 +1,12 @@
+Listing all RadioTrack records:
+ID: 1 | Jung Kook feat. Latto - SEVEN | URL: 'None'
+ID: 2 | ILLIT - Magnetic | URL: 'None'
+ID: 3 | AESPA - Supernova | URL: 'None'
+ID: 4 | JISOO - Flower | URL: 'None'
+
+Station State (ID: 1):
+  Current Track ID: 1
+
+Up Next IDs: [2, 3]
+  Track 2: Magnetic - URL: 'None'
+  Track 3: Supernova - URL: 'None'

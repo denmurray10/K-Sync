@@ -3,6 +3,7 @@ from .models import (
     LivePoll, LivePollOption, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, PreLaunchSignup, BlogArticle,
+    RadioTrack, RadioStationState,
 )
 
 
@@ -122,3 +123,15 @@ class BlogArticleAdmin(admin.ModelAdmin):
     @admin.display(description='Pinterest')
     def pinterest_status(self, obj):
         return '✅' if obj.pinterest_posted_at else '—'
+
+
+@admin.register(RadioTrack)
+class RadioTrackAdmin(admin.ModelAdmin):
+    list_display = ('title', 'artist', 'duration', 'is_request', 'created_at')
+    list_filter = ('is_request', 'created_at')
+    search_fields = ('title', 'artist')
+
+@admin.register(RadioStationState)
+class RadioStationStateAdmin(admin.ModelAdmin):
+    list_display = ('current_track', 'listeners_count', 'updated_at')
+    readonly_fields = ('updated_at',)

@@ -103,4 +103,5 @@ urlpatterns = [
     path('idols/<slug:slug>/', views.idol_page, name='idol_page'),
     path('idols/<slug:slug>/album/<int:collection_id>/', views.album_detail, name='album_detail'),
     path('legal/placeholder/', views.placeholder, name='placeholder'),
+    path('api/live/rotate/', views.api_live_rotate_track, name='live_rotate_track'),
 ]

@@ -394,3 +394,28 @@ class PreLaunchSignup(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.email})"
+
+class RadioTrack(models.Model):
+    title = models.CharField(max_length=300)
+    artist = models.CharField(max_length=200)
+    album_art = models.URLField(max_length=500, blank=True)
+    duration = models.CharField(max_length=20, help_text="e.g. 3:45", default="3:00")
+    audio_url = models.URLField(max_length=500, blank=True, null=True)
+    is_request = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.artist} - {self.title}"
+
+class RadioStationState(models.Model):
+    current_track = models.ForeignKey(RadioTrack, null=True, blank=True, on_delete=models.SET_NULL, related_name='current_as_state')
+    up_next = models.JSONField(default=list, help_text="List of RadioTrack IDs in queue order")
+    recently_played = models.JSONField(default=list, help_text="List of RadioTrack IDs in history order")
+    listeners_count = models.IntegerField(default=3847)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Radio State (Last updated: {self.updated_at})"
+
+    class Meta:
+        verbose_name_plural = "Radio Station State"
