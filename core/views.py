@@ -2305,9 +2305,9 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         logger.debug("[facebook] Already handled article %r — skipping.", article.slug)
         return
 
-    # Default: schedule 24 hours from now
+    # Default: schedule 1 hour from now
     if scheduled_unix_ts is None:
-        scheduled_unix_ts = int(_time.time()) + 86400
+        scheduled_unix_ts = int(_time.time()) + 3600
 
     hook = _social_hook(article)
     plain_excerpt = _article_opening_excerpt(article, max_chars=400)

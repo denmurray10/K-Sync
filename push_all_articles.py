@@ -28,8 +28,8 @@ def push_all():
 
     # Gap in seconds (1 minute)
     gap = 60
-    # Start 15 minutes from now to satisfy FB's 10-min minimum
-    base_time = int(time.time()) + 900
+    # Start 1 hour from now
+    base_time = int(time.time()) + 3600
     
     success_count = 0
     fail_count = 0
