@@ -196,9 +196,9 @@
     </div>
 
     <!-- TAB 2: SCHEDULER (Horizontal Grid) -->
-    <div x-show="activeTab === 'scheduler'" class="flex-1 flex overflow-hidden">
+    <div x-show="activeTab === 'scheduler'" class="flex-1 flex overflow-hidden min-h-0">
         <!-- Sidebar: Saved Playlists -->
-        <div class="w-64 border-r border-white/10 flex flex-col bg-surface/50">
+        <div class="w-64 border-r border-white/10 flex flex-col bg-surface/50 min-h-0">
             <div class="p-4 border-b border-white/10 bg-surface">
                 <h2 class="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
                     <span class="material-symbols-outlined text-sm">list</span> Saved Playlists
@@ -215,7 +215,7 @@
         </div>
 
         <!-- Main Calendar Grid -->
-        <div class="flex-1 overflow-hidden flex flex-col">
+        <div class="flex-1 overflow-hidden flex flex-col min-h-0">
             <!-- Timeline Header (Hours) -->
             <div class="flex border-b border-white/10 bg-surface">
                 <div class="w-16 border-r border-white/10 flex-shrink-0"></div> <!-- Day column placeholder -->
@@ -229,9 +229,9 @@
             </div>
 
             <!-- Grid Rows (Days) -->
-            <div class="flex-1 overflow-y-auto overflow-x-hidden">
+            <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col">
                 <template x-for="day in ['MON','TUE','WED','THU','FRI','SAT','SUN']">
-                    <div class="flex border-b border-white/10 hover:bg-white/[0.02] transition-colors min-h-[80px]">
+                    <div class="flex flex-1 border-b border-white/10 hover:bg-white/[0.02] transition-colors min-h-[96px]">
                         <!-- Day Label -->
                         <div class="w-16 border-r border-white/10 flex-shrink-0 flex items-center justify-center bg-black/40">
                             <span class="text-[10px] font-black uppercase -rotate-90 tracking-widest text-slate-400" x-text="day"></span>
@@ -280,11 +280,11 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Start</label>
-                        <input type="time" x-model="newSchedule.start" class="w-full bg-black border border-white/10 p-2 text-xs text-white">
+                        <input type="time" step="900" x-model="newSchedule.start" @change="newSchedule.start = snapTimeValue(newSchedule.start)" class="w-full bg-black border border-white/10 p-2 text-xs text-white">
                     </div>
                     <div>
                         <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">End</label>
-                        <input type="time" x-model="newSchedule.end" class="w-full bg-black border border-white/10 p-2 text-xs text-white">
+                        <input type="time" step="900" x-model="newSchedule.end" @change="newSchedule.end = snapTimeValue(newSchedule.end)" class="w-full bg-black border border-white/10 p-2 text-xs text-white">
                     </div>
                 </div>
                 <div>
@@ -388,6 +388,7 @@ function playlistApp() {
         undo: { visible: false, message: '', snapshot: null },
         undoTimeout: null,
         isPlaylistDropActive: false,
+        snapIntervalMinutes: 15,
         slotTargetMinutes: 60,
         showAIModal: false,
         aiStep: 1,
@@ -518,6 +519,43 @@ function playlistApp() {
             const seconds = safe % 60;
             if (hours > 0) return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        },
+
+        timeToMinutes(value) {
+            const raw = String(value || '');
+            const parts = raw.split(':').map((part) => parseInt(part, 10));
+            if (parts.length < 2 || parts.some((part) => Number.isNaN(part))) return 0;
+            return (parts[0] * 60) + parts[1];
+        },
+
+        minutesToTime(totalMinutes) {
+            const safe = Math.max(0, Math.min(1439, Math.floor(totalMinutes || 0)));
+            const hours = Math.floor(safe / 60).toString().padStart(2, '0');
+            const minutes = (safe % 60).toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        },
+
+        snapTimeValue(value) {
+            const interval = Math.max(1, parseInt(this.snapIntervalMinutes || 15, 10));
+            const minutes = this.timeToMinutes(value);
+            const snapped = Math.round(minutes / interval) * interval;
+            return this.minutesToTime(Math.min(1439, snapped));
+        },
+
+        applyScheduleSnapping() {
+            const interval = Math.max(1, parseInt(this.snapIntervalMinutes || 15, 10));
+            const snappedStart = this.snapTimeValue(this.newSchedule.start);
+            let snappedEnd = this.snapTimeValue(this.newSchedule.end);
+
+            const startMinutes = this.timeToMinutes(snappedStart);
+            let endMinutes = this.timeToMinutes(snappedEnd);
+            if (endMinutes <= startMinutes) {
+                endMinutes = Math.min(1439, startMinutes + interval);
+                snappedEnd = this.minutesToTime(endMinutes);
+            }
+
+            this.newSchedule.start = snappedStart;
+            this.newSchedule.end = snappedEnd;
         },
 
         get playlistTotalSeconds() {
@@ -876,6 +914,7 @@ function playlistApp() {
 
         async saveSchedule() {
             if (!this.newSchedule.playlist_id) return alert('Select a playlist first');
+            this.applyScheduleSnapping();
             try {
                 const resp = await fetch('/api/schedule/save/', {
                     method: 'POST',
