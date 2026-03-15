@@ -70,20 +70,26 @@
                     <span class="material-symbols-outlined text-sm">cloud</span> Media Library
                 </h2>
                 <div class="mt-4 relative">
-                    <input type="text" x-model="searchQuery" placeholder="Search B2 tracks..." 
-                           class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase">
+                          <input type="text" x-model="searchQuery" placeholder="Search B2 tracks..." 
+                              class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase mb-2">
+                          <input type="text" x-model="groupQuery" placeholder="Group names..." 
+                              class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-primary focus:border-primary outline-none uppercase" style="margin-top: 6px;">
                 </div>
             </div>
             
             <div id="library-list" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
                 <template x-for="track in filteredTracks" :key="track.fileId">
-                    <div :data-url="track.url" :data-name="track.name" 
+                    <div :data-url="track.url" :data-name="track.name" :data-artist="track.artist" :data-album-art="track.album_art"
                          class="library-item group flex items-center gap-3 p-3 bg-white/5 border border-white/10 cursor-grab hover:border-secondary transition-all">
-                        <div class="w-8 h-8 bg-black flex items-center justify-center border border-white/10 group-hover:border-secondary/50">
-                            <span class="material-symbols-outlined text-sm text-slate-500 group-hover:text-secondary">music_note</span>
+                        <div class="w-10 h-10 bg-black border border-white/10 group-hover:border-secondary/50 overflow-hidden flex-shrink-0">
+                            <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
+                            <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
+                                <span class="material-symbols-outlined text-sm text-slate-500 group-hover:text-secondary">music_note</span>
+                            </div>
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-[10px] font-bold truncate uppercase" x-text="track.name"></p>
+                            <p class="text-[9px] font-mono text-slate-500 truncate uppercase" x-text="track.artist || 'Unknown Artist'"></p>
                         </div>
                         <button @click="addTrack(track)" class="opacity-0 group-hover:opacity-100 bg-secondary/20 hover:bg-secondary text-secondary hover:text-black p-1 transition-all">
                             <span class="material-symbols-outlined text-xs">add</span>
@@ -123,6 +129,12 @@
                 <template x-for="(track, index) in currentPlaylist.tracks" :key="index">
                     <div class="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/10 group">
                         <span class="text-[10px] font-mono text-slate-600 w-4" x-text="(index + 1).toString().padStart(2, '0')"></span>
+                        <div class="w-10 h-10 bg-black border border-white/10 overflow-hidden flex-shrink-0">
+                            <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
+                            <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
+                                <span class="material-symbols-outlined text-sm text-slate-500">music_note</span>
+                            </div>
+                        </div>
                         <div class="flex-1 min-w-0">
                             <input type="text" x-model="track.title" class="bg-transparent border-none p-0 text-sm font-bold uppercase tracking-tight focus:ring-0 w-full">
                             <input type="text" x-model="track.artist" class="bg-transparent border-none p-0 text-[10px] font-mono text-slate-500 uppercase tracking-widest focus:ring-0 w-full">
@@ -247,6 +259,7 @@ function playlistApp() {
         activeTab: 'builder',
         tracks: [],
         searchQuery: '',
+        groupQuery: '',
         currentPlaylist: { id: null, name: 'Untitled Playlist', tracks: [] },
         daySchedules: {},
         activeDay: 'MON',
@@ -275,9 +288,16 @@ function playlistApp() {
         },
 
         get filteredTracks() {
-            if (!this.searchQuery) return this.tracks;
-            const q = this.searchQuery.toLowerCase();
-            return this.tracks.filter(t => t.name.toLowerCase().includes(q));
+            let filtered = this.tracks;
+            if (this.searchQuery) {
+                const q = this.searchQuery.toLowerCase();
+                filtered = filtered.filter(t => t.name.toLowerCase().includes(q));
+            }
+            if (this.groupQuery) {
+                const g = this.groupQuery.toLowerCase();
+                filtered = filtered.filter(t => (t.artist || '').toLowerCase().includes(g));
+            }
+            return filtered;
         },
 
         initSortable() {
@@ -291,9 +311,9 @@ function playlistApp() {
                 group: 't',
                 animation: 150,
                 onAdd: (evt) => {
-                    const { url, name } = evt.item.dataset;
+                    const { url, name, artist, albumArt } = evt.item.dataset;
                     evt.item.remove();
-                    this.addTrack({ url, name }, evt.newIndex);
+                    this.addTrack({ url, name, artist, album_art: albumArt }, evt.newIndex);
                 },
                 onUpdate: (evt) => {
                     const item = this.currentPlaylist.tracks.splice(evt.oldIndex, 1)[0];
@@ -328,9 +348,10 @@ function playlistApp() {
 
         addTrack(track, index = null) {
             const newTrack = {
-                title: track.name ? track.name.replace(/\.[^/.]+$/, "") : 'New Track',
-                artist: 'Unknown Artist',
-                url: track.url
+                title: track.title || (track.name ? track.name.replace(/\.[^/.]+$/, "") : 'New Track'),
+                artist: track.artist || 'Unknown Artist',
+                url: track.url,
+                album_art: track.album_art || ''
             };
             if (index !== null) {
                 this.currentPlaylist.tracks.splice(index, 0, newTrack);

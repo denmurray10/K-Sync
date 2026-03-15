@@ -12,6 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
 import requests
+import urllib.parse
+import re
 from openai import OpenAI
 import bleach
 from django.shortcuts import get_object_or_404
@@ -66,6 +68,9 @@ def api_b2_tracks(request):
     key_id = settings.B2_KEY_ID
     app_key = settings.B2_APPLICATION_KEY
     bucket_name = settings.B2_BUCKET_NAME
+    default_album_art = "https://res.cloudinary.com/diuanqnce/image/upload/v1710546648/ksync/skz_group_default.jpg"
+    search_query = (request.GET.get('q') or '').strip().lower()
+    group_query = (request.GET.get('group') or request.GET.get('group_name') or '').strip().lower()
     
     if not all([key_id, app_key, bucket_name]):
         return JsonResponse({'ok': False, 'error': 'B2 credentials missing'}, status=500)
@@ -99,18 +104,101 @@ def api_b2_tracks(request):
             return JsonResponse({'ok': False, 'error': f'B2 List Files Failed: {files_resp.text}'}, status=files_resp.status_code)
             
         files = files_resp.json().get('files', [])
-        
-        # Filter for audio files and format
+
+        def normalize(text):
+            if not text:
+                return ''
+            return text.strip().lower().replace('_', ' ')
+
+        def prettify_artist(text):
+            if not text:
+                return ''
+            candidate = text.replace('_', ' ').replace('-', ' ').strip()
+            candidate = re.sub(r'([a-z])([A-Z])', r'\1 \2', candidate)
+            candidate = re.sub(r'\s+', ' ', candidate)
+            return candidate
+
+        def artist_from_audio_url(audio_url):
+            if not audio_url:
+                return ''
+            parsed = urllib.parse.urlparse(audio_url)
+            path = urllib.parse.unquote(parsed.path or '')
+            parts = [p for p in path.split('/') if p]
+            if len(parts) >= 2:
+                return prettify_artist(parts[-2])
+            return ''
+
+        metadata_by_title = {}
+        metadata_by_filename = {}
+        for radio_track in RadioTrack.objects.all().only('title', 'artist', 'album_art', 'audio_url'):
+            title_key = normalize(radio_track.title)
+            if title_key and title_key not in metadata_by_title:
+                metadata_by_title[title_key] = radio_track
+
+            if radio_track.audio_url:
+                parsed = urllib.parse.urlparse(radio_track.audio_url)
+                path = urllib.parse.unquote(parsed.path or '')
+                filename = normalize(path.split('/')[-1])
+                if filename and filename not in metadata_by_filename:
+                    metadata_by_filename[filename] = radio_track
+
         tracks = []
         for f in files:
-            name = f['fileName']
-            if name.lower().endswith(('.mp3', '.wav', '.m4a')):
-                download_url = f"{auth_data.get('downloadUrl')}/file/{bucket_name}/{name}"
-                tracks.append({
-                    'name': name,
-                    'url': download_url,
-                    'fileId': f['fileId']
-                })
+            file_name = f['fileName']
+            if not file_name.lower().endswith(('.mp3', '.wav', '.m4a')):
+                continue
+
+            path_parts = file_name.split('/')
+            parent_folder = path_parts[-2] if len(path_parts) > 1 else ''
+            file_leaf = path_parts[-1]
+            base_name = file_leaf.rsplit('.', 1)[0]
+
+            parsed_artist = parent_folder or ''
+            parsed_title = base_name
+            if ' - ' in base_name:
+                left, right = base_name.split(' - ', 1)
+                if left and right:
+                    parsed_artist = left
+                    parsed_title = right
+
+            metadata = (
+                metadata_by_filename.get(normalize(file_leaf))
+                or metadata_by_title.get(normalize(base_name))
+                or metadata_by_title.get(normalize(parsed_title))
+            )
+
+            metadata_artist = (metadata.artist if metadata else '') or ''
+            if metadata_artist.lower() == 'unknown artist':
+                metadata_artist = ''
+
+            artist = (
+                metadata_artist
+                or artist_from_audio_url(metadata.audio_url if metadata else '')
+                or prettify_artist(parsed_artist)
+                or 'Unknown Artist'
+            ).strip()
+
+            album_art = (metadata.album_art if metadata else '') or default_album_art
+            encoded_name = urllib.parse.quote(file_name, safe='/')
+            download_url = f"{auth_data.get('downloadUrl')}/file/{bucket_name}/{encoded_name}"
+
+            if search_query:
+                title_match = search_query in base_name.lower() or search_query in parsed_title.lower()
+                artist_match = search_query in artist.lower()
+                if not (title_match or artist_match):
+                    continue
+
+            if group_query and group_query not in artist.lower():
+                continue
+
+            tracks.append({
+                'name': file_name,
+                'title': parsed_title,
+                'artist': artist,
+                'album_art': album_art,
+                'url': download_url,
+                'fileId': f['fileId']
+            })
         
         return JsonResponse({'ok': True, 'tracks': tracks})
     except Exception as e:
@@ -125,7 +213,7 @@ def api_playlist_save(request):
         data = json.loads(request.body)
         playlist_id = data.get('id')
         name = data.get('name')
-        track_data = data.get('tracks', []) # List of {title, artist, audio_url}
+        track_data = data.get('tracks', []) # List of {title, artist, url, album_art}
         
         if not name:
             return JsonResponse({'ok': False, 'error': 'Playlist name is required'}, status=400)
@@ -145,15 +233,22 @@ def api_playlist_save(request):
             title = t.get('title', t.get('name', 'Unknown'))
             artist = t.get('artist', 'Unknown Artist')
             audio_url = t.get('url', '')
+            album_art = t.get('album_art', '')
             
             track, _ = RadioTrack.objects.get_or_create(
                 title=title,
                 artist=artist,
-                defaults={'audio_url': audio_url}
+                defaults={'audio_url': audio_url, 'album_art': album_art}
             )
             # If track exists but URL changed, update it
+            changed = False
             if track.audio_url != audio_url:
                 track.audio_url = audio_url
+                changed = True
+            if album_art and track.album_art != album_art:
+                track.album_art = album_art
+                changed = True
+            if changed:
                 track.save()
                 
             RadioPlaylistTrack.objects.create(
@@ -211,7 +306,8 @@ def api_playlist_data(request, playlist_id):
             track_list.append({
                 'title': pt.track.title,
                 'artist': pt.track.artist,
-                'url': pt.track.audio_url
+                'url': pt.track.audio_url,
+                'album_art': pt.track.album_art,
             })
             
         return JsonResponse({
