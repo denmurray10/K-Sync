@@ -93,7 +93,7 @@
             <div class="relative flex-1 min-h-0">
                 <div id="playlist-builder" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 space-y-2 bg-black/20">
                     <template x-for="(track, index) in currentPlaylist.tracks" :key="index">
-                        <div class="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 group">
+                        <div class="playlist-track-item flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 group">
                             <span class="text-[10px] font-mono text-slate-600 w-4" x-text="(index + 1).toString().padStart(2, '0')"></span>
                             <div class="w-10 h-10 bg-black border border-white/10 group-hover:border-secondary/50 overflow-hidden flex-shrink-0">
                                 <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
@@ -132,7 +132,7 @@
 
             <div class="relative flex-1 min-h-0">
                 <div id="library-list" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 bg-black/20 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 content-start auto-rows-max">
-                    <template x-for="track in filteredTracks" :key="track.fileId">
+                    <template x-for="track in filteredTracks" :key="`${track.fileId}-${catalogueRenderKey}`">
                         <div :data-url="track.url" :data-name="track.name" :data-title="track.title" :data-artist="track.artist" :data-album-art="track.album_art" :data-duration="track.duration"
                              class="library-item group p-2 bg-white/5 border border-white/10 cursor-grab hover:border-secondary transition-all flex flex-col gap-2">
                             <div class="w-full aspect-square bg-black border border-white/10 overflow-hidden">
@@ -269,6 +269,7 @@ function playlistApp() {
     return {
         activeTab: 'builder',
         tracks: [],
+        catalogueRenderKey: 0,
         searchQuery: '',
         groupQuery: '',
         currentPlaylist: { id: null, name: 'Untitled Playlist', tracks: [] },
@@ -305,6 +306,50 @@ function playlistApp() {
             setPanelHeight('playlist-builder', 22);
         },
 
+        rerenderCatalogue() {
+            this.catalogueRenderKey += 1;
+        },
+
+        finalizeCatalogueAfterDrag() {
+            this.$nextTick(() => {
+                this.rerenderCatalogue();
+                this.cleanupCatalogueArtifacts();
+            });
+        },
+
+        extractTrackPayloadFromDrop(evt) {
+            const sourceFromList = evt.from?.querySelectorAll('.library-item')?.[evt.oldIndex] || null;
+            const candidates = [evt.item, evt.clone, sourceFromList].filter(Boolean);
+            const readAttr = (key) => {
+                for (const el of candidates) {
+                    const value = el.getAttribute(`data-${key}`);
+                    if (value) return value;
+                }
+                return '';
+            };
+
+            return {
+                url: readAttr('url'),
+                name: readAttr('name'),
+                title: readAttr('title'),
+                artist: readAttr('artist'),
+                album_art: readAttr('album-art'),
+                duration: readAttr('duration')
+            };
+        },
+
+        cleanupCatalogueArtifacts() {
+            const library = document.getElementById('library-list');
+            if (!library) return;
+            library.querySelectorAll('.library-item').forEach((el) => {
+                const hasTrackData = !!(el.getAttribute('data-url') || el.getAttribute('data-name') || el.getAttribute('data-title'));
+                if (!hasTrackData) {
+                    el.remove();
+                }
+            });
+            library.querySelectorAll('.sortable-fallback, .sortable-ghost').forEach((el) => el.remove());
+        },
+
         async fetchB2Tracks() {
             try {
                 const resp = await fetch('/api/b2-tracks/');
@@ -337,18 +382,34 @@ function playlistApp() {
             // Builder Logic
             new Sortable(document.getElementById('library-list'), {
                 group: { name: 't', pull: 'clone', put: false },
-                sort: false
+                draggable: '.library-item',
+                sort: false,
+                removeCloneOnHide: true,
+                onEnd: () => {
+                    this.$nextTick(() => this.cleanupCatalogueArtifacts());
+                }
             });
 
             new Sortable(document.getElementById('playlist-builder'), {
-                group: 't',
+                group: { name: 't', pull: true, put: true },
                 animation: 150,
                 onAdd: (evt) => {
-                    const { url, name, title, artist, albumArt, duration } = evt.item.dataset;
-                    evt.item.remove();
-                    this.addTrack({ url, name, title, artist, album_art: albumArt, duration }, evt.newIndex);
+                    const payload = this.extractTrackPayloadFromDrop(evt);
+
+                    if (evt.item && evt.item.parentNode) {
+                        evt.item.parentNode.removeChild(evt.item);
+                    }
+
+                    if (payload.url || payload.title || payload.name) {
+                        this.addTrack(payload, evt.newIndex);
+                    }
+                    this.finalizeCatalogueAfterDrag();
                 },
                 onUpdate: (evt) => {
+                    if (!evt.item.classList.contains('playlist-track-item')) {
+                        if (evt.item && evt.item.parentNode) evt.item.parentNode.removeChild(evt.item);
+                        return;
+                    }
                     const item = this.currentPlaylist.tracks.splice(evt.oldIndex, 1)[0];
                     this.currentPlaylist.tracks.splice(evt.newIndex, 0, item);
                 }
@@ -380,10 +441,16 @@ function playlistApp() {
         },
 
         addTrack(track, index = null) {
+            const computedTitle = track.title || (track.name ? track.name.replace(/\.[^/.]+$/, "") : '');
+            const computedUrl = track.url || '';
+            const computedArtist = track.artist || '';
+
+            if (!computedUrl && !computedTitle) return;
+
             const newTrack = {
-                title: track.title || (track.name ? track.name.replace(/\.[^/.]+$/, "") : 'New Track'),
-                artist: track.artist || 'Unknown Artist',
-                url: track.url,
+                title: computedTitle || 'New Track',
+                artist: computedArtist || 'Unknown Artist',
+                url: computedUrl,
                 album_art: track.album_art || '',
                 duration: track.duration || '3:00'
             };
