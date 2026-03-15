@@ -40,15 +40,17 @@
         body { zoom: 0.9; }
     </style>
 </head>
-<body class="bg-black text-white font-display min-h-screen flex flex-col overflow-hidden">
+<body class="bg-black text-white font-display min-h-screen flex flex-col overflow-hidden" x-data="playlistApp()">
 
 <!-- Header -->
+<div x-show="showPageHeader" style="display: none;">
 {% include 'core/header.html' %}
+</div>
 
-<main class="flex-1 flex flex-col overflow-hidden pt-20" x-data="playlistApp()">
+<main class="flex-1 flex flex-col overflow-hidden" :class="showPageHeader ? 'pt-20' : 'pt-0'">
     
     <!-- Tab Navigation -->
-    <div class="bg-surface border-b border-white/10 px-8 flex gap-8">
+    <div class="bg-surface border-b border-white/10 px-8 flex items-center gap-8">
         <button @click="switchTab('builder')" 
                 :class="activeTab === 'builder' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-white'"
                 class="py-4 text-[11px] font-black uppercase tracking-[0.2em] border-b-2 transition-all flex items-center gap-2">
@@ -59,10 +61,21 @@
                 class="py-4 text-[11px] font-black uppercase tracking-[0.2em] border-b-2 transition-all flex items-center gap-2">
             <span class="material-symbols-outlined text-sm">calendar_view_week</span> Weekly Scheduler
         </button>
+
+        <div x-show="activeTab === 'builder'" class="ml-auto py-2 relative flex items-center gap-2" style="display: none;">
+            <button @click="savePlaylist" class="h-8 bg-primary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Update/Save</button>
+            <button @click="assignToSchedule" class="h-8 bg-secondary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Assign To Schedule</button>
+            <button @click="showPageHeader = !showPageHeader"
+                    :class="showPageHeader ? 'border-secondary text-secondary' : 'border-white/20 text-slate-300'"
+                    class="h-8 w-8 border bg-black/40 hover:border-secondary hover:text-secondary transition-colors flex items-center justify-center">
+                <span class="material-symbols-outlined text-sm">settings</span>
+            </button>
+        </div>
     </div>
 
     <!-- TAB 1: BUILDER -->
-    <div x-show="activeTab === 'builder'" class="flex-1 flex overflow-hidden min-h-0">
+    <div x-show="activeTab === 'builder'" class="flex-1 flex flex-col overflow-hidden min-h-0">
+        <div class="flex-1 flex overflow-hidden min-h-0">
         <!-- LEFT PANEL: Playlist -->
         <div class="w-96 border-r border-white/10 flex flex-col bg-surface/50 min-h-0">
             <div class="p-4 border-b border-white/10 bg-surface">
@@ -71,9 +84,12 @@
                 </h2>
                 <input type="text" x-model="currentPlaylist.name" placeholder="PLAYLIST NAME"
                        class="mt-3 h-9 w-full bg-black/50 border border-white/10 px-3 text-sm font-black uppercase tracking-tight focus:border-primary outline-none">
-                <div class="mt-3 grid grid-cols-2 gap-2.5">
+                <div class="mt-3 grid grid-cols-3 gap-2.5">
                     <button @click="createNewPlaylist" class="h-9 bg-white/5 border border-white/10 px-3 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-sm">add_box</span> New
+                    </button>
+                    <button @click="clearPlaylist" class="h-9 bg-white/5 border border-white/10 px-3 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">ink_eraser</span> Clear
                     </button>
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" class="w-full h-9 bg-white/5 border border-white/10 px-3 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
@@ -85,15 +101,6 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <button @click="removeDuplicates" class="col-span-2 h-9 bg-white/5 border border-white/10 px-3 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-sm">content_cut</span> Remove Duplicates
-                    </button>
-                    <div class="col-span-2 h-8 border border-white/10 bg-black/40 px-3 flex items-center justify-between text-[9px] font-mono uppercase tracking-widest">
-                        <span class="text-slate-500">Save Status</span>
-                        <span :class="saveState === 'saving' ? 'text-secondary' : (saveState === 'saved' ? 'text-green-300' : (saveState === 'failed' ? 'text-red-400' : 'text-slate-500'))" x-text="saveStateLabel"></span>
-                    </div>
-                    <button @click="savePlaylist" class="col-span-2 h-9 bg-primary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Update/Save</button>
-                    <button @click="assignToSchedule" class="col-span-2 h-9 bg-secondary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Assign To Schedule</button>
                 </div>
             </div>
 
@@ -132,11 +139,27 @@
                 <h2 class="text-xs font-black uppercase tracking-widest text-secondary flex items-center gap-2">
                     <span class="material-symbols-outlined text-sm">library_music</span> Song Catalogue
                 </h2>
-                <div class="mt-3 relative">
-                    <input type="text" x-model="searchQuery" placeholder="Search tracks..."
-                           class="h-9 w-full bg-black/50 border border-white/10 px-3 text-[10px] font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase mb-2">
-                    <input type="text" x-model="groupQuery" placeholder="Group names..."
-                           class="h-9 w-full bg-black/50 border border-white/10 px-3 text-[10px] font-mono placeholder-primary focus:border-primary outline-none uppercase mt-1.5">
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                    <div class="space-y-1">
+                        <div class="h-8 border border-white/10 bg-black/40 px-2 flex items-center gap-2 overflow-x-auto no-scrollbar whitespace-nowrap">
+                            <span class="text-[9px] font-mono uppercase tracking-widest text-slate-500">Time</span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white" x-text="playlistTotalLabel"></span>
+                            <span class="text-white/20">|</span>
+                            <label class="text-[9px] font-mono uppercase tracking-widest text-slate-500">Slot</label>
+                            <input type="number" min="1" x-model.number="slotTargetMinutes" class="h-6 w-16 bg-black border border-white/10 px-2 text-[10px] font-mono text-white focus:border-secondary outline-none">
+                            <span :class="playlistRemainingSeconds >= 0 ? 'text-green-300' : 'text-red-400'" class="text-[10px] font-bold uppercase tracking-widest" x-text="playlistRemainingLabel"></span>
+                        </div>
+                        <input type="text" x-model="searchQuery" placeholder="Search tracks..."
+                               class="h-9 w-full bg-black/50 border border-white/10 px-3 text-[10px] font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="h-8 border border-white/10 bg-black/40 px-2 flex items-center justify-between">
+                            <span class="text-[9px] font-mono uppercase tracking-widest text-slate-500">Save Status</span>
+                            <span :class="saveState === 'saving' ? 'text-secondary' : (saveState === 'saved' ? 'text-green-300' : (saveState === 'failed' ? 'text-red-400' : 'text-slate-500'))" class="text-[10px] font-bold uppercase tracking-widest" x-text="saveStateLabel"></span>
+                        </div>
+                        <input type="text" x-model="groupQuery" placeholder="Group names..."
+                               class="h-9 w-full bg-black/50 border border-white/10 px-3 text-[10px] font-mono placeholder-primary focus:border-primary outline-none uppercase">
+                    </div>
                 </div>
             </div>
 
@@ -169,6 +192,7 @@
                 <div class="pointer-events-none absolute left-0 right-0 top-0 h-8 bg-gradient-to-b from-surface/95 to-transparent"></div>
                 <div class="pointer-events-none absolute left-0 right-0 bottom-0 h-10 bg-gradient-to-t from-black/90 to-transparent"></div>
             </div>
+        </div>
         </div>
     </div>
 
@@ -293,6 +317,7 @@
 function playlistApp() {
     return {
         activeTab: 'builder',
+        showPageHeader: false,
         tracks: [],
         catalogueRenderKey: 0,
         playlistRenderKey: 0,
@@ -310,6 +335,7 @@ function playlistApp() {
         undo: { visible: false, message: '', snapshot: null },
         undoTimeout: null,
         isPlaylistDropActive: false,
+        slotTargetMinutes: 60,
 
         async init() {
             await this.fetchB2Tracks();
@@ -383,6 +409,12 @@ function playlistApp() {
             library.querySelectorAll('.sortable-fallback, .sortable-ghost').forEach((el) => el.remove());
         },
 
+        cleanupPlaylistArtifacts() {
+            const playlist = document.getElementById('playlist-builder');
+            if (!playlist) return;
+            playlist.querySelectorAll('.playlist-track-item, .sortable-fallback, .sortable-ghost').forEach((el) => el.remove());
+        },
+
         async fetchB2Tracks() {
             try {
                 const resp = await fetch('/api/b2-tracks/');
@@ -409,6 +441,45 @@ function playlistApp() {
                 filtered = filtered.filter(t => (t.artist || '').toLowerCase().includes(g));
             }
             return filtered;
+        },
+
+        durationToSeconds(value) {
+            if (typeof value === 'number' && Number.isFinite(value)) return Math.max(0, value);
+            const raw = String(value || '').trim();
+            if (!raw) return 0;
+            const parts = raw.split(':').map((part) => parseInt(part, 10));
+            if (parts.some((part) => Number.isNaN(part))) return 0;
+            if (parts.length === 2) return Math.max(0, (parts[0] * 60) + parts[1]);
+            if (parts.length === 3) return Math.max(0, (parts[0] * 3600) + (parts[1] * 60) + parts[2]);
+            return 0;
+        },
+
+        formatSeconds(totalSeconds) {
+            const safe = Math.max(0, Math.floor(totalSeconds || 0));
+            const hours = Math.floor(safe / 3600);
+            const minutes = Math.floor((safe % 3600) / 60);
+            const seconds = safe % 60;
+            if (hours > 0) return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        },
+
+        get playlistTotalSeconds() {
+            return this.currentPlaylist.tracks.reduce((sum, track) => sum + this.durationToSeconds(track.duration), 0);
+        },
+
+        get playlistTotalLabel() {
+            return this.formatSeconds(this.playlistTotalSeconds);
+        },
+
+        get playlistRemainingSeconds() {
+            const targetSeconds = Math.max(1, parseInt(this.slotTargetMinutes || 0, 10)) * 60;
+            return targetSeconds - this.playlistTotalSeconds;
+        },
+
+        get playlistRemainingLabel() {
+            const remaining = this.playlistRemainingSeconds;
+            if (remaining >= 0) return `Remaining ${this.formatSeconds(remaining)}`;
+            return `Over ${this.formatSeconds(Math.abs(remaining))}`;
         },
 
         trackIdentity(track) {
@@ -587,6 +658,18 @@ function playlistApp() {
             if (this.currentPlaylist.tracks.length > 0 && !confirm('Discard current playlist and start new?')) return;
             this.currentPlaylist = { id: null, name: 'Untitled Playlist', tracks: [] };
             this.rerenderPlaylist();
+        },
+
+        clearPlaylist() {
+            if (!this.currentPlaylist.tracks.length) {
+                this.showToast('Playlist already empty');
+                return;
+            }
+            this.beginUndoWindow('Playlist cleared');
+            this.currentPlaylist.tracks = [];
+            this.rerenderPlaylist();
+            this.$nextTick(() => this.cleanupPlaylistArtifacts());
+            this.showToast('Playlist cleared');
         },
 
         assignToSchedule() {

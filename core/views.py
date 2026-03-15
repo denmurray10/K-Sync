@@ -27,8 +27,18 @@ from .models import (
     RadioTrack, RadioStationState, RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
 )
 
+def _staff_only_json(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'ok': False, 'error': 'Authentication required'}, status=403)
+    if not request.user.is_staff:
+        return JsonResponse({'ok': False, 'error': 'Staff access required'}, status=403)
+    return None
+
 def api_schedule_data(request):
     """Returns the weekly schedule grouped by day for the frontend."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
     schedules = RadioSchedule.objects.select_related('playlist').all()
     
     # Initialize days
@@ -58,13 +68,19 @@ def api_schedule_data(request):
         
     return JsonResponse(day_map)
 
+@login_required(login_url='/staff/login/')
 def playlist_manager(request):
     """Renders the Playlist Manager UI."""
+    if not request.user.is_staff:
+        return redirect('signups_login')
     playlists = RadioPlaylist.objects.all()
     return render(request, 'core/playlist_manager.html', {'playlists': playlists})
 
 def api_b2_tracks(request):
     """Lists files from Backblaze B2 bucket."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
     key_id = settings.B2_KEY_ID
     app_key = settings.B2_APPLICATION_KEY
     bucket_name = settings.B2_BUCKET_NAME
@@ -213,6 +229,9 @@ def api_b2_tracks(request):
 @require_POST
 def api_playlist_save(request):
     """Saves or updates a playlist and its tracks."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
     try:
         data = json.loads(request.body)
         playlist_id = data.get('id')
@@ -297,6 +316,9 @@ def api_playlist_save(request):
 @require_POST
 def api_schedule_save(request):
     """Saves a schedule entry."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
     try:
         data = json.loads(request.body)
         # We expect a list of schedule items for simplicity, or clear and replace
@@ -329,6 +351,9 @@ def api_schedule_save(request):
 
 def api_playlist_data(request, playlist_id):
     """Returns data for a specific playlist."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
     try:
         playlist = RadioPlaylist.objects.get(id=playlist_id)
         tracks = RadioPlaylistTrack.objects.filter(playlist=playlist).select_related('track')
@@ -361,6 +386,9 @@ def api_playlist_data(request, playlist_id):
 @require_POST
 def api_schedule_delete(request, schedule_id):
     """Deletes a schedule entry."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
     try:
         schedule = RadioSchedule.objects.get(id=schedule_id)
         schedule.delete()
