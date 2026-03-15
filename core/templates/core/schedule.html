@@ -452,8 +452,65 @@ function scheduleApp() {
     return {
         days,
         activeDay: todayKey,
-        scheduleData,
-        currentShow,
+        scheduleData: {}, // Start empty
+        currentShow: { name: 'K-Beats Radio', host: 'Auto DJ' },
+
+        async init() {
+            try {
+                const response = await fetch('/api/schedule-data/');
+                const data = await response.json();
+                
+                // If we got data, use it. Otherwise, fallback or handle error.
+                if (Object.keys(data).some(k => data[k].length > 0)) {
+                    this.scheduleData = data;
+                } else {
+                    console.warn("No schedule data returned from API.");
+                    // Optional: Load some default dummy data if needed
+                }
+                
+                this.updateLiveStatus();
+                // Refresh periodically
+                setInterval(() => this.updateLiveStatus(), 60000);
+            } catch (error) {
+                console.error("Failed to load schedule:", error);
+            }
+        },
+
+        updateLiveStatus() {
+            const now = new Date();
+            const kstOffset = 9 * 60;
+            const kstDate = new Date(now.getTime() + (kstOffset + now.getTimezoneOffset()) * 60000);
+            const todayIdx = kstDate.getDay();
+            const dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+            const todayK = dayNames[todayIdx];
+            const currentH = kstDate.getHours();
+            const currentM = kstDate.getMinutes();
+            const currentTimeStr = `${currentH.toString().padStart(2, '0')}:${currentM.toString().padStart(2, '0')}`;
+
+            if (!this.scheduleData[todayK]) return;
+
+            let foundLive = false;
+            const dayShows = this.scheduleData[todayK];
+            
+            for (let i = 0; i < dayShows.length; i++) {
+                const show = dayShows[i];
+                const nextShow = dayShows[i + 1];
+                
+                const startTime = show.time;
+                const endTime = nextShow ? nextShow.time : '24:00';
+
+                if (!foundLive && currentTimeStr >= startTime && currentTimeStr < endTime) {
+                    show.live = true;
+                    foundLive = true;
+                    this.currentShow = show;
+                    if (nextShow) nextShow.upcoming = true;
+                } else {
+                    show.live = false;
+                    show.upcoming = false;
+                }
+            }
+        },
+
         get activeDayLabel() {
             const d = this.days.find(d => d.key === this.activeDay);
             return d ? d.label.toUpperCase() + ' LINEUP' : '';

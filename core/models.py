@@ -421,3 +421,49 @@ class RadioStationState(models.Model):
 
     class Meta:
         verbose_name_plural = "Radio Station State"
+
+class RadioPlaylist(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    tracks = models.ManyToManyField(RadioTrack, through='RadioPlaylistTrack', related_name='playlists')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+class RadioPlaylistTrack(models.Model):
+    playlist = models.ForeignKey(RadioPlaylist, on_delete=models.CASCADE)
+    track = models.ForeignKey(RadioTrack, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.playlist.name} - {self.track.title} (#{self.order})"
+
+class RadioSchedule(models.Model):
+    DAY_CHOICES = (
+        ('MON', 'Monday'),
+        ('TUE', 'Tuesday'),
+        ('WED', 'Wednesday'),
+        ('THU', 'Thursday'),
+        ('FRI', 'Friday'),
+        ('SAT', 'Saturday'),
+        ('SUN', 'Sunday'),
+    )
+    day = models.CharField(max_length=3, choices=DAY_CHOICES)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    playlist = models.ForeignKey(RadioPlaylist, on_delete=models.CASCADE, related_name='schedules')
+    host = models.CharField(max_length=255, default='Auto DJ')
+    genre = models.CharField(max_length=50, default='MUSIC')
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['day', 'start_time']
+        verbose_name_plural = "Radio Schedules"
+
+    def __str__(self):
+        return f"{self.get_day_display()} {self.start_time}-{self.end_time}: {self.playlist.name}"

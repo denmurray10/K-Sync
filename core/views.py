@@ -16,13 +16,229 @@ from openai import OpenAI
 import bleach
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
+import base64
 from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, UserNotification, ClubInvitation, ClubLaunch, UserBadge,
-    RadioTrack, RadioStationState,
+    RadioTrack, RadioStationState, RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
 )
+
+def api_schedule_data(request):
+    """Returns the weekly schedule grouped by day for the frontend."""
+    schedules = RadioSchedule.objects.select_related('playlist').all()
+    
+    # Initialize days
+    day_map = {
+        'MON': [], 'TUE': [], 'WED': [], 'THU': [], 
+        'FRI': [], 'SAT': [], 'SUN': []
+    }
+    
+    for s in schedules:
+        day_map[s.day].append({
+            'id': s.id,
+            'time': s.start_time.strftime('%H:%M'),
+            'duration': f"Until {s.end_time.strftime('%H:%M')}",
+            'name': s.playlist.name,
+            'playlist_id': s.playlist.id,
+            'host': s.host,
+            'description': s.description or s.playlist.description,
+            'genre': s.genre,
+            'icon': 'graphic_eq' if s.genre == 'LIVE' else 'album',
+            'live': False,
+            'upcoming': False
+        })
+    
+    # Sort each day by time
+    for day in day_map:
+        day_map[day].sort(key=lambda x: x['time'])
+        
+    return JsonResponse(day_map)
+
+def playlist_manager(request):
+    """Renders the Playlist Manager UI."""
+    playlists = RadioPlaylist.objects.all()
+    return render(request, 'core/playlist_manager.html', {'playlists': playlists})
+
+def api_b2_tracks(request):
+    """Lists files from Backblaze B2 bucket."""
+    key_id = settings.B2_KEY_ID
+    app_key = settings.B2_APPLICATION_KEY
+    bucket_name = settings.B2_BUCKET_NAME
+    
+    if not all([key_id, app_key, bucket_name]):
+        return JsonResponse({'ok': False, 'error': 'B2 credentials missing'}, status=500)
+    
+    try:
+        # Auth
+        auth_string = 'Basic ' + base64.b64encode(f"{key_id}:{app_key}".encode('ascii')).decode('ascii')
+        auth_resp = requests.get('https://api.backblazeb2.com/b2api/v2/b2_authorize_account', headers={'Authorization': auth_string})
+        if auth_resp.status_code != 200:
+            return JsonResponse({'ok': False, 'error': f'B2 Auth Failed: {auth_resp.text}'}, status=auth_resp.status_code)
+            
+        auth_data = auth_resp.json()
+        token = auth_data['authorizationToken']
+        api_url = auth_data['apiUrl']
+        account_id = auth_data['accountId']
+        
+        # List Buckets to get ID
+        list_buckets_resp = requests.get(f"{api_url}/b2api/v2/b2_list_buckets?accountId={account_id}", headers={'Authorization': token})
+        if list_buckets_resp.status_code != 200:
+            return JsonResponse({'ok': False, 'error': f'B2 List Buckets Failed: {list_buckets_resp.text}'}, status=list_buckets_resp.status_code)
+            
+        buckets = list_buckets_resp.json().get('buckets', [])
+        bucket = next((b for b in buckets if b['bucketName'] == bucket_name), None)
+        
+        if not bucket:
+            return JsonResponse({'ok': False, 'error': f'Bucket "{bucket_name}" not found'}, status=404)
+            
+        # List Files
+        files_resp = requests.post(f"{api_url}/b2api/v2/b2_list_file_names", json={'bucketId': bucket['bucketId']}, headers={'Authorization': token})
+        if files_resp.status_code != 200:
+            return JsonResponse({'ok': False, 'error': f'B2 List Files Failed: {files_resp.text}'}, status=files_resp.status_code)
+            
+        files = files_resp.json().get('files', [])
+        
+        # Filter for audio files and format
+        tracks = []
+        for f in files:
+            name = f['fileName']
+            if name.lower().endswith(('.mp3', '.wav', '.m4a')):
+                download_url = f"{auth_data.get('downloadUrl')}/file/{bucket_name}/{name}"
+                tracks.append({
+                    'name': name,
+                    'url': download_url,
+                    'fileId': f['fileId']
+                })
+        
+        return JsonResponse({'ok': True, 'tracks': tracks})
+    except Exception as e:
+        logging.exception("B2 API Error")
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+@csrf_exempt
+@require_POST
+def api_playlist_save(request):
+    """Saves or updates a playlist and its tracks."""
+    try:
+        data = json.loads(request.body)
+        playlist_id = data.get('id')
+        name = data.get('name')
+        track_data = data.get('tracks', []) # List of {title, artist, audio_url}
+        
+        if not name:
+            return JsonResponse({'ok': False, 'error': 'Playlist name is required'}, status=400)
+            
+        if playlist_id:
+            playlist = RadioPlaylist.objects.get(id=playlist_id)
+            playlist.name = name
+            playlist.save()
+        else:
+            playlist = RadioPlaylist.objects.create(name=name)
+            
+        # Clear existing tracks and re-add in order
+        RadioPlaylistTrack.objects.filter(playlist=playlist).delete()
+        
+        for idx, t in enumerate(track_data):
+            # Get or create the RadioTrack first
+            title = t.get('title', t.get('name', 'Unknown'))
+            artist = t.get('artist', 'Unknown Artist')
+            audio_url = t.get('url', '')
+            
+            track, _ = RadioTrack.objects.get_or_create(
+                title=title,
+                artist=artist,
+                defaults={'audio_url': audio_url}
+            )
+            # If track exists but URL changed, update it
+            if track.audio_url != audio_url:
+                track.audio_url = audio_url
+                track.save()
+                
+            RadioPlaylistTrack.objects.create(
+                playlist=playlist,
+                track=track,
+                order=idx
+            )
+            
+        return JsonResponse({'ok': True, 'id': playlist.id})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+@csrf_exempt
+@require_POST
+def api_schedule_save(request):
+    """Saves a schedule entry."""
+    try:
+        data = json.loads(request.body)
+        # We expect a list of schedule items for simplicity, or clear and replace
+        # Radio.co style drag-to-calendar
+        day = data.get('day')
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+        playlist_id = data.get('playlist_id')
+        host = data.get('host', 'Auto DJ')
+        genre = data.get('genre', 'MUSIC')
+        
+        if not all([day, start_time, end_time, playlist_id]):
+            return JsonResponse({'ok': False, 'error': 'Missing required fields'}, status=400)
+            
+        playlist = RadioPlaylist.objects.get(id=playlist_id)
+        
+        # Check for overlaps (simplified for now)
+        RadioSchedule.objects.create(
+            day=day,
+            start_time=start_time,
+            end_time=end_time,
+            playlist=playlist,
+            host=host,
+            genre=genre
+        )
+        
+        return JsonResponse({'ok': True})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+def api_playlist_data(request, playlist_id):
+    """Returns data for a specific playlist."""
+    try:
+        playlist = RadioPlaylist.objects.get(id=playlist_id)
+        tracks = RadioPlaylistTrack.objects.filter(playlist=playlist).select_related('track')
+        
+        track_list = []
+        for pt in tracks:
+            track_list.append({
+                'title': pt.track.title,
+                'artist': pt.track.artist,
+                'url': pt.track.audio_url
+            })
+            
+        return JsonResponse({
+            'ok': True,
+            'playlist': {
+                'id': playlist.id,
+                'name': playlist.name,
+                'tracks': track_list
+            }
+        })
+    except RadioPlaylist.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'Playlist not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+@csrf_exempt
+@require_POST
+def api_schedule_delete(request, schedule_id):
+    """Deletes a schedule entry."""
+    try:
+        schedule = RadioSchedule.objects.get(id=schedule_id)
+        schedule.delete()
+        return JsonResponse({'ok': True})
+    except RadioSchedule.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'Schedule not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
 
 logger = logging.getLogger(__name__)
 

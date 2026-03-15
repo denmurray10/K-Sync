@@ -4,7 +4,24 @@ from .models import (
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, PreLaunchSignup, BlogArticle,
     RadioTrack, RadioStationState,
+    RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
 )
+
+class RadioPlaylistTrackInline(admin.TabularInline):
+    model = RadioPlaylistTrack
+    extra = 5
+    raw_id_fields = ('track',)
+
+@admin.register(RadioPlaylist)
+class RadioPlaylistAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at', 'updated_at')
+    inlines = [RadioPlaylistTrackInline]
+
+@admin.register(RadioSchedule)
+class RadioScheduleAdmin(admin.ModelAdmin):
+    list_display = ('day', 'start_time', 'end_time', 'playlist', 'host', 'genre')
+    list_filter = ('day', 'genre')
+    search_fields = ('playlist__name', 'host')
 
 
 class LivePollOptionInline(admin.TabularInline):

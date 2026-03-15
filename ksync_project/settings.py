@@ -181,4 +181,9 @@ PINTEREST_BOARD_ID = os.environ.get('PINTEREST_BOARD_ID', '')
 # ── Cloudinary (image CDN) ───────────────────────────────────────────────────
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'diuanqnce')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '285831974678743')
-CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', 'T12HgD1pZdFQZiWd7xl9KlRT4HA')
+
+# ── Backblaze B2 (Audio Storage) ─────────────────────────────────────────────
+B2_KEY_ID = os.environ.get('B2_KEY_ID', 'a2e0a74c71c2')
+B2_APPLICATION_KEY = os.environ.get('B2_APPLICATION_KEY', '003aca1366ecec133a01a611e2b26259e958c10129')
+B2_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME', 'StrayKids')
+B2_DOWNLOAD_URL = os.environ.get('B2_DOWNLOAD_URL', 'https://f003.backblazeb2.com')
