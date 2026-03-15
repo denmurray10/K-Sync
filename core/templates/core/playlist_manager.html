@@ -79,8 +79,13 @@
         <!-- LEFT PANEL: Playlist -->
         <div class="w-96 border-r border-white/10 flex flex-col bg-surface/50 min-h-0">
             <div class="p-4 border-b border-white/10 bg-surface">
-                <h2 class="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                <h2 class="text-xs font-black uppercase tracking-widest text-primary flex items-center justify-between gap-2">
+                    <span class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-sm">playlist_play</span> Playlist
+                    </span>
+                    <button @click="openAIModal" class="h-7 px-3 border border-secondary/50 bg-secondary/15 text-secondary text-[9px] font-bold uppercase tracking-widest hover:bg-secondary hover:text-black transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">auto_awesome</span> AI
+                    </button>
                 </h2>
                 <input type="text" x-model="currentPlaylist.name" placeholder="PLAYLIST NAME"
                        class="mt-3 h-9 w-full bg-black/50 border border-white/10 px-3 text-sm font-black uppercase tracking-tight focus:border-primary outline-none">
@@ -300,6 +305,59 @@
         </div>
     </div>
 
+    <div x-show="showAIModal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl" style="display: none;">
+        <div class="bg-surface border border-white/10 w-full max-w-lg p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-black uppercase tracking-tighter">AI Playlist Builder</h3>
+                <button @click="closeAIModal" class="text-slate-400 hover:text-white">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div x-show="aiStep === 1" class="space-y-2">
+                    <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest">How long is the set? (minutes)</label>
+                    <input type="number" min="5" max="360" x-model.number="aiForm.set_minutes" class="w-full bg-black border border-white/10 p-2 text-sm text-white">
+                </div>
+
+                <div x-show="aiStep === 2" class="space-y-2">
+                    <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest">What vibe do you want?</label>
+                    <select x-model="aiForm.vibe" class="w-full bg-black border border-white/10 p-2 text-sm text-white">
+                        <option value="energetic">Energetic</option>
+                        <option value="chill">Chill</option>
+                        <option value="hype">Hype</option>
+                        <option value="balanced">Balanced</option>
+                    </select>
+                </div>
+
+                <div x-show="aiStep === 3" class="space-y-2">
+                    <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest">Newer or older music?</label>
+                    <select x-model="aiForm.era" class="w-full bg-black border border-white/10 p-2 text-sm text-white">
+                        <option value="new">Newer</option>
+                        <option value="older">Older</option>
+                        <option value="mix">Mix</option>
+                    </select>
+                </div>
+
+                <div x-show="aiStep === 4" class="space-y-2">
+                    <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest">Familiarity level?</label>
+                    <select x-model="aiForm.familiarity" class="w-full bg-black border border-white/10 p-2 text-sm text-white">
+                        <option value="popular">Popular hits</option>
+                        <option value="deep-cuts">Deep cuts</option>
+                        <option value="mix">Mix</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-6">
+                <button @click="prevAIStep" :disabled="aiStep === 1" class="h-9 px-4 border border-white/10 text-[10px] font-bold uppercase tracking-widest disabled:opacity-40">Back</button>
+                <div class="text-[9px] font-mono text-slate-500 uppercase tracking-widest" x-text="`Step ${aiStep} of 4`"></div>
+                <button x-show="aiStep < 4" @click="nextAIStep" class="h-9 px-4 bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest">Next</button>
+                <button x-show="aiStep === 4" @click="generateAIPlaylist" :disabled="aiLoading" class="h-9 px-4 bg-secondary text-black text-[10px] font-bold uppercase tracking-widest disabled:opacity-50" x-text="aiLoading ? 'Generating...' : 'Generate Playlist'"></button>
+            </div>
+        </div>
+    </div>
+
     <div x-show="toast.visible" x-transition.opacity.duration.200ms class="fixed bottom-6 right-6 z-[70]" style="display: none;">
         <div class="bg-green-500/15 border border-green-400/60 text-green-200 px-4 py-2 text-[10px] font-bold uppercase tracking-widest shadow-[4px_4px_0px_#000000]" x-text="toast.message"></div>
     </div>
@@ -336,6 +394,10 @@ function playlistApp() {
         undoTimeout: null,
         isPlaylistDropActive: false,
         slotTargetMinutes: 60,
+        showAIModal: false,
+        aiStep: 1,
+        aiLoading: false,
+        aiForm: { set_minutes: 60, vibe: 'balanced', era: 'mix', familiarity: 'mix' },
 
         async init() {
             await this.fetchB2Tracks();
@@ -503,6 +565,56 @@ function playlistApp() {
             this.toastTimeout = setTimeout(() => {
                 this.toast.visible = false;
             }, 1800);
+        },
+
+        openAIModal() {
+            this.aiStep = 1;
+            this.aiLoading = false;
+            this.aiForm.set_minutes = this.slotTargetMinutes || 60;
+            this.showAIModal = true;
+        },
+
+        closeAIModal() {
+            this.showAIModal = false;
+            this.aiLoading = false;
+        },
+
+        nextAIStep() {
+            if (this.aiStep < 4) this.aiStep += 1;
+        },
+
+        prevAIStep() {
+            if (this.aiStep > 1) this.aiStep -= 1;
+        },
+
+        async generateAIPlaylist() {
+            this.aiLoading = true;
+            try {
+                const resp = await fetch('/api/playlist/ai-generate/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify(this.aiForm)
+                });
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.showToast(data.error || 'AI generation failed');
+                    this.aiLoading = false;
+                    return;
+                }
+
+                this.beginUndoWindow('AI playlist generated');
+                this.currentPlaylist.id = null;
+                this.currentPlaylist.name = data.playlist_name || 'AI Playlist';
+                this.currentPlaylist.tracks = data.tracks || [];
+                this.slotTargetMinutes = this.aiForm.set_minutes || this.slotTargetMinutes;
+                this.rerenderPlaylist();
+                this.showToast('AI playlist ready');
+                this.closeAIModal();
+            } catch (e) {
+                this.showToast('AI generation failed');
+            } finally {
+                this.aiLoading = false;
+            }
         },
 
         setSaveState(state, label) {

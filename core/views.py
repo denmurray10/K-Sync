@@ -14,6 +14,7 @@ from django.conf import settings
 import requests
 import urllib.parse
 import re
+import random
 from openai import OpenAI
 import bleach
 from django.shortcuts import get_object_or_404
@@ -381,6 +382,128 @@ def api_playlist_data(request, playlist_id):
         return JsonResponse({'ok': False, 'error': 'Playlist not found'}, status=404)
     except Exception as e:
         return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+@csrf_exempt
+@require_POST
+def api_playlist_ai_generate(request):
+    """Generates a playlist draft with DeepSeek from RadioTrack records."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+
+    try:
+        payload = json.loads(request.body or '{}')
+    except Exception:
+        payload = {}
+
+    set_minutes = int(payload.get('set_minutes') or 60)
+    set_minutes = max(5, min(360, set_minutes))
+    vibe = (payload.get('vibe') or 'balanced').strip().lower()
+    era = (payload.get('era') or 'mix').strip().lower()
+    familiarity = (payload.get('familiarity') or 'mix').strip().lower()
+
+    track_qs = RadioTrack.objects.exclude(audio_url='').exclude(audio_url__isnull=True)
+    if era == 'new':
+        track_qs = track_qs.order_by('-created_at')
+    elif era == 'older':
+        track_qs = track_qs.order_by('created_at')
+    else:
+        track_qs = track_qs.order_by('-created_at')
+
+    candidate_tracks = list(track_qs[:350])
+    if not candidate_tracks:
+        return JsonResponse({'ok': False, 'error': 'No tracks available for AI generation.'}, status=400)
+
+    target_seconds = set_minutes * 60
+    candidate_lines = [
+        f"{t.id}|{t.title}|{t.artist}|{t.duration_seconds or 180}|{t.duration or '3:00'}"
+        for t in candidate_tracks
+    ]
+
+    ai_prompt = (
+        "Build a K-pop radio playlist from the provided candidates only.\n"
+        f"Target duration: about {set_minutes} minutes ({target_seconds} seconds).\n"
+        f"Vibe: {vibe}. Era preference: {era}. Familiarity: {familiarity}.\n"
+        "Return STRICT JSON only in this shape: "
+        "{\"name\":\"...\",\"track_ids\":[1,2,3]}\n"
+        "Rules: Use only listed IDs, avoid duplicates, keep coherent flow, and aim near target duration.\n\n"
+        "Candidates (id|title|artist|duration_seconds|duration):\n"
+        + "\n".join(candidate_lines)
+    )
+
+    selected_ids = []
+    playlist_name = f"AI {set_minutes}min {vibe.title()} Set"
+
+    try:
+        ai_text = _chat(ai_prompt, system="You are a precise K-pop radio playlist programmer.")
+        json_match = re.search(r'\{[\s\S]*\}', ai_text)
+        if json_match:
+            obj = json.loads(json_match.group(0))
+            if isinstance(obj.get('name'), str) and obj.get('name').strip():
+                playlist_name = obj.get('name').strip()[:120]
+            raw_ids = obj.get('track_ids') or []
+            selected_ids = [int(i) for i in raw_ids if str(i).isdigit()]
+    except Exception:
+        selected_ids = []
+
+    by_id = {t.id: t for t in candidate_tracks}
+    deduped_ids = []
+    seen = set()
+    for track_id in selected_ids:
+        if track_id in by_id and track_id not in seen:
+            deduped_ids.append(track_id)
+            seen.add(track_id)
+
+    # fallback if AI produced nothing usable
+    if not deduped_ids:
+        pool = candidate_tracks[:]
+        random.shuffle(pool)
+        total = 0
+        for track in pool:
+            if total >= target_seconds:
+                break
+            deduped_ids.append(track.id)
+            total += (track.duration_seconds or 180)
+
+    final_ids = []
+    total_seconds = 0
+    for track_id in deduped_ids:
+        track = by_id.get(track_id)
+        if not track:
+            continue
+        seconds = track.duration_seconds or 180
+        if total_seconds < target_seconds or total_seconds < (target_seconds - 120):
+            final_ids.append(track_id)
+            total_seconds += seconds
+        elif total_seconds <= (target_seconds + 120):
+            final_ids.append(track_id)
+            total_seconds += seconds
+            break
+
+    if not final_ids:
+        final_ids = deduped_ids[:10]
+
+    tracks = []
+    for track_id in final_ids:
+        track = by_id.get(track_id)
+        if not track:
+            continue
+        tracks.append({
+            'title': track.title,
+            'artist': track.artist,
+            'url': track.audio_url,
+            'album_art': track.album_art,
+            'duration': track.duration or '3:00',
+            'duration_seconds': track.duration_seconds or 180,
+        })
+
+    return JsonResponse({
+        'ok': True,
+        'playlist_name': playlist_name,
+        'tracks': tracks,
+        'target_minutes': set_minutes,
+        'total_seconds': sum(t.get('duration_seconds', 0) for t in tracks),
+    })
 
 @csrf_exempt
 @require_POST
