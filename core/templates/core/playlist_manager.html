@@ -63,25 +63,38 @@
 
     <!-- TAB 1: BUILDER -->
     <div x-show="activeTab === 'builder'" class="flex-1 flex overflow-hidden min-h-0">
-        <!-- LEFT PANEL: Track Library -->
-        <div class="w-80 border-r border-white/10 flex flex-col bg-surface/50 min-h-0">
+        <!-- LEFT PANEL: Playlist -->
+        <div class="w-96 border-r border-white/10 flex flex-col bg-surface/50 min-h-0">
             <div class="p-4 border-b border-white/10 bg-surface">
-                <h2 class="text-xs font-black uppercase tracking-widest text-secondary flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">cloud</span> Media Library
+                <h2 class="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">playlist_play</span> Playlist
                 </h2>
-                <div class="mt-4 relative">
-                    <input type="text" x-model="searchQuery" placeholder="Search B2 tracks..."
-                           class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase mb-2">
-                    <input type="text" x-model="groupQuery" placeholder="Group names..."
-                           class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-primary focus:border-primary outline-none uppercase mt-1.5">
+                <input type="text" x-model="currentPlaylist.name" placeholder="PLAYLIST NAME"
+                       class="mt-3 w-full bg-black/50 border border-white/10 px-3 py-2 text-sm font-black uppercase tracking-tight focus:border-primary outline-none">
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                    <button @click="createNewPlaylist" class="bg-white/5 border border-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">add_box</span> New
+                    </button>
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="w-full bg-white/5 border border-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">folder_open</span> Load
+                        </button>
+                        <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-64 bg-surface border border-white/10 shadow-2xl z-50 py-2">
+                            {% for p in playlists %}
+                            <button @click="loadPlaylist({{ p.id }}); open = false" class="w-full text-left px-4 py-2 text-[10px] font-bold uppercase hover:bg-primary hover:text-black transition-colors">{{ p.name }}</button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button @click="savePlaylist" class="col-span-2 bg-primary text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Update/Save</button>
+                    <button @click="assignToSchedule" class="col-span-2 bg-secondary text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Assign To Schedule</button>
                 </div>
             </div>
-            
+
             <div class="relative flex-1 min-h-0">
-                <div id="library-list" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-2 space-y-2">
-                    <template x-for="track in filteredTracks" :key="track.fileId">
-                        <div :data-url="track.url" :data-name="track.name" :data-artist="track.artist" :data-album-art="track.album_art"
-                             class="library-item group flex items-center gap-3 p-3 bg-white/5 border border-white/10 cursor-grab hover:border-secondary transition-all">
+                <div id="playlist-builder" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 space-y-2 bg-black/20">
+                    <template x-for="(track, index) in currentPlaylist.tracks" :key="index">
+                        <div class="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 group">
+                            <span class="text-[10px] font-mono text-slate-600 w-4" x-text="(index + 1).toString().padStart(2, '0')"></span>
                             <div class="w-10 h-10 bg-black border border-white/10 group-hover:border-secondary/50 overflow-hidden flex-shrink-0">
                                 <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
                                 <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
@@ -89,12 +102,12 @@
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-[10px] font-bold truncate uppercase" x-text="track.name"></p>
-                                <p class="text-[9px] font-mono text-slate-500 truncate uppercase" x-text="track.artist || 'Unknown Artist'"></p>
+                                <input type="text" x-model="track.title" class="bg-transparent border-none p-0 text-[10px] font-bold uppercase tracking-tight focus:ring-0 w-full">
+                                <input type="text" x-model="track.artist" class="bg-transparent border-none p-0 text-[9px] font-mono text-slate-500 uppercase tracking-widest focus:ring-0 w-full">
                             </div>
-                            <button @click="addTrack(track)" class="opacity-0 group-hover:opacity-100 bg-secondary/20 hover:bg-secondary text-secondary hover:text-black p-1 transition-all">
-                                <span class="material-symbols-outlined text-xs">add</span>
-                            </button>
+                            <p class="text-[9px] font-mono text-slate-400 uppercase w-12 text-right" x-text="track.duration || '3:00'"></p>
+                            <button @click="removeTrack(index)" class="text-slate-600 hover:text-red-500"><span class="material-symbols-outlined text-sm">delete</span></button>
+                            <span class="material-symbols-outlined text-slate-700 cursor-move">drag_indicator</span>
                         </div>
                     </template>
                 </div>
@@ -103,49 +116,39 @@
             </div>
         </div>
 
-        <!-- MIDDLE PANEL: Builder -->
+        <!-- RIGHT PANEL: Song Catalogue -->
         <div class="flex-1 flex flex-col min-h-0">
-            <div class="p-6 border-b border-white/10 bg-surface flex items-center justify-between">
-                <div>
-                    <input type="text" x-model="currentPlaylist.name" placeholder="PLAYLIST NAME" 
-                           class="bg-transparent text-2xl font-black border-none focus:ring-0 uppercase tracking-tighter w-full">
-                </div>
-                <div class="flex gap-3">
-                    <button @click="createNewPlaylist" class="bg-white/5 border border-white/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm">add_box</span> New
-                    </button>
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="bg-white/5 border border-white/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">folder_open</span> Load
-                        </button>
-                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-64 bg-surface border border-white/10 shadow-2xl z-50 py-2">
-                            {% for p in playlists %}
-                            <button @click="loadPlaylist({{ p.id }}); open = false" class="w-full text-left px-4 py-2 text-[10px] font-bold uppercase hover:bg-primary hover:text-black transition-colors">{{ p.name }}</button>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <button @click="savePlaylist" class="bg-primary text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Update/Save</button>
-                    <button @click="assignToSchedule" class="bg-secondary text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Assign To Schedule</button>
+            <div class="p-4 border-b border-white/10 bg-surface">
+                <h2 class="text-xs font-black uppercase tracking-widest text-secondary flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">library_music</span> Song Catalogue
+                </h2>
+                <div class="mt-4 relative">
+                    <input type="text" x-model="searchQuery" placeholder="Search tracks..."
+                           class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase mb-2">
+                    <input type="text" x-model="groupQuery" placeholder="Group names..."
+                           class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-primary focus:border-primary outline-none uppercase mt-1.5">
                 </div>
             </div>
 
             <div class="relative flex-1 min-h-0">
-                <div id="playlist-builder" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-6 space-y-3 bg-black/20">
-                    <template x-for="(track, index) in currentPlaylist.tracks" :key="index">
-                        <div class="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/10 group">
-                            <span class="text-[10px] font-mono text-slate-600 w-4" x-text="(index + 1).toString().padStart(2, '0')"></span>
-                            <div class="w-10 h-10 bg-black border border-white/10 overflow-hidden flex-shrink-0">
+                <div id="library-list" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 bg-black/20 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 content-start auto-rows-max">
+                    <template x-for="track in filteredTracks" :key="track.fileId">
+                        <div :data-url="track.url" :data-name="track.name" :data-title="track.title" :data-artist="track.artist" :data-album-art="track.album_art" :data-duration="track.duration"
+                             class="library-item group p-2 bg-white/5 border border-white/10 cursor-grab hover:border-secondary transition-all flex flex-col gap-2">
+                            <div class="w-full aspect-square bg-black border border-white/10 overflow-hidden">
                                 <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
                                 <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
                                     <span class="material-symbols-outlined text-sm text-slate-500">music_note</span>
                                 </div>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <input type="text" x-model="track.title" class="bg-transparent border-none p-0 text-sm font-bold uppercase tracking-tight focus:ring-0 w-full">
-                                <input type="text" x-model="track.artist" class="bg-transparent border-none p-0 text-[10px] font-mono text-slate-500 uppercase tracking-widest focus:ring-0 w-full">
+                            <div class="min-w-0">
+                                <p class="text-[10px] font-bold truncate uppercase" x-text="track.title || track.name"></p>
+                                <p class="text-[9px] font-mono text-slate-500 truncate uppercase" x-text="track.artist || 'Unknown Artist'"></p>
+                                <p class="text-[9px] font-mono text-slate-400 uppercase" x-text="track.duration || '3:00'"></p>
                             </div>
-                            <button @click="removeTrack(index)" class="text-slate-600 hover:text-red-500"><span class="material-symbols-outlined text-sm">delete</span></button>
-                            <span class="material-symbols-outlined text-slate-700 cursor-move">drag_indicator</span>
+                            <button @click="addTrack(track)" class="mt-auto bg-secondary/20 hover:bg-secondary text-secondary hover:text-black p-1 transition-all self-start">
+                                <span class="material-symbols-outlined text-xs">add</span>
+                            </button>
                         </div>
                     </template>
                 </div>
@@ -321,7 +324,7 @@ function playlistApp() {
             let filtered = this.tracks;
             if (this.searchQuery) {
                 const q = this.searchQuery.toLowerCase();
-                filtered = filtered.filter(t => t.name.toLowerCase().includes(q));
+                filtered = filtered.filter(t => ((t.title || t.name || '').toLowerCase().includes(q)));
             }
             if (this.groupQuery) {
                 const g = this.groupQuery.toLowerCase();
@@ -341,9 +344,9 @@ function playlistApp() {
                 group: 't',
                 animation: 150,
                 onAdd: (evt) => {
-                    const { url, name, artist, albumArt } = evt.item.dataset;
+                    const { url, name, title, artist, albumArt, duration } = evt.item.dataset;
                     evt.item.remove();
-                    this.addTrack({ url, name, artist, album_art: albumArt }, evt.newIndex);
+                    this.addTrack({ url, name, title, artist, album_art: albumArt, duration }, evt.newIndex);
                 },
                 onUpdate: (evt) => {
                     const item = this.currentPlaylist.tracks.splice(evt.oldIndex, 1)[0];
@@ -381,7 +384,8 @@ function playlistApp() {
                 title: track.title || (track.name ? track.name.replace(/\.[^/.]+$/, "") : 'New Track'),
                 artist: track.artist || 'Unknown Artist',
                 url: track.url,
-                album_art: track.album_art || ''
+                album_art: track.album_art || '',
+                duration: track.duration || '3:00'
             };
             if (index !== null) {
                 this.currentPlaylist.tracks.splice(index, 0, newTrack);

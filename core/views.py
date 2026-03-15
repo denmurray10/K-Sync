@@ -130,7 +130,7 @@ def api_b2_tracks(request):
 
         metadata_by_title = {}
         metadata_by_filename = {}
-        for radio_track in RadioTrack.objects.all().only('title', 'artist', 'album_art', 'audio_url'):
+        for radio_track in RadioTrack.objects.all().only('title', 'artist', 'album_art', 'audio_url', 'duration', 'duration_seconds'):
             title_key = normalize(radio_track.title)
             if title_key and title_key not in metadata_by_title:
                 metadata_by_title[title_key] = radio_track
@@ -179,6 +179,8 @@ def api_b2_tracks(request):
             ).strip()
 
             album_art = (metadata.album_art if metadata else '') or default_album_art
+            duration = (metadata.duration if metadata else '') or '3:00'
+            duration_seconds = (metadata.duration_seconds if metadata else 0) or 180
             encoded_name = urllib.parse.quote(file_name, safe='/')
             download_url = f"{auth_data.get('downloadUrl')}/file/{bucket_name}/{encoded_name}"
 
@@ -196,6 +198,8 @@ def api_b2_tracks(request):
                 'title': parsed_title,
                 'artist': artist,
                 'album_art': album_art,
+                'duration': duration,
+                'duration_seconds': duration_seconds,
                 'url': download_url,
                 'fileId': f['fileId']
             })
@@ -213,7 +217,22 @@ def api_playlist_save(request):
         data = json.loads(request.body)
         playlist_id = data.get('id')
         name = data.get('name')
-        track_data = data.get('tracks', []) # List of {title, artist, url, album_art}
+        track_data = data.get('tracks', []) # List of {title, artist, url, album_art, duration}
+
+        def parse_duration_seconds(value):
+            if isinstance(value, int):
+                return max(0, value)
+            if not value:
+                return 180
+            try:
+                parts = str(value).split(':')
+                if len(parts) != 2:
+                    return 180
+                mins = int(parts[0])
+                secs = int(parts[1])
+                return max(0, mins * 60 + secs)
+            except Exception:
+                return 180
         
         if not name:
             return JsonResponse({'ok': False, 'error': 'Playlist name is required'}, status=400)
@@ -234,11 +253,18 @@ def api_playlist_save(request):
             artist = t.get('artist', 'Unknown Artist')
             audio_url = t.get('url', '')
             album_art = t.get('album_art', '')
+            duration = t.get('duration', '3:00')
+            duration_seconds = t.get('duration_seconds', parse_duration_seconds(duration))
             
             track, _ = RadioTrack.objects.get_or_create(
                 title=title,
                 artist=artist,
-                defaults={'audio_url': audio_url, 'album_art': album_art}
+                defaults={
+                    'audio_url': audio_url,
+                    'album_art': album_art,
+                    'duration': duration,
+                    'duration_seconds': duration_seconds,
+                }
             )
             # If track exists but URL changed, update it
             changed = False
@@ -247,6 +273,12 @@ def api_playlist_save(request):
                 changed = True
             if album_art and track.album_art != album_art:
                 track.album_art = album_art
+                changed = True
+            if duration and track.duration != duration:
+                track.duration = duration
+                changed = True
+            if isinstance(duration_seconds, int) and track.duration_seconds != duration_seconds:
+                track.duration_seconds = duration_seconds
                 changed = True
             if changed:
                 track.save()
@@ -308,6 +340,8 @@ def api_playlist_data(request, playlist_id):
                 'artist': pt.track.artist,
                 'url': pt.track.audio_url,
                 'album_art': pt.track.album_art,
+                'duration': pt.track.duration,
+                'duration_seconds': pt.track.duration_seconds,
             })
             
         return JsonResponse({
