@@ -852,6 +852,7 @@ function playlistApp() {
                 const data = await resp.json();
                 if (data.ok) {
                     this.currentPlaylist.id = data.id;
+                    await this.fetchSchedules();
                     this.setSaveState('saved', 'Saved');
                     this.showToast('Playlist saved');
                 } else {
