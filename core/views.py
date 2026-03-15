@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import timedelta
 from django.db import models
 from django.utils import timezone
 from django.shortcuts import render, redirect
@@ -402,86 +403,108 @@ def api_playlist_ai_generate(request):
     era = (payload.get('era') or 'mix').strip().lower()
     familiarity = (payload.get('familiarity') or 'mix').strip().lower()
 
-    track_qs = RadioTrack.objects.exclude(audio_url='').exclude(audio_url__isnull=True)
+    track_qs = (
+        RadioTrack.objects
+        .exclude(audio_url='')
+        .exclude(audio_url__isnull=True)
+        .exclude(duration_seconds__isnull=True)
+    )
+
+    now = timezone.now()
+    recent_cutoff = now - timedelta(days=730)
+
     if era == 'new':
-        track_qs = track_qs.order_by('-created_at')
+        track_qs = track_qs.filter(created_at__gte=recent_cutoff).order_by('-created_at')
     elif era == 'older':
-        track_qs = track_qs.order_by('created_at')
+        track_qs = track_qs.filter(created_at__lt=recent_cutoff).order_by('created_at')
     else:
         track_qs = track_qs.order_by('-created_at')
 
-    candidate_tracks = list(track_qs[:350])
+    candidate_tracks = list(track_qs[:450])
     if not candidate_tracks:
         return JsonResponse({'ok': False, 'error': 'No tracks available for AI generation.'}, status=400)
 
     target_seconds = set_minutes * 60
-    candidate_lines = [
-        f"{t.id}|{t.title}|{t.artist}|{t.duration_seconds or 180}|{t.duration or '3:00'}"
-        for t in candidate_tracks
-    ]
+    # deterministic familiarity proxy prefilter (no explicit popularity field in DB)
+    if familiarity == 'popular':
+        candidate_tracks = candidate_tracks[:220]
+    elif familiarity == 'deep-cuts':
+        candidate_tracks = candidate_tracks[len(candidate_tracks)//3:]
 
-    ai_prompt = (
-        "Build a K-pop radio playlist from the provided candidates only.\n"
-        f"Target duration: about {set_minutes} minutes ({target_seconds} seconds).\n"
-        f"Vibe: {vibe}. Era preference: {era}. Familiarity: {familiarity}.\n"
-        "Return STRICT JSON only in this shape: "
-        "{\"name\":\"...\",\"track_ids\":[1,2,3]}\n"
-        "Rules: Use only listed IDs, avoid duplicates, keep coherent flow, and aim near target duration.\n\n"
-        "Candidates (id|title|artist|duration_seconds|duration):\n"
-        + "\n".join(candidate_lines)
-    )
+    # vibe-based duration preference (deterministic scoring)
+    desired_seconds = {
+        'energetic': 190,
+        'hype': 180,
+        'chill': 225,
+        'balanced': 205,
+    }.get(vibe, 205)
 
-    selected_ids = []
+    scored_pool = []
+    for track in candidate_tracks:
+        seconds = track.duration_seconds or 180
+        if seconds < 90 or seconds > 480:
+            continue
+        score = abs(seconds - desired_seconds)
+        scored_pool.append((score, random.random(), track))
+
+    scored_pool.sort(key=lambda x: (x[0], x[1]))
+    ordered_pool = [t for _, _, t in scored_pool]
+
+    # deterministic time-fit selection (AI will order flow afterwards)
+    selected_tracks = []
+    total_seconds = 0
+    for track in ordered_pool:
+        seconds = track.duration_seconds or 180
+        if total_seconds + seconds <= target_seconds + 120:
+            selected_tracks.append(track)
+            total_seconds += seconds
+        if total_seconds >= target_seconds - 60:
+            break
+
+    if not selected_tracks:
+        selected_tracks = ordered_pool[:max(1, min(15, len(ordered_pool)))]
+
+    by_id = {t.id: t for t in selected_tracks}
     playlist_name = f"AI {set_minutes}min {vibe.title()} Set"
 
+    # Use DeepSeek only to order the preselected subset for better flow
+    flow_candidates = [
+        f"{t.id}|{t.title}|{t.artist}|{t.duration_seconds or 180}|{t.duration or '3:00'}"
+        for t in selected_tracks
+    ]
+    flow_prompt = (
+        "Order these preselected tracks for best radio flow."
+        f" Vibe: {vibe}. Era: {era}. Familiarity: {familiarity}."
+        " Return STRICT JSON only: {\"name\":\"...\",\"track_ids\":[...]}"
+        " using only provided IDs with no duplicates.\n\n"
+        "Candidates (id|title|artist|duration_seconds|duration):\n"
+        + "\n".join(flow_candidates)
+    )
+
+    final_ids = [t.id for t in selected_tracks]
     try:
-        ai_text = _chat(ai_prompt, system="You are a precise K-pop radio playlist programmer.")
+        ai_text = _chat(flow_prompt, system="You are a precise K-pop radio programmer focused on sequencing.")
         json_match = re.search(r'\{[\s\S]*\}', ai_text)
         if json_match:
             obj = json.loads(json_match.group(0))
             if isinstance(obj.get('name'), str) and obj.get('name').strip():
                 playlist_name = obj.get('name').strip()[:120]
-            raw_ids = obj.get('track_ids') or []
-            selected_ids = [int(i) for i in raw_ids if str(i).isdigit()]
+            ai_ids = [int(i) for i in (obj.get('track_ids') or []) if str(i).isdigit()]
+            deduped = []
+            seen = set()
+            for track_id in ai_ids:
+                if track_id in by_id and track_id not in seen:
+                    deduped.append(track_id)
+                    seen.add(track_id)
+            # append any missing tracks to preserve selection completeness
+            for track in selected_tracks:
+                if track.id not in seen:
+                    deduped.append(track.id)
+                    seen.add(track.id)
+            if deduped:
+                final_ids = deduped
     except Exception:
-        selected_ids = []
-
-    by_id = {t.id: t for t in candidate_tracks}
-    deduped_ids = []
-    seen = set()
-    for track_id in selected_ids:
-        if track_id in by_id and track_id not in seen:
-            deduped_ids.append(track_id)
-            seen.add(track_id)
-
-    # fallback if AI produced nothing usable
-    if not deduped_ids:
-        pool = candidate_tracks[:]
-        random.shuffle(pool)
-        total = 0
-        for track in pool:
-            if total >= target_seconds:
-                break
-            deduped_ids.append(track.id)
-            total += (track.duration_seconds or 180)
-
-    final_ids = []
-    total_seconds = 0
-    for track_id in deduped_ids:
-        track = by_id.get(track_id)
-        if not track:
-            continue
-        seconds = track.duration_seconds or 180
-        if total_seconds < target_seconds or total_seconds < (target_seconds - 120):
-            final_ids.append(track_id)
-            total_seconds += seconds
-        elif total_seconds <= (target_seconds + 120):
-            final_ids.append(track_id)
-            total_seconds += seconds
-            break
-
-    if not final_ids:
-        final_ids = deduped_ids[:10]
+        pass
 
     tracks = []
     for track_id in final_ids:
