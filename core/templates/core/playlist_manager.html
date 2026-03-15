@@ -70,13 +70,13 @@
                     <span class="material-symbols-outlined text-sm">playlist_play</span> Playlist
                 </h2>
                 <input type="text" x-model="currentPlaylist.name" placeholder="PLAYLIST NAME"
-                       class="mt-3 w-full bg-black/50 border border-white/10 px-3 py-2 text-sm font-black uppercase tracking-tight focus:border-primary outline-none">
-                <div class="mt-3 grid grid-cols-2 gap-2">
-                    <button @click="createNewPlaylist" class="bg-white/5 border border-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                       class="mt-3 h-9 w-full bg-black/50 border border-white/10 px-3 text-sm font-black uppercase tracking-tight focus:border-primary outline-none">
+                <div class="mt-3 grid grid-cols-2 gap-2.5">
+                    <button @click="createNewPlaylist" class="h-9 bg-white/5 border border-white/10 px-3 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-sm">add_box</span> New
                     </button>
                     <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="w-full bg-white/5 border border-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                        <button @click="open = !open" class="w-full h-9 bg-white/5 border border-white/10 px-3 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
                             <span class="material-symbols-outlined text-sm">folder_open</span> Load
                         </button>
                         <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-64 bg-surface border border-white/10 shadow-2xl z-50 py-2">
@@ -85,8 +85,8 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <button @click="savePlaylist" class="col-span-2 bg-primary text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Update/Save</button>
-                    <button @click="assignToSchedule" class="col-span-2 bg-secondary text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Assign To Schedule</button>
+                    <button @click="savePlaylist" class="col-span-2 h-9 bg-primary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Update/Save</button>
+                    <button @click="assignToSchedule" class="col-span-2 h-9 bg-secondary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Assign To Schedule</button>
                 </div>
             </div>
 
@@ -122,11 +122,11 @@
                 <h2 class="text-xs font-black uppercase tracking-widest text-secondary flex items-center gap-2">
                     <span class="material-symbols-outlined text-sm">library_music</span> Song Catalogue
                 </h2>
-                <div class="mt-4 relative">
+                <div class="mt-3 relative">
                     <input type="text" x-model="searchQuery" placeholder="Search tracks..."
-                           class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase mb-2">
+                           class="h-9 w-full bg-black/50 border border-white/10 px-3 text-[10px] font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase mb-2">
                     <input type="text" x-model="groupQuery" placeholder="Group names..."
-                           class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-primary focus:border-primary outline-none uppercase mt-1.5">
+                           class="h-9 w-full bg-black/50 border border-white/10 px-3 text-[10px] font-mono placeholder-primary focus:border-primary outline-none uppercase mt-1.5">
                 </div>
             </div>
 
@@ -134,7 +134,9 @@
                 <div id="library-list" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 bg-black/20 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 content-start auto-rows-max">
                     <template x-for="track in filteredTracks" :key="`${track.fileId}-${catalogueRenderKey}`">
                         <div :data-url="track.url" :data-name="track.name" :data-title="track.title" :data-artist="track.artist" :data-album-art="track.album_art" :data-duration="track.duration"
-                             class="library-item group p-2 bg-white/5 border border-white/10 cursor-grab hover:border-secondary transition-all flex flex-col gap-2">
+                             :class="isTrackInPlaylist(track) ? 'border-green-500/90 shadow-[0_0_0_1px_rgba(34,197,94,0.35)]' : 'border-white/10 hover:border-secondary'"
+                             class="library-item group p-2 bg-white/5 border cursor-grab transition-all flex flex-col gap-2 relative overflow-hidden">
+                            <div x-show="isTrackInPlaylist(track)" class="pointer-events-none absolute inset-0 bg-green-400/10"></div>
                             <div class="w-full aspect-square bg-black border border-white/10 overflow-hidden">
                                 <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
                                 <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
@@ -376,6 +378,20 @@ function playlistApp() {
                 filtered = filtered.filter(t => (t.artist || '').toLowerCase().includes(g));
             }
             return filtered;
+        },
+
+        trackIdentity(track) {
+            const byUrl = (track.url || '').trim().toLowerCase();
+            if (byUrl) return byUrl;
+            const title = (track.title || track.name || '').trim().toLowerCase();
+            const artist = (track.artist || '').trim().toLowerCase();
+            return `${title}::${artist}`;
+        },
+
+        isTrackInPlaylist(track) {
+            const identity = this.trackIdentity(track);
+            if (!identity) return false;
+            return this.currentPlaylist.tracks.some((playlistTrack) => this.trackIdentity(playlistTrack) === identity);
         },
 
         initSortable() {
