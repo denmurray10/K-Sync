@@ -49,12 +49,12 @@
     
     <!-- Tab Navigation -->
     <div class="bg-surface border-b border-white/10 px-8 flex gap-8">
-        <button @click="activeTab = 'builder'" 
+        <button @click="switchTab('builder')" 
                 :class="activeTab === 'builder' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-white'"
                 class="py-4 text-[11px] font-black uppercase tracking-[0.2em] border-b-2 transition-all flex items-center gap-2">
             <span class="material-symbols-outlined text-sm">construction</span> Playlist Builder
         </button>
-        <button @click="activeTab = 'scheduler'" 
+        <button @click="switchTab('scheduler')" 
                 :class="activeTab === 'scheduler' ? 'border-secondary text-secondary' : 'border-transparent text-slate-500 hover:text-white'"
                 class="py-4 text-[11px] font-black uppercase tracking-[0.2em] border-b-2 transition-all flex items-center gap-2">
             <span class="material-symbols-outlined text-sm">calendar_view_week</span> Weekly Scheduler
@@ -62,45 +62,49 @@
     </div>
 
     <!-- TAB 1: BUILDER -->
-    <div x-show="activeTab === 'builder'" class="flex-1 flex overflow-hidden">
+    <div x-show="activeTab === 'builder'" class="flex-1 flex overflow-hidden min-h-0">
         <!-- LEFT PANEL: Track Library -->
-        <div class="w-80 border-r border-white/10 flex flex-col bg-surface/50">
+        <div class="w-80 border-r border-white/10 flex flex-col bg-surface/50 min-h-0">
             <div class="p-4 border-b border-white/10 bg-surface">
                 <h2 class="text-xs font-black uppercase tracking-widest text-secondary flex items-center gap-2">
                     <span class="material-symbols-outlined text-sm">cloud</span> Media Library
                 </h2>
                 <div class="mt-4 relative">
-                          <input type="text" x-model="searchQuery" placeholder="Search B2 tracks..." 
-                              class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase mb-2">
-                          <input type="text" x-model="groupQuery" placeholder="Group names..." 
-                              class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-primary focus:border-primary outline-none uppercase" style="margin-top: 6px;">
+                    <input type="text" x-model="searchQuery" placeholder="Search B2 tracks..."
+                           class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase mb-2">
+                    <input type="text" x-model="groupQuery" placeholder="Group names..."
+                           class="w-full bg-black/50 border border-white/10 px-3 py-2 text-xs font-mono placeholder-primary focus:border-primary outline-none uppercase mt-1.5">
                 </div>
             </div>
             
-            <div id="library-list" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
-                <template x-for="track in filteredTracks" :key="track.fileId">
-                    <div :data-url="track.url" :data-name="track.name" :data-artist="track.artist" :data-album-art="track.album_art"
-                         class="library-item group flex items-center gap-3 p-3 bg-white/5 border border-white/10 cursor-grab hover:border-secondary transition-all">
-                        <div class="w-10 h-10 bg-black border border-white/10 group-hover:border-secondary/50 overflow-hidden flex-shrink-0">
-                            <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
-                            <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
-                                <span class="material-symbols-outlined text-sm text-slate-500 group-hover:text-secondary">music_note</span>
+            <div class="relative flex-1 min-h-0">
+                <div id="library-list" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-2 space-y-2">
+                    <template x-for="track in filteredTracks" :key="track.fileId">
+                        <div :data-url="track.url" :data-name="track.name" :data-artist="track.artist" :data-album-art="track.album_art"
+                             class="library-item group flex items-center gap-3 p-3 bg-white/5 border border-white/10 cursor-grab hover:border-secondary transition-all">
+                            <div class="w-10 h-10 bg-black border border-white/10 group-hover:border-secondary/50 overflow-hidden flex-shrink-0">
+                                <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
+                                <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-sm text-slate-500 group-hover:text-secondary">music_note</span>
+                                </div>
                             </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[10px] font-bold truncate uppercase" x-text="track.name"></p>
+                                <p class="text-[9px] font-mono text-slate-500 truncate uppercase" x-text="track.artist || 'Unknown Artist'"></p>
+                            </div>
+                            <button @click="addTrack(track)" class="opacity-0 group-hover:opacity-100 bg-secondary/20 hover:bg-secondary text-secondary hover:text-black p-1 transition-all">
+                                <span class="material-symbols-outlined text-xs">add</span>
+                            </button>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-[10px] font-bold truncate uppercase" x-text="track.name"></p>
-                            <p class="text-[9px] font-mono text-slate-500 truncate uppercase" x-text="track.artist || 'Unknown Artist'"></p>
-                        </div>
-                        <button @click="addTrack(track)" class="opacity-0 group-hover:opacity-100 bg-secondary/20 hover:bg-secondary text-secondary hover:text-black p-1 transition-all">
-                            <span class="material-symbols-outlined text-xs">add</span>
-                        </button>
-                    </div>
-                </template>
+                    </template>
+                </div>
+                <div class="pointer-events-none absolute left-0 right-0 top-0 h-6 bg-gradient-to-b from-surface/95 to-transparent"></div>
+                <div class="pointer-events-none absolute left-0 right-0 bottom-0 h-8 bg-gradient-to-t from-surface/95 to-transparent"></div>
             </div>
         </div>
 
         <!-- MIDDLE PANEL: Builder -->
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1 flex flex-col min-h-0">
             <div class="p-6 border-b border-white/10 bg-surface flex items-center justify-between">
                 <div>
                     <input type="text" x-model="currentPlaylist.name" placeholder="PLAYLIST NAME" 
@@ -125,24 +129,28 @@
                 </div>
             </div>
 
-            <div id="playlist-builder" class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-3 bg-black/20">
-                <template x-for="(track, index) in currentPlaylist.tracks" :key="index">
-                    <div class="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/10 group">
-                        <span class="text-[10px] font-mono text-slate-600 w-4" x-text="(index + 1).toString().padStart(2, '0')"></span>
-                        <div class="w-10 h-10 bg-black border border-white/10 overflow-hidden flex-shrink-0">
-                            <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
-                            <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
-                                <span class="material-symbols-outlined text-sm text-slate-500">music_note</span>
+            <div class="relative flex-1 min-h-0">
+                <div id="playlist-builder" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-6 space-y-3 bg-black/20">
+                    <template x-for="(track, index) in currentPlaylist.tracks" :key="index">
+                        <div class="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/10 group">
+                            <span class="text-[10px] font-mono text-slate-600 w-4" x-text="(index + 1).toString().padStart(2, '0')"></span>
+                            <div class="w-10 h-10 bg-black border border-white/10 overflow-hidden flex-shrink-0">
+                                <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
+                                <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-sm text-slate-500">music_note</span>
+                                </div>
                             </div>
+                            <div class="flex-1 min-w-0">
+                                <input type="text" x-model="track.title" class="bg-transparent border-none p-0 text-sm font-bold uppercase tracking-tight focus:ring-0 w-full">
+                                <input type="text" x-model="track.artist" class="bg-transparent border-none p-0 text-[10px] font-mono text-slate-500 uppercase tracking-widest focus:ring-0 w-full">
+                            </div>
+                            <button @click="removeTrack(index)" class="text-slate-600 hover:text-red-500"><span class="material-symbols-outlined text-sm">delete</span></button>
+                            <span class="material-symbols-outlined text-slate-700 cursor-move">drag_indicator</span>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <input type="text" x-model="track.title" class="bg-transparent border-none p-0 text-sm font-bold uppercase tracking-tight focus:ring-0 w-full">
-                            <input type="text" x-model="track.artist" class="bg-transparent border-none p-0 text-[10px] font-mono text-slate-500 uppercase tracking-widest focus:ring-0 w-full">
-                        </div>
-                        <button @click="removeTrack(index)" class="text-slate-600 hover:text-red-500"><span class="material-symbols-outlined text-sm">delete</span></button>
-                        <span class="material-symbols-outlined text-slate-700 cursor-move">drag_indicator</span>
-                    </div>
-                </template>
+                    </template>
+                </div>
+                <div class="pointer-events-none absolute left-0 right-0 top-0 h-8 bg-gradient-to-b from-surface/95 to-transparent"></div>
+                <div class="pointer-events-none absolute left-0 right-0 bottom-0 h-10 bg-gradient-to-t from-black/90 to-transparent"></div>
             </div>
         </div>
     </div>
@@ -270,6 +278,28 @@ function playlistApp() {
             await this.fetchB2Tracks();
             await this.fetchSchedules();
             this.initSortable();
+            this.$nextTick(() => {
+                this.syncScrollPanelHeights();
+                window.addEventListener('resize', () => this.syncScrollPanelHeights());
+            });
+        },
+
+        switchTab(tab) {
+            this.activeTab = tab;
+            this.$nextTick(() => this.syncScrollPanelHeights());
+        },
+
+        syncScrollPanelHeights() {
+            const setPanelHeight = (id, bottomPadding = 16) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const rect = el.getBoundingClientRect();
+                const maxHeight = Math.max(180, Math.floor(window.innerHeight - rect.top - bottomPadding));
+                el.style.maxHeight = `${maxHeight}px`;
+            };
+
+            setPanelHeight('library-list', 18);
+            setPanelHeight('playlist-builder', 22);
         },
 
         async fetchB2Tracks() {
