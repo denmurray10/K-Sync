@@ -257,6 +257,7 @@
                                         </button>
                                     </div>
                                     <p class="text-[8px] font-mono text-white/40 uppercase mt-1" x-text="slot.time + ' - ' + slot.duration.replace('Until ', '')"></p>
+                                    <p class="text-[8px] font-mono uppercase mt-1" :class="getSlotFitClass(slot)" x-text="getSlotFitLabel(slot)"></p>
                                 </div>
                             </template>
                         </div>
@@ -821,6 +822,25 @@ function playlistApp() {
             return `left: ${left}px; width: ${width}px;`;
         },
 
+        getSlotFitDeltaSeconds(slot) {
+            const slotSeconds = Number(slot.slot_duration_seconds || 0);
+            const playlistSeconds = Number(slot.playlist_duration_seconds || 0);
+            return slotSeconds - playlistSeconds;
+        },
+
+        getSlotFitClass(slot) {
+            const delta = this.getSlotFitDeltaSeconds(slot);
+            if (delta < 0) return 'text-red-300';
+            if (delta <= 120) return 'text-emerald-300';
+            return 'text-amber-300';
+        },
+
+        getSlotFitLabel(slot) {
+            const delta = this.getSlotFitDeltaSeconds(slot);
+            if (delta < 0) return `Over ${this.formatSeconds(Math.abs(delta))}`;
+            return `Fit +${this.formatSeconds(delta)}`;
+        },
+
         async savePlaylist() {
             this.setSaveState('saving', 'Saving...');
             try {
@@ -855,21 +875,27 @@ function playlistApp() {
 
         async saveSchedule() {
             if (!this.newSchedule.playlist_id) return alert('Select a playlist first');
-            const resp = await fetch('/api/schedule/save/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-                body: JSON.stringify({
-                    day: this.activeDay,
-                    start_time: this.newSchedule.start,
-                    end_time: this.newSchedule.end,
-                    playlist_id: this.newSchedule.playlist_id,
-                    host: this.newSchedule.host
-                })
-            });
-            const data = await resp.json();
-            if (data.ok) {
-                this.showScheduleModal = false;
-                await this.fetchSchedules();
+            try {
+                const resp = await fetch('/api/schedule/save/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({
+                        day: this.activeDay,
+                        start_time: this.newSchedule.start,
+                        end_time: this.newSchedule.end,
+                        playlist_id: this.newSchedule.playlist_id,
+                        host: this.newSchedule.host
+                    })
+                });
+                const data = await resp.json();
+                if (data.ok) {
+                    this.showScheduleModal = false;
+                    await this.fetchSchedules();
+                } else {
+                    this.showToast(data.error || 'Could not save schedule');
+                }
+            } catch (e) {
+                this.showToast('Could not save schedule');
             }
         },
 

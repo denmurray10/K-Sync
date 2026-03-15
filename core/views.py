@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.db import models
 from django.utils import timezone
 from django.shortcuts import render, redirect
@@ -42,6 +42,14 @@ def api_schedule_data(request):
     if staff_check:
         return staff_check
     schedules = RadioSchedule.objects.select_related('playlist').all()
+    playlist_duration_map = {
+        item['playlist_id']: int(item['total_seconds'] or 0)
+        for item in (
+            RadioPlaylistTrack.objects
+            .values('playlist_id')
+            .annotate(total_seconds=models.Sum('track__duration_seconds'))
+        )
+    }
     
     # Initialize days
     day_map = {
@@ -50,12 +58,18 @@ def api_schedule_data(request):
     }
     
     for s in schedules:
+        start_seconds = (s.start_time.hour * 3600) + (s.start_time.minute * 60) + s.start_time.second
+        end_seconds = (s.end_time.hour * 3600) + (s.end_time.minute * 60) + s.end_time.second
+        slot_duration_seconds = max(0, end_seconds - start_seconds)
+        playlist_duration_seconds = playlist_duration_map.get(s.playlist.id, 0)
         day_map[s.day].append({
             'id': s.id,
             'time': s.start_time.strftime('%H:%M'),
             'duration': f"Until {s.end_time.strftime('%H:%M')}",
             'name': s.playlist.name,
             'playlist_id': s.playlist.id,
+            'slot_duration_seconds': slot_duration_seconds,
+            'playlist_duration_seconds': playlist_duration_seconds,
             'host': s.host,
             'description': s.description or s.playlist.description,
             'genre': s.genre,
@@ -334,10 +348,31 @@ def api_schedule_save(request):
         
         if not all([day, start_time, end_time, playlist_id]):
             return JsonResponse({'ok': False, 'error': 'Missing required fields'}, status=400)
+
+        try:
+            start_obj = datetime.strptime(start_time, '%H:%M').time()
+            end_obj = datetime.strptime(end_time, '%H:%M').time()
+        except Exception:
+            return JsonResponse({'ok': False, 'error': 'Invalid time format'}, status=400)
+
+        if start_obj >= end_obj:
+            return JsonResponse({'ok': False, 'error': 'End time must be after start time'}, status=400)
             
         playlist = RadioPlaylist.objects.get(id=playlist_id)
-        
-        # Check for overlaps (simplified for now)
+
+        overlap = (
+            RadioSchedule.objects
+            .filter(day=day, start_time__lt=end_obj, end_time__gt=start_obj)
+            .select_related('playlist')
+            .first()
+        )
+
+        if overlap:
+            return JsonResponse({
+                'ok': False,
+                'error': f'Conflict with {overlap.playlist.name} ({overlap.start_time.strftime("%H:%M")} - {overlap.end_time.strftime("%H:%M")})'
+            }, status=409)
+
         RadioSchedule.objects.create(
             day=day,
             start_time=start_time,
