@@ -400,6 +400,7 @@ class RadioTrack(models.Model):
     artist = models.CharField(max_length=200)
     album_art = models.URLField(max_length=500, blank=True)
     duration = models.CharField(max_length=20, help_text="e.g. 3:45", default="3:00")
+    duration_seconds = models.IntegerField(default=180, help_text="Duration in seconds")
     audio_url = models.URLField(max_length=500, blank=True, null=True)
     is_request = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -412,6 +413,7 @@ class RadioStationState(models.Model):
     up_next = models.JSONField(default=list, help_text="List of RadioTrack IDs in queue order")
     recently_played = models.JSONField(default=list, help_text="List of RadioTrack IDs in history order")
     listeners_count = models.IntegerField(default=3847)
+    started_at = models.DateTimeField(null=True, blank=True, help_text="Time when the current track started playing")
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

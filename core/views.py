@@ -1904,6 +1904,68 @@ def bias_quiz_result(request):
             status=500,
         )
 
+def _auto_rotate_station(state):
+    """
+    Ensures the station 'plays' in the background by fast-forwarding 
+    state if songs have ended since the last update.
+    """
+    import random
+    from datetime import timedelta
+    from django.utils import timezone
+    from core.models import RadioTrack
+    
+    if not state or not state.current_track or not state.started_at:
+        return state
+
+    now = timezone.now()
+    
+    # Loop to fast-forward through multiple ended songs if necessary
+    for _ in range(10): # Safety break
+        current_track = state.current_track
+        if not current_track:
+            break
+            
+        duration = current_track.duration_seconds or 180
+        end_time = state.started_at + timedelta(seconds=duration)
+        
+        if now < end_time:
+            # We are still in the middle of this song
+            break
+            
+        # Song has theoretically finished. Move to history.
+        history = list(state.recently_played)
+        if current_track.id not in history:
+            history.insert(0, current_track.id)
+        state.recently_played = history[:10]
+        
+        # Advance to next song in queue
+        queue = list(state.up_next)
+        if queue:
+            next_id = queue.pop(0)
+            state.current_track_id = next_id
+            state.up_next = queue
+            state.started_at = end_time  # Next song starts at exact end of previous
+        else:
+            # Queue empty, refill and stop fast-forwarding for now
+            all_tracks = list(RadioTrack.objects.values_list('id', flat=True))
+            if all_tracks:
+                state.current_track_id = random.choice(all_tracks)
+                state.started_at = end_time
+            break
+
+        # Emergency refill if queue low
+        if len(state.up_next) < 3:
+            all_tracks = list(RadioTrack.objects.values_list('id', flat=True))
+            exclude_ids = set([state.current_track_id] + list(state.recently_played) + list(state.up_next))
+            pool = [tid for tid in all_tracks if tid not in exclude_ids]
+            if not pool: pool = [tid for tid in all_tracks if tid not in set(state.up_next)]
+            if pool:
+                random.shuffle(pool)
+                state.up_next = (list(state.up_next) + pool[:5])[:5]
+
+    state.save()
+    return state
+
 def live(request):
     from datetime import timedelta
     cutoff = timezone.now() - timedelta(hours=24)
@@ -1912,8 +1974,10 @@ def live(request):
     ).values_list('song_title', flat=True)
     requested_titles = [t.lower() for t in requested]
 
-    # Fetch Radio Station State
+    # Fetch Radio Station State and Auto-Rotate if needed
     state = RadioStationState.objects.first()
+    if state:
+        state = _auto_rotate_station(state)
 
     current_track = None
     up_next_tracks = []
@@ -1933,12 +1997,19 @@ def live(request):
         recently_played_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
         recently_played_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
 
+    # Calculate offset for synchronization
+    current_offset = 0
+    if state and state.started_at:
+        elapsed = timezone.now() - state.started_at
+        current_offset = max(0, int(elapsed.total_seconds()))
+
     return render(request, 'core/Live.html', {
         'requested_titles': requested_titles,
         'state': state,
         'current_track': current_track,
         'up_next_tracks': up_next_tracks,
         'recently_played_tracks': recently_played_tracks,
+        'current_offset': current_offset,
     })
 
 def api_live_rotate_track(request):
@@ -1951,6 +2022,9 @@ def api_live_rotate_track(request):
     state = RadioStationState.objects.first()
     if not state:
         return JsonResponse({'ok': False, 'error': 'No station state found'}, status=404)
+
+    # Catch-up current state first
+    state = _auto_rotate_station(state)
 
     # Move current to history
     if state.current_track_id:
@@ -1986,6 +2060,7 @@ def api_live_rotate_track(request):
             new_queue = list(state.up_next) + pool[:5]
             state.up_next = new_queue[:5]
 
+    state.started_at = timezone.now()
     state.save()
 
     # Prepare response data

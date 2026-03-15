@@ -52,7 +52,9 @@ def extract_metadata(audio_url, track_id):
     """
     metadata = {
         'album_art': None,
-        'artist': None
+        'artist': None,
+        'duration_seconds': 0,
+        'duration_str': "3:00"
     }
     try:
         # Download first 1MB (art and metadata are usually at the start)
@@ -62,7 +64,19 @@ def extract_metadata(audio_url, track_id):
             return metadata
             
         file_data = io.BytesIO(response.content)
+        
+        # Extract Duration
         try:
+            audio_info = MP3(file_data).info
+            seconds = int(audio_info.length)
+            metadata['duration_seconds'] = seconds
+            mins, secs = divmod(seconds, 60)
+            metadata['duration_str'] = f"{mins}:{secs:02d}"
+        except Exception as e:
+            print(f"Duration extraction failed: {e}")
+
+        try:
+            file_data.seek(0)
             tags = ID3(file_data)
         except Exception:
             return metadata
@@ -177,7 +191,7 @@ def sync_tracks_from_b2():
             
             # Default fallback if extraction fails
             if not album_art:
-                 album_art = "https://res.cloudinary.com/diuanqnce/image/upload/v1710457000/ksync/skz_group_default.jpg"
+                 album_art = "https://res.cloudinary.com/diuanqnce/image/upload/v1710546648/ksync/skz_group_default.jpg"
             
             track, created = RadioTrack.objects.update_or_create(
                 title=title,
@@ -185,7 +199,8 @@ def sync_tracks_from_b2():
                     'artist': artist,
                     'audio_url': audio_url,
                     'album_art': album_art,
-                    'duration': '3:00', # Default duration
+                    'duration': metadata.get('duration_str', '3:00'),
+                    'duration_seconds': metadata.get('duration_seconds', 180),
                 }
             )
             all_synced_ids.append(track.id)

@@ -523,27 +523,64 @@
         
         if (playBtn && audio) {
             let isPlaying = false;
+            const initialServerOffset = {{ current_offset|default:0 }};
+            const pageLoadTime = Date.now();
+
+            // Function to get current global offset
+            const getGlobalOffset = () => {
+                const elapsedSinceLoad = (Date.now() - pageLoadTime) / 1000;
+                return Math.floor(initialServerOffset + elapsedSinceLoad);
+            };
+
+            // Set up initial seek logic
+            const syncAudio = () => {
+                const targetTime = getGlobalOffset();
+                if (Math.abs(audio.currentTime - targetTime) > 2) {
+                    console.log(`Syncing audio to: ${targetTime}s`);
+                    audio.currentTime = targetTime;
+                }
+            };
+
+            // Only seek if we actually have an offset
+            if (initialServerOffset > 0) {
+                audio.addEventListener('canplay', () => {
+                    syncAudio();
+                }, { once: true });
+            }
 
             playBtn.addEventListener('click', async () => {
                 if (isPlaying) {
-                     // Instead of pausing, we mute to keep in sync
+                     // Toggle Mute
+                     const wasMuted = audio.muted;
                      audio.muted = !audio.muted;
+                     
+                     if (wasMuted && !audio.muted) {
+                         syncAudio();
+                     }
+
                      playBtn.querySelector('.material-symbols-outlined').textContent = audio.muted ? 'play_arrow' : 'pause';
                      playBtn.classList.toggle('pulse-glow', audio.muted);
                 } else {
                      try {
-                         // If no source or needs refresh, reload
-                         if (!audio.src || audio.src !== audio.querySelector('source')?.src) {
+                         // Load if not loaded
+                         if (!audio.src || audio.src === "") {
                              audio.load();
                          }
-                         audio.muted = false; // Ensure unmuted on start
+                         
+                         audio.muted = false;
                          await audio.play();
+                         syncAudio(); // Sync immediately after play start
                      } catch (error) {
-                         if (error.name === 'AbortError') {
-                             console.log("Playback interrupted (AbortError), safe to ignore.");
-                         } else {
-                             console.error("Playback failed:", error);
-                             alert("Please ensure your Backblaze bucket is public or refresh the page.");
+                         console.warn("Playback failed, likely autoplay block:", error);
+                         // Try playing muted as a fallback
+                         try {
+                             audio.muted = true;
+                             await audio.play();
+                             syncAudio();
+                             playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
+                             playBtn.classList.add('pulse-glow');
+                         } catch (e) {
+                             console.error("Critical playback failure:", e);
                          }
                      }
                 }
@@ -578,9 +615,8 @@
             }
         }
 
-        // Handle Track Rotation
-        audio.addEventListener('ended', async () => {
-            console.log("Track ended, rotating...");
+        async function rotateTrack() {
+            console.log("Rotating track...");
             try {
                 const response = await fetch('/api/live/rotate/');
                 const data = await response.json();
@@ -607,7 +643,10 @@
             } catch (error) {
                 console.error("Rotation failed:", error);
             }
-        });
+        }
+
+        // Handle Track Rotation
+        audio.addEventListener('ended', rotateTrack);
 
         function updatePlaylistUI(containerId, tracks, colorClass) {
             const container = document.getElementById(containerId);
