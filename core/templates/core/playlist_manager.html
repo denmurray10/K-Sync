@@ -37,7 +37,6 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .sortable-ghost { opacity: 0.4; background: #f425c0 !important; }
         .glass-panel { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px); }
-        body { zoom: 0.9; }
     </style>
 </head>
 <body class="bg-black text-white font-display min-h-screen flex flex-col overflow-hidden" x-data="playlistApp()">
@@ -65,11 +64,6 @@
         <div x-show="activeTab === 'builder'" class="ml-auto py-2 relative flex items-center gap-2" style="display: none;">
             <button @click="savePlaylist" class="h-8 bg-primary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Update/Save</button>
             <button @click="assignToSchedule" class="h-8 bg-secondary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Assign To Schedule</button>
-            <button @click="showPageHeader = !showPageHeader"
-                    :class="showPageHeader ? 'border-secondary text-secondary' : 'border-white/20 text-slate-300'"
-                    class="h-8 w-8 border bg-black/40 hover:border-secondary hover:text-secondary transition-colors flex items-center justify-center">
-                <span class="material-symbols-outlined text-sm">settings</span>
-            </button>
         </div>
     </div>
 
