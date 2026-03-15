@@ -85,14 +85,24 @@
                             {% endfor %}
                         </div>
                     </div>
+                    <button @click="removeDuplicates" class="col-span-2 h-9 bg-white/5 border border-white/10 px-3 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">content_cut</span> Remove Duplicates
+                    </button>
+                    <div class="col-span-2 h-8 border border-white/10 bg-black/40 px-3 flex items-center justify-between text-[9px] font-mono uppercase tracking-widest">
+                        <span class="text-slate-500">Save Status</span>
+                        <span :class="saveState === 'saving' ? 'text-secondary' : (saveState === 'saved' ? 'text-green-300' : (saveState === 'failed' ? 'text-red-400' : 'text-slate-500'))" x-text="saveStateLabel"></span>
+                    </div>
                     <button @click="savePlaylist" class="col-span-2 h-9 bg-primary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Update/Save</button>
                     <button @click="assignToSchedule" class="col-span-2 h-9 bg-secondary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Assign To Schedule</button>
                 </div>
             </div>
 
             <div class="relative flex-1 min-h-0">
-                <div id="playlist-builder" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 space-y-2 bg-black/20">
-                    <template x-for="(track, index) in currentPlaylist.tracks" :key="index">
+                <div x-show="isPlaylistDropActive" class="pointer-events-none absolute inset-0 z-10 border border-secondary/80 bg-secondary/10 flex items-start justify-center" style="display: none;">
+                    <span class="mt-3 px-3 py-1 text-[9px] font-bold uppercase tracking-widest bg-secondary text-black">Drop to add to playlist</span>
+                </div>
+                <div id="playlist-builder" :class="isPlaylistDropActive ? 'border border-secondary/70 shadow-[0_0_0_1px_rgba(0,240,255,0.35)]' : ''" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 space-y-2 bg-black/20">
+                    <template x-for="(track, index) in currentPlaylist.tracks" :key="`${index}-${playlistRenderKey}`">
                         <div class="playlist-track-item flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 group">
                             <span class="text-[10px] font-mono text-slate-600 w-4" x-text="(index + 1).toString().padStart(2, '0')"></span>
                             <div class="w-10 h-10 bg-black border border-white/10 group-hover:border-secondary/50 overflow-hidden flex-shrink-0">
@@ -148,7 +158,9 @@
                                 <p class="text-[9px] font-mono text-slate-500 truncate uppercase" x-text="track.artist || 'Unknown Artist'"></p>
                                 <p class="text-[9px] font-mono text-slate-400 uppercase" x-text="track.duration || '3:00'"></p>
                             </div>
-                            <button @click="addTrack(track)" class="mt-auto bg-secondary/20 hover:bg-secondary text-secondary hover:text-black p-1 transition-all self-start">
+                            <button @click="addTrack(track)" :disabled="isTrackInPlaylist(track)"
+                                    :class="isTrackInPlaylist(track) ? 'bg-green-500/20 text-green-300 cursor-not-allowed' : 'bg-secondary/20 hover:bg-secondary text-secondary hover:text-black'"
+                                    class="mt-auto p-1 transition-all self-start">
                                 <span class="material-symbols-outlined text-xs">add</span>
                             </button>
                         </div>
@@ -264,6 +276,17 @@
         </div>
     </div>
 
+    <div x-show="toast.visible" x-transition.opacity.duration.200ms class="fixed bottom-6 right-6 z-[70]" style="display: none;">
+        <div class="bg-green-500/15 border border-green-400/60 text-green-200 px-4 py-2 text-[10px] font-bold uppercase tracking-widest shadow-[4px_4px_0px_#000000]" x-text="toast.message"></div>
+    </div>
+
+    <div x-show="undo.visible" x-transition.opacity.duration.200ms class="fixed bottom-6 left-6 z-[70]" style="display: none;">
+        <div class="bg-black/90 border border-white/20 px-3 py-2 flex items-center gap-3 shadow-[4px_4px_0px_#000000]">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-slate-300" x-text="undo.message"></span>
+            <button @click="undoLastAction" class="h-7 px-3 border border-secondary/70 text-secondary text-[10px] font-bold uppercase tracking-widest hover:bg-secondary hover:text-black transition-colors">Undo</button>
+        </div>
+    </div>
+
 </main>
 
 <script>
@@ -272,6 +295,7 @@ function playlistApp() {
         activeTab: 'builder',
         tracks: [],
         catalogueRenderKey: 0,
+        playlistRenderKey: 0,
         searchQuery: '',
         groupQuery: '',
         currentPlaylist: { id: null, name: 'Untitled Playlist', tracks: [] },
@@ -279,6 +303,13 @@ function playlistApp() {
         activeDay: 'MON',
         showScheduleModal: false,
         newSchedule: { playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ' },
+        toast: { visible: false, message: '' },
+        toastTimeout: null,
+        saveState: 'idle',
+        saveStateLabel: 'Idle',
+        undo: { visible: false, message: '', snapshot: null },
+        undoTimeout: null,
+        isPlaylistDropActive: false,
 
         async init() {
             await this.fetchB2Tracks();
@@ -308,13 +339,13 @@ function playlistApp() {
             setPanelHeight('playlist-builder', 22);
         },
 
-        rerenderCatalogue() {
-            this.catalogueRenderKey += 1;
+        rerenderPlaylist() {
+            this.playlistRenderKey += 1;
         },
 
         finalizeCatalogueAfterDrag() {
             this.$nextTick(() => {
-                this.rerenderCatalogue();
+                this.catalogueRenderKey += 1;
                 this.cleanupCatalogueArtifacts();
             });
         },
@@ -394,6 +425,41 @@ function playlistApp() {
             return this.currentPlaylist.tracks.some((playlistTrack) => this.trackIdentity(playlistTrack) === identity);
         },
 
+        showToast(message) {
+            this.toast.message = message;
+            this.toast.visible = true;
+            if (this.toastTimeout) clearTimeout(this.toastTimeout);
+            this.toastTimeout = setTimeout(() => {
+                this.toast.visible = false;
+            }, 1800);
+        },
+
+        setSaveState(state, label) {
+            this.saveState = state;
+            this.saveStateLabel = label;
+        },
+
+        beginUndoWindow(message) {
+            this.undo.snapshot = JSON.parse(JSON.stringify(this.currentPlaylist.tracks));
+            this.undo.message = message;
+            this.undo.visible = true;
+            if (this.undoTimeout) clearTimeout(this.undoTimeout);
+            this.undoTimeout = setTimeout(() => {
+                this.undo.visible = false;
+                this.undo.snapshot = null;
+            }, 5000);
+        },
+
+        undoLastAction() {
+            if (!this.undo.snapshot) return;
+            this.currentPlaylist.tracks = JSON.parse(JSON.stringify(this.undo.snapshot));
+            this.rerenderPlaylist();
+            this.undo.visible = false;
+            this.undo.snapshot = null;
+            if (this.undoTimeout) clearTimeout(this.undoTimeout);
+            this.showToast('Undid last action');
+        },
+
         initSortable() {
             // Builder Logic
             new Sortable(document.getElementById('library-list'), {
@@ -401,7 +467,11 @@ function playlistApp() {
                 draggable: '.library-item',
                 sort: false,
                 removeCloneOnHide: true,
+                onStart: () => {
+                    this.isPlaylistDropActive = true;
+                },
                 onEnd: () => {
+                    this.isPlaylistDropActive = false;
                     this.$nextTick(() => this.cleanupCatalogueArtifacts());
                 }
             });
@@ -411,6 +481,7 @@ function playlistApp() {
                 animation: 150,
                 onAdd: (evt) => {
                     const payload = this.extractTrackPayloadFromDrop(evt);
+                    this.isPlaylistDropActive = false;
 
                     if (evt.item && evt.item.parentNode) {
                         evt.item.parentNode.removeChild(evt.item);
@@ -426,8 +497,10 @@ function playlistApp() {
                         if (evt.item && evt.item.parentNode) evt.item.parentNode.removeChild(evt.item);
                         return;
                     }
+                    this.beginUndoWindow('Track reordered');
                     const item = this.currentPlaylist.tracks.splice(evt.oldIndex, 1)[0];
                     this.currentPlaylist.tracks.splice(evt.newIndex, 0, item);
+                    this.rerenderPlaylist();
                 }
             });
 
@@ -470,16 +543,50 @@ function playlistApp() {
                 album_art: track.album_art || '',
                 duration: track.duration || '3:00'
             };
+
+            if (this.isTrackInPlaylist(newTrack)) {
+                this.showToast('Already in playlist');
+                return;
+            }
+
+            this.beginUndoWindow('Track added');
+
             if (index !== null) {
                 this.currentPlaylist.tracks.splice(index, 0, newTrack);
             } else {
                 this.currentPlaylist.tracks.push(newTrack);
+            }
+            this.rerenderPlaylist();
+        },
+
+        removeDuplicates() {
+            this.beginUndoWindow('Duplicates removed');
+            const seen = new Set();
+            const deduped = [];
+
+            for (const track of this.currentPlaylist.tracks) {
+                const identity = this.trackIdentity(track);
+                if (!identity || !seen.has(identity)) {
+                    deduped.push(track);
+                    if (identity) seen.add(identity);
+                }
+            }
+
+            const removedCount = this.currentPlaylist.tracks.length - deduped.length;
+            this.currentPlaylist.tracks = deduped;
+            this.rerenderPlaylist();
+
+            if (removedCount > 0) {
+                this.showToast(`Removed ${removedCount} duplicate${removedCount === 1 ? '' : 's'}`);
+            } else {
+                this.showToast('No duplicates found');
             }
         },
 
         createNewPlaylist() {
             if (this.currentPlaylist.tracks.length > 0 && !confirm('Discard current playlist and start new?')) return;
             this.currentPlaylist = { id: null, name: 'Untitled Playlist', tracks: [] };
+            this.rerenderPlaylist();
         },
 
         assignToSchedule() {
@@ -491,7 +598,9 @@ function playlistApp() {
         },
 
         removeTrack(index) {
+            this.beginUndoWindow('Track removed');
             this.currentPlaylist.tracks.splice(index, 1);
+            this.rerenderPlaylist();
         },
 
         openQuickSchedule(day, hour, pId = null, pName = null) {
@@ -524,22 +633,35 @@ function playlistApp() {
         },
 
         async savePlaylist() {
-            const resp = await fetch('/api/playlist/save/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-                body: JSON.stringify(this.currentPlaylist)
-            });
-            const data = await resp.json();
-            if (data.ok) {
-                this.currentPlaylist.id = data.id;
-                alert('Saved!');
+            this.setSaveState('saving', 'Saving...');
+            try {
+                const resp = await fetch('/api/playlist/save/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify(this.currentPlaylist)
+                });
+                const data = await resp.json();
+                if (data.ok) {
+                    this.currentPlaylist.id = data.id;
+                    this.setSaveState('saved', 'Saved');
+                    this.showToast('Playlist saved');
+                } else {
+                    this.setSaveState('failed', 'Failed');
+                    this.showToast('Save failed');
+                }
+            } catch (e) {
+                this.setSaveState('failed', 'Failed');
+                this.showToast('Save failed');
             }
         },
 
         async loadPlaylist(id) {
             const resp = await fetch(`/api/playlist/${id}/data/`);
             const data = await resp.json();
-            if (data.ok) this.currentPlaylist = data.playlist;
+            if (data.ok) {
+                this.currentPlaylist = data.playlist;
+                this.rerenderPlaylist();
+            }
         },
 
         async saveSchedule() {
