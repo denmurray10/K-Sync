@@ -98,10 +98,10 @@
                         <button @click="open = !open" class="w-full h-9 bg-white/5 border border-white/10 px-3 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
                             <span class="material-symbols-outlined text-sm">folder_open</span> Load
                         </button>
-                        <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-64 bg-surface border border-white/10 shadow-2xl z-50 py-2">
-                            {% for p in playlists %}
-                            <button @click="loadPlaylist({{ p.id }}); open = false" class="w-full text-left px-4 py-2 text-[10px] font-bold uppercase hover:bg-primary hover:text-black transition-colors">{{ p.name }}</button>
-                            {% endfor %}
+                        <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-64 max-h-72 overflow-y-auto overscroll-contain custom-scrollbar bg-surface border border-white/10 shadow-2xl z-50 py-2">
+                            <template x-for="playlist in savedPlaylists" :key="`load-${playlist.id}`">
+                                <button @click="loadPlaylist(playlist.id); open = false" class="w-full text-left px-4 py-2 text-[10px] font-bold uppercase hover:bg-primary hover:text-black transition-colors" x-text="playlist.name"></button>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -202,24 +202,29 @@
     <!-- TAB 2: SCHEDULER (Horizontal Grid) -->
     <div x-show="activeTab === 'scheduler'" class="flex-1 flex overflow-hidden min-h-0">
         <!-- Sidebar: Saved Playlists -->
-        <div class="w-64 border-r border-white/10 flex flex-col bg-surface/50 min-h-0">
+        <div class="w-64 border-r border-white/10 flex flex-col bg-surface/50 min-h-0 overflow-hidden">
             <div class="p-4 border-b border-white/10 bg-surface">
                 <h2 class="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
                     <span class="material-symbols-outlined text-sm">list</span> Saved Playlists
                 </h2>
             </div>
-            <div id="draggable-playlists" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
-                {% for p in playlists %}
-                <div data-id="{{ p.id }}" data-name="{{ p.name }}"
-                     class="playlist-item p-3 bg-white/5 border border-white/10 cursor-grab hover:border-primary transition-all">
-                    <p class="text-[10px] font-bold uppercase truncate">{{ p.name }}</p>
+            <div id="draggable-playlists" class="flex-1 min-h-0 overflow-y-scroll overflow-x-hidden overscroll-contain custom-scrollbar p-2 space-y-2">
+                <template x-for="playlist in savedPlaylists" :key="`sched-${playlist.id}`">
+                <div :data-id="playlist.id" :data-name="playlist.name"
+                     class="playlist-item p-2 bg-white/5 border border-white/10 hover:border-primary transition-all flex items-center gap-2">
+                    <button @click="openPlaylistPreview(playlist.id)" class="flex-1 text-left px-1 py-1">
+                        <p class="text-[10px] font-bold uppercase truncate" x-text="playlist.name"></p>
+                    </button>
+                    <button class="playlist-drag-handle h-7 w-7 flex items-center justify-center border border-white/10 text-slate-400 hover:text-white cursor-grab" title="Drag to schedule">
+                        <span class="material-symbols-outlined text-sm">drag_indicator</span>
+                    </button>
                 </div>
-                {% endfor %}
+                </template>
             </div>
         </div>
 
         <!-- Main Calendar Grid -->
-        <div class="flex-1 overflow-hidden flex flex-col min-h-0">
+        <div id="scheduler-grid-root" class="flex-1 overflow-hidden flex flex-col min-h-0">
             <!-- Timeline Header (Hours) -->
             <div class="flex border-b border-white/10 bg-surface">
                 <div class="w-16 border-r border-white/10 flex-shrink-0"></div> <!-- Day column placeholder -->
@@ -233,9 +238,9 @@
             </div>
 
             <!-- Grid Rows (Days) -->
-            <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col">
+            <div class="flex-1 min-h-0 overflow-hidden overflow-x-hidden grid grid-rows-7">
                 <template x-for="day in ['MON','TUE','WED','THU','FRI','SAT','SUN']">
-                    <div class="flex flex-1 border-b border-white/10 hover:bg-white/[0.02] transition-colors min-h-[96px]">
+                    <div class="flex min-h-0 border-b border-white/10 hover:bg-white/[0.02] transition-colors">
                         <!-- Day Label -->
                         <div class="w-16 border-r border-white/10 flex-shrink-0 flex items-center justify-center bg-black/40">
                             <button @click.stop="openDayAction(day)" class="text-[10px] font-black uppercase -rotate-90 tracking-widest text-slate-400 hover:text-white transition-colors" x-text="day"></button>
@@ -243,7 +248,7 @@
                         <!-- Cells -->
                         <div class="flex-1 flex overflow-x-auto no-scrollbar relative grid-row" :data-day="day">
                             <template x-for="hour in 24">
-                                <div class="w-24 flex-shrink-0 border-r border-white/5 relative grid-cell h-full min-h-[80px]" 
+                                  <div class="w-24 flex-shrink-0 border-r border-white/5 relative grid-cell h-full" 
                                      @click="openQuickSchedule(day, hour-1)"
                                      :data-hour="hour-1">
                                 </div>
@@ -312,9 +317,9 @@
                     <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Target Playlist</label>
                     <select x-model.number="newSchedule.playlist_id" @change="syncSchedulePlaylistName" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
                         <option value="" disabled>Select playlist...</option>
-                        {% for p in playlists %}
-                        <option value="{{ p.id }}">{{ p.name }}</option>
-                        {% endfor %}
+                        <template x-for="playlist in savedPlaylists" :key="`slot-${playlist.id}`">
+                            <option :value="playlist.id" x-text="playlist.name"></option>
+                        </template>
                     </select>
                     <p class="mt-1 text-[9px] font-mono uppercase tracking-widest text-slate-500 truncate" x-text="newSchedule.playlist_name"></p>
                 </div>
@@ -338,6 +343,33 @@
                 <button x-show="newSchedule.schedule_id" @click="deleteCurrentScheduleFromModal" class="flex-1 border border-red-400/60 text-red-300 py-3 text-[10px] font-bold uppercase" style="display: none;">Delete</button>
                 <button @click="showScheduleModal = false" class="flex-1 border border-white/10 py-3 text-[10px] font-bold uppercase">Cancel</button>
                 <button @click="saveSchedule" class="flex-1 bg-secondary text-black py-3 text-[10px] font-bold uppercase shadow-[4px_4px_0px_#f425c0]" x-text="newSchedule.schedule_id ? 'Update' : 'Confirm'"></button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showPlaylistPreviewModal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl" style="display: none;">
+        <div class="bg-surface border border-white/10 w-full max-w-xl p-6 shadow-2xl max-h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-black uppercase tracking-tighter truncate pr-3" x-text="previewPlaylist.name || 'Playlist Preview'"></h3>
+                <button @click="showPlaylistPreviewModal = false" class="text-slate-400 hover:text-white">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+
+            <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar border border-white/10 bg-black/30">
+                <div x-show="previewLoading" class="p-4 text-[10px] font-mono uppercase tracking-widest text-slate-400">Loading songs...</div>
+                <div x-show="!previewLoading && !(previewPlaylist.tracks || []).length" class="p-4 text-[10px] font-mono uppercase tracking-widest text-slate-400">No songs in this playlist.</div>
+                <template x-for="(track, index) in (previewPlaylist.tracks || [])" :key="`preview-${index}`">
+                    <div class="px-4 py-2 border-b border-white/5 last:border-b-0">
+                        <p class="text-[10px] font-bold uppercase truncate" x-text="track.title || track.name || 'Untitled' "></p>
+                        <p class="text-[9px] font-mono uppercase tracking-widest text-slate-500 truncate" x-text="track.artist || 'Unknown Artist'"></p>
+                    </div>
+                </template>
+            </div>
+
+            <div class="flex gap-3 mt-4">
+                <button @click="showPlaylistPreviewModal = false" class="flex-1 h-9 border border-white/10 text-[10px] font-bold uppercase tracking-widest">Close</button>
+                <button @click="editPlaylistFromPreview" :disabled="!previewPlaylist.id" class="flex-1 h-9 bg-secondary text-black text-[10px] font-bold uppercase tracking-widest disabled:opacity-50">Edit Playlist</button>
             </div>
         </div>
     </div>
@@ -544,6 +576,9 @@ function playlistApp() {
         daySchedules: {},
         activeDay: 'MON',
         showScheduleModal: false,
+        showPlaylistPreviewModal: false,
+        previewLoading: false,
+        previewPlaylist: { id: null, name: '', tracks: [] },
         newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ' },
         toast: { visible: false, message: '' },
         toastTimeout: null,
@@ -611,6 +646,8 @@ function playlistApp() {
 
             setPanelHeight('library-list', 18);
             setPanelHeight('playlist-builder', 22);
+            setPanelHeight('scheduler-grid-root', 12);
+            setPanelHeight('draggable-playlists', 18);
         },
 
         rerenderPlaylist() {
@@ -944,6 +981,17 @@ function playlistApp() {
             }, 1800);
         },
 
+        mergeSavedPlaylists(playlists) {
+            if (!Array.isArray(playlists) || !playlists.length) return;
+            const byId = new Map((this.savedPlaylists || []).map((playlist) => [Number(playlist.id), playlist]));
+            for (const playlist of playlists) {
+                const id = Number(playlist.id);
+                if (!id) continue;
+                byId.set(id, { id, name: String(playlist.name || '').trim() || `Playlist ${id}` });
+            }
+            this.savedPlaylists = Array.from(byId.values()).sort((a, b) => a.name.localeCompare(b.name));
+        },
+
         openAIModal() {
             this.aiStep = 1;
             this.aiLoading = false;
@@ -981,6 +1029,7 @@ function playlistApp() {
                     this.showToast(data.error || 'AI scheduler failed');
                     return;
                 }
+                this.mergeSavedPlaylists(data.created_playlists || []);
                 await this.fetchSchedules();
                 this.showAISchedulerModal = false;
                 this.showToast(`AI scheduled ${data.created_slots || 0} slot${(data.created_slots || 0) === 1 ? '' : 's'}`);
@@ -1102,7 +1151,8 @@ function playlistApp() {
             // Scheduler Logic (Drag Playlists onto Grid)
             new Sortable(document.getElementById('draggable-playlists'), {
                 group: { name: 'p', pull: 'clone', put: false },
-                sort: false
+                sort: false,
+                handle: '.playlist-drag-handle'
             });
             
             // Allow grid rows to accept playlists
@@ -1546,6 +1596,7 @@ function playlistApp() {
                 const data = await resp.json();
                 if (data.ok) {
                     this.currentPlaylist.id = data.id;
+                    this.mergeSavedPlaylists([{ id: data.id, name: this.currentPlaylist.name }]);
                     await this.fetchSchedules();
                     this.setSaveState('saved', 'Saved');
                     this.showToast('Playlist saved');
@@ -1566,6 +1617,38 @@ function playlistApp() {
                 this.currentPlaylist = data.playlist;
                 this.rerenderPlaylist();
             }
+        },
+
+        async openPlaylistPreview(id) {
+            this.previewLoading = true;
+            this.showPlaylistPreviewModal = true;
+            this.previewPlaylist = { id, name: '', tracks: [] };
+
+            const fallback = (this.savedPlaylists || []).find((playlist) => Number(playlist.id) === Number(id));
+            if (fallback) this.previewPlaylist.name = fallback.name;
+
+            try {
+                const resp = await fetch(`/api/playlist/${id}/data/`);
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.showToast(data.error || 'Could not load playlist');
+                    return;
+                }
+                this.previewPlaylist = data.playlist || { id, name: fallback?.name || '', tracks: [] };
+            } catch (e) {
+                this.showToast('Could not load playlist');
+            } finally {
+                this.previewLoading = false;
+            }
+        },
+
+        async editPlaylistFromPreview() {
+            const playlistId = this.previewPlaylist?.id;
+            if (!playlistId) return;
+            await this.loadPlaylist(playlistId);
+            this.showPlaylistPreviewModal = false;
+            this.activeTab = 'builder';
+            this.$nextTick(() => this.syncScrollPanelHeights());
         },
 
         async saveSchedule() {
