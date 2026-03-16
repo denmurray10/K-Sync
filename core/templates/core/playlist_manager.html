@@ -2525,8 +2525,9 @@ function playlistApp() {
             }
         },
 
-        async generateTrackVoiceOver(track, index) {
-            if (!track) return;
+        async generateTrackVoiceOver(track, index, options = {}) {
+            if (!track) return false;
+            const silent = !!options.silent;
             this.voiceOverGeneratingTrackIndex = index;
             try {
                 const trackVoiceId = (track.voice_over_voice_id || '').trim();
@@ -2548,8 +2549,8 @@ function playlistApp() {
                 });
                 const data = await resp.json();
                 if (!data.ok) {
-                    this.showToast(data.error || 'Voice-over generation failed');
-                    return;
+                    if (!silent) this.showToast(data.error || 'Voice-over generation failed');
+                    return false;
                 }
 
                 track.voice_over_text = data.voice_over_text || '';
@@ -2558,9 +2559,13 @@ function playlistApp() {
                     this.toggleVoiceOverTrack(track);
                 }
                 const removed = this.removePlainDuplicatesForVoSongs();
-                this.showToast(removed ? `Voice-over generated (${removed} plain duplicate${removed === 1 ? '' : 's'} removed)` : 'Voice-over generated');
+                if (!silent) {
+                    this.showToast(removed ? `Voice-over generated (${removed} plain duplicate${removed === 1 ? '' : 's'} removed)` : 'Voice-over generated');
+                }
+                return !!String(track.voice_over_text || '').trim();
             } catch (e) {
-                this.showToast('Voice-over generation failed');
+                if (!silent) this.showToast('Voice-over generation failed');
+                return false;
             } finally {
                 this.voiceOverGeneratingTrackIndex = null;
             }
@@ -2661,8 +2666,6 @@ function playlistApp() {
 
             const candidates = this.voiceTimelineTracks.filter((track, idx) => {
                 if (!track || this.isGeneratedVoiceTrack(track)) return false;
-                const hasScript = String(track.voice_over_text || '').trim().length > 0;
-                if (!hasScript) return false;
                 return !this.hasGeneratedVoiceAudioAfter(idx);
             });
 
@@ -2678,6 +2681,7 @@ function playlistApp() {
             let processed = 0;
             let rendered = 0;
             let failed = 0;
+            let scripted = 0;
             let cancelled = false;
 
             try {
@@ -2691,6 +2695,20 @@ function playlistApp() {
                     if (currentIndex < 0 || this.isGeneratedVoiceTrack(sourceTrack) || this.hasGeneratedVoiceAudioAfter(currentIndex)) {
                         processed += 1;
                         this.updateBatchVoiceProgress(processed, candidates.length, `Skipped ${processed}/${candidates.length}`);
+                        continue;
+                    }
+
+                    const hasScript = String(sourceTrack.voice_over_text || '').trim().length > 0;
+                    if (!hasScript) {
+                        this.updateBatchVoiceProgress(processed, candidates.length, `Writing ${processed + 1}/${candidates.length}`);
+                        const scriptOk = await this.generateTrackVoiceOver(sourceTrack, currentIndex, { silent: true });
+                        if (scriptOk) scripted += 1;
+                    }
+
+                    if (!String(sourceTrack.voice_over_text || '').trim()) {
+                        failed += 1;
+                        processed += 1;
+                        this.updateBatchVoiceProgress(processed, candidates.length, `Skipped (no script) ${processed}/${candidates.length}`);
                         continue;
                     }
 
@@ -2721,11 +2739,11 @@ function playlistApp() {
             }
 
             if (rendered && failed) {
-                this.showToast(`Rendered ${rendered} VO audio (${failed} failed)`);
+                this.showToast(`Rendered ${rendered} VO audio (${scripted} scripts, ${failed} failed)`);
                 return;
             }
             if (rendered) {
-                this.showToast(`Rendered ${rendered} VO audio clip${rendered === 1 ? '' : 's'}`);
+                this.showToast(`Rendered ${rendered} VO audio clip${rendered === 1 ? '' : 's'} (${scripted} scripts)`);
                 return;
             }
             this.showToast('No VO audio rendered');

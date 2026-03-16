@@ -535,6 +535,7 @@
             let rotateWatchdogTimer = null;
             let rotateInFlight = false;
             let playbackGuardInterval = null;
+            let mainFadeInterval = null;
             const pageLoadTime = Date.now();
 
             const parseDurationLabelSeconds = (value) => {
@@ -606,6 +607,41 @@
                     } catch (e) {}
                 }
                 audio.volume = getSliderVolume();
+            };
+
+            const clearMainFadeIn = () => {
+                if (!mainFadeInterval) return;
+                clearInterval(mainFadeInterval);
+                mainFadeInterval = null;
+            };
+
+            const startMainTrackFadeIn = (durationMs = 10000) => {
+                clearMainFadeIn();
+                if (audio.muted) return;
+
+                const targetVolume = getSliderVolume();
+                const totalMs = Math.max(1000, Number(durationMs || 10000));
+                const stepMs = 100;
+                const steps = Math.max(1, Math.floor(totalMs / stepMs));
+                let step = 0;
+
+                audio.volume = 0;
+                mainFadeInterval = setInterval(() => {
+                    if (audio.muted) {
+                        clearMainFadeIn();
+                        return;
+                    }
+                    if (voiceAudio && !voiceAudio.paused) {
+                        return;
+                    }
+                    step += 1;
+                    const nextVolume = Math.min(targetVolume, targetVolume * (step / steps));
+                    audio.volume = nextVolume;
+                    if (step >= steps) {
+                        audio.volume = targetVolume;
+                        clearMainFadeIn();
+                    }
+                }, stepMs);
             };
 
             const clearRotateWatchdog = () => {
@@ -774,6 +810,7 @@
             audio.onpause = () => {
                 isPlaying = false;
                 clearVoiceOverlayPlayback();
+                clearMainFadeIn();
                 clearRotateWatchdog();
                 stopPlaybackGuard();
                 playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
@@ -839,6 +876,9 @@
                         };
 
                         await tryPlay();
+                        if (!isSameTrack) {
+                            startMainTrackFadeIn(10000);
+                        }
                         if (Number.isFinite(serverOffset) && serverOffset > 0) {
                             const seekTo = Math.max(0, Math.floor(serverOffset));
                             if (Math.abs(audio.currentTime - seekTo) > 2) {

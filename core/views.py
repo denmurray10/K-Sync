@@ -3608,6 +3608,40 @@ def _build_live_playlist_timeline(playlist):
     return timeline
 
 
+def _build_schedule_context_from_index(slot, timeline, current_index, current_offset=0, started_at=None):
+    if not slot or not timeline:
+        return None
+
+    timeline_len = len(timeline)
+    if timeline_len <= 0:
+        return None
+
+    safe_index = max(0, min(timeline_len - 1, int(current_index or 0)))
+    safe_offset = max(0, int(current_offset or 0))
+    current_item = timeline[safe_index]
+    current_track = current_item['track']
+
+    up_next_tracks = []
+    for step in range(1, min(6, timeline_len) + 1):
+        up_next_tracks.append(timeline[(safe_index + step) % timeline_len]['track'])
+
+    recently_played_tracks = []
+    for step in range(1, min(6, timeline_len) + 1):
+        recently_played_tracks.append(timeline[(safe_index - step) % timeline_len]['track'])
+
+    resolved_started_at = started_at if started_at is not None else (timezone.now() - timedelta(seconds=safe_offset))
+
+    return {
+        'slot': slot,
+        'current_track': current_track,
+        'current_voice_overlay': current_item.get('voice_overlay'),
+        'up_next_tracks': up_next_tracks,
+        'recently_played_tracks': recently_played_tracks,
+        'current_offset': safe_offset,
+        'started_at': resolved_started_at,
+    }
+
+
 def _compute_schedule_live_context(now_local, force_advance=False):
     slot, start_seconds, _end_seconds = _get_active_schedule_slot(now_local)
     if not slot:
@@ -3640,28 +3674,39 @@ def _compute_schedule_live_context(now_local, force_advance=False):
         current_index = (current_index + 1) % timeline_len
         current_offset = 0
 
-    current_item = timeline[current_index]
-    current_track = current_item['track']
+    return _build_schedule_context_from_index(
+        slot,
+        timeline,
+        current_index,
+        current_offset=current_offset,
+        started_at=(timezone.now() if force_advance else None),
+    )
 
-    up_next_tracks = []
-    for step in range(1, min(6, timeline_len) + 1):
-        up_next_tracks.append(timeline[(current_index + step) % timeline_len]['track'])
 
-    recently_played_tracks = []
-    for step in range(1, min(6, timeline_len) + 1):
-        recently_played_tracks.append(timeline[(current_index - step) % timeline_len]['track'])
+def _compute_schedule_live_context_next_from_state(now_local, current_track_id):
+    slot, _start_seconds, _end_seconds = _get_active_schedule_slot(now_local)
+    if not slot:
+        return None
 
-    started_at = timezone.now() if force_advance else (timezone.now() - timedelta(seconds=int(current_offset)))
+    timeline = _build_live_playlist_timeline(slot.playlist)
+    if not timeline:
+        return None
 
-    return {
-        'slot': slot,
-        'current_track': current_track,
-        'current_voice_overlay': current_item.get('voice_overlay'),
-        'up_next_tracks': up_next_tracks,
-        'recently_played_tracks': recently_played_tracks,
-        'current_offset': int(current_offset),
-        'started_at': started_at,
-    }
+    if not current_track_id:
+        return _build_schedule_context_from_index(slot, timeline, 0, current_offset=0, started_at=timezone.now())
+
+    current_index = None
+    for idx, item in enumerate(timeline):
+        track = item.get('track')
+        if track and track.id == current_track_id:
+            current_index = idx
+            break
+
+    if current_index is None:
+        return None
+
+    next_index = (current_index + 1) % len(timeline)
+    return _build_schedule_context_from_index(slot, timeline, next_index, current_offset=0, started_at=timezone.now())
 
 
 def _sync_state_with_schedule_context(state, context):
@@ -3752,7 +3797,12 @@ def api_live_rotate_track(request):
     state, _ = RadioStationState.objects.get_or_create(id=1)
 
     advance_requested = str(request.GET.get('advance') or '').strip().lower() in ('1', 'true', 'yes', 'on')
-    schedule_context = _compute_schedule_live_context(timezone.localtime(), force_advance=advance_requested)
+    if advance_requested:
+        schedule_context = _compute_schedule_live_context_next_from_state(timezone.localtime(), state.current_track_id)
+        if not schedule_context:
+            schedule_context = _compute_schedule_live_context(timezone.localtime(), force_advance=True)
+    else:
+        schedule_context = _compute_schedule_live_context(timezone.localtime(), force_advance=False)
     if schedule_context:
         _sync_state_with_schedule_context(state, schedule_context)
         current = schedule_context['current_track']
