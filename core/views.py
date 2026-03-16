@@ -1,5 +1,7 @@
 import json
 import logging
+import os
+import uuid
 from datetime import timedelta, datetime
 from django.db import models, transaction
 from django.utils import timezone
@@ -263,6 +265,8 @@ def api_playlist_save(request):
         data = json.loads(request.body)
         playlist_id = data.get('id')
         name = data.get('name')
+        default_voice_id = (data.get('default_voice_id') or '').strip()
+        default_voice_name = (data.get('default_voice_name') or '').strip()
         track_data = data.get('tracks', []) # List of {title, artist, url, album_art, duration}
 
         def parse_duration_seconds(value):
@@ -286,9 +290,15 @@ def api_playlist_save(request):
         if playlist_id:
             playlist = RadioPlaylist.objects.get(id=playlist_id)
             playlist.name = name
+            playlist.default_voice_id = default_voice_id
+            playlist.default_voice_name = default_voice_name
             playlist.save()
         else:
-            playlist = RadioPlaylist.objects.create(name=name)
+            playlist = RadioPlaylist.objects.create(
+                name=name,
+                default_voice_id=default_voice_id,
+                default_voice_name=default_voice_name,
+            )
             
         # Clear existing tracks and re-add in order
         RadioPlaylistTrack.objects.filter(playlist=playlist).delete()
@@ -302,6 +312,8 @@ def api_playlist_save(request):
             duration = t.get('duration', '3:00')
             duration_seconds = t.get('duration_seconds', parse_duration_seconds(duration))
             voice_over_text = (t.get('voice_over_text') or '').strip()
+            voice_over_voice_id = (t.get('voice_over_voice_id') or '').strip()
+            voice_over_voice_name = (t.get('voice_over_voice_name') or '').strip()
             voice_over_active = bool(t.get('voice_over_active'))
             duck_volume_percent = t.get('duck_volume_percent', 20)
             voice_over_start_percent = t.get('voice_over_start_percent', 0)
@@ -353,6 +365,8 @@ def api_playlist_save(request):
                 playlist=playlist,
                 track=track,
                 order=idx,
+                voice_over_voice_id=voice_over_voice_id,
+                voice_over_voice_name=voice_over_voice_name,
                 voice_over_text=voice_over_text,
                 voice_over_active=voice_over_active,
                 duck_volume_percent=duck_volume_percent,
@@ -463,6 +477,8 @@ def api_playlist_data(request, playlist_id):
                 'album_art': pt.track.album_art,
                 'duration': pt.track.duration,
                 'duration_seconds': pt.track.duration_seconds,
+                'voice_over_voice_id': pt.voice_over_voice_id,
+                'voice_over_voice_name': pt.voice_over_voice_name,
                 'voice_over_text': pt.voice_over_text,
                 'voice_over_active': pt.voice_over_active,
                 'duck_volume_percent': pt.duck_volume_percent,
@@ -475,6 +491,8 @@ def api_playlist_data(request, playlist_id):
             'playlist': {
                 'id': playlist.id,
                 'name': playlist.name,
+                'default_voice_id': playlist.default_voice_id,
+                'default_voice_name': playlist.default_voice_name,
                 'tracks': track_list
             }
         })
@@ -504,6 +522,8 @@ def api_voiceover_generate(request):
     artist = (payload.get('artist') or '').strip()
     duration = (payload.get('duration') or '').strip()
     playlist_name = (payload.get('playlist_name') or '').strip()
+    selected_voice_id = (payload.get('voice_over_voice_id') or '').strip()
+    selected_voice_name = (payload.get('voice_over_voice_name') or '').strip()
     style = (payload.get('style') or 'hype').strip().lower()
 
     if not title:
@@ -519,6 +539,7 @@ def api_voiceover_generate(request):
         "Write ONE short radio DJ voice-over line for this song. "
         "Requirements: 1-2 sentences, max 240 characters, no hashtags, no emojis, no quotes. "
         f"Tone: {style_hint}. "
+        f"DJ voice persona: {selected_voice_name or selected_voice_id or 'Default DJ'}. "
         f"Track: {title}. "
         f"Artist: {artist or 'Unknown Artist'}. "
         f"Duration: {duration or 'unknown'}. "
@@ -543,7 +564,165 @@ def api_voiceover_generate(request):
         'voice_over_text': line,
         'provider': 'inworld',
         'model': settings.INWORLD_CHAT_MODEL,
+        'voice_over_voice_id': selected_voice_id,
+        'voice_over_voice_name': selected_voice_name,
     })
+
+
+@csrf_exempt
+@require_POST
+def api_voiceover_synthesize(request):
+    """Synthesizes a voice-over script to audio and returns a playlist-ready track."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+
+    if not settings.INWORLD_API_KEY:
+        return JsonResponse({'ok': False, 'error': 'Inworld API key is not configured on the server.'}, status=500)
+
+    try:
+        payload = json.loads(request.body or '{}')
+    except Exception:
+        payload = {}
+
+    script_text = (payload.get('text') or '').strip()
+    voice_id = (payload.get('voice_over_voice_id') or '').strip()
+    voice_name = (payload.get('voice_over_voice_name') or '').strip()
+    song_title = (payload.get('song_title') or '').strip()
+
+    if not script_text:
+        return JsonResponse({'ok': False, 'error': 'Voice-over script is empty.'}, status=400)
+    if not voice_id:
+        return JsonResponse({'ok': False, 'error': 'Select a DJ voice first.'}, status=400)
+
+    try:
+        tts_resp = requests.post(
+            f"{settings.INWORLD_API_ROOT.rstrip('/')}/tts/v1/voice",
+            headers={
+                'Authorization': f"Basic {settings.INWORLD_API_KEY}",
+                'Content-Type': 'application/json',
+            },
+            json={
+                'text': script_text,
+                'voiceId': voice_id,
+                'modelId': settings.INWORLD_TTS_MODEL,
+                'audioConfig': {
+                    'audioEncoding': 'MP3',
+                    'sampleRateHertz': 24000,
+                },
+                'applyTextNormalization': 'ON',
+                'temperature': 1.0,
+            },
+            timeout=45,
+        )
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': f'Inworld TTS request failed: {str(e)}'}, status=502)
+
+    if tts_resp.status_code != 200:
+        return JsonResponse({'ok': False, 'error': f'Inworld TTS failed: {tts_resp.text[:300]}'}, status=502)
+
+    try:
+        data = tts_resp.json()
+        audio_b64 = data.get('audioContent') or ''
+        audio_bytes = base64.b64decode(audio_b64)
+    except Exception:
+        return JsonResponse({'ok': False, 'error': 'Invalid audio payload from Inworld.'}, status=502)
+
+    if not audio_bytes:
+        return JsonResponse({'ok': False, 'error': 'Inworld returned empty audio.'}, status=502)
+
+    safe_voice = re.sub(r'[^a-zA-Z0-9_-]+', '-', voice_name or voice_id)[:64].strip('-') or 'dj'
+    filename = f"vo_{safe_voice}_{uuid.uuid4().hex[:10]}.mp3"
+    relative_dir = os.path.join('radio', 'voiceovers')
+    absolute_dir = os.path.join(settings.MEDIA_ROOT, relative_dir)
+    os.makedirs(absolute_dir, exist_ok=True)
+    absolute_path = os.path.join(absolute_dir, filename)
+
+    try:
+        with open(absolute_path, 'wb') as out_file:
+            out_file.write(audio_bytes)
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': f'Could not save audio file: {str(e)}'}, status=500)
+
+    media_rel_url = f"{settings.MEDIA_URL.rstrip('/')}/{relative_dir.replace(os.sep, '/')}/{filename}"
+    audio_url = request.build_absolute_uri(media_rel_url)
+
+    estimated_seconds = max(3, min(120, int(round(len(script_text.split()) / 2.4))))
+    duration_label = f"{estimated_seconds // 60}:{estimated_seconds % 60:02d}"
+
+    track_title_base = song_title or 'Voice Over'
+    track_title = f"VO: {track_title_base}"[:300]
+    track_artist = (voice_name or voice_id or 'DJ Voice')[:200]
+
+    return JsonResponse({
+        'ok': True,
+        'track': {
+            'title': track_title,
+            'artist': track_artist,
+            'url': audio_url,
+            'album_art': '',
+            'duration': duration_label,
+            'duration_seconds': estimated_seconds,
+            'voice_over_text': '',
+            'voice_over_active': False,
+            'voice_over_start_percent': 0,
+            'voice_over_length_percent': 22,
+            'voice_over_voice_id': voice_id,
+            'voice_over_voice_name': voice_name,
+        },
+        'provider': 'inworld',
+        'model': settings.INWORLD_TTS_MODEL,
+    })
+
+
+def api_inworld_voices(request):
+    """Returns available Inworld voices for the workspace bound to the API key."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+
+    if not settings.INWORLD_API_KEY:
+        return JsonResponse({'ok': False, 'error': 'Inworld API key is not configured on the server.'}, status=500)
+
+    language_filters = request.GET.getlist('languages')
+    query_parts = []
+    for language in language_filters:
+        code = str(language or '').strip()
+        if code:
+            query_parts.append(('languages', code))
+
+    try:
+        response = requests.get(
+            f"{settings.INWORLD_API_ROOT.rstrip('/')}/voices/v1/voices",
+            headers={
+                'Authorization': f"Basic {settings.INWORLD_API_KEY}",
+            },
+            params=query_parts,
+            timeout=20,
+        )
+
+        if response.status_code != 200:
+            return JsonResponse({'ok': False, 'error': f'Inworld voices request failed: {response.text[:300]}'}, status=502)
+
+        payload = response.json()
+        voices = payload.get('voices') or []
+        simplified = []
+        for voice in voices:
+            voice_id = (voice.get('voiceId') or '').strip()
+            if not voice_id:
+                continue
+            simplified.append({
+                'voice_id': voice_id,
+                'display_name': (voice.get('displayName') or voice_id).strip(),
+                'lang_code': (voice.get('langCode') or '').strip(),
+                'source': (voice.get('source') or '').strip(),
+                'description': (voice.get('description') or '').strip(),
+            })
+
+        simplified.sort(key=lambda item: (item.get('display_name') or '').lower())
+        return JsonResponse({'ok': True, 'voices': simplified})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
 
 @csrf_exempt
 @require_POST

@@ -318,6 +318,21 @@
             <button @click="saveVoiceTimeline" :disabled="!voiceTimelinePlaylistId || voiceTimelineLoading" class="h-9 px-3 bg-secondary text-black text-[10px] font-bold uppercase tracking-widest disabled:opacity-50">Save Voice-Over Mix</button>
         </div>
 
+        <div class="p-3 border-b border-white/10 bg-black/20 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 items-center">
+            <select x-model="voiceTimelineDefaultVoiceId"
+                    @change="setPlaylistDefaultVoice(voiceTimelineDefaultVoiceId)"
+                    class="h-9 bg-black border border-white/10 px-2 text-xs text-white uppercase">
+                <option value="">Default DJ Voice (None)</option>
+                <template x-for="voice in inworldVoices" :key="`inworld-v-${voice.voice_id}`">
+                    <option :value="voice.voice_id" x-text="`${voice.display_name}${voice.source ? ` (${voice.source})` : ''}`"></option>
+                </template>
+            </select>
+            <button @click="fetchInworldVoices"
+                    :disabled="voiceVoicesLoading"
+                    class="h-9 px-3 border border-secondary/60 text-secondary text-[10px] font-bold uppercase tracking-widest disabled:opacity-50"
+                    x-text="voiceVoicesLoading ? 'Loading DJs...' : 'Refresh DJs'"></button>
+        </div>
+
         <div class="p-3 border-b border-white/10 bg-black/20">
             <div class="text-[9px] font-mono uppercase tracking-widest text-slate-500 mb-2">Premiere-style Timeline (A1 Music / A2 Voice-Over)</div>
             <div class="overflow-x-auto no-scrollbar">
@@ -337,6 +352,16 @@
                                     <input type="checkbox" x-model="track.voice_over_active" @change="toggleVoiceOverTrack(track)" class="h-3 w-3 bg-black border-white/20 text-primary">
                                     Voice-Over Active
                                 </label>
+                                <select :value="track.voice_over_voice_id || ''"
+                                        @change="setTrackVoiceSelection(track, $event.target.value)"
+                                        class="w-full h-7 bg-black border border-white/10 px-2 text-[9px] text-white uppercase">
+                                    <option value="">Use Playlist Default DJ</option>
+                                    <template x-for="voice in inworldVoices" :key="`track-voice-${index}-${voice.voice_id}`">
+                                        <option :value="voice.voice_id" x-text="`${voice.display_name}${voice.source ? ` (${voice.source})` : ''}`"></option>
+                                    </template>
+                                </select>
+                                <p class="text-[9px] font-mono uppercase tracking-widest text-slate-400"
+                                   x-text="getEffectiveTrackVoiceLabel(track)"></p>
                                 <div class="voice-lane relative h-8 border border-white/10 bg-black/50" @click="setVoiceClipPositionFromLane($event, track)">
                                     <template x-if="track.voice_over_active">
                                         <div class="group absolute top-1 bottom-1 bg-primary/70 border border-primary cursor-grab flex items-center justify-center text-[8px] font-bold uppercase tracking-widest text-black"
@@ -350,11 +375,15 @@
                                     </template>
                                 </div>
                                 <textarea x-model="track.voice_over_text" rows="3" class="w-full bg-black border border-white/10 p-2 text-[10px] text-white" placeholder="Voice-over line/script..."></textarea>
-                                <div class="flex justify-end">
+                                <div class="flex justify-end gap-2">
                                     <button @click="generateTrackVoiceOver(track, index)"
                                             :disabled="voiceTimelineLoading || voiceOverGeneratingTrackIndex === index"
                                             class="h-7 px-2 border border-secondary/60 text-secondary text-[9px] font-bold uppercase tracking-widest disabled:opacity-50"
                                             x-text="voiceOverGeneratingTrackIndex === index ? 'Generating…' : 'Generate VO'"></button>
+                                    <button @click="synthesizeTrackVoiceOver(track, index)"
+                                            :disabled="voiceTimelineLoading || voiceOverSynthTrackIndex === index"
+                                            class="h-7 px-2 border border-primary/60 text-primary text-[9px] font-bold uppercase tracking-widest disabled:opacity-50"
+                                            x-text="voiceOverSynthTrackIndex === index ? 'Rendering…' : 'Add VO Audio'"></button>
                                 </div>
                             </div>
                         </div>
@@ -676,9 +705,16 @@ function playlistApp() {
         previewPlaylist: { id: null, name: '', tracks: [] },
         voiceTimelinePlaylistId: null,
         voiceTimelinePlaylistName: '',
+        voiceTimelineDefaultVoiceId: '',
+        voiceTimelineDefaultVoiceName: '',
+        preferredDefaultVoiceId: 'default-trm-shaco-fymwvka9pdsg__design-voice-851b1e38',
+        preferredDefaultVoiceName: 'Yang',
+        inworldVoices: [],
+        voiceVoicesLoading: false,
         voiceTimelineTracks: [],
         voiceTimelineLoading: false,
         voiceOverGeneratingTrackIndex: null,
+        voiceOverSynthTrackIndex: null,
         voiceClipDragContext: null,
         newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ', genre: 'MUSIC', voice_over: '' },
         toast: { visible: false, message: '' },
@@ -725,6 +761,7 @@ function playlistApp() {
         async init() {
             await this.fetchB2Tracks();
             await this.fetchSchedules();
+            await this.fetchInworldVoices();
             this.initSortable();
             this.startNowTicker();
             await this.loadScheduleTemplates();
@@ -1168,6 +1205,88 @@ function playlistApp() {
                 byId.set(id, { id, name: String(playlist.name || '').trim() || `Playlist ${id}` });
             }
             this.savedPlaylists = Array.from(byId.values()).sort((a, b) => a.name.localeCompare(b.name));
+        },
+
+        getVoiceById(voiceId) {
+            const key = String(voiceId || '').trim();
+            if (!key) return null;
+            return (this.inworldVoices || []).find((voice) => String(voice.voice_id || '').trim() === key) || null;
+        },
+
+        getVoiceDisplayName(voiceId) {
+            const selected = this.getVoiceById(voiceId);
+            return selected ? (selected.display_name || selected.voice_id) : '';
+        },
+
+        setPlaylistDefaultVoice(voiceId) {
+            const clean = String(voiceId || '').trim();
+            this.voiceTimelineDefaultVoiceId = clean;
+            this.voiceTimelineDefaultVoiceName = clean ? this.getVoiceDisplayName(clean) : '';
+        },
+
+        setTrackVoiceSelection(track, voiceId) {
+            if (!track) return;
+            const clean = String(voiceId || '').trim();
+            track.voice_over_voice_id = clean;
+            track.voice_over_voice_name = clean ? this.getVoiceDisplayName(clean) : '';
+        },
+
+        getEffectiveTrackVoiceLabel(track) {
+            if (!track) return 'DJ: Default';
+            const trackVoiceId = String(track.voice_over_voice_id || '').trim();
+            if (trackVoiceId) {
+                const trackName = this.getVoiceDisplayName(trackVoiceId) || String(track.voice_over_voice_name || '').trim() || 'Custom DJ';
+                return `DJ: ${trackName} (Track)`;
+            }
+            const defaultVoiceId = String(this.voiceTimelineDefaultVoiceId || '').trim();
+            if (defaultVoiceId) {
+                const defaultName = this.getVoiceDisplayName(defaultVoiceId) || String(this.voiceTimelineDefaultVoiceName || '').trim() || 'Playlist DJ';
+                return `DJ: ${defaultName} (Default)`;
+            }
+            return 'DJ: None Selected';
+        },
+
+        async fetchInworldVoices() {
+            this.voiceVoicesLoading = true;
+            try {
+                const resp = await fetch('/api/inworld/voices/?languages=EN_US&languages=KO_KR');
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.showToast(data.error || 'Could not load DJ voices');
+                    return;
+                }
+                const fetched = Array.isArray(data.voices) ? data.voices : [];
+                const hasPreferred = fetched.some((voice) => String(voice.voice_id || '').trim() === this.preferredDefaultVoiceId);
+                this.inworldVoices = hasPreferred ? fetched : [
+                    {
+                        voice_id: this.preferredDefaultVoiceId,
+                        display_name: this.preferredDefaultVoiceName,
+                        lang_code: 'EN_US',
+                        source: 'IVC',
+                        description: 'Preferred default DJ voice',
+                    },
+                    ...fetched,
+                ];
+                if (!this.voiceTimelineDefaultVoiceId && this.preferredDefaultVoiceId) {
+                    this.voiceTimelineDefaultVoiceId = this.preferredDefaultVoiceId;
+                    this.voiceTimelineDefaultVoiceName = this.getVoiceDisplayName(this.preferredDefaultVoiceId) || this.preferredDefaultVoiceName;
+                } else if (this.voiceTimelineDefaultVoiceId) {
+                    this.voiceTimelineDefaultVoiceName = this.getVoiceDisplayName(this.voiceTimelineDefaultVoiceId);
+                }
+            } catch (e) {
+                this.showToast('Could not load DJ voices');
+                this.inworldVoices = [
+                    {
+                        voice_id: this.preferredDefaultVoiceId,
+                        display_name: this.preferredDefaultVoiceName,
+                        lang_code: 'EN_US',
+                        source: 'IVC',
+                        description: 'Preferred default DJ voice',
+                    }
+                ];
+            } finally {
+                this.voiceVoicesLoading = false;
+            }
         },
 
         openAIModal() {
@@ -1942,6 +2061,8 @@ function playlistApp() {
             const clipLength = Number(track.voice_over_length_percent);
             return {
                 ...track,
+                voice_over_voice_id: (track.voice_over_voice_id || '').trim(),
+                voice_over_voice_name: (track.voice_over_voice_name || '').trim(),
                 voice_over_active: !!track.voice_over_active,
                 voice_over_text: track.voice_over_text || '',
                 duck_volume_percent: track.voice_over_active ? 20 : 100,
@@ -2066,6 +2187,8 @@ function playlistApp() {
 
                 this.voiceTimelinePlaylistId = playlistId;
                 this.voiceTimelinePlaylistName = data.playlist?.name || '';
+                this.voiceTimelineDefaultVoiceId = data.playlist?.default_voice_id || this.preferredDefaultVoiceId || '';
+                this.voiceTimelineDefaultVoiceName = data.playlist?.default_voice_name || this.getVoiceDisplayName(this.voiceTimelineDefaultVoiceId) || (this.voiceTimelineDefaultVoiceId ? this.preferredDefaultVoiceName : '');
                 this.voiceTimelineTracks = (data.playlist?.tracks || []).map((track) => this.normalizeVoiceTimelineTrack(track));
             } catch (e) {
                 this.showToast('Could not load timeline');
@@ -2097,6 +2220,8 @@ function playlistApp() {
                     album_art: track.album_art,
                     duration: track.duration,
                     duration_seconds: track.duration_seconds,
+                    voice_over_voice_id: (track.voice_over_voice_id || '').trim(),
+                    voice_over_voice_name: (track.voice_over_voice_name || '').trim() || this.getVoiceDisplayName(track.voice_over_voice_id),
                     voice_over_text: track.voice_over_text || '',
                     voice_over_active: !!track.voice_over_active,
                     duck_volume_percent: track.voice_over_active ? 20 : 100,
@@ -2110,6 +2235,8 @@ function playlistApp() {
                     body: JSON.stringify({
                         id: playlistId,
                         name: playlistName,
+                        default_voice_id: (this.voiceTimelineDefaultVoiceId || '').trim(),
+                        default_voice_name: (this.voiceTimelineDefaultVoiceName || '').trim() || this.getVoiceDisplayName(this.voiceTimelineDefaultVoiceId),
                         tracks: payloadTracks,
                     })
                 });
@@ -2131,6 +2258,10 @@ function playlistApp() {
             if (!track) return;
             this.voiceOverGeneratingTrackIndex = index;
             try {
+                const trackVoiceId = (track.voice_over_voice_id || '').trim();
+                const effectiveVoiceId = trackVoiceId || (this.voiceTimelineDefaultVoiceId || '').trim();
+                const effectiveVoiceName = this.getVoiceDisplayName(effectiveVoiceId) || (track.voice_over_voice_name || '').trim() || (this.voiceTimelineDefaultVoiceName || '').trim();
+
                 const resp = await fetch('/api/voiceover/generate/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
@@ -2139,6 +2270,8 @@ function playlistApp() {
                         artist: track.artist || '',
                         duration: track.duration || '',
                         playlist_name: this.voiceTimelinePlaylistName || '',
+                        voice_over_voice_id: effectiveVoiceId,
+                        voice_over_voice_name: effectiveVoiceName,
                         style: 'hype',
                     })
                 });
@@ -2158,6 +2291,56 @@ function playlistApp() {
                 this.showToast('Voice-over generation failed');
             } finally {
                 this.voiceOverGeneratingTrackIndex = null;
+            }
+        },
+
+        async synthesizeTrackVoiceOver(track, index) {
+            if (!track) return;
+            const script = String(track.voice_over_text || '').trim();
+            if (!script) {
+                this.showToast('Enter voice-over script first');
+                return;
+            }
+
+            const trackVoiceId = (track.voice_over_voice_id || '').trim();
+            const effectiveVoiceId = trackVoiceId || (this.voiceTimelineDefaultVoiceId || '').trim();
+            const effectiveVoiceName = this.getVoiceDisplayName(effectiveVoiceId) || (track.voice_over_voice_name || '').trim() || (this.voiceTimelineDefaultVoiceName || '').trim();
+
+            if (!effectiveVoiceId) {
+                this.showToast('Select a DJ voice first');
+                return;
+            }
+
+            this.voiceOverSynthTrackIndex = index;
+            try {
+                const resp = await fetch('/api/voiceover/synthesize/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({
+                        text: script,
+                        song_title: track.title || track.name || 'Voice Over',
+                        voice_over_voice_id: effectiveVoiceId,
+                        voice_over_voice_name: effectiveVoiceName,
+                    })
+                });
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.showToast(data.error || 'Voice rendering failed');
+                    return;
+                }
+
+                const generated = this.normalizeVoiceTimelineTrack(data.track || {});
+                generated.voice_over_active = false;
+                generated.voice_over_text = '';
+                generated.voice_over_start_percent = 0;
+                generated.voice_over_length_percent = 22;
+
+                this.voiceTimelineTracks.splice(index + 1, 0, generated);
+                this.showToast('VO audio added to playlist');
+            } catch (e) {
+                this.showToast('Voice rendering failed');
+            } finally {
+                this.voiceOverSynthTrackIndex = null;
             }
         },
 
