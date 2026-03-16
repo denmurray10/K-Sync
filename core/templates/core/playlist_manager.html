@@ -2067,7 +2067,7 @@ function playlistApp() {
                 voice_over_text: track.voice_over_text || '',
                 duck_volume_percent: track.voice_over_active ? 20 : 100,
                 voice_over_start_percent: Number.isFinite(Number(track.voice_over_start_percent)) ? Number(track.voice_over_start_percent) : 0,
-                voice_over_length_percent: Number.isFinite(clipLength) ? Math.max(5, Math.min(100, Math.round(clipLength))) : 22,
+                voice_over_length_percent: Number.isFinite(clipLength) ? Math.max(1, Math.min(100, Math.round(clipLength))) : 22,
             };
         },
 
@@ -2077,7 +2077,7 @@ function playlistApp() {
         },
 
         getVoiceClipLength(track) {
-            return Math.max(5, Math.min(100, Math.round(Number(track.voice_over_length_percent || 22))));
+            return Math.max(1, Math.min(100, Math.round(Number(track.voice_over_length_percent || 22))));
         },
 
         getVoiceClipLabel(track) {
@@ -2129,7 +2129,7 @@ function playlistApp() {
             if (mode === 'resize') {
                 const deltaPx = moveEvent.clientX - startX;
                 const deltaPercent = (deltaPx / Math.max(1, rect.width)) * 100;
-                const nextLength = Math.max(5, Math.min(100 - startPercent, Math.round(startLength + deltaPercent)));
+                const nextLength = Math.max(1, Math.min(100 - startPercent, Math.round(startLength + deltaPercent)));
                 track.voice_over_length_percent = nextLength;
                 return;
             }
@@ -2330,13 +2330,23 @@ function playlistApp() {
                 }
 
                 const generated = this.normalizeVoiceTimelineTrack(data.track || {});
+                const songSeconds = Math.max(1, Number(track.duration_seconds || 0));
+                const voSeconds = Math.max(1, Number(generated.duration_seconds || 0));
+                const autoPercent = Math.max(1, Math.min(100, Math.round((voSeconds / songSeconds) * 100)));
+
+                track.voice_over_length_percent = autoPercent;
+                if (!track.voice_over_active) {
+                    track.voice_over_active = true;
+                    this.toggleVoiceOverTrack(track);
+                }
+
                 generated.voice_over_active = false;
                 generated.voice_over_text = '';
                 generated.voice_over_start_percent = 0;
                 generated.voice_over_length_percent = 22;
 
                 this.voiceTimelineTracks.splice(index + 1, 0, generated);
-                this.showToast('VO audio added to playlist');
+                this.showToast(`VO audio added (${autoPercent}% clip length)`);
             } catch (e) {
                 this.showToast('Voice rendering failed');
             } finally {

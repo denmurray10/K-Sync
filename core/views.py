@@ -332,7 +332,7 @@ def api_playlist_save(request):
                 voice_over_length_percent = int(voice_over_length_percent)
             except Exception:
                 voice_over_length_percent = 22
-            voice_over_length_percent = max(5, min(100, voice_over_length_percent))
+            voice_over_length_percent = max(1, min(100, voice_over_length_percent))
             
             track, _ = RadioTrack.objects.get_or_create(
                 title=title,
@@ -647,8 +647,31 @@ def api_voiceover_synthesize(request):
     media_rel_url = f"{settings.MEDIA_URL.rstrip('/')}/{relative_dir.replace(os.sep, '/')}/{filename}"
     audio_url = request.build_absolute_uri(media_rel_url)
 
-    estimated_seconds = max(3, min(120, int(round(len(script_text.split()) / 2.4))))
-    duration_label = f"{estimated_seconds // 60}:{estimated_seconds % 60:02d}"
+    duration_seconds = 0
+    timestamp_info = data.get('timestampInfo') or {}
+    word_alignment = timestamp_info.get('wordAlignment') or {}
+    char_alignment = timestamp_info.get('characterAlignment') or {}
+
+    try:
+        word_ends = word_alignment.get('wordEndTimeSeconds') or []
+        if word_ends:
+            duration_seconds = int(round(float(word_ends[-1])))
+    except Exception:
+        duration_seconds = 0
+
+    if duration_seconds <= 0:
+        try:
+            char_ends = char_alignment.get('characterEndTimeSeconds') or []
+            if char_ends:
+                duration_seconds = int(round(float(char_ends[-1])))
+        except Exception:
+            duration_seconds = 0
+
+    if duration_seconds <= 0:
+        duration_seconds = int(round(len(script_text.split()) / 2.4))
+
+    duration_seconds = max(1, min(120, duration_seconds))
+    duration_label = f"{duration_seconds // 60}:{duration_seconds % 60:02d}"
 
     track_title_base = song_title or 'Voice Over'
     track_title = f"VO: {track_title_base}"[:300]
@@ -662,7 +685,7 @@ def api_voiceover_synthesize(request):
             'url': audio_url,
             'album_art': '',
             'duration': duration_label,
-            'duration_seconds': estimated_seconds,
+            'duration_seconds': duration_seconds,
             'voice_over_text': '',
             'voice_over_active': False,
             'voice_over_start_percent': 0,
