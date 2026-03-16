@@ -3477,7 +3477,7 @@ def _auto_rotate_station(state):
             state.started_at = end_time  # Next song starts at exact end of previous
         else:
             # Queue empty, refill and stop fast-forwarding for now
-            all_tracks = list(RadioTrack.objects.values_list('id', flat=True))
+            all_tracks = _get_non_vo_live_track_ids()
             if all_tracks:
                 state.current_track_id = random.choice(all_tracks)
                 state.started_at = end_time
@@ -3485,7 +3485,7 @@ def _auto_rotate_station(state):
 
         # Emergency refill if queue low
         if len(state.up_next) < 3:
-            all_tracks = list(RadioTrack.objects.values_list('id', flat=True))
+            all_tracks = _get_non_vo_live_track_ids()
             exclude_ids = set([state.current_track_id] + list(state.recently_played) + list(state.up_next))
             pool = [tid for tid in all_tracks if tid not in exclude_ids]
             if not pool: pool = [tid for tid in all_tracks if tid not in set(state.up_next)]
@@ -3493,6 +3493,185 @@ def _auto_rotate_station(state):
                 random.shuffle(pool)
                 state.up_next = (list(state.up_next) + pool[:5])[:5]
 
+    state.save()
+    return state
+
+
+def _day_code_for_datetime(dt):
+    day_codes = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+    return day_codes[dt.weekday()]
+
+
+def _seconds_since_midnight(dt):
+    return (dt.hour * 3600) + (dt.minute * 60) + dt.second
+
+
+def _is_generated_voice_track(track):
+    if not track:
+        return False
+    title = str(getattr(track, 'title', '') or '').strip()
+    audio_url = str(getattr(track, 'audio_url', '') or '').lower()
+    if title.startswith('VO:'):
+        return True
+    return '/radio/voiceovers/' in audio_url
+
+
+def _get_non_vo_live_track_ids():
+    return list(
+        RadioTrack.objects
+        .exclude(audio_url='')
+        .exclude(audio_url__isnull=True)
+        .exclude(title__startswith='VO:')
+        .exclude(audio_url__icontains='/radio/voiceovers/')
+        .values_list('id', flat=True)
+    )
+
+
+def _safe_track_duration_seconds(track):
+    if not track:
+        return 180
+    try:
+        seconds = int(getattr(track, 'duration_seconds', 0) or 0)
+    except Exception:
+        seconds = 0
+    return seconds if seconds > 0 else 180
+
+
+def _get_active_schedule_slot(now_local):
+    day_code = _day_code_for_datetime(now_local)
+    now_seconds = _seconds_since_midnight(now_local)
+    slots = (
+        RadioSchedule.objects
+        .select_related('playlist')
+        .filter(day=day_code)
+        .order_by('start_time', 'id')
+    )
+
+    for slot in slots:
+        start_seconds = (slot.start_time.hour * 3600) + (slot.start_time.minute * 60) + slot.start_time.second
+        end_seconds = (slot.end_time.hour * 3600) + (slot.end_time.minute * 60) + slot.end_time.second
+        if end_seconds <= start_seconds:
+            continue
+        if start_seconds <= now_seconds < end_seconds:
+            return slot, start_seconds, end_seconds
+
+    return None, None, None
+
+
+def _build_live_playlist_timeline(playlist):
+    timeline = []
+    playlist_tracks = list(
+        RadioPlaylistTrack.objects
+        .select_related('track')
+        .filter(playlist=playlist)
+        .order_by('order', 'id')
+    )
+    for idx, playlist_track in enumerate(playlist_tracks):
+        track = playlist_track.track
+        if not track or not track.audio_url:
+            continue
+        if _is_generated_voice_track(track):
+            continue
+
+        duration_seconds = _safe_track_duration_seconds(track)
+        voice_overlay = None
+
+        if playlist_track.voice_over_active:
+            next_playlist_track = playlist_tracks[idx + 1] if idx + 1 < len(playlist_tracks) else None
+            next_track = next_playlist_track.track if next_playlist_track else None
+            if next_track and next_track.audio_url and _is_generated_voice_track(next_track):
+                try:
+                    start_percent = int(playlist_track.voice_over_start_percent or 0)
+                except Exception:
+                    start_percent = 0
+                start_percent = max(0, min(100, start_percent))
+                start_seconds = int(round(duration_seconds * (start_percent / 100.0)))
+
+                try:
+                    duck_percent = int(playlist_track.duck_volume_percent or 10)
+                except Exception:
+                    duck_percent = 10
+                duck_percent = max(0, min(100, duck_percent))
+
+                voice_overlay = {
+                    'audio_url': next_track.audio_url,
+                    'start_seconds': max(0, start_seconds),
+                    'duration_seconds': _safe_track_duration_seconds(next_track),
+                    'duck_volume': duck_percent / 100.0,
+                }
+
+        timeline.append({
+            'track': track,
+            'duration_seconds': duration_seconds,
+            'voice_overlay': voice_overlay,
+        })
+    return timeline
+
+
+def _compute_schedule_live_context(now_local):
+    slot, start_seconds, _end_seconds = _get_active_schedule_slot(now_local)
+    if not slot:
+        return None
+
+    timeline = _build_live_playlist_timeline(slot.playlist)
+    if not timeline:
+        return None
+
+    elapsed_in_slot = max(0, _seconds_since_midnight(now_local) - start_seconds)
+    cycle_duration = sum(item['duration_seconds'] for item in timeline)
+    if cycle_duration <= 0:
+        return None
+
+    cycle_position = elapsed_in_slot % cycle_duration
+    running_total = 0
+    current_index = 0
+    current_offset = 0
+
+    for idx, item in enumerate(timeline):
+        next_total = running_total + item['duration_seconds']
+        if cycle_position < next_total:
+            current_index = idx
+            current_offset = max(0, cycle_position - running_total)
+            break
+        running_total = next_total
+
+    timeline_len = len(timeline)
+    current_item = timeline[current_index]
+    current_track = current_item['track']
+
+    up_next_tracks = []
+    for step in range(1, min(6, timeline_len) + 1):
+        up_next_tracks.append(timeline[(current_index + step) % timeline_len]['track'])
+
+    recently_played_tracks = []
+    for step in range(1, min(6, timeline_len) + 1):
+        recently_played_tracks.append(timeline[(current_index - step) % timeline_len]['track'])
+
+    started_at = timezone.now() - timedelta(seconds=int(current_offset))
+
+    return {
+        'slot': slot,
+        'current_track': current_track,
+        'current_voice_overlay': current_item.get('voice_overlay'),
+        'up_next_tracks': up_next_tracks,
+        'recently_played_tracks': recently_played_tracks,
+        'current_offset': int(current_offset),
+        'started_at': started_at,
+    }
+
+
+def _sync_state_with_schedule_context(state, context):
+    if not state or not context:
+        return state
+
+    current_track = context['current_track']
+    up_next_tracks = context['up_next_tracks']
+    recently_played_tracks = context['recently_played_tracks']
+
+    state.current_track_id = current_track.id if current_track else None
+    state.up_next = [track.id for track in up_next_tracks if track]
+    state.recently_played = [track.id for track in recently_played_tracks if track]
+    state.started_at = context['started_at']
     state.save()
     return state
 
@@ -3504,32 +3683,47 @@ def live(request):
     ).values_list('song_title', flat=True)
     requested_titles = [t.lower() for t in requested]
 
-    # Fetch Radio Station State and Auto-Rotate if needed
-    state = RadioStationState.objects.first()
-    if state:
+    # Fetch Radio Station State and use scheduler-linked playback when possible
+    state, _ = RadioStationState.objects.get_or_create(id=1)
+    schedule_context = _compute_schedule_live_context(timezone.localtime())
+    if schedule_context:
+        state = _sync_state_with_schedule_context(state, schedule_context)
+    else:
         state = _auto_rotate_station(state)
 
     current_track = None
+    current_voice_overlay = None
     up_next_tracks = []
     recently_played_tracks = []
 
-    if state:
+    if schedule_context:
+        current_track = schedule_context['current_track']
+        current_voice_overlay = schedule_context.get('current_voice_overlay')
+        up_next_tracks = schedule_context['up_next_tracks'][:6]
+        recently_played_tracks = schedule_context['recently_played_tracks'][:6]
+    elif state:
         current_track = state.current_track
+        if _is_generated_voice_track(current_track):
+            current_track = None
 
         # Fetch up_next tracks in order, limit to 6
         up_next_ids = (state.up_next or [])[:6]
         up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
+        up_next_tracks = [track for track in up_next_tracks if not _is_generated_voice_track(track)]
         # Preserving order from list
         up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
 
         # Fetch recently_played tracks in order, limit to 6
         recent_ids = (state.recently_played or [])[:6]
         recently_played_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
+        recently_played_tracks = [track for track in recently_played_tracks if not _is_generated_voice_track(track)]
         recently_played_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
 
     # Calculate offset for synchronization
     current_offset = 0
-    if state and state.started_at:
+    if schedule_context:
+        current_offset = schedule_context['current_offset']
+    elif state and state.started_at:
         elapsed = timezone.now() - state.started_at
         current_offset = max(0, int(elapsed.total_seconds()))
 
@@ -3537,6 +3731,7 @@ def live(request):
         'requested_titles': requested_titles,
         'state': state,
         'current_track': current_track,
+        'current_voice_overlay_json': json.dumps(current_voice_overlay),
         'up_next_tracks': up_next_tracks,
         'recently_played_tracks': recently_played_tracks,
         'current_offset': current_offset,
@@ -3549,9 +3744,35 @@ def api_live_rotate_track(request):
     from core.models import RadioStationState, RadioTrack
     import random
 
-    state = RadioStationState.objects.first()
-    if not state:
-        return JsonResponse({'ok': False, 'error': 'No station state found'}, status=404)
+    state, _ = RadioStationState.objects.get_or_create(id=1)
+
+    schedule_context = _compute_schedule_live_context(timezone.localtime())
+    if schedule_context:
+        _sync_state_with_schedule_context(state, schedule_context)
+        current = schedule_context['current_track']
+        up_next_list = schedule_context['up_next_tracks'][:6]
+        recently_played_list = schedule_context['recently_played_tracks'][:6]
+
+        return JsonResponse({
+            'ok': True,
+            'current_offset': schedule_context['current_offset'],
+            'voice_overlay': schedule_context.get('current_voice_overlay'),
+            'current_track': {
+                'title': current.title,
+                'artist': current.artist,
+                'album_art': current.album_art,
+                'audio_url': current.audio_url,
+                'duration': current.duration,
+            },
+            'up_next': [
+                {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
+                for t in up_next_list
+            ],
+            'recently_played': [
+                {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
+                for t in recently_played_list
+            ]
+        })
 
     # Catch-up current state first
     state = _auto_rotate_station(state)
@@ -3571,13 +3792,13 @@ def api_live_rotate_track(request):
         state.up_next = queue
     else:
         # Emergency refill if queue is empty
-        all_tracks = list(RadioTrack.objects.values_list('id', flat=True))
+        all_tracks = _get_non_vo_live_track_ids()
         if all_tracks:
             state.current_track_id = random.choice(all_tracks)
 
     # Refill queue if low
     if len(state.up_next) < 3:
-        all_tracks = list(RadioTrack.objects.values_list('id', flat=True))
+        all_tracks = _get_non_vo_live_track_ids()
         exclude_ids = set([state.current_track_id] + list(state.recently_played) + list(state.up_next))
         pool = [tid for tid in all_tracks if tid not in exclude_ids]
         
@@ -3598,13 +3819,17 @@ def api_live_rotate_track(request):
     up_next_ids = state.up_next
     up_next_tracks = RadioTrack.objects.filter(id__in=up_next_ids)
     up_next_list = sorted(list(up_next_tracks), key=lambda t: up_next_ids.index(t.id))
+    up_next_list = [track for track in up_next_list if not _is_generated_voice_track(track)]
 
     recently_played_ids = state.recently_played
     recently_played_tracks = RadioTrack.objects.filter(id__in=recently_played_ids)
     recently_played_list = sorted(list(recently_played_tracks), key=lambda t: recently_played_ids.index(t.id))
+    recently_played_list = [track for track in recently_played_list if not _is_generated_voice_track(track)]
 
     return JsonResponse({
         'ok': True,
+        'current_offset': 0,
+        'voice_overlay': None,
         'current_track': {
             'title': current.title,
             'artist': current.artist,

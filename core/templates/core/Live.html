@@ -170,6 +170,7 @@
             <source src="{{ current_track.audio_url }}" type="audio/mpeg">
         {% endif %}
     </audio>
+    <audio id="live-vo-audio" preload="auto"></audio>
 
     <!-- Central Player -->
     <div class="relative z-20 flex flex-col items-center text-center px-6 pt-48 pb-24 max-w-5xl mx-auto w-full">
@@ -520,11 +521,86 @@
         // Play button toggle
         const playBtn = document.getElementById('play-btn');
         const audio = document.getElementById('live-audio');
+        const voiceAudio = document.getElementById('live-vo-audio');
         
         if (playBtn && audio) {
             let isPlaying = false;
             const initialServerOffset = {{ current_offset|default:0 }};
+            let currentVoiceOverlay = {{ current_voice_overlay_json|default:"null"|safe }};
+            let voiceStartTimer = null;
             const pageLoadTime = Date.now();
+
+            const getSliderVolume = () => {
+                const volumeSlider = document.getElementById('volume-slider');
+                if (!volumeSlider) return 0.75;
+                const sliderVal = Number(volumeSlider.value);
+                if (!Number.isFinite(sliderVal)) return 0.75;
+                return Math.max(0, Math.min(1, sliderVal / 100));
+            };
+
+            const clearVoiceOverlayPlayback = () => {
+                if (voiceStartTimer) {
+                    clearTimeout(voiceStartTimer);
+                    voiceStartTimer = null;
+                }
+                if (voiceAudio) {
+                    try {
+                        voiceAudio.pause();
+                        voiceAudio.currentTime = 0;
+                        voiceAudio.src = '';
+                    } catch (e) {}
+                }
+                audio.volume = getSliderVolume();
+            };
+
+            const scheduleVoiceOverlayForOffset = (trackOffsetSeconds) => {
+                clearVoiceOverlayPlayback();
+
+                if (!voiceAudio || !currentVoiceOverlay || !currentVoiceOverlay.audio_url) {
+                    return;
+                }
+
+                const startSeconds = Math.max(0, Number(currentVoiceOverlay.start_seconds || 0));
+                const overlayDuration = Math.max(0, Number(currentVoiceOverlay.duration_seconds || 0));
+                const configuredDuck = Math.max(0, Math.min(1, Number(currentVoiceOverlay.duck_volume ?? 0.1)));
+                const duckVolume = Math.min(getSliderVolume(), configuredDuck);
+                const safeOffset = Math.max(0, Number(trackOffsetSeconds || 0));
+
+                if (overlayDuration > 0 && safeOffset >= startSeconds + overlayDuration) {
+                    return;
+                }
+
+                const startOverlayNow = (overlaySeek = 0) => {
+                    try {
+                        voiceAudio.src = currentVoiceOverlay.audio_url;
+                        voiceAudio.muted = audio.muted;
+                        voiceAudio.currentTime = Math.max(0, overlaySeek);
+                        audio.volume = duckVolume;
+                        voiceAudio.play().catch(() => {
+                            audio.volume = getSliderVolume();
+                        });
+                    } catch (e) {
+                        audio.volume = getSliderVolume();
+                    }
+                };
+
+                if (safeOffset >= startSeconds) {
+                    const voElapsed = safeOffset - startSeconds;
+                    startOverlayNow(voElapsed);
+                } else {
+                    const waitMs = Math.max(0, Math.round((startSeconds - safeOffset) * 1000));
+                    voiceStartTimer = setTimeout(() => {
+                        voiceStartTimer = null;
+                        startOverlayNow(0);
+                    }, waitMs);
+                }
+            };
+
+            if (voiceAudio) {
+                voiceAudio.onended = () => {
+                    audio.volume = getSliderVolume();
+                };
+            }
 
             // Function to get current global offset
             const getGlobalOffset = () => {
@@ -539,6 +615,7 @@
                     console.log(`Syncing audio to: ${targetTime}s`);
                     audio.currentTime = targetTime;
                 }
+                scheduleVoiceOverlayForOffset(targetTime);
             };
 
             // Only seek if we actually have an offset
@@ -553,6 +630,7 @@
                      // Toggle Mute
                      const wasMuted = audio.muted;
                      audio.muted = !audio.muted;
+                     if (voiceAudio) voiceAudio.muted = audio.muted;
                      
                      if (wasMuted && !audio.muted) {
                          syncAudio();
@@ -589,11 +667,13 @@
             // Sync initial state if audio is already playing/paused
             audio.onplay = () => {
                 isPlaying = true;
+                if (voiceAudio) voiceAudio.muted = audio.muted;
                 playBtn.querySelector('.material-symbols-outlined').textContent = audio.muted ? 'play_arrow' : 'pause';
                 playBtn.classList.toggle('pulse-glow', audio.muted);
             };
             audio.onpause = () => {
                 isPlaying = false;
+                clearVoiceOverlayPlayback();
                 playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
                 playBtn.classList.add('pulse-glow');
             };
@@ -604,10 +684,13 @@
                 // Set initial volume
                 audio.volume = volumeSlider.value / 100;
                 volumeSlider.addEventListener('input', (e) => {
-                    audio.volume = e.target.value / 100;
+                    if (!voiceAudio || voiceAudio.paused) {
+                        audio.volume = e.target.value / 100;
+                    }
                     // If user moves slider, unmute automatically for better UX
                     if (audio.muted && audio.volume > 0) {
                         audio.muted = false;
+                        if (voiceAudio) voiceAudio.muted = false;
                         playBtn.querySelector('.material-symbols-outlined').textContent = 'pause';
                         playBtn.classList.remove('pulse-glow');
                     }
@@ -623,11 +706,21 @@
                 
                 if (data.ok) {
                     const track = data.current_track;
+                    const serverOffset = Number(data.current_offset || 0);
+                    currentVoiceOverlay = data.voice_overlay || null;
                     
                     // Update Audio
+                    clearVoiceOverlayPlayback();
                     audio.src = track.audio_url;
                     audio.load();
                     await audio.play();
+                    if (Number.isFinite(serverOffset) && serverOffset > 0) {
+                        const seekTo = Math.max(0, Math.floor(serverOffset));
+                        if (Math.abs(audio.currentTime - seekTo) > 2) {
+                            audio.currentTime = seekTo;
+                        }
+                    }
+                    scheduleVoiceOverlayForOffset(serverOffset);
                     
                     // Update Hero UI
                     document.getElementById('hero-title').textContent = track.title;
