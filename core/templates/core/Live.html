@@ -290,8 +290,8 @@
                     <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.7s;"></div>
                 </div>
                 <div class="text-center truncate min-w-[200px] max-w-sm lg:max-w-md">
-                    <span class="font-black uppercase tracking-tighter text-2xl md:text-3xl leading-none text-black block truncate">{% if current_track %}{{ current_track.title }}{% else %}RADIO LIVE{% endif %}</span>
-                    <span class="block text-black/70 font-mono text-[10px] tracking-widest uppercase mt-1 truncate">{% if current_track %}{{ current_track.artist }}{% else %}K-BEATS ON AIR{% endif %}</span>
+                    <span id="sticky-track-title" class="font-black uppercase tracking-tighter text-2xl md:text-3xl leading-none text-black block truncate">{% if current_track %}{{ current_track.title }}{% else %}RADIO LIVE{% endif %}</span>
+                    <span id="sticky-track-artist" class="block text-black/70 font-mono text-[10px] tracking-widest uppercase mt-1 truncate">{% if current_track %}{{ current_track.artist }}{% else %}K-BEATS ON AIR{% endif %}</span>
                 </div>
                 <div class="flex gap-1.5 items-end h-10 opacity-90 w-16">
                     <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.7s;"></div>
@@ -852,6 +852,10 @@
                         document.getElementById('hero-title').textContent = track.title;
                         document.getElementById('hero-artist').textContent = track.artist;
                         document.getElementById('hero-album-art').src = track.album_art;
+                        const stickyTitle = document.getElementById('sticky-track-title');
+                        const stickyArtist = document.getElementById('sticky-track-artist');
+                        if (stickyTitle) stickyTitle.textContent = track.title;
+                        if (stickyArtist) stickyArtist.textContent = track.artist;
                         const bgImg = document.getElementById('album-bg-img');
                         if (bgImg) bgImg.src = track.album_art;
 
