@@ -1996,7 +1996,7 @@ def idols(request):
     elif gender == 'female':
         groups = groups.filter(models.Q(group_type='GIRL') | models.Q(group_type='SOLO'))
 
-    groups = groups.order_by('rank')
+    groups = groups.filter(rank__isnull=False).order_by('rank', 'name')
     
     return render(request, 'core/idols.html', {
         'today_events': today_events, 

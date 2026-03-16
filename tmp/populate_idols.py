@@ -1,6 +1,10 @@
 import os
 import sys
 import django
+import json
+import time
+import urllib.parse
+import urllib.request
 
 # Set up Django environment
 sys.path.append(os.getcwd())
@@ -11,36 +15,122 @@ from core.models import KPopGroup
 from django.utils.text import slugify
 
 groups_data = [
-    (1, "BTS", "HYBE Labels", "BOY"),
-    (2, "Stray Kids", "JYP Entertainment", "BOY"),
-    (3, "BLACKPINK", "YG Entertainment", "GIRL"),
-    (4, "TWICE", "JYP Entertainment", "GIRL"),
-    (5, "ITZY", "JYP Entertainment", "GIRL"),
-    (6, "TXT (Tomorrow X Together)", "HYBE Labels", "BOY"),
-    (7, "(G)I-DLE", "Cube Entertainment", "GIRL"),
-    (8, "ENHYPEN", "Belift Lab / HYBE Labels", "BOY"),
-    (9, "aespa", "SM Entertainment", "GIRL"),
-    (10, "LE SSERAFIM", "Source Music / HYBE Labels", "GIRL"),
-    (11, "Super Junior", "SM Entertainment", "BOY"),
-    (12, "Red Velvet", "SM Entertainment", "GIRL"),
-    (13, "IVE", "Starship Entertainment", "GIRL"),
-    (14, "SEVENTEEN", "Pledis / HYBE Labels", "BOY"),
-    (15, "NewJeans", "ADOR / HYBE Labels", "GIRL"),
-    (16, "GOT7", "JYP Entertainment", "BOY"),
-    (17, "ILLIT", "Belift Lab / HYBE Labels", "GIRL"),
-    (18, "BIGBANG", "YG Entertainment", "BOY"),
-    (19, "BabyMonster", "YG Entertainment", "GIRL"),
-    (20, "Mamamoo", "RBW Entertainment", "GIRL"),
-    (21, "NCT", "SM Entertainment", "BOY"),
-    (22, "Katseye", "HYBE / Geffen Records", "GIRL"),
-    (23, "EXO", "SM Entertainment", "BOY"),
-    (24, "ATEEZ", "KQ Entertainment", "BOY"),
-    (25, "NMIXX", "JYP Entertainment", "GIRL"),
+    (1, "BTS", "HYBE Labels", "BOY", "Global dominance with multiple #1 Billboard albums."),
+    (2, "BLACKPINK", "YG Entertainment", "GIRL", "First K-pop girl group to headline Coachella."),
+    (3, "SEVENTEEN", "PLEDIS Entertainment", "BOY", "Recognized as 2025 Billboard K-Pop Artist #1."),
+    (4, "Stray Kids", "JYP Entertainment", "BOY", "Consistent Billboard 200 chart-toppers."),
+    (5, "EXO", "SM Entertainment", "BOY", "Pioneered K-pop’s global expansion in the 2010s."),
+    (6, "TWICE", "JYP Entertainment", "GIRL", "One of the best-selling K-pop girl groups ever."),
+    (7, "SHINee", "SM Entertainment", "BOY", "Legendary discography and performance legacy."),
+    (8, "NCT 127", "SM Entertainment", "BOY", "Known for an experimental sound and global fanbase."),
+    (9, "NCT Dream", "SM Entertainment", "BOY", "Powerful streaming and strong youth appeal."),
+    (10, "Super Junior", "SM Entertainment", "BOY", "One of K-pop’s original global superstar groups."),
+    (11, "ATEEZ", "KQ Entertainment", "BOY", "4th-gen performance powerhouse with international touring strength."),
+    (12, "ENHYPEN", "BELIFT LAB", "BOY", "Rapid global rise with strong album and tour momentum."),
+    (13, "TXT (Tomorrow X Together)", "BIGHIT MUSIC", "BOY", "Signature storytelling concept and worldwide fandom growth."),
+    (14, "aespa", "SM Entertainment", "GIRL", "Genre-blending concept leaders of the current era."),
+    (15, "(G)I-DLE", "Cube Entertainment", "GIRL", "Self-driven identity and chart-winning releases."),
+    (16, "IVE", "Starship Entertainment", "GIRL", "Hitmaking consistency and premium concept execution."),
+    (17, "LE SSERAFIM", "SOURCE MUSIC", "GIRL", "Performance-forward identity with global pop crossover."),
+    (18, "NewJeans", "ADOR", "GIRL", "Cultural trendsetters with standout streaming impact."),
+    (19, "ITZY", "JYP Entertainment", "GIRL", "High-energy choreography and strong fan support."),
+    (20, "TREASURE", "YG Entertainment", "BOY", "Strong global fanbase and stage-focused brand."),
+    (21, "ZEROBASEONE", "WAKEONE", "BOY", "Fast-rising project group with major rookie momentum."),
+    (22, "RIIZE", "SM Entertainment", "BOY", "New-generation growth with strong digital response."),
+    (23, "TWS", "PLEDIS Entertainment", "BOY", "Emerging act with breakout public attention."),
+    (24, "GOT7", "Warner Music Korea", "BOY", "Beloved 3rd-gen group with proven global reach."),
+    (25, "MONSTA X", "Starship Entertainment", "BOY", "Internationally recognized for performance and touring."),
+    (26, "Red Velvet", "SM Entertainment", "GIRL", "Versatile concept queens with a respected catalog."),
+    (27, "NCT U", "SM Entertainment", "BOY", "Flexible unit format showcasing NCT’s core range."),
+    (28, "BIGBANG", "YG Entertainment", "BOY", "Iconic trendsetting legacy in modern K-pop history."),
+    (29, "Girls' Generation (SNSD)", "SM Entertainment", "GIRL", "Foundational girl-group icons of the Hallyu era."),
+    (30, "MAMAMOO", "RBW", "GIRL", "Renowned vocal group with enduring fan loyalty."),
+    (31, "BABYMONSTER", "YG Entertainment", "GIRL", "5th-gen YG girl group with major spotlight."),
+    (32, "ILLIT", "BELIFT LAB", "GIRL", "Breakout 5th-gen act with rapid audience growth."),
+    (33, "ASTRO", "Fantagio", "BOY", "Beloved 3rd-gen team with dedicated fandom."),
+    (34, "IZ*ONE", "Off The Record / Swing Entertainment", "GIRL", "Iconic project group with lasting influence."),
+    (35, "EXID", "Banana Culture", "GIRL", "2nd-gen legends known for viral-era impact."),
+    (36, "Wanna One", "Swing Entertainment", "BOY", "Project group that produced many top stars."),
+    (37, "CIX", "C9 Entertainment", "BOY", "Vocal-focused group with strong concept identity."),
+    (38, "DAY6", "JYP Entertainment", "BOY", "K-pop band respected for live-musicianship."),
+    (39, "HIGHLIGHT", "Around US Entertainment", "BOY", "Veteran group with stable long-term support."),
+    (40, "VICTON", "IST Entertainment", "BOY", "Fan-favorite team with a loyal core audience."),
+    (41, "KISS OF LIFE", "S2 Entertainment", "GIRL", "Retro-inspired identity with strong buzz."),
+    (42, "fromis_9", "PLEDIS Entertainment", "GIRL", "Consistent releases and steady fan growth."),
+    (43, "VERIVERY", "Jellyfish Entertainment", "BOY", "4th-gen boy group with performance strengths."),
+    (44, "PENTAGON", "Cube Entertainment", "BOY", "Creative, self-producing team with dedicated fandom."),
+    (45, "THE BOYZ", "IST Entertainment", "BOY", "Performance-focused act with global support."),
+    (46, "EVNNE", "Jellyfish Entertainment", "BOY", "Rising 5th-gen group gaining momentum."),
+    (47, "FIFTY FIFTY", "ATTRAKT", "GIRL", "Global viral breakout via ‘Cupid’."),
+    (48, "STAYC", "High Up Entertainment", "GIRL", "4th-gen girl group with consistent chart presence."),
+    (49, "Kep1er", "WAKEONE / Swing Entertainment", "GIRL", "Project girl group with international fanbase."),
+    (50, "XODIAC", "One Cool Jacso Entertainment", "BOY", "Emerging 5th-gen act with rising attention."),
 ]
 
+
+def _slug_for(name: str) -> str:
+    overrides = {
+        "TXT (Tomorrow X Together)": "txt",
+        "(G)I-DLE": "g-i-dle",
+        "Girls' Generation (SNSD)": "girls-generation-snsd",
+        "IZ*ONE": "izone",
+        "fromis_9": "fromis-9",
+    }
+    return overrides.get(name, slugify(name))
+
+
+def _story_for(name: str, label: str, gtype: str, trait: str) -> str:
+    group_label = 'boy group' if gtype == 'BOY' else ('girl group' if gtype == 'GIRL' else 'solo artist')
+    return (
+        f"{name} is a leading K-pop {group_label} under {label}. "
+        f"{trait} "
+        f"On K-Beats, fans can follow {name}'s story through releases, milestones, and community highlights."
+    )
+
+
+def _itunes_artist_image(name: str) -> str:
+    search_map = {
+        '(G)I-DLE': 'G I-DLE',
+        "Girls' Generation (SNSD)": "Girls Generation",
+        'IZ*ONE': 'IZONE',
+        'fromis_9': 'fromis 9',
+        'TXT (Tomorrow X Together)': 'TOMORROW X TOGETHER',
+    }
+    query_name = search_map.get(name, name)
+    query = urllib.parse.quote(query_name)
+    headers = {'User-Agent': 'Mozilla/5.0'}
+
+    endpoints = [
+        f'https://itunes.apple.com/search?term={query}&entity=album&limit=5&country=KR',
+        f'https://itunes.apple.com/search?term={query}&entity=song&limit=5&country=KR',
+        f'https://itunes.apple.com/search?term={query}&entity=musicArtist&limit=3',
+    ]
+
+    for endpoint in endpoints:
+        try:
+            req = urllib.request.Request(endpoint, headers=headers)
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                data = json.loads(resp.read())
+            for item in data.get('results', []):
+                artwork = item.get('artworkUrl100') or item.get('artworkUrl60')
+                if artwork:
+                    return artwork.replace('100x100bb', '600x600bb').replace('100x100', '600x600')
+        except Exception:
+            time.sleep(0.15)
+
+    return ''
+
+
+def _fallback_avatar(name: str) -> str:
+    seed = urllib.parse.quote(name)
+    return f'https://api.dicebear.com/7.x/initials/svg?seed={seed}&backgroundColor=111111&textColor=ffffff'
+
 def populate():
-    for rank, name, label, gtype in groups_data:
-        slug = slugify(name)
+    target_slugs = set()
+
+    for rank, name, label, gtype, trait in groups_data:
+        slug = _slug_for(name)
+        target_slugs.add(slug)
         group, created = KPopGroup.objects.update_or_create(
             slug=slug,
             defaults={
@@ -48,13 +138,25 @@ def populate():
                 'label': label,
                 'group_type': gtype,
                 'rank': rank,
-                'logo_path': f'core/images/group_logos/{slug.replace("-", "_")}.png'
+                'logo_path': f'core/images/group_logos/{slug.replace("-", "_")}.png',
+                'description': _story_for(name, label, gtype, trait),
             }
         )
+
+        if not (group.image_url or '').strip():
+            fetched = _itunes_artist_image(name)
+            group.image_url = fetched or _fallback_avatar(name)
+            group.save(update_fields=['image_url'])
+            time.sleep(0.2)
+
         if created:
             print(f"Created group: {name}")
         else:
             print(f"Updated group: {name}")
+
+    demoted = KPopGroup.objects.exclude(slug__in=target_slugs).exclude(rank__isnull=True).update(rank=None)
+    if demoted:
+        print(f"Demoted {demoted} non-top-50 ranked entries (set rank=None)")
 
 if __name__ == "__main__":
     populate()
