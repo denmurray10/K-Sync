@@ -199,8 +199,8 @@
 
 <!-- Track Title -->
 <div class="text-center truncate min-w-[200px] flex-1">
-<span class="font-black uppercase tracking-tighter text-2xl md:text-3xl leading-none text-black block truncate">SEVEN</span>
-<span class="block text-black/70 font-mono text-[10px] tracking-widest uppercase mt-1 truncate">JUNG KOOK FEAT. LATTO</span>
+<span id="home-live-title" class="font-black uppercase tracking-tighter text-2xl md:text-3xl leading-none text-black block truncate">{{ home_live_track.title|default:"LIVE MIX" }}</span>
+<span id="home-live-artist" class="block text-black/70 font-mono text-[10px] tracking-widest uppercase mt-1 truncate">{{ home_live_track.artist|default:"K-BEATS RADIO" }}</span>
 </div>
 
 <!-- Right Waveform -->
@@ -707,6 +707,31 @@ function updateCountdowns() {
 updateCountdowns();
 setInterval(updateCountdowns, 60000);
 window.addEventListener('load', fetchLiveArtwork);
+
+// ── Homepage Live Bar Sync ──────────────────────────────────────
+async function refreshHomepageLiveBar() {
+    const titleEl = document.getElementById('home-live-title');
+    const artistEl = document.getElementById('home-live-artist');
+    if (!titleEl || !artistEl) return;
+
+    try {
+        const resp = await fetch(`/api/live/rotate/?t=${Date.now()}`, { cache: 'no-store' });
+        const data = await resp.json();
+        if (!data?.ok || !data?.current_track) return;
+
+        const nextTitle = String(data.current_track.title || '').trim();
+        const nextArtist = String(data.current_track.artist || '').trim();
+        if (nextTitle) titleEl.textContent = nextTitle;
+        if (nextArtist) artistEl.textContent = nextArtist;
+    } catch (e) {
+        // keep existing values on transient network failures
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    refreshHomepageLiveBar();
+    setInterval(refreshHomepageLiveBar, 15000);
+});
 
 // ── Scroll Reveal Animations ─────────────────────────────────────
 const observerOptions = {

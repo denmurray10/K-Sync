@@ -1767,6 +1767,26 @@ def home(request):
 
     # Get the active LivePoll
     active_poll = LivePoll.objects.filter(is_active=True).first()
+
+    # Live player snapshot for homepage now-playing bar
+    home_live_track = None
+    try:
+        state, _ = RadioStationState.objects.get_or_create(id=1)
+        schedule_context = _compute_schedule_live_context(timezone.localtime())
+        if schedule_context:
+            state = _sync_state_with_schedule_context(state, schedule_context)
+            candidate_track = schedule_context.get('current_track')
+        else:
+            state = _auto_rotate_station(state)
+            candidate_track = state.current_track if state else None
+
+        if candidate_track and not _is_generated_voice_track(candidate_track):
+            home_live_track = {
+                'title': candidate_track.title,
+                'artist': candidate_track.artist,
+            }
+    except Exception:
+        home_live_track = None
     
     return render(request, 'core/index.html', {
         'upcoming_comebacks': upcoming,
@@ -1775,7 +1795,8 @@ def home(request):
         'trending_ticker_tracks': trending_ticker,
         'news_articles': news_articles,
         'current_month': now.strftime('%B %Y'),
-        'active_poll': active_poll
+        'active_poll': active_poll,
+        'home_live_track': home_live_track,
     })
 
 def charts(request):
