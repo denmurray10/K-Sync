@@ -255,11 +255,11 @@
 
                             <!-- Absolute Positioned Scheduled Blocks -->
                             <template x-for="slot in (daySchedules[day] || [])" :key="slot.id">
-                                <div class="absolute top-1 bottom-1 bg-secondary/20 border border-secondary/50 p-2 overflow-hidden group cursor-pointer"
+                                <div class="absolute top-1 bottom-1 p-2 overflow-hidden group cursor-pointer"
                                      @click.stop="openEditSchedule(day, slot)"
-                                     :style="getSlotStyle(slot)">
+                                     :style="getSlotCardStyle(slot)">
                                     <div class="flex justify-between items-start">
-                                        <p class="text-[9px] font-black uppercase truncate text-secondary" x-text="slot.show_name || slot.name"></p>
+                                        <p class="text-[9px] font-black uppercase truncate" :style="getSlotTitleStyle(slot)" x-text="slot.show_name || slot.name"></p>
                                         <button @click.stop="deleteSchedule(slot.id)" class="opacity-0 group-hover:opacity-100 text-white/50 hover:text-red-500">
                                             <span class="material-symbols-outlined text-[10px]">close</span>
                                         </button>
@@ -287,6 +287,16 @@
                 <div>
                     <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Show Name</label>
                     <input type="text" x-model="newSchedule.show_name" placeholder="e.g. Hype Beats Tuesdays" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Show Colour</label>
+                    <select x-model="newSchedule.show_color" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
+                        <option value="CYAN">Cyan</option>
+                        <option value="PINK">Pink</option>
+                        <option value="PURPLE">Purple</option>
+                        <option value="GREEN">Green</option>
+                        <option value="AMBER">Amber</option>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Target Playlist</label>
@@ -449,7 +459,7 @@ function playlistApp() {
         daySchedules: {},
         activeDay: 'MON',
         showScheduleModal: false,
-        newSchedule: { schedule_id: null, show_name: '', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ' },
+        newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ' },
         toast: { visible: false, message: '' },
         toastTimeout: null,
         saveState: 'idle',
@@ -656,6 +666,29 @@ function playlistApp() {
             slot.slot_duration_seconds = Math.max(0, (endMinutes - startMinutes) * 60);
         },
 
+        getColorTheme(colorKey) {
+            const palette = {
+                CYAN: { bg: 'rgba(0, 240, 255, 0.16)', border: 'rgba(0, 240, 255, 0.55)', title: '#4ff7ff' },
+                PINK: { bg: 'rgba(244, 37, 192, 0.16)', border: 'rgba(244, 37, 192, 0.55)', title: '#ff67d3' },
+                PURPLE: { bg: 'rgba(168, 85, 247, 0.16)', border: 'rgba(168, 85, 247, 0.55)', title: '#c084fc' },
+                GREEN: { bg: 'rgba(34, 197, 94, 0.16)', border: 'rgba(34, 197, 94, 0.55)', title: '#86efac' },
+                AMBER: { bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.55)', title: '#fcd34d' },
+            };
+            const key = String(colorKey || 'CYAN').toUpperCase();
+            return palette[key] || palette.CYAN;
+        },
+
+        getSlotCardStyle(slot) {
+            const baseStyle = this.getSlotStyle(slot);
+            const theme = this.getColorTheme(slot.show_color);
+            return `${baseStyle} background-color: ${theme.bg}; border: 1px solid ${theme.border};`;
+        },
+
+        getSlotTitleStyle(slot) {
+            const theme = this.getColorTheme(slot.show_color);
+            return `color: ${theme.title};`;
+        },
+
         syncSchedulePlaylistName() {
             const selectedId = Number(this.newSchedule.playlist_id || 0);
             const selected = (this.savedPlaylists || []).find((playlist) => Number(playlist.id) === selectedId);
@@ -727,6 +760,7 @@ function playlistApp() {
                         end_time: this.minutesToTime(endMinutes),
                         playlist_id: slot.playlist_id,
                         show_name: slot.show_name || '',
+                        show_color: slot.show_color || 'CYAN',
                         host: slot.host || 'Auto DJ',
                         genre: slot.genre || 'MUSIC'
                     })
@@ -750,6 +784,7 @@ function playlistApp() {
             this.activeDay = day;
             this.newSchedule.schedule_id = slot.id;
             this.newSchedule.show_name = slot.show_name || '';
+            this.newSchedule.show_color = slot.show_color || 'CYAN';
             this.newSchedule.playlist_id = slot.playlist_id;
             this.newSchedule.playlist_name = slot.name || 'Scheduled Playlist';
             this.newSchedule.start = this.snapTimeValue(slot.time || '09:00');
@@ -1040,6 +1075,7 @@ function playlistApp() {
             this.activeDay = day;
             this.newSchedule.schedule_id = null;
             this.newSchedule.show_name = '';
+            this.newSchedule.show_color = 'CYAN';
             this.newSchedule.playlist_id = pId || (this.currentPlaylist.id ? this.currentPlaylist.id : null);
             this.newSchedule.playlist_name = pName || (this.currentPlaylist.name || 'Current Builder Playlist');
             
@@ -1176,6 +1212,7 @@ function playlistApp() {
                     end_time: this.slotEndTime(slot),
                     playlist_id: slot.playlist_id,
                     show_name: slot.show_name || '',
+                    show_color: slot.show_color || 'CYAN',
                     host: slot.host || 'Auto DJ',
                     genre: slot.genre || 'MUSIC',
                 }));
@@ -1286,6 +1323,7 @@ function playlistApp() {
                             end_time: this.slotEndTime(slot),
                             playlist_id: slot.playlist_id,
                             show_name: slot.show_name || '',
+                            show_color: slot.show_color || 'CYAN',
                             host: slot.host || 'Auto DJ',
                             genre: slot.genre || 'MUSIC'
                         })
@@ -1335,6 +1373,7 @@ function playlistApp() {
                             end_time: slot.end_time,
                             playlist_id: slot.playlist_id,
                             show_name: slot.show_name || '',
+                            show_color: slot.show_color || 'CYAN',
                             host: slot.host || 'Auto DJ',
                             genre: slot.genre || 'MUSIC'
                         })
@@ -1400,6 +1439,7 @@ function playlistApp() {
                         end_time: this.newSchedule.end,
                         playlist_id: this.newSchedule.playlist_id,
                         show_name: this.newSchedule.show_name,
+                        show_color: this.newSchedule.show_color,
                         host: this.newSchedule.host
                     })
                 });

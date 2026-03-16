@@ -37,6 +37,12 @@ def _staff_only_json(request):
         return JsonResponse({'ok': False, 'error': 'Staff access required'}, status=403)
     return None
 
+
+def _normalize_show_color(raw_value):
+    allowed = {'CYAN', 'PINK', 'PURPLE', 'GREEN', 'AMBER'}
+    candidate = str(raw_value or '').strip().upper()
+    return candidate if candidate in allowed else 'CYAN'
+
 def api_schedule_data(request):
     """Returns the weekly schedule grouped by day for the frontend."""
     staff_check = _staff_only_json(request)
@@ -69,6 +75,7 @@ def api_schedule_data(request):
             'duration': f"Until {s.end_time.strftime('%H:%M')}",
             'name': s.playlist.name,
             'show_name': s.description or '',
+            'show_color': _normalize_show_color(s.show_color),
             'playlist_id': s.playlist.id,
             'slot_duration_seconds': slot_duration_seconds,
             'playlist_duration_seconds': playlist_duration_seconds,
@@ -347,6 +354,7 @@ def api_schedule_save(request):
         playlist_id = data.get('playlist_id')
         schedule_id = data.get('schedule_id')
         show_name = (data.get('show_name') or '').strip()
+        show_color = _normalize_show_color(data.get('show_color'))
         host = data.get('host', 'Auto DJ')
         genre = data.get('genre', 'MUSIC')
         
@@ -383,6 +391,7 @@ def api_schedule_save(request):
             schedule.end_time = end_time
             schedule.playlist = playlist
             schedule.description = show_name
+            schedule.show_color = show_color
             schedule.host = host
             schedule.genre = genre
             schedule.save()
@@ -393,6 +402,7 @@ def api_schedule_save(request):
                 end_time=end_time,
                 playlist=playlist,
                 description=show_name,
+                show_color=show_color,
                 host=host,
                 genre=genre
             )
@@ -610,6 +620,7 @@ def api_schedule_templates(request):
                 'start_time': slot.start_time.strftime('%H:%M'),
                 'end_time': slot.end_time.strftime('%H:%M'),
                 'show_name': slot.show_name or '',
+                'show_color': _normalize_show_color(slot.show_color),
                 'playlist_id': slot.playlist_id,
                 'host': slot.host,
                 'genre': slot.genre,
@@ -667,6 +678,7 @@ def api_schedule_template_save(request):
                 start_time=start_obj,
                 end_time=end_obj,
                 show_name=(slot_data.get('show_name') or '').strip(),
+                show_color=_normalize_show_color(slot_data.get('show_color')),
                 playlist=playlist,
                 host=slot_data.get('host') or 'Auto DJ',
                 genre=slot_data.get('genre') or 'MUSIC',
