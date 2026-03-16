@@ -186,6 +186,7 @@ PINTEREST_BOARD_ID = os.environ.get('PINTEREST_BOARD_ID', '')
 # ── Cloudinary (image CDN) ───────────────────────────────────────────────────
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'diuanqnce')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '285831974678743')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
 
 # ── Backblaze B2 (Audio Storage) ─────────────────────────────────────────────
 B2_KEY_ID = os.environ.get('B2_KEY_ID', 'a2e0a74c71c2')

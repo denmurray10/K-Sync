@@ -3997,12 +3997,22 @@ def _fetch_blog_image(title, category, excerpt='', variant=1):
     if not serper_key:
         return ''
 
-    cloudinary.config(
-        cloud_name=getattr(settings, 'CLOUDINARY_CLOUD_NAME', ''),
-        api_key=getattr(settings, 'CLOUDINARY_API_KEY', ''),
-        api_secret=getattr(settings, 'CLOUDINARY_API_SECRET', ''),
-        secure=True,
-    )
+    cloud_name = getattr(settings, 'CLOUDINARY_CLOUD_NAME', '')
+    cloud_key = getattr(settings, 'CLOUDINARY_API_KEY', '')
+    cloud_secret = getattr(settings, 'CLOUDINARY_API_SECRET', '')
+    can_upload_to_cloudinary = bool(cloud_name and cloud_key and cloud_secret)
+    if can_upload_to_cloudinary:
+        cloudinary.config(
+            cloud_name=cloud_name,
+            api_key=cloud_key,
+            api_secret=cloud_secret,
+            secure=True,
+        )
+    else:
+        logger.warning(
+            "[blog image %d] Cloudinary credentials incomplete; using source image URL fallback.",
+            variant,
+        )
 
     # Ask DeepSeek for concise image search keywords
     if variant == 1:
@@ -4073,6 +4083,13 @@ def _fetch_blog_image(title, category, excerpt='', variant=1):
                     img_url = item.get('imageUrl', '')
                     if not img_url:
                         continue
+                    if not can_upload_to_cloudinary:
+                        logger.info(
+                            "[blog image %d] using direct image URL fallback: %r",
+                            variant, img_url,
+                        )
+                        return img_url
+
                     # Download and upload to Cloudinary for stable hosting
                     try:
                         result = cloudinary.uploader.upload(
