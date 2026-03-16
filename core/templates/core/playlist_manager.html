@@ -61,6 +61,10 @@
             <span class="material-symbols-outlined text-sm">calendar_view_week</span> Weekly Scheduler
         </button>
 
+        <button x-show="activeTab === 'scheduler'" @click="openAISchedulerModal" class="py-2 px-3 border border-secondary/60 text-secondary text-[10px] font-bold uppercase tracking-widest hover:bg-secondary hover:text-black transition-colors" style="display: none;">
+            AI Scheduler
+        </button>
+
         <div x-show="activeTab === 'builder'" class="ml-auto py-2 relative flex items-center gap-2" style="display: none;">
             <button @click="savePlaylist" class="h-8 bg-primary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Update/Save</button>
             <button @click="assignToSchedule" class="h-8 bg-secondary text-black px-4 text-[10px] font-bold uppercase tracking-widest transition-all shadow-[4px_4px_0px_#ffffff]">Assign To Schedule</button>
@@ -245,6 +249,12 @@
                                 </div>
                             </template>
 
+                            <div x-show="isDayEmpty(day)" class="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center" style="display: none;">
+                                <div class="px-3 py-1 border border-white/10 bg-black/35 text-[9px] font-mono uppercase tracking-widest text-slate-400">
+                                    Click any hour or drag a playlist here
+                                </div>
+                            </div>
+
                             <template x-if="isTodayDay(day)">
                                 <div class="pointer-events-none absolute top-0 bottom-0 z-20" :style="getNowLineStyle()">
                                     <div class="absolute inset-y-0 left-0 w-px bg-primary/90"></div>
@@ -427,6 +437,81 @@
         </div>
     </div>
 
+    <div x-show="showAISchedulerModal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl" style="display: none;">
+        <div class="bg-surface border border-white/10 w-full max-w-xl p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-black uppercase tracking-tighter">AI Scheduler</h3>
+                <button @click="showAISchedulerModal = false" class="text-slate-400 hover:text-white">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-2">How much should AI fill?</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button @click="aiScheduler.fill_level = 'a_bit'" :class="aiScheduler.fill_level === 'a_bit' ? 'border-secondary text-secondary' : 'border-white/10 text-slate-300'" class="h-9 border text-[10px] font-bold uppercase tracking-widest">A Bit</button>
+                        <button @click="aiScheduler.fill_level = 'a_lot'" :class="aiScheduler.fill_level === 'a_lot' ? 'border-secondary text-secondary' : 'border-white/10 text-slate-300'" class="h-9 border text-[10px] font-bold uppercase tracking-widest">A Lot</button>
+                        <button @click="aiScheduler.fill_level = 'everything'" :class="aiScheduler.fill_level === 'everything' ? 'border-secondary text-secondary' : 'border-white/10 text-slate-300'" class="h-9 border text-[10px] font-bold uppercase tracking-widest">Everything</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Energy / Vibe</label>
+                        <select x-model="aiScheduler.vibe" class="w-full bg-black border border-white/10 p-2 text-xs text-white">
+                            <option value="energetic">Energetic</option>
+                            <option value="hype">Hype</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="chill">Chill</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Block Focus</label>
+                        <select x-model="aiScheduler.focus" class="w-full bg-black border border-white/10 p-2 text-xs text-white">
+                            <option value="games">Games</option>
+                            <option value="trivia">Trivia</option>
+                            <option value="mix">Mix</option>
+                            <option value="variety">Variety</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Era Preference</label>
+                        <select x-model="aiScheduler.era" class="w-full bg-black border border-white/10 p-2 text-xs text-white">
+                            <option value="new">Newer</option>
+                            <option value="older">Older</option>
+                            <option value="mix">Mix</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Familiarity</label>
+                        <select x-model="aiScheduler.familiarity" class="w-full bg-black border border-white/10 p-2 text-xs text-white">
+                            <option value="popular">Popular</option>
+                            <option value="deep-cuts">Deep Cuts</option>
+                            <option value="mix">Mix</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Prefer Artists / Groups</label>
+                        <input type="text" x-model="aiScheduler.include_artists" placeholder="e.g. BTS, NewJeans" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Avoid Artists / Groups</label>
+                        <input type="text" x-model="aiScheduler.avoid_artists" placeholder="e.g. Group A, Group B" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button @click="showAISchedulerModal = false" class="flex-1 h-9 border border-white/10 text-[10px] font-bold uppercase tracking-widest">Cancel</button>
+                <button @click="runAIScheduler" :disabled="aiScheduler.loading" class="flex-1 h-9 bg-secondary text-black text-[10px] font-bold uppercase tracking-widest disabled:opacity-50" x-text="aiScheduler.loading ? 'Scheduling...' : 'Generate Schedule'"></button>
+            </div>
+        </div>
+    </div>
+
     <div x-show="toast.visible" x-transition.opacity.duration.200ms class="fixed bottom-6 right-6 z-[70]" style="display: none;">
         <div class="bg-green-500/15 border border-green-400/60 text-green-200 px-4 py-2 text-[10px] font-bold uppercase tracking-widest shadow-[4px_4px_0px_#000000]" x-text="toast.message"></div>
     </div>
@@ -468,6 +553,7 @@ function playlistApp() {
         undoTimeout: null,
         isPlaylistDropActive: false,
         snapIntervalMinutes: 15,
+        maxShowMinutes: 120,
         isResizingSlot: false,
         resizeContext: null,
         suppressScheduleClickUntil: 0,
@@ -482,9 +568,20 @@ function playlistApp() {
         templateApplyMode: false,
         slotTargetMinutes: 60,
         showAIModal: false,
+        showAISchedulerModal: false,
         aiStep: 1,
         aiLoading: false,
         aiForm: { set_minutes: 60, vibe: 'balanced', era: 'mix', familiarity: 'mix' },
+        aiScheduler: {
+            fill_level: 'a_lot',
+            vibe: 'balanced',
+            focus: 'games',
+            era: 'mix',
+            familiarity: 'mix',
+            include_artists: '',
+            avoid_artists: '',
+            loading: false,
+        },
 
         async init() {
             await this.fetchB2Tracks();
@@ -647,6 +744,12 @@ function playlistApp() {
                 snappedEnd = this.minutesToTime(endMinutes);
             }
 
+            const maxEndMinutes = Math.min(1440, startMinutes + Math.max(30, parseInt(this.maxShowMinutes || 120, 10)));
+            if (endMinutes > maxEndMinutes) {
+                endMinutes = maxEndMinutes;
+                snappedEnd = this.minutesToTime(endMinutes);
+            }
+
             this.newSchedule.start = snappedStart;
             this.newSchedule.end = snappedEnd;
         },
@@ -721,12 +824,13 @@ function playlistApp() {
             if (!this.resizeContext) return;
             const { slot, startMinutes, originalEndMinutes, dragStartClientX } = this.resizeContext;
             const interval = Math.max(1, parseInt(this.snapIntervalMinutes || 15, 10));
+            const maxShow = Math.max(30, parseInt(this.maxShowMinutes || 120, 10));
 
             const deltaPixels = moveEvent.clientX - dragStartClientX;
             const deltaMinutes = (deltaPixels / 96) * 60;
             const rawEnd = originalEndMinutes + deltaMinutes;
             let snappedEnd = Math.round(rawEnd / interval) * interval;
-            snappedEnd = Math.max(startMinutes + interval, Math.min(24 * 60, snappedEnd));
+            snappedEnd = Math.max(startMinutes + interval, Math.min(startMinutes + maxShow, Math.min(24 * 60, snappedEnd)));
 
             this.updateSlotBounds(slot, startMinutes, snappedEnd);
         },
@@ -850,6 +954,41 @@ function playlistApp() {
         closeAIModal() {
             this.showAIModal = false;
             this.aiLoading = false;
+        },
+
+        openAISchedulerModal() {
+            this.showAISchedulerModal = true;
+        },
+
+        async runAIScheduler() {
+            this.aiScheduler.loading = true;
+            try {
+                const resp = await fetch('/api/schedule/ai-fill/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({
+                        fill_level: this.aiScheduler.fill_level,
+                        vibe: this.aiScheduler.vibe,
+                        focus: this.aiScheduler.focus,
+                        era: this.aiScheduler.era,
+                        familiarity: this.aiScheduler.familiarity,
+                        include_artists: this.aiScheduler.include_artists,
+                        avoid_artists: this.aiScheduler.avoid_artists,
+                    })
+                });
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.showToast(data.error || 'AI scheduler failed');
+                    return;
+                }
+                await this.fetchSchedules();
+                this.showAISchedulerModal = false;
+                this.showToast(`AI scheduled ${data.created_slots || 0} slot${(data.created_slots || 0) === 1 ? '' : 's'}`);
+            } catch (e) {
+                this.showToast('AI scheduler failed');
+            } finally {
+                this.aiScheduler.loading = false;
+            }
         },
 
         nextAIStep() {
@@ -1157,6 +1296,10 @@ function playlistApp() {
 
         isTodayDay(day) {
             return day === this.nowDayKey;
+        },
+
+        isDayEmpty(day) {
+            return !((this.daySchedules[day] || []).length);
         },
 
         getNowLineStyle() {

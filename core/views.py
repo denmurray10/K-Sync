@@ -1,7 +1,7 @@
 import json
 import logging
 from datetime import timedelta, datetime
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
@@ -369,6 +369,10 @@ def api_schedule_save(request):
 
         if start_obj >= end_obj:
             return JsonResponse({'ok': False, 'error': 'End time must be after start time'}, status=400)
+
+        duration_minutes = ((end_obj.hour * 60) + end_obj.minute) - ((start_obj.hour * 60) + start_obj.minute)
+        if duration_minutes > 120:
+            return JsonResponse({'ok': False, 'error': 'Maximum show length is 2 hours'}, status=400)
             
         playlist = RadioPlaylist.objects.get(id=playlist_id)
 
@@ -586,6 +590,254 @@ def api_playlist_ai_generate(request):
         'tracks': tracks,
         'target_minutes': set_minutes,
         'total_seconds': sum(t.get('duration_seconds', 0) for t in tracks),
+    })
+
+
+@csrf_exempt
+@require_POST
+def api_schedule_ai_fill(request):
+    """Fills open scheduler gaps with AI-generated playlists without touching existing slots."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+
+    try:
+        payload = json.loads(request.body or '{}')
+    except Exception:
+        payload = {}
+
+    fill_level = (payload.get('fill_level') or 'a_lot').strip().lower()
+    vibe = (payload.get('vibe') or 'balanced').strip().lower()
+    era = (payload.get('era') or 'mix').strip().lower()
+    familiarity = (payload.get('familiarity') or 'mix').strip().lower()
+    focus = (payload.get('focus') or 'mix').strip().lower()
+    include_artists = (payload.get('include_artists') or '').strip().lower()
+    avoid_artists = (payload.get('avoid_artists') or '').strip().lower()
+
+    fill_ratio_map = {
+        'a_bit': 0.25,
+        'a_lot': 0.60,
+        'everything': 1.00,
+    }
+    fill_ratio = fill_ratio_map.get(fill_level, 0.60)
+
+    day_order = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+
+    existing = (
+        RadioSchedule.objects
+        .select_related('playlist')
+        .all()
+        .order_by('day', 'start_time')
+    )
+
+    by_day = {day: [] for day in day_order}
+    for slot in existing:
+        by_day[slot.day].append(slot)
+
+    def to_minutes(time_obj):
+        return (time_obj.hour * 60) + time_obj.minute
+
+    gaps = []
+    for day in day_order:
+        cursor = 0
+        for slot in by_day[day]:
+            start_m = to_minutes(slot.start_time)
+            end_m = to_minutes(slot.end_time)
+            if start_m > cursor:
+                gaps.append({'day': day, 'start': cursor, 'end': start_m})
+            cursor = max(cursor, end_m)
+        if cursor < 1440:
+            gaps.append({'day': day, 'start': cursor, 'end': 1440})
+
+    # avoid tiny windows that cannot host meaningful content
+    gaps = [gap for gap in gaps if (gap['end'] - gap['start']) >= 30]
+    if not gaps:
+        return JsonResponse({'ok': False, 'error': 'No open schedule gaps available.'}, status=400)
+
+    total_open_minutes = sum(g['end'] - g['start'] for g in gaps)
+    target_fill_minutes = max(30, int(total_open_minutes * fill_ratio))
+
+    allowed_show_lengths = [60, 90, 120]
+    length_weights = {60: 0.5, 90: 0.3, 120: 0.2}
+    selected_windows = []
+    remaining_fill = target_fill_minutes
+    for gap in gaps:
+        window_start = gap['start']
+        while window_start < gap['end'] and remaining_fill > 0:
+            available = gap['end'] - window_start
+            if available < 60:
+                break
+
+            feasible_lengths = [
+                length for length in allowed_show_lengths
+                if length <= available and length <= remaining_fill
+            ]
+
+            if not feasible_lengths:
+                break
+
+            chunk = random.choices(
+                feasible_lengths,
+                weights=[length_weights.get(length, 0.1) for length in feasible_lengths],
+                k=1,
+            )[0]
+            selected_windows.append({'day': gap['day'], 'start': window_start, 'end': window_start + chunk})
+            window_start += chunk
+            remaining_fill -= chunk
+        if remaining_fill <= 0:
+            break
+
+    if not selected_windows:
+        return JsonResponse({'ok': False, 'error': 'No eligible windows available within 2-hour show limit.'}, status=400)
+
+    track_qs = (
+        RadioTrack.objects
+        .exclude(audio_url='')
+        .exclude(audio_url__isnull=True)
+        .exclude(duration_seconds__isnull=True)
+    )
+
+    now = timezone.now()
+    recent_cutoff = now - timedelta(days=730)
+    if era == 'new':
+        track_qs = track_qs.filter(created_at__gte=recent_cutoff).order_by('-created_at')
+    elif era == 'older':
+        track_qs = track_qs.filter(created_at__lt=recent_cutoff).order_by('created_at')
+    else:
+        track_qs = track_qs.order_by('-created_at')
+
+    candidate_tracks = list(track_qs[:700])
+    if not candidate_tracks:
+        return JsonResponse({'ok': False, 'error': 'No tracks available for AI scheduler.'}, status=400)
+
+    if familiarity == 'popular':
+        candidate_tracks = candidate_tracks[:320]
+    elif familiarity == 'deep-cuts':
+        candidate_tracks = candidate_tracks[len(candidate_tracks)//3:]
+
+    include_terms = [item.strip() for item in include_artists.split(',') if item.strip()]
+    avoid_terms = [item.strip() for item in avoid_artists.split(',') if item.strip()]
+
+    def artist_match(track, terms):
+        haystack = f"{track.artist or ''} {track.title or ''}".lower()
+        return any(term in haystack for term in terms)
+
+    if include_terms:
+        included = [track for track in candidate_tracks if artist_match(track, include_terms)]
+        if included:
+            candidate_tracks = included + [track for track in candidate_tracks if track not in included]
+
+    if avoid_terms:
+        candidate_tracks = [track for track in candidate_tracks if not artist_match(track, avoid_terms)]
+
+    desired_seconds = {
+        'energetic': 185,
+        'hype': 178,
+        'chill': 225,
+        'balanced': 205,
+    }.get(vibe, 205)
+
+    focus_label = {
+        'games': 'Game Break',
+        'trivia': 'Trivia Block',
+        'mix': 'Interactive Mix',
+        'variety': 'Variety Set',
+    }.get(focus, 'Interactive Mix')
+
+    focus_color = {
+        'games': 'PURPLE',
+        'trivia': 'AMBER',
+        'mix': 'CYAN',
+        'variety': 'GREEN',
+    }.get(focus, 'CYAN')
+
+    generated_show_names = []
+    try:
+        name_prompt = (
+            "Create short radio show names for K-pop schedule gaps. "
+            f"Need exactly {len(selected_windows)} names. "
+            f"Focus: {focus}. Vibe: {vibe}. Era: {era}. Familiarity: {familiarity}. "
+            "Return STRICT JSON only: {\"names\":[\"...\"]}."
+        )
+        name_resp = _chat(name_prompt, system="You are a concise K-pop radio naming assistant.")
+        match = re.search(r'\{[\s\S]*\}', name_resp)
+        if match:
+            obj = json.loads(match.group(0))
+            raw_names = obj.get('names') or []
+            generated_show_names = [str(name).strip()[:80] for name in raw_names if str(name).strip()]
+    except Exception:
+        generated_show_names = []
+
+    def minutes_to_hhmm(total_minutes):
+        safe = max(0, min(1439, int(total_minutes)))
+        return f"{safe // 60:02d}:{safe % 60:02d}"
+
+    def select_tracks_for_gap(target_seconds):
+        scored_pool = []
+        for track in candidate_tracks:
+            seconds = track.duration_seconds or 180
+            if seconds < 90 or seconds > 480:
+                continue
+            score = abs(seconds - desired_seconds)
+            scored_pool.append((score, random.random(), track))
+        scored_pool.sort(key=lambda item: (item[0], item[1]))
+
+        picked = []
+        running = 0
+        for _, _, track in scored_pool:
+            seconds = track.duration_seconds or 180
+            if running + seconds <= target_seconds + 120:
+                picked.append(track)
+                running += seconds
+            if running >= target_seconds - 60:
+                break
+
+        if not picked:
+            picked = [item[2] for item in scored_pool[:10]]
+            running = sum((track.duration_seconds or 180) for track in picked)
+
+        return picked, running
+
+    created_count = 0
+
+    with transaction.atomic():
+        for idx, gap in enumerate(selected_windows, start=1):
+            gap_minutes = gap['end'] - gap['start']
+            gap_seconds = gap_minutes * 60
+            tracks, total_seconds = select_tracks_for_gap(gap_seconds)
+            if not tracks:
+                continue
+
+            start_label = minutes_to_hhmm(gap['start'])
+            end_label = minutes_to_hhmm(gap['end'])
+            show_name = generated_show_names[idx - 1] if idx - 1 < len(generated_show_names) else f"{focus_label} {idx}"
+            playlist_name = f"AI {show_name} {gap['day']} {start_label}"
+
+            playlist = RadioPlaylist.objects.create(
+                name=playlist_name[:255],
+                description=f"Auto-generated by AI Scheduler ({fill_level})."
+            )
+
+            for order, track in enumerate(tracks):
+                RadioPlaylistTrack.objects.create(playlist=playlist, track=track, order=order)
+
+            RadioSchedule.objects.create(
+                day=gap['day'],
+                start_time=start_label,
+                end_time=end_label,
+                playlist=playlist,
+                description=show_name,
+                show_color=focus_color,
+                host='AI Scheduler',
+                genre='GAME',
+            )
+            created_count += 1
+
+    return JsonResponse({
+        'ok': True,
+        'created_slots': created_count,
+        'filled_minutes': sum((gap['end'] - gap['start']) for gap in selected_windows[:created_count]),
+        'fill_level': fill_level,
     })
 
 @csrf_exempt
