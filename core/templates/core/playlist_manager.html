@@ -584,7 +584,7 @@ function playlistApp() {
         toastTimeout: null,
         saveState: 'idle',
         saveStateLabel: 'Idle',
-        undo: { visible: false, message: '', snapshot: null },
+        undo: { visible: false, message: '', snapshot: null, mode: 'playlist' },
         undoTimeout: null,
         isPlaylistDropActive: false,
         snapIntervalMinutes: 15,
@@ -888,6 +888,7 @@ function playlistApp() {
                 originalEndMinutes: endMinutes,
                 startMinutes,
                 dragStartClientX: event.clientX,
+                daySnapshot: this.getScheduleSnapshotForDays([day]),
             };
 
             const onMove = (moveEvent) => this.handleResizeMove(moveEvent);
@@ -921,7 +922,7 @@ function playlistApp() {
                 return;
             }
 
-            const { day, slot, startMinutes, originalEndMinutes } = this.resizeContext;
+            const { day, slot, startMinutes, originalEndMinutes, daySnapshot } = this.resizeContext;
             const { endMinutes } = this.parseSlotBounds(slot);
 
             this.resizeContext = null;
@@ -953,6 +954,7 @@ function playlistApp() {
                     return;
                 }
                 await this.fetchSchedules();
+                this.setSchedulerUndo('Schedule slot resized', daySnapshot);
                 this.showToast('Schedule slot resized');
             } catch (e) {
                 this.updateSlotBounds(slot, startMinutes, originalEndMinutes);
@@ -1050,6 +1052,8 @@ function playlistApp() {
 
         async runAIScheduler() {
             this.aiScheduler.loading = true;
+            const allDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+            const snapshot = this.getScheduleSnapshotForDays(allDays);
             try {
                 const resp = await fetch('/api/schedule/ai-fill/', {
                     method: 'POST',
@@ -1072,6 +1076,7 @@ function playlistApp() {
                 this.mergeSavedPlaylists(data.created_playlists || []);
                 await this.fetchSchedules();
                 this.showAISchedulerModal = false;
+                this.setSchedulerUndo('AI schedule generated', snapshot);
                 this.showToast(`AI scheduled ${data.created_slots || 0} slot${(data.created_slots || 0) === 1 ? '' : 's'}`);
             } catch (e) {
                 this.showToast('AI scheduler failed');
@@ -1125,6 +1130,7 @@ function playlistApp() {
 
         beginUndoWindow(message) {
             this.undo.snapshot = JSON.parse(JSON.stringify(this.currentPlaylist.tracks));
+            this.undo.mode = 'playlist';
             this.undo.message = message;
             this.undo.visible = true;
             if (this.undoTimeout) clearTimeout(this.undoTimeout);
@@ -1134,14 +1140,101 @@ function playlistApp() {
             }, 5000);
         },
 
-        undoLastAction() {
-            if (!this.undo.snapshot) return;
-            this.currentPlaylist.tracks = JSON.parse(JSON.stringify(this.undo.snapshot));
-            this.rerenderPlaylist();
-            this.undo.visible = false;
-            this.undo.snapshot = null;
+        getScheduleSnapshotForDays(days) {
+            const snapshot = {};
+            (days || []).forEach((day) => {
+                snapshot[day] = ((this.daySchedules[day] || []).map((slot) => ({
+                    start_time: slot.time,
+                    end_time: this.slotEndTime(slot),
+                    playlist_id: slot.playlist_id,
+                    show_name: slot.show_name || '',
+                    show_color: slot.show_color || 'CYAN',
+                    host: slot.host || 'Auto DJ',
+                    genre: slot.genre || 'MUSIC',
+                })));
+            });
+            return snapshot;
+        },
+
+        setSchedulerUndo(message, snapshot) {
+            this.undo.snapshot = JSON.parse(JSON.stringify(snapshot || {}));
+            this.undo.mode = 'scheduler';
+            this.undo.message = message;
+            this.undo.visible = true;
             if (this.undoTimeout) clearTimeout(this.undoTimeout);
-            this.showToast('Undid last action');
+            this.undoTimeout = setTimeout(() => {
+                this.undo.visible = false;
+                this.undo.snapshot = null;
+            }, 5000);
+        },
+
+        findScheduleDayById(scheduleId) {
+            const targetId = Number(scheduleId);
+            const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+            for (const day of days) {
+                const found = (this.daySchedules[day] || []).some((slot) => Number(slot.id) === targetId);
+                if (found) return day;
+            }
+            return null;
+        },
+
+        async restoreSchedulerSnapshot(snapshot) {
+            const days = Object.keys(snapshot || {});
+            if (!days.length) return;
+
+            await this.fetchSchedules();
+
+            for (const day of days) {
+                const currentSlots = [...(this.daySchedules[day] || [])];
+                for (const slot of currentSlots) {
+                    const delResp = await fetch(`/api/schedule/${slot.id}/delete/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    });
+                    const delData = await delResp.json();
+                    if (!delData.ok) throw new Error(delData.error || 'Undo delete failed');
+                }
+
+                for (const slot of (snapshot[day] || [])) {
+                    const saveResp = await fetch('/api/schedule/save/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                        body: JSON.stringify({
+                            day,
+                            start_time: slot.start_time,
+                            end_time: slot.end_time,
+                            playlist_id: slot.playlist_id,
+                            show_name: slot.show_name || '',
+                            show_color: slot.show_color || 'CYAN',
+                            host: slot.host || 'Auto DJ',
+                            genre: slot.genre || 'MUSIC',
+                        })
+                    });
+                    const saveData = await saveResp.json();
+                    if (!saveData.ok) throw new Error(saveData.error || 'Undo save failed');
+                }
+            }
+
+            await this.fetchSchedules();
+        },
+
+        async undoLastAction() {
+            if (!this.undo.snapshot) return;
+            try {
+                if (this.undo.mode === 'scheduler') {
+                    await this.restoreSchedulerSnapshot(this.undo.snapshot);
+                } else {
+                    this.currentPlaylist.tracks = JSON.parse(JSON.stringify(this.undo.snapshot));
+                    this.rerenderPlaylist();
+                }
+                this.showToast('Undid last action');
+            } catch (e) {
+                this.showToast(e?.message || 'Undo failed');
+            } finally {
+                this.undo.visible = false;
+                this.undo.snapshot = null;
+                if (this.undoTimeout) clearTimeout(this.undoTimeout);
+            }
         },
 
         initSortable() {
@@ -1321,6 +1414,9 @@ function playlistApp() {
             if (!scheduleId) return;
             if (!confirm('Delete this schedule slot?')) return;
 
+            const affectedDay = this.activeDay || this.findScheduleDayById(scheduleId);
+            const daySnapshot = affectedDay ? this.getScheduleSnapshotForDays([affectedDay]) : {};
+
             const resp = await fetch(`/api/schedule/${scheduleId}/delete/`, {
                 method: 'POST',
                 headers: { 'X-CSRFToken': '{{ csrf_token }}' }
@@ -1329,6 +1425,7 @@ function playlistApp() {
             if (data.ok) {
                 this.showScheduleModal = false;
                 await this.fetchSchedules();
+                if (affectedDay) this.setSchedulerUndo('Schedule deleted', daySnapshot);
                 this.showToast('Schedule deleted');
             } else {
                 this.showToast(data.error || 'Delete failed');
@@ -1505,6 +1602,8 @@ function playlistApp() {
 
             if (!confirm(`Delete all schedule entries for ${day}?`)) return;
 
+            const daySnapshot = this.getScheduleSnapshotForDays([day]);
+
             try {
                 for (const slot of daySlots) {
                     const delResp = await fetch(`/api/schedule/${slot.id}/delete/`, {
@@ -1517,6 +1616,7 @@ function playlistApp() {
 
                 await this.fetchSchedules();
                 this.showDayActionModal = false;
+                this.setSchedulerUndo('Day schedule deleted', daySnapshot);
                 this.showToast(`${day} schedule deleted`);
             } catch (e) {
                 await this.fetchSchedules();
@@ -1533,6 +1633,7 @@ function playlistApp() {
 
             const sourceSlots = [...(this.daySchedules[fromDay] || [])].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
             const targetSlots = [...(this.daySchedules[toDay] || [])];
+            const daySnapshot = this.getScheduleSnapshotForDays([toDay]);
 
             if (!confirm(`Paste ${fromDay} into ${toDay}? This will override all existing data for ${toDay}.`)) return;
 
@@ -1568,6 +1669,7 @@ function playlistApp() {
                 await this.fetchSchedules();
                 this.showDayActionModal = false;
                 this.copiedSourceDay = null;
+                this.setSchedulerUndo('Day schedule pasted', daySnapshot);
                 this.showToast(`Pasted ${fromDay} to ${toDay}`);
             } catch (e) {
                 await this.fetchSchedules();
@@ -1585,6 +1687,7 @@ function playlistApp() {
             if (!confirm(`Apply template ${selected.name} to ${day}? This will override all existing data for ${day}.`)) return;
 
             const targetSlots = [...(this.daySchedules[day] || [])];
+            const daySnapshot = this.getScheduleSnapshotForDays([day]);
 
             try {
                 for (const slot of targetSlots) {
@@ -1618,6 +1721,7 @@ function playlistApp() {
                 await this.fetchSchedules();
                 this.templateApplyMode = false;
                 this.showDayActionModal = false;
+                this.setSchedulerUndo('Template applied', daySnapshot);
                 this.showToast(`Applied ${selected.name} to ${day}`);
             } catch (e) {
                 await this.fetchSchedules();
@@ -1694,6 +1798,7 @@ function playlistApp() {
         async saveSchedule() {
             if (!this.newSchedule.playlist_id) return alert('Select a playlist first');
             this.applyScheduleSnapping();
+            const daySnapshot = this.getScheduleSnapshotForDays([this.activeDay]);
             try {
                 const resp = await fetch('/api/schedule/save/', {
                     method: 'POST',
@@ -1713,6 +1818,7 @@ function playlistApp() {
                 if (data.ok) {
                     this.showScheduleModal = false;
                     await this.fetchSchedules();
+                    this.setSchedulerUndo(this.newSchedule.schedule_id ? 'Schedule updated' : 'Schedule added', daySnapshot);
                 } else {
                     this.showToast(data.error || 'Could not save schedule');
                 }
@@ -1723,11 +1829,16 @@ function playlistApp() {
 
         async deleteSchedule(id) {
             if (!confirm('Delete?')) return;
+            const affectedDay = this.findScheduleDayById(id);
+            const daySnapshot = affectedDay ? this.getScheduleSnapshotForDays([affectedDay]) : {};
             const resp = await fetch(`/api/schedule/${id}/delete/`, {
                 method: 'POST',
                 headers: { 'X-CSRFToken': '{{ csrf_token }}' }
             });
-            if ((await resp.json()).ok) await this.fetchSchedules();
+            if ((await resp.json()).ok) {
+                await this.fetchSchedules();
+                if (affectedDay) this.setSchedulerUndo('Schedule deleted', daySnapshot);
+            }
         }
     };
 }
