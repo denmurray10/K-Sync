@@ -2879,7 +2879,13 @@ function playlistApp() {
 
                 this.voiceTimelineTracks.splice(index + 1, 0, generated);
                 const removed = this.removePlainDuplicatesForVoSongs();
-                this.showToast(removed ? `VO audio added (${autoPercent}% clip, ${removed} plain duplicate${removed === 1 ? '' : 's'} removed)` : `VO audio added (${autoPercent}% clip length)`);
+                const storageTarget = String(data.storage_target || generated.storage_target || '').trim().toLowerCase();
+                const storageLabel = storageTarget === 'cloudinary' ? 'cloud' : (storageTarget === 'local' ? 'local' : 'unknown');
+                this.showToast(
+                    removed
+                        ? `VO audio added (${autoPercent}% clip, ${removed} plain duplicate${removed === 1 ? '' : 's'} removed, ${storageLabel})`
+                        : `VO audio added (${autoPercent}% clip length, ${storageLabel})`
+                );
                 return true;
             } catch (e) {
                 this.showToast('Voice rendering failed');

@@ -680,18 +680,52 @@ def api_voiceover_synthesize(request):
     safe_voice = re.sub(r'[^a-zA-Z0-9_-]+', '-', voice_name or voice_id)[:64].strip('-') or 'dj'
     filename = f"vo_{safe_voice}_{uuid.uuid4().hex[:10]}.mp3"
     relative_dir = os.path.join('radio', 'voiceovers')
-    absolute_dir = os.path.join(settings.MEDIA_ROOT, relative_dir)
-    os.makedirs(absolute_dir, exist_ok=True)
-    absolute_path = os.path.join(absolute_dir, filename)
+    audio_url = ''
+    storage_target = 'local'
 
-    try:
-        with open(absolute_path, 'wb') as out_file:
-            out_file.write(audio_bytes)
-    except Exception as e:
-        return JsonResponse({'ok': False, 'error': f'Could not save audio file: {str(e)}'}, status=500)
+    cloud_name = getattr(settings, 'CLOUDINARY_CLOUD_NAME', '')
+    cloud_key = getattr(settings, 'CLOUDINARY_API_KEY', '')
+    cloud_secret = getattr(settings, 'CLOUDINARY_API_SECRET', '')
+    can_upload_to_cloudinary = bool(cloud_name and cloud_key and cloud_secret)
 
-    media_rel_url = f"{settings.MEDIA_URL.rstrip('/')}/{relative_dir.replace(os.sep, '/')}/{filename}"
-    audio_url = request.build_absolute_uri(media_rel_url)
+    if can_upload_to_cloudinary:
+        try:
+            import io
+            import cloudinary
+            import cloudinary.uploader
+
+            cloudinary.config(
+                cloud_name=cloud_name,
+                api_key=cloud_key,
+                api_secret=cloud_secret,
+                secure=True,
+            )
+
+            cloud_result = cloudinary.uploader.upload(
+                io.BytesIO(audio_bytes),
+                public_id=f"ksync/radio/voiceovers/{os.path.splitext(filename)[0]}",
+                resource_type='video',
+                format='mp3',
+                overwrite=False,
+            )
+            audio_url = (cloud_result.get('secure_url') or '').strip()
+            if audio_url:
+                storage_target = 'cloudinary'
+        except Exception as cloud_err:
+            logger.warning('Voice-over Cloudinary upload failed, falling back to local media: %s', cloud_err)
+
+    if not audio_url:
+        absolute_dir = os.path.join(settings.MEDIA_ROOT, relative_dir)
+        os.makedirs(absolute_dir, exist_ok=True)
+        absolute_path = os.path.join(absolute_dir, filename)
+        try:
+            with open(absolute_path, 'wb') as out_file:
+                out_file.write(audio_bytes)
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': f'Could not save audio file: {str(e)}'}, status=500)
+
+        media_rel_url = f"{settings.MEDIA_URL.rstrip('/')}/{relative_dir.replace(os.sep, '/')}/{filename}"
+        audio_url = request.build_absolute_uri(media_rel_url)
 
     duration_seconds = 0
     timestamp_info = data.get('timestampInfo') or {}
@@ -729,6 +763,7 @@ def api_voiceover_synthesize(request):
             'title': track_title,
             'artist': track_artist,
             'url': audio_url,
+            'storage_target': storage_target,
             'album_art': '',
             'duration': duration_label,
             'duration_seconds': duration_seconds,
@@ -739,6 +774,7 @@ def api_voiceover_synthesize(request):
             'voice_over_voice_id': voice_id,
             'voice_over_voice_name': voice_name,
         },
+        'storage_target': storage_target,
         'provider': 'inworld',
         'model': settings.INWORLD_TTS_MODEL,
     })
