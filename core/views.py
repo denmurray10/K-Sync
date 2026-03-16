@@ -1652,6 +1652,7 @@ def _inworld_chat(prompt, system="You are an expert K-Pop radio assistant."):
 
 def home(request):
     now = timezone.now()
+    now_local = timezone.localtime()
     data_current = ComebackData.objects.filter(year=now.year, month=now.month).first()
     data_next = ComebackData.objects.filter(year=now.year if now.month < 12 else now.year + 1, 
                                             month=now.month + 1 if now.month < 12 else 1).first()
@@ -1770,6 +1771,67 @@ def home(request):
     # Get the active LivePoll
     active_poll = LivePoll.objects.filter(is_active=True).first()
 
+    # Homepage programming rail: next 4 schedule slots starting from current (if any)
+    day_keys = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+    current_day_index = now_local.weekday()  # Monday=0
+    current_minutes = (now_local.hour * 60) + now_local.minute
+
+    schedule_items = []
+    all_schedules = list(RadioSchedule.objects.select_related('playlist').all())
+    for slot in all_schedules:
+        day_key = str(slot.day or '').upper()
+        if day_key not in day_keys:
+            continue
+        day_index = day_keys.index(day_key)
+        day_delta = (day_index - current_day_index) % 7
+        start_minutes = (slot.start_time.hour * 60) + slot.start_time.minute
+        end_minutes = (slot.end_time.hour * 60) + slot.end_time.minute
+        is_current = day_delta == 0 and start_minutes <= current_minutes < end_minutes
+        schedule_items.append({
+            'slot': slot,
+            'day_delta': day_delta,
+            'start_minutes': start_minutes,
+            'is_current': is_current,
+        })
+
+    schedule_items.sort(key=lambda item: (item['day_delta'], item['start_minutes']))
+
+    start_index = 0
+    current_index = next((idx for idx, item in enumerate(schedule_items) if item['is_current']), None)
+    if current_index is not None:
+        start_index = current_index
+    else:
+        upcoming_today_index = next(
+            (
+                idx for idx, item in enumerate(schedule_items)
+                if item['day_delta'] == 0 and item['start_minutes'] >= current_minutes
+            ),
+            None,
+        )
+        if upcoming_today_index is not None:
+            start_index = upcoming_today_index
+
+    homepage_programming = []
+    if schedule_items:
+        take_count = min(4, len(schedule_items))
+        for offset in range(take_count):
+            selected = schedule_items[(start_index + offset) % len(schedule_items)]
+            slot = selected['slot']
+            title = (slot.description or '').strip() or slot.playlist.name
+            if selected['is_current'] and offset == 0:
+                status = 'On Air'
+            elif offset == 0:
+                status = 'Up Next'
+            else:
+                status = ''
+            description = f"Hosted by {slot.host} · {slot.genre}"
+            homepage_programming.append({
+                'status': status,
+                'time_label': slot.start_time.strftime('%H:%M'),
+                'title': title,
+                'description': description,
+            })
+
     # Live player snapshot for homepage now-playing bar
     home_live_track = None
     try:
@@ -1801,6 +1863,7 @@ def home(request):
         'current_month': now.strftime('%B %Y'),
         'active_poll': active_poll,
         'home_live_track': home_live_track,
+        'homepage_programming': homepage_programming,
     })
 
 def charts(request):

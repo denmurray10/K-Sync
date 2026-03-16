@@ -239,43 +239,31 @@
 </div>
 
 <div class="flex flex-col border-t border-black">
-<!-- Schedule Row 1 (Current) -->
+{% if homepage_programming %}
+{% for item in homepage_programming %}
 <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-black hover:bg-black hover:text-white transition-colors cursor-pointer">
 <div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-black flex flex-col justify-center shrink-0">
-<span class="font-mono text-xs tracking-widest uppercase font-bold text-primary group-hover:text-white mb-1">On Air</span>
-<span class="font-black text-2xl tracking-tighter">10:00 KST</span>
+{% if item.status %}
+<span class="font-mono text-xs tracking-widest uppercase {% if item.status == 'On Air' %}font-bold text-primary group-hover:text-white{% else %}opacity-50 group-hover:opacity-100 transition-opacity{% endif %} mb-1">{{ item.status }}</span>
+{% endif %}
+<span class="font-black text-2xl tracking-tighter">{{ item.time_label }} KST</span>
 </div>
 <div class="flex-1 p-6 flex flex-col justify-center">
-<h3 class="text-3xl font-black uppercase tracking-tighter mb-1">The Morning Wave</h3>
-<p class="font-mono text-[10px] tracking-widest uppercase opacity-70">Hosted by DJ Hype · K-Pop's freshest morning hits.</p>
+<h3 class="text-3xl font-black uppercase tracking-tighter mb-1">{{ item.title }}</h3>
+<p class="font-mono text-[10px] tracking-widest uppercase opacity-70">{{ item.description }}</p>
 </div>
+{% if forloop.first and item.status == 'On Air' %}
 <div class="hidden md:flex p-6 border-l border-black items-center justify-center shrink-0 w-32 bg-primary group-hover:bg-primary/80 transition-colors">
 <span class="material-symbols-outlined text-4xl text-black">graphic_eq</span>
 </div>
+{% endif %}
 </div>
-
-<!-- Schedule Row 2 -->
-<div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-black hover:bg-black hover:text-white transition-colors cursor-pointer">
-<div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-black flex flex-col justify-center shrink-0">
-<span class="font-mono text-xs tracking-widest uppercase opacity-50 group-hover:opacity-100 transition-opacity mb-1">Up Next</span>
-<span class="font-black text-2xl tracking-tighter">14:00 KST</span>
+{% endfor %}
+{% else %}
+<div class="border-b border-black p-6">
+<p class="font-mono text-[10px] tracking-widest uppercase text-black/60">No schedules available.</p>
 </div>
-<div class="flex-1 p-6 flex flex-col justify-center">
-<h3 class="text-3xl font-black uppercase tracking-tighter mb-1">Comeback Hour</h3>
-<p class="font-mono text-[10px] tracking-widest uppercase opacity-70">New releases, fan requests, and charting tracks.</p>
-</div>
-</div>
-
-<!-- Schedule Row 3 -->
-<div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-black hover:bg-black hover:text-white transition-colors cursor-pointer">
-<div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-black flex flex-col justify-center shrink-0">
-<span class="font-black text-2xl tracking-tighter">20:00 KST</span>
-</div>
-<div class="flex-1 p-6 flex flex-col justify-center">
-<h3 class="text-3xl font-black uppercase tracking-tighter mb-1">Seoul Nights</h3>
-<p class="font-mono text-[10px] tracking-widest uppercase opacity-70">Midnight synthwave, R&B, and chill hip-hop vibes.</p>
-</div>
-</div>
+{% endif %}
 </div>
 </div>
 </section>
