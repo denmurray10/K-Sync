@@ -71,11 +71,13 @@ def api_schedule_data(request):
         playlist_duration_seconds = playlist_duration_map.get(s.playlist.id, 0)
         day_map[s.day].append({
             'id': s.id,
+            'day': s.day,
             'time': s.start_time.strftime('%H:%M'),
             'duration': f"Until {s.end_time.strftime('%H:%M')}",
             'name': s.playlist.name,
             'show_name': s.description or '',
             'show_color': _normalize_show_color(s.show_color),
+            'voice_over': s.voice_over or '',
             'playlist_id': s.playlist.id,
             'slot_duration_seconds': slot_duration_seconds,
             'playlist_duration_seconds': playlist_duration_seconds,
@@ -355,6 +357,7 @@ def api_schedule_save(request):
         schedule_id = data.get('schedule_id')
         show_name = (data.get('show_name') or '').strip()
         show_color = _normalize_show_color(data.get('show_color'))
+        voice_over = (data.get('voice_over') or '').strip()
         host = data.get('host', 'Auto DJ')
         genre = data.get('genre', 'MUSIC')
         
@@ -396,6 +399,7 @@ def api_schedule_save(request):
             schedule.playlist = playlist
             schedule.description = show_name
             schedule.show_color = show_color
+            schedule.voice_over = voice_over
             schedule.host = host
             schedule.genre = genre
             schedule.save()
@@ -407,6 +411,7 @@ def api_schedule_save(request):
                 playlist=playlist,
                 description=show_name,
                 show_color=show_color,
+                voice_over=voice_over,
                 host=host,
                 genre=genre
             )
@@ -876,6 +881,7 @@ def api_schedule_templates(request):
                 'end_time': slot.end_time.strftime('%H:%M'),
                 'show_name': slot.show_name or '',
                 'show_color': _normalize_show_color(slot.show_color),
+                'voice_over': slot.voice_over or '',
                 'playlist_id': slot.playlist_id,
                 'host': slot.host,
                 'genre': slot.genre,
@@ -934,6 +940,7 @@ def api_schedule_template_save(request):
                 end_time=end_obj,
                 show_name=(slot_data.get('show_name') or '').strip(),
                 show_color=_normalize_show_color(slot_data.get('show_color')),
+                voice_over=(slot_data.get('voice_over') or '').strip(),
                 playlist=playlist,
                 host=slot_data.get('host') or 'Auto DJ',
                 genre=slot_data.get('genre') or 'MUSIC',

@@ -461,6 +461,7 @@ class RadioSchedule(models.Model):
     genre = models.CharField(max_length=50, default='MUSIC')
     description = models.TextField(blank=True)
     show_color = models.CharField(max_length=20, default='CYAN')
+    voice_over = models.TextField(blank=True)
 
     class Meta:
         ordering = ['day', 'start_time']
@@ -488,6 +489,7 @@ class RadioScheduleTemplateSlot(models.Model):
     end_time = models.TimeField()
     show_name = models.CharField(max_length=255, blank=True)
     show_color = models.CharField(max_length=20, default='CYAN')
+    voice_over = models.TextField(blank=True)
     playlist = models.ForeignKey(RadioPlaylist, on_delete=models.CASCADE)
     host = models.CharField(max_length=255, default='Auto DJ')
     genre = models.CharField(max_length=50, default='MUSIC')

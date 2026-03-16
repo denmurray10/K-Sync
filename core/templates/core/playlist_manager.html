@@ -61,6 +61,12 @@
             <span class="material-symbols-outlined text-sm">calendar_view_week</span> Weekly Scheduler
         </button>
 
+        <button @click="switchTab('v-scheduler')" 
+                :class="activeTab === 'v-scheduler' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-white'"
+                class="py-4 text-[11px] font-black uppercase tracking-[0.2em] border-b-2 transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">keyboard_voice</span> VWeekly Scheduler
+        </button>
+
         <button x-show="activeTab === 'scheduler'" @click="openAISchedulerModal" class="py-2 px-3 border border-secondary/60 text-secondary text-[10px] font-bold uppercase tracking-widest hover:bg-secondary hover:text-black transition-colors" style="display: none;">
             AI Scheduler
         </button>
@@ -292,6 +298,35 @@
         </div>
     </div>
 
+    <!-- TAB 3: VWEEKLY SCHEDULER -->
+    <div x-show="activeTab === 'v-scheduler'" class="flex-1 flex flex-col overflow-hidden min-h-0">
+        <div class="p-4 border-b border-white/10 bg-surface flex items-center justify-between gap-3">
+            <h2 class="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">record_voice_over</span> Voice Weekly Scheduler
+            </h2>
+            <button @click="openVoiceScheduleCreate" class="h-8 px-3 bg-primary text-black text-[10px] font-bold uppercase tracking-widest">Add Voice Slot</button>
+        </div>
+
+        <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-2 bg-black/20">
+            <div x-show="!voiceWeeklySlots.length" class="h-full flex items-center justify-center text-[10px] font-mono uppercase tracking-widest text-slate-500">
+                No scheduled slots yet
+            </div>
+            <template x-for="slot in voiceWeeklySlots" :key="`voice-slot-${slot.id}`">
+                <div class="p-3 border border-white/10 bg-white/[0.03]">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-black uppercase truncate" x-text="`${slot.day} ${slot.time} - ${slot.duration.replace('Until ', '')}`"></p>
+                            <p class="text-[9px] font-mono uppercase tracking-widest text-slate-400 truncate" x-text="slot.show_name || slot.name"></p>
+                            <p class="text-[9px] font-mono uppercase tracking-widest text-slate-500 truncate" x-text="slot.name"></p>
+                            <p class="mt-1 text-[9px] font-mono text-slate-300" x-text="slot.voice_over || 'No voice-over notes yet.'"></p>
+                        </div>
+                        <button @click="openEditSchedule(slot.day, slot)" class="h-8 px-3 border border-secondary/60 text-secondary text-[9px] font-bold uppercase tracking-widest">Edit</button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
     <!-- Modal: Schedule Event -->
     <div x-show="showScheduleModal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl" style="display: none;">
         <div class="bg-surface border border-white/10 w-full max-w-sm p-8 shadow-2xl">
@@ -336,6 +371,10 @@
                 <div>
                     <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Host</label>
                     <input type="text" x-model="newSchedule.host" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Voice Over</label>
+                    <textarea x-model="newSchedule.voice_over" rows="3" class="w-full bg-black border border-white/10 p-2 text-xs text-white" placeholder="Voice-over notes/script..."></textarea>
                 </div>
             </div>
 
@@ -579,7 +618,7 @@ function playlistApp() {
         showPlaylistPreviewModal: false,
         previewLoading: false,
         previewPlaylist: { id: null, name: '', tracks: [] },
-        newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ' },
+        newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ', genre: 'MUSIC', voice_over: '' },
         toast: { visible: false, message: '' },
         toastTimeout: null,
         saveState: 'idle',
@@ -943,6 +982,7 @@ function playlistApp() {
                         playlist_id: slot.playlist_id,
                         show_name: slot.show_name || '',
                         show_color: slot.show_color || 'CYAN',
+                        voice_over: slot.voice_over || '',
                         host: slot.host || 'Auto DJ',
                         genre: slot.genre || 'MUSIC'
                     })
@@ -973,6 +1013,24 @@ function playlistApp() {
             this.newSchedule.start = this.snapTimeValue(slot.time || '09:00');
             this.newSchedule.end = this.snapTimeValue(String(slot.duration || '').replace('Until ', '') || '10:00');
             this.newSchedule.host = slot.host || 'Auto DJ';
+            this.newSchedule.genre = slot.genre || 'MUSIC';
+            this.newSchedule.voice_over = slot.voice_over || '';
+            this.syncSchedulePlaylistName();
+            this.showScheduleModal = true;
+        },
+
+        openVoiceScheduleCreate() {
+            this.activeDay = 'MON';
+            this.newSchedule.schedule_id = null;
+            this.newSchedule.show_name = '';
+            this.newSchedule.show_color = 'CYAN';
+            this.newSchedule.playlist_id = this.currentPlaylist.id ? this.currentPlaylist.id : null;
+            this.newSchedule.playlist_name = this.currentPlaylist.name || 'Current Builder Playlist';
+            this.newSchedule.start = '09:00';
+            this.newSchedule.end = '10:00';
+            this.newSchedule.host = 'Auto DJ';
+            this.newSchedule.genre = 'VOICE';
+            this.newSchedule.voice_over = '';
             this.syncSchedulePlaylistName();
             this.showScheduleModal = true;
         },
@@ -998,6 +1056,22 @@ function playlistApp() {
 
         get nowTimeLabel() {
             return this.minutesToTime(this.nowMinutes);
+        },
+
+        get voiceWeeklySlots() {
+            const dayOrder = { MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6, SUN: 7 };
+            const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+            const slots = [];
+
+            days.forEach((day) => {
+                (this.daySchedules[day] || []).forEach((slot) => slots.push(slot));
+            });
+
+            return slots.sort((a, b) => {
+                const dayDelta = (dayOrder[a.day] || 99) - (dayOrder[b.day] || 99);
+                if (dayDelta !== 0) return dayDelta;
+                return String(a.time || '').localeCompare(String(b.time || ''));
+            });
         },
 
         trackIdentity(track) {
@@ -1149,6 +1223,7 @@ function playlistApp() {
                     playlist_id: slot.playlist_id,
                     show_name: slot.show_name || '',
                     show_color: slot.show_color || 'CYAN',
+                    voice_over: slot.voice_over || '',
                     host: slot.host || 'Auto DJ',
                     genre: slot.genre || 'MUSIC',
                 })));
@@ -1206,6 +1281,7 @@ function playlistApp() {
                             playlist_id: slot.playlist_id,
                             show_name: slot.show_name || '',
                             show_color: slot.show_color || 'CYAN',
+                            voice_over: slot.voice_over || '',
                             host: slot.host || 'Auto DJ',
                             genre: slot.genre || 'MUSIC',
                         })
@@ -1405,6 +1481,8 @@ function playlistApp() {
             const endH = (hour + 1).toString().padStart(2, '0');
             this.newSchedule.start = `${hStr}:00`;
             this.newSchedule.end = `${endH}:00`;
+            this.newSchedule.genre = 'MUSIC';
+            this.newSchedule.voice_over = '';
             this.syncSchedulePlaylistName();
             this.showScheduleModal = true;
         },
@@ -1543,6 +1621,7 @@ function playlistApp() {
                     playlist_id: slot.playlist_id,
                     show_name: slot.show_name || '',
                     show_color: slot.show_color || 'CYAN',
+                    voice_over: slot.voice_over || '',
                     host: slot.host || 'Auto DJ',
                     genre: slot.genre || 'MUSIC',
                 }));
@@ -1658,6 +1737,7 @@ function playlistApp() {
                             playlist_id: slot.playlist_id,
                             show_name: slot.show_name || '',
                             show_color: slot.show_color || 'CYAN',
+                            voice_over: slot.voice_over || '',
                             host: slot.host || 'Auto DJ',
                             genre: slot.genre || 'MUSIC'
                         })
@@ -1710,6 +1790,7 @@ function playlistApp() {
                             playlist_id: slot.playlist_id,
                             show_name: slot.show_name || '',
                             show_color: slot.show_color || 'CYAN',
+                            voice_over: slot.voice_over || '',
                             host: slot.host || 'Auto DJ',
                             genre: slot.genre || 'MUSIC'
                         })
@@ -1811,7 +1892,9 @@ function playlistApp() {
                         playlist_id: this.newSchedule.playlist_id,
                         show_name: this.newSchedule.show_name,
                         show_color: this.newSchedule.show_color,
-                        host: this.newSchedule.host
+                        voice_over: this.newSchedule.voice_over,
+                        host: this.newSchedule.host,
+                        genre: this.newSchedule.genre,
                     })
                 });
                 const data = await resp.json();
