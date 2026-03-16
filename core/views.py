@@ -41,6 +41,36 @@ def _staff_only_json(request):
     return None
 
 
+def _build_stream_audio_url(source_url):
+    """Optionally rewrite Backblaze audio URLs through Cloudinary fetch CDN."""
+    raw = str(source_url or '').strip()
+    if not raw:
+        return raw
+
+    if not getattr(settings, 'AUDIO_STREAM_USE_CLOUDINARY_FETCH', False):
+        return raw
+
+    cloud_name = getattr(settings, 'CLOUDINARY_CLOUD_NAME', '')
+    if not cloud_name:
+        return raw
+
+    parsed = urllib.parse.urlparse(raw)
+    host = (parsed.netloc or '').lower()
+    if not host or 'res.cloudinary.com' in host:
+        return raw
+
+    b2_host = urllib.parse.urlparse(getattr(settings, 'B2_DOWNLOAD_URL', '')).netloc.lower()
+    is_backblaze = ('backblazeb2.com' in host) or (b2_host and host == b2_host)
+    if not is_backblaze:
+        return raw
+
+    transform = str(getattr(settings, 'AUDIO_STREAM_CLOUDINARY_TRANSFORM', '') or '').strip()
+    encoded = urllib.parse.quote(raw, safe='')
+    if transform:
+        return f"https://res.cloudinary.com/{cloud_name}/video/fetch/{transform}/{encoded}"
+    return f"https://res.cloudinary.com/{cloud_name}/video/fetch/{encoded}"
+
+
 def _normalize_show_color(raw_value):
     allowed = {'CYAN', 'PINK', 'PURPLE', 'GREEN', 'AMBER'}
     candidate = str(raw_value or '').strip().upper()
@@ -229,6 +259,7 @@ def api_b2_tracks(request):
             duration_seconds = (metadata.duration_seconds if metadata else 0) or 180
             encoded_name = urllib.parse.quote(file_name, safe='/')
             download_url = f"{auth_data.get('downloadUrl')}/file/{bucket_name}/{encoded_name}"
+            stream_url = _build_stream_audio_url(download_url)
 
             if search_query:
                 title_match = search_query in base_name.lower() or search_query in parsed_title.lower()
@@ -246,7 +277,7 @@ def api_b2_tracks(request):
                 'album_art': album_art,
                 'duration': duration,
                 'duration_seconds': duration_seconds,
-                'url': download_url,
+                'url': stream_url,
                 'fileId': f['fileId']
             })
         
@@ -1866,6 +1897,7 @@ def home(request):
         'home_live_track': home_live_track,
         'homepage_programming': homepage_programming,
     })
+
 
 def charts(request):
     chart_type = request.GET.get('type', 'songs')
@@ -3834,7 +3866,7 @@ def _build_live_playlist_timeline(playlist):
                 duck_percent = max(0, min(100, duck_percent))
 
                 voice_overlay = {
-                    'audio_url': next_track.audio_url,
+                    'audio_url': _build_stream_audio_url(next_track.audio_url),
                     'start_seconds': max(0, start_seconds),
                     'duration_seconds': _safe_track_duration_seconds(next_track),
                     'duck_volume': duck_percent / 100.0,
@@ -3988,12 +4020,18 @@ def live(request):
     if schedule_context:
         current_track = schedule_context['current_track']
         current_voice_overlay = schedule_context.get('current_voice_overlay')
+        if current_track:
+            current_track.audio_url = _build_stream_audio_url(current_track.audio_url)
+        if current_voice_overlay and current_voice_overlay.get('audio_url'):
+            current_voice_overlay['audio_url'] = _build_stream_audio_url(current_voice_overlay.get('audio_url'))
         up_next_tracks = schedule_context['up_next_tracks'][:6]
         recently_played_tracks = schedule_context['recently_played_tracks'][:6]
     elif state:
         current_track = state.current_track
         if _is_generated_voice_track(current_track):
             current_track = None
+        elif current_track:
+            current_track.audio_url = _build_stream_audio_url(current_track.audio_url)
 
         # Fetch up_next tracks in order, limit to 6
         up_next_ids = (state.up_next or [])[:6]
@@ -4057,7 +4095,7 @@ def api_live_rotate_track(request):
                 'title': current.title,
                 'artist': current.artist,
                 'album_art': current.album_art,
-                'audio_url': current.audio_url,
+                'audio_url': _build_stream_audio_url(current.audio_url),
                 'duration': current.duration,
                 'duration_seconds': current.duration_seconds,
             },
@@ -4131,7 +4169,7 @@ def api_live_rotate_track(request):
             'title': current.title,
             'artist': current.artist,
             'album_art': current.album_art,
-            'audio_url': current.audio_url,
+            'audio_url': _build_stream_audio_url(current.audio_url),
             'duration': current.duration,
             'duration_seconds': current.duration_seconds,
         },

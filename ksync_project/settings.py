@@ -194,3 +194,9 @@ B2_KEY_ID = os.environ.get('B2_KEY_ID', 'a2e0a74c71c2')
 B2_APPLICATION_KEY = os.environ.get('B2_APPLICATION_KEY', '003aca1366ecec133a01a611e2b26259e958c10129')
 B2_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME', 'StrayKids')
 B2_DOWNLOAD_URL = os.environ.get('B2_DOWNLOAD_URL', 'https://f003.backblazeb2.com')
+
+# ── Audio delivery optimisation (Cloudinary Fetch in front of B2) ───────────
+# Set to false to instantly revert to direct Backblaze URLs.
+AUDIO_STREAM_USE_CLOUDINARY_FETCH = os.environ.get('AUDIO_STREAM_USE_CLOUDINARY_FETCH', 'false').lower() == 'true'
+# Cloudinary video transformations are used for audio resources as well.
+AUDIO_STREAM_CLOUDINARY_TRANSFORM = os.environ.get('AUDIO_STREAM_CLOUDINARY_TRANSFORM', 'q_auto:eco,br_96k,f_mp3')
