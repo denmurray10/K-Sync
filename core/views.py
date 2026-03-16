@@ -68,6 +68,7 @@ def api_schedule_data(request):
             'time': s.start_time.strftime('%H:%M'),
             'duration': f"Until {s.end_time.strftime('%H:%M')}",
             'name': s.playlist.name,
+            'show_name': s.description or '',
             'playlist_id': s.playlist.id,
             'slot_duration_seconds': slot_duration_seconds,
             'playlist_duration_seconds': playlist_duration_seconds,
@@ -345,6 +346,7 @@ def api_schedule_save(request):
         end_time = data.get('end_time')
         playlist_id = data.get('playlist_id')
         schedule_id = data.get('schedule_id')
+        show_name = (data.get('show_name') or '').strip()
         host = data.get('host', 'Auto DJ')
         genre = data.get('genre', 'MUSIC')
         
@@ -380,6 +382,7 @@ def api_schedule_save(request):
             schedule.start_time = start_time
             schedule.end_time = end_time
             schedule.playlist = playlist
+            schedule.description = show_name
             schedule.host = host
             schedule.genre = genre
             schedule.save()
@@ -389,6 +392,7 @@ def api_schedule_save(request):
                 start_time=start_time,
                 end_time=end_time,
                 playlist=playlist,
+                description=show_name,
                 host=host,
                 genre=genre
             )
@@ -605,6 +609,7 @@ def api_schedule_templates(request):
             slots.append({
                 'start_time': slot.start_time.strftime('%H:%M'),
                 'end_time': slot.end_time.strftime('%H:%M'),
+                'show_name': slot.show_name or '',
                 'playlist_id': slot.playlist_id,
                 'host': slot.host,
                 'genre': slot.genre,
@@ -661,6 +666,7 @@ def api_schedule_template_save(request):
                 template=template,
                 start_time=start_obj,
                 end_time=end_obj,
+                show_name=(slot_data.get('show_name') or '').strip(),
                 playlist=playlist,
                 host=slot_data.get('host') or 'Auto DJ',
                 genre=slot_data.get('genre') or 'MUSIC',

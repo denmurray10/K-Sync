@@ -485,6 +485,7 @@ class RadioScheduleTemplateSlot(models.Model):
     template = models.ForeignKey(RadioScheduleTemplate, on_delete=models.CASCADE, related_name='slots')
     start_time = models.TimeField()
     end_time = models.TimeField()
+    show_name = models.CharField(max_length=255, blank=True)
     playlist = models.ForeignKey(RadioPlaylist, on_delete=models.CASCADE)
     host = models.CharField(max_length=255, default='Auto DJ')
     genre = models.CharField(max_length=50, default='MUSIC')

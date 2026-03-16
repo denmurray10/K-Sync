@@ -259,11 +259,12 @@
                                      @click.stop="openEditSchedule(day, slot)"
                                      :style="getSlotStyle(slot)">
                                     <div class="flex justify-between items-start">
-                                        <p class="text-[9px] font-black uppercase truncate text-secondary" x-text="slot.name"></p>
+                                        <p class="text-[9px] font-black uppercase truncate text-secondary" x-text="slot.show_name || slot.name"></p>
                                         <button @click.stop="deleteSchedule(slot.id)" class="opacity-0 group-hover:opacity-100 text-white/50 hover:text-red-500">
                                             <span class="material-symbols-outlined text-[10px]">close</span>
                                         </button>
                                     </div>
+                                    <p class="text-[8px] font-mono text-slate-300 uppercase truncate mt-0.5" x-text="slot.name"></p>
                                     <p class="text-[8px] font-mono text-white/40 uppercase mt-1" x-text="slot.time + ' - ' + slot.duration.replace('Until ', '')"></p>
                                     <p class="text-[8px] font-mono uppercase mt-1" :class="getSlotFitClass(slot)" x-text="getSlotFitLabel(slot)"></p>
                                     <div @mousedown.stop.prevent="startResizeSlot($event, day, slot)" class="absolute top-0 right-0 h-full w-2 cursor-ew-resize bg-secondary/0 hover:bg-secondary/40 transition-colors"></div>
@@ -283,6 +284,10 @@
             <p class="text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-6" x-show="newSchedule.schedule_id" style="display: none;">Editing existing schedule entry</p>
             
             <div class="space-y-4">
+                <div>
+                    <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Show Name</label>
+                    <input type="text" x-model="newSchedule.show_name" placeholder="e.g. Hype Beats Tuesdays" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
+                </div>
                 <div>
                     <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Target Playlist</label>
                     <select x-model.number="newSchedule.playlist_id" @change="syncSchedulePlaylistName" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
@@ -444,7 +449,7 @@ function playlistApp() {
         daySchedules: {},
         activeDay: 'MON',
         showScheduleModal: false,
-        newSchedule: { schedule_id: null, playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ' },
+        newSchedule: { schedule_id: null, show_name: '', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ' },
         toast: { visible: false, message: '' },
         toastTimeout: null,
         saveState: 'idle',
@@ -721,6 +726,7 @@ function playlistApp() {
                         start_time: this.minutesToTime(startMinutes),
                         end_time: this.minutesToTime(endMinutes),
                         playlist_id: slot.playlist_id,
+                        show_name: slot.show_name || '',
                         host: slot.host || 'Auto DJ',
                         genre: slot.genre || 'MUSIC'
                     })
@@ -743,6 +749,7 @@ function playlistApp() {
             if (Date.now() < this.suppressScheduleClickUntil) return;
             this.activeDay = day;
             this.newSchedule.schedule_id = slot.id;
+            this.newSchedule.show_name = slot.show_name || '';
             this.newSchedule.playlist_id = slot.playlist_id;
             this.newSchedule.playlist_name = slot.name || 'Scheduled Playlist';
             this.newSchedule.start = this.snapTimeValue(slot.time || '09:00');
@@ -1032,6 +1039,7 @@ function playlistApp() {
         openQuickSchedule(day, hour, pId = null, pName = null) {
             this.activeDay = day;
             this.newSchedule.schedule_id = null;
+            this.newSchedule.show_name = '';
             this.newSchedule.playlist_id = pId || (this.currentPlaylist.id ? this.currentPlaylist.id : null);
             this.newSchedule.playlist_name = pName || (this.currentPlaylist.name || 'Current Builder Playlist');
             
@@ -1167,6 +1175,7 @@ function playlistApp() {
                     start_time: slot.time,
                     end_time: this.slotEndTime(slot),
                     playlist_id: slot.playlist_id,
+                    show_name: slot.show_name || '',
                     host: slot.host || 'Auto DJ',
                     genre: slot.genre || 'MUSIC',
                 }));
@@ -1276,6 +1285,7 @@ function playlistApp() {
                             start_time: slot.time,
                             end_time: this.slotEndTime(slot),
                             playlist_id: slot.playlist_id,
+                            show_name: slot.show_name || '',
                             host: slot.host || 'Auto DJ',
                             genre: slot.genre || 'MUSIC'
                         })
@@ -1324,6 +1334,7 @@ function playlistApp() {
                             start_time: slot.start_time,
                             end_time: slot.end_time,
                             playlist_id: slot.playlist_id,
+                            show_name: slot.show_name || '',
                             host: slot.host || 'Auto DJ',
                             genre: slot.genre || 'MUSIC'
                         })
@@ -1388,6 +1399,7 @@ function playlistApp() {
                         start_time: this.newSchedule.start,
                         end_time: this.newSchedule.end,
                         playlist_id: this.newSchedule.playlist_id,
+                        show_name: this.newSchedule.show_name,
                         host: this.newSchedule.host
                     })
                 });
