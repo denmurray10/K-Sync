@@ -28,6 +28,7 @@ from .models import (
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, UserNotification, ClubInvitation, ClubLaunch, UserBadge,
+    LiveChatMessage, ChatBlockedTerm,
     RadioTrack, RadioStationState, RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
     RadioScheduleTemplate, RadioScheduleTemplateSlot,
 )
@@ -2726,6 +2727,101 @@ def set_bias(request):
         profile.bias = None
         profile.save()
         return JsonResponse({'ok': True, 'name': None})
+
+
+@login_required
+@require_http_methods(["GET"])
+def api_live_chat_messages(request):
+    messages_qs = LiveChatMessage.objects.select_related('user').order_by('-created_at')[:50]
+    messages = []
+    for item in reversed(list(messages_qs)):
+        messages.append({
+            'id': item.id,
+            'username': item.user.username,
+            'message': item.message,
+            'created_at': item.created_at.isoformat(),
+            'is_me': item.user_id == request.user.id,
+        })
+    return JsonResponse({'ok': True, 'messages': messages})
+
+
+def _contains_blocked_chat_language(raw_text):
+    text = str(raw_text or '').lower().strip()
+    if not text:
+        return False
+
+    leet_map = str.maketrans({
+        '@': 'a',
+        '$': 's',
+        '0': 'o',
+        '1': 'i',
+        '3': 'e',
+        '4': 'a',
+        '5': 's',
+        '7': 't',
+        '!': 'i',
+    })
+    normalized = text.translate(leet_map)
+    tokenized = re.sub(r'[^a-z\s]', ' ', normalized)
+    compact = re.sub(r'[^a-z]', '', normalized)
+
+    blocked_terms = {
+        'fuck', 'fucking', 'shit', 'bitch', 'asshole', 'bastard',
+        'dick', 'pussy', 'cunt', 'whore', 'slut', 'motherfucker',
+        'fag', 'retard', 'idiot',
+    }
+
+    try:
+        db_terms = ChatBlockedTerm.objects.filter(is_active=True).values_list('term', flat=True)
+        for term in db_terms:
+            cleaned = str(term or '').strip().lower()
+            if cleaned:
+                blocked_terms.add(cleaned)
+    except Exception:
+        pass
+
+    words = [w for w in tokenized.split() if w]
+    for word in words:
+        if word in blocked_terms:
+            return True
+
+    for term in blocked_terms:
+        if term in compact:
+            return True
+
+    return False
+
+
+@login_required
+@require_POST
+def api_live_chat_send(request):
+    try:
+        payload = json.loads(request.body or '{}')
+    except Exception:
+        payload = {}
+
+    text = (payload.get('message') or '').strip()
+    if not text:
+        return JsonResponse({'ok': False, 'error': 'Message is empty.'}, status=400)
+
+    if _contains_blocked_chat_language(text):
+        return JsonResponse(
+            {'ok': False, 'error': 'Message rejected: offensive language is not allowed.'},
+            status=400,
+        )
+
+    text = text[:500]
+    chat_item = LiveChatMessage.objects.create(user=request.user, message=text)
+    return JsonResponse({
+        'ok': True,
+        'message': {
+            'id': chat_item.id,
+            'username': request.user.username,
+            'message': chat_item.message,
+            'created_at': chat_item.created_at.isoformat(),
+            'is_me': True,
+        }
+    })
 
 
 @login_required

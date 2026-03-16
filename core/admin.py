@@ -5,6 +5,7 @@ from .models import (
     FanClubMembership, PreLaunchSignup, BlogArticle,
     RadioTrack, RadioStationState,
     RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
+    ChatBlockedTerm,
 )
 
 class RadioPlaylistTrackInline(admin.TabularInline):
@@ -152,3 +153,10 @@ class RadioTrackAdmin(admin.ModelAdmin):
 class RadioStationStateAdmin(admin.ModelAdmin):
     list_display = ('current_track', 'listeners_count', 'updated_at')
     readonly_fields = ('updated_at',)
+
+
+@admin.register(ChatBlockedTerm)
+class ChatBlockedTermAdmin(admin.ModelAdmin):
+    list_display = ('term', 'is_active', 'created_at')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('term',)

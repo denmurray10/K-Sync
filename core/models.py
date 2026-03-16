@@ -191,6 +191,34 @@ class SongRequest(models.Model):
         return f"{self.artist} – {self.song_title}"
 
 
+class LiveChatMessage(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='live_chat_messages',
+    )
+    message = models.TextField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username}: {self.message[:40]}"
+
+
+class ChatBlockedTerm(models.Model):
+    term = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['term']
+
+    def __str__(self):
+        return self.term
+
+
 class GameScore(models.Model):
     GAME_CHOICES = [
         ('song_game', 'Song Game'),

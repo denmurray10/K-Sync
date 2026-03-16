@@ -405,33 +405,26 @@
 
                 <!-- Chat Container -->
                 <div class="border border-white/10 bg-white/[0.02] h-[550px] flex flex-col">
-                    <!-- Messages Area -->
-                    <div id="chat-messages" class="flex-1 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4">
-                        <!-- Initial Messages -->
-                        <div class="chat-msg">
-                            <span class="text-[10px] font-bold text-primary uppercase tracking-tighter block mb-1">K-Beats Bot</span>
-                            <div class="bg-primary/10 border-l-2 border-primary p-3 text-xs text-slate-300 leading-relaxed italic">
-                                Welcome to the Global Studio 1! Be respectful and enjoy the music. 🎵
-                            </div>
-                        </div>
-                        <div class="chat-msg">
-                            <span class="text-[10px] font-bold text-secondary uppercase tracking-tighter block mb-1">Sana_Lover</span>
-                            <div class="bg-white/5 border-l-2 border-secondary p-3 text-xs text-white leading-relaxed">
-                                JUNG KOOK IS UNREAL! 🔥🔥🔥
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Input Area (Simulated) -->
+                    {% if user.is_authenticated %}
+                    <div id="chat-messages" class="flex-1 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4"></div>
                     <div class="p-4 border-t border-white/10 bg-black">
                         <div class="flex gap-2">
-                            <input type="text" placeholder="Type a message..." class="flex-1 bg-white/5 border border-white/10 px-4 py-3 text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-primary/50 transition-colors uppercase" disabled>
-                            <button class="bg-primary hover:bg-white text-black w-12 flex items-center justify-center transition-colors">
+                            <input id="chat-input" type="text" placeholder="Type a message..." class="flex-1 bg-white/5 border border-white/10 px-4 py-3 text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-primary/50 transition-colors uppercase" maxlength="500">
+                            <button id="chat-send-btn" class="bg-primary hover:bg-white text-black w-12 flex items-center justify-center transition-colors">
                                 <span class="material-symbols-outlined text-xl">send</span>
                             </button>
                         </div>
-                        <p class="text-[9px] text-slate-600 mt-2 uppercase tracking-widest text-center">Login to join the conversation</p>
+                        <p id="chat-error" class="hidden text-[9px] text-red-300 mt-2 uppercase tracking-widest text-center"></p>
+                        <p class="text-[9px] text-slate-600 mt-2 uppercase tracking-widest text-center">Members chat only · Be respectful</p>
                     </div>
+                    {% else %}
+                    <div class="flex-1 p-6 flex items-center justify-center">
+                        <div class="text-center max-w-sm">
+                            <p class="text-[11px] text-slate-400 font-mono uppercase tracking-widest">Live chat is for logged-in members</p>
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="inline-flex mt-4 h-9 px-4 items-center justify-center bg-primary text-black text-[10px] font-bold uppercase tracking-widest">Login To Join</a>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -988,51 +981,132 @@
             updateStickyTop(); // Initial call
         }
 
-        // Live Chat Simulation
+        // Live Chat (member-only)
         const chatContainer = document.getElementById('chat-messages');
-        const users = ['JiminieP', 'KpopQueen', 'ArmyForever', 'Blink2024', 'Felix_Skz', 'Hanni_Fan', 'V_Tae', 'Jennie_Ruby'];
-        const messages = [
-            'STREAMING FROM LONDON! 🇬🇧',
-            'This beat is actually insane',
-            'K-Sync (K-Beats) always has the best vibes',
-            'I need to request an Aespa track next!',
-            'Does anyone know when the next comeback is?',
-            'Seven is legendary.',
-            'Best radio app hands down.',
-            'Can we get some Stray Kids please? 🙏',
-            'Love from Brazil! 🇧🇷',
-            'This AI commentary is so cool'
-        ];
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatError = document.getElementById('chat-error');
+        const isChatMember = {% if user.is_authenticated %}true{% else %}false{% endif %};
+        let lastChatMessageId = 0;
 
-        function addMessage() {
+        function setChatError(message) {
+            if (!chatError) return;
+            const text = String(message || '').trim();
+            if (!text) {
+                chatError.textContent = '';
+                chatError.classList.add('hidden');
+                return;
+            }
+            chatError.textContent = text;
+            chatError.classList.remove('hidden');
+        }
+
+        function escapeHtml(text) {
+            return String(text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderChatMessages(messages) {
             if (!chatContainer) return;
-            
-            const user = users[Math.floor(Math.random() * users.length)];
-            const msg = messages[Math.floor(Math.random() * messages.length)];
-            const isSecondary = Math.random() > 0.5;
+            chatContainer.innerHTML = '';
 
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'chat-msg';
-            msgDiv.innerHTML = `
-                <span class="text-[10px] font-bold ${isSecondary ? 'text-secondary' : 'text-primary'} uppercase tracking-tighter block mb-1">${user}</span>
-                <div class="bg-white/5 border-l-2 ${isSecondary ? 'border-secondary' : 'border-primary'} p-3 text-xs text-white leading-relaxed">
-                    ${msg}
-                </div>
-            `;
-            
-            chatContainer.appendChild(msgDiv);
+            if (!Array.isArray(messages) || !messages.length) {
+                const emptyState = document.createElement('p');
+                emptyState.className = 'text-slate-500 text-xs text-center py-4 font-mono uppercase tracking-widest';
+                emptyState.textContent = 'No chat messages yet';
+                chatContainer.appendChild(emptyState);
+                return;
+            }
+
+            messages.forEach((item) => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chat-msg';
+
+                const usernameClass = item.is_me ? 'text-primary' : 'text-secondary';
+                const borderClass = item.is_me ? 'border-primary' : 'border-secondary';
+                const safeUser = escapeHtml(item.username || 'Member');
+                const safeMessage = escapeHtml(item.message || '');
+
+                msgDiv.innerHTML = `
+                    <span class="text-[10px] font-bold ${usernameClass} uppercase tracking-tighter block mb-1">${safeUser}</span>
+                    <div class="bg-white/5 border-l-2 ${borderClass} p-3 text-xs text-white leading-relaxed">${safeMessage}</div>
+                `;
+                chatContainer.appendChild(msgDiv);
+
+                const numericId = Number(item.id || 0);
+                if (numericId > lastChatMessageId) lastChatMessageId = numericId;
+            });
+
             chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-            // Keep only last 20 messages for performance
-            if (chatContainer.children.length > 20) {
-                chatContainer.removeChild(chatContainer.children[0]);
+        async function refreshLiveChat() {
+            if (!isChatMember || !chatContainer) return;
+            try {
+                const resp = await fetch(`/api/live/chat/messages/?t=${Date.now()}`, { cache: 'no-store' });
+                const data = await resp.json();
+                if (!data?.ok) return;
+                renderChatMessages(data.messages || []);
+            } catch (e) {
+                // keep current UI on transient network issues
             }
         }
 
-        // Add a new message every 3-8 seconds
-        setInterval(() => {
-            if (Math.random() > 0.4) addMessage();
-        }, 5000);
+        async function sendLiveChatMessage() {
+            if (!isChatMember || !chatInput) return;
+            const text = String(chatInput.value || '').trim();
+            if (!text) return;
+            setChatError('');
+
+            chatInput.disabled = true;
+            if (chatSendBtn) chatSendBtn.disabled = true;
+
+            try {
+                const resp = await fetch('/api/live/chat/send/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ message: text }),
+                });
+                const data = await resp.json();
+                if (!data?.ok) {
+                    setChatError(data?.error || 'Message rejected');
+                    return;
+                }
+                chatInput.value = '';
+                await refreshLiveChat();
+            } catch (e) {
+                setChatError('Could not send message right now');
+            } finally {
+                chatInput.disabled = false;
+                if (chatSendBtn) chatSendBtn.disabled = false;
+                chatInput.focus();
+            }
+        }
+
+        if (isChatMember && chatContainer) {
+            refreshLiveChat();
+            setInterval(refreshLiveChat, 5000);
+        }
+
+        if (chatSendBtn) {
+            chatSendBtn.addEventListener('click', sendLiveChatMessage);
+        }
+
+        if (chatInput) {
+            chatInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    sendLiveChatMessage();
+                }
+            });
+        }
     });
 </script>
 
