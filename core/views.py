@@ -797,9 +797,21 @@ def api_voiceover_ai_scripts(request):
         title = (item.get('title') or item.get('name') or '').strip()
         artist = (item.get('artist') or '').strip() or 'Unknown Artist'
         duration = (item.get('duration') or '').strip()
+        source_index_raw = item.get('index', None)
+        source_index = None
+        try:
+            if source_index_raw is not None and str(source_index_raw).strip() != '':
+                source_index = int(source_index_raw)
+        except Exception:
+            source_index = None
         if not title:
             continue
-        tracks.append({'title': title[:300], 'artist': artist[:200], 'duration': duration[:20]})
+        tracks.append({
+            'title': title[:300],
+            'artist': artist[:200],
+            'duration': duration[:20],
+            'source_index': source_index,
+        })
 
     if not tracks:
         return JsonResponse({'ok': False, 'error': 'No valid tracks provided.'}, status=400)
@@ -981,7 +993,7 @@ def api_voiceover_ai_scripts(request):
                 recent_opener_signatures = recent_opener_signatures[-5:]
 
         assignments.append({
-            'index': track_index,
+            'index': current.get('source_index') if isinstance(current.get('source_index'), int) else track_index,
             'text': script,
             'mentions_skipped': bool(skipped_tracks),
         })

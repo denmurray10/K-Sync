@@ -2299,6 +2299,46 @@ function playlistApp() {
             };
         },
 
+        getSongIdentityKey(track) {
+            if (!track || this.isGeneratedVoiceTrack(track)) return '';
+            const title = String(track.title || track.name || '').trim().toLowerCase();
+            const artist = String(track.artist || '').trim().toLowerCase();
+            if (!title) return '';
+            return `${title}__${artist}`;
+        },
+
+        hasVoiceData(track) {
+            if (!track || this.isGeneratedVoiceTrack(track)) return false;
+            return !!String(track.voice_over_text || '').trim() || !!track.voice_over_active;
+        },
+
+        removePlainDuplicatesForVoSongs() {
+            const entriesByKey = new Map();
+            (this.voiceTimelineTracks || []).forEach((track, idx) => {
+                const key = this.getSongIdentityKey(track);
+                if (!key) return;
+                if (!entriesByKey.has(key)) entriesByKey.set(key, []);
+                entriesByKey.get(key).push({ track, idx });
+            });
+
+            const removeIndexes = [];
+            entriesByKey.forEach((entries) => {
+                const hasVoVersion = entries.some(({ track }) => this.hasVoiceData(track));
+                if (!hasVoVersion) return;
+                entries.forEach(({ track, idx }) => {
+                    if (!this.hasVoiceData(track)) removeIndexes.push(idx);
+                });
+            });
+
+            if (!removeIndexes.length) return 0;
+
+            this.stopVoicePreview();
+            removeIndexes.sort((a, b) => b - a).forEach((idx) => {
+                this.voiceTimelineTracks.splice(idx, 1);
+            });
+            return removeIndexes.length;
+        },
+
         toggleVoiceOverTrack(track) {
             track.duck_volume_percent = track.voice_over_active ? 10 : 100;
             if (!track.voice_over_active) track.voice_over_start_percent = 0;
@@ -2517,7 +2557,8 @@ function playlistApp() {
                     track.voice_over_active = true;
                     this.toggleVoiceOverTrack(track);
                 }
-                this.showToast('Voice-over generated');
+                const removed = this.removePlainDuplicatesForVoSongs();
+                this.showToast(removed ? `Voice-over generated (${removed} plain duplicate${removed === 1 ? '' : 's'} removed)` : 'Voice-over generated');
             } catch (e) {
                 this.showToast('Voice-over generation failed');
             } finally {
@@ -2531,6 +2572,19 @@ function playlistApp() {
                 return;
             }
 
+            const eligibleTracks = this.voiceTimelineTracks
+                .map((track, idx) => ({ track, idx }))
+                .filter(({ track }) => {
+                    if (!track) return false;
+                    if (this.isGeneratedVoiceTrack(track)) return false;
+                    return !(track.voice_over_text || '').trim();
+                });
+
+            if (!eligibleTracks.length) {
+                this.showToast('No empty song scripts to generate');
+                return;
+            }
+
             this.aiVoiceScriptsLoading = true;
             try {
                 const resp = await fetch('/api/voiceover/ai-scripts/', {
@@ -2538,7 +2592,8 @@ function playlistApp() {
                     headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
                     body: JSON.stringify({
                         playlist_name: this.voiceTimelinePlaylistName || 'Voice Timeline Playlist',
-                        tracks: this.voiceTimelineTracks.map((track) => ({
+                        tracks: eligibleTracks.map(({ track, idx }) => ({
+                            index: idx,
                             title: track.title || track.name || '',
                             artist: track.artist || '',
                             duration: track.duration || '',
@@ -2554,14 +2609,12 @@ function playlistApp() {
 
                 const assignments = Array.isArray(data.assignments) ? data.assignments : [];
                 let applied = 0;
-                let skippedExisting = 0;
 
                 assignments.forEach((assignment) => {
                     const idx = Number(assignment.index);
                     if (!Number.isInteger(idx) || idx < 0 || idx >= this.voiceTimelineTracks.length) return;
                     const track = this.voiceTimelineTracks[idx];
-                    if (!track || (track.voice_over_text || '').trim()) {
-                        skippedExisting += 1;
+                    if (!track || this.isGeneratedVoiceTrack(track) || (track.voice_over_text || '').trim()) {
                         return;
                     }
                     track.voice_over_text = String(assignment.text || '').trim();
@@ -2573,12 +2626,12 @@ function playlistApp() {
                 });
 
                 if (!applied) {
-                    this.showToast(skippedExisting ? 'AI scripts ready, but target tracks already had text' : 'No AI scripts generated');
+                    this.showToast('AI returned no usable scripts this run');
                     return;
                 }
 
-                const suffix = skippedExisting ? ` (${skippedExisting} kept existing)` : '';
-                this.showToast(`AI added ${applied} DJ scripts${suffix}`);
+                const removed = this.removePlainDuplicatesForVoSongs();
+                this.showToast(removed ? `AI added ${applied} DJ scripts (${removed} plain duplicate${removed === 1 ? '' : 's'} removed)` : `AI added ${applied} DJ scripts`);
             } catch (e) {
                 this.showToast('AI DJ scripts failed');
             } finally {
@@ -2730,7 +2783,8 @@ function playlistApp() {
                 generated.voice_over_length_percent = 22;
 
                 this.voiceTimelineTracks.splice(index + 1, 0, generated);
-                this.showToast(`VO audio added (${autoPercent}% clip length)`);
+                const removed = this.removePlainDuplicatesForVoSongs();
+                this.showToast(removed ? `VO audio added (${autoPercent}% clip, ${removed} plain duplicate${removed === 1 ? '' : 's'} removed)` : `VO audio added (${autoPercent}% clip length)`);
                 return true;
             } catch (e) {
                 this.showToast('Voice rendering failed');
