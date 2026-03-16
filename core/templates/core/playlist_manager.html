@@ -248,7 +248,7 @@
                             <!-- Absolute Positioned Scheduled Blocks -->
                             <template x-for="slot in (daySchedules[day] || [])" :key="slot.id">
                                 <div class="absolute top-1 bottom-1 bg-secondary/20 border border-secondary/50 p-2 overflow-hidden group cursor-pointer"
-                                     @click.stop="openEditSchedule(slot)"
+                                     @click.stop="openEditSchedule(day, slot)"
                                      :style="getSlotStyle(slot)">
                                     <div class="flex justify-between items-start">
                                         <p class="text-[9px] font-black uppercase truncate text-secondary" x-text="slot.name"></p>
@@ -258,6 +258,7 @@
                                     </div>
                                     <p class="text-[8px] font-mono text-white/40 uppercase mt-1" x-text="slot.time + ' - ' + slot.duration.replace('Until ', '')"></p>
                                     <p class="text-[8px] font-mono uppercase mt-1" :class="getSlotFitClass(slot)" x-text="getSlotFitLabel(slot)"></p>
+                                    <div @mousedown.stop.prevent="startResizeSlot($event, day, slot)" class="absolute top-0 right-0 h-full w-2 cursor-ew-resize bg-secondary/0 hover:bg-secondary/40 transition-colors"></div>
                                 </div>
                             </template>
                         </div>
@@ -380,7 +381,7 @@ function playlistApp() {
         daySchedules: {},
         activeDay: 'MON',
         showScheduleModal: false,
-        newSchedule: { playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ' },
+        newSchedule: { schedule_id: null, playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ' },
         toast: { visible: false, message: '' },
         toastTimeout: null,
         saveState: 'idle',
@@ -389,6 +390,9 @@ function playlistApp() {
         undoTimeout: null,
         isPlaylistDropActive: false,
         snapIntervalMinutes: 15,
+        isResizingSlot: false,
+        resizeContext: null,
+        suppressScheduleClickUntil: 0,
         slotTargetMinutes: 60,
         showAIModal: false,
         aiStep: 1,
@@ -556,6 +560,115 @@ function playlistApp() {
 
             this.newSchedule.start = snappedStart;
             this.newSchedule.end = snappedEnd;
+        },
+
+        parseSlotBounds(slot) {
+            const [startHour, startMinute] = String(slot.time || '00:00').split(':').map((part) => parseInt(part, 10) || 0);
+            const endRaw = String(slot.duration || '').replace('Until ', '');
+            const [endHour, endMinute] = endRaw.split(':').map((part) => parseInt(part, 10) || 0);
+            const startMinutes = (startHour * 60) + startMinute;
+            const endMinutes = (endHour * 60) + endMinute;
+            return { startMinutes, endMinutes };
+        },
+
+        updateSlotBounds(slot, startMinutes, endMinutes) {
+            slot.time = this.minutesToTime(startMinutes);
+            slot.duration = `Until ${this.minutesToTime(endMinutes)}`;
+            slot.slot_duration_seconds = Math.max(0, (endMinutes - startMinutes) * 60);
+        },
+
+        startResizeSlot(event, day, slot) {
+            const row = event.currentTarget.closest('.grid-row');
+            if (!row || this.isResizingSlot) return;
+
+            const { startMinutes, endMinutes } = this.parseSlotBounds(slot);
+            this.isResizingSlot = true;
+            this.resizeContext = {
+                day,
+                slot,
+                row,
+                originalEndMinutes: endMinutes,
+                startMinutes,
+                dragStartClientX: event.clientX,
+            };
+
+            const onMove = (moveEvent) => this.handleResizeMove(moveEvent);
+            const onUp = () => this.finishResizeSlot(onMove, onUp);
+
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp, { once: true });
+        },
+
+        handleResizeMove(moveEvent) {
+            if (!this.resizeContext) return;
+            const { slot, startMinutes, originalEndMinutes, dragStartClientX } = this.resizeContext;
+            const interval = Math.max(1, parseInt(this.snapIntervalMinutes || 15, 10));
+
+            const deltaPixels = moveEvent.clientX - dragStartClientX;
+            const deltaMinutes = (deltaPixels / 96) * 60;
+            const rawEnd = originalEndMinutes + deltaMinutes;
+            let snappedEnd = Math.round(rawEnd / interval) * interval;
+            snappedEnd = Math.max(startMinutes + interval, Math.min(24 * 60, snappedEnd));
+
+            this.updateSlotBounds(slot, startMinutes, snappedEnd);
+        },
+
+        async finishResizeSlot(onMove, onUp) {
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+
+            if (!this.resizeContext) {
+                this.isResizingSlot = false;
+                return;
+            }
+
+            const { day, slot, startMinutes, originalEndMinutes } = this.resizeContext;
+            const { endMinutes } = this.parseSlotBounds(slot);
+
+            this.resizeContext = null;
+            this.isResizingSlot = false;
+
+            if (endMinutes === originalEndMinutes) return;
+            this.suppressScheduleClickUntil = Date.now() + 250;
+
+            try {
+                const resp = await fetch('/api/schedule/save/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({
+                        schedule_id: slot.id,
+                        day,
+                        start_time: this.minutesToTime(startMinutes),
+                        end_time: this.minutesToTime(endMinutes),
+                        playlist_id: slot.playlist_id,
+                        host: slot.host || 'Auto DJ',
+                        genre: slot.genre || 'MUSIC'
+                    })
+                });
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.updateSlotBounds(slot, startMinutes, originalEndMinutes);
+                    this.showToast(data.error || 'Could not resize slot');
+                    return;
+                }
+                await this.fetchSchedules();
+                this.showToast('Schedule slot resized');
+            } catch (e) {
+                this.updateSlotBounds(slot, startMinutes, originalEndMinutes);
+                this.showToast('Could not resize slot');
+            }
+        },
+
+        openEditSchedule(day, slot) {
+            if (Date.now() < this.suppressScheduleClickUntil) return;
+            this.activeDay = day;
+            this.newSchedule.schedule_id = slot.id;
+            this.newSchedule.playlist_id = slot.playlist_id;
+            this.newSchedule.playlist_name = slot.name || 'Scheduled Playlist';
+            this.newSchedule.start = this.snapTimeValue(slot.time || '09:00');
+            this.newSchedule.end = this.snapTimeValue(String(slot.duration || '').replace('Until ', '') || '10:00');
+            this.newSchedule.host = slot.host || 'Auto DJ';
+            this.showScheduleModal = true;
         },
 
         get playlistTotalSeconds() {
@@ -833,6 +946,7 @@ function playlistApp() {
 
         openQuickSchedule(day, hour, pId = null, pName = null) {
             this.activeDay = day;
+            this.newSchedule.schedule_id = null;
             this.newSchedule.playlist_id = pId || (this.currentPlaylist.id ? this.currentPlaylist.id : null);
             this.newSchedule.playlist_name = pName || (this.currentPlaylist.name || 'Current Builder Playlist');
             
@@ -921,6 +1035,7 @@ function playlistApp() {
                     headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
                     body: JSON.stringify({
                         day: this.activeDay,
+                        schedule_id: this.newSchedule.schedule_id,
                         start_time: this.newSchedule.start,
                         end_time: this.newSchedule.end,
                         playlist_id: this.newSchedule.playlist_id,

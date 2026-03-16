@@ -343,6 +343,7 @@ def api_schedule_save(request):
         start_time = data.get('start_time')
         end_time = data.get('end_time')
         playlist_id = data.get('playlist_id')
+        schedule_id = data.get('schedule_id')
         host = data.get('host', 'Auto DJ')
         genre = data.get('genre', 'MUSIC')
         
@@ -360,12 +361,11 @@ def api_schedule_save(request):
             
         playlist = RadioPlaylist.objects.get(id=playlist_id)
 
-        overlap = (
-            RadioSchedule.objects
-            .filter(day=day, start_time__lt=end_obj, end_time__gt=start_obj)
-            .select_related('playlist')
-            .first()
-        )
+        overlap_qs = RadioSchedule.objects.filter(day=day, start_time__lt=end_obj, end_time__gt=start_obj)
+        if schedule_id:
+            overlap_qs = overlap_qs.exclude(id=schedule_id)
+
+        overlap = overlap_qs.select_related('playlist').first()
 
         if overlap:
             return JsonResponse({
@@ -373,14 +373,24 @@ def api_schedule_save(request):
                 'error': f'Conflict with {overlap.playlist.name} ({overlap.start_time.strftime("%H:%M")} - {overlap.end_time.strftime("%H:%M")})'
             }, status=409)
 
-        RadioSchedule.objects.create(
-            day=day,
-            start_time=start_time,
-            end_time=end_time,
-            playlist=playlist,
-            host=host,
-            genre=genre
-        )
+        if schedule_id:
+            schedule = RadioSchedule.objects.get(id=schedule_id)
+            schedule.day = day
+            schedule.start_time = start_time
+            schedule.end_time = end_time
+            schedule.playlist = playlist
+            schedule.host = host
+            schedule.genre = genre
+            schedule.save()
+        else:
+            RadioSchedule.objects.create(
+                day=day,
+                start_time=start_time,
+                end_time=end_time,
+                playlist=playlist,
+                host=host,
+                genre=genre
+            )
         
         return JsonResponse({'ok': True})
     except Exception as e:
