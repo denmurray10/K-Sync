@@ -267,6 +267,11 @@ def api_playlist_save(request):
         name = data.get('name')
         default_voice_id = (data.get('default_voice_id') or '').strip()
         default_voice_name = (data.get('default_voice_name') or '').strip()
+        enforce_final_vo_window_raw = data.get('enforce_final_vo_window', True)
+        if isinstance(enforce_final_vo_window_raw, str):
+            enforce_final_vo_window = enforce_final_vo_window_raw.strip().lower() not in ('0', 'false', 'no', 'off')
+        else:
+            enforce_final_vo_window = bool(enforce_final_vo_window_raw)
         track_data = data.get('tracks', []) # List of {title, artist, url, album_art, duration}
 
         def parse_duration_seconds(value):
@@ -333,6 +338,12 @@ def api_playlist_save(request):
             except Exception:
                 voice_over_length_percent = 22
             voice_over_length_percent = max(1, min(100, voice_over_length_percent))
+            if voice_over_active:
+                max_start = max(0, 100 - voice_over_length_percent)
+                min_start = min(max_start, 85) if enforce_final_vo_window else 0
+                voice_over_start_percent = max(min_start, min(max_start, voice_over_start_percent))
+            else:
+                voice_over_start_percent = 0
             
             track, _ = RadioTrack.objects.get_or_create(
                 title=title,
@@ -533,8 +544,11 @@ def api_voiceover_generate(request):
     }.get(style, 'high-energy and punchy')
 
     prompt = (
-        "Write ONE short radio DJ voice-over line for this song. "
-        "Requirements: 1-2 sentences, max 240 characters, no hashtags, no emojis, no quotes. "
+        "Write ONE radio DJ link for this song that sounds broadcast-ready and specific. "
+        "Requirements: 2-4 short sentences, max 420 characters, no hashtags, no emojis, no quotation marks. "
+        "Vary sentence structure and avoid generic filler phrasing. "
+        "Include at least ONE concrete talking point where possible: current single/comeback, tour stop, chart milestone, recent public appearance, fandom reaction, or notable group fact. "
+        "If uncertain on a detail, keep it soft and non-factual (e.g., 'fans are buzzing'). Do not invent exact dates/venues. "
         f"Tone: {style_hint}. "
         f"DJ voice persona: {selected_voice_name or selected_voice_id or 'Default DJ'}. "
         f"Track: {title}. "
@@ -568,8 +582,8 @@ def api_voiceover_generate(request):
 
     line = re.sub(r'\s+', ' ', str(text)).strip()
     line = line.strip('"').strip("'")
-    if len(line) > 240:
-        line = line[:240].rstrip()
+    if len(line) > 420:
+        line = line[:420].rstrip()
 
     return JsonResponse({
         'ok': True,
@@ -866,6 +880,16 @@ def api_voiceover_ai_scripts(request):
         "we took a quick step forward in the playlist",
     ]
 
+    content_angle_pool = [
+        "recent release momentum (single/album/comeback)",
+        "touring or live-stage buzz",
+        "group identity/fandom culture insight",
+        "recent media/variety/public appearance",
+        "songcraft/performance detail (vocals, rap line, choreography)",
+        "chart/streaming momentum in broad terms",
+        "what listeners should notice in this next track",
+    ]
+
     assignments = []
     previous_selected = None
     recent_opener_signatures = []
@@ -881,6 +905,7 @@ def api_voiceover_ai_scripts(request):
         prev_track = tracks[track_index - 1] if track_index > 0 else None
         next_tracks = tracks[track_index + 1: track_index + 3]
         lead_in_seed = intro_pool[selection_idx % len(intro_pool)]
+        content_angle = random.choice(content_angle_pool)
 
         skipped_tracks = []
         if previous_selected is not None and track_index - previous_selected > 1:
@@ -906,11 +931,15 @@ def api_voiceover_ai_scripts(request):
         prompt = (
             "Write one short radio DJ voice-over script for this playlist moment. "
             "Style: energetic, conversational, natural UK radio pacing. "
-            "Length: 1-2 sentences, maximum 260 characters. "
+            "Length: 2-4 short sentences, maximum 520 characters. "
             f"Use this opening style as inspiration (do not copy verbatim): {lead_in_seed} "
+            f"Primary content angle for this link: {content_angle}. "
+            "Include at least one meaningful insight where possible: latest single/comeback, touring chatter, recent public appearance, fandom reaction, or artist/group fact tied to the moment. "
+            "If uncertain on hard facts, use careful wording and avoid exact dates/venues. "
             "If you reference an album, only do so when you are confident; otherwise skip album mention. "
             "Avoid hashtags, emojis, stage directions, and quotation marks. "
             "Avoid repetitive stock phrases; do not default to 'we skipped ahead'. "
+            "Vary rhythm and syntax from previous links; do not reuse openings. "
             f"Playlist: {playlist_name}. "
             f"Current song: {current['title']} by {current['artist']}. "
             f"{prev_clause} "
@@ -940,8 +969,8 @@ def api_voiceover_ai_scripts(request):
                 fallback = f"{lead_in_seed} Up now: {current['title']} by {current['artist']}."
             script = re.sub(r'\s+', ' ', fallback).strip().strip('"').strip("'")
 
-        if len(script) > 260:
-            script = script[:260].rstrip()
+        if len(script) > 520:
+            script = script[:520].rstrip()
         if not script:
             continue
 

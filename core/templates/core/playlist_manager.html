@@ -309,6 +309,10 @@
                         :disabled="aiVoiceScriptsLoading || !voiceTimelineTracks.length"
                         class="h-8 px-3 border border-secondary/60 text-secondary text-[10px] font-bold uppercase tracking-widest disabled:opacity-50"
                         x-text="aiVoiceScriptsLoading ? 'AI Writing…' : 'AI DJ Scripts'"></button>
+                <button @click="generateAllVoiceOversAudio"
+                        :disabled="voiceBatchSynthLoading || voiceTimelineLoading || !voiceTimelineTracks.length"
+                        class="h-8 px-3 border border-emerald-400/70 text-emerald-300 text-[10px] font-bold uppercase tracking-widest disabled:opacity-50"
+                        x-text="voiceBatchSynthLoading ? 'Rendering All…' : 'Generate All VO Audio'"></button>
                 <button @click="openVoiceScheduleCreate" class="h-8 px-3 bg-primary text-black text-[10px] font-bold uppercase tracking-widest">Add Voice Slot</button>
             </div>
         </div>
@@ -339,12 +343,25 @@
                     x-text="voiceVoicesLoading ? 'Loading DJs...' : 'Refresh DJs'"></button>
         </div>
 
+            <div class="p-3 border-b border-white/10 bg-black/20 flex items-center gap-2">
+                <span class="text-[9px] font-mono uppercase tracking-widest text-slate-500">VO Placement</span>
+                <button @click="setVoicePlacementMode('final15')"
+                    :class="voicePlacementMode === 'final15' ? 'border-secondary text-secondary' : 'border-white/10 text-slate-300'"
+                    class="h-7 px-2 border text-[9px] font-bold uppercase tracking-widest">Final 15%</button>
+                <button @click="setVoicePlacementMode('free')"
+                    :class="voicePlacementMode === 'free' ? 'border-secondary text-secondary' : 'border-white/10 text-slate-300'"
+                    class="h-7 px-2 border text-[9px] font-bold uppercase tracking-widest">Free</button>
+            </div>
+
         <div class="p-3 border-b border-white/10 bg-black/20">
             <div class="text-[9px] font-mono uppercase tracking-widest text-slate-500 mb-2">Premiere-style Timeline (A1 Music / A2 Voice-Over)</div>
             <div class="overflow-x-auto no-scrollbar">
                 <div class="inline-flex gap-3 min-w-full pb-1">
                     <template x-for="(track, index) in voiceTimelineTracks" :key="`vt-${index}`">
-                        <div class="w-72 flex-shrink-0 border border-white/10 bg-black/30">
+                        <div class="relative w-72 flex-shrink-0 border border-white/10 bg-black/30">
+                            <button @click="removeVoiceTimelineTrack(index)"
+                                    class="absolute top-1 right-1 z-10 h-5 w-5 border border-red-400/60 text-red-300 text-[10px] font-black leading-none hover:bg-red-400 hover:text-black transition-colors"
+                                    title="Remove from playlist">×</button>
                             <div class="px-2 py-1 border-b border-white/10 text-[9px] font-mono uppercase tracking-widest text-slate-400">A1 Music</div>
                             <div class="p-2 border-b border-white/10" :class="track.voice_over_active ? 'bg-red-500/10' : 'bg-cyan-500/10'">
                                 <p class="text-[10px] font-bold uppercase truncate" x-text="track.title || track.name"></p>
@@ -696,6 +713,28 @@
         </div>
     </div>
 
+    <div x-show="voiceBatchSynthLoading" x-transition.opacity.duration.150ms class="fixed inset-0 z-[80] bg-black/80 backdrop-blur-sm flex items-center justify-center" style="display: none;">
+        <div class="w-full max-w-sm border border-emerald-400/40 bg-surface p-5">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-emerald-300 animate-spin">autorenew</span>
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-widest text-emerald-300">Rendering Voice-Overs</p>
+                    <p class="text-[10px] font-mono uppercase tracking-widest text-slate-300" x-text="voiceBatchSynthStatus || 'Preparing…'"></p>
+                </div>
+            </div>
+            <div class="mt-4 h-2 w-full bg-black border border-white/10">
+                <div class="h-full bg-emerald-400 transition-all duration-200" :style="`width: ${voiceBatchSynthProgress}%`"></div>
+            </div>
+            <p class="mt-2 text-right text-[10px] font-mono uppercase tracking-widest text-emerald-300" x-text="`${voiceBatchSynthProgress}%`"></p>
+            <div class="mt-4 flex justify-end">
+                <button @click="requestCancelVoiceBatch"
+                        class="h-7 px-3 border border-red-400/70 text-red-300 text-[9px] font-bold uppercase tracking-widest hover:bg-red-400 hover:text-black transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
 </main>
 
 <script>
@@ -722,6 +761,7 @@ function playlistApp() {
         previewPlaylist: { id: null, name: '', tracks: [] },
         voiceTimelinePlaylistId: null,
         voiceTimelinePlaylistName: '',
+        voicePlacementMode: 'final15',
         voiceTimelineDefaultVoiceId: '',
         voiceTimelineDefaultVoiceName: '',
         preferredDefaultVoiceId: 'default-trm-shaco-fymwvka9pdsg__design-voice-851b1e38',
@@ -733,6 +773,10 @@ function playlistApp() {
         voiceOverGeneratingTrackIndex: null,
         voiceOverSynthTrackIndex: null,
         aiVoiceScriptsLoading: false,
+        voiceBatchSynthLoading: false,
+        voiceBatchSynthProgress: 0,
+        voiceBatchSynthStatus: '',
+        voiceBatchSynthCancelRequested: false,
         voicePreviewSongAudio: null,
         voicePreviewVoAudio: null,
         voicePreviewTimer: null,
@@ -1296,13 +1340,43 @@ function playlistApp() {
         getVoicePlacementLabel(index) {
             const track = (this.voiceTimelineTracks || [])[Number(index)];
             if (!track) return '';
-            const startPercent = Math.max(0, Math.min(100, Number(track.voice_over_start_percent || 0)));
+            const startPercent = this.clampVoiceClipStart(track, track.voice_over_start_percent);
             const songSeconds = Math.max(
                 0,
                 Number(track.duration_seconds || 0) || this.durationToSeconds(track.duration)
             );
             const startSeconds = Math.max(0, Math.round(songSeconds * (startPercent / 100)));
             return `VO Starts @ ${this.formatSeconds(startSeconds)} (${Math.round(startPercent)}%)`;
+        },
+
+        setVoicePlacementMode(mode) {
+            const nextMode = mode === 'free' ? 'free' : 'final15';
+            this.voicePlacementMode = nextMode;
+            if (nextMode === 'final15') {
+                (this.voiceTimelineTracks || []).forEach((track) => {
+                    if (!track || !track.voice_over_active) return;
+                    track.voice_over_start_percent = this.clampVoiceClipStart(track, track.voice_over_start_percent);
+                });
+            }
+        },
+
+        enforceFinalVoiceWindow() {
+            return this.voicePlacementMode === 'final15';
+        },
+
+        removeVoiceTimelineTrack(index) {
+            const trackIndex = Number(index);
+            if (!Number.isInteger(trackIndex) || trackIndex < 0 || trackIndex >= this.voiceTimelineTracks.length) return;
+
+            this.stopVoicePreview();
+
+            const current = this.voiceTimelineTracks[trackIndex];
+            const next = this.voiceTimelineTracks[trackIndex + 1];
+            const removePairedVo = !this.isGeneratedVoiceTrack(current) && this.isGeneratedVoiceTrack(next);
+            const removeCount = removePairedVo ? 2 : 1;
+
+            this.voiceTimelineTracks.splice(trackIndex, removeCount);
+            this.showToast(removePairedVo ? 'Song and linked VO audio removed' : 'Track removed from playlist');
         },
 
         isVoicePreviewPlaying(index) {
@@ -1360,7 +1434,7 @@ function playlistApp() {
             try {
                 const songAudio = new Audio(songTrack.url);
                 const voAudio = new Audio(generatedTrack.url);
-                const startPercent = Math.max(0, Math.min(100, Number(songTrack.voice_over_start_percent || 0)));
+                const startPercent = this.clampVoiceClipStart(songTrack, songTrack.voice_over_start_percent);
                 const songSeconds = Math.max(1, Number(songTrack.duration_seconds || 0));
                 const startDelayMs = Math.max(0, Math.round((songSeconds * (startPercent / 100)) * 1000));
                 const duckVolume = songTrack.voice_over_active
@@ -2241,7 +2315,8 @@ function playlistApp() {
         clampVoiceClipStart(track, startPercent) {
             const length = this.getVoiceClipLength(track);
             const maxStart = Math.max(0, 100 - length);
-            return Math.max(0, Math.min(maxStart, Math.round(Number(startPercent || 0))));
+            const minStart = this.enforceFinalVoiceWindow() ? Math.min(maxStart, 85) : 0;
+            return Math.max(minStart, Math.min(maxStart, Math.round(Number(startPercent || 0))));
         },
 
         getVoiceClipStyle(track) {
@@ -2390,6 +2465,7 @@ function playlistApp() {
                     body: JSON.stringify({
                         id: playlistId,
                         name: playlistName,
+                        enforce_final_vo_window: this.enforceFinalVoiceWindow(),
                         default_voice_id: (this.voiceTimelineDefaultVoiceId || '').trim(),
                         default_voice_name: (this.voiceTimelineDefaultVoiceName || '').trim() || this.getVoiceDisplayName(this.voiceTimelineDefaultVoiceId),
                         tracks: payloadTracks,
@@ -2510,12 +2586,104 @@ function playlistApp() {
             }
         },
 
+        updateBatchVoiceProgress(done, total, status) {
+            const safeTotal = Math.max(1, Number(total || 0));
+            const safeDone = Math.max(0, Math.min(safeTotal, Number(done || 0)));
+            this.voiceBatchSynthProgress = Math.max(0, Math.min(100, Math.round((safeDone / safeTotal) * 100)));
+            this.voiceBatchSynthStatus = status || `${safeDone}/${safeTotal} complete`;
+        },
+
+        requestCancelVoiceBatch() {
+            if (!this.voiceBatchSynthLoading) return;
+            this.voiceBatchSynthCancelRequested = true;
+            this.voiceBatchSynthStatus = 'Cancel requested… finishing current track';
+        },
+
+        async generateAllVoiceOversAudio() {
+            if (this.voiceBatchSynthLoading || this.voiceTimelineLoading) return;
+            if (!Array.isArray(this.voiceTimelineTracks) || !this.voiceTimelineTracks.length) {
+                this.showToast('Load a timeline first');
+                return;
+            }
+
+            const candidates = this.voiceTimelineTracks.filter((track, idx) => {
+                if (!track || this.isGeneratedVoiceTrack(track)) return false;
+                const hasScript = String(track.voice_over_text || '').trim().length > 0;
+                if (!hasScript) return false;
+                return !this.hasGeneratedVoiceAudioAfter(idx);
+            });
+
+            if (!candidates.length) {
+                this.showToast('No tracks need VO audio right now');
+                return;
+            }
+
+            this.voiceBatchSynthLoading = true;
+            this.voiceBatchSynthCancelRequested = false;
+            this.updateBatchVoiceProgress(0, candidates.length, `Starting 0/${candidates.length}`);
+
+            let processed = 0;
+            let rendered = 0;
+            let failed = 0;
+            let cancelled = false;
+
+            try {
+                for (const sourceTrack of candidates) {
+                    if (this.voiceBatchSynthCancelRequested) {
+                        cancelled = true;
+                        break;
+                    }
+
+                    const currentIndex = this.voiceTimelineTracks.indexOf(sourceTrack);
+                    if (currentIndex < 0 || this.isGeneratedVoiceTrack(sourceTrack) || this.hasGeneratedVoiceAudioAfter(currentIndex)) {
+                        processed += 1;
+                        this.updateBatchVoiceProgress(processed, candidates.length, `Skipped ${processed}/${candidates.length}`);
+                        continue;
+                    }
+
+                    this.updateBatchVoiceProgress(processed, candidates.length, `Rendering ${processed + 1}/${candidates.length}`);
+                    const ok = await this.synthesizeTrackVoiceOver(sourceTrack, currentIndex);
+                    if (ok) rendered += 1;
+                    else failed += 1;
+
+                    processed += 1;
+                    this.updateBatchVoiceProgress(processed, candidates.length, `Processed ${processed}/${candidates.length}`);
+                }
+            } finally {
+                if (cancelled) {
+                    this.updateBatchVoiceProgress(processed, candidates.length, `Cancelled ${processed}/${candidates.length}`);
+                } else {
+                    this.updateBatchVoiceProgress(candidates.length, candidates.length, `Done ${candidates.length}/${candidates.length}`);
+                }
+                setTimeout(() => {
+                    this.voiceBatchSynthLoading = false;
+                    this.voiceBatchSynthStatus = '';
+                    this.voiceBatchSynthCancelRequested = false;
+                }, 450);
+            }
+
+            if (cancelled) {
+                this.showToast(`Batch cancelled (${processed}/${candidates.length} processed)`);
+                return;
+            }
+
+            if (rendered && failed) {
+                this.showToast(`Rendered ${rendered} VO audio (${failed} failed)`);
+                return;
+            }
+            if (rendered) {
+                this.showToast(`Rendered ${rendered} VO audio clip${rendered === 1 ? '' : 's'}`);
+                return;
+            }
+            this.showToast('No VO audio rendered');
+        },
+
         async synthesizeTrackVoiceOver(track, index) {
-            if (!track) return;
+            if (!track) return false;
             const script = String(track.voice_over_text || '').trim();
             if (!script) {
                 this.showToast('Enter voice-over script first');
-                return;
+                return false;
             }
 
             const trackVoiceId = (track.voice_over_voice_id || '').trim();
@@ -2524,7 +2692,7 @@ function playlistApp() {
 
             if (!effectiveVoiceId) {
                 this.showToast('Select a DJ voice first');
-                return;
+                return false;
             }
 
             this.voiceOverSynthTrackIndex = index;
@@ -2542,7 +2710,7 @@ function playlistApp() {
                 const data = await resp.json();
                 if (!data.ok) {
                     this.showToast(data.error || 'Voice rendering failed');
-                    return;
+                    return false;
                 }
 
                 const generated = this.normalizeVoiceTimelineTrack(data.track || {});
@@ -2563,8 +2731,10 @@ function playlistApp() {
 
                 this.voiceTimelineTracks.splice(index + 1, 0, generated);
                 this.showToast(`VO audio added (${autoPercent}% clip length)`);
+                return true;
             } catch (e) {
                 this.showToast('Voice rendering failed');
+                return false;
             } finally {
                 this.voiceOverSynthTrackIndex = null;
             }
