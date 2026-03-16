@@ -3993,9 +3993,40 @@ def _fetch_blog_image(title, category, excerpt='', variant=1):
     """Use DeepSeek for keywords, fetch via Serper, upload to Cloudinary."""
     import cloudinary
     import cloudinary.uploader
+    from urllib.parse import urlparse
     serper_key = getattr(settings, 'SERPER_API_KEY', '')
     if not serper_key:
         return ''
+
+    def _is_valid_image_candidate(url: str) -> bool:
+        if not url or not isinstance(url, str):
+            return False
+        parsed = urlparse(url)
+        if parsed.scheme not in ('http', 'https'):
+            return False
+        host = (parsed.netloc or '').lower()
+        blocked_hosts = (
+            'lookaside.instagram.com',
+            'lookaside.fbsbx.com',
+            'www.tiktok.com',
+            'tiktok.com',
+        )
+        if any(host.endswith(h) for h in blocked_hosts):
+            return False
+        try:
+            check_resp = requests.get(
+                url,
+                timeout=10,
+                allow_redirects=True,
+                headers={'User-Agent': 'Mozilla/5.0'},
+                stream=True,
+            )
+            if check_resp.status_code >= 400:
+                return False
+            content_type = (check_resp.headers.get('content-type') or '').lower()
+            return content_type.startswith('image/')
+        except Exception:
+            return False
 
     cloud_name = getattr(settings, 'CLOUDINARY_CLOUD_NAME', '')
     cloud_key = getattr(settings, 'CLOUDINARY_API_KEY', '')
@@ -4082,6 +4113,8 @@ def _fetch_blog_image(title, category, excerpt='', variant=1):
                 for item in items:
                     img_url = item.get('imageUrl', '')
                     if not img_url:
+                        continue
+                    if not _is_valid_image_candidate(img_url):
                         continue
                     if not can_upload_to_cloudinary:
                         logger.info(

@@ -766,6 +766,8 @@ function playlistApp() {
         voiceTimelineDefaultVoiceName: '',
         preferredDefaultVoiceId: 'default-trm-shaco-fymwvka9pdsg__design-voice-851b1e38',
         preferredDefaultVoiceName: 'Yang',
+        jungVoiceId: 'default-trm-shaco-fymwvka9pdsg__jung',
+        jungVoiceName: 'Jung',
         inworldVoices: [],
         voiceVoicesLoading: false,
         voiceTimelineTracks: [],
@@ -1284,6 +1286,34 @@ function playlistApp() {
             return selected ? (selected.display_name || selected.voice_id) : '';
         },
 
+        ensurePinnedVoices(voices) {
+            const list = Array.isArray(voices) ? [...voices] : [];
+            const pinned = [
+                {
+                    voice_id: this.preferredDefaultVoiceId,
+                    display_name: this.preferredDefaultVoiceName,
+                    lang_code: 'EN_US',
+                    source: 'IVC',
+                    description: 'Preferred default DJ voice',
+                },
+                {
+                    voice_id: this.jungVoiceId,
+                    display_name: this.jungVoiceName,
+                    lang_code: 'EN_US',
+                    source: 'IVC',
+                    description: 'Inworld Jung DJ voice',
+                },
+            ];
+
+            for (const voice of pinned) {
+                const id = String(voice.voice_id || '').trim();
+                if (!id) continue;
+                const hasVoice = list.some((item) => String(item.voice_id || '').trim() === id);
+                if (!hasVoice) list.unshift(voice);
+            }
+            return list;
+        },
+
         setPlaylistDefaultVoice(voiceId) {
             const clean = String(voiceId || '').trim();
             this.voiceTimelineDefaultVoiceId = clean;
@@ -1484,17 +1514,8 @@ function playlistApp() {
                     return;
                 }
                 const fetched = Array.isArray(data.voices) ? data.voices : [];
-                const hasPreferred = fetched.some((voice) => String(voice.voice_id || '').trim() === this.preferredDefaultVoiceId);
-                this.inworldVoices = hasPreferred ? fetched : [
-                    {
-                        voice_id: this.preferredDefaultVoiceId,
-                        display_name: this.preferredDefaultVoiceName,
-                        lang_code: 'EN_US',
-                        source: 'IVC',
-                        description: 'Preferred default DJ voice',
-                    },
-                    ...fetched,
-                ];
+                const ivcOnly = fetched.filter((voice) => String(voice?.source || '').trim().toUpperCase() === 'IVC');
+                this.inworldVoices = this.ensurePinnedVoices(ivcOnly);
                 if (!this.voiceTimelineDefaultVoiceId && this.preferredDefaultVoiceId) {
                     this.voiceTimelineDefaultVoiceId = this.preferredDefaultVoiceId;
                     this.voiceTimelineDefaultVoiceName = this.getVoiceDisplayName(this.preferredDefaultVoiceId) || this.preferredDefaultVoiceName;
@@ -1503,15 +1524,7 @@ function playlistApp() {
                 }
             } catch (e) {
                 this.showToast('Could not load DJ voices');
-                this.inworldVoices = [
-                    {
-                        voice_id: this.preferredDefaultVoiceId,
-                        display_name: this.preferredDefaultVoiceName,
-                        lang_code: 'EN_US',
-                        source: 'IVC',
-                        description: 'Preferred default DJ voice',
-                    }
-                ];
+                this.inworldVoices = this.ensurePinnedVoices([]);
             } finally {
                 this.voiceVoicesLoading = false;
             }
