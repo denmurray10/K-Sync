@@ -245,6 +245,14 @@
                                 </div>
                             </template>
 
+                            <template x-if="isTodayDay(day)">
+                                <div class="pointer-events-none absolute top-0 bottom-0 z-20" :style="getNowLineStyle()">
+                                    <div class="absolute inset-y-0 left-0 w-px bg-primary/90"></div>
+                                    <div class="absolute -top-0.5 -left-1.5 w-3 h-3 rounded-full bg-primary/90 border border-black"></div>
+                                    <div class="absolute -top-1 left-2 px-1.5 py-0.5 bg-primary text-black text-[8px] font-bold uppercase tracking-widest" x-text="nowTimeLabel"></div>
+                                </div>
+                            </template>
+
                             <!-- Absolute Positioned Scheduled Blocks -->
                             <template x-for="slot in (daySchedules[day] || [])" :key="slot.id">
                                 <div class="absolute top-1 bottom-1 bg-secondary/20 border border-secondary/50 p-2 overflow-hidden group cursor-pointer"
@@ -393,6 +401,9 @@ function playlistApp() {
         isResizingSlot: false,
         resizeContext: null,
         suppressScheduleClickUntil: 0,
+        nowMinutes: 0,
+        nowDayKey: 'MON',
+        nowTicker: null,
         slotTargetMinutes: 60,
         showAIModal: false,
         aiStep: 1,
@@ -403,6 +414,7 @@ function playlistApp() {
             await this.fetchB2Tracks();
             await this.fetchSchedules();
             this.initSortable();
+            this.startNowTicker();
             this.$nextTick(() => {
                 this.syncScrollPanelHeights();
                 window.addEventListener('resize', () => this.syncScrollPanelHeights());
@@ -688,6 +700,10 @@ function playlistApp() {
             const remaining = this.playlistRemainingSeconds;
             if (remaining >= 0) return `Remaining ${this.formatSeconds(remaining)}`;
             return `Over ${this.formatSeconds(Math.abs(remaining))}`;
+        },
+
+        get nowTimeLabel() {
+            return this.minutesToTime(this.nowMinutes);
         },
 
         trackIdentity(track) {
@@ -991,6 +1007,28 @@ function playlistApp() {
             const delta = this.getSlotFitDeltaSeconds(slot);
             if (delta < 0) return `Over ${this.formatSeconds(Math.abs(delta))}`;
             return `Fit +${this.formatSeconds(delta)}`;
+        },
+
+        updateNowIndicator() {
+            const now = new Date();
+            this.nowMinutes = (now.getHours() * 60) + now.getMinutes();
+            const dayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            this.nowDayKey = dayMap[now.getDay()] || 'MON';
+        },
+
+        startNowTicker() {
+            this.updateNowIndicator();
+            if (this.nowTicker) clearInterval(this.nowTicker);
+            this.nowTicker = setInterval(() => this.updateNowIndicator(), 30000);
+        },
+
+        isTodayDay(day) {
+            return day === this.nowDayKey;
+        },
+
+        getNowLineStyle() {
+            const left = Math.max(0, Math.min(24 * 96, (this.nowMinutes / 60) * 96));
+            return `left: ${left}px;`;
         },
 
         async savePlaylist() {
