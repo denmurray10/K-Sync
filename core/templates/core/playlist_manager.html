@@ -234,7 +234,7 @@
                     <div class="flex flex-1 border-b border-white/10 hover:bg-white/[0.02] transition-colors min-h-[96px]">
                         <!-- Day Label -->
                         <div class="w-16 border-r border-white/10 flex-shrink-0 flex items-center justify-center bg-black/40">
-                            <span class="text-[10px] font-black uppercase -rotate-90 tracking-widest text-slate-400" x-text="day"></span>
+                            <button @click.stop="openDayAction(day)" class="text-[10px] font-black uppercase -rotate-90 tracking-widest text-slate-400 hover:text-white transition-colors" x-text="day"></button>
                         </div>
                         <!-- Cells -->
                         <div class="flex-1 flex overflow-x-auto no-scrollbar relative grid-row" :data-day="day">
@@ -305,6 +305,26 @@
             <div class="flex gap-4 mt-8">
                 <button @click="showScheduleModal = false" class="flex-1 border border-white/10 py-3 text-[10px] font-bold uppercase">Cancel</button>
                 <button @click="saveSchedule" class="flex-1 bg-secondary text-black py-3 text-[10px] font-bold uppercase shadow-[4px_4px_0px_#f425c0]">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showDayActionModal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl" style="display: none;">
+        <div class="bg-surface border border-white/10 w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-black uppercase tracking-tighter">Day Actions: <span class="text-secondary" x-text="dayActionDay"></span></h3>
+            <p class="mt-2 text-[10px] font-mono uppercase tracking-widest text-slate-500" x-show="copiedSourceDay">Copied source: <span class="text-white" x-text="copiedSourceDay"></span></p>
+
+            <div class="mt-5 space-y-2" x-show="canPasteToDay(dayActionDay)">
+                <p class="text-[10px] font-mono uppercase tracking-widest text-slate-300">Paste from <span x-text="copiedSourceDay"></span> to <span x-text="dayActionDay"></span>?</p>
+                <p class="text-[9px] font-mono uppercase tracking-widest text-red-300">This will override all existing data for this day.</p>
+                <button @click="pasteToDay(dayActionDay)" class="w-full h-9 bg-secondary text-black text-[10px] font-bold uppercase tracking-widest">Paste & Override</button>
+                <button @click="showDayActionModal = false" class="w-full h-9 border border-white/10 text-[10px] font-bold uppercase tracking-widest">Cancel</button>
+            </div>
+
+            <div class="mt-5 space-y-2" x-show="!canPasteToDay(dayActionDay)">
+                <button @click="markDayAsCopySource(dayActionDay)" class="w-full h-9 border border-secondary/70 text-secondary text-[10px] font-bold uppercase tracking-widest">Copy Schedule</button>
+                <button @click="deleteDaySchedule(dayActionDay)" class="w-full h-9 border border-red-400/60 text-red-300 text-[10px] font-bold uppercase tracking-widest">Delete Schedule</button>
+                <button @click="showDayActionModal = false" class="w-full h-9 border border-white/10 text-[10px] font-bold uppercase tracking-widest">Cancel</button>
             </div>
         </div>
     </div>
@@ -404,6 +424,9 @@ function playlistApp() {
         nowMinutes: 0,
         nowDayKey: 'MON',
         nowTicker: null,
+        showDayActionModal: false,
+        dayActionDay: 'MON',
+        copiedSourceDay: null,
         slotTargetMinutes: 60,
         showAIModal: false,
         aiStep: 1,
@@ -1029,6 +1052,103 @@ function playlistApp() {
         getNowLineStyle() {
             const left = Math.max(0, Math.min(24 * 96, (this.nowMinutes / 60) * 96));
             return `left: ${left}px;`;
+        },
+
+        openDayAction(day) {
+            this.dayActionDay = day;
+            this.showDayActionModal = true;
+        },
+
+        canPasteToDay(day) {
+            return !!(this.copiedSourceDay && this.copiedSourceDay !== day);
+        },
+
+        markDayAsCopySource(day) {
+            this.copiedSourceDay = day;
+            this.showDayActionModal = false;
+            this.showToast(`Copied ${day}. Select another day to paste.`);
+        },
+
+        slotEndTime(slot) {
+            return String(slot.duration || '').replace('Until ', '');
+        },
+
+        async deleteDaySchedule(day) {
+            const daySlots = [...(this.daySchedules[day] || [])];
+            if (!daySlots.length) {
+                this.showToast(`${day} is already empty`);
+                this.showDayActionModal = false;
+                return;
+            }
+
+            if (!confirm(`Delete all schedule entries for ${day}?`)) return;
+
+            try {
+                for (const slot of daySlots) {
+                    const delResp = await fetch(`/api/schedule/${slot.id}/delete/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    });
+                    const delData = await delResp.json();
+                    if (!delData.ok) throw new Error(delData.error || 'Delete failed');
+                }
+
+                await this.fetchSchedules();
+                this.showDayActionModal = false;
+                this.showToast(`${day} schedule deleted`);
+            } catch (e) {
+                await this.fetchSchedules();
+                this.showToast(e?.message || 'Delete day failed');
+            }
+        },
+
+        async pasteToDay(toDay) {
+            const fromDay = this.copiedSourceDay;
+            if (!fromDay || fromDay === toDay) {
+                this.showToast('Select a different target day');
+                return;
+            }
+
+            const sourceSlots = [...(this.daySchedules[fromDay] || [])].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+            const targetSlots = [...(this.daySchedules[toDay] || [])];
+
+            if (!confirm(`Paste ${fromDay} into ${toDay}? This will override all existing data for ${toDay}.`)) return;
+
+            try {
+                for (const slot of targetSlots) {
+                    const delResp = await fetch(`/api/schedule/${slot.id}/delete/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    });
+                    const delData = await delResp.json();
+                    if (!delData.ok) throw new Error(delData.error || 'Delete failed');
+                }
+
+                for (const slot of sourceSlots) {
+                    const saveResp = await fetch('/api/schedule/save/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                        body: JSON.stringify({
+                            day: toDay,
+                            start_time: slot.time,
+                            end_time: this.slotEndTime(slot),
+                            playlist_id: slot.playlist_id,
+                            host: slot.host || 'Auto DJ',
+                            genre: slot.genre || 'MUSIC'
+                        })
+                    });
+                    const saveData = await saveResp.json();
+                    if (!saveData.ok) throw new Error(saveData.error || 'Copy failed');
+                }
+
+                await this.fetchSchedules();
+                this.showDayActionModal = false;
+                this.copiedSourceDay = null;
+                this.showToast(`Pasted ${fromDay} to ${toDay}`);
+            } catch (e) {
+                await this.fetchSchedules();
+                this.showToast(e?.message || 'Copy day failed');
+            }
         },
 
         async savePlaylist() {
