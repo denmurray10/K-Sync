@@ -1,4 +1,5 @@
 import re
+import json
 import urllib.request
 import urllib.parse
 from django.core.management.base import BaseCommand
@@ -146,6 +147,78 @@ def _find_kpopping_profile_image(name: str, preferred_folder: str = '') -> str:
     return ''
 
 
+def _fetch_kpopping_group_payload(name: str):
+    for candidate in _name_candidates(name, GROUP_NAME_MAP):
+        encoded = urllib.parse.quote(candidate, safe='-')
+        url = f'https://kpopping.com/api/groups/{encoded}'
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0',
+            'Referer': 'https://kpopping.com/',
+            'Accept': 'application/json',
+        })
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                raw = resp.read().decode('utf-8', errors='ignore')
+                payload = json.loads(raw)
+                if isinstance(payload, dict) and isinstance(payload.get('members'), list):
+                    return payload
+        except Exception:
+            continue
+    return None
+
+
+def _backfill_missing_members(*, top50: bool, dry_run: bool, style, stdout):
+    qs = KPopGroup.objects.all()
+    if top50:
+        qs = qs.filter(rank__isnull=False)
+
+    groups = list(qs.order_by('rank', 'name'))
+    groups_without_members = [g for g in groups if not g.members.exists()]
+    if not groups_without_members:
+        stdout.write(style.SUCCESS('No groups are missing members.'))
+        return 0, 0
+
+    created = 0
+    failed_groups = 0
+    stdout.write(f'Backfilling members for {len(groups_without_members)} group(s) with no members...')
+
+    for group in groups_without_members:
+        payload = _fetch_kpopping_group_payload(group.name)
+        members = (payload or {}).get('members') if payload else None
+        if not members:
+            failed_groups += 1
+            stdout.write(style.WARNING(f'FAIL  [BACKFILL] {group.name}'))
+            continue
+
+        for index, member in enumerate(members, start=1):
+            stage_name = str(member.get('name') or '').strip()
+            if not stage_name:
+                continue
+            image_url = str(member.get('image') or '').strip()
+            position = str(member.get('position') or '').strip()
+
+            defaults = {
+                'name': stage_name,
+                'stage_name': stage_name,
+                'position': position,
+                'order': index,
+            }
+            if image_url:
+                defaults['image_url'] = image_url
+
+            if not dry_run:
+                KPopMember.objects.update_or_create(
+                    group=group,
+                    stage_name=stage_name,
+                    defaults=defaults,
+                )
+            created += 1
+
+        stdout.write(style.SUCCESS(f'OK    [BACKFILL] {group.name} (+{len(members)} member(s))'))
+
+    return created, failed_groups
+
+
 def _sync_groups(*, top50: bool, only_missing: bool, dry_run: bool, style, stdout):
     qs = KPopGroup.objects.all()
     if top50:
@@ -238,6 +311,7 @@ class Command(BaseCommand):
         parser.add_argument('--only-missing', action='store_true', help='Only process records with empty image_url.')
         parser.add_argument('--groups-only', action='store_true', help='Sync only group photos.')
         parser.add_argument('--members-only', action='store_true', help='Sync only member photos.')
+        parser.add_argument('--backfill-members', action='store_true', help='Create missing member records from Kpopping group API before image sync.')
         parser.add_argument('--dry-run', action='store_true', help='Show what would change without writing.')
 
     def handle(self, *args, **options):
@@ -251,6 +325,18 @@ class Command(BaseCommand):
         total_updated = 0
         total_skipped = 0
         total_failed = 0
+
+        if options['backfill_members']:
+            self.stdout.write('')
+            self.stdout.write(self.style.NOTICE('=== MEMBER BACKFILL ==='))
+            created, failed_groups = _backfill_missing_members(
+                top50=options['top50'],
+                dry_run=options['dry_run'],
+                style=self.style,
+                stdout=self.stdout,
+            )
+            self.stdout.write(self.style.SUCCESS(f'Backfilled members: {created}'))
+            self.stdout.write(self.style.WARNING(f'Backfill group failures: {failed_groups}'))
 
         if run_groups:
             self.stdout.write('')
