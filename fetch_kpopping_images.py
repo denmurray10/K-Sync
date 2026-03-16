@@ -53,10 +53,16 @@ GROUP_NAME_MAP = {
     "NewJeans":     "NewJeans",
     "SEVENTEEN":    "SEVENTEEN",
     "Stray Kids":   "Stray-Kids",
+    "Super Junior": "Super-Junior",
     "TWICE":        "TWICE",
     "TXT":          "TXT",
+    "TXT (Tomorrow X Together)": "TXT",
     "Taeyang":      "Taeyang",
     "aespa":        "aespa",
+    "Girls' Generation (SNSD)": "Girls-Generation",
+    "HIGHLIGHT":    "Highlight",
+    "IZ*ONE":       "IZ-ONE",
+    "fromis_9":     "fromis-9",
 }
 
 # Solo artists stored as KPopGroup in our DB — CDN images live under /idols/ not /groups/

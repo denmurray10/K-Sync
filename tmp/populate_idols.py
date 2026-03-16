@@ -1,10 +1,6 @@
 import os
 import sys
 import django
-import json
-import time
-import urllib.parse
-import urllib.request
 
 # Set up Django environment
 sys.path.append(os.getcwd())
@@ -88,43 +84,6 @@ def _story_for(name: str, label: str, gtype: str, trait: str) -> str:
     )
 
 
-def _itunes_artist_image(name: str) -> str:
-    search_map = {
-        '(G)I-DLE': 'G I-DLE',
-        "Girls' Generation (SNSD)": "Girls Generation",
-        'IZ*ONE': 'IZONE',
-        'fromis_9': 'fromis 9',
-        'TXT (Tomorrow X Together)': 'TOMORROW X TOGETHER',
-    }
-    query_name = search_map.get(name, name)
-    query = urllib.parse.quote(query_name)
-    headers = {'User-Agent': 'Mozilla/5.0'}
-
-    endpoints = [
-        f'https://itunes.apple.com/search?term={query}&entity=album&limit=5&country=KR',
-        f'https://itunes.apple.com/search?term={query}&entity=song&limit=5&country=KR',
-        f'https://itunes.apple.com/search?term={query}&entity=musicArtist&limit=3',
-    ]
-
-    for endpoint in endpoints:
-        try:
-            req = urllib.request.Request(endpoint, headers=headers)
-            with urllib.request.urlopen(req, timeout=12) as resp:
-                data = json.loads(resp.read())
-            for item in data.get('results', []):
-                artwork = item.get('artworkUrl100') or item.get('artworkUrl60')
-                if artwork:
-                    return artwork.replace('100x100bb', '600x600bb').replace('100x100', '600x600')
-        except Exception:
-            time.sleep(0.15)
-
-    return ''
-
-
-def _fallback_avatar(name: str) -> str:
-    seed = urllib.parse.quote(name)
-    return f'https://api.dicebear.com/7.x/initials/svg?seed={seed}&backgroundColor=111111&textColor=ffffff'
-
 def populate():
     target_slugs = set()
 
@@ -142,12 +101,6 @@ def populate():
                 'description': _story_for(name, label, gtype, trait),
             }
         )
-
-        if not (group.image_url or '').strip():
-            fetched = _itunes_artist_image(name)
-            group.image_url = fetched or _fallback_avatar(name)
-            group.save(update_fields=['image_url'])
-            time.sleep(0.2)
 
         if created:
             print(f"Created group: {name}")
