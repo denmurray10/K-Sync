@@ -515,6 +515,26 @@ def api_playlist_data(request, playlist_id):
 
 @csrf_exempt
 @require_POST
+def api_playlist_delete(request, playlist_id):
+    """Deletes a playlist and related tracks/schedules."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+
+    try:
+        playlist = RadioPlaylist.objects.get(id=playlist_id)
+    except RadioPlaylist.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'Playlist not found'}, status=404)
+
+    try:
+        playlist.delete()
+        return JsonResponse({'ok': True})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@require_POST
 def api_voiceover_generate(request):
     """Generates a short DJ voice-over script for a track using Inworld Router."""
     staff_check = _staff_only_json(request)
