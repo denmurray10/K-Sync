@@ -4474,11 +4474,14 @@ def _do_blog_generate():
         except Exception as e:
             logger.warning("[instagram] Post failed for %r: %s", title, e)
 
-        # Post to X (Twitter)
-        try:
-            _post_to_x(article)
-        except Exception as e:
-            logger.warning("[x] Post failed for %r: %s", title, e)
+        # Post to X (Twitter) when enabled
+        if getattr(settings, 'X_POST_ENABLED', False):
+            try:
+                _post_to_x(article)
+            except Exception as e:
+                logger.warning("[x] Post failed for %r: %s", title, e)
+        else:
+            logger.info("[x] Posting disabled — skipping for %r", title)
 
         # Post to Pinterest
         try:
@@ -4820,6 +4823,10 @@ def _post_to_x(article):
     Posts a tweet to X (Twitter) via API v2 using OAuth 1.0a.
     Requires X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET.
     """
+    if not getattr(settings, 'X_POST_ENABLED', False):
+        logger.debug("[x] Posting disabled via X_POST_ENABLED — skipping.")
+        return
+
     api_key = getattr(settings, 'X_API_KEY', '')
     api_secret = getattr(settings, 'X_API_SECRET', '')
     access_token = getattr(settings, 'X_ACCESS_TOKEN', '')

@@ -172,6 +172,7 @@ INSTAGRAM_POST_ENABLED = os.environ.get('INSTAGRAM_POST_ENABLED', 'false').lower
 # ── X (Twitter) ───────────────────────────────────────────────────────────────
 # Get from developer.twitter.com → Your App → Keys and Tokens
 # Needs "Read and Write" OAuth 1.0a permissions.
+X_POST_ENABLED = os.environ.get('X_POST_ENABLED', 'false').lower() == 'true'
 X_API_KEY = os.environ.get('X_API_KEY', '')
 X_API_SECRET = os.environ.get('X_API_SECRET', '')
 X_ACCESS_TOKEN = os.environ.get('X_ACCESS_TOKEN', '')
