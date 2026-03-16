@@ -436,6 +436,11 @@ class RadioPlaylistTrack(models.Model):
     playlist = models.ForeignKey(RadioPlaylist, on_delete=models.CASCADE)
     track = models.ForeignKey(RadioTrack, on_delete=models.CASCADE)
     order = models.PositiveIntegerField(default=0)
+    voice_over_text = models.TextField(blank=True)
+    voice_over_active = models.BooleanField(default=False)
+    duck_volume_percent = models.PositiveSmallIntegerField(default=20)
+    voice_over_start_percent = models.PositiveSmallIntegerField(default=0)
+    voice_over_length_percent = models.PositiveSmallIntegerField(default=22)
 
     class Meta:
         ordering = ['order']

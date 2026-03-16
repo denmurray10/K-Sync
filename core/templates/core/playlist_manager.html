@@ -307,6 +307,56 @@
             <button @click="openVoiceScheduleCreate" class="h-8 px-3 bg-primary text-black text-[10px] font-bold uppercase tracking-widest">Add Voice Slot</button>
         </div>
 
+        <div class="p-3 border-b border-white/10 bg-black/30 grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-2">
+            <select x-model.number="voiceTimelinePlaylistId" class="h-9 bg-black border border-white/10 px-2 text-xs text-white uppercase">
+                <option value="">Select playlist for timeline...</option>
+                <template x-for="playlist in savedPlaylists" :key="`voice-p-${playlist.id}`">
+                    <option :value="playlist.id" x-text="playlist.name"></option>
+                </template>
+            </select>
+            <button @click="loadVoiceTimelinePlaylist()" class="h-9 px-3 border border-secondary/60 text-secondary text-[10px] font-bold uppercase tracking-widest">Load Timeline</button>
+            <button @click="saveVoiceTimeline" :disabled="!voiceTimelinePlaylistId || voiceTimelineLoading" class="h-9 px-3 bg-secondary text-black text-[10px] font-bold uppercase tracking-widest disabled:opacity-50">Save Voice-Over Mix</button>
+        </div>
+
+        <div class="p-3 border-b border-white/10 bg-black/20">
+            <div class="text-[9px] font-mono uppercase tracking-widest text-slate-500 mb-2">Premiere-style Timeline (A1 Music / A2 Voice-Over)</div>
+            <div class="overflow-x-auto no-scrollbar">
+                <div class="inline-flex gap-3 min-w-full pb-1">
+                    <template x-for="(track, index) in voiceTimelineTracks" :key="`vt-${index}`">
+                        <div class="w-72 flex-shrink-0 border border-white/10 bg-black/30">
+                            <div class="px-2 py-1 border-b border-white/10 text-[9px] font-mono uppercase tracking-widest text-slate-400">A1 Music</div>
+                            <div class="p-2 border-b border-white/10" :class="track.voice_over_active ? 'bg-red-500/10' : 'bg-cyan-500/10'">
+                                <p class="text-[10px] font-bold uppercase truncate" x-text="track.title || track.name"></p>
+                                <p class="text-[9px] font-mono uppercase tracking-widest text-slate-400 truncate" x-text="track.artist || 'Unknown Artist'"></p>
+                                <p class="text-[9px] font-mono uppercase tracking-widest" :class="track.voice_over_active ? 'text-red-300' : 'text-emerald-300'" x-text="`Volume: ${track.voice_over_active ? 20 : 100}%`"></p>
+                            </div>
+
+                            <div class="px-2 py-1 border-b border-white/10 text-[9px] font-mono uppercase tracking-widest text-slate-400">A2 Voice-Over</div>
+                            <div class="p-2 space-y-2" :class="track.voice_over_active ? 'bg-purple-500/10' : 'bg-white/[0.02]'">
+                                <label class="flex items-center gap-2 text-[9px] font-mono uppercase tracking-widest text-slate-300">
+                                    <input type="checkbox" x-model="track.voice_over_active" @change="toggleVoiceOverTrack(track)" class="h-3 w-3 bg-black border-white/20 text-primary">
+                                    Voice-Over Active
+                                </label>
+                                <div class="voice-lane relative h-8 border border-white/10 bg-black/50" @click="setVoiceClipPositionFromLane($event, track)">
+                                    <template x-if="track.voice_over_active">
+                                        <div class="group absolute top-1 bottom-1 bg-primary/70 border border-primary cursor-grab flex items-center justify-center text-[8px] font-bold uppercase tracking-widest text-black"
+                                             :style="getVoiceClipStyle(track)"
+                                             @pointerdown.stop.prevent="startVoiceClipDrag($event, track)">
+                                            <span x-text="getVoiceClipLabel(track)"></span>
+                                            <button type="button"
+                                                class="absolute right-0 top-0 bottom-0 w-2 border-l border-black/50 bg-black/40 opacity-60 transition-opacity group-hover:opacity-100 hover:opacity-100 active:opacity-100 cursor-ew-resize"
+                                                    @pointerdown.stop.prevent="startVoiceClipResize($event, track)"></button>
+                                        </div>
+                                    </template>
+                                </div>
+                                <textarea x-model="track.voice_over_text" rows="3" class="w-full bg-black border border-white/10 p-2 text-[10px] text-white" placeholder="Voice-over line/script..."></textarea>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
         <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-2 bg-black/20">
             <div x-show="!voiceWeeklySlots.length" class="h-full flex items-center justify-center text-[10px] font-mono uppercase tracking-widest text-slate-500">
                 No scheduled slots yet
@@ -618,6 +668,11 @@ function playlistApp() {
         showPlaylistPreviewModal: false,
         previewLoading: false,
         previewPlaylist: { id: null, name: '', tracks: [] },
+        voiceTimelinePlaylistId: null,
+        voiceTimelinePlaylistName: '',
+        voiceTimelineTracks: [],
+        voiceTimelineLoading: false,
+        voiceClipDragContext: null,
         newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ', genre: 'MUSIC', voice_over: '' },
         toast: { visible: false, message: '' },
         toastTimeout: null,
@@ -1024,8 +1079,8 @@ function playlistApp() {
             this.newSchedule.schedule_id = null;
             this.newSchedule.show_name = '';
             this.newSchedule.show_color = 'CYAN';
-            this.newSchedule.playlist_id = this.currentPlaylist.id ? this.currentPlaylist.id : null;
-            this.newSchedule.playlist_name = this.currentPlaylist.name || 'Current Builder Playlist';
+            this.newSchedule.playlist_id = this.voiceTimelinePlaylistId || (this.currentPlaylist.id ? this.currentPlaylist.id : null);
+            this.newSchedule.playlist_name = this.voiceTimelinePlaylistName || this.currentPlaylist.name || 'Current Builder Playlist';
             this.newSchedule.start = '09:00';
             this.newSchedule.end = '10:00';
             this.newSchedule.host = 'Auto DJ';
@@ -1874,6 +1929,195 @@ function playlistApp() {
             this.showPlaylistPreviewModal = false;
             this.activeTab = 'builder';
             this.$nextTick(() => this.syncScrollPanelHeights());
+        },
+
+        normalizeVoiceTimelineTrack(track) {
+            const clipLength = Number(track.voice_over_length_percent);
+            return {
+                ...track,
+                voice_over_active: !!track.voice_over_active,
+                voice_over_text: track.voice_over_text || '',
+                duck_volume_percent: track.voice_over_active ? 20 : 100,
+                voice_over_start_percent: Number.isFinite(Number(track.voice_over_start_percent)) ? Number(track.voice_over_start_percent) : 0,
+                voice_over_length_percent: Number.isFinite(clipLength) ? Math.max(5, Math.min(100, Math.round(clipLength))) : 22,
+            };
+        },
+
+        toggleVoiceOverTrack(track) {
+            track.duck_volume_percent = track.voice_over_active ? 20 : 100;
+            if (!track.voice_over_active) track.voice_over_start_percent = 0;
+        },
+
+        getVoiceClipLength(track) {
+            return Math.max(5, Math.min(100, Math.round(Number(track.voice_over_length_percent || 22))));
+        },
+
+        getVoiceClipLabel(track) {
+            return `VO ${this.getVoiceClipLength(track)}%`;
+        },
+
+        clampVoiceClipStart(track, startPercent) {
+            const length = this.getVoiceClipLength(track);
+            const maxStart = Math.max(0, 100 - length);
+            return Math.max(0, Math.min(maxStart, Math.round(Number(startPercent || 0))));
+        },
+
+        getVoiceClipStyle(track) {
+            const length = this.getVoiceClipLength(track);
+            const start = this.clampVoiceClipStart(track, track.voice_over_start_percent);
+            return `left: ${start}%; width: ${length}%;`;
+        },
+
+        setVoiceClipPositionFromLane(event, track) {
+            if (!track.voice_over_active) return;
+            const lane = event.currentTarget;
+            const rect = lane.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const percent = (x / Math.max(1, rect.width)) * 100;
+            track.voice_over_start_percent = this.clampVoiceClipStart(track, percent);
+        },
+
+        startVoiceClipDrag(event, track) {
+            const lane = event.currentTarget.closest('.voice-lane');
+            if (!lane) return;
+
+            this.voiceClipDragContext = {
+                mode: 'move',
+                lane,
+                track,
+            };
+
+            const onMove = (moveEvent) => this.handleVoiceClipDrag(moveEvent);
+            const onUp = () => this.stopVoiceClipDrag(onMove, onUp);
+
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp, { once: true });
+        },
+
+        handleVoiceClipDrag(moveEvent) {
+            if (!this.voiceClipDragContext) return;
+            const { lane, track, mode, startX, startLength, startPercent } = this.voiceClipDragContext;
+            const rect = lane.getBoundingClientRect();
+            if (mode === 'resize') {
+                const deltaPx = moveEvent.clientX - startX;
+                const deltaPercent = (deltaPx / Math.max(1, rect.width)) * 100;
+                const nextLength = Math.max(5, Math.min(100 - startPercent, Math.round(startLength + deltaPercent)));
+                track.voice_over_length_percent = nextLength;
+                return;
+            }
+            const x = moveEvent.clientX - rect.left;
+            const percent = (x / Math.max(1, rect.width)) * 100;
+            track.voice_over_start_percent = this.clampVoiceClipStart(track, percent);
+        },
+
+        startVoiceClipResize(event, track) {
+            const lane = event.currentTarget.closest('.voice-lane');
+            if (!lane) return;
+
+            const initialLength = this.getVoiceClipLength(track);
+            track.voice_over_length_percent = initialLength;
+            const initialStart = this.clampVoiceClipStart(track, track.voice_over_start_percent);
+            track.voice_over_start_percent = initialStart;
+
+            this.voiceClipDragContext = {
+                mode: 'resize',
+                lane,
+                track,
+                startX: event.clientX,
+                startLength: initialLength,
+                startPercent: initialStart,
+            };
+
+            const onMove = (moveEvent) => this.handleVoiceClipDrag(moveEvent);
+            const onUp = () => this.stopVoiceClipDrag(onMove, onUp);
+
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp, { once: true });
+        },
+
+        stopVoiceClipDrag(onMove, onUp) {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            this.voiceClipDragContext = null;
+        },
+
+        async loadVoiceTimelinePlaylist(explicitId = null) {
+            const playlistId = Number(explicitId || this.voiceTimelinePlaylistId || 0);
+            if (!playlistId) {
+                this.showToast('Select playlist first');
+                return;
+            }
+
+            this.voiceTimelineLoading = true;
+            try {
+                const resp = await fetch(`/api/playlist/${playlistId}/data/`);
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.showToast(data.error || 'Could not load timeline');
+                    return;
+                }
+
+                this.voiceTimelinePlaylistId = playlistId;
+                this.voiceTimelinePlaylistName = data.playlist?.name || '';
+                this.voiceTimelineTracks = (data.playlist?.tracks || []).map((track) => this.normalizeVoiceTimelineTrack(track));
+            } catch (e) {
+                this.showToast('Could not load timeline');
+            } finally {
+                this.voiceTimelineLoading = false;
+            }
+        },
+
+        async saveVoiceTimeline() {
+            const playlistId = Number(this.voiceTimelinePlaylistId || 0);
+            if (!playlistId) {
+                this.showToast('Select playlist first');
+                return;
+            }
+
+            const playlistRef = (this.savedPlaylists || []).find((playlist) => Number(playlist.id) === playlistId);
+            const playlistName = this.voiceTimelinePlaylistName || playlistRef?.name;
+            if (!playlistName) {
+                this.showToast('Playlist name missing');
+                return;
+            }
+
+            this.voiceTimelineLoading = true;
+            try {
+                const payloadTracks = (this.voiceTimelineTracks || []).map((track) => ({
+                    title: track.title,
+                    artist: track.artist,
+                    url: track.url,
+                    album_art: track.album_art,
+                    duration: track.duration,
+                    duration_seconds: track.duration_seconds,
+                    voice_over_text: track.voice_over_text || '',
+                    voice_over_active: !!track.voice_over_active,
+                    duck_volume_percent: track.voice_over_active ? 20 : 100,
+                    voice_over_start_percent: track.voice_over_active ? this.clampVoiceClipStart(track, track.voice_over_start_percent) : 0,
+                    voice_over_length_percent: track.voice_over_active ? this.getVoiceClipLength(track) : this.getVoiceClipLength(track),
+                }));
+
+                const resp = await fetch('/api/playlist/save/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({
+                        id: playlistId,
+                        name: playlistName,
+                        tracks: payloadTracks,
+                    })
+                });
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.showToast(data.error || 'Voice-over save failed');
+                    return;
+                }
+
+                this.showToast('Voice-over mix saved');
+            } catch (e) {
+                this.showToast('Voice-over save failed');
+            } finally {
+                this.voiceTimelineLoading = false;
+            }
         },
 
         async saveSchedule() {

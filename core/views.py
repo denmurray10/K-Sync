@@ -301,6 +301,26 @@ def api_playlist_save(request):
             album_art = t.get('album_art', '')
             duration = t.get('duration', '3:00')
             duration_seconds = t.get('duration_seconds', parse_duration_seconds(duration))
+            voice_over_text = (t.get('voice_over_text') or '').strip()
+            voice_over_active = bool(t.get('voice_over_active'))
+            duck_volume_percent = t.get('duck_volume_percent', 20)
+            voice_over_start_percent = t.get('voice_over_start_percent', 0)
+            voice_over_length_percent = t.get('voice_over_length_percent', 22)
+            try:
+                duck_volume_percent = int(duck_volume_percent)
+            except Exception:
+                duck_volume_percent = 20
+            duck_volume_percent = max(0, min(100, duck_volume_percent))
+            try:
+                voice_over_start_percent = int(voice_over_start_percent)
+            except Exception:
+                voice_over_start_percent = 0
+            voice_over_start_percent = max(0, min(100, voice_over_start_percent))
+            try:
+                voice_over_length_percent = int(voice_over_length_percent)
+            except Exception:
+                voice_over_length_percent = 22
+            voice_over_length_percent = max(5, min(100, voice_over_length_percent))
             
             track, _ = RadioTrack.objects.get_or_create(
                 title=title,
@@ -332,7 +352,12 @@ def api_playlist_save(request):
             RadioPlaylistTrack.objects.create(
                 playlist=playlist,
                 track=track,
-                order=idx
+                order=idx,
+                voice_over_text=voice_over_text,
+                voice_over_active=voice_over_active,
+                duck_volume_percent=duck_volume_percent,
+                voice_over_start_percent=voice_over_start_percent,
+                voice_over_length_percent=voice_over_length_percent,
             )
             
         return JsonResponse({'ok': True, 'id': playlist.id})
@@ -438,6 +463,11 @@ def api_playlist_data(request, playlist_id):
                 'album_art': pt.track.album_art,
                 'duration': pt.track.duration,
                 'duration_seconds': pt.track.duration_seconds,
+                'voice_over_text': pt.voice_over_text,
+                'voice_over_active': pt.voice_over_active,
+                'duck_volume_percent': pt.duck_volume_percent,
+                'voice_over_start_percent': pt.voice_over_start_percent,
+                'voice_over_length_percent': pt.voice_over_length_percent,
             })
             
         return JsonResponse({
