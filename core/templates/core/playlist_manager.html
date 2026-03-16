@@ -279,12 +279,19 @@
     <!-- Modal: Schedule Event -->
     <div x-show="showScheduleModal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl" style="display: none;">
         <div class="bg-surface border border-white/10 w-full max-w-sm p-8 shadow-2xl">
-            <h3 class="text-xl font-black uppercase tracking-tighter mb-6">Schedule on <span class="text-primary" x-text="activeDay"></span></h3>
+            <h3 class="text-xl font-black uppercase tracking-tighter mb-2"><span x-text="newSchedule.schedule_id ? 'Edit Slot' : 'Schedule Slot'"></span> on <span class="text-primary" x-text="activeDay"></span></h3>
+            <p class="text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-6" x-show="newSchedule.schedule_id" style="display: none;">Editing existing schedule entry</p>
             
             <div class="space-y-4">
                 <div>
                     <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Target Playlist</label>
-                    <p class="text-sm font-bold uppercase truncate border-b border-white/10 pb-2" x-text="newSchedule.playlist_name"></p>
+                    <select x-model.number="newSchedule.playlist_id" @change="syncSchedulePlaylistName" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
+                        <option value="" disabled>Select playlist...</option>
+                        {% for p in playlists %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="mt-1 text-[9px] font-mono uppercase tracking-widest text-slate-500 truncate" x-text="newSchedule.playlist_name"></p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -303,8 +310,9 @@
             </div>
 
             <div class="flex gap-4 mt-8">
+                <button x-show="newSchedule.schedule_id" @click="deleteCurrentScheduleFromModal" class="flex-1 border border-red-400/60 text-red-300 py-3 text-[10px] font-bold uppercase" style="display: none;">Delete</button>
                 <button @click="showScheduleModal = false" class="flex-1 border border-white/10 py-3 text-[10px] font-bold uppercase">Cancel</button>
-                <button @click="saveSchedule" class="flex-1 bg-secondary text-black py-3 text-[10px] font-bold uppercase shadow-[4px_4px_0px_#f425c0]">Confirm</button>
+                <button @click="saveSchedule" class="flex-1 bg-secondary text-black py-3 text-[10px] font-bold uppercase shadow-[4px_4px_0px_#f425c0]" x-text="newSchedule.schedule_id ? 'Update' : 'Confirm'"></button>
             </div>
         </div>
     </div>
@@ -427,6 +435,11 @@ function playlistApp() {
         playlistRenderKey: 0,
         searchQuery: '',
         groupQuery: '',
+        savedPlaylists: [
+            {% for p in playlists %}
+            { id: {{ p.id }}, name: '{{ p.name|escapejs }}' },
+            {% endfor %}
+        ],
         currentPlaylist: { id: null, name: 'Untitled Playlist', tracks: [] },
         daySchedules: {},
         activeDay: 'MON',
@@ -638,6 +651,12 @@ function playlistApp() {
             slot.slot_duration_seconds = Math.max(0, (endMinutes - startMinutes) * 60);
         },
 
+        syncSchedulePlaylistName() {
+            const selectedId = Number(this.newSchedule.playlist_id || 0);
+            const selected = (this.savedPlaylists || []).find((playlist) => Number(playlist.id) === selectedId);
+            this.newSchedule.playlist_name = selected ? selected.name : '';
+        },
+
         startResizeSlot(event, day, slot) {
             const row = event.currentTarget.closest('.grid-row');
             if (!row || this.isResizingSlot) return;
@@ -729,6 +748,7 @@ function playlistApp() {
             this.newSchedule.start = this.snapTimeValue(slot.time || '09:00');
             this.newSchedule.end = this.snapTimeValue(String(slot.duration || '').replace('Until ', '') || '10:00');
             this.newSchedule.host = slot.host || 'Auto DJ';
+            this.syncSchedulePlaylistName();
             this.showScheduleModal = true;
         },
 
@@ -1019,7 +1039,27 @@ function playlistApp() {
             const endH = (hour + 1).toString().padStart(2, '0');
             this.newSchedule.start = `${hStr}:00`;
             this.newSchedule.end = `${endH}:00`;
+            this.syncSchedulePlaylistName();
             this.showScheduleModal = true;
+        },
+
+        async deleteCurrentScheduleFromModal() {
+            const scheduleId = this.newSchedule.schedule_id;
+            if (!scheduleId) return;
+            if (!confirm('Delete this schedule slot?')) return;
+
+            const resp = await fetch(`/api/schedule/${scheduleId}/delete/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            });
+            const data = await resp.json();
+            if (data.ok) {
+                this.showScheduleModal = false;
+                await this.fetchSchedules();
+                this.showToast('Schedule deleted');
+            } else {
+                this.showToast(data.error || 'Delete failed');
+            }
         },
 
         getSlotStyle(slot) {
