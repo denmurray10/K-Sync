@@ -112,4 +112,7 @@ urlpatterns = [
     path('api/playlist/<int:playlist_id>/data/', views.api_playlist_data, name='api_playlist_data'),
     path('api/schedule/save/', views.api_schedule_save, name='api_schedule_save'),
     path('api/schedule/<int:schedule_id>/delete/', views.api_schedule_delete, name='api_schedule_delete'),
+    path('api/schedule/templates/', views.api_schedule_templates, name='api_schedule_templates'),
+    path('api/schedule/templates/save/', views.api_schedule_template_save, name='api_schedule_template_save'),
+    path('api/schedule/templates/<int:template_id>/delete/', views.api_schedule_template_delete, name='api_schedule_template_delete'),
 ]

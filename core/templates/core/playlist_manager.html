@@ -313,6 +313,7 @@
         <div class="bg-surface border border-white/10 w-full max-w-sm p-6 shadow-2xl">
             <h3 class="text-lg font-black uppercase tracking-tighter">Day Actions: <span class="text-secondary" x-text="dayActionDay"></span></h3>
             <p class="mt-2 text-[10px] font-mono uppercase tracking-widest text-slate-500" x-show="copiedSourceDay">Copied source: <span class="text-white" x-text="copiedSourceDay"></span></p>
+            <p class="mt-1 text-[10px] font-mono uppercase tracking-widest text-slate-500" x-show="templateApplyMode">Apply template mode</p>
 
             <div class="mt-5 space-y-2" x-show="canPasteToDay(dayActionDay)">
                 <p class="text-[10px] font-mono uppercase tracking-widest text-slate-300">Paste from <span x-text="copiedSourceDay"></span> to <span x-text="dayActionDay"></span>?</p>
@@ -321,8 +322,29 @@
                 <button @click="showDayActionModal = false" class="w-full h-9 border border-white/10 text-[10px] font-bold uppercase tracking-widest">Cancel</button>
             </div>
 
-            <div class="mt-5 space-y-2" x-show="!canPasteToDay(dayActionDay)">
+            <div class="mt-5 space-y-2" x-show="templateApplyMode && !canPasteToDay(dayActionDay)">
+                <template x-if="scheduleTemplates.length">
+                    <div class="space-y-2">
+                        <select x-model.number="selectedTemplateId" class="w-full h-9 bg-black border border-white/10 px-2 text-[10px] font-mono text-white uppercase">
+                            <template x-for="template in scheduleTemplates" :key="template.id">
+                                <option :value="template.id" x-text="template.name"></option>
+                            </template>
+                        </select>
+                        <p class="text-[9px] font-mono uppercase tracking-widest text-red-300">This will override all existing data for this day.</p>
+                        <button @click="applyTemplateToDay(dayActionDay)" class="w-full h-9 bg-secondary text-black text-[10px] font-bold uppercase tracking-widest">Apply Template</button>
+                        <button @click="deleteSelectedTemplate" class="w-full h-9 border border-red-400/60 text-red-300 text-[10px] font-bold uppercase tracking-widest">Delete Template</button>
+                    </div>
+                </template>
+                <template x-if="!scheduleTemplates.length">
+                    <p class="text-[10px] font-mono uppercase tracking-widest text-slate-400">No templates saved yet.</p>
+                </template>
+                <button @click="templateApplyMode = false" class="w-full h-9 border border-white/10 text-[10px] font-bold uppercase tracking-widest">Back</button>
+            </div>
+
+            <div class="mt-5 space-y-2" x-show="!canPasteToDay(dayActionDay) && !templateApplyMode">
                 <button @click="markDayAsCopySource(dayActionDay)" class="w-full h-9 border border-secondary/70 text-secondary text-[10px] font-bold uppercase tracking-widest">Copy Schedule</button>
+                <button @click="saveDayAsTemplate(dayActionDay)" class="w-full h-9 border border-primary/60 text-primary text-[10px] font-bold uppercase tracking-widest">Save As Template</button>
+                <button @click="openTemplateApplyMode" class="w-full h-9 border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">Apply Template</button>
                 <button @click="deleteDaySchedule(dayActionDay)" class="w-full h-9 border border-red-400/60 text-red-300 text-[10px] font-bold uppercase tracking-widest">Delete Schedule</button>
                 <button @click="showDayActionModal = false" class="w-full h-9 border border-white/10 text-[10px] font-bold uppercase tracking-widest">Cancel</button>
             </div>
@@ -427,6 +449,9 @@ function playlistApp() {
         showDayActionModal: false,
         dayActionDay: 'MON',
         copiedSourceDay: null,
+        scheduleTemplates: [],
+        selectedTemplateId: null,
+        templateApplyMode: false,
         slotTargetMinutes: 60,
         showAIModal: false,
         aiStep: 1,
@@ -438,6 +463,7 @@ function playlistApp() {
             await this.fetchSchedules();
             this.initSortable();
             this.startNowTicker();
+            await this.loadScheduleTemplates();
             this.$nextTick(() => {
                 this.syncScrollPanelHeights();
                 window.addEventListener('resize', () => this.syncScrollPanelHeights());
@@ -1056,6 +1082,7 @@ function playlistApp() {
 
         openDayAction(day) {
             this.dayActionDay = day;
+            this.templateApplyMode = false;
             this.showDayActionModal = true;
         },
 
@@ -1067,6 +1094,82 @@ function playlistApp() {
             this.copiedSourceDay = day;
             this.showDayActionModal = false;
             this.showToast(`Copied ${day}. Select another day to paste.`);
+        },
+
+        async loadScheduleTemplates() {
+            try {
+                const resp = await fetch('/api/schedule/templates/');
+                const data = await resp.json();
+                if (!data.ok) throw new Error(data.error || 'Failed to load templates');
+                this.scheduleTemplates = Array.isArray(data.templates) ? data.templates : [];
+                if (this.scheduleTemplates.length && !this.selectedTemplateId) {
+                    this.selectedTemplateId = this.scheduleTemplates[0].id;
+                }
+            } catch (e) {
+                this.scheduleTemplates = [];
+            }
+        },
+
+        openTemplateApplyMode() {
+            this.templateApplyMode = true;
+            if (this.scheduleTemplates.length && !this.selectedTemplateId) {
+                this.selectedTemplateId = this.scheduleTemplates[0].id;
+            }
+        },
+
+        async saveDayAsTemplate(day) {
+            const templateName = (prompt(`Template name for ${day}:`) || '').trim().toUpperCase();
+            if (!templateName) return;
+
+            const slots = [...(this.daySchedules[day] || [])]
+                .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
+                .map((slot) => ({
+                    start_time: slot.time,
+                    end_time: this.slotEndTime(slot),
+                    playlist_id: slot.playlist_id,
+                    host: slot.host || 'Auto DJ',
+                    genre: slot.genre || 'MUSIC',
+                }));
+
+            try {
+                const resp = await fetch('/api/schedule/templates/save/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ name: templateName, slots })
+                });
+                const data = await resp.json();
+                if (!data.ok) throw new Error(data.error || 'Template save failed');
+
+                await this.loadScheduleTemplates();
+                this.selectedTemplateId = data.id;
+                this.showDayActionModal = false;
+                this.showToast(`Template ${templateName} saved`);
+            } catch (e) {
+                this.showToast(e?.message || 'Template save failed');
+            }
+        },
+
+        async deleteSelectedTemplate() {
+            if (!this.selectedTemplateId) {
+                this.showToast('Select a template');
+                return;
+            }
+            if (!confirm('Delete selected template?')) return;
+
+            try {
+                const resp = await fetch(`/api/schedule/templates/${this.selectedTemplateId}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                });
+                const data = await resp.json();
+                if (!data.ok) throw new Error(data.error || 'Template delete failed');
+
+                await this.loadScheduleTemplates();
+                this.selectedTemplateId = this.scheduleTemplates.length ? this.scheduleTemplates[0].id : null;
+                this.showToast('Template deleted');
+            } catch (e) {
+                this.showToast(e?.message || 'Template delete failed');
+            }
         },
 
         slotEndTime(slot) {
@@ -1148,6 +1251,54 @@ function playlistApp() {
             } catch (e) {
                 await this.fetchSchedules();
                 this.showToast(e?.message || 'Copy day failed');
+            }
+        },
+
+        async applyTemplateToDay(day) {
+            const selected = this.scheduleTemplates.find((template) => template.id === this.selectedTemplateId);
+            if (!selected) {
+                this.showToast('Select a template');
+                return;
+            }
+
+            if (!confirm(`Apply template ${selected.name} to ${day}? This will override all existing data for ${day}.`)) return;
+
+            const targetSlots = [...(this.daySchedules[day] || [])];
+
+            try {
+                for (const slot of targetSlots) {
+                    const delResp = await fetch(`/api/schedule/${slot.id}/delete/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    });
+                    const delData = await delResp.json();
+                    if (!delData.ok) throw new Error(delData.error || 'Delete failed');
+                }
+
+                for (const slot of selected.slots || []) {
+                    const saveResp = await fetch('/api/schedule/save/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                        body: JSON.stringify({
+                            day,
+                            start_time: slot.start_time,
+                            end_time: slot.end_time,
+                            playlist_id: slot.playlist_id,
+                            host: slot.host || 'Auto DJ',
+                            genre: slot.genre || 'MUSIC'
+                        })
+                    });
+                    const saveData = await saveResp.json();
+                    if (!saveData.ok) throw new Error(saveData.error || 'Template apply failed');
+                }
+
+                await this.fetchSchedules();
+                this.templateApplyMode = false;
+                this.showDayActionModal = false;
+                this.showToast(`Applied ${selected.name} to ${day}`);
+            } catch (e) {
+                await this.fetchSchedules();
+                this.showToast(e?.message || 'Apply template failed');
             }
         },
 

@@ -467,3 +467,31 @@ class RadioSchedule(models.Model):
 
     def __str__(self):
         return f"{self.get_day_display()} {self.start_time}-{self.end_time}: {self.playlist.name}"
+
+
+class RadioScheduleTemplate(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class RadioScheduleTemplateSlot(models.Model):
+    template = models.ForeignKey(RadioScheduleTemplate, on_delete=models.CASCADE, related_name='slots')
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    playlist = models.ForeignKey(RadioPlaylist, on_delete=models.CASCADE)
+    host = models.CharField(max_length=255, default='Auto DJ')
+    genre = models.CharField(max_length=50, default='MUSIC')
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'start_time']
+
+    def __str__(self):
+        return f"{self.template.name} {self.start_time}-{self.end_time}: {self.playlist.name}"

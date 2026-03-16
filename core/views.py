@@ -27,6 +27,7 @@ from .models import (
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, UserNotification, ClubInvitation, ClubLaunch, UserBadge,
     RadioTrack, RadioStationState, RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
+    RadioScheduleTemplate, RadioScheduleTemplateSlot,
 )
 
 def _staff_only_json(request):
@@ -586,6 +587,104 @@ def api_schedule_delete(request, schedule_id):
         return JsonResponse({'ok': True})
     except RadioSchedule.DoesNotExist:
         return JsonResponse({'ok': False, 'error': 'Schedule not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+
+def api_schedule_templates(request):
+    """Returns saved schedule templates."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+
+    templates = RadioScheduleTemplate.objects.prefetch_related('slots__playlist').all()
+    payload = []
+    for template in templates:
+        slots = []
+        for slot in template.slots.all():
+            slots.append({
+                'start_time': slot.start_time.strftime('%H:%M'),
+                'end_time': slot.end_time.strftime('%H:%M'),
+                'playlist_id': slot.playlist_id,
+                'host': slot.host,
+                'genre': slot.genre,
+            })
+        payload.append({
+            'id': template.id,
+            'name': template.name,
+            'slots': slots,
+        })
+
+    return JsonResponse({'ok': True, 'templates': payload})
+
+
+@csrf_exempt
+@require_POST
+def api_schedule_template_save(request):
+    """Creates or updates a schedule template by name."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+
+    try:
+        data = json.loads(request.body)
+        name = (data.get('name') or '').strip()
+        slots_data = data.get('slots') or []
+
+        if not name:
+            return JsonResponse({'ok': False, 'error': 'Template name is required'}, status=400)
+        if not isinstance(slots_data, list):
+            return JsonResponse({'ok': False, 'error': 'Slots must be a list'}, status=400)
+
+        playlist_ids = [slot.get('playlist_id') for slot in slots_data if slot.get('playlist_id')]
+        playlist_map = RadioPlaylist.objects.in_bulk(playlist_ids)
+
+        template, _ = RadioScheduleTemplate.objects.get_or_create(name=name)
+        template.slots.all().delete()
+
+        for idx, slot_data in enumerate(slots_data):
+            playlist_id = slot_data.get('playlist_id')
+            playlist = playlist_map.get(playlist_id)
+            if not playlist:
+                return JsonResponse({'ok': False, 'error': f'Playlist not found: {playlist_id}'}, status=400)
+
+            try:
+                start_obj = datetime.strptime(slot_data.get('start_time', ''), '%H:%M').time()
+                end_obj = datetime.strptime(slot_data.get('end_time', ''), '%H:%M').time()
+            except Exception:
+                return JsonResponse({'ok': False, 'error': 'Invalid slot time format'}, status=400)
+
+            if start_obj >= end_obj:
+                return JsonResponse({'ok': False, 'error': 'Template slot end must be after start'}, status=400)
+
+            RadioScheduleTemplateSlot.objects.create(
+                template=template,
+                start_time=start_obj,
+                end_time=end_obj,
+                playlist=playlist,
+                host=slot_data.get('host') or 'Auto DJ',
+                genre=slot_data.get('genre') or 'MUSIC',
+                order=idx,
+            )
+
+        return JsonResponse({'ok': True, 'id': template.id})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@require_POST
+def api_schedule_template_delete(request, template_id):
+    """Deletes a saved schedule template."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+    try:
+        template = RadioScheduleTemplate.objects.get(id=template_id)
+        template.delete()
+        return JsonResponse({'ok': True})
+    except RadioScheduleTemplate.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'Template not found'}, status=404)
     except Exception as e:
         return JsonResponse({'ok': False, 'error': str(e)}, status=500)
 
