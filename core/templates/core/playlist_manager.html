@@ -368,9 +368,13 @@
                                 </select>
                                 <p class="text-[9px] font-mono uppercase tracking-widest text-slate-400"
                                    x-text="getEffectiveTrackVoiceLabel(track)"></p>
-                                          <p x-show="hasGeneratedVoiceAudioAfter(index)"
-                                              class="text-[9px] font-mono uppercase tracking-widest text-emerald-300"
-                                              x-text="getGeneratedVoiceAudioLabel(index)"></p>
+                                          <div x-show="hasGeneratedVoiceAudioAfter(index)" class="flex items-center justify-between gap-2">
+                                                <p class="text-[9px] font-mono uppercase tracking-widest text-emerald-300"
+                                                    x-text="getGeneratedVoiceAudioLabel(index)"></p>
+                                                <button @click="toggleVoicePreview(index)"
+                                                          class="h-6 px-2 border border-emerald-400/60 text-emerald-300 text-[8px] font-bold uppercase tracking-widest"
+                                                          x-text="isVoicePreviewPlaying(index) ? 'Stop VO' : 'Test VO'"></button>
+                                          </div>
                                 <div class="voice-lane relative h-8 border border-white/10 bg-black/50" @click="setVoiceClipPositionFromLane($event, track)">
                                     <template x-if="track.voice_over_active">
                                         <div class="group absolute top-1 bottom-1 bg-primary/70 border border-primary cursor-grab flex items-center justify-center text-[8px] font-bold uppercase tracking-widest text-black"
@@ -725,6 +729,8 @@ function playlistApp() {
         voiceOverGeneratingTrackIndex: null,
         voiceOverSynthTrackIndex: null,
         aiVoiceScriptsLoading: false,
+        voicePreviewAudio: null,
+        voicePreviewTrackIndex: null,
         voiceClipDragContext: null,
         newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ', genre: 'MUSIC', voice_over: '' },
         toast: { visible: false, message: '' },
@@ -1269,11 +1275,65 @@ function playlistApp() {
             return this.isGeneratedVoiceTrack(nextTrack);
         },
 
+        getGeneratedVoiceTrackAfter(index) {
+            const nextTrack = (this.voiceTimelineTracks || [])[Number(index) + 1];
+            return this.isGeneratedVoiceTrack(nextTrack) ? nextTrack : null;
+        },
+
         getGeneratedVoiceAudioLabel(index) {
             const nextTrack = (this.voiceTimelineTracks || [])[Number(index) + 1];
             if (!this.isGeneratedVoiceTrack(nextTrack)) return '';
             const dur = String(nextTrack.duration || '').trim();
             return dur ? `VO Audio Ready (${dur})` : 'VO Audio Ready';
+        },
+
+        isVoicePreviewPlaying(index) {
+            return this.voicePreviewTrackIndex === Number(index)
+                && !!this.voicePreviewAudio
+                && !this.voicePreviewAudio.paused;
+        },
+
+        stopVoicePreview() {
+            if (!this.voicePreviewAudio) {
+                this.voicePreviewTrackIndex = null;
+                return;
+            }
+            try {
+                this.voicePreviewAudio.pause();
+                this.voicePreviewAudio.currentTime = 0;
+            } catch (e) {
+            }
+            this.voicePreviewAudio = null;
+            this.voicePreviewTrackIndex = null;
+        },
+
+        toggleVoicePreview(index) {
+            const songIndex = Number(index);
+            if (this.isVoicePreviewPlaying(songIndex)) {
+                this.stopVoicePreview();
+                return;
+            }
+
+            const generatedTrack = this.getGeneratedVoiceTrackAfter(songIndex);
+            if (!generatedTrack || !generatedTrack.url) {
+                this.showToast('No generated VO audio to preview');
+                return;
+            }
+
+            this.stopVoicePreview();
+            try {
+                const audio = new Audio(generatedTrack.url);
+                this.voicePreviewAudio = audio;
+                this.voicePreviewTrackIndex = songIndex;
+                audio.onended = () => this.stopVoicePreview();
+                audio.play().catch(() => {
+                    this.stopVoicePreview();
+                    this.showToast('Could not play VO preview');
+                });
+            } catch (e) {
+                this.stopVoicePreview();
+                this.showToast('Could not play VO preview');
+            }
         },
 
         async fetchInworldVoices() {
@@ -2206,6 +2266,7 @@ function playlistApp() {
                 return;
             }
 
+            this.stopVoicePreview();
             this.voiceTimelineLoading = true;
             try {
                 const resp = await fetch(`/api/playlist/${playlistId}/data/`);
