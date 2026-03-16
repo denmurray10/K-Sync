@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 import dj_database_url
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -185,9 +186,9 @@ PINTEREST_ACCESS_TOKEN = os.environ.get('PINTEREST_ACCESS_TOKEN', '')
 PINTEREST_BOARD_ID = os.environ.get('PINTEREST_BOARD_ID', '')
 
 # ── Cloudinary (image CDN) ───────────────────────────────────────────────────
-CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'diuanqnce')
-CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '285831974678743')
-CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
+CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default='diuanqnce')
+CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY', default='285831974678743')
+CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET', default='')
 
 # ── Backblaze B2 (Audio Storage) ─────────────────────────────────────────────
 B2_KEY_ID = os.environ.get('B2_KEY_ID', 'a2e0a74c71c2')
