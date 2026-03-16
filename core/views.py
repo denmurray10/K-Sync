@@ -3608,7 +3608,7 @@ def _build_live_playlist_timeline(playlist):
     return timeline
 
 
-def _compute_schedule_live_context(now_local):
+def _compute_schedule_live_context(now_local, force_advance=False):
     slot, start_seconds, _end_seconds = _get_active_schedule_slot(now_local)
     if not slot:
         return None
@@ -3636,6 +3636,10 @@ def _compute_schedule_live_context(now_local):
         running_total = next_total
 
     timeline_len = len(timeline)
+    if force_advance and timeline_len > 1:
+        current_index = (current_index + 1) % timeline_len
+        current_offset = 0
+
     current_item = timeline[current_index]
     current_track = current_item['track']
 
@@ -3647,7 +3651,7 @@ def _compute_schedule_live_context(now_local):
     for step in range(1, min(6, timeline_len) + 1):
         recently_played_tracks.append(timeline[(current_index - step) % timeline_len]['track'])
 
-    started_at = timezone.now() - timedelta(seconds=int(current_offset))
+    started_at = timezone.now() if force_advance else (timezone.now() - timedelta(seconds=int(current_offset)))
 
     return {
         'slot': slot,
@@ -3731,6 +3735,7 @@ def live(request):
         'requested_titles': requested_titles,
         'state': state,
         'current_track': current_track,
+        'current_track_duration_seconds': (current_track.duration_seconds if current_track else 0),
         'current_voice_overlay_json': json.dumps(current_voice_overlay),
         'up_next_tracks': up_next_tracks,
         'recently_played_tracks': recently_played_tracks,
@@ -3746,7 +3751,8 @@ def api_live_rotate_track(request):
 
     state, _ = RadioStationState.objects.get_or_create(id=1)
 
-    schedule_context = _compute_schedule_live_context(timezone.localtime())
+    advance_requested = str(request.GET.get('advance') or '').strip().lower() in ('1', 'true', 'yes', 'on')
+    schedule_context = _compute_schedule_live_context(timezone.localtime(), force_advance=advance_requested)
     if schedule_context:
         _sync_state_with_schedule_context(state, schedule_context)
         current = schedule_context['current_track']
@@ -3763,6 +3769,7 @@ def api_live_rotate_track(request):
                 'album_art': current.album_art,
                 'audio_url': current.audio_url,
                 'duration': current.duration,
+                'duration_seconds': current.duration_seconds,
             },
             'up_next': [
                 {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
@@ -3836,6 +3843,7 @@ def api_live_rotate_track(request):
             'album_art': current.album_art,
             'audio_url': current.audio_url,
             'duration': current.duration,
+            'duration_seconds': current.duration_seconds,
         },
         'up_next': [
             {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}

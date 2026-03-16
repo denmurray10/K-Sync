@@ -240,11 +240,11 @@
         <!-- Progress Bar -->
         <div class="w-full max-w-xl">
             <div class="w-full h-1 bg-white/10 relative overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-primary to-secondary progress-animate"></div>
+                <div id="live-progress-fill" class="h-full bg-gradient-to-r from-primary to-secondary transition-[width] duration-200" style="width: 0%"></div>
             </div>
             <div class="flex justify-between mt-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-                <span>0:00</span>
-                <span>{% if current_track %}{{ current_track.duration }}{% else %}3:00{% endif %}</span>
+                <span id="live-progress-current">0:00</span>
+                <span id="live-progress-total">{% if current_track %}{{ current_track.duration }}{% else %}3:00{% endif %}</span>
             </div>
         </div>
 
@@ -522,13 +522,68 @@
         const playBtn = document.getElementById('play-btn');
         const audio = document.getElementById('live-audio');
         const voiceAudio = document.getElementById('live-vo-audio');
+        const progressFillEl = document.getElementById('live-progress-fill');
+        const progressCurrentEl = document.getElementById('live-progress-current');
+        const progressTotalEl = document.getElementById('live-progress-total');
         
         if (playBtn && audio) {
             let isPlaying = false;
             const initialServerOffset = {{ current_offset|default:0 }};
+            let currentTrackDurationSeconds = Number({{ current_track_duration_seconds|default:0 }} || 0);
             let currentVoiceOverlay = {{ current_voice_overlay_json|default:"null"|safe }};
             let voiceStartTimer = null;
+            let rotateWatchdogTimer = null;
+            let rotateInFlight = false;
+            let playbackGuardInterval = null;
             const pageLoadTime = Date.now();
+
+            const parseDurationLabelSeconds = (value) => {
+                const raw = String(value || '').trim();
+                if (!raw) return 0;
+                const parts = raw.split(':').map((p) => parseInt(p, 10));
+                if (parts.some((p) => Number.isNaN(p))) return 0;
+                if (parts.length === 2) return Math.max(0, (parts[0] * 60) + parts[1]);
+                if (parts.length === 3) return Math.max(0, (parts[0] * 3600) + (parts[1] * 60) + parts[2]);
+                return 0;
+            };
+
+            const formatClock = (seconds) => {
+                const safe = Math.max(0, Math.floor(Number(seconds || 0)));
+                const mins = Math.floor(safe / 60);
+                const secs = safe % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            const getEffectiveDurationSeconds = () => {
+                const audioDuration = Number(audio.duration || 0);
+                if (Number.isFinite(audioDuration) && audioDuration > 0) return audioDuration;
+                const knownDuration = Number(currentTrackDurationSeconds || 0);
+                if (Number.isFinite(knownDuration) && knownDuration > 0) return knownDuration;
+                if (progressTotalEl) return parseDurationLabelSeconds(progressTotalEl.textContent || '');
+                return 0;
+            };
+
+            const updateProgressUI = (explicitCurrent = null) => {
+                const duration = getEffectiveDurationSeconds();
+                const current = explicitCurrent === null ? Number(audio.currentTime || 0) : Number(explicitCurrent || 0);
+                const safeCurrent = Math.max(0, current);
+
+                if (progressCurrentEl) {
+                    progressCurrentEl.textContent = formatClock(safeCurrent);
+                }
+
+                if (duration > 0) {
+                    if (progressTotalEl) {
+                        progressTotalEl.textContent = formatClock(duration);
+                    }
+                    const pct = Math.max(0, Math.min(100, (safeCurrent / duration) * 100));
+                    if (progressFillEl) {
+                        progressFillEl.style.width = `${pct}%`;
+                    }
+                } else if (progressFillEl) {
+                    progressFillEl.style.width = '0%';
+                }
+            };
 
             const getSliderVolume = () => {
                 const volumeSlider = document.getElementById('volume-slider');
@@ -553,6 +608,43 @@
                 audio.volume = getSliderVolume();
             };
 
+            const clearRotateWatchdog = () => {
+                if (rotateWatchdogTimer) {
+                    clearTimeout(rotateWatchdogTimer);
+                    rotateWatchdogTimer = null;
+                }
+            };
+
+            const scheduleRotateWatchdog = () => {
+                clearRotateWatchdog();
+                const dur = Number(currentTrackDurationSeconds || 0);
+                if (!Number.isFinite(dur) || dur <= 0) return;
+                const remaining = Math.max(0, dur - Number(audio.currentTime || 0));
+                const delayMs = Math.max(600, Math.round((remaining + 0.35) * 1000));
+                rotateWatchdogTimer = setTimeout(() => {
+                    triggerRotate('watchdog');
+                }, delayMs);
+            };
+
+            const startPlaybackGuard = () => {
+                if (playbackGuardInterval) return;
+                playbackGuardInterval = setInterval(() => {
+                    if (rotateInFlight) return;
+                    const dur = Number(currentTrackDurationSeconds || 0);
+                    if (!Number.isFinite(dur) || dur <= 0) return;
+                    const nowTime = Number(audio.currentTime || 0);
+                    if (nowTime >= Math.max(0, dur - 0.35)) {
+                        triggerRotate('guard-near-end');
+                    }
+                }, 500);
+            };
+
+            const stopPlaybackGuard = () => {
+                if (!playbackGuardInterval) return;
+                clearInterval(playbackGuardInterval);
+                playbackGuardInterval = null;
+            };
+
             const scheduleVoiceOverlayForOffset = (trackOffsetSeconds) => {
                 clearVoiceOverlayPlayback();
 
@@ -563,7 +655,7 @@
                 const startSeconds = Math.max(0, Number(currentVoiceOverlay.start_seconds || 0));
                 const overlayDuration = Math.max(0, Number(currentVoiceOverlay.duration_seconds || 0));
                 const configuredDuck = Math.max(0, Math.min(1, Number(currentVoiceOverlay.duck_volume ?? 0.1)));
-                const duckVolume = Math.min(getSliderVolume(), configuredDuck);
+                const duckVolume = Math.min(getSliderVolume(), configuredDuck, 0.05);
                 const safeOffset = Math.max(0, Number(trackOffsetSeconds || 0));
 
                 if (overlayDuration > 0 && safeOffset >= startSeconds + overlayDuration) {
@@ -616,7 +708,13 @@
                     audio.currentTime = targetTime;
                 }
                 scheduleVoiceOverlayForOffset(targetTime);
+                scheduleRotateWatchdog();
+                updateProgressUI(targetTime);
             };
+
+            audio.addEventListener('timeupdate', () => updateProgressUI());
+            audio.addEventListener('loadedmetadata', () => updateProgressUI());
+            audio.addEventListener('durationchange', () => updateProgressUI());
 
             // Only seek if we actually have an offset
             if (initialServerOffset > 0) {
@@ -670,10 +768,14 @@
                 if (voiceAudio) voiceAudio.muted = audio.muted;
                 playBtn.querySelector('.material-symbols-outlined').textContent = audio.muted ? 'play_arrow' : 'pause';
                 playBtn.classList.toggle('pulse-glow', audio.muted);
+                scheduleRotateWatchdog();
+                startPlaybackGuard();
             };
             audio.onpause = () => {
                 isPlaying = false;
                 clearVoiceOverlayPlayback();
+                clearRotateWatchdog();
+                stopPlaybackGuard();
                 playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
                 playBtn.classList.add('pulse-glow');
             };
@@ -696,50 +798,88 @@
                     }
                 });
             }
-        }
 
-        async function rotateTrack() {
-            console.log("Rotating track...");
-            try {
-                const response = await fetch('/api/live/rotate/');
-                const data = await response.json();
-                
-                if (data.ok) {
-                    const track = data.current_track;
-                    const serverOffset = Number(data.current_offset || 0);
-                    currentVoiceOverlay = data.voice_overlay || null;
-                    
-                    // Update Audio
-                    clearVoiceOverlayPlayback();
-                    audio.src = track.audio_url;
-                    audio.load();
-                    await audio.play();
-                    if (Number.isFinite(serverOffset) && serverOffset > 0) {
-                        const seekTo = Math.max(0, Math.floor(serverOffset));
-                        if (Math.abs(audio.currentTime - seekTo) > 2) {
-                            audio.currentTime = seekTo;
+            async function rotateTrack() {
+                console.log("Rotating track...");
+                try {
+                    const response = await fetch(`/api/live/rotate/?advance=1&_ts=${Date.now()}`, { cache: 'no-store' });
+                    const data = await response.json();
+
+                    if (data.ok) {
+                        const track = data.current_track;
+                        const serverOffset = Number(data.current_offset || 0);
+                        const durationFromPayload = Number(track.duration_seconds || 0);
+                        currentTrackDurationSeconds = durationFromPayload > 0
+                            ? durationFromPayload
+                            : parseDurationLabelSeconds(track.duration);
+                        if (progressTotalEl) {
+                            progressTotalEl.textContent = String(track.duration || formatClock(currentTrackDurationSeconds || 0));
                         }
-                    }
-                    scheduleVoiceOverlayForOffset(serverOffset);
-                    
-                    // Update Hero UI
-                    document.getElementById('hero-title').textContent = track.title;
-                    document.getElementById('hero-artist').textContent = track.artist;
-                    document.getElementById('hero-album-art').src = track.album_art;
-                    const bgImg = document.getElementById('album-bg-img');
-                    if (bgImg) bgImg.src = track.album_art;
-                    
-                    // Update Up Next & Recently Played
-                    updatePlaylistUI('up-next-container', data.up_next, 'primary');
-                    updatePlaylistUI('recently-played-container', data.recently_played, 'secondary');
-                }
-            } catch (error) {
-                console.error("Rotation failed:", error);
-            }
-        }
+                        currentVoiceOverlay = data.voice_overlay || null;
+                        const previousSrc = String(audio.currentSrc || audio.src || '');
+                        const nextSrc = String(track.audio_url || '');
+                        const normalizedPrev = previousSrc.split('?')[0];
+                        const normalizedNext = nextSrc.split('?')[0];
+                        const isSameTrack = !!normalizedPrev && !!normalizedNext && normalizedPrev === normalizedNext;
 
-        // Handle Track Rotation
-        audio.addEventListener('ended', rotateTrack);
+                        clearVoiceOverlayPlayback();
+                        if (!isSameTrack) {
+                            audio.src = track.audio_url;
+                            audio.load();
+                        }
+
+                        const tryPlay = async () => {
+                            try {
+                                audio.muted = false;
+                                await audio.play();
+                            } catch (err) {
+                                audio.muted = true;
+                                await audio.play();
+                            }
+                        };
+
+                        await tryPlay();
+                        if (Number.isFinite(serverOffset) && serverOffset > 0) {
+                            const seekTo = Math.max(0, Math.floor(serverOffset));
+                            if (Math.abs(audio.currentTime - seekTo) > 2) {
+                                audio.currentTime = seekTo;
+                            }
+                        }
+                        scheduleVoiceOverlayForOffset(serverOffset);
+                        scheduleRotateWatchdog();
+                        updateProgressUI(serverOffset);
+
+                        document.getElementById('hero-title').textContent = track.title;
+                        document.getElementById('hero-artist').textContent = track.artist;
+                        document.getElementById('hero-album-art').src = track.album_art;
+                        const bgImg = document.getElementById('album-bg-img');
+                        if (bgImg) bgImg.src = track.album_art;
+
+                        updatePlaylistUI('up-next-container', data.up_next, 'primary');
+                        updatePlaylistUI('recently-played-container', data.recently_played, 'secondary');
+                    }
+                } catch (error) {
+                    console.error("Rotation failed:", error);
+                    setTimeout(() => {
+                        triggerRotate('retry');
+                    }, 1000);
+                }
+            }
+
+            async function triggerRotate(reason = 'ended') {
+                if (rotateInFlight) return;
+                rotateInFlight = true;
+                clearRotateWatchdog();
+                try {
+                    await rotateTrack();
+                } finally {
+                    rotateInFlight = false;
+                }
+            }
+
+            audio.addEventListener('ended', () => triggerRotate('ended'));
+            updateProgressUI(initialServerOffset || 0);
+        }
 
         function updatePlaylistUI(containerId, tracks, colorClass) {
             const container = document.getElementById(containerId);
