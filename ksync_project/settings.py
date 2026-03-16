@@ -143,7 +143,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ── AI API Keys ──────────────────────────────────────────────────────────────
 # In Heroku, add these via: heroku config:set DEEPSEEK_API_KEY=...
 DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', 'sk-16a74707578d4d589f9fb72db4954176')
-INWORLD_API_KEY = os.environ.get('INWORLD_API_KEY', '')
+INWORLD_API_KEY = os.environ.get('INWORLD_API_KEY', 'bnJvOURJZVdBV3VvRThMZVZKV085UlU0b2NPRDd0QTE6S2JzdTdvQ2FBRVBDOFNLTDl5dzFQT3JlWDJpekhibnNnMDNqWGU5VkNaQjhRdjM5bWIxQVZ4ejlQRGFBWUU3Zw==')
 INWORLD_API_ROOT = os.environ.get('INWORLD_API_ROOT', 'https://api.inworld.ai')
 INWORLD_BASE_URL = os.environ.get('INWORLD_BASE_URL', 'https://api.inworld.ai/v1')
 INWORLD_CHAT_MODEL = os.environ.get('INWORLD_CHAT_MODEL', 'auto')

@@ -510,9 +510,6 @@ def api_voiceover_generate(request):
     if staff_check:
         return staff_check
 
-    if not settings.INWORLD_API_KEY:
-        return JsonResponse({'ok': False, 'error': 'Inworld API key is not configured on the server.'}, status=500)
-
     try:
         payload = json.loads(request.body or '{}')
     except Exception:
@@ -546,10 +543,25 @@ def api_voiceover_generate(request):
         f"Playlist context: {playlist_name or 'General K-pop rotation'}."
     )
 
-    try:
-        text = _inworld_chat(prompt, system="You are a concise K-pop radio host scriptwriter.")
-    except Exception as e:
-        return JsonResponse({'ok': False, 'error': f'Inworld request failed: {str(e)}'}, status=502)
+    provider = 'deepseek'
+    model_name = 'deepseek-chat'
+    text = ''
+
+    if settings.INWORLD_API_KEY:
+        try:
+            text = _inworld_chat(prompt, system="You are a concise K-pop radio host scriptwriter.")
+            provider = 'inworld'
+            model_name = settings.INWORLD_CHAT_MODEL
+        except Exception:
+            text = ''
+
+    if not text:
+        try:
+            text = _chat(prompt, system="You are a concise K-pop radio host scriptwriter.")
+            provider = 'deepseek'
+            model_name = 'deepseek-chat'
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': f'Script generation failed: {str(e)}'}, status=502)
 
     if not text:
         return JsonResponse({'ok': False, 'error': 'Inworld returned an empty response.'}, status=502)
@@ -562,8 +574,8 @@ def api_voiceover_generate(request):
     return JsonResponse({
         'ok': True,
         'voice_over_text': line,
-        'provider': 'inworld',
-        'model': settings.INWORLD_CHAT_MODEL,
+        'provider': provider,
+        'model': model_name,
         'voice_over_voice_id': selected_voice_id,
         'voice_over_voice_name': selected_voice_name,
     })
@@ -746,6 +758,212 @@ def api_inworld_voices(request):
         return JsonResponse({'ok': True, 'voices': simplified})
     except Exception as e:
         return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@require_POST
+def api_voiceover_ai_scripts(request):
+    """Generate DJ-style voice-over scripts for selected tracks in a playlist timeline."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+
+    try:
+        payload = json.loads(request.body or '{}')
+    except Exception:
+        payload = {}
+
+    playlist_name = (payload.get('playlist_name') or 'Playlist').strip()
+    raw_tracks = payload.get('tracks') or []
+    if not isinstance(raw_tracks, list) or not raw_tracks:
+        return JsonResponse({'ok': False, 'error': 'No tracks provided.'}, status=400)
+
+    tracks = []
+    for item in raw_tracks[:80]:
+        title = (item.get('title') or item.get('name') or '').strip()
+        artist = (item.get('artist') or '').strip() or 'Unknown Artist'
+        duration = (item.get('duration') or '').strip()
+        if not title:
+            continue
+        tracks.append({'title': title[:300], 'artist': artist[:200], 'duration': duration[:20]})
+
+    if not tracks:
+        return JsonResponse({'ok': False, 'error': 'No valid tracks provided.'}, status=400)
+
+    selected_indices = []
+    idx = 0
+    while idx < len(tracks) and len(selected_indices) < 18:
+        selected_indices.append(idx)
+        idx += random.choices([1, 2, 3, 4], weights=[0.22, 0.38, 0.27, 0.13], k=1)[0]
+
+    if selected_indices and selected_indices[-1] < len(tracks) - 1 and len(selected_indices) < 18 and random.random() < 0.45:
+        selected_indices.append(len(tracks) - 1)
+
+    intro_pool = [
+        "Right then, let’s keep things moving with this next one.",
+        "You’re locked in with us, and this one’s a proper vibe.",
+        "Keeping the momentum rolling, here’s what’s up next.",
+        "Time for another pick from the playlist that hits just right.",
+        "Let’s dip into something a little special right here.",
+        "If you’re just joining us, perfect timing for this track.",
+        "Straight back into the music with another standout tune.",
+        "Let’s bring the energy up a notch with this next song.",
+        "We’re not slowing down—here comes another great one.",
+        "Fresh from the queue, this next track deserves your attention.",
+        "Settle in, this next moment is one for the fans.",
+        "Back to back quality—here’s what we’ve lined up now.",
+        "Big mood incoming with this one.",
+        "This next song is a lovely switch in flavour.",
+        "From one great tune to another, let’s go.",
+        "Let’s stay in that groove and keep it flowing.",
+        "Your K-pop soundtrack continues right now.",
+        "A quick reset, then straight into this next track.",
+        "No filler, just bangers—here’s the next one.",
+        "Let’s queue up something that always lands.",
+        "This one’s for everyone still singing along at home.",
+        "Another brilliant entry coming in hot.",
+        "Let’s pivot into this next track—trust me on this.",
+        "Keeping it smooth and steady with this next tune.",
+        "Here’s one that always gets a reaction.",
+        "Ready for another? Let’s get into it.",
+        "Let’s jump to the next chapter in tonight’s playlist.",
+        "We’ve got a strong follow-up coming your way.",
+        "Back in the mix now with a fan favourite.",
+        "Time to lean into this next song.",
+        "This next pick fits the mood perfectly.",
+        "Let’s carry that feeling forward with this track.",
+        "A little something to keep the night moving.",
+        "Here comes another one worth turning up for.",
+        "I’ve got a great one lined up right here.",
+        "This next cut keeps the set looking sharp.",
+        "Let’s move into something with real character.",
+        "From the same lane but a different flavour, here we go.",
+        "You know the drill—another top track incoming.",
+        "Plenty more to come, starting with this one.",
+        "Let’s keep this run going with another gem.",
+        "This next selection deserves a proper listen.",
+        "Coming in now with a solid follow-on track.",
+        "Stay with me—this next one is excellent.",
+        "The playlist’s in great form, and here’s proof.",
+        "Next up, a tune that sits beautifully in this set.",
+        "No long talk—let’s get straight to the music.",
+        "We’re right in the sweet spot now, here’s the next track.",
+        "This next song keeps the quality bar high.",
+        "Let’s roll straight into this one.",
+    ]
+    random.shuffle(intro_pool)
+
+    skip_phrase_pool = [
+        "we jumped over a couple tracks",
+        "we fast-tracked through one or two songs",
+        "we moved quickly past a few tunes",
+        "we took a quick leap in the running order",
+        "we skimmed ahead a touch in the playlist",
+        "we’ve hopped forward through a couple of entries",
+        "we zipped past a few songs in the queue",
+        "we’ve advanced a little in the set",
+        "we rolled forward through a handful of tracks",
+        "we took a quick step forward in the playlist",
+    ]
+
+    assignments = []
+    previous_selected = None
+    recent_opener_signatures = []
+
+    def opener_signature(text):
+        cleaned = re.sub(r'[^a-z0-9\s]', ' ', str(text or '').lower())
+        cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+        words = cleaned.split(' ')
+        return ' '.join(words[:6])
+
+    for selection_idx, track_index in enumerate(selected_indices):
+        current = tracks[track_index]
+        prev_track = tracks[track_index - 1] if track_index > 0 else None
+        next_tracks = tracks[track_index + 1: track_index + 3]
+        lead_in_seed = intro_pool[selection_idx % len(intro_pool)]
+
+        skipped_tracks = []
+        if previous_selected is not None and track_index - previous_selected > 1:
+            skipped_tracks = tracks[previous_selected + 1:track_index]
+
+        skipped_clause = 'No skipped songs between your previous scripted break and this one.'
+        if skipped_tracks:
+            skipped_titles = ', '.join([f"{item['title']} by {item['artist']}" for item in skipped_tracks[:2]])
+            skip_hint = random.choice(skip_phrase_pool)
+            skipped_clause = (
+                f"You are skipping {len(skipped_tracks)} song(s) since your last scripted break. "
+                f"Acknowledge this naturally using varied wording (example tone: '{skip_hint}') and optionally mention: {skipped_titles}."
+            )
+
+        next_clause = 'No next song context available.'
+        if next_tracks:
+            next_clause = 'Up next context: ' + ', '.join([f"{item['title']} by {item['artist']}" for item in next_tracks]) + '.'
+
+        prev_clause = 'No previous song context available.'
+        if prev_track:
+            prev_clause = f"Previous song: {prev_track['title']} by {prev_track['artist']}."
+
+        prompt = (
+            "Write one short radio DJ voice-over script for this playlist moment. "
+            "Style: energetic, conversational, natural UK radio pacing. "
+            "Length: 1-2 sentences, maximum 260 characters. "
+            f"Use this opening style as inspiration (do not copy verbatim): {lead_in_seed} "
+            "If you reference an album, only do so when you are confident; otherwise skip album mention. "
+            "Avoid hashtags, emojis, stage directions, and quotation marks. "
+            "Avoid repetitive stock phrases; do not default to 'we skipped ahead'. "
+            f"Playlist: {playlist_name}. "
+            f"Current song: {current['title']} by {current['artist']}. "
+            f"{prev_clause} "
+            f"{next_clause} "
+            f"{skipped_clause}"
+        )
+
+        script = ''
+        for _attempt in range(3):
+            try:
+                candidate = _chat(prompt, system="You are a professional K-pop radio DJ writing short voice links between songs.")
+            except Exception:
+                candidate = ''
+
+            candidate = re.sub(r'\s+', ' ', str(candidate or '')).strip().strip('"').strip("'")
+            sig = opener_signature(candidate)
+            if not candidate:
+                continue
+            if sig and sig in recent_opener_signatures:
+                continue
+            script = candidate
+            break
+
+        if not script:
+            fallback = lead_in_seed
+            if current.get('title') and current.get('artist'):
+                fallback = f"{lead_in_seed} Up now: {current['title']} by {current['artist']}."
+            script = re.sub(r'\s+', ' ', fallback).strip().strip('"').strip("'")
+
+        if len(script) > 260:
+            script = script[:260].rstrip()
+        if not script:
+            continue
+
+        opener_sig = opener_signature(script)
+        if opener_sig:
+            recent_opener_signatures.append(opener_sig)
+            if len(recent_opener_signatures) > 5:
+                recent_opener_signatures = recent_opener_signatures[-5:]
+
+        assignments.append({
+            'index': track_index,
+            'text': script,
+            'mentions_skipped': bool(skipped_tracks),
+        })
+        previous_selected = track_index
+
+    return JsonResponse({
+        'ok': True,
+        'assignments': assignments,
+        'generated_count': len(assignments),
+        'total_tracks': len(tracks),
+    })
 
 @csrf_exempt
 @require_POST

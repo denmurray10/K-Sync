@@ -304,7 +304,13 @@
             <h2 class="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
                 <span class="material-symbols-outlined text-sm">record_voice_over</span> Voice Weekly Scheduler
             </h2>
-            <button @click="openVoiceScheduleCreate" class="h-8 px-3 bg-primary text-black text-[10px] font-bold uppercase tracking-widest">Add Voice Slot</button>
+            <div class="flex items-center gap-2">
+                <button @click="generateAIVoiceScripts"
+                        :disabled="aiVoiceScriptsLoading || !voiceTimelineTracks.length"
+                        class="h-8 px-3 border border-secondary/60 text-secondary text-[10px] font-bold uppercase tracking-widest disabled:opacity-50"
+                        x-text="aiVoiceScriptsLoading ? 'AI Writing…' : 'AI DJ Scripts'"></button>
+                <button @click="openVoiceScheduleCreate" class="h-8 px-3 bg-primary text-black text-[10px] font-bold uppercase tracking-widest">Add Voice Slot</button>
+            </div>
         </div>
 
         <div class="p-3 border-b border-white/10 bg-black/30 grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-2">
@@ -362,6 +368,9 @@
                                 </select>
                                 <p class="text-[9px] font-mono uppercase tracking-widest text-slate-400"
                                    x-text="getEffectiveTrackVoiceLabel(track)"></p>
+                                          <p x-show="hasGeneratedVoiceAudioAfter(index)"
+                                              class="text-[9px] font-mono uppercase tracking-widest text-emerald-300"
+                                              x-text="getGeneratedVoiceAudioLabel(index)"></p>
                                 <div class="voice-lane relative h-8 border border-white/10 bg-black/50" @click="setVoiceClipPositionFromLane($event, track)">
                                     <template x-if="track.voice_over_active">
                                         <div class="group absolute top-1 bottom-1 bg-primary/70 border border-primary cursor-grab flex items-center justify-center text-[8px] font-bold uppercase tracking-widest text-black"
@@ -715,6 +724,7 @@ function playlistApp() {
         voiceTimelineLoading: false,
         voiceOverGeneratingTrackIndex: null,
         voiceOverSynthTrackIndex: null,
+        aiVoiceScriptsLoading: false,
         voiceClipDragContext: null,
         newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ', genre: 'MUSIC', voice_over: '' },
         toast: { visible: false, message: '' },
@@ -1244,6 +1254,26 @@ function playlistApp() {
                 return `DJ: ${defaultName} (Default)`;
             }
             return 'DJ: None Selected';
+        },
+
+        isGeneratedVoiceTrack(track) {
+            if (!track) return false;
+            const title = String(track.title || track.name || '').trim();
+            const url = String(track.url || '').toLowerCase();
+            if (!title.startsWith('VO:')) return false;
+            return url.includes('/media/radio/voiceovers/') || url.includes('/radio/voiceovers/');
+        },
+
+        hasGeneratedVoiceAudioAfter(index) {
+            const nextTrack = (this.voiceTimelineTracks || [])[Number(index) + 1];
+            return this.isGeneratedVoiceTrack(nextTrack);
+        },
+
+        getGeneratedVoiceAudioLabel(index) {
+            const nextTrack = (this.voiceTimelineTracks || [])[Number(index) + 1];
+            if (!this.isGeneratedVoiceTrack(nextTrack)) return '';
+            const dur = String(nextTrack.duration || '').trim();
+            return dur ? `VO Audio Ready (${dur})` : 'VO Audio Ready';
         },
 
         async fetchInworldVoices() {
@@ -2291,6 +2321,67 @@ function playlistApp() {
                 this.showToast('Voice-over generation failed');
             } finally {
                 this.voiceOverGeneratingTrackIndex = null;
+            }
+        },
+
+        async generateAIVoiceScripts() {
+            if (!this.voiceTimelineTracks.length) {
+                this.showToast('Load a playlist timeline first');
+                return;
+            }
+
+            this.aiVoiceScriptsLoading = true;
+            try {
+                const resp = await fetch('/api/voiceover/ai-scripts/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({
+                        playlist_name: this.voiceTimelinePlaylistName || 'Voice Timeline Playlist',
+                        tracks: this.voiceTimelineTracks.map((track) => ({
+                            title: track.title || track.name || '',
+                            artist: track.artist || '',
+                            duration: track.duration || '',
+                        })),
+                    })
+                });
+
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.showToast(data.error || 'AI DJ scripts failed');
+                    return;
+                }
+
+                const assignments = Array.isArray(data.assignments) ? data.assignments : [];
+                let applied = 0;
+                let skippedExisting = 0;
+
+                assignments.forEach((assignment) => {
+                    const idx = Number(assignment.index);
+                    if (!Number.isInteger(idx) || idx < 0 || idx >= this.voiceTimelineTracks.length) return;
+                    const track = this.voiceTimelineTracks[idx];
+                    if (!track || (track.voice_over_text || '').trim()) {
+                        skippedExisting += 1;
+                        return;
+                    }
+                    track.voice_over_text = String(assignment.text || '').trim();
+                    if (track.voice_over_text) {
+                        track.voice_over_active = true;
+                        this.toggleVoiceOverTrack(track);
+                        applied += 1;
+                    }
+                });
+
+                if (!applied) {
+                    this.showToast(skippedExisting ? 'AI scripts ready, but target tracks already had text' : 'No AI scripts generated');
+                    return;
+                }
+
+                const suffix = skippedExisting ? ` (${skippedExisting} kept existing)` : '';
+                this.showToast(`AI added ${applied} DJ scripts${suffix}`);
+            } catch (e) {
+                this.showToast('AI DJ scripts failed');
+            } finally {
+                this.aiVoiceScriptsLoading = false;
             }
         },
 

@@ -110,6 +110,7 @@ urlpatterns = [
     path('api/playlist/save/', views.api_playlist_save, name='api_playlist_save'),
     path('api/inworld/voices/', views.api_inworld_voices, name='api_inworld_voices'),
     path('api/voiceover/generate/', views.api_voiceover_generate, name='api_voiceover_generate'),
+    path('api/voiceover/ai-scripts/', views.api_voiceover_ai_scripts, name='api_voiceover_ai_scripts'),
     path('api/voiceover/synthesize/', views.api_voiceover_synthesize, name='api_voiceover_synthesize'),
     path('api/playlist/ai-generate/', views.api_playlist_ai_generate, name='api_playlist_ai_generate'),
     path('api/playlist/<int:playlist_id>/data/', views.api_playlist_data, name='api_playlist_data'),
