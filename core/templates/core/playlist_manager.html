@@ -349,7 +349,7 @@
                             <div class="p-2 border-b border-white/10" :class="track.voice_over_active ? 'bg-red-500/10' : 'bg-cyan-500/10'">
                                 <p class="text-[10px] font-bold uppercase truncate" x-text="track.title || track.name"></p>
                                 <p class="text-[9px] font-mono uppercase tracking-widest text-slate-400 truncate" x-text="track.artist || 'Unknown Artist'"></p>
-                                <p class="text-[9px] font-mono uppercase tracking-widest" :class="track.voice_over_active ? 'text-red-300' : 'text-emerald-300'" x-text="`Volume: ${track.voice_over_active ? 20 : 100}%`"></p>
+                                <p class="text-[9px] font-mono uppercase tracking-widest" :class="track.voice_over_active ? 'text-red-300' : 'text-emerald-300'" x-text="`Volume: ${track.voice_over_active ? (Number(track.duck_volume_percent || 10)) : 100}%`"></p>
                             </div>
 
                             <div class="px-2 py-1 border-b border-white/10 text-[9px] font-mono uppercase tracking-widest text-slate-400">A2 Voice-Over</div>
@@ -1364,7 +1364,7 @@ function playlistApp() {
                 const songSeconds = Math.max(1, Number(songTrack.duration_seconds || 0));
                 const startDelayMs = Math.max(0, Math.round((songSeconds * (startPercent / 100)) * 1000));
                 const duckVolume = songTrack.voice_over_active
-                    ? Math.max(0, Math.min(1, Number(songTrack.duck_volume_percent || 20) / 100))
+                    ? Math.max(0, Math.min(1, Number(songTrack.duck_volume_percent || 10) / 100))
                     : 1;
 
                 this.voicePreviewSongAudio = songAudio;
@@ -2219,14 +2219,14 @@ function playlistApp() {
                 voice_over_voice_name: (track.voice_over_voice_name || '').trim(),
                 voice_over_active: !!track.voice_over_active,
                 voice_over_text: track.voice_over_text || '',
-                duck_volume_percent: track.voice_over_active ? 20 : 100,
+                duck_volume_percent: track.voice_over_active ? 10 : 100,
                 voice_over_start_percent: Number.isFinite(Number(track.voice_over_start_percent)) ? Number(track.voice_over_start_percent) : 0,
                 voice_over_length_percent: Number.isFinite(clipLength) ? Math.max(1, Math.min(100, Math.round(clipLength))) : 22,
             };
         },
 
         toggleVoiceOverTrack(track) {
-            track.duck_volume_percent = track.voice_over_active ? 20 : 100;
+            track.duck_volume_percent = track.voice_over_active ? 10 : 100;
             if (!track.voice_over_active) track.voice_over_start_percent = 0;
         },
 
@@ -2379,7 +2379,7 @@ function playlistApp() {
                     voice_over_voice_name: (track.voice_over_voice_name || '').trim() || this.getVoiceDisplayName(track.voice_over_voice_id),
                     voice_over_text: track.voice_over_text || '',
                     voice_over_active: !!track.voice_over_active,
-                    duck_volume_percent: track.voice_over_active ? 20 : 100,
+                    duck_volume_percent: track.voice_over_active ? 10 : 100,
                     voice_over_start_percent: track.voice_over_active ? this.clampVoiceClipStart(track, track.voice_over_start_percent) : 0,
                     voice_over_length_percent: track.voice_over_active ? this.getVoiceClipLength(track) : this.getVoiceClipLength(track),
                 }));

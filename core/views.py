@@ -315,13 +315,13 @@ def api_playlist_save(request):
             voice_over_voice_id = (t.get('voice_over_voice_id') or '').strip()
             voice_over_voice_name = (t.get('voice_over_voice_name') or '').strip()
             voice_over_active = bool(t.get('voice_over_active'))
-            duck_volume_percent = t.get('duck_volume_percent', 20)
+            duck_volume_percent = t.get('duck_volume_percent', 10)
             voice_over_start_percent = t.get('voice_over_start_percent', 0)
             voice_over_length_percent = t.get('voice_over_length_percent', 22)
             try:
                 duck_volume_percent = int(duck_volume_percent)
             except Exception:
-                duck_volume_percent = 20
+                duck_volume_percent = 10
             duck_volume_percent = max(0, min(100, duck_volume_percent))
             try:
                 voice_over_start_percent = int(voice_over_start_percent)

@@ -442,7 +442,7 @@ class RadioPlaylistTrack(models.Model):
     voice_over_voice_name = models.CharField(max_length=255, blank=True, default='')
     voice_over_text = models.TextField(blank=True)
     voice_over_active = models.BooleanField(default=False)
-    duck_volume_percent = models.PositiveSmallIntegerField(default=20)
+    duck_volume_percent = models.PositiveSmallIntegerField(default=10)
     voice_over_start_percent = models.PositiveSmallIntegerField(default=0)
     voice_over_length_percent = models.PositiveSmallIntegerField(default=22)
 
