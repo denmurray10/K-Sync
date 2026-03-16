@@ -399,6 +399,9 @@ Cast your vote now.
 <div class="reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">TRENDING <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">NOW</span></h2>
 <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">The hottest tracks lighting up the charts right now.</p>
+{% if trending_last_updated %}
+<p class="text-slate-500 mt-2 font-mono text-[10px] tracking-widest uppercase">Last updated: {{ trending_last_updated|date:"d M Y · H:i" }} UTC</p>
+{% endif %}
 </div>
 <a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase reveal-left" style="transition-delay: 200ms;" href="{% url 'charts' %}">
                     View Full Chart <span class="material-symbols-outlined text-sm">arrow_forward</span>

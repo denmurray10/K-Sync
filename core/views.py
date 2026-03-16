@@ -1688,6 +1688,7 @@ def home(request):
 
     # Trending Sidebar: Use daily ranking data (now synced from iChart)
     daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    trending_last_updated = daily_rank.created_at if daily_rank else None
     trending_all = []
     if daily_rank and daily_rank.ranking_data:
         raw_trending = daily_rank.ranking_data[:20]
@@ -1794,6 +1795,7 @@ def home(request):
         'upcoming_ticker': upcoming_ticker,
         'trending_tracks': trending,
         'trending_ticker_tracks': trending_ticker,
+        'trending_last_updated': trending_last_updated,
         'news_articles': news_articles,
         'featured_article': featured_article,
         'current_month': now.strftime('%B %Y'),
