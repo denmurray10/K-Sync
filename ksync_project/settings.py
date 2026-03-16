@@ -143,6 +143,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ── AI API Keys ──────────────────────────────────────────────────────────────
 # In Heroku, add these via: heroku config:set DEEPSEEK_API_KEY=...
 DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', 'sk-16a74707578d4d589f9fb72db4954176')
+INWORLD_API_KEY = os.environ.get('INWORLD_API_KEY', '')
+INWORLD_BASE_URL = os.environ.get('INWORLD_BASE_URL', 'https://api.inworld.ai/v1')
+INWORLD_CHAT_MODEL = os.environ.get('INWORLD_CHAT_MODEL', 'auto')
 GETIMG_API_KEY = os.environ.get('GETIMG_API_KEY', 'key-3t583MrYM5GrTQMJuymWSCOlQkylmA90xhvX7KB7eVRXgq24GwLXDHSYCVMqCDEBrTdYQn5n5MTVguY9tsFI8ZbQM4T4dbQ2')
 # Free stock photos for blog articles — get a free key at pexels.com/api
 PEXELS_API_KEY = os.environ.get('PEXELS_API_KEY', 'GPlKuBUuXNxu06VvSJIM4pCSUGtHBwp3NwT7Q0XfFWgL2dwGB7yMTRqP')

@@ -108,6 +108,7 @@ urlpatterns = [
     path('playlist-manager/', views.playlist_manager, name='playlist_manager'),
     path('api/b2-tracks/', views.api_b2_tracks, name='api_b2_tracks'),
     path('api/playlist/save/', views.api_playlist_save, name='api_playlist_save'),
+    path('api/voiceover/generate/', views.api_voiceover_generate, name='api_voiceover_generate'),
     path('api/playlist/ai-generate/', views.api_playlist_ai_generate, name='api_playlist_ai_generate'),
     path('api/playlist/<int:playlist_id>/data/', views.api_playlist_data, name='api_playlist_data'),
     path('api/schedule/save/', views.api_schedule_save, name='api_schedule_save'),

@@ -350,6 +350,12 @@
                                     </template>
                                 </div>
                                 <textarea x-model="track.voice_over_text" rows="3" class="w-full bg-black border border-white/10 p-2 text-[10px] text-white" placeholder="Voice-over line/script..."></textarea>
+                                <div class="flex justify-end">
+                                    <button @click="generateTrackVoiceOver(track, index)"
+                                            :disabled="voiceTimelineLoading || voiceOverGeneratingTrackIndex === index"
+                                            class="h-7 px-2 border border-secondary/60 text-secondary text-[9px] font-bold uppercase tracking-widest disabled:opacity-50"
+                                            x-text="voiceOverGeneratingTrackIndex === index ? 'Generating…' : 'Generate VO'"></button>
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -672,6 +678,7 @@ function playlistApp() {
         voiceTimelinePlaylistName: '',
         voiceTimelineTracks: [],
         voiceTimelineLoading: false,
+        voiceOverGeneratingTrackIndex: null,
         voiceClipDragContext: null,
         newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ', genre: 'MUSIC', voice_over: '' },
         toast: { visible: false, message: '' },
@@ -2117,6 +2124,40 @@ function playlistApp() {
                 this.showToast('Voice-over save failed');
             } finally {
                 this.voiceTimelineLoading = false;
+            }
+        },
+
+        async generateTrackVoiceOver(track, index) {
+            if (!track) return;
+            this.voiceOverGeneratingTrackIndex = index;
+            try {
+                const resp = await fetch('/api/voiceover/generate/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({
+                        title: track.title || track.name || '',
+                        artist: track.artist || '',
+                        duration: track.duration || '',
+                        playlist_name: this.voiceTimelinePlaylistName || '',
+                        style: 'hype',
+                    })
+                });
+                const data = await resp.json();
+                if (!data.ok) {
+                    this.showToast(data.error || 'Voice-over generation failed');
+                    return;
+                }
+
+                track.voice_over_text = data.voice_over_text || '';
+                if (track.voice_over_text && !track.voice_over_active) {
+                    track.voice_over_active = true;
+                    this.toggleVoiceOverTrack(track);
+                }
+                this.showToast('Voice-over generated');
+            } catch (e) {
+                this.showToast('Voice-over generation failed');
+            } finally {
+                this.voiceOverGeneratingTrackIndex = null;
             }
         },
 

@@ -483,6 +483,68 @@ def api_playlist_data(request, playlist_id):
     except Exception as e:
         return JsonResponse({'ok': False, 'error': str(e)}, status=500)
 
+
+@csrf_exempt
+@require_POST
+def api_voiceover_generate(request):
+    """Generates a short DJ voice-over script for a track using Inworld Router."""
+    staff_check = _staff_only_json(request)
+    if staff_check:
+        return staff_check
+
+    if not settings.INWORLD_API_KEY:
+        return JsonResponse({'ok': False, 'error': 'Inworld API key is not configured on the server.'}, status=500)
+
+    try:
+        payload = json.loads(request.body or '{}')
+    except Exception:
+        payload = {}
+
+    title = (payload.get('title') or '').strip()
+    artist = (payload.get('artist') or '').strip()
+    duration = (payload.get('duration') or '').strip()
+    playlist_name = (payload.get('playlist_name') or '').strip()
+    style = (payload.get('style') or 'hype').strip().lower()
+
+    if not title:
+        return JsonResponse({'ok': False, 'error': 'Track title is required'}, status=400)
+
+    style_hint = {
+        'hype': 'high-energy and punchy',
+        'smooth': 'smooth and warm',
+        'neutral': 'clean and informative',
+    }.get(style, 'high-energy and punchy')
+
+    prompt = (
+        "Write ONE short radio DJ voice-over line for this song. "
+        "Requirements: 1-2 sentences, max 240 characters, no hashtags, no emojis, no quotes. "
+        f"Tone: {style_hint}. "
+        f"Track: {title}. "
+        f"Artist: {artist or 'Unknown Artist'}. "
+        f"Duration: {duration or 'unknown'}. "
+        f"Playlist context: {playlist_name or 'General K-pop rotation'}."
+    )
+
+    try:
+        text = _inworld_chat(prompt, system="You are a concise K-pop radio host scriptwriter.")
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': f'Inworld request failed: {str(e)}'}, status=502)
+
+    if not text:
+        return JsonResponse({'ok': False, 'error': 'Inworld returned an empty response.'}, status=502)
+
+    line = re.sub(r'\s+', ' ', str(text)).strip()
+    line = line.strip('"').strip("'")
+    if len(line) > 240:
+        line = line[:240].rstrip()
+
+    return JsonResponse({
+        'ok': True,
+        'voice_over_text': line,
+        'provider': 'inworld',
+        'model': settings.INWORLD_CHAT_MODEL,
+    })
+
 @csrf_exempt
 @require_POST
 def api_playlist_ai_generate(request):
@@ -1034,6 +1096,39 @@ def _chat_reasoner(prompt, system="You are an expert K-Pop journalist."):
         max_tokens=8000,
     )
     return resp.choices[0].message.content.strip()
+
+
+def _inworld_chat(prompt, system="You are an expert K-Pop radio assistant."):
+    """Calls Inworld Router chat completions endpoint."""
+    body = {
+        'model': settings.INWORLD_CHAT_MODEL,
+        'messages': [
+            {'role': 'system', 'content': system},
+            {'role': 'user', 'content': prompt},
+        ],
+        'temperature': 0.8,
+        'max_tokens': 220,
+    }
+
+    response = requests.post(
+        f"{settings.INWORLD_BASE_URL.rstrip('/')}/chat/completions",
+        headers={
+            'Authorization': f"Basic {settings.INWORLD_API_KEY}",
+            'Content-Type': 'application/json',
+        },
+        json=body,
+        timeout=30,
+    )
+
+    if response.status_code != 200:
+        raise RuntimeError(f"HTTP {response.status_code}: {response.text[:500]}")
+
+    payload = response.json()
+    choices = payload.get('choices') or []
+    if not choices:
+        return ''
+    message = choices[0].get('message') or {}
+    return (message.get('content') or '').strip()
 
 # ── Page views ───────────────────────────────────────────────────────────────
 
