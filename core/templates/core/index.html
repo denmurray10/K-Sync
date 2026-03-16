@@ -140,12 +140,12 @@
                         Experience the electrifying beat of K-Pop. 24/7 non-stop hits, exclusive interviews, and live performances direct from Korea.
                     </p>
 <div class="mt-8 flex items-center pointer-events-auto max-w-full">
-<a href="{% url 'news' %}" class="group flex items-center border border-white/20 hover:border-primary bg-black/50 backdrop-blur-sm transition-colors duration-300 w-full sm:w-max overflow-hidden">
+<a href="{% if featured_article %}{% url 'blog_article_read' featured_article.slug %}{% else %}{% url 'news' %}{% endif %}" class="group flex items-center border border-white/20 hover:border-primary bg-black/50 backdrop-blur-sm transition-colors duration-300 w-full sm:w-max overflow-hidden">
 <div class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] py-4 px-4 h-full flex items-center border-r border-white/20">
                             Featured
                         </div>
 <div class="px-6 py-3 flex flex-col">
-<span class="text-white font-bold text-sm tracking-tight group-hover:text-primary transition-colors">The Rise of Global Girl Groups</span>
+<span class="text-white font-bold text-sm tracking-tight group-hover:text-primary transition-colors">{% if featured_article %}{{ featured_article.title }}{% else %}Latest K-Beat Editorial{% endif %}</span>
 <span class="text-slate-400 font-mono text-[10px] uppercase tracking-widest mt-1">Read Editorial <span class="material-symbols-outlined text-[10px] ml-1">arrow_forward</span></span>
 </div>
 </a>

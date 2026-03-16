@@ -1762,8 +1762,9 @@ def home(request):
                 'trend_value': '',
             })
 
-    # Mock News Articles for Brutalist Section
-    news_articles = BlogArticle.objects.order_by('-created_at')[:3]
+    # Latest news/blog articles
+    news_articles = list(BlogArticle.objects.order_by('-created_at')[:3])
+    featured_article = news_articles[0] if news_articles else None
 
     # Get the active LivePoll
     active_poll = LivePoll.objects.filter(is_active=True).first()
@@ -1794,6 +1795,7 @@ def home(request):
         'trending_tracks': trending,
         'trending_ticker_tracks': trending_ticker,
         'news_articles': news_articles,
+        'featured_article': featured_article,
         'current_month': now.strftime('%B %Y'),
         'active_poll': active_poll,
         'home_live_track': home_live_track,
