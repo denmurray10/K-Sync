@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>K-Beats Test Landing — Wow Hero</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#f425c0',
+                        secondary: '#00f0ff',
+                        'background-dark': '#000000'
+                    },
+                    fontFamily: {
+                        display: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-glow {
+            text-shadow: 0 0 24px rgba(244, 37, 192, 0.6), 0 0 40px rgba(0, 240, 255, 0.25);
+        }
+        .hero-outline {
+            -webkit-text-stroke: 2px rgba(255, 255, 255, 0.85);
+            color: transparent;
+        }
+        .scanline {
+            background-image: repeating-linear-gradient(
+                to bottom,
+                rgba(255,255,255,0.03) 0,
+                rgba(255,255,255,0.03) 1px,
+                transparent 1px,
+                transparent 4px
+            );
+        }
+        .radial-bloom {
+            background: radial-gradient(circle at 20% 35%, rgba(244, 37, 192, 0.45), transparent 45%),
+                        radial-gradient(circle at 82% 70%, rgba(0, 240, 255, 0.25), transparent 40%);
+        }
+        @keyframes heroFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .hero-float {
+            animation: heroFloat 5s ease-in-out infinite;
+        }
+        @keyframes driftGlow {
+            0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: 0.55; }
+            50% { transform: translate3d(20px,-18px,0) scale(1.08); opacity: 0.85; }
+        }
+        .drift-glow {
+            animation: driftGlow 9s ease-in-out infinite;
+        }
+        @keyframes pulseBorder {
+            0%, 100% { box-shadow: 0 0 0 rgba(244, 37, 192, 0); }
+            50% { box-shadow: 0 0 32px rgba(244, 37, 192, 0.5); }
+        }
+        .pulse-border {
+            animation: pulseBorder 2.6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-white font-display min-h-screen overflow-x-hidden">
+    {% include 'core/header.html' %}
+
+    <main>
+        <section class="relative min-h-[100svh] border-b border-white/15 overflow-hidden">
+            <video id="wow-hero-video" class="absolute inset-0 h-full w-full object-cover" autoplay muted loop playsinline preload="auto" webkit-playsinline>
+                <source src="https://f003.backblazeb2.com/file/StrayKids/hero/Hero_video.mp4" type="video/mp4">
+            </video>
+
+            <div class="absolute inset-0 bg-black/45"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/35 via-black/50 to-secondary/20"></div>
+            <div class="absolute inset-0 radial-bloom"></div>
+            <div class="absolute inset-0 scanline mix-blend-soft-light"></div>
+            <div class="absolute -top-24 -left-16 w-72 h-72 md:w-[28rem] md:h-[28rem] rounded-full bg-primary/25 blur-3xl drift-glow"></div>
+            <div class="absolute -bottom-24 -right-16 w-72 h-72 md:w-[24rem] md:h-[24rem] rounded-full bg-secondary/20 blur-3xl drift-glow" style="animation-delay: 1.8s;"></div>
+
+            <div class="relative z-10 container mx-auto max-w-[1400px] px-6 pt-28 pb-14 min-h-[100svh] flex flex-col justify-between">
+                <div class="grid lg:grid-cols-2 gap-10 items-center mt-8">
+                    <div>
+                        <p class="text-[10px] md:text-xs tracking-[0.35em] uppercase font-bold text-primary">Test Landing Variation</p>
+                        <h1 class="mt-4 text-6xl md:text-8xl lg:text-9xl font-black uppercase leading-[0.82] tracking-tight hero-glow">
+                            K-BEATS<br/>
+                            <span class="hero-outline">AFTERGLOW</span>
+                        </h1>
+                        <p class="mt-7 max-w-xl text-sm md:text-lg text-white/85 leading-relaxed">
+                            A cinematic wow concept built for impact: full-viewport motion, oversized editorial typography, and a premium feature spotlight.
+                        </p>
+
+                        <div class="mt-10 flex items-center max-w-full">
+                            <a href="{% if featured_article %}{% url 'blog_article_read' featured_article.slug %}{% else %}{% url 'news' %}{% endif %}" class="group flex items-center border border-white/20 hover:border-primary/90 bg-white/5 backdrop-blur-xl transition-colors duration-300 w-full sm:w-max overflow-hidden">
+                                <div class="text-primary font-black uppercase tracking-[0.2em] text-[10px] py-4 px-4 h-full flex items-center border-r border-white/20 bg-transparent">
+                                    Featured
+                                </div>
+                                <div class="px-6 py-3 flex flex-col">
+                                    <span class="text-white font-bold text-sm tracking-tight group-hover:text-primary transition-colors">{% if featured_article %}{{ featured_article.title }}{% else %}Latest K-Beat Editorial{% endif %}</span>
+                                    <span class="text-white/60 font-mono text-[10px] uppercase tracking-widest mt-1">Read Editorial <span class="material-symbols-outlined text-[10px] ml-1">arrow_forward</span></span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="justify-self-end w-full max-w-md border border-white/20 bg-black/50 backdrop-blur-md hero-float">
+                        <div class="px-6 py-5 border-b border-white/15 flex items-center justify-between">
+                            <span class="text-[10px] tracking-[0.2em] uppercase font-bold text-primary">Spotlight</span>
+                            <span class="material-symbols-outlined text-secondary">auto_awesome</span>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-white/60">This Hero Variation</p>
+                            <h3 class="mt-2 text-3xl font-black uppercase leading-none">Neon Cinematic</h3>
+                            <p class="mt-2 text-xs tracking-[0.15em] uppercase text-white/70">No player UI • Feature-led design</p>
+                            <div class="mt-6 h-40 border border-white/15 bg-gradient-to-br from-primary/30 via-black/30 to-secondary/30 flex items-end p-4">
+                                <p class="text-white/90 text-sm uppercase tracking-[0.15em] font-bold">Built for “wow” first impression</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-8">
+                    <p class="text-[10px] md:text-xs uppercase tracking-[0.35em] text-white/60">UK'S FIRST DEDICATED K-POP RADIO EXPERIENCE</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'core/footer.html' %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('wow-hero-video');
+            if (!video) return;
+            video.muted = true;
+            video.defaultMuted = true;
+            const playAttempt = video.play();
+            if (playAttempt && typeof playAttempt.catch === 'function') {
+                playAttempt.catch(() => {});
+            }
+        });
+    </script>
+</body>
+</html>

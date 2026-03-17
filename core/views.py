@@ -3990,6 +3990,124 @@ def _sync_state_with_schedule_context(state, context):
     state.save()
     return state
 
+
+def _default_live_ai_payload(track):
+    title = (track.title if track else 'Current Track')
+    artist = (track.artist if track else 'K-Beats')
+    return {
+        'version': 2,
+        'about_label': f'About "{title}"',
+        'commentary': (
+            f'Now spinning {title} by {artist} on K-Beats Live. This record stands out for its performance-ready structure, '
+            'strong melodic identity, and polished production choices that translate extremely well in a live radio mix. '
+            'Its pacing and sonic layering keep momentum high from intro to chorus, making it a dependable anchor track in rotation.\n\n'
+            f'From an audience perspective, {title} works because it balances immediate hooks with replay value. '
+            'The vocal delivery and arrangement details create emotional lift while still leaving room for personality, '
+            'which is exactly what keeps listeners engaged across repeat spins and cross-show transitions.'
+        ),
+        'cards': [
+            {
+                'label': 'Track Focus',
+                'value': 'Now Live',
+                'subtext': f'{artist}',
+            },
+            {
+                'label': 'Energy Profile',
+                'value': 'High',
+                'subtext': 'K-Beats AI Estimate',
+            },
+            {
+                'label': 'On-Air Context',
+                'value': 'Featured',
+                'subtext': 'Current Rotation',
+            },
+        ],
+    }
+
+
+def _normalize_live_ai_payload(payload, track):
+    fallback = _default_live_ai_payload(track)
+    if not isinstance(payload, dict):
+        return fallback
+
+    commentary = str(payload.get('commentary') or '').strip() or fallback['commentary']
+    about_label = str(payload.get('about_label') or '').strip() or fallback['about_label']
+    raw_cards = payload.get('cards') if isinstance(payload.get('cards'), list) else []
+
+    cards = []
+    for idx, card in enumerate(raw_cards[:3]):
+        if not isinstance(card, dict):
+            continue
+        fallback_card = fallback['cards'][idx]
+        cards.append({
+            'label': str(card.get('label') or '').strip() or fallback_card['label'],
+            'value': str(card.get('value') or '').strip() or fallback_card['value'],
+            'subtext': str(card.get('subtext') or '').strip() or fallback_card['subtext'],
+        })
+
+    while len(cards) < 3:
+        cards.append(fallback['cards'][len(cards)])
+
+    return {
+        'version': int(payload.get('version') or 1),
+        'about_label': about_label,
+        'commentary': commentary,
+        'helpful_count': max(0, int(payload.get('helpful_count') or 0)),
+        'cards': cards,
+    }
+
+
+def _generate_live_ai_payload(track):
+    fallback = _default_live_ai_payload(track)
+    if not track:
+        return fallback
+
+    prompt = (
+        f"You are a K-Pop music analyst for a live radio station. "
+        f"For the song '{track.title}' by {track.artist}, generate concise on-air metadata. "
+        f"Return ONLY valid JSON in this exact shape: "
+        '{"version":2,"about_label":"About \\\"<song>\\\"","commentary":"minimum 2 paragraphs; each paragraph 2-4 sentences",'
+        '"cards":[{"label":"...","value":"...","subtext":"..."},'
+        '{"label":"...","value":"...","subtext":"..."},'
+        '{"label":"...","value":"...","subtext":"..."}]}'
+    )
+
+    try:
+        raw = _chat(prompt, system='You are an expert K-Pop radio metadata writer.')
+        start = raw.find('{')
+        end = raw.rfind('}') + 1
+        if start == -1 or end <= start:
+            return fallback
+        parsed = json.loads(raw[start:end])
+        return _normalize_live_ai_payload(parsed, track)
+    except Exception:
+        return fallback
+
+
+def _get_or_generate_live_ai_payload(track):
+    if not track:
+        return _default_live_ai_payload(None)
+
+    normalized_existing = _normalize_live_ai_payload(track.live_ai_payload or {}, track)
+    existing_commentary = str((track.live_ai_payload or {}).get('commentary') or '').strip()
+    existing_paragraphs = [p for p in re.split(r'\n\s*\n', existing_commentary) if p.strip()]
+    has_existing = bool(existing_commentary)
+    is_fresh_format = (
+        int((track.live_ai_payload or {}).get('version') or 1) >= 2
+        and len(existing_paragraphs) >= 2
+    )
+    if has_existing and is_fresh_format:
+        return normalized_existing
+
+    generated = _generate_live_ai_payload(track)
+    try:
+        track.live_ai_payload = generated
+        track.live_ai_generated_at = timezone.now()
+        track.save(update_fields=['live_ai_payload', 'live_ai_generated_at'])
+    except Exception:
+        pass
+    return generated
+
 def live(request):
     from datetime import timedelta
     cutoff = timezone.now() - timedelta(hours=24)
@@ -4040,6 +4158,8 @@ def live(request):
         recently_played_tracks = [track for track in recently_played_tracks if not _is_generated_voice_track(track)]
         recently_played_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
 
+    live_ai_payload = _get_or_generate_live_ai_payload(current_track)
+
     # Calculate offset for synchronization
     current_offset = 0
     if schedule_context:
@@ -4052,11 +4172,14 @@ def live(request):
         'requested_titles': requested_titles,
         'state': state,
         'current_track': current_track,
+        'current_track_id': (current_track.id if current_track else None),
         'current_track_duration_seconds': (current_track.duration_seconds if current_track else 0),
         'current_voice_overlay_json': json.dumps(current_voice_overlay),
         'up_next_tracks': up_next_tracks,
         'recently_played_tracks': recently_played_tracks,
         'current_offset': current_offset,
+        'live_ai_payload': live_ai_payload,
+        'live_ai_payload_json': json.dumps(live_ai_payload),
     })
 
 def api_live_rotate_track(request):
@@ -4078,6 +4201,7 @@ def api_live_rotate_track(request):
     if schedule_context:
         _sync_state_with_schedule_context(state, schedule_context)
         current = schedule_context['current_track']
+        live_ai_payload = _get_or_generate_live_ai_payload(current)
         up_next_list = schedule_context['up_next_tracks'][:6]
         recently_played_list = schedule_context['recently_played_tracks'][:6]
 
@@ -4086,6 +4210,7 @@ def api_live_rotate_track(request):
             'current_offset': schedule_context['current_offset'],
             'voice_overlay': schedule_context.get('current_voice_overlay'),
             'current_track': {
+                'id': current.id,
                 'title': current.title,
                 'artist': current.artist,
                 'album_art': current.album_art,
@@ -4093,6 +4218,7 @@ def api_live_rotate_track(request):
                 'duration': current.duration,
                 'duration_seconds': current.duration_seconds,
             },
+            'live_ai_payload': live_ai_payload,
             'up_next': [
                 {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
                 for t in up_next_list
@@ -4145,6 +4271,7 @@ def api_live_rotate_track(request):
 
     # Prepare response data
     current = state.current_track
+    live_ai_payload = _get_or_generate_live_ai_payload(current)
     up_next_ids = state.up_next
     up_next_tracks = RadioTrack.objects.filter(id__in=up_next_ids)
     up_next_list = sorted(list(up_next_tracks), key=lambda t: up_next_ids.index(t.id))
@@ -4160,6 +4287,7 @@ def api_live_rotate_track(request):
         'current_offset': 0,
         'voice_overlay': None,
         'current_track': {
+            'id': current.id,
             'title': current.title,
             'artist': current.artist,
             'album_art': current.album_art,
@@ -4167,6 +4295,7 @@ def api_live_rotate_track(request):
             'duration': current.duration,
             'duration_seconds': current.duration_seconds,
         },
+        'live_ai_payload': live_ai_payload,
         'up_next': [
             {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
             for t in up_next_list[:6]
@@ -4175,6 +4304,43 @@ def api_live_rotate_track(request):
             {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
             for t in recently_played_list[:6]
         ]
+    })
+
+
+@csrf_exempt
+@require_POST
+def api_live_ai_helpful(request):
+    try:
+        payload = json.loads(request.body or '{}')
+    except Exception:
+        payload = {}
+
+    track_id = payload.get('track_id')
+    if not track_id:
+        state, _ = RadioStationState.objects.get_or_create(id=1)
+        track_id = state.current_track_id
+
+    if not track_id:
+        return JsonResponse({'ok': False, 'error': 'No active track found'}, status=400)
+
+    track = RadioTrack.objects.filter(id=track_id).first()
+    if not track:
+        return JsonResponse({'ok': False, 'error': 'Track not found'}, status=404)
+
+    normalized = _normalize_live_ai_payload(track.live_ai_payload or {}, track)
+    current_count = max(0, int(normalized.get('helpful_count') or 0))
+    normalized['helpful_count'] = current_count + 1
+    if int(normalized.get('version') or 1) < 2:
+        normalized['version'] = 2
+
+    track.live_ai_payload = normalized
+    track.live_ai_generated_at = timezone.now()
+    track.save(update_fields=['live_ai_payload', 'live_ai_generated_at'])
+
+    return JsonResponse({
+        'ok': True,
+        'track_id': track.id,
+        'helpful_count': normalized['helpful_count'],
     })
 
 def top_cheerleader_badges(request):
@@ -4191,6 +4357,12 @@ def neon_home_variant_1(request):
 
 def neon_home_variant_2(request):
     return render(request, 'core/neon_home_variant_2.html')
+
+def test_landing_wow_hero(request):
+    featured_article = BlogArticle.objects.order_by('-created_at').first()
+    return render(request, 'core/test_landing_wow_hero.html', {
+        'featured_article': featured_article,
+    })
 
 def celebration_toggle(request):
     return render(request, 'core/celebration_toggle.html')

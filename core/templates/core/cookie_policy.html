@@ -77,6 +77,21 @@
             box-shadow: 3px 3px 0 rgba(255,255,255,1);
         }
         .back:hover { background: #fff; color: #000; border-color: #fff; }
+        .open-cookie-settings {
+            display: inline-block;
+            margin-top: 14px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            font-size: .7rem;
+            border: 1px solid #f425c0;
+            background: transparent;
+            padding: 12px 14px;
+            cursor: pointer;
+        }
+        .open-cookie-settings:hover { background: #f425c0; color: #000; }
     </style>
 </head>
 <body>
@@ -105,12 +120,26 @@
         <p>By default, analytics and advertising storage are denied until consent is granted. Consent signals are sent to Google tags through Consent Mode.</p>
 
         <h2>Managing Cookies</h2>
-        <p>You can reopen preferences using the Cookie settings button. You can also adjust browser settings to block or delete cookies, though some features may be affected.</p>
+        <p>You can reopen preferences from this page whenever needed. You can also adjust browser settings to block or delete cookies, though some features may be affected.</p>
+        <button id="open-cookie-settings" class="open-cookie-settings" type="button">Open Cookie Preferences</button>
 
         <h2>More Information</h2>
         <p>For broader data handling details, see our <a href="{% url 'privacy_policy' %}">Privacy Policy</a>.</p>
 
         <a class="back" href="{% url 'home' %}">← Back to Home</a>
     </main>
+    <script>
+        (function () {
+            const trigger = document.getElementById('open-cookie-settings');
+            if (!trigger) return;
+            trigger.addEventListener('click', function () {
+                if (typeof window.ksyncOpenConsentSettings === 'function') {
+                    window.ksyncOpenConsentSettings();
+                    return;
+                }
+                window.dispatchEvent(new CustomEvent('ksync:open-consent-settings'));
+            });
+        })();
+    </script>
 </body>
 </html>

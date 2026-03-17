@@ -451,10 +451,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="container mx-auto px-6 max-w-[1400px]">
         <div class="flex items-end justify-between mb-12">
             <div>
-                <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-2">Powered by AI</p>
-                <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter leading-none">AI DJ</h2>
+                <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-2">Powered by K-beats</p>
+                <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter leading-none">DJ Insights</h2>
             </div>
-            <span class="material-symbols-outlined text-secondary text-3xl neon-text-cyan">smart_toy</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-up">
@@ -466,21 +465,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                     <div>
                         <p class="text-sm font-bold text-white uppercase tracking-tight">Track Commentary</p>
-                        <p class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">About "SEVEN"</p>
+                        <p id="live-ai-about-label" class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">{{ live_ai_payload.about_label }}</p>
                     </div>
                 </div>
-                <p class="text-slate-300 text-sm leading-relaxed font-light">
-                    "SEVEN" by Jung Kook featuring Latto is a summer anthem that dominated global charts upon release.
-                    The track blends infectious pop hooks with hip-hop verses, showcasing Jung Kook's versatility as a solo artist.
-                    It spent multiple weeks at #1 on the Billboard Hot 100, making it one of the most successful K-Pop solo singles in history.
-                    The song's minimalist production and catchy chorus exemplify the evolving sound of fourth-generation K-Pop.
-                </p>
+                <p id="live-ai-commentary" class="text-slate-300 text-sm leading-relaxed font-light">{{ live_ai_payload.commentary }}</p>
                 <div class="flex items-center gap-4 mt-6">
-                    <button class="flex items-center gap-2 text-secondary text-xs font-bold uppercase tracking-[0.2em] hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-base">thumb_up</span> Helpful
-                    </button>
-                    <button class="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-[0.2em] hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-base">refresh</span> New Insight
+                    <button id="live-ai-helpful-btn" class="flex items-center gap-2 text-secondary text-xs font-bold uppercase tracking-[0.2em] hover:text-white transition-colors">
+                        <span id="live-ai-helpful-icon" class="material-symbols-outlined text-base">thumb_up</span> Helpful
                     </button>
                 </div>
             </div>
@@ -488,19 +479,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <!-- Quick Stats -->
             <div class="flex flex-col gap-6">
                 <div class="p-6 border border-white/10 bg-white/[0.03]">
-                    <p class="text-[10px] font-mono text-primary uppercase tracking-[0.3em] mb-2">Peak Chart Position</p>
-                    <p class="text-4xl font-black text-white">#1</p>
-                    <p class="text-xs text-slate-500 font-mono uppercase tracking-widest mt-1">Billboard Hot 100</p>
+                    <p id="live-ai-card-1-label" class="text-[10px] font-mono text-primary uppercase tracking-[0.3em] mb-2">{{ live_ai_payload.cards.0.label }}</p>
+                    <p id="live-ai-card-1-value" class="text-4xl font-black text-white">{{ live_ai_payload.cards.0.value }}</p>
+                    <p id="live-ai-card-1-subtext" class="text-xs text-slate-500 font-mono uppercase tracking-widest mt-1">{{ live_ai_payload.cards.0.subtext }}</p>
                 </div>
                 <div class="p-6 border border-white/10 bg-white/[0.03]">
-                    <p class="text-[10px] font-mono text-secondary uppercase tracking-[0.3em] mb-2">Total Streams</p>
-                    <p class="text-4xl font-black text-white">1.8B</p>
-                    <p class="text-xs text-slate-500 font-mono uppercase tracking-widest mt-1">Spotify Worldwide</p>
+                    <p id="live-ai-card-2-label" class="text-[10px] font-mono text-secondary uppercase tracking-[0.3em] mb-2">{{ live_ai_payload.cards.1.label }}</p>
+                    <p id="live-ai-card-2-value" class="text-4xl font-black text-white">{{ live_ai_payload.cards.1.value }}</p>
+                    <p id="live-ai-card-2-subtext" class="text-xs text-slate-500 font-mono uppercase tracking-widest mt-1">{{ live_ai_payload.cards.1.subtext }}</p>
                 </div>
                 <div class="p-6 border border-white/10 bg-white/[0.03]">
-                    <p class="text-[10px] font-mono text-primary uppercase tracking-[0.3em] mb-2">Release Date</p>
-                    <p class="text-4xl font-black text-white">JUL</p>
-                    <p class="text-xs text-slate-500 font-mono uppercase tracking-widest mt-1">14, 2023</p>
+                    <p id="live-ai-card-3-label" class="text-[10px] font-mono text-primary uppercase tracking-[0.3em] mb-2">{{ live_ai_payload.cards.2.label }}</p>
+                    <p id="live-ai-card-3-value" class="text-4xl font-black text-white">{{ live_ai_payload.cards.2.value }}</p>
+                    <p id="live-ai-card-3-subtext" class="text-xs text-slate-500 font-mono uppercase tracking-widest mt-1">{{ live_ai_payload.cards.2.subtext }}</p>
                 </div>
             </div>
         </div>
@@ -533,6 +524,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const progressTotalEl = document.getElementById('live-progress-total');
         
         if (playBtn && audio) {
+            let currentLiveAiPayload = {{ live_ai_payload_json|default:"{}"|safe }};
+            let currentTrackId = Number({{ current_track_id|default:0 }} || 0);
+            const helpfulSelectedTrackIds = new Set();
             let isPlaying = false;
             const initialServerOffset = {{ current_offset|default:0 }};
             let currentTrackDurationSeconds = Number({{ current_track_duration_seconds|default:0 }} || 0);
@@ -850,6 +844,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                     if (data.ok) {
                         const track = data.current_track;
+                        currentTrackId = Number(track.id || 0);
                         const serverOffset = Number(data.current_offset || 0);
                         const durationFromPayload = Number(track.duration_seconds || 0);
                         currentTrackDurationSeconds = durationFromPayload > 0
@@ -905,6 +900,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         const bgImg = document.getElementById('album-bg-img');
                         if (bgImg) bgImg.src = track.album_art;
 
+                        currentLiveAiPayload = data.live_ai_payload || {};
+                        applyLiveAiPayload(currentLiveAiPayload);
+
                         updatePlaylistUI('up-next-container', data.up_next, 'primary');
                         updatePlaylistUI('recently-played-container', data.recently_played, 'secondary');
                     }
@@ -929,6 +927,74 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             audio.addEventListener('ended', () => triggerRotate('ended'));
             updateProgressUI(initialServerOffset || 0);
+            applyLiveAiPayload(currentLiveAiPayload);
+
+            const helpfulBtn = document.getElementById('live-ai-helpful-btn');
+            const helpfulIcon = document.getElementById('live-ai-helpful-icon');
+            const updateHelpfulIconState = () => {
+                if (!helpfulIcon) return;
+                const isSelected = currentTrackId && helpfulSelectedTrackIds.has(currentTrackId);
+                helpfulIcon.style.fontVariationSettings = isSelected ? "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" : "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+            };
+            updateHelpfulIconState();
+            if (helpfulBtn) {
+                helpfulBtn.addEventListener('click', async () => {
+                    if (!currentTrackId) return;
+                    if (helpfulSelectedTrackIds.has(currentTrackId)) return;
+                    helpfulBtn.disabled = true;
+                    try {
+                        const response = await fetch('/api/live/ai/helpful/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ track_id: currentTrackId }),
+                        });
+                        const data = await response.json();
+                        if (data && data.ok) {
+                            helpfulSelectedTrackIds.add(currentTrackId);
+                            updateHelpfulIconState();
+                            if (!currentLiveAiPayload || typeof currentLiveAiPayload !== 'object') {
+                                currentLiveAiPayload = {};
+                            }
+                            currentLiveAiPayload.helpful_count = Number(data.helpful_count || 0);
+                            applyLiveAiPayload(currentLiveAiPayload);
+                        }
+                    } catch (err) {
+                        console.error('Failed to record helpful click:', err);
+                    } finally {
+                        helpfulBtn.disabled = false;
+                    }
+                });
+            }
+
+            const originalApplyLiveAiPayload = applyLiveAiPayload;
+            applyLiveAiPayload = (payload) => {
+                originalApplyLiveAiPayload(payload);
+                updateHelpfulIconState();
+            };
+        }
+
+        function applyLiveAiPayload(payload) {
+            if (!payload || typeof payload !== 'object') return;
+
+            const safeCards = Array.isArray(payload.cards) ? payload.cards : [];
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const text = String(value || '').trim();
+                if (text) el.textContent = text;
+            };
+
+            setText('live-ai-about-label', payload.about_label);
+            setText('live-ai-commentary', payload.commentary);
+
+            for (let idx = 0; idx < 3; idx += 1) {
+                const card = safeCards[idx] || {};
+                const slot = idx + 1;
+                setText(`live-ai-card-${slot}-label`, card.label);
+                setText(`live-ai-card-${slot}-value`, card.value);
+                setText(`live-ai-card-${slot}-subtext`, card.subtext);
+            }
         }
 
         function updatePlaylistUI(containerId, tracks, colorClass) {

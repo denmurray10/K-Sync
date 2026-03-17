@@ -430,6 +430,8 @@ class RadioTrack(models.Model):
     duration = models.CharField(max_length=20, help_text="e.g. 3:45", default="3:00")
     duration_seconds = models.IntegerField(default=180, help_text="Duration in seconds")
     audio_url = models.URLField(max_length=500, blank=True, null=True)
+    live_ai_payload = models.JSONField(default=dict, blank=True)
+    live_ai_generated_at = models.DateTimeField(null=True, blank=True)
     is_request = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

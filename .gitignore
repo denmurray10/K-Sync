@@ -11,3 +11,4 @@ upload_to_cloudinary.py
 compress_upload.py
 __pycache__/
 *.pyc
+media/blog/Hero_video.mp4

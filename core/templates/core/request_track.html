@@ -235,7 +235,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <p class="text-slate-400 font-mono text-xs tracking-widest uppercase max-w-sm">
                     Your song has been added to the queue. Tune in to hear it on the next live show.
                 </p>
-                <a href="{% url 'coming_soon' %}" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] mt-4">
+                <a href="{% url 'live' %}" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] mt-4">
                     Listen Live
                 </a>
                 <button @click="submitted = false" class="text-slate-500 font-mono text-[10px] tracking-widest uppercase hover:text-white transition-colors mt-2">
@@ -407,7 +407,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-4">Hear your requested songs played on air. K-Beats Radio — 24/7 non-stop K-Pop.</p>
         </div>
         <div class="w-full md:w-1/2 flex flex-col sm:flex-row gap-4 reveal-left" style="transition-delay: 200ms;">
-            <a href="{% url 'coming_soon' %}" class="bg-black text-white font-black px-10 py-5 transition-colors uppercase tracking-[0.2em] text-sm border border-black hover:bg-white hover:text-black shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] text-center">
+            <a href="{% url 'live' %}" class="bg-black text-white font-black px-10 py-5 transition-colors uppercase tracking-[0.2em] text-sm border border-black hover:bg-white hover:text-black shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] text-center">
                 Start Listening
             </a>
             <a href="{% url 'charts' %}" class="bg-transparent text-black font-black px-10 py-5 transition-colors uppercase tracking-[0.2em] text-sm border border-black hover:bg-black hover:text-primary text-center">

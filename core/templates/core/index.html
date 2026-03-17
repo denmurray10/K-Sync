@@ -48,6 +48,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .neon-text {
             text-shadow: 0 0 10px rgba(244, 37, 192, 0.7), 0 0 20px rgba(244, 37, 192, 0.5);
         }
+        .outline-outer-glow {
+            filter: drop-shadow(0 0 6px rgba(244, 37, 192, 0.9)) drop-shadow(0 0 14px rgba(244, 37, 192, 0.75));
+        }
         .neon-border {
              box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
         }
@@ -94,7 +97,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         @media (max-width: 768px) {
             .relative.w-full.bg-primary {
-                margin-top: -60px;
+                margin-top: 0;
             }
         }
         @media (min-width: 769px) {
@@ -103,7 +106,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 flex-direction: column;
             }
             .relative.w-full.bg-primary {
-                margin-top: 50px;
+                margin-top: 0;
             }
         }        @media (max-width: 768px) {
             section.w-full.bg-black.py-32 {
@@ -130,22 +133,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- Main Content -->
 <main class="flex-grow pt-0">
 <!-- Hero Section -->
-<section id="hero-section" class="relative h-[95vh] min-h-[700px] w-full overflow-hidden flex items-center justify-center border-b border-white/10">
+<section id="hero-section" class="relative w-full overflow-hidden flex items-center justify-center border-b border-white/10" style="height: 100svh; min-height: 100svh;">
 <!-- Background -->
-<div class="absolute inset-0 z-0 bg-black">
-<div class="w-full h-full bg-cover bg-center bg-fixed opacity-40 grayscale mix-blend-luminosity" style="background-image: url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner');"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+<div id="hero-bg-media" class="absolute inset-0 z-0 bg-black">
+<video
+    id="hero-bg-video"
+    class="absolute inset-0 w-full h-full object-cover opacity-90"
+    autoplay
+    muted
+    loop
+    playsinline
+    webkit-playsinline
+    preload="auto"
+>
+<source src="https://f003.backblazeb2.com/file/StrayKids/hero/Hero_video.mp4" type="video/mp4" />
+<source src="/media/blog/Hero_video.mp4" type="video/mp4" />
+</video>
+<div class="absolute inset-0 bg-black/5"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"></div>
 </div>
 
-<div class="relative z-20 container mx-auto px-6 max-w-[1400px] h-full flex flex-col md:flex-row items-start md:items-end justify-between pb-12 md:pb-24 pt-[180px] md:pt-64">
+<div class="relative z-20 container mx-auto px-6 max-w-[1400px] h-full flex flex-col md:flex-row items-center md:items-center justify-between py-12 md:py-16">
 <!-- Left Content: Massive Typography -->
 <div class="flex flex-col gap-0 max-w-4xl text-left relative z-30 pointer-events-none">
-<h1 class="text-[16vw] sm:text-5xl md:text-[8rem] lg:text-[11rem] font-black text-white leading-[0.85] md:leading-[0.8] tracking-tighter uppercase font-display relative z-20">
+                <h1 class="text-6xl md:text-8xl lg:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase relative z-20">
 <span class="block relative group">
                         K-BEATS
                         <span class="absolute inset-0 text-transparent [-webkit-text-stroke:2px_theme(colors.primary)] translate-x-2 -translate-y-2 mix-blend-screen opacity-0 group-hover:opacity-100 transition-opacity duration-300">K-BEATS</span>
 </span>
-<span class="block text-transparent [-webkit-text-stroke:2px_white] hover:text-white transition-colors duration-500">SPECTRUM</span>
+<span class="block text-transparent [-webkit-text-stroke:2px_white] outline-outer-glow">LAUNCHED</span>
 </h1>
 <p class="text-base md:text-lg text-slate-300 max-w-[280px] md:max-w-md font-light leading-relaxed mt-8 tracking-wide">
                         Experience the electrifying beat of K-Pop. 24/7 non-stop hits, exclusive interviews, and live performances direct from Korea.
@@ -175,7 +191,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 </section>
 <!-- Live Radio Player Bar (Brutalist) -->
-<div class="relative w-full bg-primary border-t border-b border-white/20 h-24 flex items-center justify-between z-40 overflow-hidden">
+<div id="home-live-player-bar" class="relative w-full bg-primary border-t border-b border-white/20 h-24 flex items-center justify-between z-40 overflow-hidden">
 <!-- Grain overlay -->
 <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
 
@@ -229,7 +245,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button class="hover:opacity-60 transition-opacity text-black hidden lg:block">
 <span class="material-symbols-outlined text-3xl">volume_up</span>
 </button>
-<a href="{% url 'coming_soon' %}" class="bg-black text-white px-4 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+<a href="{% url 'live' %}" class="bg-black text-white px-4 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                 Open Studio
             </a>
 </div>
@@ -757,14 +773,52 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// ── Ensure Hero Background Video Plays ──────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    const heroVideo = document.getElementById('hero-bg-video');
+    const heroMedia = document.getElementById('hero-bg-media');
+    if (!heroVideo) return;
+
+    heroVideo.muted = true;
+    heroVideo.defaultMuted = true;
+    heroVideo.setAttribute('muted', '');
+
+    const showFallbackImage = () => {
+        if (!heroMedia) return;
+        heroVideo.style.display = 'none';
+    };
+
+    const tryPlay = () => {
+        const playPromise = heroVideo.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(() => {
+                // Browser may block autoplay or codec may be unsupported.
+                showFallbackImage();
+            });
+        }
+    };
+
+    heroVideo.addEventListener('error', showFallbackImage);
+    heroVideo.addEventListener('stalled', showFallbackImage);
+    heroVideo.addEventListener('abort', showFallbackImage);
+
+    tryPlay();
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && heroVideo.paused) {
+            tryPlay();
+        }
+    });
+});
+
 // ── Sparkle Particles Canvas ─────────────────────────────────────
 const canvas = document.getElementById('sparkle-canvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas ? canvas.getContext('2d') : null;
 let particles = [];
 const particleCount = 100;
 const colors = ['#f425c0', '#00f0ff', '#ffffff', '#9B00FF'];
 
 function resizeCanvas() {
+    if (!canvas) return;
     canvas.width = window.innerWidth;
     canvas.height = document.getElementById('hero-section').offsetHeight || window.innerHeight;
 }
@@ -811,6 +865,7 @@ function initParticles() {
 }
 
 function animateParticles() {
+    if (!canvas || !ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach(p => {
         p.update();
