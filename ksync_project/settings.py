@@ -47,6 +47,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     # 'core.middleware.PreLaunchMiddleware',              # UNLOCKED
+    'core.middleware.GoogleTagManagerMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -158,6 +159,7 @@ SERPER_API_KEY = os.environ.get('SERPER_API_KEY', 'f099f725535455f20dd5a70ca6f81
 # ── Facebook Page integration ────────────────────────────────────────────────
 # ── Site URL ─────────────────────────────────────────────────────────────────
 SITE_URL = os.environ.get('SITE_URL', 'https://kbeatsradio.co.uk')
+GOOGLE_TAG_MANAGER_ID = os.environ.get('GOOGLE_TAG_MANAGER_ID', 'GTM-KDMN68PM')
 
 # ── Facebook ─────────────────────────────────────────────────────────────────
 # Required permissions: pages_manage_posts, pages_read_engagement
