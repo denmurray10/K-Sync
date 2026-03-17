@@ -125,13 +125,30 @@ def get_b2_auth_token():
 def list_b2_files(auth_token, api_url, bucket_id):
     """Lists all files in the given B2 bucket."""
     headers = {'Authorization': auth_token}
-    post_params = {'bucketId': bucket_id}
-    
-    response = requests.post(f"{api_url}/b2api/v2/b2_list_file_names", json=post_params, headers=headers)
-    if response.status_code != 200:
-        raise Exception(f"Failed to list files: {response.text}")
-    
-    return response.json().get('files', [])
+    all_files = []
+    next_file_name = None
+
+    while True:
+        post_params = {
+            'bucketId': bucket_id,
+            'maxFileCount': 1000,
+        }
+        if next_file_name:
+            post_params['startFileName'] = next_file_name
+
+        response = requests.post(f"{api_url}/b2api/v2/b2_list_file_names", json=post_params, headers=headers)
+        if response.status_code != 200:
+            raise Exception(f"Failed to list files: {response.text}")
+
+        payload = response.json()
+        page_files = payload.get('files', [])
+        all_files.extend(page_files)
+
+        next_file_name = payload.get('nextFileName')
+        if not next_file_name:
+            break
+
+    return all_files
 
 def sync_tracks_from_b2(prune_missing=False, new_only=False):
     print("Connecting to Backblaze B2...")

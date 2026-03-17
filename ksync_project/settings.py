@@ -198,7 +198,7 @@ CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET', default='')
 
 # ── Backblaze B2 (Audio Storage) ─────────────────────────────────────────────
 B2_KEY_ID = os.environ.get('B2_KEY_ID', 'a2e0a74c71c2')
-B2_APPLICATION_KEY = os.environ.get('B2_APPLICATION_KEY', '003aca1366ecec133a01a611e2b26259e958c10129')
+B2_APPLICATION_KEY = os.environ.get('B2_APPLICATION_KEY', '003309a8127932d4a086f5baf502ea6cada23f462d')
 B2_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME', 'StrayKids')
 B2_DOWNLOAD_URL = os.environ.get('B2_DOWNLOAD_URL', 'https://f003.backblazeb2.com')
 
