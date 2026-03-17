@@ -45,14 +45,17 @@
 
         <!-- Status + Actions -->
         <div class="flex items-center gap-4">
-            <!-- Live badge -->
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full glass-bright border border-red-500/30">
+            <!-- Live On Air -->
+            <button
+                class="group relative flex items-center gap-2 border border-primary px-6 py-3 font-black text-white hover:bg-primary hover:text-black transition-all"
+                onclick="window.location.href='{% url 'live' %}'"
+            >
                 <span class="relative flex h-2.5 w-2.5">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                 </span>
-                <span class="text-xs font-bold uppercase tracking-wider text-red-400">Live On Air</span>
-            </div>
+                <span class="text-[10px] md:text-xs uppercase tracking-widest">Live On Air</span>
+            </button>
             <!-- Listener count -->
             <div class="hidden sm:flex items-center gap-1.5 text-slate-400 text-xs font-medium">
                 <span class="material-symbols-outlined text-base text-secondary">headphones</span>
@@ -103,8 +106,8 @@
                     onclick="window.location.href='{% url 'live' %}'"
                 >
                     <span class="relative flex h-2.5 w-2.5">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                     </span>
                     <span class="text-[10px] md:text-xs uppercase tracking-widest">Live On Air</span>
                 </button>
