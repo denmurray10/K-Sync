@@ -84,7 +84,8 @@ DEFAULT_DB_URL = 'postgresql://neondb_owner:npg_7BEvOGSUZY8R@ep-little-credit-ag
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL', DEFAULT_DB_URL),
-        conn_max_age=600
+        conn_max_age=60,
+        conn_health_checks=True
     )
 }
 
