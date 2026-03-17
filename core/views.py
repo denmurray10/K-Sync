@@ -239,6 +239,15 @@ def my_station_onboarding(request):
         ('4th_gen', '4th Gen Power Wave (2020–2023)'),
         ('5th_gen', '5th Gen Rising Era (2024+)'),
     ]
+    timezone_choices = [
+        'Europe/London',
+        'Europe/Paris',
+        'America/New_York',
+        'America/Los_Angeles',
+        'Asia/Seoul',
+        'Asia/Tokyo',
+        'Australia/Sydney',
+    ]
 
     if request.method == 'POST':
         selected_group_ids = request.POST.getlist('favorite_groups')
@@ -251,15 +260,49 @@ def my_station_onboarding(request):
             return redirect('dashboard')
 
         groups = list(KPopGroup.objects.filter(id__in=selected_group_ids))
+        digest_enabled = request.POST.get('digest_enabled') == '1'
+        digest_channel_push = request.POST.get('digest_channel_push') == '1'
+        digest_channel_email = request.POST.get('digest_channel_email') == '1'
+        digest_timezone = str(request.POST.get('digest_timezone') or 'Europe/London').strip()
+        digest_hour_raw = request.POST.get('digest_hour')
+        try:
+            digest_hour = int(digest_hour_raw)
+        except (TypeError, ValueError):
+            digest_hour = 8
+        digest_hour = max(0, min(23, digest_hour))
+
         profile.favorite_eras = [
             era for era in selected_eras if era in {key for key, _label in eras}
         ]
         profile.onboarding_completed = True
+        profile.digest_enabled = digest_enabled
+        profile.digest_channel_push = digest_channel_push
+        profile.digest_channel_email = digest_channel_email
+        profile.digest_timezone = digest_timezone if digest_timezone in timezone_choices else 'Europe/London'
+        profile.digest_hour = digest_hour
+        profile.digest_include_comebacks = request.POST.get('digest_include_comebacks') == '1'
+        profile.digest_include_birthdays = request.POST.get('digest_include_birthdays') == '1'
+        profile.digest_include_chart_jumps = request.POST.get('digest_include_chart_jumps') == '1'
+
+        if profile.digest_enabled and not (profile.digest_channel_push or profile.digest_channel_email):
+            profile.digest_channel_push = True
 
         if not profile.bias and groups:
             profile.bias = groups[0]
 
-        profile.save(update_fields=['favorite_eras', 'onboarding_completed', 'bias'])
+        profile.save(update_fields=[
+            'favorite_eras',
+            'onboarding_completed',
+            'bias',
+            'digest_enabled',
+            'digest_channel_push',
+            'digest_channel_email',
+            'digest_timezone',
+            'digest_hour',
+            'digest_include_comebacks',
+            'digest_include_birthdays',
+            'digest_include_chart_jumps',
+        ])
         profile.favorite_groups.set(groups)
 
         return redirect('dashboard')
@@ -271,6 +314,7 @@ def my_station_onboarding(request):
     return render(request, 'core/my_station_onboarding.html', {
         'groups': groups,
         'eras': eras,
+        'timezone_choices': timezone_choices,
         'selected_groups': selected_groups,
         'selected_eras': selected_eras,
         'profile': profile,

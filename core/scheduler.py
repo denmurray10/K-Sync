@@ -5,6 +5,7 @@ import logging
 import re
 from core.models import Ranking
 from core.views import _chat, _do_blog_generate
+from core.digests import send_due_user_digests
 import urllib.request
 import urllib.parse
 
@@ -216,6 +217,16 @@ def auto_blog_generate():
         logger.error("[scheduler] Auto blog generation failed: %s", e)
 
 
+def send_user_digests_job():
+    """Background job: send opt-in user digests for users due in their local timezone."""
+    logger.info("[scheduler] Starting user digest dispatch...")
+    try:
+        sent = send_due_user_digests()
+        logger.info("[scheduler] User digest dispatch complete — %d sent.", sent)
+    except Exception as e:
+        logger.error("[scheduler] User digest dispatch failed: %s", e)
+
+
 def start_scheduler():
     scheduler = BackgroundScheduler()
     # Schedule Daily: Run every day at 08:00 AM
@@ -244,6 +255,9 @@ def start_scheduler():
 
     # Schedule Blog Auto-Generation: Run every 30 minutes
     scheduler.add_job(auto_blog_generate, 'interval', minutes=30, id='auto_blog_generate', replace_existing=True)
+
+    # Schedule User Digests: Run every hour (timezone-aware per user)
+    scheduler.add_job(send_user_digests_job, 'interval', hours=1, id='send_user_digests', replace_existing=True)
 
     scheduler.add_job(generate_ranking, 'date', args=['daily'], run_date=timezone.now(), id='initial_daily_sync')
     scheduler.add_job(generate_ranking, 'date', args=['soloists'], run_date=timezone.now(), id='initial_soloists_sync')

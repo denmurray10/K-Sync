@@ -66,6 +66,59 @@
                     </div>
                 </section>
 
+                <section class="mb-12 border border-white/10 bg-black/30 p-6">
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-4">Daily Digest Alerts</h2>
+                    <p class="text-slate-500 text-xs uppercase tracking-[0.2em] mb-6">Opt in to comeback, birthday, and chart-jump updates</p>
+
+                    <div class="space-y-4">
+                        <label class="flex items-center gap-3 border border-white/10 bg-black/40 p-4 cursor-pointer hover:border-primary/60 transition-colors">
+                            <input type="checkbox" name="digest_enabled" value="1" class="w-4 h-4 accent-primary" {% if profile.digest_enabled %}checked{% endif %}>
+                            <span class="text-sm font-semibold uppercase tracking-tight">Enable daily digest</span>
+                        </label>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label class="flex items-center gap-3 border border-white/10 bg-black/40 p-3 cursor-pointer hover:border-secondary/60 transition-colors">
+                                <input type="checkbox" name="digest_channel_push" value="1" class="w-4 h-4 accent-primary" {% if profile.digest_channel_push %}checked{% endif %}>
+                                <span class="text-sm uppercase tracking-tight">In-app notifications</span>
+                            </label>
+                            <label class="flex items-center gap-3 border border-white/10 bg-black/40 p-3 cursor-pointer hover:border-secondary/60 transition-colors">
+                                <input type="checkbox" name="digest_channel_email" value="1" class="w-4 h-4 accent-primary" {% if profile.digest_channel_email %}checked{% endif %}>
+                                <span class="text-sm uppercase tracking-tight">Email digest</span>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-slate-500 text-xs uppercase tracking-[0.2em] mb-2">Timezone</label>
+                                <select name="digest_timezone" class="w-full bg-black border border-white/10 px-4 py-3 text-white focus:outline-none focus:border-primary">
+                                    {% for tz in timezone_choices %}
+                                    <option value="{{ tz }}" {% if profile.digest_timezone == tz %}selected{% endif %}>{{ tz }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-500 text-xs uppercase tracking-[0.2em] mb-2">Digest hour (local)</label>
+                                <input type="number" min="0" max="23" name="digest_hour" value="{{ profile.digest_hour|default:8 }}" class="w-full bg-black border border-white/10 px-4 py-3 text-white focus:outline-none focus:border-primary" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <label class="flex items-center gap-3 border border-white/10 bg-black/40 p-3 cursor-pointer hover:border-primary/60 transition-colors">
+                                <input type="checkbox" name="digest_include_comebacks" value="1" class="w-4 h-4 accent-primary" {% if profile.digest_include_comebacks %}checked{% endif %}>
+                                <span class="text-xs uppercase tracking-widest">Comebacks</span>
+                            </label>
+                            <label class="flex items-center gap-3 border border-white/10 bg-black/40 p-3 cursor-pointer hover:border-primary/60 transition-colors">
+                                <input type="checkbox" name="digest_include_birthdays" value="1" class="w-4 h-4 accent-primary" {% if profile.digest_include_birthdays %}checked{% endif %}>
+                                <span class="text-xs uppercase tracking-widest">Birthdays</span>
+                            </label>
+                            <label class="flex items-center gap-3 border border-white/10 bg-black/40 p-3 cursor-pointer hover:border-primary/60 transition-colors">
+                                <input type="checkbox" name="digest_include_chart_jumps" value="1" class="w-4 h-4 accent-primary" {% if profile.digest_include_chart_jumps %}checked{% endif %}>
+                                <span class="text-xs uppercase tracking-widest">Chart jumps</span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
                     <button type="submit" class="bg-primary text-black border border-primary px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-white transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">Save My Station</button>
                     <button type="submit" name="skip" value="1" class="border border-white/20 text-slate-300 px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:text-white hover:border-white transition-colors">Skip for now</button>

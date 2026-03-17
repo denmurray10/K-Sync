@@ -158,6 +158,15 @@ class UserProfile(models.Model):
     )
     favorite_eras = models.JSONField(default=list, blank=True)
     onboarding_completed = models.BooleanField(default=False)
+    digest_enabled = models.BooleanField(default=False)
+    digest_channel_push = models.BooleanField(default=True)
+    digest_channel_email = models.BooleanField(default=False)
+    digest_timezone = models.CharField(max_length=64, default='Europe/London')
+    digest_hour = models.PositiveSmallIntegerField(default=8)
+    digest_include_comebacks = models.BooleanField(default=True)
+    digest_include_birthdays = models.BooleanField(default=True)
+    digest_include_chart_jumps = models.BooleanField(default=True)
+    digest_last_sent_on = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s profile"
