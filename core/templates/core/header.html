@@ -19,6 +19,7 @@
     backdrop-filter: blur(0px);
     border-bottom: 1px solid transparent;
   }
+    [x-cloak] { display: none !important; }
 </style>
 
 {% if request.resolver_match.url_name == 'live' %}
@@ -57,67 +58,6 @@
                 <span class="material-symbols-outlined text-base text-secondary">headphones</span>
                 <span id="listener-count">3,847</span> Listening
             </div>
-            <!-- Notifications (Alpine.js) -->
-            {% if user.is_authenticated %}
-            <div x-data="{ 
-                open: false, 
-                notifications: [], 
-                unreadCount: 0,
-                async init() {
-                    const res = await fetch('/api/notifications/');
-                    const data = await res.json();
-                    if (data.status === 'success') {
-                        this.notifications = data.notifications;
-                        this.unreadCount = data.unread_count;
-                    }
-                },
-                async markRead(id) {
-                    const res = await fetch(`/api/notifications/${id}/read/`, {
-                        method: 'POST',
-                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-                    });
-                    if (res.ok) {
-                        this.notifications = this.notifications.filter(n => n.id !== id);
-                        this.unreadCount = Math.max(0, this.unreadCount - 1);
-                    }
-                }
-            }" class="relative">
-                <button @click="open = !open" class="relative w-9 h-9 rounded-full glass-bright flex items-center justify-center text-slate-300 hover:text-primary transition-colors border border-white/10 group">
-                    <span class="material-symbols-outlined text-xl">notifications</span>
-                    <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute -top-1 -right-1 bg-primary text-black text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-black animate-pulse"></span>
-                </button>
-                
-                <!-- Dropdown -->
-                <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-3 w-80 bg-black/95 backdrop-blur-xl border border-white/10 shadow-2xl z-[60] py-2">
-                    <div class="px-4 py-2 border-bottom border-white/10 flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Notifications</span>
-                        <span x-show="unreadCount > 0" class="text-[9px] bg-primary/20 text-primary px-2 py-0.5 rounded">NEW</span>
-                    </div>
-                    
-                    <div class="max-h-64 overflow-y-auto">
-                        <template x-if="notifications.length === 0">
-                            <div class="px-4 py-8 text-center">
-                                <span class="material-symbols-outlined text-slate-700 text-3xl mb-2">notifications_off</span>
-                                <p class="text-[10px] font-mono text-slate-600 uppercase tracking-widest">No unread alerts</p>
-                            </div>
-                        </template>
-                        
-                        <template x-for="n in notifications" :key="n.id">
-                            <div class="group px-4 py-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors relative">
-                                <div class="flex flex-col gap-1 pr-6">
-                                    <p class="text-xs text-slate-200 leading-tight" x-text="n.message"></p>
-                                    <span class="text-[9px] font-mono text-slate-500 uppercase" x-text="n.created_at"></span>
-                                </div>
-                                <button @click="markRead(n.id)" class="absolute top-4 right-4 text-slate-600 hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined text-sm">close</span>
-                                </button>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
             <!-- Settings -->
             <a href="{% url 'profile_personalization_settings' %}" class="w-9 h-9 rounded-full glass-bright flex items-center justify-center text-slate-300 hover:text-white transition-colors border border-white/10">
                 <span class="material-symbols-outlined text-xl">settings</span>
@@ -169,67 +109,6 @@
                     <span class="text-[10px] md:text-xs uppercase tracking-widest">Live On Air</span>
                 </button>
                 {% if user.is_authenticated %}
-                <!-- Notifications (Alpine.js) -->
-                {% if user.is_authenticated %}
-                <div x-data="{ 
-                    open: false, 
-                    notifications: [], 
-                    unreadCount: 0,
-                    async init() {
-                        const res = await fetch('/api/notifications/');
-                        const data = await res.json();
-                        if (data.status === 'success') {
-                            this.notifications = data.notifications;
-                            this.unreadCount = data.unread_count;
-                        }
-                    },
-                    async markRead(id) {
-                        const res = await fetch(`/api/notifications/${id}/read/`, {
-                            method: 'POST',
-                            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-                        });
-                        if (res.ok) {
-                            this.notifications = this.notifications.filter(n => n.id !== id);
-                            this.unreadCount = Math.max(0, this.unreadCount - 1);
-                        }
-                    }
-                }" class="relative">
-                    <button @click="open = !open" class="relative w-9 h-9 rounded-full bg-black/30 flex items-center justify-center text-slate-300 hover:text-primary transition-colors border border-white/10 group">
-                        <span class="material-symbols-outlined text-xl">notifications</span>
-                        <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute -top-1 -right-1 bg-primary text-black text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-black animate-pulse"></span>
-                    </button>
-                    
-                    <!-- Dropdown -->
-                    <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-3 w-80 bg-black/95 backdrop-blur-xl border border-white/10 shadow-2xl z-[60] py-2">
-                        <div class="px-4 py-2 border-bottom border-white/10 flex items-center justify-between">
-                            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Notifications</span>
-                            <span x-show="unreadCount > 0" class="text-[9px] bg-primary/20 text-primary px-2 py-0.5 rounded">NEW</span>
-                        </div>
-                        
-                        <div class="max-h-64 overflow-y-auto">
-                            <template x-if="notifications.length === 0">
-                                <div class="px-4 py-8 text-center">
-                                    <span class="material-symbols-outlined text-slate-700 text-3xl mb-2">notifications_off</span>
-                                    <p class="text-[10px] font-mono text-slate-600 uppercase tracking-widest">No unread alerts</p>
-                                </div>
-                            </template>
-                            
-                            <template x-for="n in notifications" :key="n.id">
-                                <div class="group px-4 py-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors relative">
-                                    <div class="flex flex-col gap-1 pr-6">
-                                        <p class="text-xs text-slate-200 leading-tight" x-text="n.message"></p>
-                                        <span class="text-[9px] font-mono text-slate-500 uppercase" x-text="n.created_at"></span>
-                                    </div>
-                                    <button @click="markRead(n.id)" class="absolute top-4 right-4 text-slate-600 hover:text-primary transition-colors">
-                                        <span class="material-symbols-outlined text-sm">close</span>
-                                    </button>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
                 <a href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
                     <span class="material-symbols-outlined text-xl">account_circle</span>
                 </a>
@@ -241,6 +120,132 @@
     </div>
 </header>
 {% endif %}
+
+<!-- ───── GLOBAL MY STATION TAB ───── -->
+<div
+    x-data="{
+        open: false,
+        notifications: [],
+        unreadCount: 0,
+        async init() {
+            {% if user.is_authenticated %}
+            try {
+                const res = await fetch('/api/notifications/');
+                const data = await res.json();
+                if (data.status === 'success') {
+                    this.notifications = data.notifications || [];
+                    this.unreadCount = Number(data.unread_count || 0);
+                }
+            } catch (e) {}
+            {% endif %}
+        },
+        async markRead(id) {
+            {% if user.is_authenticated %}
+            const res = await fetch(`/api/notifications/${id}/read/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            });
+            if (res.ok) {
+                this.notifications = this.notifications.filter(n => n.id !== id);
+                this.unreadCount = Math.max(0, this.unreadCount - 1);
+            }
+            {% endif %}
+        }
+    }"
+    class="hidden lg:block z-[70]"
+>
+    <div
+        x-show="open"
+        x-transition.opacity.duration.200ms
+        class="fixed inset-0 bg-black/45 z-[70]"
+        @click="open = false"
+        x-cloak
+    ></div>
+
+    <div
+        id="my-station-panel"
+        role="dialog"
+        aria-modal="true"
+        class="fixed top-1/2 right-0 -translate-y-1/2 w-[340px] border border-white/20 bg-black/95 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform z-[71]"
+        :class="open ? 'translate-x-0' : 'translate-x-full'"
+    >
+        <div class="p-6 border-b border-white/10">
+            <div class="flex items-start justify-between gap-4">
+                <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-black">My Station</p>
+                <button @click="open = false" class="text-slate-400 hover:text-white transition-colors" aria-label="Close My Station">
+                    <span class="material-symbols-outlined text-lg">close</span>
+                </button>
+            </div>
+            {% if user.is_authenticated %}
+                <h3 class="text-2xl font-black uppercase tracking-tight mt-2">Personalised for {{ user.username }}</h3>
+                <p class="text-slate-400 text-sm mt-2">Quick access to your personalised settings, live listening, and alerts.</p>
+            {% else %}
+                <h3 class="text-2xl font-black uppercase tracking-tight mt-2">Unlock My Station</h3>
+                <p class="text-slate-400 text-sm mt-2">Sign up to customise your K-Beats experience with your biases, eras, and live recommendations.</p>
+            {% endif %}
+        </div>
+
+        <div class="p-6 space-y-5">
+            {% if user.is_authenticated %}
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                        <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Notifications</p>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500" x-text="`${unreadCount} Unread`"></span>
+                    </div>
+
+                    <div class="space-y-2 max-h-48 overflow-y-auto">
+                        <template x-if="notifications.length === 0">
+                            <div class="border border-dashed border-white/10 p-4 text-center">
+                                <p class="font-mono text-[8px] tracking-widest uppercase text-slate-600">No unread alerts</p>
+                            </div>
+                        </template>
+
+                        <template x-for="n in notifications" :key="n.id">
+                            <div class="border border-white/10 bg-white/[0.02] p-3 relative">
+                                <p class="text-xs text-slate-200 leading-tight pr-6" x-text="n.message"></p>
+                                <div class="mt-2 flex items-center justify-between gap-2">
+                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500" x-text="n.created_at"></span>
+                                    <a x-show="n.link" :href="n.link" class="font-mono text-[8px] tracking-widest uppercase text-primary hover:text-white transition-colors">Open</a>
+                                </div>
+                                <button @click="markRead(n.id)" class="absolute top-3 right-3 text-slate-600 hover:text-primary transition-colors" aria-label="Mark notification as read">
+                                    <span class="material-symbols-outlined text-sm">close</span>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3 pt-2 border-t border-white/10">
+                    <a href="{% url 'my_station_onboarding' %}" class="bg-secondary text-black border border-secondary px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:bg-white transition-colors">Open My Station</a>
+                    <a href="{% url 'dashboard' %}" class="border border-white/20 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:border-white hover:bg-white/5 transition-colors">Open Dashboard</a>
+                    <a href="{% url 'live' %}" class="border border-white/20 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:border-white hover:bg-white/5 transition-colors">Go Live</a>
+                </div>
+            {% else %}
+                <div class="flex flex-col gap-3 pt-1">
+                    <a href="{% url 'signup' %}" class="bg-secondary text-black border border-secondary px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:bg-white transition-colors">Sign Up To Customise</a>
+                    <a href="{% url 'login' %}" class="border border-white/20 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:border-white hover:bg-white/5 transition-colors">Log In</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <button
+        @click="open = !open"
+        class="fixed top-1/2 -translate-y-1/2 h-36 w-10 bg-primary text-black border border-primary font-black uppercase text-[10px] leading-none shadow-[2px_2px_0px_#ffffff] hover:shadow-none transition-[right,transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[right,transform] flex items-center justify-center"
+        :class="open ? 'right-[340px] z-[72]' : 'right-0 z-[72]'"
+        :aria-expanded="open.toString()"
+        aria-controls="my-station-panel"
+    >
+        <div class="relative flex items-center justify-center">
+            <span class="[writing-mode:vertical-rl] [text-orientation:mixed] tracking-[0.15em] rotate-180">My Station</span>
+            <span
+                x-show="unreadCount > 0"
+                x-text="unreadCount"
+                class="absolute -top-2 -left-2 bg-black text-primary text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-primary"
+            ></span>
+        </div>
+    </button>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
