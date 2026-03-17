@@ -65,7 +65,11 @@ class GoogleTagManagerMiddleware:
         charset = getattr(response, 'charset', None) or 'utf-8'
         html = content.decode(charset, errors='ignore')
 
-        if f'googletagmanager.com/gtm.js?id={gtm_id}' in html:
+        if (
+            f'googletagmanager.com/gtm.js?id={gtm_id}' in html
+            or f"dataLayer','{gtm_id}'" in html
+            or f'googletagmanager.com/ns.html?id={gtm_id}' in html
+        ):
             return response
 
         head_script = (
