@@ -804,6 +804,51 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             {% endif %}
                         </div>
 
+                        <!-- Daily Quests -->
+                        <div class="mb-12 reveal-up" style="transition-delay: 120ms">
+                            <div class="flex items-center justify-between mb-6 pb-3 border-b border-white/20">
+                                <h3 class="font-black text-sm uppercase tracking-widest text-white flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-base">task_alt</span>
+                                    Daily Quests
+                                </h3>
+                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">{{ daily_quests_completed }}/{{ daily_quests|length }} Complete</span>
+                            </div>
+
+                            <div class="space-y-3">
+                                {% for quest in daily_quests %}
+                                <div class="border border-white/10 p-3 bg-white/[0.02]">
+                                    <div class="flex items-center justify-between gap-3 mb-2">
+                                        <p class="text-[10px] font-black uppercase tracking-tight {% if quest.completed %}text-primary{% else %}text-white{% endif %}">{{ quest.label }}</p>
+                                        <span class="font-mono text-[8px] tracking-widest uppercase {% if quest.completed %}text-primary{% else %}text-slate-500{% endif %}">{{ quest.progress }}/{{ quest.target }}</span>
+                                    </div>
+                                    <div class="h-1 bg-white/10 overflow-hidden">
+                                        <div class="h-full {% if quest.completed %}bg-primary{% else %}bg-secondary/70{% endif %}" style="width: {% widthratio quest.progress quest.target 100 %}%"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Streak Milestones -->
+                        <div class="mb-12 reveal-up" style="transition-delay: 130ms">
+                            <div class="flex items-center justify-between mb-6 pb-3 border-b border-white/20">
+                                <h3 class="font-black text-sm uppercase tracking-widest text-white flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-secondary text-base">local_fire_department</span>
+                                    Streak Milestones
+                                </h3>
+                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Now {{ current_activity_streak }} · Best {{ longest_activity_streak }}</span>
+                            </div>
+
+                            <div class="space-y-2">
+                                {% for milestone in streak_milestones %}
+                                <div class="flex items-center justify-between border border-white/10 p-3 bg-white/[0.02]">
+                                    <span class="font-mono text-[9px] tracking-widest uppercase {% if milestone.unlocked %}text-primary{% else %}text-slate-400{% endif %}">{{ milestone.label }}</span>
+                                    <span class="material-symbols-outlined text-sm {% if milestone.unlocked %}text-primary{% else %}text-white/20{% endif %}">{% if milestone.unlocked %}check_circle{% else %}radio_button_unchecked{% endif %}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
                         <!-- Digital Badges (Phase 7.2) -->
                         <div class="mb-12 reveal-up" style="transition-delay: 150ms">
                             <div class="flex items-center justify-between mb-6 pb-3 border-b border-white/20">

@@ -54,6 +54,92 @@ def _record_live_track_play(request, track):
     if already_recorded:
         return
     RadioTrackPlay.objects.create(user=request.user, track=track)
+    _run_progression_unlocks(request.user)
+
+
+def _award_user_badge(user, name, badge_type='PROGRESSION', is_glowing=True):
+    if not user or not user.is_authenticated:
+        return False
+    _, created = UserBadge.objects.get_or_create(
+        user=user,
+        name=name,
+        defaults={
+            'badge_type': badge_type,
+            'is_glowing': is_glowing,
+        },
+    )
+    return created
+
+
+def _activity_day_set_for_user(user):
+    radio_days = set(
+        RadioTrackPlay.objects.filter(user=user)
+        .values_list('listened_at__date', flat=True)
+    )
+    game_days = set(
+        GameScore.objects.filter(user=user)
+        .values_list('played_at__date', flat=True)
+    )
+    return {d for d in (radio_days | game_days) if d}
+
+
+def _calculate_activity_streaks(activity_days, today):
+    if not activity_days:
+        return {'current': 0, 'longest': 0}
+
+    sorted_days = sorted(activity_days)
+    longest = 1
+    run = 1
+    for idx in range(1, len(sorted_days)):
+        if sorted_days[idx - 1] + timedelta(days=1) == sorted_days[idx]:
+            run += 1
+            longest = max(longest, run)
+        elif sorted_days[idx - 1] != sorted_days[idx]:
+            run = 1
+
+    current = 0
+    cursor = today
+    while cursor in activity_days:
+        current += 1
+        cursor = cursor - timedelta(days=1)
+
+    return {'current': current, 'longest': longest}
+
+
+def _run_progression_unlocks(user):
+    if not user or not user.is_authenticated:
+        return {'current_streak': 0, 'longest_streak': 0}
+
+    radio_total = RadioTrackPlay.objects.filter(user=user).count()
+    game_total = GameScore.objects.filter(user=user).count()
+    best_game_streak = int(
+        GameScore.objects.filter(user=user).aggregate(best=models.Max('best_streak')).get('best') or 0
+    )
+
+    today = timezone.localdate()
+    activity_days = _activity_day_set_for_user(user)
+    streaks = _calculate_activity_streaks(activity_days, today)
+
+    if radio_total >= 25:
+        _award_user_badge(user, 'Radio Starter')
+    if radio_total >= 100:
+        _award_user_badge(user, 'Radio Loyalist')
+    if game_total >= 10:
+        _award_user_badge(user, 'Game Challenger')
+    if best_game_streak >= 10:
+        _award_user_badge(user, 'Streak Spark')
+    if streaks['current'] >= 3:
+        _award_user_badge(user, 'Daily Pulse · 3 Day')
+    if streaks['current'] >= 7:
+        _award_user_badge(user, 'Daily Pulse · 7 Day')
+
+    return {
+        'radio_total': radio_total,
+        'game_total': game_total,
+        'best_game_streak': best_game_streak,
+        'current_streak': streaks['current'],
+        'longest_streak': streaks['longest'],
+    }
 
 
 def _build_stream_audio_url(source_url):
@@ -2707,6 +2793,8 @@ def dashboard(request):
     if onboarding_redirect:
         return onboarding_redirect
 
+    progression = _run_progression_unlocks(user)
+
     # Time-aware greeting
     hour = now.hour
     if hour < 12:
@@ -2861,6 +2949,50 @@ def dashboard(request):
         .order_by('-play_count', '-last_listened')[:5]
     )
 
+    today = timezone.localdate()
+    radio_today_count = RadioTrackPlay.objects.filter(
+        user=user,
+        listened_at__date=today,
+    ).count()
+    games_today_qs = GameScore.objects.filter(
+        user=user,
+        played_at__date=today,
+    )
+    games_today_count = games_today_qs.count()
+    high_score_today = games_today_qs.filter(score__gte=70).exists()
+
+    daily_quests = [
+        {
+            'key': 'radio_3',
+            'label': 'Listen to 3 live tracks',
+            'progress': min(radio_today_count, 3),
+            'target': 3,
+            'completed': radio_today_count >= 3,
+        },
+        {
+            'key': 'game_1',
+            'label': 'Play 1 game',
+            'progress': min(games_today_count, 1),
+            'target': 1,
+            'completed': games_today_count >= 1,
+        },
+        {
+            'key': 'score_70',
+            'label': 'Score 70+ in any game',
+            'progress': 1 if high_score_today else 0,
+            'target': 1,
+            'completed': high_score_today,
+        },
+    ]
+
+    streak_milestones = [
+        {'days': 3, 'label': '3-day streak', 'unlocked': progression.get('current_streak', 0) >= 3},
+        {'days': 7, 'label': '7-day streak', 'unlocked': progression.get('current_streak', 0) >= 7},
+        {'days': 14, 'label': '14-day streak', 'unlocked': progression.get('current_streak', 0) >= 14},
+    ]
+
+    badges = list(user.badges.all())
+
     return render(request, 'core/dashboard.html', {
         'trending': trending,
         'upcoming': upcoming,
@@ -2885,10 +3017,15 @@ def dashboard(request):
                 user=user
             ).select_related('group')[:8]
         ),
-        'badges': list(user.badges.all()),
+        'badges': badges,
         'weekly_stream_total': weekly_stream_total,
         'weekly_top_streams': weekly_top_streams,
         'weekly_stream_range_label': f"{week_cutoff.strftime('%d %b')} – {now.strftime('%d %b')}",
+        'daily_quests': daily_quests,
+        'daily_quests_completed': sum(1 for quest in daily_quests if quest['completed']),
+        'current_activity_streak': progression.get('current_streak', 0),
+        'longest_activity_streak': progression.get('longest_streak', 0),
+        'streak_milestones': streak_milestones,
     })
 
 
@@ -3157,6 +3294,7 @@ def save_game_score(request):
             total=int(data.get('total', 0)),
             best_streak=int(data.get('best_streak', 0)),
         )
+        _run_progression_unlocks(request.user)
         return JsonResponse({'ok': True})
     except (ValueError, KeyError, TypeError):
         return JsonResponse({'ok': False}, status=400)
