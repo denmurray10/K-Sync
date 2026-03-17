@@ -151,6 +151,13 @@ class UserProfile(models.Model):
         on_delete=models.SET_NULL,
         related_name='biased_by',
     )
+    favorite_groups = models.ManyToManyField(
+        KPopGroup,
+        blank=True,
+        related_name='station_fans',
+    )
+    favorite_eras = models.JSONField(default=list, blank=True)
+    onboarding_completed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.username}'s profile"

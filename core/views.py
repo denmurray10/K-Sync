@@ -76,6 +76,105 @@ def _normalize_show_color(raw_value):
     candidate = str(raw_value or '').strip().upper()
     return candidate if candidate in allowed else 'CYAN'
 
+
+def _station_group_names_from_profile(profile):
+    names = set()
+    if not profile:
+        return []
+
+    if profile.bias and profile.bias.name:
+        names.add(profile.bias.name.strip().lower())
+
+    for group in profile.favorite_groups.all():
+        if group and group.name:
+            names.add(group.name.strip().lower())
+
+    return sorted(names)
+
+
+def _text_matches_station(text_parts, station_group_names):
+    if not station_group_names:
+        return False
+    merged = ' '.join([str(part or '').lower() for part in text_parts])
+    return any(name in merged for name in station_group_names)
+
+
+def _sort_items_for_station(items, matcher):
+    if not items:
+        return items
+    scored = []
+    for idx, item in enumerate(items):
+        scored.append((0 if matcher(item) else 1, idx, item))
+    scored.sort(key=lambda row: (row[0], row[1]))
+    return [row[2] for row in scored]
+
+
+def _maybe_redirect_to_onboarding(request, profile):
+    if not request.user.is_authenticated:
+        return None
+    if not profile or profile.onboarding_completed:
+        return None
+
+    exempt_names = {
+        'my_station_onboarding',
+        'logout',
+        'signups_logout',
+        'signups_login',
+        'admin:index',
+    }
+    current_name = request.resolver_match.url_name if request.resolver_match else None
+    if current_name in exempt_names:
+        return None
+    return redirect('my_station_onboarding')
+
+
+@login_required
+def my_station_onboarding(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    eras = [
+        ('2nd_gen', '2nd Gen Classics (2008–2013)'),
+        ('3rd_gen', '3rd Gen Golden Era (2014–2019)'),
+        ('4th_gen', '4th Gen Power Wave (2020–2023)'),
+        ('5th_gen', '5th Gen Rising Era (2024+)'),
+    ]
+
+    if request.method == 'POST':
+        selected_group_ids = request.POST.getlist('favorite_groups')
+        selected_eras = request.POST.getlist('favorite_eras')
+        skip = request.POST.get('skip') == '1'
+
+        if skip:
+            profile.onboarding_completed = True
+            profile.save(update_fields=['onboarding_completed'])
+            return redirect('dashboard')
+
+        groups = list(KPopGroup.objects.filter(id__in=selected_group_ids))
+        profile.favorite_eras = [
+            era for era in selected_eras if era in {key for key, _label in eras}
+        ]
+        profile.onboarding_completed = True
+
+        if not profile.bias and groups:
+            profile.bias = groups[0]
+
+        profile.save(update_fields=['favorite_eras', 'onboarding_completed', 'bias'])
+        profile.favorite_groups.set(groups)
+
+        return redirect('dashboard')
+
+    groups = KPopGroup.objects.order_by('name')[:120]
+    selected_groups = set(profile.favorite_groups.values_list('id', flat=True))
+    selected_eras = set(profile.favorite_eras or [])
+
+    return render(request, 'core/my_station_onboarding.html', {
+        'groups': groups,
+        'eras': eras,
+        'selected_groups': selected_groups,
+        'selected_eras': selected_eras,
+        'profile': profile,
+    })
+
 def api_schedule_data(request):
     """Returns the weekly schedule grouped by day for the frontend."""
     staff_check = _staff_only_json(request)
@@ -1677,6 +1776,15 @@ def _inworld_chat(prompt, system="You are an expert K-Pop radio assistant."):
 
 
 def home(request):
+    profile = None
+    station_group_names = []
+    if request.user.is_authenticated:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        onboarding_redirect = _maybe_redirect_to_onboarding(request, profile)
+        if onboarding_redirect:
+            return onboarding_redirect
+        station_group_names = _station_group_names_from_profile(profile)
+
     now = timezone.now()
     now_local = timezone.localtime()
     data_current = ComebackData.objects.filter(year=now.year, month=now.month).first()
@@ -1706,6 +1814,14 @@ def home(request):
     all_releases.sort(key=lambda x: x['date_str'])
     today_str = now.strftime('%Y-%m-%d')
     upcoming_all = [r for r in all_releases if r['date_str'] >= today_str][:20]
+    if station_group_names:
+        upcoming_all = _sort_items_for_station(
+            upcoming_all,
+            lambda release: _text_matches_station(
+                [release.get('artist'), release.get('title')],
+                station_group_names,
+            ),
+        )
     upcoming = upcoming_all[:4]
     upcoming_ticker = upcoming_all[4:20]
     
@@ -1756,6 +1872,15 @@ def home(request):
                 'trend_value': trend_value,
             })
             
+    if station_group_names:
+        trending_all = _sort_items_for_station(
+            trending_all,
+            lambda track: _text_matches_station(
+                [track.get('artist'), track.get('title')],
+                station_group_names,
+            ),
+        )
+
     trending = trending_all[:10]
     if trending_all[10:20]:
         trending_ticker = trending_all[10:20]
@@ -1890,6 +2015,8 @@ def home(request):
         'active_poll': active_poll,
         'home_live_track': home_live_track,
         'homepage_programming': homepage_programming,
+        'my_station_profile': profile,
+        'my_station_groups': station_group_names,
     })
 
 
@@ -2481,6 +2608,9 @@ def login_page(request):
             )
             if user is not None:
                 login(request, user)
+                profile, _ = UserProfile.objects.get_or_create(user=user)
+                if not profile.onboarding_completed:
+                    return redirect('my_station_onboarding')
                 nxt = request.GET.get('next', 'dashboard')
                 return redirect(nxt)
             else:
@@ -2542,6 +2672,9 @@ def signup(request):
                 username=username, email=email, password=password
             )
             login(request, user)
+            profile, _ = UserProfile.objects.get_or_create(user=user)
+            if not profile.onboarding_completed:
+                return redirect('my_station_onboarding')
             return redirect('dashboard')
     return render(request, 'core/signup.html', {'error': error})
 
@@ -2554,6 +2687,9 @@ def dashboard(request):
 
     # Ensure profile exists
     profile, _ = UserProfile.objects.get_or_create(user=user)
+    onboarding_redirect = _maybe_redirect_to_onboarding(request, profile)
+    if onboarding_redirect:
+        return onboarding_redirect
 
     # Time-aware greeting
     hour = now.hour
@@ -4110,6 +4246,16 @@ def _get_or_generate_live_ai_payload(track):
 
 def live(request):
     from datetime import timedelta
+
+    profile = None
+    station_group_names = []
+    if request.user.is_authenticated:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        onboarding_redirect = _maybe_redirect_to_onboarding(request, profile)
+        if onboarding_redirect:
+            return onboarding_redirect
+        station_group_names = _station_group_names_from_profile(profile)
+
     cutoff = timezone.now() - timedelta(hours=24)
     requested = SongRequest.objects.filter(
         created_at__gte=cutoff
@@ -4157,6 +4303,16 @@ def live(request):
         recently_played_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
         recently_played_tracks = [track for track in recently_played_tracks if not _is_generated_voice_track(track)]
         recently_played_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
+
+    if station_group_names:
+        up_next_tracks = _sort_items_for_station(
+            up_next_tracks,
+            lambda track: _text_matches_station([getattr(track, 'artist', ''), getattr(track, 'title', '')], station_group_names),
+        )
+        recently_played_tracks = _sort_items_for_station(
+            recently_played_tracks,
+            lambda track: _text_matches_station([getattr(track, 'artist', ''), getattr(track, 'title', '')], station_group_names),
+        )
 
     live_ai_payload = _get_or_generate_live_ai_payload(current_track)
 

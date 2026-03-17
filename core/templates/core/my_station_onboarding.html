@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>My Station Setup</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f425c0",
+                        "secondary": "#00f0ff",
+                        "background-dark": "#000000",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-black text-white font-display min-h-screen">
+    {% include 'core/header.html' %}
+
+    <main class="pt-36 pb-20 px-6">
+        <div class="max-w-6xl mx-auto border border-white/10 bg-white/[0.02]">
+            <div class="p-8 md:p-12 border-b border-white/10">
+                <p class="text-primary text-[10px] tracking-[0.3em] uppercase font-black">My Station</p>
+                <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter mt-3">Personalize your feed</h1>
+                <p class="text-slate-400 text-sm mt-4 max-w-2xl">Pick your bias artists and favorite eras. We’ll personalize homepage highlights and live radio blocks for you.</p>
+            </div>
+
+            <form method="post" class="p-8 md:p-12">
+                {% csrf_token %}
+
+                <section class="mb-12">
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-4">Pick Biases</h2>
+                    <p class="text-slate-500 text-xs uppercase tracking-[0.2em] mb-6">Select one or more artists/groups</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto pr-1">
+                        {% for group in groups %}
+                        <label class="flex items-center gap-3 border border-white/10 bg-black/40 p-3 hover:border-primary/60 transition-colors cursor-pointer">
+                            <input type="checkbox" name="favorite_groups" value="{{ group.id }}" class="w-4 h-4 accent-primary" {% if group.id in selected_groups %}checked{% endif %}/>
+                            <span class="text-sm font-semibold uppercase tracking-tight">{{ group.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="mb-12">
+                    <h2 class="text-2xl font-black uppercase tracking-tight mb-4">Favorite Eras</h2>
+                    <p class="text-slate-500 text-xs uppercase tracking-[0.2em] mb-6">Choose the eras you vibe with most</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {% for era_key, era_label in eras %}
+                        <label class="flex items-center gap-3 border border-white/10 bg-black/40 p-4 hover:border-secondary/60 transition-colors cursor-pointer">
+                            <input type="checkbox" name="favorite_eras" value="{{ era_key }}" class="w-4 h-4 accent-primary" {% if era_key in selected_eras %}checked{% endif %}/>
+                            <span class="text-sm font-semibold uppercase tracking-tight">{{ era_label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+                    <button type="submit" class="bg-primary text-black border border-primary px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-white transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">Save My Station</button>
+                    <button type="submit" name="skip" value="1" class="border border-white/20 text-slate-300 px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:text-white hover:border-white transition-colors">Skip for now</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    {% include 'core/footer.html' %}
+</body>
+</html>
