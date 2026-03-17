@@ -697,6 +697,7 @@ def api_voiceover_generate(request):
     prompt = (
         "Write ONE radio DJ link for this song that sounds broadcast-ready and specific. "
         "Requirements: 2-4 short sentences, max 420 characters, no hashtags, no emojis, no quotation marks. "
+        "Use UK English spelling and phrasing throughout. "
         "Vary sentence structure and avoid generic filler phrasing. "
         "Include at least ONE concrete talking point where possible: current single/comeback, tour stop, chart milestone, recent public appearance, fandom reaction, or notable group fact. "
         "If uncertain on a detail, keep it soft and non-factual (e.g., 'fans are buzzing'). Do not invent exact dates/venues. "
@@ -4201,6 +4202,7 @@ def _generate_live_ai_payload(track):
     prompt = (
         f"You are a K-Pop music analyst for a live radio station. "
         f"For the song '{track.title}' by {track.artist}, generate concise on-air metadata. "
+        f"Use UK English spelling and phrasing throughout. "
         f"Return ONLY valid JSON in this exact shape: "
         '{"version":2,"about_label":"About \\\"<song>\\\"","commentary":"minimum 2 paragraphs; each paragraph 2-4 sentences",'
         '"cards":[{"label":"...","value":"...","subtext":"..."},'
