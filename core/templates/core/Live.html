@@ -200,13 +200,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- Album Art + Track Info Row -->
         <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-12 w-full justify-center">
             <!-- Album Cover with 20px White Border, Glow & 3D Shadow -->
-            <div class="w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0 bg-white album-cover-glow relative group p-[20px] transition-all duration-500">
-                <div class="w-full h-full shadow-[0_15px_35px_rgba(0,0,0,0.4)] overflow-hidden">
-                    <img id="hero-album-art" src="{% if current_track %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}"
-                         alt="{{ current_track.title }} - {{ current_track.artist }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            <div class="flex flex-col items-center w-full md:w-auto">
+                <div class="w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0 bg-white album-cover-glow relative group p-[20px] transition-all duration-500">
+                    <div class="w-full h-full shadow-[0_15px_35px_rgba(0,0,0,0.4)] overflow-hidden">
+                        <img id="hero-album-art" src="{% if current_track %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}"
+                             alt="{{ current_track.title }} - {{ current_track.artist }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    </div>
+                    <!-- Subtle inner border shadow for depth -->
+                    <div class="absolute inset-0 shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] pointer-events-none"></div>
                 </div>
-                <!-- Subtle inner border shadow for depth -->
-                <div class="absolute inset-0 shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] pointer-events-none"></div>
+
+                <div class="w-full max-w-md border border-white/20 bg-white/[0.03] p-4 mt-4 md:mt-6 text-left">
+                    <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-secondary mb-2">Share card</p>
+                    <p class="text-xs text-slate-400 uppercase tracking-wide">Now Playing on K-Beats</p>
+                    <p id="share-card-title" class="text-white font-black text-lg uppercase tracking-tight mt-1 truncate">{% if current_track %}{{ current_track.title }}{% else %}RADIO LIVE{% endif %}</p>
+                    <p id="share-card-artist" class="text-slate-300 text-xs uppercase tracking-widest mt-1 truncate">{% if current_track %}{{ current_track.artist }}{% else %}K-BEATS ON AIR{% endif %}</p>
+                    <div class="mt-4 flex items-center gap-3">
+                        <button id="share-now-playing-btn" class="bg-primary text-black border border-primary px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white transition-colors">Share Now Playing</button>
+                        <span id="share-now-playing-status" class="text-[10px] font-mono tracking-widest uppercase text-slate-500"></span>
+                    </div>
+                </div>
             </div>
 
             <!-- Track Info & Waveforms -->
@@ -537,6 +550,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             let playbackGuardInterval = null;
             let mainFadeInterval = null;
             const pageLoadTime = Date.now();
+            const shareNowPlayingBtn = document.getElementById('share-now-playing-btn');
+            const shareNowPlayingStatus = document.getElementById('share-now-playing-status');
 
             const parseDurationLabelSeconds = (value) => {
                 const raw = String(value || '').trim();
@@ -554,6 +569,60 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 const secs = safe % 60;
                 return `${mins}:${secs.toString().padStart(2, '0')}`;
             };
+
+            const getNowPlayingSharePayload = () => {
+                const title = (document.getElementById('hero-title')?.textContent || '').trim() || 'RADIO LIVE';
+                const artist = (document.getElementById('hero-artist')?.textContent || '').trim() || 'K-BEATS ON AIR';
+                const liveUrl = `${window.location.origin}/live/`;
+                return {
+                    title,
+                    artist,
+                    text: `Now Playing on K-Beats: ${title} by ${artist}. Listen live: ${liveUrl}`,
+                    url: liveUrl,
+                };
+            };
+
+            const setShareStatus = (text) => {
+                if (!shareNowPlayingStatus) return;
+                shareNowPlayingStatus.textContent = String(text || '').trim();
+                if (shareNowPlayingStatus.textContent) {
+                    setTimeout(() => {
+                        if (shareNowPlayingStatus) shareNowPlayingStatus.textContent = '';
+                    }, 2400);
+                }
+            };
+
+            const updateShareCard = (track) => {
+                if (!track || typeof track !== 'object') return;
+                const titleEl = document.getElementById('share-card-title');
+                const artistEl = document.getElementById('share-card-artist');
+                if (titleEl && track.title) titleEl.textContent = track.title;
+                if (artistEl && track.artist) artistEl.textContent = track.artist;
+            };
+
+            if (shareNowPlayingBtn) {
+                shareNowPlayingBtn.addEventListener('click', async () => {
+                    const payload = getNowPlayingSharePayload();
+                    try {
+                        if (navigator.share) {
+                            await navigator.share({
+                                title: `${payload.title} · K-Beats`,
+                                text: payload.text,
+                                url: payload.url,
+                            });
+                            setShareStatus('Shared');
+                            return;
+                        }
+                        await navigator.clipboard.writeText(payload.text);
+                        setShareStatus('Copied');
+                    } catch (err) {
+                        if (err && err.name === 'AbortError') {
+                            return;
+                        }
+                        setShareStatus('Share failed');
+                    }
+                });
+            }
 
             const getEffectiveDurationSeconds = () => {
                 const audioDuration = Number(audio.duration || 0);
@@ -899,6 +968,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         if (stickyArtist) stickyArtist.textContent = track.artist;
                         const bgImg = document.getElementById('album-bg-img');
                         if (bgImg) bgImg.src = track.album_art;
+                        updateShareCard(track);
 
                         currentLiveAiPayload = data.live_ai_payload || {};
                         applyLiveAiPayload(currentLiveAiPayload);
@@ -928,6 +998,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             audio.addEventListener('ended', () => triggerRotate('ended'));
             updateProgressUI(initialServerOffset || 0);
             applyLiveAiPayload(currentLiveAiPayload);
+            updateShareCard({
+                title: document.getElementById('hero-title')?.textContent || 'RADIO LIVE',
+                artist: document.getElementById('hero-artist')?.textContent || 'K-BEATS ON AIR',
+            });
 
             const helpfulBtn = document.getElementById('live-ai-helpful-btn');
             const helpfulIcon = document.getElementById('live-ai-helpful-icon');

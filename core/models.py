@@ -184,6 +184,30 @@ class FavouriteSong(models.Model):
         return f"{self.user.username} ♥ {self.title}"
 
 
+class RadioTrackPlay(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='radio_track_plays',
+    )
+    track = models.ForeignKey(
+        'RadioTrack',
+        on_delete=models.CASCADE,
+        related_name='play_events',
+    )
+    listened_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-listened_at']
+        indexes = [
+            models.Index(fields=['user', '-listened_at']),
+            models.Index(fields=['track', '-listened_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} listened to {self.track.title}"
+
+
 class SongRequest(models.Model):
     song_title = models.CharField(max_length=300)
     artist = models.CharField(max_length=200)

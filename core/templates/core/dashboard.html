@@ -138,6 +138,48 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════
+             WEEKLY RECAP — Top songs you streamed
+             ══════════════════════════════════════════════════════════════ -->
+        <section class="w-full bg-black py-12 border-b border-white/10">
+            <div class="container mx-auto px-6 max-w-[1400px]">
+                <div class="border border-white/10 bg-white/[0.02] p-6 md:p-8 reveal-up">
+                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-3xl md:text-4xl font-black text-white leading-none tracking-tighter uppercase">Top songs you streamed on K-Beats</h2>
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-2">Weekly recap · {{ weekly_stream_range_label }} · {{ weekly_stream_total }} streams</p>
+                        </div>
+                        <a href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-white/20 text-slate-300 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:border-primary hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-sm">radio</span> Stream Live
+                        </a>
+                    </div>
+
+                    {% if weekly_top_streams %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        {% for item in weekly_top_streams %}
+                        <div class="border border-white/10 bg-black/40 p-4 hover:border-primary/60 transition-colors">
+                            <div class="w-full aspect-square border border-white/10 bg-white/5 overflow-hidden mb-4 flex items-center justify-center">
+                                {% if item.track__album_art %}
+                                <img src="{{ item.track__album_art }}" alt="{{ item.track__title }} artwork" class="w-full h-full object-cover" />
+                                {% else %}
+                                <span class="material-symbols-outlined text-white/30 text-3xl">album</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-white font-black text-sm uppercase tracking-tight truncate">{{ item.track__title }}</p>
+                            <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase truncate mt-1">{{ item.track__artist }}</p>
+                            <p class="text-primary font-mono text-[10px] tracking-widest uppercase mt-3">{{ item.play_count }} plays</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="border border-white/10 p-8 text-center">
+                        <p class="text-slate-400 font-mono text-[10px] tracking-widest uppercase">No live streams recorded this week yet. Start listening to build your recap.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════════
              BIAS SECTION — Dedicated to bias artist
              ══════════════════════════════════════════════════════════════ -->
         <section class="w-full bg-black py-16 md:py-24 border-b border-white/10" x-data="biasSelector()">

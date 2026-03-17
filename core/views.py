@@ -26,6 +26,7 @@ import base64
 from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
+    RadioTrackPlay,
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, UserNotification, ClubInvitation, ClubLaunch, UserBadge,
     LiveChatMessage, ChatBlockedTerm,
@@ -39,6 +40,20 @@ def _staff_only_json(request):
     if not request.user.is_staff:
         return JsonResponse({'ok': False, 'error': 'Staff access required'}, status=403)
     return None
+
+
+def _record_live_track_play(request, track):
+    if not request.user.is_authenticated or not track:
+        return
+    dedupe_cutoff = timezone.now() - timedelta(minutes=20)
+    already_recorded = RadioTrackPlay.objects.filter(
+        user=request.user,
+        track=track,
+        listened_at__gte=dedupe_cutoff,
+    ).exists()
+    if already_recorded:
+        return
+    RadioTrackPlay.objects.create(user=request.user, track=track)
 
 
 def _build_stream_audio_url(source_url):
@@ -2828,6 +2843,24 @@ def dashboard(request):
         .first()
     )
 
+    week_cutoff = now - timedelta(days=7)
+    weekly_stream_total = RadioTrackPlay.objects.filter(
+        user=user,
+        listened_at__gte=week_cutoff,
+    ).count()
+    weekly_top_streams = list(
+        RadioTrackPlay.objects.filter(
+            user=user,
+            listened_at__gte=week_cutoff,
+        )
+        .values('track__title', 'track__artist', 'track__album_art')
+        .annotate(
+            play_count=models.Count('id'),
+            last_listened=models.Max('listened_at'),
+        )
+        .order_by('-play_count', '-last_listened')[:5]
+    )
+
     return render(request, 'core/dashboard.html', {
         'trending': trending,
         'upcoming': upcoming,
@@ -2853,6 +2886,9 @@ def dashboard(request):
             ).select_related('group')[:8]
         ),
         'badges': list(user.badges.all()),
+        'weekly_stream_total': weekly_stream_total,
+        'weekly_top_streams': weekly_top_streams,
+        'weekly_stream_range_label': f"{week_cutoff.strftime('%d %b')} – {now.strftime('%d %b')}",
     })
 
 
@@ -4316,6 +4352,8 @@ def live(request):
             lambda track: _text_matches_station([getattr(track, 'artist', ''), getattr(track, 'title', '')], station_group_names),
         )
 
+    _record_live_track_play(request, current_track)
+
     live_ai_payload = _get_or_generate_live_ai_payload(current_track)
 
     # Calculate offset for synchronization
@@ -4359,6 +4397,7 @@ def api_live_rotate_track(request):
     if schedule_context:
         _sync_state_with_schedule_context(state, schedule_context)
         current = schedule_context['current_track']
+        _record_live_track_play(request, current)
         live_ai_payload = _get_or_generate_live_ai_payload(current)
         up_next_list = schedule_context['up_next_tracks'][:6]
         recently_played_list = schedule_context['recently_played_tracks'][:6]
@@ -4429,6 +4468,7 @@ def api_live_rotate_track(request):
 
     # Prepare response data
     current = state.current_track
+    _record_live_track_play(request, current)
     live_ai_payload = _get_or_generate_live_ai_payload(current)
     up_next_ids = state.up_next
     up_next_tracks = RadioTrack.objects.filter(id__in=up_next_ids)
