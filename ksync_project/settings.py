@@ -85,9 +85,12 @@ DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL', DEFAULT_DB_URL),
         conn_max_age=60,
-        conn_health_checks=True
     )
 }
+
+# Enable health checks so Django will verify connections before using them.
+# Some versions of dj_database_url do not support conn_health_checks directly.
+DATABASES['default']['CONN_HEALTH_CHECKS'] = True
 
 
 # Password validation

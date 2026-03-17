@@ -1062,23 +1062,44 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
         }
 
+        function sanitizePlaylistTitle(title) {
+            if (!title || typeof title !== 'string') return '';
+            let sanitized = title;
+
+            // Remove standalone "AI" tokens (case-insensitive)
+            sanitized = sanitized.replace(/\bAI\b/gi, '');
+            
+            // Remove common datetime patterns (e.g., 2024-01-30 15:00, 2024-01-30, 15:00)
+            sanitized = sanitized.replace(/\b\d{4}-\d{2}-\d{2}(?:\s+\d{1,2}:\d{2})?\b/g, '');
+            sanitized = sanitized.replace(/\b\d{1,2}:\d{2}\b/g, '');
+
+            // Clean up extra separators and whitespace
+            sanitized = sanitized.replace(/[\-–—|]+/g, ' ');
+            sanitized = sanitized.replace(/\s{2,}/g, ' ').trim();
+
+            return sanitized || title;
+        }
+
         function updatePlaylistUI(containerId, tracks, colorClass) {
             const container = document.getElementById(containerId);
             if (!container) return;
             
-            container.innerHTML = tracks.map((track, idx) => `
+            container.innerHTML = tracks.map((track, idx) => {
+                const title = sanitizePlaylistTitle(track.title);
+                return `
                 <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-${colorClass}/50 hover:bg-${colorClass}/5 transition-all duration-300 group cursor-pointer">
                     ${containerId === 'up-next-container' ? `<span class="text-slate-600 font-mono text-xs w-6 text-center">${(idx + 1).toString().padStart(2, '0')}</span>` : ''}
                     <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                         ${track.album_art ? `<img src="${track.album_art}" class="w-full h-full object-cover">` : `<span class="material-symbols-outlined text-slate-500 group-hover:text-${colorClass} transition-colors">album</span>`}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-${colorClass} transition-colors">${track.title}</p>
+                        <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-${colorClass} transition-colors">${title}</p>
                         <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">${track.artist}</p>
                     </div>
                     ${containerId === 'up-next-container' ? `<span class="material-symbols-outlined text-slate-600 text-sm">chevron_right</span>` : `<span class="text-[10px] font-mono text-slate-600 tracking-wider">Played</span>`}
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         // Simulate listener count fluctuation

@@ -102,7 +102,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <span>WEEKLY </span><span class="text-transparent [-webkit-text-stroke:2px_theme(colors.primary)]">SCHEDULE</span>
                 </h1>
                 <p class="text-slate-300 font-mono text-xs md:text-sm tracking-widest uppercase leading-relaxed max-w-lg mt-6 mb-[140px]">
-                    Your complete guide to every show on K-Beats Global Studio 1. All times in KST.
+                    Your complete guide to every show on K-Beats Global Studio 1. All times in UK time (GMT/BST).
                 </p>
             </div>
         </div>
@@ -157,7 +157,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="flex items-end justify-between mb-12 pb-4 border-b border-white/20 reveal-left">
                 <div>
                     <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none" x-text="activeDayLabel"></h2>
-                    <p class="text-slate-400 mt-3 font-mono text-xs tracking-widest uppercase">Full programming lineup · KST timezone</p>
+                    <p class="text-slate-400 mt-3 font-mono text-xs tracking-widest uppercase">Full programming lineup · UK time (GMT/BST)</p>
                 </div>
                 <div class="hidden sm:flex items-center gap-3 text-slate-400 font-mono text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-primary text-base">schedule</span>
@@ -194,15 +194,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <div class="flex-1 p-6 flex flex-col justify-center">
                             <div class="flex items-center gap-3 mb-2 flex-wrap">
                                 <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-black transition-colors" x-text="show.name"></h3>
-                                <span
-                                    class="inline-block text-[9px] font-black px-2 py-0.5 uppercase tracking-widest border"
-                                    :class="show.genre === 'LIVE'
-                                        ? 'bg-primary text-black border-primary'
-                                        : show.genre === 'INTERVIEW'
-                                            ? 'bg-secondary text-black border-secondary'
-                                            : 'bg-white/10 text-white border-white/20 group-hover:bg-black/10 group-hover:text-black group-hover:border-black/20'"
-                                    x-text="show.genre"
-                                ></span>
                             </div>
                             <p class="font-mono text-[10px] md:text-xs tracking-widest uppercase text-slate-400 group-hover:text-black/60 transition-colors" x-text="'Hosted by ' + show.host + ' · ' + show.description"></p>
                         </div>
@@ -245,7 +236,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <h3 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter leading-none mb-4 group-hover:text-primary transition-colors">K-POP UNPLUGGED</h3>
                     <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed mb-6">Acoustic reimaginings of chart-topping hits, performed live in-studio. Intimate, raw, unforgettable.</p>
                     <div class="flex items-center justify-between border-t border-white/10 pt-6">
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">SAT · 20:00 KST</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">SAT · 20:00 UK</span>
                         <span class="material-symbols-outlined text-white/30 group-hover:text-primary transition-colors">arrow_forward</span>
                     </div>
                 </div>
@@ -259,7 +250,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <h3 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter leading-none mb-4 group-hover:text-secondary transition-colors">IDOL SPOTLIGHT</h3>
                     <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed mb-6">Deep-dive interview series featuring the biggest names in K-Pop. Candid conversations and exclusive stories.</p>
                     <div class="flex items-center justify-between border-t border-white/10 pt-6">
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">WED · 16:00 KST</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">WED · 16:00 UK</span>
                         <span class="material-symbols-outlined text-white/30 group-hover:text-secondary transition-colors">arrow_forward</span>
                     </div>
                 </div>
@@ -273,7 +264,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <h3 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter leading-none mb-4 group-hover:text-primary transition-colors">SEOUL NIGHTS</h3>
                     <p class="text-slate-400 font-mono text-xs tracking-widest uppercase leading-relaxed mb-6">Late-night vibes with the smoothest R&B, chill hip-hop, and lo-fi beats straight from Seoul's underground scene.</p>
                     <div class="flex items-center justify-between border-t border-white/10 pt-6">
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">DAILY · 00:00 KST</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">DAILY · 00:00 UK</span>
                         <span class="material-symbols-outlined text-white/30 group-hover:text-primary transition-colors">arrow_forward</span>
                     </div>
                 </div>
@@ -352,11 +343,28 @@ function scheduleApp() {
     const dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
     const dayLabels = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const now = new Date();
-    // Convert to KST (UTC+9)
-    const kstOffset = 9 * 60;
-    const kstDate = new Date(now.getTime() + (kstOffset + now.getTimezoneOffset()) * 60000);
-    const todayIndex = kstDate.getDay();
-    const currentHourKST = kstDate.getHours();
+    // Convert to UK local time (Europe/London) for schedule calculations
+    const londonDate = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/London' }));
+    const todayIndex = londonDate.getDay();
+    const currentHourUK = londonDate.getHours();
+
+    function sanitizePlaylistTitle(title) {
+        if (!title || typeof title !== 'string') return '';
+        let sanitized = title;
+
+        // Remove standalone "AI", "TUE", and "GAME" tokens (case-insensitive)
+        sanitized = sanitized.replace(/\b(AI|TUE|GAME)\b/gi, '');
+        
+        // Remove date/time patterns (e.g., 2024-01-30 15:00, 2024-01-30, 15:00)
+        sanitized = sanitized.replace(/\b\d{4}-\d{2}-\d{2}(?:\s+\d{1,2}:\d{2})?\b/g, '');
+        sanitized = sanitized.replace(/\b\d{1,2}:\d{2}\b/g, '');
+
+        // Clean up extra separators and whitespace
+        sanitized = sanitized.replace(/[\-–—|]+/g, ' ');
+        sanitized = sanitized.replace(/\s{2,}/g, ' ').trim();
+
+        return sanitized || title;
+    }
 
     const days = dayNames.map((short, i) => ({
         key: short,
@@ -431,7 +439,7 @@ function scheduleApp() {
         ],
     };
 
-    // Mark live / upcoming based on current KST time & day
+    // Mark live / upcoming based on current UK time & day
     const todayKey = dayNames[todayIndex];
     if (scheduleData[todayKey]) {
         let foundLive = false;
@@ -440,7 +448,7 @@ function scheduleApp() {
             const nextHour = i + 1 < scheduleData[todayKey].length
                 ? parseInt(scheduleData[todayKey][i + 1].time.split(':')[0])
                 : 24;
-            if (!foundLive && currentHourKST >= showHour && currentHourKST < nextHour) {
+            if (!foundLive && currentHourUK >= showHour && currentHourUK < nextHour) {
                 scheduleData[todayKey][i].live = true;
                 foundLive = true;
                 if (i + 1 < scheduleData[todayKey].length) {
@@ -455,7 +463,7 @@ function scheduleApp() {
     if (scheduleData[todayKey]) {
         for (let i = scheduleData[todayKey].length - 1; i >= 0; i--) {
             const h = parseInt(scheduleData[todayKey][i].time.split(':')[0]);
-            if (currentHourKST >= h) {
+            if (currentHourUK >= h) {
                 currentShow = scheduleData[todayKey][i];
                 break;
             }
@@ -475,6 +483,12 @@ function scheduleApp() {
                 
                 // If we got data, use it. Otherwise, fallback or handle error.
                 if (Object.keys(data).some(k => data[k].length > 0)) {
+                    // Sanitize titles (remove AI + datetime strings) before rendering
+                    Object.keys(data).forEach(dayKey => {
+                        data[dayKey].forEach(show => {
+                            show.name = sanitizePlaylistTitle(show.name);
+                        });
+                    });
                     this.scheduleData = data;
                 } else {
                     console.warn("No schedule data returned from API.");
@@ -491,13 +505,12 @@ function scheduleApp() {
 
         updateLiveStatus() {
             const now = new Date();
-            const kstOffset = 9 * 60;
-            const kstDate = new Date(now.getTime() + (kstOffset + now.getTimezoneOffset()) * 60000);
-            const todayIdx = kstDate.getDay();
+            const londonDate = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/London' }));
+            const todayIdx = londonDate.getDay();
             const dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
             const todayK = dayNames[todayIdx];
-            const currentH = kstDate.getHours();
-            const currentM = kstDate.getMinutes();
+            const currentH = londonDate.getHours();
+            const currentM = londonDate.getMinutes();
             const currentTimeStr = `${currentH.toString().padStart(2, '0')}:${currentM.toString().padStart(2, '0')}`;
 
             if (!this.scheduleData[todayK]) return;
@@ -528,8 +541,48 @@ function scheduleApp() {
             const d = this.days.find(d => d.key === this.activeDay);
             return d ? d.label.toUpperCase() + ' LINEUP' : '';
         },
+        get currentUKTime() {
+            const now = new Date();
+            const londonDate = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/London' }));
+            const h = londonDate.getHours();
+            const m = londonDate.getMinutes();
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        },
+
+        get currentUKDayKey() {
+            const now = new Date();
+            const londonDate = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/London' }));
+            const dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+            return dayNames[londonDate.getDay()];
+        },
+
         get activeShows() {
-            return this.scheduleData[this.activeDay] || [];
+            const shows = this.scheduleData[this.activeDay] || [];
+
+            // Only prune finished shows for today so the live show stays on top.
+            if (this.activeDay === this.currentUKDayKey && shows.length) {
+                const now = this.currentUKTime;
+
+                // Find live show index (if any)
+                const liveIndex = shows.findIndex(s => s.live);
+
+                // Keep live show (if exists) and all future shows
+                const filtered = shows.filter(s => {
+                    if (s.live) return true;
+                    return s.time >= now;
+                });
+
+                // Place the live show at the top if it's not already
+                if (liveIndex !== -1) {
+                    const liveShow = shows[liveIndex];
+                    const withoutLive = filtered.filter(s => s !== liveShow);
+                    return [liveShow, ...withoutLive];
+                }
+
+                return filtered;
+            }
+
+            return shows;
         }
     };
 }
