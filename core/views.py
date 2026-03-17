@@ -202,6 +202,7 @@ def _sanitize_playlist_name(name):
 
 def _fallback_playlist_preview(playlist_name, sample_tracks):
     safe_name = _sanitize_playlist_name(playlist_name) or 'this show'
+    safe_name_lower = safe_name.lower()
     titles = []
     artists = []
     for track in sample_tracks[:6]:
@@ -217,13 +218,32 @@ def _fallback_playlist_preview(playlist_name, sample_tracks):
     title_a = titles[0] if titles else 'high-impact choruses'
     title_b = titles[1] if len(titles) > 1 else 'smooth transitions'
 
-    templates = [
-        f"Expect a punchy blend from {artist_text}, giving {safe_name} a bright, high-energy flow from start to finish.",
-        f"{safe_name} leans into confident hooks and big drops, with {lead_artist} and company shaping a bold primetime mix.",
-        f"From {title_a} into {title_b}, this set keeps momentum steady while spotlighting a balanced artist spread.",
-        f"This hour on {safe_name} is built for replay value: polished vocals, dynamic production and crowd-ready K-pop moments.",
-        f"{safe_name} threads fan favourites with newer sounds, moving cleanly between upbeat peaks and lighter melodic sections.",
-    ]
+    if 'album' in safe_name_lower:
+        templates = [
+            f"{safe_name} spotlights full-album storytelling, moving through deeper cuts from {artist_text} with richer pacing and mood shifts.",
+            f"Built for album listeners, {safe_name} leans into sequence and atmosphere, letting standout tracks from {lead_artist} breathe beyond singles.",
+            f"From {title_a} to {title_b}, {safe_name} explores long-form K-pop texture with cohesive transitions and deeper catalog moments.",
+        ]
+    elif 'single' in safe_name_lower:
+        templates = [
+            f"{safe_name} is all killer hooks and instant payoffs, stacking sharp, chart-ready singles from {artist_text} back-to-back.",
+            f"Expect tight runtimes and high-impact choruses on {safe_name}, where {lead_artist} and peers deliver pure headline-single energy.",
+            f"{safe_name} keeps things fast and catchy, pivoting from {title_a} into {title_b} with clean, radio-first momentum.",
+        ]
+    elif 'ep' in safe_name_lower:
+        templates = [
+            f"{safe_name} highlights mini-album gems, balancing title-track urgency with standout EP b-sides from {artist_text}.",
+            f"On {safe_name}, shorter project cuts take centre stage, with {lead_artist} and others driving compact but adventurous transitions.",
+            f"{safe_name} bridges {title_a} and {title_b} with a focused EP-driven arc that feels concise, curated and fresh.",
+        ]
+    else:
+        templates = [
+            f"Expect a punchy blend from {artist_text}, giving {safe_name} a bright, high-energy flow from start to finish.",
+            f"{safe_name} leans into confident hooks and big drops, with {lead_artist} and company shaping a bold primetime mix.",
+            f"From {title_a} into {title_b}, this set keeps momentum steady while spotlighting a balanced artist spread.",
+            f"This hour on {safe_name} is built for replay value: polished vocals, dynamic production and crowd-ready K-pop moments.",
+            f"{safe_name} threads fan favourites with newer sounds, moving cleanly between upbeat peaks and lighter melodic sections.",
+        ]
 
     template_index = uuid.uuid5(uuid.NAMESPACE_DNS, safe_name.lower()).int % len(templates)
     return templates[template_index]
