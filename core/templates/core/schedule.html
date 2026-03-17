@@ -141,7 +141,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <span class="text-[10px] font-black uppercase tracking-[0.2em] text-black">On Air Now</span>
                 </div>
                 <span class="text-black font-black text-lg md:text-xl uppercase tracking-tighter" x-text="currentShow.name">—</span>
-                <span class="hidden md:inline text-black/60 font-mono text-xs uppercase tracking-widest" x-text="'with ' + currentShow.host">—</span>
+                <span class="hidden md:inline text-black/60 font-mono text-xs uppercase tracking-widest" x-text="'with ' + displayHostName(currentShow.host)">—</span>
             </div>
             <a href="{% url 'live' %}" class="bg-black text-white px-4 py-2 md:px-6 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                 Listen Live
@@ -195,7 +195,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <div class="flex items-center gap-3 mb-2 flex-wrap">
                                 <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-black transition-colors" x-text="show.name"></h3>
                             </div>
-                            <p class="font-mono text-[10px] md:text-xs tracking-widest uppercase text-slate-400 group-hover:text-black/60 transition-colors" x-text="'Hosted by ' + show.host + ' · ' + show.description"></p>
+                            <p class="font-mono text-[10px] md:text-xs tracking-widest uppercase text-slate-400 group-hover:text-black/60 transition-colors" x-text="'Hosted by ' + displayHostName(show.host) + ' · ' + show.description"></p>
                         </div>
 
                         <!-- Live Icon Column -->
@@ -288,7 +288,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="w-24 h-24 mx-auto mb-4 bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                         <span class="material-symbols-outlined text-5xl text-white/20 group-hover:text-primary transition-colors">mic</span>
                     </div>
-                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-primary transition-colors">DJ Hype</h4>
+                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-primary transition-colors">Yang</h4>
                     <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">The Morning Wave</p>
                 </div>
                 <!-- Host 2 -->
@@ -296,7 +296,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="w-24 h-24 mx-auto mb-4 bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                         <span class="material-symbols-outlined text-5xl text-white/20 group-hover:text-secondary transition-colors">headphones</span>
                     </div>
-                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-secondary transition-colors">MC Juno</h4>
+                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-secondary transition-colors">Jung</h4>
                     <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">Comeback Hour</p>
                 </div>
                 <!-- Host 3 -->
@@ -304,7 +304,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="w-24 h-24 mx-auto mb-4 bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                         <span class="material-symbols-outlined text-5xl text-white/20 group-hover:text-primary transition-colors">record_voice_over</span>
                     </div>
-                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-primary transition-colors">Sora Lee</h4>
+                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-primary transition-colors">Jung</h4>
                     <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">Idol Spotlight</p>
                 </div>
                 <!-- Host 4 -->
@@ -312,7 +312,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="w-24 h-24 mx-auto mb-4 bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                         <span class="material-symbols-outlined text-5xl text-white/20 group-hover:text-secondary transition-colors">nightlife</span>
                     </div>
-                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-secondary transition-colors">Luna K</h4>
+                    <h4 class="font-black text-white uppercase tracking-tighter text-lg group-hover:text-secondary transition-colors">Yang</h4>
                     <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">Seoul Nights</p>
                 </div>
             </div>
@@ -375,67 +375,67 @@ function scheduleApp() {
     // Full weekly schedule data
     const scheduleData = {
         MON: [
-            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "K-Pop's freshest morning hits to start your day.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
-            { time: '10:00', duration: '2 Hours', name: 'Chart Attack', host: 'MC Juno', description: 'Breaking down the weekly chart movers.', genre: 'CHARTS', icon: 'trending_up', live: false, upcoming: false },
-            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Non-stop fan favourites and requests.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
-            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'New releases, fan requests, and charting tracks.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
-            { time: '16:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Sora Lee', description: 'You pick the playlist. Call in your favourites.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
-            { time: '20:00', duration: '2 Hours', name: 'Evening Mixtape', host: 'Luna K', description: 'Deep cuts, B-sides, and hidden gems.', genre: 'MUSIC', icon: 'album', live: false, upcoming: false },
-            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'R&B, chill hip-hop, and late-night vibes.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'Yang', description: "K-Pop's freshest morning hits to start your day.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'Chart Attack', host: 'Jung', description: 'Breaking down the weekly chart movers.', genre: 'CHARTS', icon: 'trending_up', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'Yang', description: 'Non-stop fan favourites and requests.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'Jung', description: 'New releases, fan requests, and charting tracks.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Jung', description: 'You pick the playlist. Call in your favourites.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'Evening Mixtape', host: 'Yang', description: 'Deep cuts, B-sides, and hidden gems.', genre: 'MUSIC', icon: 'album', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Yang', description: 'R&B, chill hip-hop, and late-night vibes.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
         ],
         TUE: [
-            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "Rise and shine with K-Pop's biggest hits.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
-            { time: '10:00', duration: '2 Hours', name: 'Throwback Tuesday', host: 'Sora Lee', description: 'Classic K-Pop anthems from every generation.', genre: 'THROWBACK', icon: 'history', live: false, upcoming: false },
-            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Midday energy boost with your favourites.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
-            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'New releases and trending tracks.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
-            { time: '16:00', duration: '2 Hours', name: 'Global Wave', host: 'MC Juno', description: 'K-Pop acts charting around the world.', genre: 'CHARTS', icon: 'public', live: false, upcoming: false },
-            { time: '20:00', duration: '2 Hours', name: 'Studio Sessions', host: 'Sora Lee', description: 'Live acoustic performances and interviews.', genre: 'LIVE', icon: 'mic', live: false, upcoming: false },
-            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'Midnight synthwave, R&B and chill vibes.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'Yang', description: "Rise and shine with K-Pop's biggest hits.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'Throwback Tuesday', host: 'Jung', description: 'Classic K-Pop anthems from every generation.', genre: 'THROWBACK', icon: 'history', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'Yang', description: 'Midday energy boost with your favourites.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'Jung', description: 'New releases and trending tracks.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Global Wave', host: 'Jung', description: 'K-Pop acts charting around the world.', genre: 'CHARTS', icon: 'public', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'Studio Sessions', host: 'Jung', description: 'Live acoustic performances and interviews.', genre: 'LIVE', icon: 'mic', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Yang', description: 'Midnight synthwave, R&B and chill vibes.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
         ],
         WED: [
-            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "Your midweek morning K-Pop fix.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
-            { time: '10:00', duration: '2 Hours', name: 'Chart Attack', host: 'MC Juno', description: 'Midweek chart update and analysis.', genre: 'CHARTS', icon: 'trending_up', live: false, upcoming: false },
-            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Non-stop hits over your lunch break.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
-            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'Fresh releases and fan favourites.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
-            { time: '16:00', duration: '2 Hours', name: 'Idol Spotlight', host: 'Sora Lee', description: 'In-depth interviews with top K-Pop idols.', genre: 'INTERVIEW', icon: 'record_voice_over', live: false, upcoming: false },
-            { time: '20:00', duration: '2 Hours', name: 'K-Pop Unplugged', host: 'Sora Lee', description: 'Stripped-back acoustic performances.', genre: 'LIVE', icon: 'piano', live: false, upcoming: false },
-            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'Late-night lo-fi and smooth R&B.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'Yang', description: "Your midweek morning K-Pop fix.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'Chart Attack', host: 'Jung', description: 'Midweek chart update and analysis.', genre: 'CHARTS', icon: 'trending_up', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'Yang', description: 'Non-stop hits over your lunch break.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'Jung', description: 'Fresh releases and fan favourites.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Idol Spotlight', host: 'Jung', description: 'In-depth interviews with top K-Pop idols.', genre: 'INTERVIEW', icon: 'record_voice_over', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'K-Pop Unplugged', host: 'Jung', description: 'Stripped-back acoustic performances.', genre: 'LIVE', icon: 'piano', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Yang', description: 'Late-night lo-fi and smooth R&B.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
         ],
         THU: [
-            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "Energise your Thursday morning.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
-            { time: '10:00', duration: '2 Hours', name: 'New Music Thursday', host: 'MC Juno', description: 'First plays of the week\'s biggest releases.', genre: 'MUSIC', icon: 'library_music', live: false, upcoming: false },
-            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Your favourite K-Pop hits on rotation.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
-            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'Comebacks, debuts and chart risers.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
-            { time: '16:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Sora Lee', description: 'Listener picks and shout-outs.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
-            { time: '20:00', duration: '2 Hours', name: 'Evening Mixtape', host: 'Luna K', description: 'B-sides, deep cuts, and curated playlists.', genre: 'MUSIC', icon: 'album', live: false, upcoming: false },
-            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'Smooth late-night vibes from Seoul.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'Yang', description: "Energise your Thursday morning.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'New Music Thursday', host: 'Jung', description: 'First plays of the week\'s biggest releases.', genre: 'MUSIC', icon: 'library_music', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'Yang', description: 'Your favourite K-Pop hits on rotation.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'Jung', description: 'Comebacks, debuts and chart risers.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Jung', description: 'Listener picks and shout-outs.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'Evening Mixtape', host: 'Yang', description: 'B-sides, deep cuts, and curated playlists.', genre: 'MUSIC', icon: 'album', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Yang', description: 'Smooth late-night vibes from Seoul.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
         ],
         FRI: [
-            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'DJ Hype', description: "Friday energy! Weekend starts here.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
-            { time: '10:00', duration: '2 Hours', name: 'Chart Attack', host: 'MC Juno', description: 'End-of-week chart countdown.', genre: 'CHARTS', icon: 'trending_up', live: false, upcoming: false },
-            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'DJ Hype', description: 'Pre-weekend party mix.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
-            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'MC Juno', description: 'Friday releases and chart dominators.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
-            { time: '16:00', duration: '2 Hours', name: 'Idol Spotlight', host: 'Sora Lee', description: 'Exclusive Friday interview special.', genre: 'INTERVIEW', icon: 'record_voice_over', live: false, upcoming: false },
-            { time: '20:00', duration: '4 Hours', name: 'Friday Night Live', host: 'Luna K', description: 'The ultimate weekend warm-up party mix.', genre: 'LIVE', icon: 'celebration', live: false, upcoming: false },
-            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Luna K', description: 'Friday night fever — dance and R&B.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+            { time: '06:00', duration: '4 Hours', name: 'The Morning Wave', host: 'Yang', description: "Friday energy! Weekend starts here.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '10:00', duration: '2 Hours', name: 'Chart Attack', host: 'Jung', description: 'End-of-week chart countdown.', genre: 'CHARTS', icon: 'trending_up', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'Lunchtime Jams', host: 'Yang', description: 'Pre-weekend party mix.', genre: 'MUSIC', icon: 'restaurant', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Comeback Hour', host: 'Jung', description: 'Friday releases and chart dominators.', genre: 'MUSIC', icon: 'new_releases', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Idol Spotlight', host: 'Jung', description: 'Exclusive Friday interview special.', genre: 'INTERVIEW', icon: 'record_voice_over', live: false, upcoming: false },
+            { time: '20:00', duration: '4 Hours', name: 'Friday Night Live', host: 'Yang', description: 'The ultimate weekend warm-up party mix.', genre: 'LIVE', icon: 'celebration', live: false, upcoming: false },
+            { time: '00:00', duration: '6 Hours', name: 'Seoul Nights', host: 'Yang', description: 'Friday night fever — dance and R&B.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
         ],
         SAT: [
-            { time: '08:00', duration: '4 Hours', name: 'Weekend Wake-Up', host: 'DJ Hype', description: "Easy Saturday morning grooves.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
-            { time: '12:00', duration: '2 Hours', name: 'K-Pop Rewind', host: 'Sora Lee', description: 'Iconic tracks from K-Pop history.', genre: 'THROWBACK', icon: 'history', live: false, upcoming: false },
-            { time: '14:00', duration: '2 Hours', name: 'Global Wave', host: 'MC Juno', description: 'K-Pop conquering the world charts.', genre: 'CHARTS', icon: 'public', live: false, upcoming: false },
-            { time: '16:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Sora Lee', description: 'Saturday special fan dedications.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
-            { time: '18:00', duration: '2 Hours', name: 'Idol Spotlight', host: 'Sora Lee', description: 'Weekend long-form interview special.', genre: 'INTERVIEW', icon: 'record_voice_over', live: false, upcoming: false },
-            { time: '20:00', duration: '2 Hours', name: 'K-Pop Unplugged', host: 'Sora Lee', description: 'Live acoustic performances in the studio.', genre: 'LIVE', icon: 'piano', live: false, upcoming: false },
-            { time: '00:00', duration: '8 Hours', name: 'Seoul Nights Extended', host: 'Luna K', description: 'Extended midnight session — deep vibes all night.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+            { time: '08:00', duration: '4 Hours', name: 'Weekend Wake-Up', host: 'Yang', description: "Easy Saturday morning grooves.", genre: 'MUSIC', icon: 'wb_sunny', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'K-Pop Rewind', host: 'Jung', description: 'Iconic tracks from K-Pop history.', genre: 'THROWBACK', icon: 'history', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Global Wave', host: 'Jung', description: 'K-Pop conquering the world charts.', genre: 'CHARTS', icon: 'public', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Jung', description: 'Saturday special fan dedications.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
+            { time: '18:00', duration: '2 Hours', name: 'Idol Spotlight', host: 'Jung', description: 'Weekend long-form interview special.', genre: 'INTERVIEW', icon: 'record_voice_over', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'K-Pop Unplugged', host: 'Jung', description: 'Live acoustic performances in the studio.', genre: 'LIVE', icon: 'piano', live: false, upcoming: false },
+            { time: '00:00', duration: '8 Hours', name: 'Seoul Nights Extended', host: 'Yang', description: 'Extended midnight session — deep vibes all night.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
         ],
         SUN: [
-            { time: '08:00', duration: '4 Hours', name: 'Sunday Slow Jams', host: 'Luna K', description: "Easy listening to start your Sunday.", genre: 'MUSIC', icon: 'self_improvement', live: false, upcoming: false },
-            { time: '12:00', duration: '2 Hours', name: 'K-Pop Top 40', host: 'MC Juno', description: 'The definitive weekly countdown.', genre: 'CHARTS', icon: 'emoji_events', live: false, upcoming: false },
-            { time: '14:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'DJ Hype', description: 'Sunday listener favourites.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
-            { time: '16:00', duration: '2 Hours', name: 'Comeback Preview', host: 'MC Juno', description: "Sneak peeks at next week's releases.", genre: 'MUSIC', icon: 'preview', live: false, upcoming: false },
-            { time: '18:00', duration: '2 Hours', name: 'Studio Sessions', host: 'Sora Lee', description: 'Live performances and behind-the-scenes stories.', genre: 'LIVE', icon: 'mic', live: false, upcoming: false },
-            { time: '20:00', duration: '2 Hours', name: 'Evening Mixtape', host: 'Luna K', description: 'Wind down with curated deep cuts.', genre: 'MUSIC', icon: 'album', live: false, upcoming: false },
-            { time: '00:00', duration: '8 Hours', name: 'Seoul Nights Extended', host: 'Luna K', description: 'Sunday night chill — smooth vibes until dawn.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
+            { time: '08:00', duration: '4 Hours', name: 'Sunday Slow Jams', host: 'Yang', description: "Easy listening to start your Sunday.", genre: 'MUSIC', icon: 'self_improvement', live: false, upcoming: false },
+            { time: '12:00', duration: '2 Hours', name: 'K-Pop Top 40', host: 'Jung', description: 'The definitive weekly countdown.', genre: 'CHARTS', icon: 'emoji_events', live: false, upcoming: false },
+            { time: '14:00', duration: '2 Hours', name: 'Fan Request Hour', host: 'Yang', description: 'Sunday listener favourites.', genre: 'LIVE', icon: 'call', live: false, upcoming: false },
+            { time: '16:00', duration: '2 Hours', name: 'Comeback Preview', host: 'Jung', description: "Sneak peeks at next week's releases.", genre: 'MUSIC', icon: 'preview', live: false, upcoming: false },
+            { time: '18:00', duration: '2 Hours', name: 'Studio Sessions', host: 'Jung', description: 'Live performances and behind-the-scenes stories.', genre: 'LIVE', icon: 'mic', live: false, upcoming: false },
+            { time: '20:00', duration: '2 Hours', name: 'Evening Mixtape', host: 'Yang', description: 'Wind down with curated deep cuts.', genre: 'MUSIC', icon: 'album', live: false, upcoming: false },
+            { time: '00:00', duration: '8 Hours', name: 'Seoul Nights Extended', host: 'Yang', description: 'Sunday night chill — smooth vibes until dawn.', genre: 'MUSIC', icon: 'dark_mode', live: false, upcoming: false },
         ],
     };
 
@@ -473,7 +473,7 @@ function scheduleApp() {
     return {
         days,
         activeDay: todayKey,
-        scheduleData: {}, // Start empty
+        scheduleData: scheduleData, // Start with built-in fallback data
         currentShow: { name: 'K-Beats Radio', host: 'Auto DJ' },
 
         async init() {
@@ -481,18 +481,28 @@ function scheduleApp() {
                 const response = await fetch('/api/schedule-data/');
                 const data = await response.json();
                 
-                // If we got data, use it. Otherwise, fallback or handle error.
-                if (Object.keys(data).some(k => data[k].length > 0)) {
+                // Use API data only when it has valid day arrays with content.
+                const dayKeys = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+                const hasValidApiData = dayKeys.some(k => Array.isArray(data?.[k]) && data[k].length > 0);
+                if (hasValidApiData) {
                     // Sanitize titles (remove AI + datetime strings) before rendering
                     Object.keys(data).forEach(dayKey => {
+                        if (!Array.isArray(data[dayKey])) return;
                         data[dayKey].forEach(show => {
                             show.name = sanitizePlaylistTitle(show.name);
                         });
                     });
                     this.scheduleData = data;
                 } else {
-                    console.warn("No schedule data returned from API.");
-                    // Optional: Load some default dummy data if needed
+                    console.warn("No valid schedule data returned from API; using fallback schedule.");
+                }
+
+                // If selected day has no entries, jump to first day that does.
+                if (!Array.isArray(this.scheduleData[this.activeDay]) || this.scheduleData[this.activeDay].length === 0) {
+                    const firstDayWithShows = dayKeys.find(k => Array.isArray(this.scheduleData[k]) && this.scheduleData[k].length > 0);
+                    if (firstDayWithShows) {
+                        this.activeDay = firstDayWithShows;
+                    }
                 }
                 
                 this.updateLiveStatus();
@@ -500,6 +510,8 @@ function scheduleApp() {
                 setInterval(() => this.updateLiveStatus(), 60000);
             } catch (error) {
                 console.error("Failed to load schedule:", error);
+                // Keep fallback scheduleData already loaded above.
+                this.updateLiveStatus();
             }
         },
 
@@ -535,6 +547,11 @@ function scheduleApp() {
                     show.upcoming = false;
                 }
             }
+        },
+
+        displayHostName(host) {
+            const rawHost = String(host || '').trim();
+            return rawHost;
         },
 
         get activeDayLabel() {
@@ -577,6 +594,11 @@ function scheduleApp() {
                     const liveShow = shows[liveIndex];
                     const withoutLive = filtered.filter(s => s !== liveShow);
                     return [liveShow, ...withoutLive];
+                }
+
+                // If everything has passed, show full lineup instead of blank state
+                if (!filtered.length) {
+                    return shows;
                 }
 
                 return filtered;

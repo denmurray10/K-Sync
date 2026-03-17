@@ -518,7 +518,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
                 <div>
                     <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Host</label>
-                    <input type="text" x-model="newSchedule.host" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
+                    <select x-model="newSchedule.host" class="w-full bg-black border border-white/10 p-2 text-xs text-white uppercase">
+                        <option value="Yang">Yang</option>
+                        <option value="Jung">Jung</option>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">Voice Over</label>
@@ -814,7 +817,7 @@ function playlistApp() {
         voicePreviewTimer: null,
         voicePreviewTrackIndex: null,
         voiceClipDragContext: null,
-        newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Auto DJ', genre: 'MUSIC', voice_over: '' },
+        newSchedule: { schedule_id: null, show_name: '', show_color: 'CYAN', playlist_id: null, playlist_name: '', start: '09:00', end: '10:00', host: 'Yang', genre: 'MUSIC', voice_over: '' },
         toast: { visible: false, message: '' },
         toastTimeout: null,
         saveState: 'idle',
@@ -1180,7 +1183,7 @@ function playlistApp() {
                         show_name: slot.show_name || '',
                         show_color: slot.show_color || 'CYAN',
                         voice_over: slot.voice_over || '',
-                        host: slot.host || 'Auto DJ',
+                        host: slot.host || 'Yang',
                         genre: slot.genre || 'MUSIC'
                     })
                 });
@@ -1209,7 +1212,7 @@ function playlistApp() {
             this.newSchedule.playlist_name = slot.name || 'Scheduled Playlist';
             this.newSchedule.start = this.snapTimeValue(slot.time || '09:00');
             this.newSchedule.end = this.snapTimeValue(String(slot.duration || '').replace('Until ', '') || '10:00');
-            this.newSchedule.host = slot.host || 'Auto DJ';
+            this.newSchedule.host = slot.host || 'Yang';
             this.newSchedule.genre = slot.genre || 'MUSIC';
             this.newSchedule.voice_over = slot.voice_over || '';
             this.syncSchedulePlaylistName();
@@ -1225,7 +1228,7 @@ function playlistApp() {
             this.newSchedule.playlist_name = this.voiceTimelinePlaylistName || this.currentPlaylist.name || 'Current Builder Playlist';
             this.newSchedule.start = '09:00';
             this.newSchedule.end = '10:00';
-            this.newSchedule.host = 'Auto DJ';
+            this.newSchedule.host = 'Yang';
             this.newSchedule.genre = 'VOICE';
             this.newSchedule.voice_over = '';
             this.syncSchedulePlaylistName();
@@ -1676,7 +1679,7 @@ function playlistApp() {
                     show_name: slot.show_name || '',
                     show_color: slot.show_color || 'CYAN',
                     voice_over: slot.voice_over || '',
-                    host: slot.host || 'Auto DJ',
+                    host: slot.host || 'Yang',
                     genre: slot.genre || 'MUSIC',
                 })));
             });
@@ -1734,7 +1737,7 @@ function playlistApp() {
                             show_name: slot.show_name || '',
                             show_color: slot.show_color || 'CYAN',
                             voice_over: slot.voice_over || '',
-                            host: slot.host || 'Auto DJ',
+                            host: slot.host || 'Yang',
                             genre: slot.genre || 'MUSIC',
                         })
                     });
@@ -2074,7 +2077,7 @@ function playlistApp() {
                     show_name: slot.show_name || '',
                     show_color: slot.show_color || 'CYAN',
                     voice_over: slot.voice_over || '',
-                    host: slot.host || 'Auto DJ',
+                    host: slot.host || 'Yang',
                     genre: slot.genre || 'MUSIC',
                 }));
 
@@ -2190,7 +2193,7 @@ function playlistApp() {
                             show_name: slot.show_name || '',
                             show_color: slot.show_color || 'CYAN',
                             voice_over: slot.voice_over || '',
-                            host: slot.host || 'Auto DJ',
+                            host: slot.host || 'Yang',
                             genre: slot.genre || 'MUSIC'
                         })
                     });
@@ -2243,7 +2246,7 @@ function playlistApp() {
                             show_name: slot.show_name || '',
                             show_color: slot.show_color || 'CYAN',
                             voice_over: slot.voice_over || '',
-                            host: slot.host || 'Auto DJ',
+                            host: slot.host || 'Yang',
                             genre: slot.genre || 'MUSIC'
                         })
                     });
