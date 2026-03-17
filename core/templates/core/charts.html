@@ -346,6 +346,41 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </section>
 
+            <!-- Trust Signals: Methodology + Sources -->
+            <section class="w-full bg-black border-b border-white/10 py-8 md:py-10">
+                <div class="container mx-auto px-6 max-w-[1400px]">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 reveal-up">
+                        <div class="border border-white/20 bg-white/[0.02] p-6">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-primary text-lg">manage_search</span>
+                                <h3 class="font-black text-xs uppercase tracking-[0.2em] text-white">How Ranks Are Calculated</h3>
+                            </div>
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-4">{{ ranking_explain_label }}</p>
+                            <ul class="space-y-2">
+                                {% for item in ranking_methodology %}
+                                <li class="text-sm text-slate-300 leading-relaxed">• {{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="border border-white/20 bg-white/[0.02] p-6">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-secondary text-lg">source_environment</span>
+                                <h3 class="font-black text-xs uppercase tracking-[0.2em] text-white">Source Cards</h3>
+                            </div>
+                            <div class="space-y-3">
+                                {% for source in ranking_sources %}
+                                <div class="border border-white/10 p-3 bg-black/40">
+                                    <p class="font-mono text-[10px] tracking-widest uppercase text-primary">{{ source.name }}</p>
+                                    <p class="text-xs text-slate-400 mt-1">{{ source.detail }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Scrolling Ticker Bar (Tracks 11-20) -->
             {% if chart_ticker %}
             <section

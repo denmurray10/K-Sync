@@ -2219,6 +2219,26 @@ def charts(request):
         {'key': 'soloists', 'label': 'Solo Artists', 'db': 'soloists'},
         {'key': 'groups', 'label': 'Idol Groups', 'db': 'groups'},
     ]
+
+    ranking_methodology = [
+        'Digital impact carries the highest weight (streaming and chart velocity).',
+        'Music-show performance and sustained momentum are included.',
+        'Global fandom signals (voting and sales activity) are included.',
+        'Trends show movement since the previous sync window.',
+    ]
+
+    if db_type == 'daily':
+        ranking_sources = [
+            {'name': 'iChart', 'detail': 'Hourly synced real-time ranking feed for daily chart positions.'},
+        ]
+        ranking_explain_label = 'Daily chart uses direct iChart sync.'
+    else:
+        ranking_sources = [
+            {'name': 'Circle Chart / MelOn / Spotify KR / YouTube Music', 'detail': 'Digital impact source set used in synthesis prompts.'},
+            {'name': 'Music Shows', 'detail': 'M Countdown, Music Bank, Inkigayo signals are included.'},
+            {'name': 'Voting and Sales', 'detail': 'Fandom and sales indicators are considered for momentum.'},
+        ]
+        ranking_explain_label = 'This timeframe uses weighted synthesis from multiple source families.'
     
     # Separate #1 track, main chart (2-10), and ticker (11-20)
     number_one = rankings[0] if rankings else None
@@ -2233,6 +2253,9 @@ def charts(request):
         'current_type': chart_type,
         'chart_types': chart_types,
         'last_updated': last_updated,
+        'ranking_methodology': ranking_methodology,
+        'ranking_sources': ranking_sources,
+        'ranking_explain_label': ranking_explain_label,
     }
     return render(request, 'core/charts.html', context)
 
