@@ -202,15 +202,31 @@ def _sanitize_playlist_name(name):
 
 def _fallback_playlist_preview(playlist_name, sample_tracks):
     safe_name = _sanitize_playlist_name(playlist_name) or 'this show'
+    titles = []
     artists = []
     for track in sample_tracks[:6]:
+        title = str(track.get('title') or '').strip()
         artist = str(track.get('artist') or '').strip()
+        if title and title not in titles:
+            titles.append(title)
         if artist and artist not in artists:
             artists.append(artist)
-    if artists:
-        artist_text = ', '.join(artists[:3])
-        return f"A curated K-pop mix from {artist_text}, built for {safe_name}."
-    return f"A curated K-pop playlist built for {safe_name}, balancing fan favourites with fresh rotation picks."
+
+    lead_artist = artists[0] if artists else 'today\'s featured acts'
+    artist_text = ', '.join(artists[:3]) if artists else 'top K-pop favourites and fresh cuts'
+    title_a = titles[0] if titles else 'high-impact choruses'
+    title_b = titles[1] if len(titles) > 1 else 'smooth transitions'
+
+    templates = [
+        f"Expect a punchy blend from {artist_text}, giving {safe_name} a bright, high-energy flow from start to finish.",
+        f"{safe_name} leans into confident hooks and big drops, with {lead_artist} and company shaping a bold primetime mix.",
+        f"From {title_a} into {title_b}, this set keeps momentum steady while spotlighting a balanced artist spread.",
+        f"This hour on {safe_name} is built for replay value: polished vocals, dynamic production and crowd-ready K-pop moments.",
+        f"{safe_name} threads fan favourites with newer sounds, moving cleanly between upbeat peaks and lighter melodic sections.",
+    ]
+
+    template_index = uuid.uuid5(uuid.NAMESPACE_DNS, safe_name.lower()).int % len(templates)
+    return templates[template_index]
 
 
 def _generate_playlist_preview(playlist_name, sample_tracks):
