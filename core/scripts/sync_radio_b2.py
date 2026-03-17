@@ -4,6 +4,7 @@ import django
 import requests
 import base64
 import urllib.parse
+import argparse
 
 # Set up Django environment
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -132,7 +133,7 @@ def list_b2_files(auth_token, api_url, bucket_id):
     
     return response.json().get('files', [])
 
-def sync_tracks_from_b2():
+def sync_tracks_from_b2(prune_missing=False, new_only=False):
     print("Connecting to Backblaze B2...")
     if B2_KEY_ID == 'your_key_id':
         print("Please update B2_KEY_ID and B2_APPLICATION_KEY in the script or .env file.")
@@ -158,6 +159,19 @@ def sync_tracks_from_b2():
         print(f"Found {len(files)} files. Syncing database...")
         
         all_synced_ids = []
+        all_synced_urls = set()
+        created_count = 0
+        updated_count = 0
+        skipped_existing_count = 0
+
+        existing_titles = set()
+        if new_only:
+            existing_titles = {
+                (t or '').strip().lower()
+                for t in RadioTrack.objects.values_list('title', flat=True)
+                if t
+            }
+
         for file in files:
             filename = file['fileName']
             print(f"Checking file: {filename}") # LOGGING
@@ -178,6 +192,14 @@ def sync_tracks_from_b2():
             safe_filename = urllib.parse.quote(filename)
             audio_url = f"{download_url}/file/{B2_BUCKET_NAME}/{safe_filename}"
             print(f"Syncing: {artist} - {title} URL: {audio_url}") # LOGGING
+
+            all_synced_urls.add(audio_url)
+
+            normalized_title = (title or '').strip().lower()
+            if new_only and normalized_title in existing_titles:
+                skipped_existing_count += 1
+                print(f"Skipping existing track (new-only mode): {title}")
+                continue
                 
             # --- EMBEDDED METADATA EXTRACTION ---
             # Attempt to extract art and artist from the file on B2
@@ -193,21 +215,41 @@ def sync_tracks_from_b2():
             if not album_art:
                  album_art = "https://res.cloudinary.com/diuanqnce/image/upload/v1710546648/ksync/skz_group_default.jpg"
             
-            track, created = RadioTrack.objects.update_or_create(
-                title=title,
-                defaults={
-                    'artist': artist,
-                    'audio_url': audio_url,
-                    'album_art': album_art,
-                    'duration': metadata.get('duration_str', '3:00'),
-                    'duration_seconds': metadata.get('duration_seconds', 180),
-                }
-            )
+            defaults = {
+                'artist': artist,
+                'audio_url': audio_url,
+                'album_art': album_art,
+                'duration': metadata.get('duration_str', '3:00'),
+                'duration_seconds': metadata.get('duration_seconds', 180),
+            }
+            existing_matches = RadioTrack.objects.filter(title=title).order_by('id')
+            track = existing_matches.first()
+            if track:
+                for field_name, field_value in defaults.items():
+                    setattr(track, field_name, field_value)
+                track.save(update_fields=list(defaults.keys()))
+                created = False
+            else:
+                track = RadioTrack.objects.create(title=title, **defaults)
+                created = True
             all_synced_ids.append(track.id)
             if created:
+                created_count += 1
                 print(f"Added new track: {track.title}")
             else:
+                updated_count += 1
                 print(f"Updated track: {track.title}")
+
+        deleted_count = 0
+        if prune_missing:
+            b2_url_fragment = f"/file/{B2_BUCKET_NAME}/"
+            stale_tracks = RadioTrack.objects.filter(audio_url__contains=b2_url_fragment).exclude(audio_url__in=all_synced_urls)
+            stale_count = stale_tracks.count()
+            if stale_count:
+                print(f"Removing {stale_count} track(s) no longer present in B2...")
+                deleted_count, _ = stale_tracks.delete()
+            else:
+                print("No stale B2 tracks to remove.")
 
         # --- AUTO-DJ ROTATION LOGIC ---
         state, _ = RadioStationState.objects.get_or_create(id=1)
@@ -235,9 +277,26 @@ def sync_tracks_from_b2():
             print(f"Radio state updated. Queue contains {len(state.up_next)} tracks.")
 
         print("Sync complete.")
+        print(
+            f"Summary: created={created_count}, updated={updated_count}, "
+            f"skipped_existing={skipped_existing_count}, deleted={deleted_count}"
+        )
         
     except Exception as e:
         print(f"Error: {e}")
 
 if __name__ == "__main__":
-    sync_tracks_from_b2()
+    parser = argparse.ArgumentParser(description="Sync radio tracks from Backblaze B2")
+    parser.add_argument(
+        "--prune",
+        action="store_true",
+        help="Delete DB tracks whose B2 files no longer exist",
+    )
+    parser.add_argument(
+        "--new-only",
+        action="store_true",
+        help="Only add tracks that are not already in DB by title (skip updates)",
+    )
+    args = parser.parse_args()
+
+    sync_tracks_from_b2(prune_missing=args.prune, new_only=args.new_only)
