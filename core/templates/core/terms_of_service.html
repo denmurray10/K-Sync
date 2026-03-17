@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | K-POP Pulse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #000;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .wrap {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 36px 20px 72px;
+        }
+        .hero {
+            border: 1px solid rgba(255,255,255,.2);
+            background: rgba(0,0,0,.92);
+            box-shadow: 0 0 0 1px rgba(123,44,191,.35);
+            padding: 18px 18px 16px;
+            margin-bottom: 18px;
+        }
+        h1 {
+            margin: 0 0 8px;
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-weight: 900;
+            color: #f8fafc;
+        }
+        h2 {
+            margin-top: 28px;
+            margin-bottom: 8px;
+            color: #f8fafc;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-weight: 800;
+        }
+        p, li { color: #cbd5e1; font-size: .98rem; }
+        .meta {
+            color: #7b2cbf;
+            font-size: 0.78rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            font-weight: 700;
+        }
+        .card {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,.16);
+            padding: 18px;
+            margin-top: 16px;
+        }
+        ul { padding-left: 18px; }
+        li { margin-bottom: 8px; }
+        a { color: #f425c0; }
+        .back {
+            display: inline-block;
+            margin-top: 24px;
+            color: #000;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            font-size: .7rem;
+            border: 1px solid #7b2cbf;
+            background: #7b2cbf;
+            padding: 12px 14px;
+            box-shadow: 3px 3px 0 rgba(255,255,255,1);
+        }
+        .back:hover { background: #fff; color: #000; border-color: #fff; }
+    </style>
+</head>
+<body>
+    <main class="wrap">
+        <section class="hero">
+            <p class="meta">K-Beats Legal</p>
+            <h1>Terms of Service</h1>
+            <p style="margin:0;color:#94a3b8;font-size:.92rem;">Last updated: March 17, 2026</p>
+        </section>
+
+        <div class="card">
+            <p>These Terms of Service govern your access to and use of K-POP Pulse. By using this site, you agree to these terms.</p>
+        </div>
+
+        <h2>Use of the Service</h2>
+        <ul>
+            <li>You agree to use the site lawfully and not abuse or disrupt services.</li>
+            <li>You are responsible for content you submit and actions taken through your account.</li>
+            <li>We may update or discontinue features at any time.</li>
+        </ul>
+
+        <h2>User Content and Conduct</h2>
+        <p>You must not upload or post unlawful, harmful, or infringing content. We may remove content or restrict access where necessary to protect users and platform integrity.</p>
+
+        <h2>Accounts</h2>
+        <p>If you create an account, keep your credentials secure. You are responsible for activity under your account unless unauthorized use is reported promptly.</p>
+
+        <h2>Disclaimers and Liability</h2>
+        <p>The service is provided on an "as is" and "as available" basis. To the fullest extent permitted by law, we disclaim warranties and limit liability for indirect or consequential damages.</p>
+
+        <h2>Changes to Terms</h2>
+        <p>We may modify these terms from time to time. Continued use after updates means you accept the revised terms.</p>
+
+        <h2>Related Policies</h2>
+        <p>See our <a href="{% url 'privacy_policy' %}">Privacy Policy</a> and <a href="{% url 'cookie_policy' %}">Cookie Policy</a> for data and cookie details.</p>
+
+        <a class="back" href="{% url 'home' %}">← Back to Home</a>
+    </main>
+</body>
+</html>

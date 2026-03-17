@@ -208,8 +208,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         <input type="checkbox" id="terms" name="terms"
                                             class="mt-1 w-4 h-4 bg-white/[0.03] border border-white/20 text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer" required />
                                         <label for="terms" class="font-mono text-[10px] tracking-wide text-slate-500 leading-relaxed cursor-pointer">
-                                            I agree to the <a href="#" class="text-primary hover:text-white transition-colors">Terms of Service</a>
-                                            and <a href="#" class="text-primary hover:text-white transition-colors">Privacy Policy</a>
+                                            I agree to the <a href="{% url 'terms_of_service' %}" class="text-primary hover:text-white transition-colors">Terms of Service</a>
+                                            and <a href="{% url 'privacy_policy' %}" class="text-primary hover:text-white transition-colors">Privacy Policy</a>
                                         </label>
                                     </div>
 

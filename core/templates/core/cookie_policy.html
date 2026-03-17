@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy | K-POP Pulse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #000;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .wrap {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 36px 20px 72px;
+        }
+        .hero {
+            border: 1px solid rgba(255,255,255,.2);
+            background: rgba(0,0,0,.92);
+            box-shadow: 0 0 0 1px rgba(0,240,255,.35);
+            padding: 18px 18px 16px;
+            margin-bottom: 18px;
+        }
+        h1 {
+            margin: 0 0 8px;
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-weight: 900;
+            color: #f8fafc;
+        }
+        h2 {
+            margin-top: 28px;
+            margin-bottom: 8px;
+            color: #f8fafc;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-weight: 800;
+        }
+        p, li { color: #cbd5e1; font-size: .98rem; }
+        .meta {
+            color: #00f0ff;
+            font-size: 0.78rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            font-weight: 700;
+        }
+        .card {
+            background: #050505;
+            border: 1px solid rgba(255,255,255,.16);
+            padding: 18px;
+            margin-top: 16px;
+        }
+        ul { padding-left: 18px; }
+        li { margin-bottom: 8px; }
+        a { color: #f425c0; }
+        .back {
+            display: inline-block;
+            margin-top: 24px;
+            color: #000;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            font-size: .7rem;
+            border: 1px solid #00f0ff;
+            background: #00f0ff;
+            padding: 12px 14px;
+            box-shadow: 3px 3px 0 rgba(255,255,255,1);
+        }
+        .back:hover { background: #fff; color: #000; border-color: #fff; }
+    </style>
+</head>
+<body>
+    <main class="wrap">
+        <section class="hero">
+            <p class="meta">K-Beats Legal</p>
+            <h1>Cookie Policy</h1>
+            <p style="margin:0;color:#94a3b8;font-size:.92rem;">Last updated: March 17, 2026</p>
+        </section>
+
+        <div class="card">
+            <p>This Cookie Policy explains what cookies and similar technologies we use and how you can control them.</p>
+        </div>
+
+        <h2>Categories of Cookies</h2>
+        <ul>
+            <li><strong>Strictly necessary:</strong> Required for core functionality and security. Always active.</li>
+            <li><strong>Analytics:</strong> Help us understand traffic and feature usage.</li>
+            <li><strong>Advertising:</strong> Used for ad storage and personalization where enabled.</li>
+        </ul>
+
+        <h2>Consent Choices</h2>
+        <p>You can choose Accept all, Reject all, or manage preferences in the consent banner. Your choice is stored and reused on future visits unless you change it.</p>
+
+        <h2>Google Consent Mode</h2>
+        <p>By default, analytics and advertising storage are denied until consent is granted. Consent signals are sent to Google tags through Consent Mode.</p>
+
+        <h2>Managing Cookies</h2>
+        <p>You can reopen preferences using the Cookie settings button. You can also adjust browser settings to block or delete cookies, though some features may be affected.</p>
+
+        <h2>More Information</h2>
+        <p>For broader data handling details, see our <a href="{% url 'privacy_policy' %}">Privacy Policy</a>.</p>
+
+        <a class="back" href="{% url 'home' %}">← Back to Home</a>
+    </main>
+</body>
+</html>
