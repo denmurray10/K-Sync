@@ -9,10 +9,18 @@ from core.models import EventBadgeDrop, LimitedTimeEvent
 class Command(BaseCommand):
     help = "Seed sample monthly events and badge drops for fan-club tier/event testing"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--activate-all-now',
+            action='store_true',
+            help='Set spotlight event to start now so both seeded events are immediately active.',
+        )
+
     def handle(self, *args, **options):
         now = timezone.now()
         month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+        activate_all_now = bool(options.get('activate_all_now'))
 
         chart_battle, _ = LimitedTimeEvent.objects.update_or_create(
             slug='monthly-chart-battle',
@@ -38,7 +46,7 @@ class Command(BaseCommand):
             },
         )
 
-        spotlight_start = month_start + timedelta(days=7)
+        spotlight_start = now if activate_all_now else (month_start + timedelta(days=7))
         spotlight_end = min(month_end, spotlight_start + timedelta(days=6, hours=23, minutes=59))
         spotlight, _ = LimitedTimeEvent.objects.update_or_create(
             slug='artist-spotlight-week',
@@ -67,3 +75,5 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Seeded monthly events and badge drops.'))
         self.stdout.write(self.style.WARNING('Chart battle slug: monthly-chart-battle'))
         self.stdout.write(self.style.WARNING('Spotlight slug: artist-spotlight-week'))
+        if activate_all_now:
+            self.stdout.write(self.style.WARNING('Spotlight was activated immediately via --activate-all-now.'))

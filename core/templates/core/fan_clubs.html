@@ -797,6 +797,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 
+    <div x-show="toast.visible"
+         x-cloak
+         class="fixed bottom-6 right-6 z-[120] max-w-sm border border-white/20 bg-black/90 backdrop-blur-sm px-4 py-3"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-primary text-lg">info</span>
+            <p class="text-white text-xs font-mono tracking-wider uppercase" x-text="toast.message"></p>
+        </div>
+    </div>
+
 </main>
 
 {% include 'core/footer.html' %}
@@ -812,6 +827,11 @@ function fanClubApp() {
         memberCounts: {},
         monthlyEvents: [],
         eventsLoading: false,
+        toast: {
+            visible: false,
+            message: '',
+        },
+        toastTimeout: null,
         showModal: false,
         showLoginModal: false,
         modalState: 'confirm',  // 'confirm' | 'success' | 'manage'
@@ -842,6 +862,18 @@ function fanClubApp() {
 
         closeModal() {
             this.showModal = false;
+        },
+
+        showToast(message) {
+            this.toast.message = String(message || '').trim();
+            if (!this.toast.message) return;
+            this.toast.visible = true;
+            if (this.toastTimeout) {
+                clearTimeout(this.toastTimeout);
+            }
+            this.toastTimeout = setTimeout(() => {
+                this.toast.visible = false;
+            }, 2200);
         },
 
         async openTierModal(id, name, image, type, label) {
@@ -888,9 +920,13 @@ function fanClubApp() {
                 if (data.success) {
                     this.currentTier = data.tier || tier;
                     this.currentPerks = data.perks || this.currentPerks;
+                    this.showToast(`Tier updated to ${this.currentTier}`);
+                    return;
                 }
+                this.showToast(data.error || 'Tier update failed');
             } catch (e) {
                 console.error('Set tier failed:', e);
+                this.showToast('Tier update failed');
             } finally {
                 this.tierSaving = false;
             }
@@ -913,9 +949,13 @@ function fanClubApp() {
                     this.joinedClubs.add(this.modalGroup.id);
                     this.memberCounts[this.modalGroup.id] = data.member_count;
                     this.modalState = 'success';
+                    this.showToast(`Joined ${this.modalGroup.name}`);
+                    return;
                 }
+                this.showToast(data.error || 'Join failed');
             } catch (e) {
                 console.error('Join failed:', e);
+                this.showToast('Join failed');
             } finally {
                 this.joining = false;
             }
@@ -935,9 +975,13 @@ function fanClubApp() {
                 if (data.success) {
                     this.joinedClubs.delete(groupId);
                     this.memberCounts[groupId] = data.member_count;
+                    this.showToast('Left fan club');
+                    return;
                 }
+                this.showToast(data.error || 'Leave failed');
             } catch (e) {
                 console.error('Leave failed:', e);
+                this.showToast('Leave failed');
             }
         },
 
@@ -972,9 +1016,13 @@ function fanClubApp() {
                 const data = await res.json();
                 if (data.success) {
                     this.joinedEvents.add(event.id);
+                    this.showToast(`Joined ${event.title}`);
+                    return;
                 }
+                this.showToast(data.error || 'Join event failed');
             } catch (e) {
                 console.error('Join event failed:', e);
+                this.showToast('Join event failed');
             } finally {
                 this.joiningEvents.delete(event.id);
             }
@@ -998,17 +1046,17 @@ function fanClubApp() {
                 });
                 const data = await res.json();
                 if (data.success && data.claimed) {
-                    window.alert(`Badge claimed: ${data.badge}`);
+                    this.showToast(`Badge claimed: ${data.badge}`);
                     return;
                 }
                 if (data.success && data.already_owned) {
-                    window.alert(`You already own: ${data.badge}`);
+                    this.showToast(`You already own: ${data.badge}`);
                     return;
                 }
-                window.alert(data.error || 'Badge claim failed');
+                this.showToast(data.error || 'Badge claim failed');
             } catch (e) {
                 console.error('Claim badge failed:', e);
-                window.alert('Badge claim failed');
+                this.showToast('Badge claim failed');
             } finally {
                 this.claimingBadgeEvents.delete(event.id);
             }
