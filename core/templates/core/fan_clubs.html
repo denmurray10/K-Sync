@@ -273,12 +273,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 class="text-white text-[10px] font-black uppercase tracking-[0.2em] hover:text-primary transition-colors flex items-center gap-1 z-10 relative">
                                 Join <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             </button>
-                            <span
-                                x-show="joinedClubs.has({{ group.id }})"
-                                x-cloak
-                                class="text-primary text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-1">
-                                <span class="material-symbols-outlined text-sm">check_circle</span> Joined
-                            </span>
+                            <div x-show="joinedClubs.has({{ group.id }})" x-cloak class="flex items-center gap-3">
+                                <span class="text-primary text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">check_circle</span> Joined
+                                </span>
+                                <button
+                                    @click.stop="openTierModal({{ group.id }}, '{{ group.name|escapejs }}', '{{ group.image_url|default:''|escapejs }}', '{{ group.get_group_type_display|escapejs }}', '{{ group.label|escapejs }}')"
+                                    class="text-secondary text-[10px] font-black uppercase tracking-[0.2em] hover:text-primary transition-colors flex items-center gap-1 z-10 relative">
+                                    Manage Tier
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -475,78 +479,67 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="relative w-full overflow-hidden bg-black border-y border-white/10 h-12 flex items-center reveal-up" style="transition-delay: 100ms;">
                 <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
                 <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
-                <div class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">MAR 15</span><span class="font-black text-xs uppercase tracking-tighter text-white">ARMY Global Streaming Party</span><span class="text-white/20 mx-4">/</span></span>
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">MAR 22</span><span class="font-black text-xs uppercase tracking-tighter text-white">BLINK Cupsleeve Event</span><span class="text-white/20 mx-4">/</span></span>
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 01</span><span class="font-black text-xs uppercase tracking-tighter text-white">STAY Anniversary Celebration</span><span class="text-white/20 mx-4">/</span></span>
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 10</span><span class="font-black text-xs uppercase tracking-tighter text-white">ONCE Fan Art Exhibition</span><span class="text-white/20 mx-4">/</span></span>
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 18</span><span class="font-black text-xs uppercase tracking-tighter text-white">MY aespa Listening Party</span><span class="text-white/20 mx-4">/</span></span>
-                    <!-- Duplicate for seamless loop -->
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">MAR 15</span><span class="font-black text-xs uppercase tracking-tighter text-white">ARMY Global Streaming Party</span><span class="text-white/20 mx-4">/</span></span>
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">MAR 22</span><span class="font-black text-xs uppercase tracking-tighter text-white">BLINK Cupsleeve Event</span><span class="text-white/20 mx-4">/</span></span>
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 01</span><span class="font-black text-xs uppercase tracking-tighter text-white">STAY Anniversary Celebration</span><span class="text-white/20 mx-4">/</span></span>
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 10</span><span class="font-black text-xs uppercase tracking-tighter text-white">ONCE Fan Art Exhibition</span><span class="text-white/20 mx-4">/</span></span>
-                    <span class="inline-flex items-center gap-3 shrink-0"><span class="font-black text-primary">APR 18</span><span class="font-black text-xs uppercase tracking-tighter text-white">MY aespa Listening Party</span><span class="text-white/20 mx-4">/</span></span>
-                </div>
+                <template x-if="monthlyEvents.length">
+                    <div class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
+                        <template x-for="(event, idx) in [...monthlyEvents, ...monthlyEvents]" :key="'ticker-' + idx">
+                            <span class="inline-flex items-center gap-3 shrink-0">
+                                <span class="font-black text-primary" x-text="formatEventDate(event.starts_at)"></span>
+                                <span class="font-black text-xs uppercase tracking-tighter text-white" x-text="event.title"></span>
+                                <span class="text-white/20 mx-4">/</span>
+                            </span>
+                        </template>
+                    </div>
+                </template>
+                <template x-if="!monthlyEvents.length">
+                    <div class="w-full px-6 text-slate-500 font-mono text-[10px] tracking-widest uppercase" x-text="eventsLoading ? 'Loading monthly events…' : 'No active monthly events right now.'"></div>
+                </template>
             </div>
 
             <!-- Events List -->
             <div class="flex flex-col border-t border-white/20 reveal-up">
-                <!-- Event Row 1 -->
-                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
-                    <div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center shrink-0">
-                        <span class="font-mono text-xs tracking-widest uppercase font-bold text-primary mb-1">Upcoming</span>
-                        <span class="font-black text-2xl tracking-tighter text-white">MAR 15</span>
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">20:00 KST</span>
-                    </div>
-                    <div class="flex-1 p-6 flex flex-col justify-center">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Streaming</span>
-                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">ARMY</span>
+                <template x-for="event in monthlyEvents" :key="'event-' + event.id">
+                    <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+                        <div class="w-full md:w-56 p-6 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center shrink-0">
+                            <span class="font-mono text-xs tracking-widest uppercase font-bold text-primary mb-1" x-text="event.event_type.replace('_', ' ')"></span>
+                            <span class="font-black text-2xl tracking-tighter text-white" x-text="formatEventDate(event.starts_at)"></span>
+                            <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1" x-text="formatEventTime(event.starts_at)"></span>
                         </div>
-                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors mb-1">Global Streaming Party</h3>
-                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Synchronized streaming event for BTS's new single across all platforms.</p>
-                    </div>
-                    <div class="hidden md:flex p-6 border-l border-white/10 items-center justify-center shrink-0 w-32 bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                        <span class="material-symbols-outlined text-4xl text-primary">live_tv</span>
-                    </div>
-                </div>
-                <!-- Event Row 2 -->
-                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
-                    <div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center shrink-0">
-                        <span class="font-black text-2xl tracking-tighter text-white">MAR 22</span>
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">14:00 KST</span>
-                    </div>
-                    <div class="flex-1 p-6 flex flex-col justify-center">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="bg-secondary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Meetup</span>
-                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">BLINK</span>
+                        <div class="flex-1 p-6 flex flex-col justify-center">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest" x-text="eventLabel(event.event_type)"></span>
+                                <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase" x-text="event.badge_drop_count + ' badge drops'"></span>
+                            </div>
+                            <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors mb-1" x-text="event.title"></h3>
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500" x-text="event.description || 'Limited-time monthly event is live now.'"></p>
                         </div>
-                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors mb-1">Cupsleeve Event — Seoul</h3>
-                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Fan-organized cupsleeve event at Hongdae celebrating BLACKPINK's anniversary.</p>
-                    </div>
-                    <div class="hidden md:flex p-6 border-l border-white/10 items-center justify-center shrink-0 w-32">
-                        <span class="material-symbols-outlined text-4xl text-white/20">local_cafe</span>
-                    </div>
-                </div>
-                <!-- Event Row 3 -->
-                <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
-                    <div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center shrink-0">
-                        <span class="font-black text-2xl tracking-tighter text-white">APR 01</span>
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-1">All Day</span>
-                    </div>
-                    <div class="flex-1 p-6 flex flex-col justify-center">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Anniversary</span>
-                            <span class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">STAY</span>
+                        <div class="hidden md:flex p-6 border-l border-white/10 items-center justify-center shrink-0 w-56 gap-2">
+                            {% if user.is_authenticated %}
+                            <button
+                                @click.stop="joinEvent(event)"
+                                :disabled="joiningEvents.has(event.id) || joinedEvents.has(event.id)"
+                                class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-4 py-3 border border-primary hover:bg-black hover:text-primary transition-colors disabled:opacity-60">
+                                <span x-show="!joinedEvents.has(event.id)">Join Event</span>
+                                <span x-show="joinedEvents.has(event.id)">Joined</span>
+                            </button>
+                            <button
+                                x-show="event.primary_badge_drop"
+                                @click.stop="claimEventBadge(event)"
+                                :disabled="claimingBadgeEvents.has(event.id)"
+                                class="bg-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] px-4 py-3 border border-white/20 hover:bg-white hover:text-black transition-colors disabled:opacity-60">
+                                <span x-show="!claimingBadgeEvents.has(event.id)">Claim Badge</span>
+                                <span x-show="claimingBadgeEvents.has(event.id)">Claiming...</span>
+                            </button>
+                            {% else %}
+                            <button @click.stop="showLoginModal = true" class="bg-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] px-4 py-3 border border-white/20 hover:bg-white/20 transition-colors">Sign In</button>
+                            {% endif %}
                         </div>
-                        <h3 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors mb-1">STAY Anniversary Celebration</h3>
-                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Global fan projects, hashtag trending, and video compilations for Stray Kids.</p>
                     </div>
-                    <div class="hidden md:flex p-6 border-l border-white/10 items-center justify-center shrink-0 w-32">
-                        <span class="material-symbols-outlined text-4xl text-white/20">celebration</span>
+                </template>
+                <template x-if="!monthlyEvents.length && !eventsLoading">
+                    <div class="p-8 text-center border-b border-white/10">
+                        <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">No active monthly events right now.</p>
                     </div>
-                </div>
+                </template>
             </div>
         </div>
     </section>
@@ -739,6 +732,50 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                 </div>
             </template>
+
+            <!-- Manage Tier State -->
+            <template x-if="modalState === 'manage'">
+                <div>
+                    <div class="relative h-28 overflow-hidden bg-white/5 border-b border-white/10">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
+                        <div class="absolute top-4 right-4">
+                            <button @click="closeModal()" class="w-8 h-8 bg-black/50 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors">
+                                <span class="material-symbols-outlined text-lg">close</span>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-4 left-6">
+                            <h3 class="text-2xl font-black text-white uppercase tracking-tighter" x-text="modalGroup.name"></h3>
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+                        <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mb-4">Current Tier</p>
+                        <div class="grid grid-cols-3 gap-2 mb-6">
+                            <button @click="setTier('FREE')" :disabled="tierSaving || currentTier === 'FREE'" :class="currentTier === 'FREE' ? 'bg-primary text-black border-primary' : 'bg-white/10 text-white border-white/20'" class="font-black uppercase tracking-[0.2em] text-[10px] px-3 py-2 border transition-colors disabled:opacity-60">Free</button>
+                            <button @click="setTier('PLUS')" :disabled="tierSaving || currentTier === 'PLUS'" :class="currentTier === 'PLUS' ? 'bg-primary text-black border-primary' : 'bg-white/10 text-white border-white/20'" class="font-black uppercase tracking-[0.2em] text-[10px] px-3 py-2 border transition-colors disabled:opacity-60">Plus</button>
+                            <button @click="setTier('ULTRA')" :disabled="tierSaving || currentTier === 'ULTRA'" :class="currentTier === 'ULTRA' ? 'bg-primary text-black border-primary' : 'bg-white/10 text-white border-white/20'" class="font-black uppercase tracking-[0.2em] text-[10px] px-3 py-2 border transition-colors disabled:opacity-60">Ultra</button>
+                        </div>
+
+                        <div class="border border-white/10 p-4">
+                            <h4 class="text-white font-black text-xs uppercase tracking-widest mb-3">Unlocked Perks</h4>
+                            <div class="flex flex-col gap-2.5">
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="text-slate-300 text-xs">Early Access Polls</span>
+                                    <span class="text-[10px] font-black uppercase tracking-widest" :class="currentPerks.early_access_polls ? 'text-primary' : 'text-slate-500'" x-text="currentPerks.early_access_polls ? 'Unlocked' : 'Locked'"></span>
+                                </div>
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="text-slate-300 text-xs">Premium Themes</span>
+                                    <span class="text-[10px] font-black uppercase tracking-widest" :class="currentPerks.premium_themes ? 'text-primary' : 'text-slate-500'" x-text="currentPerks.premium_themes ? 'Unlocked' : 'Locked'"></span>
+                                </div>
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="text-slate-300 text-xs">Exclusive Voice-DJ Packs</span>
+                                    <span class="text-[10px] font-black uppercase tracking-widest" :class="currentPerks.exclusive_voice_dj_packs ? 'text-primary' : 'text-slate-500'" x-text="currentPerks.exclusive_voice_dj_packs ? 'Unlocked' : 'Locked'"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
 
@@ -769,12 +806,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 function fanClubApp() {
     return {
         joinedClubs: new Set([{% for gid in joined_ids %}{{ gid }},{% endfor %}]),
+        joinedEvents: new Set(),
+        joiningEvents: new Set(),
+        claimingBadgeEvents: new Set(),
         memberCounts: {},
+        monthlyEvents: [],
+        eventsLoading: false,
         showModal: false,
         showLoginModal: false,
-        modalState: 'confirm',  // 'confirm' | 'success'
+        modalState: 'confirm',  // 'confirm' | 'success' | 'manage'
         joining: false,
+        tierSaving: false,
+        currentTier: 'FREE',
+        currentPerks: {
+            early_access_polls: false,
+            premium_themes: false,
+            exclusive_voice_dj_packs: false,
+        },
         modalGroup: { id: null, name: '', image: '', type: '', label: '' },
+
+        init() {
+            this.fetchMonthlyEvents();
+        },
 
         openJoinModal(id, name, image, type, label) {
             {% if user.is_authenticated %}
@@ -789,6 +842,58 @@ function fanClubApp() {
 
         closeModal() {
             this.showModal = false;
+        },
+
+        async openTierModal(id, name, image, type, label) {
+            {% if user.is_authenticated %}
+            this.modalGroup = { id, name, image, type, label };
+            this.modalState = 'manage';
+            this.showModal = true;
+            await this.fetchPerks(id);
+            {% else %}
+            this.showLoginModal = true;
+            {% endif %}
+        },
+
+        async fetchPerks(groupId) {
+            try {
+                const res = await fetch(`{% url "api_fan_club_perks" %}?group_id=${groupId}`);
+                const data = await res.json();
+                if (data.success) {
+                    this.currentTier = data.tier || 'FREE';
+                    this.currentPerks = data.perks || {
+                        early_access_polls: false,
+                        premium_themes: false,
+                        exclusive_voice_dj_packs: false,
+                    };
+                }
+            } catch (e) {
+                console.error('Fetch perks failed:', e);
+            }
+        },
+
+        async setTier(tier) {
+            if (this.tierSaving || !this.modalGroup.id) return;
+            this.tierSaving = true;
+            try {
+                const res = await fetch('{% url "api_fan_club_set_tier" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ group_id: this.modalGroup.id, tier })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.currentTier = data.tier || tier;
+                    this.currentPerks = data.perks || this.currentPerks;
+                }
+            } catch (e) {
+                console.error('Set tier failed:', e);
+            } finally {
+                this.tierSaving = false;
+            }
         },
 
         async confirmJoin() {
@@ -834,6 +939,109 @@ function fanClubApp() {
             } catch (e) {
                 console.error('Leave failed:', e);
             }
+        },
+
+        async fetchMonthlyEvents() {
+            this.eventsLoading = true;
+            try {
+                const res = await fetch('{% url "api_monthly_events" %}');
+                const data = await res.json();
+                if (data.success && Array.isArray(data.events)) {
+                    this.monthlyEvents = data.events;
+                }
+            } catch (e) {
+                console.error('Load monthly events failed:', e);
+            } finally {
+                this.eventsLoading = false;
+            }
+        },
+
+        async joinEvent(event) {
+            {% if user.is_authenticated %}
+            if (!event || this.joiningEvents.has(event.id) || this.joinedEvents.has(event.id)) return;
+            this.joiningEvents.add(event.id);
+            try {
+                const res = await fetch('{% url "api_event_join" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ event_id: event.id })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.joinedEvents.add(event.id);
+                }
+            } catch (e) {
+                console.error('Join event failed:', e);
+            } finally {
+                this.joiningEvents.delete(event.id);
+            }
+            {% else %}
+            this.showLoginModal = true;
+            {% endif %}
+        },
+
+        async claimEventBadge(event) {
+            {% if user.is_authenticated %}
+            if (!event || !event.primary_badge_drop || this.claimingBadgeEvents.has(event.id)) return;
+            this.claimingBadgeEvents.add(event.id);
+            try {
+                const res = await fetch('{% url "api_event_claim_badge" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ badge_drop_id: event.primary_badge_drop.id })
+                });
+                const data = await res.json();
+                if (data.success && data.claimed) {
+                    window.alert(`Badge claimed: ${data.badge}`);
+                    return;
+                }
+                if (data.success && data.already_owned) {
+                    window.alert(`You already own: ${data.badge}`);
+                    return;
+                }
+                window.alert(data.error || 'Badge claim failed');
+            } catch (e) {
+                console.error('Claim badge failed:', e);
+                window.alert('Badge claim failed');
+            } finally {
+                this.claimingBadgeEvents.delete(event.id);
+            }
+            {% else %}
+            this.showLoginModal = true;
+            {% endif %}
+        },
+
+        formatEventDate(value) {
+            try {
+                const d = new Date(value);
+                return d.toLocaleDateString('en-GB', { month: 'short', day: '2-digit' }).toUpperCase();
+            } catch {
+                return 'LIVE';
+            }
+        },
+
+        formatEventTime(value) {
+            try {
+                const d = new Date(value);
+                return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' UTC';
+            } catch {
+                return 'LIVE NOW';
+            }
+        },
+
+        eventLabel(type) {
+            const labels = {
+                CHART_BATTLE: 'Chart Battle',
+                ARTIST_SPOTLIGHT: 'Spotlight Week',
+                BADGE_DROP: 'Badge Drop',
+            };
+            return labels[type] || 'Live Event';
         }
     };
 }

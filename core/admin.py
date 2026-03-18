@@ -3,6 +3,7 @@ from .models import (
     LivePoll, LivePollOption, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, PreLaunchSignup, BlogArticle,
+    LimitedTimeEvent, EventBadgeDrop, EventParticipation,
     RadioTrack, RadioStationState,
     RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
     ChatBlockedTerm,
@@ -90,9 +91,30 @@ class ContestEntryAdmin(admin.ModelAdmin):
 
 @admin.register(FanClubMembership)
 class FanClubMembershipAdmin(admin.ModelAdmin):
-    list_display = ('user', 'group', 'joined_at')
-    list_filter = ('group', 'joined_at')
+    list_display = ('user', 'group', 'tier', 'joined_at')
+    list_filter = ('group', 'tier', 'joined_at')
     raw_id_fields = ('user', 'group')
+
+
+@admin.register(LimitedTimeEvent)
+class LimitedTimeEventAdmin(admin.ModelAdmin):
+    list_display = ('title', 'event_type', 'starts_at', 'ends_at', 'is_active')
+    list_filter = ('event_type', 'is_active')
+    search_fields = ('title', 'slug')
+
+
+@admin.register(EventBadgeDrop)
+class EventBadgeDropAdmin(admin.ModelAdmin):
+    list_display = ('badge_name', 'event', 'rarity', 'minimum_tier', 'min_votes_required', 'is_active')
+    list_filter = ('rarity', 'minimum_tier', 'is_active')
+    search_fields = ('badge_name', 'event__title')
+
+
+@admin.register(EventParticipation)
+class EventParticipationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'event', 'votes_cast', 'joined_at')
+    list_filter = ('event', 'joined_at')
+    search_fields = ('user__username', 'event__title')
 
 
 @admin.register(PreLaunchSignup)

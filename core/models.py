@@ -70,8 +70,23 @@ class KPopMember(models.Model):
         return f"{self.name} ({self.group.name})"
 
 class LivePoll(models.Model):
+    TIER_CHOICES = (
+        ('FREE', 'Free'),
+        ('PLUS', 'Plus'),
+        ('ULTRA', 'Ultra'),
+    )
+
     question = models.CharField(max_length=255)
     is_active = models.BooleanField(default=False)
+    early_access_starts_at = models.DateTimeField(null=True, blank=True)
+    early_access_group = models.ForeignKey(
+        'KPopGroup',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='early_access_polls',
+    )
+    early_access_min_tier = models.CharField(max_length=10, choices=TIER_CHOICES, default='PLUS')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -336,6 +351,12 @@ class ContestEntry(models.Model):
 
 
 class FanClubMembership(models.Model):
+    TIER_CHOICES = (
+        ('FREE', 'Free'),
+        ('PLUS', 'Plus'),
+        ('ULTRA', 'Ultra'),
+    )
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -348,6 +369,7 @@ class FanClubMembership(models.Model):
     )
     joined_at = models.DateTimeField(auto_now_add=True)
     is_genesis = models.BooleanField(default=False)
+    tier = models.CharField(max_length=10, choices=TIER_CHOICES, default='FREE')
 
     class Meta:
         unique_together = ['user', 'group']
@@ -355,6 +377,27 @@ class FanClubMembership(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ∈ {self.group.name}"
+
+    @property
+    def perks(self):
+        perk_map = {
+            'FREE': {
+                'early_access_polls': False,
+                'premium_themes': False,
+                'exclusive_voice_dj_packs': False,
+            },
+            'PLUS': {
+                'early_access_polls': True,
+                'premium_themes': True,
+                'exclusive_voice_dj_packs': False,
+            },
+            'ULTRA': {
+                'early_access_polls': True,
+                'premium_themes': True,
+                'exclusive_voice_dj_packs': True,
+            },
+        }
+        return perk_map.get(self.tier, perk_map['FREE'])
 
 class UserNotification(models.Model):
     NOTIFICATION_TYPES = (
@@ -449,6 +492,84 @@ class UserBadge(models.Model):
 
     def __str__(self):
         return f"{self.name} awarded to {self.user.username}"
+
+
+class LimitedTimeEvent(models.Model):
+    EVENT_CHOICES = (
+        ('CHART_BATTLE', 'Chart Battle'),
+        ('ARTIST_SPOTLIGHT', 'Artist Spotlight Week'),
+        ('BADGE_DROP', 'Badge Drop'),
+    )
+
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=200, unique=True)
+    event_type = models.CharField(max_length=30, choices=EVENT_CHOICES)
+    description = models.TextField(blank=True)
+    starts_at = models.DateTimeField()
+    ends_at = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-starts_at']
+
+    def __str__(self):
+        return self.title
+
+
+class EventBadgeDrop(models.Model):
+    RARITY_CHOICES = (
+        ('COMMON', 'Common'),
+        ('RARE', 'Rare'),
+        ('EPIC', 'Epic'),
+        ('LEGENDARY', 'Legendary'),
+    )
+    TIER_CHOICES = (
+        ('FREE', 'Free'),
+        ('PLUS', 'Plus'),
+        ('ULTRA', 'Ultra'),
+    )
+
+    event = models.ForeignKey(
+        LimitedTimeEvent,
+        on_delete=models.CASCADE,
+        related_name='badge_drops',
+    )
+    badge_name = models.CharField(max_length=255)
+    badge_type = models.CharField(max_length=50, default='EVENT')
+    rarity = models.CharField(max_length=20, choices=RARITY_CHOICES, default='COMMON')
+    minimum_tier = models.CharField(max_length=10, choices=TIER_CHOICES, default='FREE')
+    min_votes_required = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.badge_name} ({self.event.title})"
+
+
+class EventParticipation(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='event_participations',
+    )
+    event = models.ForeignKey(
+        LimitedTimeEvent,
+        on_delete=models.CASCADE,
+        related_name='participations',
+    )
+    votes_cast = models.PositiveIntegerField(default=0)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'event']
+        ordering = ['-joined_at']
+
+    def __str__(self):
+        return f"{self.user.username} in {self.event.title}"
 
 
 class PreLaunchSignup(models.Model):

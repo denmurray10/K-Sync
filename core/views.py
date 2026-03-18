@@ -30,6 +30,7 @@ from .models import (
     RadioTrackPlay,
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, UserNotification, ClubInvitation, ClubLaunch, UserBadge,
+    LimitedTimeEvent, EventBadgeDrop, EventParticipation,
     LiveChatMessage, ChatBlockedTerm,
     RadioTrack, RadioStationState, RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
     RadioScheduleTemplate, RadioScheduleTemplateSlot,
@@ -78,6 +79,36 @@ def _award_user_badge(user, name, badge_type='PROGRESSION', is_glowing=True):
         },
     )
     return created
+
+
+TIER_RANK = {
+    'FREE': 0,
+    'PLUS': 1,
+    'ULTRA': 2,
+}
+
+
+def _user_tier_for_group(user, group):
+    if not user or not user.is_authenticated or not group:
+        return 'FREE'
+    membership = FanClubMembership.objects.filter(user=user, group=group).first()
+    if not membership:
+        return 'FREE'
+    return str(membership.tier or 'FREE').upper()
+
+
+def _tier_meets_requirement(user_tier, min_tier):
+    return TIER_RANK.get(str(user_tier or 'FREE').upper(), 0) >= TIER_RANK.get(str(min_tier or 'FREE').upper(), 0)
+
+
+def _is_poll_early_access_locked(request, poll):
+    if not poll or not poll.early_access_starts_at or not poll.early_access_group:
+        return False
+    now = timezone.now()
+    if now >= poll.early_access_starts_at:
+        return False
+    tier = _user_tier_for_group(request.user, poll.early_access_group)
+    return not _tier_meets_requirement(tier, poll.early_access_min_tier)
 
 
 def _activity_day_set_for_user(user):
@@ -6698,8 +6729,31 @@ def vote_poll(request):
         data = json.loads(request.body)
         option_id = data.get('option_id')
         option = LivePollOption.objects.get(id=option_id)
+
+        if _is_poll_early_access_locked(request, option.poll):
+            return JsonResponse({
+                'success': False,
+                'error': 'Early access is available to premium fan-club tiers only right now.',
+            }, status=403)
+
         option.votes += 1
         option.save()
+
+        event_slug = str(data.get('event_slug') or '').strip()
+        if event_slug and request.user.is_authenticated:
+            event = LimitedTimeEvent.objects.filter(
+                slug=event_slug,
+                is_active=True,
+                starts_at__lte=timezone.now(),
+                ends_at__gte=timezone.now(),
+            ).first()
+            if event:
+                participation, _ = EventParticipation.objects.get_or_create(
+                    user=request.user,
+                    event=event,
+                )
+                participation.votes_cast = int(participation.votes_cast or 0) + 1
+                participation.save(update_fields=['votes_cast'])
         
         poll = option.poll
         total_votes = sum(o.votes for o in poll.options.all())
@@ -6830,6 +6884,12 @@ def fan_clubs(request):
     groups = KPopGroup.objects.prefetch_related(
         'members'
     ).order_by('rank', 'name')
+    total_members = FanClubMembership.objects.count()
+    active_events = LimitedTimeEvent.objects.filter(
+        is_active=True,
+        starts_at__lte=timezone.now(),
+        ends_at__gte=timezone.now(),
+    ).count()
     joined_ids = set()
     if request.user.is_authenticated:
         joined_ids = set(
@@ -6841,6 +6901,8 @@ def fan_clubs(request):
     return render(request, 'core/fan_clubs.html', {
         'fan_clubs': groups,
         'total_clubs': groups.count(),
+        'total_members': total_members,
+        'active_events': active_events,
         'joined_ids': joined_ids,
         'launches': launches
     })
@@ -6989,6 +7051,209 @@ def api_fan_club_leave(request):
         'success': True,
         'joined': False,
         'member_count': count,
+    })
+
+
+@login_required
+@require_http_methods(["GET"])
+def api_fan_club_perks(request):
+    group_id = request.GET.get('group_id')
+    if not group_id:
+        return JsonResponse({'error': 'group_id is required'}, status=400)
+    try:
+        group_id = int(group_id)
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Invalid group_id'}, status=400)
+
+    membership = FanClubMembership.objects.filter(user=request.user, group_id=group_id).first()
+    if not membership:
+        return JsonResponse({
+            'success': True,
+            'joined': False,
+            'tier': 'FREE',
+            'perks': {
+                'early_access_polls': False,
+                'premium_themes': False,
+                'exclusive_voice_dj_packs': False,
+            },
+            'voice_dj_pack_access': [],
+        })
+
+    tier = str(membership.tier or 'FREE').upper()
+    pack_access = []
+    if tier == 'PLUS':
+        pack_access = ['plus-future-bass', 'plus-midnight-glow']
+    elif tier == 'ULTRA':
+        pack_access = ['plus-future-bass', 'plus-midnight-glow', 'ultra-neon-arena', 'ultra-afterparty-hype']
+
+    return JsonResponse({
+        'success': True,
+        'joined': True,
+        'group_id': group_id,
+        'tier': tier,
+        'perks': membership.perks,
+        'voice_dj_pack_access': pack_access,
+    })
+
+
+@require_POST
+@login_required
+def api_fan_club_set_tier(request):
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return JsonResponse({'error': 'Invalid JSON body'}, status=400)
+
+    try:
+        group_id = int(data.get('group_id', 0))
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Invalid group_id'}, status=400)
+
+    tier = str(data.get('tier') or '').strip().upper()
+    if tier not in TIER_RANK:
+        return JsonResponse({'error': 'Invalid tier'}, status=400)
+
+    membership = FanClubMembership.objects.filter(user=request.user, group_id=group_id).first()
+    if not membership:
+        return JsonResponse({'error': 'Join the fan club before setting a tier'}, status=400)
+
+    membership.tier = tier
+    membership.save(update_fields=['tier'])
+
+    return JsonResponse({
+        'success': True,
+        'group_id': group_id,
+        'tier': membership.tier,
+        'perks': membership.perks,
+    })
+
+
+@require_http_methods(["GET"])
+def api_monthly_events(request):
+    now = timezone.now()
+    events = LimitedTimeEvent.objects.filter(
+        is_active=True,
+        starts_at__lte=now,
+        ends_at__gte=now,
+    ).order_by('starts_at')
+
+    payload = []
+    for event in events:
+        badge_drops = list(
+            event.badge_drops.filter(is_active=True)
+            .order_by('-created_at')
+            .values('id', 'badge_name', 'rarity', 'minimum_tier', 'min_votes_required')
+        )
+        primary_badge_drop = badge_drops[0] if badge_drops else None
+        payload.append({
+            'id': event.id,
+            'slug': event.slug,
+            'title': event.title,
+            'event_type': event.event_type,
+            'description': event.description,
+            'starts_at': event.starts_at.isoformat(),
+            'ends_at': event.ends_at.isoformat(),
+            'badge_drop_count': len(badge_drops),
+            'primary_badge_drop': primary_badge_drop,
+        })
+
+    return JsonResponse({'success': True, 'events': payload})
+
+
+@require_POST
+@login_required
+def api_event_join(request):
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return JsonResponse({'error': 'Invalid JSON body'}, status=400)
+
+    event_id = data.get('event_id')
+    event_slug = str(data.get('event_slug') or '').strip()
+    event = None
+    if event_id:
+        try:
+            event = LimitedTimeEvent.objects.filter(pk=int(event_id)).first()
+        except (TypeError, ValueError):
+            return JsonResponse({'error': 'Invalid event_id'}, status=400)
+    elif event_slug:
+        event = LimitedTimeEvent.objects.filter(slug=event_slug).first()
+
+    if not event:
+        return JsonResponse({'error': 'Event not found'}, status=404)
+    if not event.is_active or timezone.now() < event.starts_at or timezone.now() > event.ends_at:
+        return JsonResponse({'error': 'Event is not currently active'}, status=400)
+
+    participation, created = EventParticipation.objects.get_or_create(
+        user=request.user,
+        event=event,
+    )
+    return JsonResponse({
+        'success': True,
+        'joined': True,
+        'created': created,
+        'event_id': event.id,
+        'event_slug': event.slug,
+        'votes_cast': participation.votes_cast,
+    })
+
+
+@require_POST
+@login_required
+def api_event_claim_badge(request):
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return JsonResponse({'error': 'Invalid JSON body'}, status=400)
+
+    try:
+        badge_drop_id = int(data.get('badge_drop_id', 0))
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Invalid badge_drop_id'}, status=400)
+
+    badge_drop = EventBadgeDrop.objects.select_related('event').filter(pk=badge_drop_id, is_active=True).first()
+    if not badge_drop:
+        return JsonResponse({'error': 'Badge drop not found'}, status=404)
+
+    event = badge_drop.event
+    now = timezone.now()
+    if not event.is_active or now < event.starts_at or now > event.ends_at:
+        return JsonResponse({'error': 'Badge drop event is not active'}, status=400)
+
+    participation = EventParticipation.objects.filter(user=request.user, event=event).first()
+    votes_cast = int(participation.votes_cast or 0) if participation else 0
+    if votes_cast < int(badge_drop.min_votes_required or 0):
+        return JsonResponse({
+            'error': 'Not enough participation yet',
+            'votes_cast': votes_cast,
+            'min_votes_required': badge_drop.min_votes_required,
+        }, status=400)
+
+    membership = FanClubMembership.objects.filter(user=request.user).order_by('-joined_at').first()
+    user_tier = str(membership.tier if membership else 'FREE').upper()
+    if not _tier_meets_requirement(user_tier, badge_drop.minimum_tier):
+        return JsonResponse({
+            'error': 'Tier upgrade required for this badge drop',
+            'required_tier': badge_drop.minimum_tier,
+            'your_tier': user_tier,
+        }, status=403)
+
+    badge, created = UserBadge.objects.get_or_create(
+        user=request.user,
+        name=badge_drop.badge_name,
+        defaults={
+            'badge_type': badge_drop.badge_type,
+            'is_glowing': badge_drop.rarity in {'EPIC', 'LEGENDARY'},
+        },
+    )
+    if not created:
+        return JsonResponse({'success': True, 'claimed': False, 'already_owned': True, 'badge': badge.name})
+
+    return JsonResponse({
+        'success': True,
+        'claimed': True,
+        'badge': badge.name,
+        'rarity': badge_drop.rarity,
     })
 
 @csrf_exempt
