@@ -52,6 +52,15 @@ def _admin_only_json(request):
     return None
 
 
+def _radio_track_base_queryset():
+    qs = (
+        RadioTrack.objects
+        .exclude(audio_url='')
+        .exclude(audio_url__isnull=True)
+    )
+    return qs.exclude(audio_url__icontains='versionId=')
+
+
 def _record_live_track_play(request, track):
     if not request.user.is_authenticated or not track:
         return
@@ -717,7 +726,7 @@ def api_b2_tracks(request):
 
         metadata_by_title = {}
         metadata_by_filename = {}
-        for radio_track in RadioTrack.objects.all().only('title', 'artist', 'album_art', 'audio_url', 'duration', 'duration_seconds'):
+        for radio_track in _radio_track_base_queryset().only('title', 'artist', 'album_art', 'audio_url', 'duration', 'duration_seconds'):
             title_key = normalize(radio_track.title)
             if title_key and title_key not in metadata_by_title:
                 metadata_by_title[title_key] = radio_track
@@ -1620,9 +1629,7 @@ def api_playlist_ai_generate(request):
     familiarity = (payload.get('familiarity') or 'mix').strip().lower()
 
     track_qs = (
-        RadioTrack.objects
-        .exclude(audio_url='')
-        .exclude(audio_url__isnull=True)
+        _radio_track_base_queryset()
         .exclude(duration_seconds__isnull=True)
     )
 
@@ -1861,9 +1868,7 @@ def api_schedule_ai_fill(request):
         return JsonResponse({'ok': False, 'error': 'No eligible windows available within 2-hour show limit.'}, status=400)
 
     track_qs = (
-        RadioTrack.objects
-        .exclude(audio_url='')
-        .exclude(audio_url__isnull=True)
+        _radio_track_base_queryset()
         .exclude(duration_seconds__isnull=True)
     )
 

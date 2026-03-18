@@ -1,4 +1,5 @@
 import sys
+import os
 from django.apps import AppConfig
 
 
@@ -7,11 +8,15 @@ class CoreConfig(AppConfig):
     name = 'core'
 
     def ready(self):
-        # Prevent scheduler from running multiple times due to auto-reloader
-        if 'runserver' in sys.argv and not sys.argv[0].endswith('manage.py'):
-            # The underlying werkzeug reloader starts a second process. 
-            # the RUN_MAIN env var is only set in the second "child" process.
-            pass
-        else:
-             from . import scheduler
-             scheduler.start_scheduler()
+        command = sys.argv[1] if len(sys.argv) > 1 else ''
+        is_runserver = command == 'runserver'
+        is_web_process = is_runserver or os.environ.get('DYNO', '').startswith('web')
+
+        if not is_web_process:
+            return
+
+        if is_runserver and os.environ.get('RUN_MAIN') != 'true':
+            return
+
+        from . import scheduler
+        scheduler.start_scheduler()

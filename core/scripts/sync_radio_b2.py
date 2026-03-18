@@ -150,7 +150,39 @@ def list_b2_files(auth_token, api_url, bucket_id):
 
     return all_files
 
-def sync_tracks_from_b2(prune_missing=False, new_only=False):
+def list_b2_file_versions(auth_token, api_url, bucket_id):
+    """Lists all file versions in the given B2 bucket."""
+    headers = {'Authorization': auth_token}
+    all_files = []
+    next_file_name = None
+    next_file_id = None
+
+    while True:
+        post_params = {
+            'bucketId': bucket_id,
+            'maxFileCount': 1000,
+        }
+        if next_file_name:
+            post_params['startFileName'] = next_file_name
+        if next_file_id:
+            post_params['startFileId'] = next_file_id
+
+        response = requests.post(f"{api_url}/b2api/v2/b2_list_file_versions", json=post_params, headers=headers)
+        if response.status_code != 200:
+            raise Exception(f"Failed to list file versions: {response.text}")
+
+        payload = response.json()
+        page_files = payload.get('files', [])
+        all_files.extend(page_files)
+
+        next_file_name = payload.get('nextFileName')
+        next_file_id = payload.get('nextFileId')
+        if not next_file_name:
+            break
+
+    return all_files
+
+def sync_tracks_from_b2(prune_missing=False, new_only=False, include_versions=False):
     print("Connecting to Backblaze B2...")
     if B2_KEY_ID == 'your_key_id':
         print("Please update B2_KEY_ID and B2_APPLICATION_KEY in the script or .env file.")
@@ -171,26 +203,30 @@ def sync_tracks_from_b2(prune_missing=False, new_only=False):
             print(f"Bucket {B2_BUCKET_NAME} not found.")
             return
 
-        files = list_b2_files(auth_token, api_url, bucket['bucketId'])
+        files = list_b2_file_versions(auth_token, api_url, bucket['bucketId']) if include_versions else list_b2_files(auth_token, api_url, bucket['bucketId'])
         
-        print(f"Found {len(files)} files. Syncing database...")
+        print(f"Found {len(files)} {'file versions' if include_versions else 'files'}. Syncing database...")
         
         all_synced_ids = []
         all_synced_urls = set()
         created_count = 0
         updated_count = 0
         skipped_existing_count = 0
+        skipped_non_upload_count = 0
 
-        existing_titles = set()
+        existing_audio_urls = set()
         if new_only:
-            existing_titles = {
-                (t or '').strip().lower()
-                for t in RadioTrack.objects.values_list('title', flat=True)
-                if t
+            existing_audio_urls = {
+                (url or '').strip().lower()
+                for url in RadioTrack.objects.values_list('audio_url', flat=True)
+                if url
             }
 
         for file in files:
             filename = file['fileName']
+            if include_versions and file.get('action') != 'upload':
+                skipped_non_upload_count += 1
+                continue
             print(f"Checking file: {filename}") # LOGGING
             if not filename.lower().endswith(('.mp3', '.wav', '.m4a')):
                 print(f"Skipping {filename} - incorrect extension.")
@@ -207,13 +243,17 @@ def sync_tracks_from_b2(prune_missing=False, new_only=False):
                 
             # Construct Download URL (URL-encode the filename for special characters like #)
             safe_filename = urllib.parse.quote(filename)
-            audio_url = f"{download_url}/file/{B2_BUCKET_NAME}/{safe_filename}"
+            file_id = (file.get('fileId') or '').strip()
+            if include_versions and file_id:
+                audio_url = f"{download_url}/file/{B2_BUCKET_NAME}/{safe_filename}?versionId={urllib.parse.quote(file_id)}"
+            else:
+                audio_url = f"{download_url}/file/{B2_BUCKET_NAME}/{safe_filename}"
             print(f"Syncing: {artist} - {title} URL: {audio_url}") # LOGGING
 
             all_synced_urls.add(audio_url)
 
-            normalized_title = (title or '').strip().lower()
-            if new_only and normalized_title in existing_titles:
+            normalized_audio_url = audio_url.strip().lower()
+            if new_only and normalized_audio_url in existing_audio_urls:
                 skipped_existing_count += 1
                 print(f"Skipping existing track (new-only mode): {title}")
                 continue
@@ -239,12 +279,12 @@ def sync_tracks_from_b2(prune_missing=False, new_only=False):
                 'duration': metadata.get('duration_str', '3:00'),
                 'duration_seconds': metadata.get('duration_seconds', 180),
             }
-            existing_matches = RadioTrack.objects.filter(title=title).order_by('id')
-            track = existing_matches.first()
+            track = RadioTrack.objects.filter(audio_url=audio_url).first()
             if track:
+                track.title = title
                 for field_name, field_value in defaults.items():
                     setattr(track, field_name, field_value)
-                track.save(update_fields=list(defaults.keys()))
+                track.save(update_fields=['title', *list(defaults.keys())])
                 created = False
             else:
                 track = RadioTrack.objects.create(title=title, **defaults)
@@ -252,6 +292,8 @@ def sync_tracks_from_b2(prune_missing=False, new_only=False):
             all_synced_ids.append(track.id)
             if created:
                 created_count += 1
+                if new_only:
+                    existing_audio_urls.add(normalized_audio_url)
                 print(f"Added new track: {track.title}")
             else:
                 updated_count += 1
@@ -296,7 +338,7 @@ def sync_tracks_from_b2(prune_missing=False, new_only=False):
         print("Sync complete.")
         print(
             f"Summary: created={created_count}, updated={updated_count}, "
-            f"skipped_existing={skipped_existing_count}, deleted={deleted_count}"
+            f"skipped_existing={skipped_existing_count}, skipped_non_upload={skipped_non_upload_count}, deleted={deleted_count}"
         )
         
     except Exception as e:
@@ -312,8 +354,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "--new-only",
         action="store_true",
-        help="Only add tracks that are not already in DB by title (skip updates)",
+        help="Only add tracks that are not already in DB by audio URL (skip updates)",
+    )
+    parser.add_argument(
+        "--include-versions",
+        action="store_true",
+        help="Import all Backblaze file versions (uses version-specific URLs)",
     )
     args = parser.parse_args()
 
-    sync_tracks_from_b2(prune_missing=args.prune, new_only=args.new_only)
+    sync_tracks_from_b2(
+        prune_missing=args.prune,
+        new_only=args.new_only,
+        include_versions=args.include_versions,
+    )

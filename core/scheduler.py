@@ -1,5 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.utils import timezone
+from django.conf import settings
 import json
 import logging
 import re
@@ -227,6 +228,22 @@ def send_user_digests_job():
         logger.error("[scheduler] User digest dispatch failed: %s", e)
 
 
+def sync_radio_from_b2_job():
+    """Background job: sync radio tracks from Backblaze B2."""
+    logger.info("[scheduler] Starting Backblaze radio sync...")
+    try:
+        from core.scripts.sync_radio_b2 import sync_tracks_from_b2
+
+        sync_tracks_from_b2(
+            prune_missing=getattr(settings, 'B2_AUTO_SYNC_PRUNE_MISSING', False),
+            new_only=getattr(settings, 'B2_AUTO_SYNC_NEW_ONLY', True),
+            include_versions=False,
+        )
+        logger.info("[scheduler] Backblaze radio sync complete.")
+    except Exception as e:
+        logger.error("[scheduler] Backblaze radio sync failed: %s", e)
+
+
 def start_scheduler():
     scheduler = BackgroundScheduler()
     # Schedule Daily: Run every day at 08:00 AM
@@ -259,9 +276,30 @@ def start_scheduler():
     # Schedule User Digests: Run every hour (timezone-aware per user)
     scheduler.add_job(send_user_digests_job, 'interval', hours=1, id='send_user_digests', replace_existing=True)
 
+    if getattr(settings, 'B2_AUTO_SYNC_ENABLED', False):
+        interval_minutes = max(5, int(getattr(settings, 'B2_AUTO_SYNC_INTERVAL_MINUTES', 30) or 30))
+        scheduler.add_job(
+            sync_radio_from_b2_job,
+            'interval',
+            minutes=interval_minutes,
+            id='sync_radio_from_b2',
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+
     scheduler.add_job(generate_ranking, 'date', args=['daily'], run_date=timezone.now(), id='initial_daily_sync')
     scheduler.add_job(generate_ranking, 'date', args=['soloists'], run_date=timezone.now(), id='initial_soloists_sync')
     scheduler.add_job(generate_ranking, 'date', args=['groups'], run_date=timezone.now(), id='initial_groups_sync')
+
+    if getattr(settings, 'B2_AUTO_SYNC_ENABLED', False) and getattr(settings, 'B2_AUTO_SYNC_RUN_ON_STARTUP', True):
+        scheduler.add_job(
+            sync_radio_from_b2_job,
+            'date',
+            run_date=timezone.now(),
+            id='initial_b2_radio_sync',
+            replace_existing=True,
+        )
 
     scheduler.start()
     logger.info("Scheduler started successfully for rankings and calendar sync.")

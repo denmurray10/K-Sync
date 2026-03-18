@@ -203,6 +203,14 @@ B2_APPLICATION_KEY = os.environ.get('B2_APPLICATION_KEY', '003309a8127932d4a086f
 B2_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME', 'StrayKids')
 B2_DOWNLOAD_URL = os.environ.get('B2_DOWNLOAD_URL', 'https://f003.backblazeb2.com')
 
+# Auto-sync radio library from Backblaze without manual runs
+B2_AUTO_SYNC_ENABLED = os.environ.get('B2_AUTO_SYNC_ENABLED', 'true').lower() == 'true'
+B2_AUTO_SYNC_INTERVAL_MINUTES = int(os.environ.get('B2_AUTO_SYNC_INTERVAL_MINUTES', '30'))
+B2_AUTO_SYNC_RUN_ON_STARTUP = os.environ.get('B2_AUTO_SYNC_RUN_ON_STARTUP', 'true').lower() == 'true'
+B2_AUTO_SYNC_NEW_ONLY = os.environ.get('B2_AUTO_SYNC_NEW_ONLY', 'true').lower() == 'true'
+B2_AUTO_SYNC_PRUNE_MISSING = os.environ.get('B2_AUTO_SYNC_PRUNE_MISSING', 'false').lower() == 'true'
+B2_AUTO_SYNC_INCLUDE_VERSIONS = os.environ.get('B2_AUTO_SYNC_INCLUDE_VERSIONS', 'false').lower() == 'true'
+
 # ── Audio delivery optimisation (Cloudinary Fetch in front of B2) ───────────
 # Set to false to instantly revert to direct Backblaze URLs.
 AUDIO_STREAM_USE_CLOUDINARY_FETCH = os.environ.get('AUDIO_STREAM_USE_CLOUDINARY_FETCH', 'false').lower() == 'true'
