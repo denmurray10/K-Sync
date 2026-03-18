@@ -2222,6 +2222,15 @@ def home(request):
                 station_group_names,
             ),
         )
+    hero_day_events = []
+    if upcoming_all:
+        first_day = str(upcoming_all[0].get('date_str') or '').strip()
+        if first_day:
+            hero_day_events = [
+                release for release in upcoming_all
+                if str(release.get('date_str') or '').strip() == first_day
+            ][:12]
+
     upcoming = upcoming_all[:4]
     upcoming_ticker = upcoming_all[4:20]
     
@@ -2419,6 +2428,7 @@ def home(request):
     
     return render(request, 'core/index.html', {
         'upcoming_comebacks': upcoming,
+        'hero_day_events': hero_day_events,
         'upcoming_ticker': upcoming_ticker,
         'trending_tracks': trending,
         'trending_ticker_tracks': trending_ticker,
