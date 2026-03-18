@@ -210,6 +210,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <button id="share-now-playing-btn" class="bg-primary text-black border border-primary px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white transition-colors">Share Now Playing</button>
                         <span id="share-now-playing-status" class="text-[10px] font-mono tracking-widest uppercase text-slate-500"></span>
                     </div>
+
+                    <button id="save-moment-btn" class="mt-4 bg-black text-white border border-white/30 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-colors w-full sm:w-auto">
+                        Save This Moment
+                    </button>
                 </div>
             </div>
 
@@ -246,6 +250,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="w-1 md:w-1.5 bg-secondary bar-animate-lg" style="animation-duration: 0.5s;"></div>
                     <div class="w-1 md:w-1.5 bg-primary/80 bar-animate-lg" style="animation-duration: 1.4s;"></div>
                 </div>
+
             </div>
         </div>
 
@@ -543,6 +548,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const pageLoadTime = Date.now();
             const shareNowPlayingBtn = document.getElementById('share-now-playing-btn');
             const shareNowPlayingStatus = document.getElementById('share-now-playing-status');
+            const saveMomentBtn = document.getElementById('save-moment-btn');
+            const saveMomentDefaultLabel = 'Save This Moment';
 
             const parseDurationLabelSeconds = (value) => {
                 const raw = String(value || '').trim();
@@ -590,6 +597,65 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (titleEl && track.title) titleEl.textContent = track.title;
                 if (artistEl && track.artist) artistEl.textContent = track.artist;
             };
+
+            const setSaveMomentSelected = (isSelected) => {
+                if (!saveMomentBtn) return;
+                saveMomentBtn.classList.toggle('bg-emerald-400', !!isSelected);
+                saveMomentBtn.classList.toggle('text-black', !!isSelected);
+                saveMomentBtn.classList.toggle('border-emerald-300', !!isSelected);
+
+                saveMomentBtn.classList.toggle('bg-black', !isSelected);
+                saveMomentBtn.classList.toggle('text-white', !isSelected);
+                saveMomentBtn.classList.toggle('border-white/30', !isSelected);
+                saveMomentBtn.textContent = isSelected ? 'Saved' : saveMomentDefaultLabel;
+            };
+
+            setSaveMomentSelected(false);
+
+            const saveCurrentMoment = async () => {
+                if (!saveMomentBtn) return;
+                saveMomentBtn.disabled = true;
+                try {
+                    const title = (document.getElementById('hero-title')?.textContent || '').trim();
+                    const artist = (document.getElementById('hero-artist')?.textContent || '').trim();
+                    const artworkUrl = (document.getElementById('hero-album-art')?.src || '').trim();
+                    const audioUrl = String(audio?.currentSrc || audio?.src || '').trim();
+
+                    const resp = await fetch('/api/live/save-moment/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({
+                            track_id: Number(currentTrackId || 0),
+                            title,
+                            artist,
+                            artwork_url: artworkUrl,
+                            audio_url: audioUrl,
+                        }),
+                    });
+                    const data = await resp.json();
+                    if (!data?.ok) {
+                        if (resp.status === 302 || resp.status === 403) {
+                            setShareStatus('Login required');
+                            return;
+                        }
+                        setShareStatus(data?.error || 'Save failed');
+                        return;
+                    }
+                    setShareStatus(data.already_saved ? 'Already saved' : 'Saved');
+                    setSaveMomentSelected(true);
+                } catch (err) {
+                    setShareStatus('Save failed');
+                } finally {
+                    saveMomentBtn.disabled = false;
+                }
+            };
+
+            if (saveMomentBtn) {
+                saveMomentBtn.addEventListener('click', saveCurrentMoment);
+            }
 
             if (shareNowPlayingBtn) {
                 shareNowPlayingBtn.addEventListener('click', async () => {
@@ -960,6 +1026,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         const bgImg = document.getElementById('album-bg-img');
                         if (bgImg) bgImg.src = track.album_art;
                         updateShareCard(track);
+                        setSaveMomentSelected(false);
 
                         currentLiveAiPayload = data.live_ai_payload || {};
                         applyLiveAiPayload(currentLiveAiPayload);

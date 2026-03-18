@@ -116,6 +116,7 @@ urlpatterns = [
     path('legal/terms-of-service/', views.terms_of_service, name='terms_of_service'),
     path('api/live/rotate/', views.api_live_rotate_track, name='live_rotate_track'),
     path('api/live/ai/helpful/', views.api_live_ai_helpful, name='live_ai_helpful'),
+    path('api/live/save-moment/', views.save_this_moment, name='save_this_moment'),
     path('api/live/chat/messages/', views.api_live_chat_messages, name='api_live_chat_messages'),
     path('api/live/chat/send/', views.api_live_chat_send, name='api_live_chat_send'),
     path('playlist-manager/', views.playlist_manager, name='playlist_manager'),

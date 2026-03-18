@@ -3579,6 +3579,78 @@ def toggle_favourite(request):
 
 
 @login_required
+@require_POST
+def save_this_moment(request):
+    """Save the currently playing moment as a favourite song (idempotent add)."""
+    try:
+        payload = json.loads(request.body or '{}')
+    except Exception:
+        payload = {}
+
+    track_id_raw = payload.get('track_id')
+    title = str(payload.get('title') or '').strip()
+    artist = str(payload.get('artist') or '').strip()
+    artwork_url = str(payload.get('artwork_url') or '').strip()
+    audio_url = str(payload.get('audio_url') or '').strip()
+
+    track = None
+    try:
+        track_id = int(track_id_raw or 0)
+    except (TypeError, ValueError):
+        track_id = 0
+
+    if track_id > 0:
+        track = RadioTrack.objects.filter(id=track_id).first()
+
+    if track:
+        title = (track.title or '').strip() or title
+        artist = (track.artist or '').strip() or artist
+        artwork_url = (track.album_art or '').strip() or artwork_url
+        audio_url = (track.audio_url or '').strip() or audio_url
+
+    if not title or not artist:
+        state = RadioStationState.objects.select_related('current_track').filter(id=1).first()
+        live_track = state.current_track if state else None
+        if live_track:
+            title = (live_track.title or '').strip() or title
+            artist = (live_track.artist or '').strip() or artist
+            artwork_url = (live_track.album_art or '').strip() or artwork_url
+            audio_url = (live_track.audio_url or '').strip() or audio_url
+
+    if not title or not artist:
+        return JsonResponse({'ok': False, 'error': 'No current track to save.'}, status=400)
+
+    fav, created = FavouriteSong.objects.get_or_create(
+        user=request.user,
+        title=title,
+        artist=artist,
+        defaults={
+            'artwork_url': artwork_url,
+            'preview_url': audio_url,
+            'itunes_url': '/live/',
+        },
+    )
+
+    changed = False
+    if artwork_url and fav.artwork_url != artwork_url:
+        fav.artwork_url = artwork_url
+        changed = True
+    if audio_url and fav.preview_url != audio_url:
+        fav.preview_url = audio_url
+        changed = True
+    if changed:
+        fav.save(update_fields=['artwork_url', 'preview_url'])
+
+    return JsonResponse({
+        'ok': True,
+        'saved': True,
+        'already_saved': not created,
+        'title': title,
+        'artist': artist,
+    })
+
+
+@login_required
 def remove_favourite(request, pk):
     """Remove a specific favourite song."""
     if request.method == 'POST':
