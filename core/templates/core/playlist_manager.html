@@ -1297,6 +1297,34 @@ function playlistApp() {
             }, 1800);
         },
 
+        trackMetaPixel(eventName, params = {}) {
+            const safeEvent = String(eventName || '').trim();
+            if (!safeEvent || typeof window === 'undefined' || typeof window.fbq !== 'function') return;
+            try {
+                const payload = (params && typeof params === 'object') ? params : {};
+                if (Object.keys(payload).length) {
+                    window.fbq('track', safeEvent, payload);
+                } else {
+                    window.fbq('track', safeEvent);
+                }
+            } catch (e) {
+            }
+        },
+
+        trackMetaPixelCustom(eventName, params = {}) {
+            const safeEvent = String(eventName || '').trim();
+            if (!safeEvent || typeof window === 'undefined' || typeof window.fbq !== 'function') return;
+            try {
+                const payload = (params && typeof params === 'object') ? params : {};
+                if (Object.keys(payload).length) {
+                    window.fbq('trackCustom', safeEvent, payload);
+                } else {
+                    window.fbq('trackCustom', safeEvent);
+                }
+            } catch (e) {
+            }
+        },
+
         mergeSavedPlaylists(playlists) {
             if (!Array.isArray(playlists) || !playlists.length) return;
             const byId = new Map((this.savedPlaylists || []).map((playlist) => [Number(playlist.id), playlist]));
@@ -1607,6 +1635,10 @@ function playlistApp() {
                 this.showAISchedulerModal = false;
                 this.setSchedulerUndo('AI schedule generated', snapshot);
                 this.showToast(`AI scheduled ${data.created_slots || 0} slot${(data.created_slots || 0) === 1 ? '' : 's'}`);
+                this.trackMetaPixelCustom('AIScheduleGenerated', {
+                    created_slots: Number(data.created_slots || 0),
+                    fill_level: String(this.aiScheduler.fill_level || '').trim(),
+                });
             } catch (e) {
                 this.showToast('AI scheduler failed');
             } finally {
@@ -1644,6 +1676,10 @@ function playlistApp() {
                 this.slotTargetMinutes = this.aiForm.set_minutes || this.slotTargetMinutes;
                 this.rerenderPlaylist();
                 this.showToast('AI playlist ready');
+                this.trackMetaPixelCustom('AIPlaylistGenerated', {
+                    track_count: Number((this.currentPlaylist.tracks || []).length),
+                    target_minutes: Number(this.slotTargetMinutes || 0),
+                });
                 this.closeAIModal();
             } catch (e) {
                 this.showToast('AI generation failed');
@@ -2280,6 +2316,10 @@ function playlistApp() {
                     await this.fetchSchedules();
                     this.setSaveState('saved', 'Saved');
                     this.showToast('Playlist saved');
+                    this.trackMetaPixelCustom('PlaylistSaved', {
+                        playlist_id: Number(data.id || 0),
+                        track_count: Number((this.currentPlaylist.tracks || []).length),
+                    });
                 } else {
                     this.setSaveState('failed', 'Failed');
                     this.showToast('Save failed');
@@ -2332,6 +2372,9 @@ function playlistApp() {
 
                 await this.fetchSchedules();
                 this.showToast('Playlist deleted');
+                this.trackMetaPixelCustom('PlaylistDeleted', {
+                    playlist_id: Number(playlistId || 0),
+                });
             } catch (e) {
                 this.showToast('Delete failed');
             }
@@ -2611,6 +2654,10 @@ function playlistApp() {
                 }
 
                 this.showToast('Voice-over mix saved');
+                this.trackMetaPixelCustom('VoiceTimelineSaved', {
+                    playlist_id: Number(playlistId || 0),
+                    track_count: Number((this.voiceTimelineTracks || []).length),
+                });
             } catch (e) {
                 this.showToast('Voice-over save failed');
             } finally {
@@ -2654,6 +2701,10 @@ function playlistApp() {
                 const removed = this.removePlainDuplicatesForVoSongs();
                 if (!silent) {
                     this.showToast(removed ? `Voice-over generated (${removed} plain duplicate${removed === 1 ? '' : 's'} removed)` : 'Voice-over generated');
+                    this.trackMetaPixelCustom('VoiceOverScriptGenerated', {
+                        playlist_id: Number(this.voiceTimelinePlaylistId || 0),
+                        duplicate_count_removed: Number(removed || 0),
+                    });
                 }
                 return !!String(track.voice_over_text || '').trim();
             } catch (e) {
@@ -2902,6 +2953,11 @@ function playlistApp() {
                         ? `VO audio added (${autoPercent}% clip, ${removed} plain duplicate${removed === 1 ? '' : 's'} removed, ${storageLabel})`
                         : `VO audio added (${autoPercent}% clip length, ${storageLabel})`
                 );
+                this.trackMetaPixelCustom('VoiceOverAudioRendered', {
+                    playlist_id: Number(this.voiceTimelinePlaylistId || 0),
+                    clip_percent: Number(autoPercent || 0),
+                    storage_target: storageLabel,
+                });
                 return true;
             } catch (e) {
                 this.showToast('Voice rendering failed');
@@ -2937,6 +2993,11 @@ function playlistApp() {
                     this.showScheduleModal = false;
                     await this.fetchSchedules();
                     this.setSchedulerUndo(this.newSchedule.schedule_id ? 'Schedule updated' : 'Schedule added', daySnapshot);
+                    this.trackMetaPixelCustom('ScheduleSaved', {
+                        day: String(this.activeDay || ''),
+                        schedule_id: Number(data.id || this.newSchedule.schedule_id || 0),
+                        playlist_id: Number(this.newSchedule.playlist_id || 0),
+                    });
                 } else {
                     this.showToast(data.error || 'Could not save schedule');
                 }

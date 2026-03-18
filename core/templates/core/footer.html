@@ -72,3 +72,31 @@ Download the App
 </div>
 </div>
 </footer>
+
+<script>
+(function () {
+    if (typeof document === 'undefined') return;
+    if (window.__ksyncMailtoPixelBound) return;
+    window.__ksyncMailtoPixelBound = true;
+
+    document.addEventListener('click', function (event) {
+        const target = event.target;
+        if (!target || typeof target.closest !== 'function') return;
+
+        const link = target.closest('a[href^="mailto:"]');
+        if (!link) return;
+        if (typeof window.fbq !== 'function') return;
+
+        const href = String(link.getAttribute('href') || '');
+        const email = href.replace(/^mailto:/i, '').split('?')[0].trim();
+        const atIndex = email.lastIndexOf('@');
+        const domain = atIndex >= 0 ? email.slice(atIndex + 1) : '';
+
+        window.fbq('track', 'Contact', {
+            contact_method: 'email',
+            contact_domain: domain,
+            page_path: window.location ? window.location.pathname : '',
+        });
+    }, true);
+})();
+</script>

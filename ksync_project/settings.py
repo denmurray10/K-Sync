@@ -169,6 +169,7 @@ GOOGLE_TAG_MANAGER_ID = os.environ.get('GOOGLE_TAG_MANAGER_ID', 'GTM-KDMN68PM')
 # Required permissions: pages_manage_posts, pages_read_engagement
 FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '966171646586881')
 FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUVcMgjdSoBQ0nyoLLbQTB7i3mrOIleDSuUZCcfL3Y2eEZAHzSnjKnLOeUreOxBtsDv8Wh52T4fgIfpZAn5vKEfVb7bvZC3xmBxTSjZCLXBv79sd0qibQxcNwBVyah8c08UKeyhpDbAClAbB3D0Xy2aNBqmyvUg80Ew811zlHXoYZCVvLlrCSZBfRI9DMbvOUnS2uV6QZDZD')
+FACEBOOK_PIXEL_ID = os.environ.get('FACEBOOK_PIXEL_ID', '1694492738408843').strip()
 
 # ── Instagram ─────────────────────────────────────────────────────────────────
 # Instagram Business account must be linked to your Facebook Page.

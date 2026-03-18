@@ -47,6 +47,8 @@ class PreLaunchMiddleware:
 class GoogleTagManagerMiddleware:
     CONSENT_SCRIPT_MARKER = 'id="ksync-consent-mode"'
     CONSENT_BANNER_MARKER = 'id="ksync-consent-banner"'
+    META_PIXEL_SCRIPT_MARKER = 'id="ksync-meta-pixel"'
+    META_PIXEL_NOSCRIPT_MARKER = 'id="ksync-meta-pixel-noscript"'
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -62,8 +64,9 @@ class GoogleTagManagerMiddleware:
             return response
 
         gtm_id = getattr(settings, 'GOOGLE_TAG_MANAGER_ID', '').strip()
+        pixel_id = str(getattr(settings, 'FACEBOOK_PIXEL_ID', '') or '').strip()
         if not gtm_id:
-            return response
+            gtm_id = ''
 
         content = response.content
         charset = getattr(response, 'charset', None) or 'utf-8'
@@ -73,7 +76,13 @@ class GoogleTagManagerMiddleware:
             f'googletagmanager.com/gtm.js?id={gtm_id}' in html
             or f"dataLayer','{gtm_id}'" in html
             or f'googletagmanager.com/ns.html?id={gtm_id}' in html
-        )
+        ) if gtm_id else True
+
+        has_pixel = (
+            f"fbq('init', '{pixel_id}')" in html
+            or f'facebook.com/tr?id={pixel_id}' in html
+            or 'connect.facebook.net/en_US/fbevents.js' in html
+        ) if pixel_id else True
 
         head_script = (
             "<!-- Google Tag Manager -->\n"
@@ -91,6 +100,32 @@ class GoogleTagManagerMiddleware:
             "height=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe></noscript>\n"
             "<!-- End Google Tag Manager (noscript) -->"
         ) % gtm_id
+
+        pixel_head_script = (
+            "<!-- Meta Pixel Code -->\n"
+            "<script id=\"ksync-meta-pixel\">"
+            "!function(f,b,e,v,n,t,s)"
+            "{if(f.fbq)return;n=f.fbq=function(){n.callMethod?"
+            "n.callMethod.apply(n,arguments):n.queue.push(arguments)};"
+            "if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';"
+            "n.queue=[];t=b.createElement(e);t.async=!0;"
+            "t.src=v;s=b.getElementsByTagName(e)[0];"
+            "s.parentNode.insertBefore(t,s)}(window, document,'script',"
+            "'https://connect.facebook.net/en_US/fbevents.js');"
+            "fbq('init', '%s');"
+            "fbq('track', 'PageView');"
+            "</script>\n"
+            "<!-- End Meta Pixel Code -->"
+        ) % pixel_id
+
+        pixel_body_noscript = (
+            "<!-- Meta Pixel (noscript) -->\n"
+            "<noscript id=\"ksync-meta-pixel-noscript\">"
+            "<img height=\"1\" width=\"1\" style=\"display:none\" "
+            "src=\"https://www.facebook.com/tr?id=%s&ev=PageView&noscript=1\"/>"
+            "</noscript>\n"
+            "<!-- End Meta Pixel (noscript) -->"
+        ) % pixel_id
 
         consent_mode_script = (
             "<!-- K-Sync Consent Mode -->\n"
@@ -217,6 +252,8 @@ class GoogleTagManagerMiddleware:
                 insert_at = head_match.end() if head_match else insert_at
             if not has_gtm:
                 html = html[:insert_at] + "\n" + head_script + html[insert_at:]
+            if pixel_id and not has_pixel and self.META_PIXEL_SCRIPT_MARKER not in html:
+                html = html[:insert_at] + "\n" + pixel_head_script + html[insert_at:]
 
         lower_html = html.lower()
         body_match = re.search(r'<body[^>]*>', lower_html)
@@ -224,6 +261,9 @@ class GoogleTagManagerMiddleware:
             insert_at = body_match.end()
             if not has_gtm:
                 html = html[:insert_at] + "\n" + body_noscript + html[insert_at:]
+                lower_html = html.lower()
+            if pixel_id and not has_pixel and self.META_PIXEL_NOSCRIPT_MARKER not in html:
+                html = html[:insert_at] + "\n" + pixel_body_noscript + html[insert_at:]
                 lower_html = html.lower()
             if self.CONSENT_BANNER_MARKER not in html:
                 body_close_match = re.search(r'</body>', lower_html)

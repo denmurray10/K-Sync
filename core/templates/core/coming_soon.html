@@ -638,7 +638,15 @@ function signupForm() {
                     body: JSON.stringify({ name: this.name, email: this.email, age: this.age })
                 });
                 const data = await res.json();
-                if (data.ok) { this.success = true; }
+                if (data.ok) {
+                    this.success = true;
+                    if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+                        window.fbq('track', 'Lead', {
+                            content_name: 'ComingSoonSignup',
+                            status: 'success',
+                        });
+                    }
+                }
                 else { this.error = data.error || 'Something went wrong.'; }
             } catch { this.error = 'Network error. Please try again.'; }
             this.loading = false;

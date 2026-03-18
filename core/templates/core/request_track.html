@@ -255,7 +255,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     })
                     .then(r => r.json())
                     .then(data => {
-                        if (data.success) submitted = true;
+                        if (data.success) {
+                            submitted = true;
+                            if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+                                window.fbq('track', 'Lead', {
+                                    content_name: 'SongRequest',
+                                    status: 'success',
+                                });
+                            }
+                        }
                         sending = false;
                     })
                     .catch(() => { sending = false; });
