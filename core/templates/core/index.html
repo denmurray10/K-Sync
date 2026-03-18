@@ -258,7 +258,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="flex items-end justify-between mb-12">
 <div>
 <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">TODAY'S <br/>PROGRAMMING</h2>
-<p class="font-mono text-xs uppercase tracking-widest mt-3 text-black/60">Live broadcasts from Global Studio 1.</p>
+<p class="font-mono text-xs uppercase tracking-widest mt-3 text-black/60">Live broadcasts from Global Studio 1 · UK time (GMT/BST).</p>
 </div>
 <a href="{% url 'schedule' %}" class="hidden sm:flex items-center text-black text-xs font-black uppercase tracking-[0.2em] border border-black px-6 py-3 hover:bg-black hover:text-white transition-colors duration-300 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                 Full Schedule
@@ -273,7 +273,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 {% if item.status %}
 <span class="font-mono text-xs tracking-widest uppercase {% if item.status == 'On Air' %}font-bold text-primary group-hover:text-white{% else %}opacity-50 group-hover:opacity-100 transition-opacity{% endif %} mb-1">{{ item.status }}</span>
 {% endif %}
-<span class="font-black text-2xl tracking-tighter">{{ item.time_label }} KST</span>
+<span class="font-black text-2xl tracking-tighter">{{ item.time_label }}</span>
+<span class="font-mono text-[10px] tracking-widest uppercase text-black/60 group-hover:text-white/60 mt-1 transition-colors">{{ item.duration_label }}</span>
 </div>
 <div class="flex-1 p-6 flex flex-col justify-center">
 <h3 class="text-3xl font-black uppercase tracking-tighter mb-1">{{ item.title }}</h3>
