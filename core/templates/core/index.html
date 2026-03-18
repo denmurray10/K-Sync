@@ -177,16 +177,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </a>
 </div>
 </div>
-<!-- Right Content: Sharp Featured Card -->
-<div class="hidden md:flex flex-col relative group cursor-pointer w-[300px] aspect-[3/4] overflow-hidden border border-white/20 bg-black mt-12 md:mt-0 z-20 hover:border-primary transition-colors duration-500 hover:-translate-y-2 transform transition-transform">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110 opacity-70 group-hover:opacity-100" data-alt="Portrait of a popular K-pop idol looking stylish" style="background-image: url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/featured-card');"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-<div class="absolute bottom-0 left-0 right-0 p-8 border-t border-white/10 bg-black/80 backdrop-blur-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+<!-- Right Content: Next Comeback Card -->
+<a href="{% url 'comeback_timeline' %}" class="hidden md:flex flex-col relative group cursor-pointer w-[300px] aspect-[3/4] overflow-hidden border border-white/20 bg-black mt-12 md:mt-0 z-20 hover:border-primary transition-colors duration-500 hover:-translate-y-2 transform transition-transform">
+{% if upcoming_comebacks and upcoming_comebacks.0 %}
+{% with next_cb=upcoming_comebacks.0 %}
+<div class="relative h-[60%] overflow-hidden border-b border-white/10">
+<img src="{{ next_cb.image }}" alt="{{ next_cb.artist }} {{ next_cb.title }}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110" />
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+</div>
+<div class="flex-1 p-6 bg-black/80 backdrop-blur-md flex flex-col justify-between">
+<div>
 <span class="text-primary text-[10px] font-bold mb-2 inline-block uppercase tracking-[0.2em]">Coming Up</span>
-<h3 class="text-2xl font-black text-white leading-none uppercase tracking-tight">Exclusive<br/>Interview</h3>
-<p class="text-slate-400 text-xs mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">Stray Kids talks about their new world tour.</p>
+<h3 class="text-2xl font-black text-white leading-none uppercase tracking-tight line-clamp-2">{{ next_cb.title }}</h3>
+<p class="text-slate-400 text-xs mt-3 font-medium uppercase tracking-widest">{{ next_cb.artist }}</p>
+</div>
+<p class="text-slate-400 text-[10px] mt-4 font-mono tracking-widest uppercase">{{ next_cb.date_str }}</p>
+</div>
+{% endwith %}
+{% else %}
+<div class="relative h-[60%] overflow-hidden border-b border-white/10">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110 opacity-70 group-hover:opacity-100" style="background-image: url('https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/featured-card');"></div>
+</div>
+<div class="flex-1 p-6 bg-black/80 backdrop-blur-md flex flex-col justify-between">
+<div>
+<span class="text-primary text-[10px] font-bold mb-2 inline-block uppercase tracking-[0.2em]">Coming Up</span>
+<h3 class="text-2xl font-black text-white leading-none uppercase tracking-tight">Next Comeback</h3>
+<p class="text-slate-400 text-xs mt-3 font-medium">Schedule update landing soon.</p>
 </div>
 </div>
+{% endif %}
+</a>
 </div>
 </section>
 
