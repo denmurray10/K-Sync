@@ -211,6 +211,9 @@ B2_AUTO_SYNC_NEW_ONLY = os.environ.get('B2_AUTO_SYNC_NEW_ONLY', 'true').lower() 
 B2_AUTO_SYNC_PRUNE_MISSING = os.environ.get('B2_AUTO_SYNC_PRUNE_MISSING', 'false').lower() == 'true'
 B2_AUTO_SYNC_INCLUDE_VERSIONS = os.environ.get('B2_AUTO_SYNC_INCLUDE_VERSIONS', 'false').lower() == 'true'
 
+# Shuffle playlist order once per week (keeps song+VO pairs together)
+PLAYLIST_WEEKLY_RANDOMIZE_ENABLED = os.environ.get('PLAYLIST_WEEKLY_RANDOMIZE_ENABLED', 'true').lower() == 'true'
+
 # ── Audio delivery optimisation (Cloudinary Fetch in front of B2) ───────────
 # Set to false to instantly revert to direct Backblaze URLs.
 AUDIO_STREAM_USE_CLOUDINARY_FETCH = os.environ.get('AUDIO_STREAM_USE_CLOUDINARY_FETCH', 'false').lower() == 'true'

@@ -4,6 +4,7 @@ from django.conf import settings
 import json
 import logging
 import re
+import random
 from core.models import Ranking
 from core.views import _chat, _do_blog_generate
 from core.digests import send_due_user_digests
@@ -228,6 +229,70 @@ def send_user_digests_job():
         logger.error("[scheduler] User digest dispatch failed: %s", e)
 
 
+def _is_generated_voice_track_url_or_title(audio_url, title):
+    title_text = str(title or '').strip()
+    url_text = str(audio_url or '').lower()
+    if title_text.startswith('VO:'):
+        return True
+    return '/radio/voiceovers/' in url_text or '/media/radio/voiceovers/' in url_text
+
+
+def randomize_playlists_for_week_job():
+    """Background job: randomize playlist track order weekly, preserving song+VO blocks."""
+    logger.info("[scheduler] Starting weekly playlist randomization...")
+    try:
+        from core.models import RadioPlaylist, RadioPlaylistTrack
+
+        randomized_playlists = 0
+        for playlist in RadioPlaylist.objects.all().only('id'):
+            tracks = list(
+                RadioPlaylistTrack.objects
+                .filter(playlist_id=playlist.id)
+                .select_related('track')
+                .order_by('order', 'id')
+            )
+            if len(tracks) < 2:
+                continue
+
+            blocks = []
+            i = 0
+            while i < len(tracks):
+                current = tracks[i]
+                current_is_vo = _is_generated_voice_track_url_or_title(
+                    getattr(current.track, 'audio_url', ''),
+                    getattr(current.track, 'title', ''),
+                )
+                if (not current_is_vo) and (i + 1 < len(tracks)):
+                    nxt = tracks[i + 1]
+                    next_is_vo = _is_generated_voice_track_url_or_title(
+                        getattr(nxt.track, 'audio_url', ''),
+                        getattr(nxt.track, 'title', ''),
+                    )
+                    if next_is_vo:
+                        blocks.append([current, nxt])
+                        i += 2
+                        continue
+                blocks.append([current])
+                i += 1
+
+            random.shuffle(blocks)
+            new_sequence = [entry for block in blocks for entry in block]
+
+            changed = False
+            for idx, playlist_track in enumerate(new_sequence):
+                if playlist_track.order != idx:
+                    playlist_track.order = idx
+                    changed = True
+
+            if changed:
+                RadioPlaylistTrack.objects.bulk_update(new_sequence, ['order'])
+                randomized_playlists += 1
+
+        logger.info("[scheduler] Weekly playlist randomization complete — %d playlist(s) updated.", randomized_playlists)
+    except Exception as e:
+        logger.error("[scheduler] Weekly playlist randomization failed: %s", e)
+
+
 def sync_radio_from_b2_job():
     """Background job: sync radio tracks from Backblaze B2."""
     logger.info("[scheduler] Starting Backblaze radio sync...")
@@ -275,6 +340,19 @@ def start_scheduler():
 
     # Schedule User Digests: Run every hour (timezone-aware per user)
     scheduler.add_job(send_user_digests_job, 'interval', hours=1, id='send_user_digests', replace_existing=True)
+
+    if getattr(settings, 'PLAYLIST_WEEKLY_RANDOMIZE_ENABLED', True):
+        scheduler.add_job(
+            randomize_playlists_for_week_job,
+            'cron',
+            day_of_week='mon',
+            hour=0,
+            minute=5,
+            id='randomize_playlists_for_week',
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
 
     if getattr(settings, 'B2_AUTO_SYNC_ENABLED', False):
         interval_minutes = max(5, int(getattr(settings, 'B2_AUTO_SYNC_INTERVAL_MINUTES', 30) or 30))
