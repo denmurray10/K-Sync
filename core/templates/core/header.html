@@ -578,6 +578,15 @@
 
                 try {
                     if (mobileMenuAudio.paused) {
+                        const livePageAudio = document.getElementById('live-audio');
+                        const livePageVoiceAudio = document.getElementById('live-vo-audio');
+                        if (livePageAudio && !livePageAudio.paused) {
+                            livePageAudio.pause();
+                        }
+                        if (livePageVoiceAudio && !livePageVoiceAudio.paused) {
+                            livePageVoiceAudio.pause();
+                        }
+
                         if (!mobileMenuAudio.src) {
                             const refreshedState = readPlayerState();
                             if (refreshedState.src) {

@@ -1110,6 +1110,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                      playBtn.classList.toggle('pulse-glow', audio.muted);
                 } else {
                      try {
+                         const mobileMenuAudio = document.getElementById('mobile-menu-live-audio');
+                         if (mobileMenuAudio && !mobileMenuAudio.paused) {
+                             mobileMenuAudio.pause();
+                         }
+
                          // Load if not loaded
                          if (!audio.src || audio.src === "") {
                              audio.load();
