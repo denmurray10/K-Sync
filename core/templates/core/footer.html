@@ -3,19 +3,19 @@
 <div class="container mx-auto px-6 max-w-[1400px]">
 <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto_auto] items-start gap-12 md:gap-16">
 <div class="max-w-sm">
-<h3 class="text-white text-3xl font-black uppercase tracking-tighter leading-none nav-cinzel">K-Beats</h3>
+<h3 class="text-white text-3xl font-black uppercase tracking-tighter leading-none nav-cinzel">K-BEATS RADIO</h3>
 <p class="font-mono text-slate-500 text-[10px] tracking-[0.3em] uppercase mt-2">Est. 2026 · Cornwall, UK</p>
 <p class="text-white text-[14px] font-medium leading-relaxed mt-4">
     Your leading source for K-pop music, news, and culture. Bringing the heart of Seoul from Cornwall to fans worldwide.
 </p>
 <div class="flex gap-3 mt-6">
-<a class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<a class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
 <span class="material-symbols-outlined text-sm">public</span>
 </a>
-<a class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
-<span class="material-symbols-outlined text-sm">videocam</span>
+<a class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="{% url 'news' %}" aria-label="News">
+<span class="material-symbols-outlined text-sm">article</span>
 </a>
-<a class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+<a class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="{% url 'live' %}" aria-label="Live">
 <span class="material-symbols-outlined text-sm">music_note</span>
 </a>
 </div>
