@@ -4964,6 +4964,15 @@ def live(request):
         'current_voice_overlay_json': json.dumps(current_voice_overlay),
         'up_next_tracks': up_next_tracks,
         'recently_played_tracks': recently_played_tracks,
+        'up_next_tracks_json': json.dumps([
+            {
+                'title': t.title,
+                'artist': t.artist,
+                'album_art': t.album_art,
+                'duration_seconds': int(t.duration_seconds or 0),
+            }
+            for t in up_next_tracks[:6]
+        ]),
         'current_offset': current_offset,
         'live_ai_payload': live_ai_payload,
         'live_ai_payload_json': json.dumps(live_ai_payload),
@@ -5008,7 +5017,12 @@ def api_live_rotate_track(request):
             },
             'live_ai_payload': live_ai_payload,
             'up_next': [
-                {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
+                {
+                    'title': t.title,
+                    'artist': t.artist,
+                    'album_art': t.album_art,
+                    'duration_seconds': int(t.duration_seconds or 0),
+                }
                 for t in up_next_list
             ],
             'recently_played': [
@@ -5086,7 +5100,12 @@ def api_live_rotate_track(request):
         },
         'live_ai_payload': live_ai_payload,
         'up_next': [
-            {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
+            {
+                'title': t.title,
+                'artist': t.artist,
+                'album_art': t.album_art,
+                'duration_seconds': int(t.duration_seconds or 0),
+            }
             for t in up_next_list[:6]
         ],
         'recently_played': [

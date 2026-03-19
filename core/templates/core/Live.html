@@ -149,6 +149,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .custom-scrollbar::-webkit-scrollbar-thumb {
         background: #f425c0;
     }
+
 </style>
 </head>
 <body class="bg-black text-white font-display min-h-screen flex flex-col overflow-x-hidden">
@@ -369,7 +370,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                             <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">{{ track.artist }}</p>
                         </div>
-                        <span class="text-[10px] font-mono text-slate-600 tracking-wider">{{ track.duration }}</span>
+                        <span id="up-next-eta-{{ forloop.counter0 }}" class="text-[10px] font-mono text-slate-500 tracking-wider uppercase">In --:--</span>
                     </div>
                     {% empty %}
                     <p class="text-slate-500 text-xs text-center py-4 font-mono uppercase tracking-widest">Playlist Loading...</p>
@@ -412,41 +413,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
 
-            <!-- LIVE ACTIVITY / CHAT -->
+            <!-- UPCOMING SHOWS LIST -->
             <div class="reveal-up" style="transition-delay: 400ms;">
                 <div class="flex items-end justify-between mb-8">
                     <div>
-                        <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-2">Listener Feed</p>
-                        <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter leading-none">Live Chat</h2>
+                        <p class="font-mono text-secondary text-[10px] tracking-[0.4em] uppercase mb-2">Schedule Feed</p>
+                        <h2 class="text-white text-[2.4rem] font-black uppercase tracking-tighter leading-none">Upcoming Shows</h2>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="flex h-2 w-2 rounded-full bg-secondary animate-pulse"></span>
-                        <span class="text-[10px] font-mono text-secondary uppercase tracking-widest">Live Now</span>
-                    </div>
+                    <span class="material-symbols-outlined text-slate-500 text-3xl">event_upcoming</span>
                 </div>
 
-                <!-- Chat Container -->
-                <div class="border border-white/10 bg-white/[0.02] h-[550px] flex flex-col">
-                    {% if user.is_authenticated %}
-                    <div id="chat-messages" class="flex-1 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4"></div>
-                    <div class="p-4 border-t border-white/10 bg-black">
-                        <div class="flex gap-2">
-                            <input id="chat-input" type="text" placeholder="Type a message..." class="flex-1 bg-white/5 border border-white/10 px-4 py-3 text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-primary/50 transition-colors uppercase" maxlength="500">
-                            <button id="chat-send-btn" class="bg-primary hover:bg-white text-black w-12 flex items-center justify-center transition-colors">
-                                <span class="material-symbols-outlined text-xl">send</span>
-                            </button>
-                        </div>
-                        <p id="chat-error" class="hidden text-[9px] text-red-300 mt-2 uppercase tracking-widest text-center"></p>
-                        <p class="text-[9px] text-slate-600 mt-2 uppercase tracking-widest text-center">Members chat only · Be respectful</p>
-                    </div>
-                    {% else %}
-                    <div class="flex-1 p-6 flex items-center justify-center">
-                        <div class="text-center max-w-sm">
-                            <p class="text-[11px] text-slate-400 font-mono uppercase tracking-widest">Live chat is for logged-in members</p>
-                            <a href="{% url 'login' %}?next={{ request.path }}" class="inline-flex mt-4 h-9 px-4 items-center justify-center bg-primary text-black text-[10px] font-bold uppercase tracking-widest">Login To Join</a>
-                        </div>
-                    </div>
-                    {% endif %}
+                <div id="upcoming-shows-column-list" class="flex flex-col gap-3">
+                    <p class="text-slate-500 text-xs text-center py-6 font-mono uppercase tracking-widest">Loading upcoming shows...</p>
                 </div>
             </div>
         </div>
@@ -550,6 +528,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const shareNowPlayingStatus = document.getElementById('share-now-playing-status');
             const saveMomentBtn = document.getElementById('save-moment-btn');
             const saveMomentDefaultLabel = 'Save This Moment';
+            const upcomingShowsColumnListEl = document.getElementById('upcoming-shows-column-list');
+            let currentUpNextTracks = {{ up_next_tracks_json|default:"[]"|safe }};
+            let scheduleSlotsCache = [];
 
             const parseDurationLabelSeconds = (value) => {
                 const raw = String(value || '').trim();
@@ -565,6 +546,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 const safe = Math.max(0, Math.floor(Number(seconds || 0)));
                 const mins = Math.floor(safe / 60);
                 const secs = safe % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            const formatCountdownClock = (seconds) => {
+                const safe = Math.max(0, Math.floor(Number(seconds || 0)));
+                const hours = Math.floor(safe / 3600);
+                const mins = Math.floor((safe % 3600) / 60);
+                const secs = safe % 60;
+                if (hours > 0) {
+                    return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
                 return `${mins}:${secs.toString().padStart(2, '0')}`;
             };
 
@@ -688,6 +680,190 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (Number.isFinite(knownDuration) && knownDuration > 0) return knownDuration;
                 if (progressTotalEl) return parseDurationLabelSeconds(progressTotalEl.textContent || '');
                 return 0;
+            };
+
+            const getCurrentTrackRemainingSeconds = () => {
+                const duration = getEffectiveDurationSeconds();
+                const current = Math.max(0, Number(audio.currentTime || 0));
+                if (!duration || duration <= 0) return 0;
+                return Math.max(0, Math.floor(duration - current));
+            };
+
+            const updateUpNextCountdownTimers = () => {
+                const queue = Array.isArray(currentUpNextTracks) ? currentUpNextTracks : [];
+                let running = getCurrentTrackRemainingSeconds();
+                queue.forEach((track, idx) => {
+                    const etaEl = document.getElementById(`up-next-eta-${idx}`);
+                    if (!etaEl) return;
+                    etaEl.textContent = `In ${formatCountdownClock(running)}`;
+                    const duration = Math.max(0, Number(track?.duration_seconds || 0));
+                    running += duration;
+                });
+            };
+
+            const parseShowDate = (dayCode, hhmm) => {
+                const dayMap = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
+                const targetDay = dayMap[String(dayCode || '').toUpperCase()];
+                if (typeof targetDay !== 'number') return null;
+                const parts = String(hhmm || '').split(':');
+                if (parts.length < 2) return null;
+                const hour = parseInt(parts[0], 10);
+                const minute = parseInt(parts[1], 10);
+                if (Number.isNaN(hour) || Number.isNaN(minute)) return null;
+
+                const now = new Date();
+                const candidate = new Date(now);
+                const diff = (targetDay - now.getDay() + 7) % 7;
+                candidate.setDate(now.getDate() + diff);
+                candidate.setHours(hour, minute, 0, 0);
+                if (candidate <= now) {
+                    candidate.setDate(candidate.getDate() + 7);
+                }
+                return candidate;
+            };
+
+            const parseShowDateThisWeek = (dayCode, hhmm) => {
+                const dayMap = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
+                const targetDay = dayMap[String(dayCode || '').toUpperCase()];
+                if (typeof targetDay !== 'number') return null;
+                const parts = String(hhmm || '').split(':');
+                if (parts.length < 2) return null;
+                const hour = parseInt(parts[0], 10);
+                const minute = parseInt(parts[1], 10);
+                if (Number.isNaN(hour) || Number.isNaN(minute)) return null;
+
+                const now = new Date();
+                const candidate = new Date(now);
+                const diff = targetDay - now.getDay();
+                candidate.setDate(now.getDate() + diff);
+                candidate.setHours(hour, minute, 0, 0);
+                return candidate;
+            };
+
+            const renderUpcomingShowsColumn = () => {
+                if (!upcomingShowsColumnListEl) return;
+                if (!Array.isArray(scheduleSlotsCache) || !scheduleSlotsCache.length) {
+                    upcomingShowsColumnListEl.innerHTML = '<p class="text-slate-500 text-xs text-center py-6 font-mono uppercase tracking-widest">Upcoming shows unavailable</p>';
+                    return;
+                }
+
+                const now = new Date();
+                const items = scheduleSlotsCache
+                    .map((slot) => {
+                        const startAt = parseShowDate(slot.day, slot.time);
+                        if (!startAt) return null;
+                        const diff = Math.max(0, Math.floor((startAt.getTime() - Date.now()) / 1000));
+                        return {
+                            label: String(slot.show_name || slot.name || 'Show').trim(),
+                            day: String(slot.day || ''),
+                            time: String(slot.time || ''),
+                            startAt,
+                            diff,
+                        };
+                    })
+                    .filter(Boolean)
+                    .filter((item) => item.startAt > now)
+                    .sort((a, b) => a.startAt - b.startAt)
+                    .slice(0, 12);
+
+                const currentCandidates = scheduleSlotsCache
+                    .map((slot) => {
+                        const thisWeek = parseShowDateThisWeek(slot.day, slot.time);
+                        if (!thisWeek) return null;
+
+                        const thisWeekTime = thisWeek.getTime();
+                        const nowTime = now.getTime();
+                        const startAt = thisWeekTime <= nowTime ? thisWeek : new Date(thisWeekTime - (7 * 24 * 60 * 60 * 1000));
+
+                        return {
+                            label: String(slot.show_name || slot.name || 'Show').trim(),
+                            day: String(slot.day || ''),
+                            time: String(slot.time || ''),
+                            startAt,
+                        };
+                    })
+                    .filter(Boolean)
+                    .filter((item) => item.startAt <= now)
+                    .sort((a, b) => b.startAt - a.startAt);
+
+                const currentShow = currentCandidates.length ? currentCandidates[0] : null;
+
+                if (!items.length) {
+                    upcomingShowsColumnListEl.innerHTML = '<p class="text-slate-500 text-xs text-center py-6 font-mono uppercase tracking-widest">No upcoming shows right now</p>';
+                    return;
+                }
+
+                const renderShowRow = (item, mode = 'queued') => {
+                    const hh = String(item.startAt.getHours()).padStart(2, '0');
+                    const mm = String(item.startAt.getMinutes()).padStart(2, '0');
+                    const countdown = mode === 'live' ? 'LIVE' : `In ${formatCountdownClock(item.diff)}`;
+                    const leftIcon = mode === 'live' ? 'radio_button_checked' : (mode === 'next' ? 'schedule' : 'event');
+                    const highlightClass = mode === 'live'
+                        ? 'border-secondary/35 bg-secondary/10 hover:border-secondary/50 hover:bg-secondary/15'
+                        : (mode === 'next' ? 'border-primary/35 bg-primary/10 hover:border-primary/50 hover:bg-primary/15' : 'hover:border-primary/40 hover:bg-primary/5');
+                    const chipClass = mode === 'live' ? 'text-secondary' : (mode === 'next' ? 'text-primary' : 'text-slate-500');
+
+                    return `
+                        <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] transition-all duration-300 group cursor-pointer ${highlightClass}">
+                            <div class="w-12 h-12 bg-white/10 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <span class="material-symbols-outlined text-slate-300 group-hover:text-white transition-colors">${leftIcon}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm font-bold text-white uppercase tracking-tight truncate">${item.label}</p>
+                                    ${mode === 'live' ? '<span class="shrink-0 inline-flex items-center gap-1 bg-secondary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest">On Air</span>' : ''}
+                                    ${mode === 'next' ? '<span class="shrink-0 inline-flex items-center gap-1 bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest">Next</span>' : ''}
+                                </div>
+                                <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">${item.day} ${hh}:${mm}</p>
+                            </div>
+                            <span class="text-[10px] font-mono ${chipClass} tracking-wider uppercase">${countdown}</span>
+                        </div>
+                    `;
+                };
+
+                const rows = [];
+                if (currentShow) {
+                    rows.push(renderShowRow({ ...currentShow, diff: 0 }, 'live'));
+                }
+
+                const MAX_SHOW_ROWS = 6;
+                if (items.length && rows.length < MAX_SHOW_ROWS) {
+                    rows.push(renderShowRow(items[0], 'next'));
+                    const remainingSlots = Math.max(0, MAX_SHOW_ROWS - rows.length);
+                    items.slice(1, 1 + remainingSlots).forEach((item) => rows.push(renderShowRow(item, 'queued')));
+                }
+
+                if (!rows.length) {
+                    upcomingShowsColumnListEl.innerHTML = '<p class="text-slate-500 text-xs text-center py-6 font-mono uppercase tracking-widest">No upcoming shows right now</p>';
+                    return;
+                }
+
+                upcomingShowsColumnListEl.innerHTML = rows.join('');
+            };
+
+            const loadNextShowRail = async () => {
+                try {
+                    const resp = await fetch(`/api/schedule-data/?_ts=${Date.now()}`, { cache: 'no-store' });
+                    const data = await resp.json();
+                    const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+                    const slots = [];
+                    days.forEach((day) => {
+                        const daySlots = Array.isArray(data?.[day]) ? data[day] : [];
+                        daySlots.forEach((slot) => {
+                            if (!slot) return;
+                            slots.push({
+                                day,
+                                time: slot.time,
+                                name: slot.name,
+                                show_name: slot.show_name,
+                            });
+                        });
+                    });
+                    scheduleSlotsCache = slots;
+                } catch (e) {
+                    scheduleSlotsCache = [];
+                }
+                renderUpcomingShowsColumn();
             };
 
             const updateProgressUI = (explicitCurrent = null) => {
@@ -1032,6 +1208,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         applyLiveAiPayload(currentLiveAiPayload);
 
                         updatePlaylistUI('up-next-container', data.up_next, 'primary');
+                        currentUpNextTracks = Array.isArray(data.up_next) ? data.up_next : [];
+                        updateUpNextCountdownTimers();
                         updatePlaylistUI('recently-played-container', data.recently_played, 'secondary');
                     }
                 } catch (error) {
@@ -1055,6 +1233,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             audio.addEventListener('ended', () => triggerRotate('ended'));
             updateProgressUI(initialServerOffset || 0);
+            updatePlaylistUI('up-next-container', currentUpNextTracks, 'primary');
+            updateUpNextCountdownTimers();
+            loadNextShowRail();
+            setInterval(updateUpNextCountdownTimers, 1000);
+            setInterval(renderUpcomingShowsColumn, 1000);
             applyLiveAiPayload(currentLiveAiPayload);
             updateShareCard({
                 title: document.getElementById('hero-title')?.textContent || 'RADIO LIVE',
@@ -1153,6 +1336,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             
             container.innerHTML = tracks.map((track, idx) => {
                 const title = sanitizePlaylistTitle(track.title);
+                const upNextEta = `In --:--`;
                 return `
                 <div class="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.03] hover:border-${colorClass}/50 hover:bg-${colorClass}/5 transition-all duration-300 group cursor-pointer">
                     ${containerId === 'up-next-container' ? `<span class="text-slate-600 font-mono text-xs w-6 text-center">${(idx + 1).toString().padStart(2, '0')}</span>` : ''}
@@ -1163,7 +1347,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p class="text-sm font-bold text-white uppercase tracking-tight truncate group-hover:text-${colorClass} transition-colors">${title}</p>
                         <p class="text-xs text-slate-500 font-mono uppercase tracking-widest truncate">${track.artist}</p>
                     </div>
-                    ${containerId === 'up-next-container' ? `<span class="material-symbols-outlined text-slate-600 text-sm">chevron_right</span>` : `<span class="text-[10px] font-mono text-slate-600 tracking-wider">Played</span>`}
+                    ${containerId === 'up-next-container' ? `<span id="up-next-eta-${idx}" class="text-[10px] font-mono text-slate-500 tracking-wider uppercase">${upNextEta}</span>` : `<span class="text-[10px] font-mono text-slate-600 tracking-wider">Played</span>`}
                 </div>
             `;
             }).join('');
