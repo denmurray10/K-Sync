@@ -128,55 +128,77 @@
 <button
     id="mobile-site-menu-toggle"
     type="button"
-    class="md:hidden fixed bottom-4 right-4 z-[79] bg-primary text-black border border-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_#ffffff] transition-opacity"
+    class="md:hidden fixed bottom-4 right-4 z-[79] bg-primary text-black border border-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_#ffffff] transition-opacity flex items-center gap-2"
     aria-expanded="false"
     aria-controls="mobile-site-menu-panel"
 >
+    <span class="material-symbols-outlined text-sm">menu</span>
     Menu
 </button>
 
 <div
     id="mobile-site-menu-panel"
-    class="md:hidden fixed inset-0 z-[80] bg-black/95 backdrop-blur-md p-6 pt-10 pb-24 translate-y-full opacity-0 pointer-events-none transition-all duration-300 overflow-y-auto"
+    class="md:hidden fixed inset-0 z-[80] bg-black/95 backdrop-blur-md p-5 pt-8 pb-24 translate-y-full opacity-0 pointer-events-none transition-all duration-300 overflow-y-auto"
     aria-hidden="true"
 >
-    <div class="flex items-center justify-between mb-8">
-        <p class="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500">Menu</p>
-        <button id="mobile-site-menu-close" type="button" class="text-slate-400 hover:text-white" aria-label="Close menu">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <p class="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500">K-BEATS RADIO</p>
+            <p class="text-white text-lg font-black uppercase tracking-tight mt-2">Menu</p>
+        </div>
+        <button id="mobile-site-menu-close" type="button" class="w-10 h-10 border border-white/20 text-slate-300 hover:text-white hover:border-primary transition-colors flex items-center justify-center" aria-label="Close menu">
             <span class="material-symbols-outlined text-lg">close</span>
         </button>
     </div>
-    <div class="space-y-8">
-        <div>
-            <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-3">Browse</p>
+    <div class="space-y-5">
+        <div class="border border-white/10 bg-white/[0.02] p-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-3">
+                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Live Player</p>
+                <span id="mobile-menu-player-status" class="font-mono text-[8px] tracking-widest uppercase text-slate-500">Ready</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <img id="mobile-menu-player-art" src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album" class="w-11 h-11 border border-white/20 object-cover" alt="Now playing art" />
+                <div class="min-w-0 flex-1">
+                    <p id="mobile-menu-player-title" class="text-xs font-black uppercase tracking-tight truncate">K-BEATS LIVE</p>
+                    <p id="mobile-menu-player-artist" class="text-[10px] font-mono uppercase tracking-widest text-slate-500 truncate">On Air</p>
+                </div>
+                <button id="mobile-menu-player-toggle" type="button" class="w-9 h-9 border border-primary bg-primary text-black flex items-center justify-center disabled:opacity-60" aria-label="Play or pause live radio">
+                    <span id="mobile-menu-player-icon" class="material-symbols-outlined text-base">play_arrow</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="border border-white/10 bg-white/[0.02] p-4">
+            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500 mb-3">Browse</p>
             <nav class="grid grid-cols-2 gap-3">
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'live' %}">Live</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'charts' %}">Charts</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'idols' %}">Idols</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'comeback_timeline' %}">Comebacks</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'news' %}">News</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'coming_soon' %}">Shop</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'live' %}">Live</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'charts' %}">Charts</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'idols' %}">Idols</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'comeback_timeline' %}">Comebacks</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'news' %}">News</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'coming_soon' %}">Shop</a>
             </nav>
         </div>
 
-        <div>
-            <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-3">My Account</p>
+        <div class="border border-white/10 bg-white/[0.02] p-4">
+            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500 mb-3">My Account</p>
             <div class="grid grid-cols-2 gap-3">
                 {% if user.is_authenticated %}
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'dashboard' %}">Dashboard</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'profile' %}">Profile</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'logout' %}">Log Out</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'dashboard' %}">Dashboard</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'profile' %}">Profile</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'logout' %}">Log Out</a>
                 {% else %}
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'login' %}">Log In</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'signup' %}">Sign Up</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
-                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'promo' %}">Get App</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'login' %}">Log In</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'signup' %}">Sign Up</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
+                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'promo' %}">Get App</a>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+<audio id="mobile-menu-live-audio" class="hidden" preload="none" playsinline></audio>
 
 <!-- ───── GLOBAL MY STATION TAB ───── -->
 <div
@@ -438,6 +460,72 @@
         const mobileMenuToggle = document.getElementById('mobile-site-menu-toggle');
         const mobileMenuPanel = document.getElementById('mobile-site-menu-panel');
         const mobileMenuClose = document.getElementById('mobile-site-menu-close');
+        const mobilePlayerStatus = document.getElementById('mobile-menu-player-status');
+        const mobilePlayerArt = document.getElementById('mobile-menu-player-art');
+        const mobilePlayerTitle = document.getElementById('mobile-menu-player-title');
+        const mobilePlayerArtist = document.getElementById('mobile-menu-player-artist');
+        const mobilePlayerToggle = document.getElementById('mobile-menu-player-toggle');
+        const mobilePlayerIcon = document.getElementById('mobile-menu-player-icon');
+        const mobileMenuAudio = document.getElementById('mobile-menu-live-audio');
+
+        const playerStateKey = 'ksync_station_widget_v1';
+
+        const readPlayerState = () => {
+            try {
+                return JSON.parse(localStorage.getItem(playerStateKey) || '{}');
+            } catch (e) {
+                return {};
+            }
+        };
+
+        const writePlayerState = (patch = {}) => {
+            const next = { ...readPlayerState(), ...patch, updatedAt: Date.now() };
+            localStorage.setItem(playerStateKey, JSON.stringify(next));
+            return next;
+        };
+
+        const syncMobilePlayerFromState = () => {
+            if (!mobilePlayerStatus || !mobilePlayerIcon) return;
+            const state = readPlayerState();
+            const track = state.track || null;
+            const isPlaying = mobileMenuAudio ? !mobileMenuAudio.paused : !!state.playing;
+
+            if (track) {
+                if (mobilePlayerTitle) mobilePlayerTitle.textContent = String(track.title || 'K-BEATS LIVE');
+                if (mobilePlayerArtist) mobilePlayerArtist.textContent = String(track.artist || 'On Air');
+                if (mobilePlayerArt) {
+                    mobilePlayerArt.src = String(track.album_art || 'https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album');
+                }
+            }
+
+            mobilePlayerStatus.textContent = track ? (isPlaying ? 'Playing' : 'Ready') : 'Offline';
+            mobilePlayerIcon.textContent = isPlaying ? 'pause' : 'play_arrow';
+        };
+
+        const fetchMobileMenuLiveStatus = async () => {
+            try {
+                const res = await fetch(`/api/live/status/?_ts=${Date.now()}`, { cache: 'no-store' });
+                const data = await res.json();
+                if (data?.ok && data.current_track) {
+                    const state = readPlayerState();
+                    writePlayerState({
+                        ...state,
+                        track: data.current_track,
+                        src: String(data.current_track.audio_url || ''),
+                        mode: 'inline',
+                    });
+                    if (mobileMenuAudio && data.current_track.audio_url) {
+                        const nextSrc = String(data.current_track.audio_url);
+                        if (mobileMenuAudio.src !== nextSrc) {
+                            mobileMenuAudio.src = nextSrc;
+                        }
+                    }
+                    syncMobilePlayerFromState();
+                }
+            } catch (e) {
+                if (mobilePlayerStatus) mobilePlayerStatus.textContent = 'Offline';
+            }
+        };
 
         const openMobileMenu = () => {
             if (!mobileMenuPanel || !mobileMenuToggle) return;
@@ -474,6 +562,64 @@
             mobileMenuPanel.querySelectorAll('a').forEach((link) => {
                 link.addEventListener('click', closeMobileMenu);
             });
+        }
+
+        if (mobilePlayerToggle) {
+            syncMobilePlayerFromState();
+            fetchMobileMenuLiveStatus();
+
+            mobilePlayerToggle.addEventListener('click', async function() {
+                const state = readPlayerState();
+                if (!mobileMenuAudio) return;
+
+                if (!state.track || !state.src) {
+                    await fetchMobileMenuLiveStatus();
+                }
+
+                try {
+                    if (mobileMenuAudio.paused) {
+                        if (!mobileMenuAudio.src) {
+                            const refreshedState = readPlayerState();
+                            if (refreshedState.src) {
+                                mobileMenuAudio.src = String(refreshedState.src);
+                            }
+                        }
+                        await mobileMenuAudio.play();
+                    } else {
+                        mobileMenuAudio.pause();
+                    }
+                } catch (e) {
+                    if (mobilePlayerStatus) mobilePlayerStatus.textContent = 'Tap to Play';
+                }
+
+                writePlayerState({
+                    ...readPlayerState(),
+                    mode: 'inline',
+                    playing: !mobileMenuAudio.paused,
+                });
+                syncMobilePlayerFromState();
+            });
+
+            if (mobileMenuAudio) {
+                mobileMenuAudio.addEventListener('play', () => {
+                    writePlayerState({ ...readPlayerState(), mode: 'inline', playing: true });
+                    syncMobilePlayerFromState();
+                });
+                mobileMenuAudio.addEventListener('pause', () => {
+                    writePlayerState({ ...readPlayerState(), mode: 'inline', playing: false });
+                    syncMobilePlayerFromState();
+                });
+                mobileMenuAudio.addEventListener('error', () => {
+                    if (mobilePlayerStatus) mobilePlayerStatus.textContent = 'Offline';
+                });
+            }
+
+            window.addEventListener('storage', (event) => {
+                if (event.key === playerStateKey) syncMobilePlayerFromState();
+            });
+
+            setInterval(syncMobilePlayerFromState, 1500);
+            setInterval(fetchMobileMenuLiveStatus, 30000);
         }
         
         window.addEventListener('scroll', function() {
