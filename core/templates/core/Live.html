@@ -181,7 +181,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- Hidden Audio Element -->
     <audio id="live-audio" preload="auto">
         {% if current_track and current_track.audio_url %}
-            <source src="{{ current_track.audio_url }}" type="audio/mpeg">
+            <source src="{{ current_track.audio_url }}" {% with lower_audio_url=current_track.audio_url|lower %}type="{% if '.m4a' in lower_audio_url %}audio/mp4{% elif '.wav' in lower_audio_url %}audio/wav{% else %}audio/mpeg{% endif %}"{% endwith %}>
         {% endif %}
     </audio>
     <audio id="live-vo-audio" preload="auto"></audio>

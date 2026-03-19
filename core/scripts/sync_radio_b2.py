@@ -34,7 +34,7 @@ B2_ENDPOINT = os.getenv('B2_ENDPOINT', '') # e.g. f000.backblazeb2.com
 import io
 import cloudinary
 import cloudinary.uploader
-from mutagen.mp3 import MP3
+from mutagen import File as MutagenFile
 from mutagen.id3 import ID3, APIC
 from django.conf import settings
 
@@ -58,6 +58,9 @@ def extract_metadata(audio_url, track_id):
         'duration_str': "3:00"
     }
     try:
+        parsed_url = urllib.parse.urlparse(audio_url or '')
+        file_ext = os.path.splitext(parsed_url.path or '')[1].lower()
+
         # Download first 1MB (art and metadata are usually at the start)
         headers = {'Range': 'bytes=0-1048576'}
         response = requests.get(audio_url, headers=headers, timeout=10)
@@ -68,43 +71,81 @@ def extract_metadata(audio_url, track_id):
         
         # Extract Duration
         try:
-            audio_info = MP3(file_data).info
-            seconds = int(audio_info.length)
-            metadata['duration_seconds'] = seconds
-            mins, secs = divmod(seconds, 60)
-            metadata['duration_str'] = f"{mins}:{secs:02d}"
+            file_data.seek(0)
+            parsed_audio = MutagenFile(file_data)
+            if parsed_audio and getattr(parsed_audio, 'info', None) and getattr(parsed_audio.info, 'length', None):
+                seconds = int(parsed_audio.info.length)
+                metadata['duration_seconds'] = seconds
+                mins, secs = divmod(seconds, 60)
+                metadata['duration_str'] = f"{mins}:{secs:02d}"
         except Exception as e:
             print(f"Duration extraction failed: {e}")
 
+        # Extract artist/artwork with format-aware tag handling
         try:
             file_data.seek(0)
-            tags = ID3(file_data)
-        except Exception:
-            return metadata
-            
-        # Extract Artist (TPE1 is the official tag for Lead Artist)
-        if 'TPE1' in tags:
-            metadata['artist'] = str(tags['TPE1'])
-            print(f"    Found Artist: {metadata['artist']}")
-        elif 'TPE2' in tags:
-            metadata['artist'] = str(tags['TPE2'])
-            print(f"    Found Artist: {metadata['artist']}")
+            parsed_audio = MutagenFile(file_data)
+            tags = getattr(parsed_audio, 'tags', {}) or {}
 
-        # Extract Artwork
-        for tag in tags.values():
-            if isinstance(tag, APIC):
-                try:
-                    upload_result = cloudinary.uploader.upload(
-                        tag.data,
-                        folder="radio/album_art",
-                        public_id=f"track_{track_id}",
-                        overwrite=True,
-                        resource_type='image'
-                    )
-                    metadata['album_art'] = upload_result.get('secure_url')
-                except Exception as upload_err:
-                    print(f"Cloudinary upload error: {upload_err}")
-                break
+            if isinstance(tags, dict):
+                artist_val = None
+                for key in ('TPE1', 'TPE2', '\xa9ART', 'aART', 'artist', 'ARTIST'):
+                    if key in tags and tags[key]:
+                        candidate = tags[key][0] if isinstance(tags[key], (list, tuple)) else tags[key]
+                        artist_val = str(candidate).strip()
+                        if artist_val:
+                            break
+                if artist_val:
+                    metadata['artist'] = artist_val
+                    print(f"    Found Artist: {metadata['artist']}")
+
+                if 'covr' in tags and tags['covr']:
+                    cover_blob = tags['covr'][0]
+                    if hasattr(cover_blob, 'data'):
+                        cover_blob = cover_blob.data
+                    if cover_blob:
+                        try:
+                            upload_result = cloudinary.uploader.upload(
+                                bytes(cover_blob),
+                                folder="radio/album_art",
+                                public_id=f"track_{track_id}",
+                                overwrite=True,
+                                resource_type='image'
+                            )
+                            metadata['album_art'] = upload_result.get('secure_url')
+                        except Exception as upload_err:
+                            print(f"Cloudinary upload error: {upload_err}")
+        except Exception:
+            pass
+
+        # MP3-specific ID3 APIC fallback for artwork/artist
+        if file_ext == '.mp3' and not metadata.get('album_art'):
+            try:
+                file_data.seek(0)
+                tags = ID3(file_data)
+
+                if not metadata.get('artist'):
+                    if 'TPE1' in tags:
+                        metadata['artist'] = str(tags['TPE1'])
+                    elif 'TPE2' in tags:
+                        metadata['artist'] = str(tags['TPE2'])
+
+                for tag in tags.values():
+                    if isinstance(tag, APIC):
+                        try:
+                            upload_result = cloudinary.uploader.upload(
+                                tag.data,
+                                folder="radio/album_art",
+                                public_id=f"track_{track_id}",
+                                overwrite=True,
+                                resource_type='image'
+                            )
+                            metadata['album_art'] = upload_result.get('secure_url')
+                        except Exception as upload_err:
+                            print(f"Cloudinary upload error: {upload_err}")
+                        break
+            except Exception:
+                pass
     except Exception as e:
         print(f"Metadata extraction error: {e}")
     return metadata
