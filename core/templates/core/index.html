@@ -274,6 +274,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             #home-live-status-mobile {
                 justify-self: center;
                 text-align: center;
+                min-width: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            #home-live-status-title-mobile,
+            #home-live-status-artist-mobile {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                white-space: normal;
+                word-break: break-word;
             }
             #home-live-player-bar .container > div:last-child {
                 justify-content: space-between;
@@ -502,14 +514,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <div id="home-live-status-mobile" class="md:hidden flex flex-col flex-1 px-2 text-center">
-<div class="flex items-center justify-center gap-2">
-<span class="relative flex h-2.5 w-2.5">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-black"></span>
-</span>
-<span id="home-live-status-title-mobile" class="text-[14px] font-black uppercase tracking-[0.1em] leading-tight text-black whitespace-nowrap truncate max-w-[190px]">{{ home_live_track.title|default:"LIVE MIX" }}</span>
+<div class="flex items-start justify-center gap-2 min-w-0">
+<span id="home-live-status-title-mobile" class="text-[14px] font-black uppercase tracking-[0.1em] leading-tight text-black max-w-full min-w-0">{{ home_live_track.title|default:"LIVE MIX" }}</span>
 </div>
-<span id="home-live-status-artist-mobile" class="text-black/80 text-[12px] font-mono uppercase tracking-[0.14em] mt-0.5 whitespace-nowrap truncate max-w-[190px]">{{ home_live_track.artist|default:"K-BEATS RADIO" }}</span>
+<span id="home-live-status-artist-mobile" class="text-black/80 text-[12px] font-mono uppercase tracking-[0.14em] mt-0.5 max-w-full min-w-0">{{ home_live_track.artist|default:"K-BEATS RADIO" }}</span>
 </div>
 
 <!-- Center: Track Info & Visualizer -->
