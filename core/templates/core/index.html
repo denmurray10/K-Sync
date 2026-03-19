@@ -218,6 +218,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             overflow-x: hidden;
         }
         @media (max-width: 768px) {
+            main .container {
+                padding-left: 1.5rem !important;
+                padding-right: 1.5rem !important;
+            }
+            #hero-section h1 {
+                font-size: clamp(3rem, 15vw, 4.25rem);
+                line-height: 0.82;
+            }
+            #hero-section h1 > span {
+                white-space: nowrap;
+            }
             .relative.w-full.bg-primary {
                 margin-top: 0;
             }
@@ -232,36 +243,45 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             }
             #hero-section {
                 height: auto !important;
-                min-height: 100svh;
+                min-height: 600px !important;
+            }
+            #hero-section .container {
+                height: auto !important;
+            }
+            #hero-bg-video {
+                min-height: 600px;
             }
             #home-live-player-bar {
                 height: auto;
                 min-height: 96px;
+                margin-top: -60px;
             }
             #home-live-player-bar .container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.75rem;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.5rem;
                 padding-top: 0.75rem;
                 padding-bottom: 0.75rem;
             }
             #home-live-player-bar .container > div {
-                width: 100%;
+                width: auto;
+            }
+            #home-live-player-bar .container > div:first-child {
+                min-width: 0;
+                flex: 1;
             }
             #home-live-player-bar .container > div:last-child {
                 justify-content: space-between;
+                flex-shrink: 0;
             }
         }
         @media (max-width: 380px) {
             #hero-section .container {
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
                 padding-top: 1.5rem;
                 padding-bottom: 1.5rem;
-            }
-            #hero-section h1 {
-                font-size: 2.5rem;
-                line-height: 0.9;
             }
             #hero-section p {
                 font-size: 0.75rem;
@@ -299,8 +319,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             }
 
             section .container {
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
             }
             section h2.text-4xl,
             section h2.text-5xl,
@@ -353,10 +373,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"></div>
 </div>
 
-<div class="relative z-20 container mx-auto px-4 sm:px-6 max-w-[1400px] h-full flex flex-col md:flex-row items-center md:items-center justify-between py-10 md:py-16">
+<div class="relative z-20 container mx-auto px-4 sm:px-6 max-w-[1400px] h-full flex flex-col md:flex-row items-center md:items-center justify-between pt-[30px] pb-[30px] md:py-16">
 <!-- Left Content: Massive Typography -->
-<div class="flex flex-col gap-0 max-w-4xl text-left relative z-30 pointer-events-none pt-[50px] md:pt-0">
-                <h1 class="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase relative z-20 break-words">
+<div class="flex flex-col gap-0 max-w-4xl text-left relative z-30 pointer-events-none pt-0 md:pt-0">
+                <h1 class="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase relative z-20">
 <span class="block relative group">
                         K-BEATS
                         <span class="absolute inset-0 text-transparent [-webkit-text-stroke:2px_theme(colors.primary)] translate-x-2 -translate-y-2 mix-blend-screen opacity-0 group-hover:opacity-100 transition-opacity duration-300">K-BEATS</span>
@@ -367,11 +387,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         Experience the electrifying beat of K-Pop. 24/7 non-stop hits, exclusive interviews, and live performances direct from Korea.
                     </p>
 <div class="mt-8 flex items-center pointer-events-auto max-w-full">
-<a href="{% if featured_article %}{% url 'blog_article_read' featured_article.slug %}{% else %}{% url 'news' %}{% endif %}" class="group flex items-center border border-white/20 hover:border-primary bg-black/50 backdrop-blur-sm transition-colors duration-300 w-full sm:w-max overflow-hidden">
-<div class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] py-4 px-4 h-full flex items-center border-r border-white/20">
+<a href="{% if featured_article %}{% url 'blog_article_read' featured_article.slug %}{% else %}{% url 'news' %}{% endif %}" class="group flex flex-col sm:flex-row items-stretch sm:items-center border border-white/20 hover:border-primary bg-black/50 backdrop-blur-sm transition-colors duration-300 w-full sm:w-max overflow-hidden">
+<div class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] py-3 px-4 sm:py-4 h-full flex items-center border-b sm:border-b-0 sm:border-r border-white/20">
                             Featured
                         </div>
-<div class="px-6 py-3 flex flex-col">
+<div class="px-4 sm:px-6 py-3 flex flex-col">
 <span class="text-white font-bold text-sm tracking-tight group-hover:text-primary transition-colors">{% if featured_article %}{{ featured_article.title }}{% else %}Latest K-Beat Editorial{% endif %}</span>
 <span class="text-slate-400 font-mono text-[10px] uppercase tracking-widest mt-1">Read Editorial <span class="material-symbols-outlined text-[10px] ml-1">arrow_forward</span></span>
 </div>
@@ -502,7 +522,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button class="hover:opacity-60 transition-opacity text-black hidden lg:block">
 <span class="material-symbols-outlined text-3xl">volume_up</span>
 </button>
-<a href="{% url 'live' %}" class="bg-black text-white px-4 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+<a href="{% url 'live' %}" class="bg-black text-white px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-[0.16em] md:tracking-[0.2em] whitespace-nowrap border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                 Open Studio
             </a>
 </div>
