@@ -128,34 +128,54 @@
 <button
     id="mobile-site-menu-toggle"
     type="button"
-    class="md:hidden fixed bottom-4 right-4 z-[72] bg-primary text-black border border-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_#ffffff]"
+    class="md:hidden fixed bottom-4 right-4 z-[79] bg-primary text-black border border-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_#ffffff] transition-opacity"
     aria-expanded="false"
     aria-controls="mobile-site-menu-panel"
 >
     Menu
 </button>
 
-<div id="mobile-site-menu-overlay" class="md:hidden fixed inset-0 bg-black/55 z-[70] hidden" aria-hidden="true"></div>
-
 <div
     id="mobile-site-menu-panel"
-    class="md:hidden fixed left-4 right-4 bottom-20 z-[71] border border-white/20 bg-black/95 backdrop-blur-md p-5 translate-y-6 opacity-0 pointer-events-none transition-all duration-300"
+    class="md:hidden fixed inset-0 z-[80] bg-black/95 backdrop-blur-md p-6 pt-10 pb-24 translate-y-full opacity-0 pointer-events-none transition-all duration-300 overflow-y-auto"
     aria-hidden="true"
 >
-    <div class="flex items-center justify-between mb-4">
-        <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Menu</p>
+    <div class="flex items-center justify-between mb-8">
+        <p class="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500">Menu</p>
         <button id="mobile-site-menu-close" type="button" class="text-slate-400 hover:text-white" aria-label="Close menu">
             <span class="material-symbols-outlined text-lg">close</span>
         </button>
     </div>
-    <nav class="grid grid-cols-2 gap-3">
-        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'live' %}">Live</a>
-        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'charts' %}">Charts</a>
-        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'idols' %}">Idols</a>
-        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'comeback_timeline' %}">Comebacks</a>
-        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'news' %}">News</a>
-        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'coming_soon' %}">Shop</a>
-    </nav>
+    <div class="space-y-8">
+        <div>
+            <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-3">Browse</p>
+            <nav class="grid grid-cols-2 gap-3">
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'live' %}">Live</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'charts' %}">Charts</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'idols' %}">Idols</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'comeback_timeline' %}">Comebacks</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'news' %}">News</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'coming_soon' %}">Shop</a>
+            </nav>
+        </div>
+
+        <div>
+            <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-3">My Account</p>
+            <div class="grid grid-cols-2 gap-3">
+                {% if user.is_authenticated %}
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'dashboard' %}">Dashboard</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'profile' %}">Profile</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'logout' %}">Log Out</a>
+                {% else %}
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'login' %}">Log In</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'signup' %}">Sign Up</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
+                <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'promo' %}">Get App</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- ───── GLOBAL MY STATION TAB ───── -->
@@ -417,28 +437,29 @@
         const header = document.getElementById('main-header');
         const mobileMenuToggle = document.getElementById('mobile-site-menu-toggle');
         const mobileMenuPanel = document.getElementById('mobile-site-menu-panel');
-        const mobileMenuOverlay = document.getElementById('mobile-site-menu-overlay');
         const mobileMenuClose = document.getElementById('mobile-site-menu-close');
 
         const openMobileMenu = () => {
-            if (!mobileMenuPanel || !mobileMenuOverlay || !mobileMenuToggle) return;
-            mobileMenuOverlay.classList.remove('hidden');
-            mobileMenuPanel.classList.remove('translate-y-6', 'opacity-0', 'pointer-events-none');
+            if (!mobileMenuPanel || !mobileMenuToggle) return;
+            mobileMenuPanel.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
             mobileMenuPanel.classList.add('translate-y-0', 'opacity-100');
             mobileMenuToggle.setAttribute('aria-expanded', 'true');
             mobileMenuPanel.setAttribute('aria-hidden', 'false');
+            mobileMenuToggle.classList.add('opacity-0', 'pointer-events-none');
+            document.body.classList.add('overflow-hidden');
         };
 
         const closeMobileMenu = () => {
-            if (!mobileMenuPanel || !mobileMenuOverlay || !mobileMenuToggle) return;
-            mobileMenuOverlay.classList.add('hidden');
-            mobileMenuPanel.classList.add('translate-y-6', 'opacity-0', 'pointer-events-none');
+            if (!mobileMenuPanel || !mobileMenuToggle) return;
+            mobileMenuPanel.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
             mobileMenuPanel.classList.remove('translate-y-0', 'opacity-100');
             mobileMenuToggle.setAttribute('aria-expanded', 'false');
             mobileMenuPanel.setAttribute('aria-hidden', 'true');
+            mobileMenuToggle.classList.remove('opacity-0', 'pointer-events-none');
+            document.body.classList.remove('overflow-hidden');
         };
 
-        if (mobileMenuToggle && mobileMenuPanel && mobileMenuOverlay) {
+        if (mobileMenuToggle && mobileMenuPanel) {
             mobileMenuToggle.addEventListener('click', function() {
                 const isOpen = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
                 if (isOpen) {
@@ -448,7 +469,6 @@
                 }
             });
 
-            mobileMenuOverlay.addEventListener('click', closeMobileMenu);
             if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
 
             mobileMenuPanel.querySelectorAll('a').forEach((link) => {
