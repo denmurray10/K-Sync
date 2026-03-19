@@ -257,9 +257,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 margin-top: -60px;
             }
             #home-live-player-bar .container {
-                flex-direction: row;
+                display: grid;
+                grid-template-columns: auto 1fr auto;
                 align-items: center;
-                justify-content: space-between;
                 gap: 0.5rem;
                 padding-top: 0.75rem;
                 padding-bottom: 0.75rem;
@@ -269,11 +269,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             }
             #home-live-player-bar .container > div:first-child {
                 min-width: 0;
-                flex: 1;
+                justify-self: start;
+            }
+            #home-live-status-mobile {
+                justify-self: center;
+                text-align: center;
             }
             #home-live-player-bar .container > div:last-child {
                 justify-content: space-between;
                 flex-shrink: 0;
+                justify-self: end;
             }
         }
         @media (max-width: 380px) {
@@ -475,10 +480,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="container mx-auto max-w-[1400px] px-4 sm:px-6 flex items-center justify-between w-full relative z-10 gap-4 sm:gap-0">
 <!-- Left: Play button & Status -->
 <div class="flex items-center gap-3 md:gap-6">
-<button class="w-12 h-12 md:w-14 md:h-14 bg-black text-white hover:bg-white hover:text-black flex items-center justify-center rounded-none transition-colors border border-black shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+<div class="md:hidden w-14 h-14 border border-black shadow-[4px_4px_0px_#ffffff] overflow-hidden bg-black">
+<img id="home-live-artwork-mobile" src="{{ home_live_track.album_art|default:'' }}" alt="Now playing artwork" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+<div class="w-full h-full hidden items-center justify-center text-white">
+<span class="material-symbols-outlined text-2xl">music_note</span>
+</div>
+</div>
+<button class="hidden md:flex w-12 h-12 md:w-14 md:h-14 bg-black text-white hover:bg-white hover:text-black items-center justify-center rounded-none transition-colors border border-black shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
 <span class="material-symbols-outlined font-black text-3xl md:text-4xl">play_arrow</span>
 </button>
-<div class="flex flex-col">
+<div class="hidden md:flex flex-col">
 <div class="flex items-center gap-2">
 <span class="relative flex h-2.5 w-2.5">
 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
@@ -488,6 +499,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 <span class="text-black/80 text-[10px] sm:text-xs font-mono uppercase tracking-widest mt-0.5">Global Studio 1</span>
 </div>
+</div>
+
+<div id="home-live-status-mobile" class="md:hidden flex flex-col flex-1 px-2 text-center">
+<div class="flex items-center justify-center gap-2">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-black"></span>
+</span>
+<span id="home-live-status-title-mobile" class="text-[14px] font-black uppercase tracking-[0.1em] leading-tight text-black whitespace-nowrap truncate max-w-[190px]">{{ home_live_track.title|default:"LIVE MIX" }}</span>
+</div>
+<span id="home-live-status-artist-mobile" class="text-black/80 text-[12px] font-mono uppercase tracking-[0.14em] mt-0.5 whitespace-nowrap truncate max-w-[190px]">{{ home_live_track.artist|default:"K-BEATS RADIO" }}</span>
 </div>
 
 <!-- Center: Track Info & Visualizer -->
@@ -522,7 +544,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <button class="hover:opacity-60 transition-opacity text-black hidden lg:block">
 <span class="material-symbols-outlined text-3xl">volume_up</span>
 </button>
-<a href="{% url 'live' %}" class="bg-black text-white px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-[0.16em] md:tracking-[0.2em] whitespace-nowrap border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+<a href="{% url 'live' %}" class="md:hidden w-14 h-14 border border-black shadow-[4px_4px_0px_#ffffff] overflow-hidden bg-black text-white flex items-center justify-center hover:bg-white hover:text-black transition-colors">
+<span class="material-symbols-outlined font-black text-3xl">play_arrow</span>
+</a>
+<a href="{% url 'live' %}" class="hidden md:inline-flex bg-black text-white px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-[0.16em] md:tracking-[0.2em] whitespace-nowrap border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                 Open Studio
             </a>
 </div>
@@ -1009,6 +1034,9 @@ window.addEventListener('load', fetchLiveArtwork);
 async function refreshHomepageLiveBar() {
     const titleEl = document.getElementById('home-live-title');
     const artistEl = document.getElementById('home-live-artist');
+    const statusTitleMobileEl = document.getElementById('home-live-status-title-mobile');
+    const statusArtistMobileEl = document.getElementById('home-live-status-artist-mobile');
+    const artworkMobileEl = document.getElementById('home-live-artwork-mobile');
     if (!titleEl || !artistEl) return;
 
     try {
@@ -1018,8 +1046,22 @@ async function refreshHomepageLiveBar() {
 
         const nextTitle = String(data.current_track.title || '').trim();
         const nextArtist = String(data.current_track.artist || '').trim();
+        const nextArtwork = String(
+            data.current_track.album_art ||
+            data.current_track.image ||
+            data.current_track.artwork ||
+            data.current_track.album_art_url ||
+            ''
+        ).trim();
         if (nextTitle) titleEl.textContent = nextTitle;
         if (nextArtist) artistEl.textContent = nextArtist;
+        if (nextTitle && statusTitleMobileEl) statusTitleMobileEl.textContent = nextTitle;
+        if (nextArtist && statusArtistMobileEl) statusArtistMobileEl.textContent = nextArtist;
+        if (nextArtwork && artworkMobileEl) {
+            artworkMobileEl.style.display = 'block';
+            if (artworkMobileEl.nextElementSibling) artworkMobileEl.nextElementSibling.style.display = 'none';
+            artworkMobileEl.src = nextArtwork;
+        }
     } catch (e) {
         // keep existing values on transient network failures
     }
