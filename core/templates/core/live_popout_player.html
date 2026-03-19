@@ -1,0 +1,230 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K-Beats Popout Player</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { primary: '#f425c0', secondary: '#00f0ff' },
+          fontFamily: { display: ['Montserrat', 'sans-serif'] }
+        }
+      }
+    };
+  </script>
+  <style>
+    .glow-card {
+      box-shadow: 0 0 0 1px rgba(244, 37, 192, 0.25), 0 0 20px rgba(244, 37, 192, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-black text-white font-display min-h-screen p-3">
+  <div class="w-full h-full min-h-[180px] border border-white/15 bg-black/90 glow-card p-4 flex flex-col justify-between">
+    <div class="flex items-start gap-3">
+      <img id="popout-art" src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album" class="w-16 h-16 object-cover border border-white/20" alt="Album art" />
+      <div class="min-w-0 flex-1">
+        <p class="text-[10px] font-mono uppercase tracking-[0.25em] text-secondary">K-Beats Popout</p>
+        <p id="popout-title" class="mt-1 text-base font-black uppercase tracking-tight truncate">K-BEATS LIVE</p>
+        <p id="popout-artist" class="text-[11px] text-slate-400 uppercase tracking-widest truncate">ON AIR</p>
+        <p id="popout-status" class="mt-1 text-[10px] font-mono uppercase tracking-widest text-slate-500">Ready</p>
+      </div>
+      <button id="popout-close-btn" class="text-slate-400 hover:text-white" aria-label="Close popout">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <div class="mt-4 flex items-center gap-3">
+      <button id="popout-play-btn" class="w-12 h-12 border border-primary bg-primary text-black flex items-center justify-center">
+        <span id="popout-play-icon" class="material-symbols-outlined text-2xl">pause</span>
+      </button>
+      <div class="flex-1 h-1 bg-white/10 overflow-hidden">
+        <div id="popout-pulse" class="h-full w-1/2 bg-gradient-to-r from-primary to-secondary"></div>
+      </div>
+      <a href="/live/" target="_blank" rel="noopener" class="text-[10px] font-black uppercase tracking-[0.18em] text-primary hover:text-white transition-colors">Live</a>
+    </div>
+
+    <audio id="popout-audio" preload="auto"></audio>
+  </div>
+
+  <script>
+    (function () {
+      const STATE_KEY = 'ksync_station_widget_v1';
+      const audio = document.getElementById('popout-audio');
+      const titleEl = document.getElementById('popout-title');
+      const artistEl = document.getElementById('popout-artist');
+      const artEl = document.getElementById('popout-art');
+      const playBtn = document.getElementById('popout-play-btn');
+      const playIcon = document.getElementById('popout-play-icon');
+      const closeBtn = document.getElementById('popout-close-btn');
+      const statusEl = document.getElementById('popout-status');
+      const pulseEl = document.getElementById('popout-pulse');
+      let lastHandledCommandId = 0;
+
+      const setStatus = (text) => {
+        if (statusEl) statusEl.textContent = String(text || '').trim() || 'Ready';
+      };
+
+      const audioMimeForUrl = (url) => {
+        const val = String(url || '').toLowerCase();
+        if (val.includes('.m4a')) return 'audio/mp4';
+        if (val.includes('.wav')) return 'audio/wav';
+        return 'audio/mpeg';
+      };
+
+      const readState = () => {
+        try { return JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); } catch (e) { return {}; }
+      };
+      const writeState = (patch) => {
+        const next = { ...readState(), ...patch, updatedAt: Date.now() };
+        localStorage.setItem(STATE_KEY, JSON.stringify(next));
+        return next;
+      };
+
+      const setUI = (track) => {
+        if (!track) return;
+        titleEl.textContent = String(track.title || 'K-BEATS LIVE').toUpperCase();
+        artistEl.textContent = String(track.artist || 'ON AIR').toUpperCase();
+        if (track.album_art) artEl.src = track.album_art;
+      };
+
+      const syncIcon = () => {
+        playIcon.textContent = audio.paused ? 'play_arrow' : 'pause';
+        if (pulseEl) {
+          pulseEl.style.width = audio.paused ? '35%' : '85%';
+          pulseEl.style.opacity = audio.paused ? '0.5' : '1';
+        }
+      };
+
+      const applyTrack = async (track, shouldPlay = true) => {
+        if (!track || !track.audio_url) return;
+        setUI(track);
+        const currentSrc = String(audio.currentSrc || audio.src || '');
+        if (currentSrc !== track.audio_url) {
+          audio.src = track.audio_url;
+          audio.type = audioMimeForUrl(track.audio_url);
+          audio.load();
+        }
+        writeState({ track, src: track.audio_url, playing: !!shouldPlay, mode: 'popout' });
+        if (shouldPlay) {
+          try {
+            await audio.play();
+            setStatus('Playing');
+          } catch (e) {
+            setStatus('Tap play');
+          }
+        } else {
+          setStatus('Ready');
+        }
+        syncIcon();
+      };
+
+      const fetchStatus = async (shouldPlay = true) => {
+        try {
+          const resp = await fetch(`/api/live/status/?_ts=${Date.now()}`, { cache: 'no-store' });
+          if (!resp.ok) return;
+          const data = await resp.json();
+          if (!data?.ok || !data.current_track) return;
+          await applyTrack(data.current_track, shouldPlay);
+        } catch (e) {}
+      };
+
+      const processIncomingCommand = async (state) => {
+        const cmd = state && typeof state === 'object' ? state.command : null;
+        if (!cmd || typeof cmd !== 'object') return;
+        const cmdId = Number(cmd.id || 0);
+        if (!cmdId || cmdId <= lastHandledCommandId) return;
+        lastHandledCommandId = cmdId;
+
+        if (cmd.type === 'play') {
+          if (!audio.src && state.track && state.track.audio_url) {
+            await applyTrack(state.track, true);
+            return;
+          }
+          try { await audio.play(); } catch (e) {}
+          return;
+        }
+
+        if (cmd.type === 'pause') {
+          audio.pause();
+          return;
+        }
+
+        if (cmd.type === 'refresh') {
+          await fetchStatus(!audio.paused);
+        }
+      };
+
+      playBtn.addEventListener('click', async () => {
+        if (audio.paused) {
+          try {
+            await audio.play();
+            writeState({ playing: true, mode: 'popout' });
+            setStatus('Playing');
+          } catch (e) {
+            setStatus('Tap play');
+          }
+        } else {
+          audio.pause();
+          writeState({ playing: false, mode: 'popout' });
+          setStatus('Paused');
+        }
+        syncIcon();
+      });
+
+      closeBtn.addEventListener('click', () => {
+        audio.pause();
+        writeState({ playing: false, mode: 'widget', popoutAliveAt: 0 });
+        window.close();
+      });
+
+      audio.addEventListener('play', () => {
+        writeState({ playing: true, mode: 'popout', popoutAliveAt: Date.now() });
+        setStatus('Playing');
+        syncIcon();
+      });
+      audio.addEventListener('pause', () => {
+        writeState({ playing: false, mode: 'popout', popoutAliveAt: Date.now() });
+        setStatus('Paused');
+        syncIcon();
+      });
+
+      window.addEventListener('storage', async (event) => {
+        if (event.key !== STATE_KEY) return;
+        const state = readState();
+        if (state.track && state.track.audio_url) {
+          const currentSrc = String(audio.currentSrc || audio.src || '');
+          if (!currentSrc || currentSrc !== state.track.audio_url) {
+            await applyTrack(state.track, state.playing !== false);
+          }
+        }
+        await processIncomingCommand(state);
+      });
+
+      const init = async () => {
+        const state = readState();
+        const hasTrack = state && state.track && state.track.audio_url;
+        if (hasTrack) {
+          await applyTrack(state.track, state.playing !== false);
+        } else {
+          await fetchStatus(true);
+        }
+        await processIncomingCommand(readState());
+      };
+
+      init();
+      setInterval(() => {
+        writeState({ popoutAliveAt: Date.now(), mode: 'popout', playing: !audio.paused });
+      }, 2000);
+      setInterval(() => { fetchStatus(!audio.paused); }, 15000);
+      window.addEventListener('beforeunload', () => { writeState({ mode: 'widget', popoutAliveAt: 0 }); });
+    })();
+  </script>
+</body>
+</html>

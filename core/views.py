@@ -5350,6 +5350,68 @@ def api_live_rotate_track(request):
     })
 
 
+def api_live_status(request):
+    state, _ = RadioStationState.objects.get_or_create(id=1)
+    schedule_context = _compute_schedule_live_context(timezone.localtime(), force_advance=False)
+
+    if schedule_context:
+        _sync_state_with_schedule_context(state, schedule_context)
+        current = schedule_context['current_track']
+        up_next_list = schedule_context['up_next_tracks'][:6]
+        recently_played_list = schedule_context['recently_played_tracks'][:6]
+        current_offset = int(schedule_context.get('current_offset') or 0)
+    else:
+        state = _auto_rotate_station(state)
+        current = state.current_track
+        current_offset = 0
+
+        up_next_ids = list(state.up_next or [])[:6]
+        up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
+        up_next_tracks = [track for track in up_next_tracks if not _is_generated_voice_track(track)]
+        up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
+        up_next_list = up_next_tracks
+
+        recent_ids = list(state.recently_played or [])[:6]
+        recent_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
+        recent_tracks = [track for track in recent_tracks if not _is_generated_voice_track(track)]
+        recent_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
+        recently_played_list = recent_tracks
+
+    if not current:
+        return JsonResponse({'ok': False, 'error': 'No active track'}, status=404)
+
+    return JsonResponse({
+        'ok': True,
+        'current_offset': current_offset,
+        'current_track': {
+            'id': current.id,
+            'title': current.title,
+            'artist': current.artist,
+            'album_art': current.album_art,
+            'audio_url': _build_stream_audio_url(current.audio_url),
+            'duration': current.duration,
+            'duration_seconds': current.duration_seconds,
+        },
+        'up_next': [
+            {
+                'title': t.title,
+                'artist': t.artist,
+                'album_art': t.album_art,
+                'duration_seconds': int(t.duration_seconds or 0),
+            }
+            for t in up_next_list
+        ],
+        'recently_played': [
+            {'title': t.title, 'artist': t.artist, 'album_art': t.album_art}
+            for t in recently_played_list
+        ],
+    })
+
+
+def live_player_popout(request):
+    return render(request, 'core/live_popout_player.html')
+
+
 @csrf_exempt
 @require_POST
 def api_live_ai_helpful(request):

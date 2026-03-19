@@ -130,6 +130,116 @@
         open: false,
         notifications: [],
         unreadCount: 0,
+        playerTrack: null,
+        playerIsPlaying: false,
+        playerStatus: 'Ready',
+        playerLoading: false,
+        playerStateKey: 'ksync_station_widget_v1',
+        playerPollTimer: null,
+        commandCounter: 0,
+        _readPlayerState() {
+            try {
+                return JSON.parse(localStorage.getItem(this.playerStateKey) || '{}');
+            } catch (e) {
+                return {};
+            }
+        },
+        _writePlayerState(patch = {}) {
+            const next = { ...this._readPlayerState(), ...patch, updatedAt: Date.now() };
+            localStorage.setItem(this.playerStateKey, JSON.stringify(next));
+            return next;
+        },
+        _isPopoutAlive() {
+            const state = this._readPlayerState();
+            const stamp = Number(state.popoutAliveAt || 0);
+            return !!stamp && (Date.now() - stamp) < 7000;
+        },
+        _syncFromState() {
+            const state = this._readPlayerState();
+            if (state.track && state.track.audio_url) {
+                this.playerTrack = state.track;
+            }
+            this.playerIsPlaying = !!state.playing;
+            if (state.mode === 'popout' && this._isPopoutAlive()) {
+                this.playerStatus = this.playerIsPlaying ? 'Playing (Popout)' : 'Paused (Popout)';
+            } else {
+                this.playerStatus = this.playerTrack ? 'Ready' : 'Ready';
+            }
+        },
+        _sendCommand(type) {
+            this.commandCounter += 1;
+            const command = {
+                id: Date.now() + this.commandCounter,
+                type,
+                at: Date.now(),
+            };
+            this._writePlayerState({ command, mode: 'popout' });
+        },
+        async _applyPlayerTrack(track) {
+            if (!track || !track.audio_url) return;
+            this.playerTrack = track;
+            const state = this._readPlayerState();
+            this._writePlayerState({ ...state, track, src: track.audio_url });
+        },
+        async fetchPlayerLiveStatus() {
+            this.playerLoading = true;
+            try {
+                const res = await fetch(`/api/live/status/?_ts=${Date.now()}`, { cache: 'no-store' });
+                const data = await res.json();
+                if (data?.ok && data.current_track) {
+                    await this._applyPlayerTrack(data.current_track);
+                    this._syncFromState();
+                }
+            } catch (e) {
+                this.playerStatus = 'Offline';
+            } finally {
+                this.playerLoading = false;
+            }
+        },
+        async toggleWidgetPlayer() {
+            if (!this._isPopoutAlive()) {
+                this.openPlayerPopout();
+                setTimeout(() => {
+                    this._sendCommand('play');
+                }, 400);
+                return;
+            }
+            this._sendCommand(this.playerIsPlaying ? 'pause' : 'play');
+            this.playerStatus = 'Sending…';
+        },
+        openPlayerPopout() {
+            this._writePlayerState({
+                track: this.playerTrack,
+                src: this.playerTrack ? String(this.playerTrack.audio_url || '') : '',
+                playing: this.playerIsPlaying,
+                mode: 'popout',
+            });
+            this.playerStatus = 'Popout';
+            window.open('/live/player-popout/', 'ksync-live-popout', 'popup=yes,width=430,height=220,left=120,top=120');
+        },
+        _initPlayer() {
+            const state = this._readPlayerState();
+            if (state.track && state.track.audio_url) {
+                this.playerTrack = state.track;
+            } else {
+                this.fetchPlayerLiveStatus();
+            }
+
+            this._syncFromState();
+
+            window.addEventListener('storage', (event) => {
+                if (event.key !== this.playerStateKey) return;
+                this._syncFromState();
+            });
+
+            this.playerPollTimer = setInterval(() => {
+                this._syncFromState();
+            }, 1500);
+
+            setInterval(() => {
+                this.fetchPlayerLiveStatus();
+            }, 30000);
+        },
         async init() {
             {% if user.is_authenticated %}
             try {
@@ -140,6 +250,7 @@
                     this.unreadCount = Number(data.unread_count || 0);
                 }
             } catch (e) {}
+            this._initPlayer();
             {% endif %}
         },
         async markRead(id) {
@@ -190,6 +301,27 @@
 
         <div class="p-6 space-y-5">
             {% if user.is_authenticated %}
+                <div class="border border-white/10 bg-white/[0.02] p-3">
+                    <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-2 mb-3">
+                        <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Live Widget</p>
+                        <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500" x-text="playerStatus"></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <img :src="(playerTrack && playerTrack.album_art) ? playerTrack.album_art : 'https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album'" class="w-10 h-10 border border-white/20 object-cover" alt="Now playing art" />
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-black uppercase tracking-tight truncate" x-text="playerTrack ? playerTrack.title : 'K-BEATS LIVE'"></p>
+                            <p class="text-[10px] font-mono uppercase tracking-widest text-slate-500 truncate" x-text="playerTrack ? playerTrack.artist : 'On Air'"></p>
+                        </div>
+                        <button @click="toggleWidgetPlayer()" :disabled="playerLoading" class="w-8 h-8 border border-primary bg-primary text-black flex items-center justify-center disabled:opacity-60" aria-label="Play or pause">
+                            <span class="material-symbols-outlined text-base" x-text="playerIsPlaying ? 'pause' : 'play_arrow'"></span>
+                        </button>
+                    </div>
+                    <div class="mt-3 flex items-center justify-between gap-2">
+                        <button @click="openPlayerPopout()" class="text-[9px] font-black uppercase tracking-[0.18em] text-primary hover:text-white transition-colors">Popout</button>
+                        <a href="{% url 'live' %}" class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-white transition-colors">Open Live</a>
+                    </div>
+                </div>
+
                 <div class="space-y-3">
                     <div class="flex items-center justify-between border-b border-white/10 pb-2">
                         <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Notifications</p>
