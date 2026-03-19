@@ -124,6 +124,40 @@
 </header>
 {% endif %}
 
+<!-- ───── MOBILE SITE MENU ───── -->
+<button
+    id="mobile-site-menu-toggle"
+    type="button"
+    class="md:hidden fixed bottom-4 right-4 z-[72] bg-primary text-black border border-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_#ffffff]"
+    aria-expanded="false"
+    aria-controls="mobile-site-menu-panel"
+>
+    Menu
+</button>
+
+<div id="mobile-site-menu-overlay" class="md:hidden fixed inset-0 bg-black/55 z-[70] hidden" aria-hidden="true"></div>
+
+<div
+    id="mobile-site-menu-panel"
+    class="md:hidden fixed left-4 right-4 bottom-20 z-[71] border border-white/20 bg-black/95 backdrop-blur-md p-5 translate-y-6 opacity-0 pointer-events-none transition-all duration-300"
+    aria-hidden="true"
+>
+    <div class="flex items-center justify-between mb-4">
+        <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Menu</p>
+        <button id="mobile-site-menu-close" type="button" class="text-slate-400 hover:text-white" aria-label="Close menu">
+            <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+    </div>
+    <nav class="grid grid-cols-2 gap-3">
+        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'live' %}">Live</a>
+        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'charts' %}">Charts</a>
+        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'idols' %}">Idols</a>
+        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'comeback_timeline' %}">Comebacks</a>
+        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'news' %}">News</a>
+        <a class="border border-white/20 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors" href="{% url 'coming_soon' %}">Shop</a>
+    </nav>
+</div>
+
 <!-- ───── GLOBAL MY STATION TAB ───── -->
 <div
     x-data="{
@@ -381,6 +415,46 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const header = document.getElementById('main-header');
+        const mobileMenuToggle = document.getElementById('mobile-site-menu-toggle');
+        const mobileMenuPanel = document.getElementById('mobile-site-menu-panel');
+        const mobileMenuOverlay = document.getElementById('mobile-site-menu-overlay');
+        const mobileMenuClose = document.getElementById('mobile-site-menu-close');
+
+        const openMobileMenu = () => {
+            if (!mobileMenuPanel || !mobileMenuOverlay || !mobileMenuToggle) return;
+            mobileMenuOverlay.classList.remove('hidden');
+            mobileMenuPanel.classList.remove('translate-y-6', 'opacity-0', 'pointer-events-none');
+            mobileMenuPanel.classList.add('translate-y-0', 'opacity-100');
+            mobileMenuToggle.setAttribute('aria-expanded', 'true');
+            mobileMenuPanel.setAttribute('aria-hidden', 'false');
+        };
+
+        const closeMobileMenu = () => {
+            if (!mobileMenuPanel || !mobileMenuOverlay || !mobileMenuToggle) return;
+            mobileMenuOverlay.classList.add('hidden');
+            mobileMenuPanel.classList.add('translate-y-6', 'opacity-0', 'pointer-events-none');
+            mobileMenuPanel.classList.remove('translate-y-0', 'opacity-100');
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            mobileMenuPanel.setAttribute('aria-hidden', 'true');
+        };
+
+        if (mobileMenuToggle && mobileMenuPanel && mobileMenuOverlay) {
+            mobileMenuToggle.addEventListener('click', function() {
+                const isOpen = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+                if (isOpen) {
+                    closeMobileMenu();
+                } else {
+                    openMobileMenu();
+                }
+            });
+
+            mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+            if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+
+            mobileMenuPanel.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+        }
         
         window.addEventListener('scroll', function() {
             if (window.scrollY > 20) {
