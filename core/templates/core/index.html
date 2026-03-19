@@ -11,7 +11,35 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>K-Beats Home - Neon Variant</title>
+<title>K-Beats Radio | Live K-Pop Music, Charts, News & Community</title>
+<meta name="description" content="Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists."/>
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/>
+<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
+
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="K-Beats Radio"/>
+<meta property="og:title" content="K-Beats Radio | Live K-Pop Music, Charts, News & Community"/>
+<meta property="og:description" content="Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists."/>
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="K-Beats Radio | Live K-Pop Music, Charts, News & Community"/>
+<meta name="twitter:description" content="Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists."/>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "K-Beats Radio",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}",
+    "inLanguage": "en-GB",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ request.scheme }}://{{ request.get_host }}{% url 'search_api' %}?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
