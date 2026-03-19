@@ -4755,11 +4755,142 @@ def _sync_state_with_schedule_context(state, context):
     return state
 
 
+def _extract_primary_artist_name(raw_artist):
+    text = str(raw_artist or '').strip()
+    if not text:
+        return ''
+    lowered = text.lower()
+    separators = [' feat.', ' featuring ', ' ft.', ' with ', '&', ',', '/', ' x ']
+    cut_idx = len(text)
+    for sep in separators:
+        idx = lowered.find(sep)
+        if idx != -1:
+            cut_idx = min(cut_idx, idx)
+    primary = text[:cut_idx].strip(' -–—|')
+    return re.sub(r'\s{2,}', ' ', primary).strip()
+
+
+def _find_group_for_artist_name(artist_name):
+    if not artist_name:
+        return None
+    exact = KPopGroup.objects.filter(name__iexact=artist_name).first()
+    if exact:
+        return exact
+    starts = KPopGroup.objects.filter(name__istartswith=artist_name).order_by('rank', 'name').first()
+    if starts:
+        return starts
+    return KPopGroup.objects.filter(name__icontains=artist_name).order_by('rank', 'name').first()
+
+
+def _shorten_text(value, max_len=210):
+    text = re.sub(r'\s+', ' ', str(value or '')).strip()
+    if not text:
+        return ''
+    if len(text) <= max_len:
+        return text
+    return text[: max_len - 1].rstrip() + '…'
+
+
+def _comeback_context_text(group_name):
+    if not group_name:
+        return 'No official comeback bulletin is pinned right now, but rotation data still shows strong fan momentum and repeat-listen heat.'
+
+    latest_records = ComebackData.objects.order_by('-year', '-month')[:4]
+    lookup = str(group_name).strip().lower()
+    for record in latest_records:
+        data_blob = json.dumps(record.data or {}, ensure_ascii=False).lower()
+        if lookup and lookup in data_blob:
+            month_year = f"{record.month:02d}/{record.year}"
+            return f'{group_name} appears in the latest comeback calendar ({month_year}), carrying clear era momentum and active fandom conversation.'
+
+    return f'{group_name} stays in heavy rotation while the next confirmed comeback window is watched closely by fans.'
+
+
+def _default_live_rich_context(track):
+    title = str(getattr(track, 'title', '') or 'Current Track').strip()
+    artist_raw = str(getattr(track, 'artist', '') or 'K-Beats').strip()
+    artist_name = _extract_primary_artist_name(artist_raw) or artist_raw
+    group = _find_group_for_artist_name(artist_name)
+
+    lyric_body = (
+        f'This section of {title} hits with sharp hook writing and controlled vocal phrasing, '
+        f'delivering immediate crowd lift while keeping the topline clean, memorable, and built for replay.'
+    )
+
+    comeback_body = _comeback_context_text(group.name if group else artist_name)
+
+    if group:
+        member_count = KPopMember.objects.filter(group=group).count()
+        group_type_label = group.get_group_type_display() if hasattr(group, 'get_group_type_display') else str(group.group_type or 'Group')
+        profile_body = _shorten_text(group.description or f'{group.name} stand out for concept precision, stage chemistry, and strong replay pull across live rotation.')
+        chips = [
+            group_type_label,
+            f'{member_count} members' if member_count else 'Line-up active',
+            str(group.label or 'Agency n/a').strip(),
+        ]
+        profile_title = group.name
+    else:
+        profile_title = artist_name or artist_raw
+        profile_body = f'{profile_title} translates cleanly on-air with sticky hooks, polished dynamics, and consistent replay value.'
+        chips = ['Artist Focus', 'Stage Energy', 'Fan Momentum']
+
+    return {
+        'lyric': {
+            'title': 'Lyric Highlight',
+            'body': _shorten_text(lyric_body, 240),
+        },
+        'comeback': {
+            'title': 'Era Pulse',
+            'body': _shorten_text(comeback_body, 240),
+        },
+        'artist_profile': {
+            'title': _shorten_text(profile_title, 60),
+            'body': _shorten_text(profile_body, 240),
+            'chips': [chip for chip in chips if str(chip or '').strip()][:3],
+        },
+    }
+
+
+def _normalize_live_rich_context(payload, track):
+    fallback = _default_live_rich_context(track)
+    if not isinstance(payload, dict):
+        return fallback
+
+    def _section(name):
+        raw = payload.get(name) if isinstance(payload.get(name), dict) else {}
+        fallback_section = fallback[name]
+        return {
+            'title': _shorten_text(raw.get('title') or fallback_section['title'], 80),
+            'body': _shorten_text(raw.get('body') or fallback_section['body'], 260),
+        }
+
+    artist_raw = payload.get('artist_profile') if isinstance(payload.get('artist_profile'), dict) else {}
+    fallback_artist = fallback['artist_profile']
+    raw_chips = artist_raw.get('chips') if isinstance(artist_raw.get('chips'), list) else fallback_artist['chips']
+    chips = [
+        _shorten_text(chip, 40)
+        for chip in raw_chips
+        if str(chip or '').strip()
+    ][:3]
+    if not chips:
+        chips = fallback_artist['chips']
+
+    return {
+        'lyric': _section('lyric'),
+        'comeback': _section('comeback'),
+        'artist_profile': {
+            'title': _shorten_text(artist_raw.get('title') or fallback_artist['title'], 80),
+            'body': _shorten_text(artist_raw.get('body') or fallback_artist['body'], 260),
+            'chips': chips,
+        },
+    }
+
+
 def _default_live_ai_payload(track):
     title = (track.title if track else 'Current Track')
     artist = (track.artist if track else 'K-Beats')
     return {
-        'version': 2,
+        'version': 3,
         'about_label': f'About "{title}"',
         'commentary': (
             f'Now spinning {title} by {artist} on K-Beats Live. This record stands out for its performance-ready structure, '
@@ -4786,6 +4917,7 @@ def _default_live_ai_payload(track):
                 'subtext': 'Current Rotation',
             },
         ],
+        'rich_context': _default_live_rich_context(track),
     }
 
 
@@ -4812,12 +4944,15 @@ def _normalize_live_ai_payload(payload, track):
     while len(cards) < 3:
         cards.append(fallback['cards'][len(cards)])
 
+    rich_context = _normalize_live_rich_context(payload.get('rich_context'), track)
+
     return {
         'version': int(payload.get('version') or 1),
         'about_label': about_label,
         'commentary': commentary,
         'helpful_count': max(0, int(payload.get('helpful_count') or 0)),
         'cards': cards,
+        'rich_context': rich_context,
     }
 
 
@@ -4829,16 +4964,29 @@ def _generate_live_ai_payload(track):
     prompt = (
         f"You are a K-Pop music analyst for a live radio station. "
         f"For the song '{track.title}' by {track.artist}, generate concise on-air metadata. "
+        f"Tone requirements: premium hype-editorial blend; energetic but credible; no slang; no clickbait; avoid exaggerated claims. "
         f"Use UK English spelling and phrasing throughout. "
         f"Return ONLY valid JSON in this exact shape: "
-        '{"version":2,"about_label":"About \\\"<song>\\\"","commentary":"minimum 2 paragraphs; each paragraph 2-4 sentences",'
+        '{"version":3,"about_label":"About \\\"<song>\\\"","commentary":"minimum 2 paragraphs; each paragraph 2-4 sentences",'
         '"cards":[{"label":"...","value":"...","subtext":"..."},'
         '{"label":"...","value":"...","subtext":"..."},'
-        '{"label":"...","value":"...","subtext":"..."}]}'
+        '{"label":"...","value":"...","subtext":"..."}],'
+        '"rich_context":{'
+        '"lyric":{"title":"Lyric Highlight","body":"1-2 sentences on songwriting/vocal/performance feel"},'
+        '"comeback":{"title":"Era Pulse","body":"1-2 sentences on era/comeback momentum using cautious wording"},'
+        '"artist_profile":{"title":"<artist or group>","body":"1-2 sentences mini-profile","chips":["Artist Focus","Stage Energy","Fan Momentum"]}'
+        '}}'
     )
 
     try:
-        raw = _chat(prompt, system='You are an expert K-Pop radio metadata writer.')
+        raw = _chat(
+            prompt,
+            system=(
+                'You are an expert K-Pop radio metadata writer. '
+                'Write in a premium hype-editorial style: vivid, concise, and grounded. '
+                'Prioritise musical observations, era context, and fan-facing relevance without speculation.'
+            ),
+        )
         start = raw.find('{')
         end = raw.rfind('}') + 1
         if start == -1 or end <= start:
@@ -4858,7 +5006,7 @@ def _get_or_generate_live_ai_payload(track):
     existing_paragraphs = [p for p in re.split(r'\n\s*\n', existing_commentary) if p.strip()]
     has_existing = bool(existing_commentary)
     is_fresh_format = (
-        int((track.live_ai_payload or {}).get('version') or 1) >= 2
+        int((track.live_ai_payload or {}).get('version') or 1) >= 3
         and len(existing_paragraphs) >= 2
     )
     if has_existing and is_fresh_format:

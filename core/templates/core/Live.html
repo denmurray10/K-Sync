@@ -482,6 +482,37 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
         </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 reveal-up" style="transition-delay: 120ms;">
+            <div class="p-6 border border-primary/30 bg-primary/5">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="material-symbols-outlined text-primary text-xl">lyrics</span>
+                    <p id="live-rich-lyric-title" class="text-sm font-bold text-white uppercase tracking-tight">Lyric Highlight</p>
+                </div>
+                <p id="live-rich-lyric-body" class="text-sm text-slate-300 leading-relaxed font-light">High-impact lyric context for the current song appears here in real time.</p>
+            </div>
+
+            <div class="p-6 border border-secondary/30 bg-secondary/5">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="material-symbols-outlined text-secondary text-xl">rocket_launch</span>
+                    <p id="live-rich-comeback-title" class="text-sm font-bold text-white uppercase tracking-tight">Era Pulse</p>
+                </div>
+                <p id="live-rich-comeback-body" class="text-sm text-slate-300 leading-relaxed font-light">Comeback momentum and era signals update as the playlist rotates.</p>
+            </div>
+
+            <div class="p-6 border border-white/10 bg-white/[0.03]">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="material-symbols-outlined text-white text-xl">group</span>
+                    <p id="live-rich-artist-title" class="text-sm font-bold text-white uppercase tracking-tight">Artist Snapshot</p>
+                </div>
+                <p id="live-rich-artist-body" class="text-sm text-slate-300 leading-relaxed font-light">A quick artist snapshot will appear here.</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span id="live-rich-artist-chip-1" class="text-[10px] font-mono uppercase tracking-widest text-slate-300 border border-white/20 px-2 py-1">Artist Focus</span>
+                    <span id="live-rich-artist-chip-2" class="text-[10px] font-mono uppercase tracking-widest text-slate-300 border border-white/20 px-2 py-1">Stage Energy</span>
+                    <span id="live-rich-artist-chip-3" class="text-[10px] font-mono uppercase tracking-widest text-slate-300 border border-white/20 px-2 py-1">Fan Momentum</span>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -799,8 +830,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     const countdown = mode === 'live' ? 'LIVE' : `In ${formatCountdownClock(item.diff)}`;
                     const leftIcon = mode === 'live' ? 'radio_button_checked' : (mode === 'next' ? 'schedule' : 'event');
                     const highlightClass = mode === 'live'
-                        ? 'border-secondary/35 bg-secondary/10 hover:border-secondary/50 hover:bg-secondary/15'
-                        : (mode === 'next' ? 'border-primary/35 bg-primary/10 hover:border-primary/50 hover:bg-primary/15' : 'hover:border-primary/40 hover:bg-primary/5');
+                        ? 'border-secondary/40 bg-gradient-to-r from-secondary/20 via-secondary/10 to-transparent hover:border-secondary/55'
+                        : (mode === 'next'
+                            ? 'border-primary/40 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent hover:border-primary/55'
+                            : 'hover:border-primary/40 hover:bg-primary/5');
                     const chipClass = mode === 'live' ? 'text-secondary' : (mode === 'next' ? 'text-primary' : 'text-slate-500');
 
                     return `
@@ -1300,6 +1333,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (text) el.textContent = text;
             };
 
+            const setChip = (id, value) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const text = String(value || '').trim();
+                if (text) {
+                    el.textContent = text;
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            };
+
             setText('live-ai-about-label', payload.about_label);
             setText('live-ai-commentary', payload.commentary);
 
@@ -1310,6 +1355,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 setText(`live-ai-card-${slot}-value`, card.value);
                 setText(`live-ai-card-${slot}-subtext`, card.subtext);
             }
+
+            const rich = payload.rich_context && typeof payload.rich_context === 'object' ? payload.rich_context : {};
+            const lyric = rich.lyric && typeof rich.lyric === 'object' ? rich.lyric : {};
+            const comeback = rich.comeback && typeof rich.comeback === 'object' ? rich.comeback : {};
+            const artistProfile = rich.artist_profile && typeof rich.artist_profile === 'object' ? rich.artist_profile : {};
+
+            setText('live-rich-lyric-title', lyric.title);
+            setText('live-rich-lyric-body', lyric.body);
+            setText('live-rich-comeback-title', comeback.title);
+            setText('live-rich-comeback-body', comeback.body);
+            setText('live-rich-artist-title', artistProfile.title);
+            setText('live-rich-artist-body', artistProfile.body);
+
+            const chips = Array.isArray(artistProfile.chips) ? artistProfile.chips : [];
+            setChip('live-rich-artist-chip-1', chips[0]);
+            setChip('live-rich-artist-chip-2', chips[1]);
+            setChip('live-rich-artist-chip-3', chips[2]);
         }
 
         function sanitizePlaylistTitle(title) {
