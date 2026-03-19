@@ -11,6 +11,7 @@ psycopg2-binary==2.9.9
 python-decouple==3.8
 pytz==2025.1
 requests==2.32.4
+Pillow==10.4.0
 sqlparse==0.5.5
 typing_extensions==4.12.2
 tzdata==2025.1

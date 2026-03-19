@@ -225,3 +225,11 @@ AUDIO_STREAM_CLOUDINARY_TRANSFORM = os.environ.get('AUDIO_STREAM_CLOUDINARY_TRAN
 IMAGE_STREAM_USE_CLOUDINARY_FETCH = os.environ.get('IMAGE_STREAM_USE_CLOUDINARY_FETCH', 'false').lower() == 'true'
 # Typical safe default for web images.
 IMAGE_STREAM_CLOUDINARY_TRANSFORM = os.environ.get('IMAGE_STREAM_CLOUDINARY_TRANSFORM', 'f_auto,q_auto')
+
+# ── Weekly image integrity checks ─────────────────────────────────────────────
+IMAGE_INTEGRITY_CHECK_ENABLED = os.environ.get('IMAGE_INTEGRITY_CHECK_ENABLED', 'true').lower() == 'true'
+IMAGE_INTEGRITY_CHECK_DAY_OF_WEEK = os.environ.get('IMAGE_INTEGRITY_CHECK_DAY_OF_WEEK', 'sun')
+IMAGE_INTEGRITY_CHECK_HOUR = int(os.environ.get('IMAGE_INTEGRITY_CHECK_HOUR', '3'))
+IMAGE_INTEGRITY_CHECK_MINUTE = int(os.environ.get('IMAGE_INTEGRITY_CHECK_MINUTE', '15'))
+IMAGE_INTEGRITY_CHECK_LIMIT = int(os.environ.get('IMAGE_INTEGRITY_CHECK_LIMIT', '0'))
+IMAGE_INTEGRITY_CHECK_TIMEOUT_SECONDS = float(os.environ.get('IMAGE_INTEGRITY_CHECK_TIMEOUT_SECONDS', '15'))

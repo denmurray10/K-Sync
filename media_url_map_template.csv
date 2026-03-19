@@ -1,0 +1,643 @@
+old_url,new_url,usage_count,example_refs
+http://images.ctfassets.net/4cd45et68cgf/2LFiqLiRRrwUnj2mqL7nGY/64033989199e7c5793fc4c2c4460475d/image__43_.png?w=2000,,1,BlogArticle:161:boyfriend-on-demand-and-blackpinks-jisoo-top-most-buzzworthy-drama-and-actor-rankings:image
+https://0.soompi.io/wp-content/uploads/2026/03/13051947/sf9-album.jpeg,,1,BlogArticle:181:update-sf9-drops-scheduler-for-upcoming-comeback-with-special-album-about-love:image
+https://0.soompi.io/wp-content/uploads/2026/03/14162830/Hearts2Hearts.jpg,,1,BlogArticle:170:watch-hearts2hearts-takes-1st-ever-public-broadcast-network-music-show-win-on-music-core-with-rude-performances-by-yena-and-more:image
+https://0.soompi.io/wp-content/uploads/2026/03/14215835/Jeon-Yeoyeojeong.jpg,,1,BlogArticle:166:newbeats-jeon-yeoyeojeong-ruptures-ligament-during-performance:image
+https://6.soompi.io/wp-content/uploads/image/20260314235908_ITZY_805ab9.jpg?s=900x600&e=t,,1,BlogArticle:169:watch-itzys-thats-a-no-no-dance-practice-is-youtubes-no-1-trending-video-in-south-korea:image
+https://6.soompi.io/wp-content/uploads/image/20260315053452_Nahyun.jpg?s=900x600&e=t,,1,BlogArticle:165:sonamoos-nahyun-announces-pregnancy-and-plans-to-get-married-next-year:image
+https://6.soompi.io/wp-content/uploads/image/20260315143606_BLACKPINK-Inkigayo.jpg?s=900x600&e=t,,1,BlogArticle:202:watch-blackpink-takes-3rd-win-for-go-on-inkigayo-performances-by-yena-kickflip-and-more:image
+https://6.soompi.io/wp-content/uploads/image/20260316025649_chaeunwoo.jpeg?s=900x600&e=t,,1,BlogArticle:194:cha-eun-woos-agency-briefly-comments-on-his-photography-exhibition:image
+https://cdn.kpopconcerts.com/wp-content/uploads/2025/10/P1_LA087-1024x682.jpg,,1,BlogArticle:203:bite-review-p1harmonys-unique-is-let-down-by-average-aesthetics:image
+https://cdn.kpopping.com/groups/ASTRO/profile.webp,,1,KPopGroup:39:astro:image_url
+https://cdn.kpopping.com/groups/ATEEZ/profile.webp,,1,KPopGroup:26:ateez:image_url
+https://cdn.kpopping.com/groups/BABYMONSTER/profile.webp,,1,KPopGroup:37:babymonster:image_url
+https://cdn.kpopping.com/groups/BIGBANG/profile.webp,,1,KPopGroup:34:bigbang:image_url
+https://cdn.kpopping.com/groups/BLACKPINK/profile.webp,,1,KPopGroup:1:blackpink:image_url
+https://cdn.kpopping.com/groups/BTS/profile.webp,,1,KPopGroup:2:bts:image_url
+https://cdn.kpopping.com/groups/CIX/profile.webp,,1,KPopGroup:43:cix:image_url
+https://cdn.kpopping.com/groups/DAY6/profile.webp,,1,KPopGroup:44:day6:image_url
+https://cdn.kpopping.com/groups/ENHYPEN/profile.webp,,1,KPopGroup:14:enhypen:image_url
+https://cdn.kpopping.com/groups/EVNNE/profile.webp,,1,KPopGroup:52:evnne:image_url
+https://cdn.kpopping.com/groups/EXID/profile.webp,,1,KPopGroup:41:exid:image_url
+https://cdn.kpopping.com/groups/EXO/profile.webp,,1,KPopGroup:7:exo:image_url
+https://cdn.kpopping.com/groups/FIFTY-FIFTY/profile.webp,,1,KPopGroup:53:fifty-fifty:image_url
+https://cdn.kpopping.com/groups/GOT7/profile.webp,,1,KPopGroup:12:got7:image_url
+https://cdn.kpopping.com/groups/Girls-Generation/profile.webp,,1,KPopGroup:35:girls-generation-snsd:image_url
+https://cdn.kpopping.com/groups/Highlight/profile.webp,,1,KPopGroup:45:highlight:image_url
+https://cdn.kpopping.com/groups/ILLIT/profile.webp,,1,KPopGroup:38:illit:image_url
+https://cdn.kpopping.com/groups/ITZY/profile.webp,,1,KPopGroup:10:itzy:image_url
+https://cdn.kpopping.com/groups/IVE/profile.webp,,1,KPopGroup:9:ive:image_url
+https://cdn.kpopping.com/groups/IZ-ONE/profile.webp,,1,KPopGroup:40:izone:image_url
+https://cdn.kpopping.com/groups/KISS-OF-LIFE/profile.webp,,1,KPopGroup:47:kiss-of-life:image_url
+https://cdn.kpopping.com/groups/Kep1er/profile.webp,,1,KPopGroup:55:kep1er:image_url
+https://cdn.kpopping.com/groups/LE-SSERAFIM/profile.webp,,1,KPopGroup:13:le-sserafim:image_url
+https://cdn.kpopping.com/groups/MAMAMOO/profile.webp,,1,KPopGroup:36:mamamoo:image_url
+https://cdn.kpopping.com/groups/MONSTA-X/profile.webp,,1,KPopGroup:31:monsta-x:image_url
+https://cdn.kpopping.com/groups/NCT-127/profile.webp,,1,KPopGroup:11:nct-127:image_url
+https://cdn.kpopping.com/groups/NCT-Dream/profile.webp,,1,KPopGroup:24:nct-dream:image_url
+https://cdn.kpopping.com/groups/NCT-U/profile.webp,,1,KPopGroup:33:nct-u:image_url
+https://cdn.kpopping.com/groups/NewJeans/profile.webp,,1,KPopGroup:6:newjeans:image_url
+https://cdn.kpopping.com/groups/PENTAGON/profile.webp,,1,KPopGroup:50:pentagon:image_url
+https://cdn.kpopping.com/groups/RIIZE/profile.webp,,1,KPopGroup:29:riize:image_url
+https://cdn.kpopping.com/groups/Red-Velvet/profile.webp,,1,KPopGroup:32:red-velvet:image_url
+https://cdn.kpopping.com/groups/SEVENTEEN/profile.webp,,1,KPopGroup:8:seventeen:image_url
+https://cdn.kpopping.com/groups/SHINee/profile.webp,,1,KPopGroup:23:shinee:image_url
+https://cdn.kpopping.com/groups/STAYC/profile.webp,,1,KPopGroup:54:stayc:image_url
+https://cdn.kpopping.com/groups/Stray-Kids/profile.webp,,1,KPopGroup:21:stray-kids:image_url
+https://cdn.kpopping.com/groups/THE-BOYZ/profile.webp,,1,KPopGroup:51:the-boyz:image_url
+https://cdn.kpopping.com/groups/TREASURE/profile.webp,,1,KPopGroup:27:treasure:image_url
+https://cdn.kpopping.com/groups/TWICE/profile.webp,,1,KPopGroup:4:twice:image_url
+https://cdn.kpopping.com/groups/TWS/profile.webp,,1,KPopGroup:30:tws:image_url
+https://cdn.kpopping.com/groups/TXT/profile.webp,,1,KPopGroup:16:txt:image_url
+https://cdn.kpopping.com/groups/VERIVERY/profile.webp,,1,KPopGroup:49:verivery:image_url
+https://cdn.kpopping.com/groups/VICTON/profile.webp,,1,KPopGroup:46:victon:image_url
+https://cdn.kpopping.com/groups/Wanna-One/profile.webp,,1,KPopGroup:42:wanna-one:image_url
+https://cdn.kpopping.com/groups/XODIAC/profile.webp,,1,KPopGroup:56:xodiac:image_url
+https://cdn.kpopping.com/groups/ZEROBASEONE/profile.webp,,1,KPopGroup:28:zerobaseone:image_url
+https://cdn.kpopping.com/groups/aespa/profile.webp,,1,KPopGroup:5:aespa:image_url
+https://cdn.kpopping.com/groups/fromis-9/profile.webp,,1,KPopGroup:48:fromis-9:image_url
+https://cdn.kpopping.com/groups/i-dle/profile.webp,,1,KPopGroup:15:g-i-dle:image_url
+https://cdn.kpopping.com/idols/Ahyeon/profile.webp,,1,KPopMember:223:Ahyeon:image_url
+https://cdn.kpopping.com/idols/Anton/profile.webp,,1,KPopMember:168:Anton:image_url
+https://cdn.kpopping.com/idols/Asa/profile.webp,,1,KPopMember:222:Asa:image_url
+https://cdn.kpopping.com/idols/Asahi/profile.webp,,1,KPopMember:153:Asahi:image_url
+https://cdn.kpopping.com/idols/Athena/profile.webp,,1,KPopMember:326:Athena:image_url
+https://cdn.kpopping.com/idols/BX/profile.webp,,1,KPopMember:264:BX:image_url
+https://cdn.kpopping.com/idols/Baekhyun/profile.webp,,1,KPopMember:41:Byun Baekhyun:image_url
+https://cdn.kpopping.com/idols/BamBam/profile.webp,,1,KPopMember:83:Kunpimook Bhuwakul:image_url
+https://cdn.kpopping.com/idols/Bang-Chan/profile.webp,,1,KPopMember:112:Bang Chan:image_url
+https://cdn.kpopping.com/idols/Belle/profile.webp,,1,KPopMember:284:Belle:image_url
+https://cdn.kpopping.com/idols/Beomgyu/profile.webp,,1,KPopMember:105:Choi Beomgyu:image_url
+https://cdn.kpopping.com/idols/Beomsoo/profile.webp,,1,KPopMember:342:Beomsoo:image_url
+https://cdn.kpopping.com/idols/Byungchan/profile.webp,,1,KPopMember:280:Byungchan:image_url
+https://cdn.kpopping.com/idols/Cha-Eunwoo/profile.webp,,1,KPopMember:234:Cha Eunwoo:image_url
+https://cdn.kpopping.com/idols/Chaehyun/profile.webp,,1,KPopMember:335:Chaehyun:image_url
+https://cdn.kpopping.com/idols/Chaeryeong/profile.webp,,1,KPopMember:65:Lee Chaeryeong:image_url
+https://cdn.kpopping.com/idols/Chaewon/profile.webp,,1,KPopMember:85:Kim Chaewon:image_url
+https://cdn.kpopping.com/idols/Chaeyoung/profile.webp,,2,KPopMember:288:Chaeyoung:image_url | KPopMember:27:Son Chaeyoung:image_url
+https://cdn.kpopping.com/idols/Chanelle-Moon/profile.webp,,1,KPopMember:323:Chanelle Moon:image_url
+https://cdn.kpopping.com/idols/Changbin/profile.webp,,1,KPopMember:114:Changbin:image_url
+https://cdn.kpopping.com/idols/Chanyeol/profile.webp,,1,KPopMember:40:Park Chanyeol:image_url
+https://cdn.kpopping.com/idols/Chen/profile.webp,,1,KPopMember:39:Kim Jongdae:image_url
+https://cdn.kpopping.com/idols/Chenle/profile.webp,,2,KPopMember:129:Chenle:image_url | KPopMember:203:Chenle:image_url
+https://cdn.kpopping.com/idols/Chiquita/profile.webp,,1,KPopMember:226:Chiquita:image_url
+https://cdn.kpopping.com/idols/D-O/profile.webp,,1,KPopMember:43:Do Kyungsoo:image_url
+https://cdn.kpopping.com/idols/DK/profile.webp,,1,KPopMember:52:Lee Seokmin:image_url
+https://cdn.kpopping.com/idols/Daehwi/profile.webp,,1,KPopMember:262:Daehwi:image_url
+https://cdn.kpopping.com/idols/Daesung/profile.webp,,1,KPopMember:207:Daesung:image_url
+https://cdn.kpopping.com/idols/Dahyun/profile.webp,,1,KPopMember:26:Kim Dahyun:image_url
+https://cdn.kpopping.com/idols/Danielle/profile.webp,,1,KPopMember:35:Danielle Marsh:image_url
+https://cdn.kpopping.com/idols/Davin/profile.webp,,1,KPopMember:346:Davin:image_url
+https://cdn.kpopping.com/idols/Dayeon/profile.webp,,1,KPopMember:336:Dayeon:image_url
+https://cdn.kpopping.com/idols/Dino/profile.webp,,1,KPopMember:57:Lee Chan:image_url
+https://cdn.kpopping.com/idols/Dohoon/profile.webp,,1,KPopMember:170:Dohoon:image_url
+https://cdn.kpopping.com/idols/Donghae/profile.webp,,1,KPopMember:137:Donghae:image_url
+https://cdn.kpopping.com/idols/Dongheon/profile.webp,,1,KPopMember:291:Dongheon:image_url
+https://cdn.kpopping.com/idols/Dongwoon/profile.webp,,1,KPopMember:275:Dongwoon:image_url
+https://cdn.kpopping.com/idols/Doojoon/profile.webp,,1,KPopMember:272:Doojoon:image_url
+https://cdn.kpopping.com/idols/Dowoon/profile.webp,,1,KPopMember:271:Dowoon:image_url
+https://cdn.kpopping.com/idols/Doyoung/profile.webp,,2,KPopMember:190:Doyoung:image_url | KPopMember:154:Doyoung:image_url
+https://cdn.kpopping.com/idols/Elly/profile.webp,,1,KPopMember:249:Elly:image_url
+https://cdn.kpopping.com/idols/Eric/profile.webp,,1,KPopMember:316:Eric:image_url
+https://cdn.kpopping.com/idols/Eunchae/profile.webp,,1,KPopMember:89:Hong Eunchae:image_url
+https://cdn.kpopping.com/idols/Eunhyuk/profile.webp,,1,KPopMember:135:Eunhyuk:image_url
+https://cdn.kpopping.com/idols/Eunseok/profile.webp,,1,KPopMember:164:Eunseok:image_url
+https://cdn.kpopping.com/idols/Felix/profile.webp,,1,KPopMember:117:Felix:image_url
+https://cdn.kpopping.com/idols/G-Dragon/profile.webp,,1,KPopMember:206:G-Dragon:image_url
+https://cdn.kpopping.com/idols/Gaeul/profile.webp,,1,KPopMember:59:Gaeul:image_url
+https://cdn.kpopping.com/idols/Gikwang/profile.webp,,1,KPopMember:274:Gikwang:image_url
+https://cdn.kpopping.com/idols/Gyehyeon/profile.webp,,1,KPopMember:294:Gyehyeon:image_url
+https://cdn.kpopping.com/idols/Gyumin/profile.webp,,1,KPopMember:344:Gyumin:image_url
+https://cdn.kpopping.com/idols/Ha-Sung-Woon/profile.webp,,1,KPopMember:254:Ha Sung Woon:image_url
+https://cdn.kpopping.com/idols/Haechan/profile.webp,,3,KPopMember:127:Haechan:image_url | KPopMember:73:Lee Donghyuck:image_url | KPopMember:200:Haechan:image_url
+https://cdn.kpopping.com/idols/Haerin/profile.webp,,1,KPopMember:36:Kang Haerin:image_url
+https://cdn.kpopping.com/idols/Han-Seung-Woo/profile.webp,,1,KPopMember:276:Han Seung Woo:image_url
+https://cdn.kpopping.com/idols/Han/profile.webp,,1,KPopMember:116:Han:image_url
+https://cdn.kpopping.com/idols/Hana/profile.webp,,1,KPopMember:325:Hana:image_url
+https://cdn.kpopping.com/idols/Haneul/profile.webp,,1,KPopMember:285:Haneul:image_url
+https://cdn.kpopping.com/idols/Hani/profile.webp,,1,KPopMember:250:Hani:image_url
+https://cdn.kpopping.com/idols/Hanjin/profile.webp,,1,KPopMember:172:Hanjin:image_url
+https://cdn.kpopping.com/idols/Hanni/profile.webp,,1,KPopMember:34:Hanni Pham:image_url
+https://cdn.kpopping.com/idols/Hanse/profile.webp,,1,KPopMember:279:Hanse:image_url
+https://cdn.kpopping.com/idols/Haruto/profile.webp,,1,KPopMember:155:Haruto:image_url
+https://cdn.kpopping.com/idols/Hayoung/profile.webp,,1,KPopMember:286:Hayoung:image_url
+https://cdn.kpopping.com/idols/Heechul/profile.webp,,1,KPopMember:132:Heechul:image_url
+https://cdn.kpopping.com/idols/Heeseung/profile.webp,,1,KPopMember:91:Lee Heeseung:image_url
+https://cdn.kpopping.com/idols/Hendery/profile.webp,,1,KPopMember:197:Hendery:image_url
+https://cdn.kpopping.com/idols/Hikaru/profile.webp,,1,KPopMember:337:Hikaru:image_url
+https://cdn.kpopping.com/idols/Hitomi/profile.webp,,1,KPopMember:244:Hitomi:image_url
+https://cdn.kpopping.com/idols/Hongjoong/profile.webp,,1,KPopMember:141:Hongjoong:image_url
+https://cdn.kpopping.com/idols/Hongseok/profile.webp,,1,KPopMember:300:Hongseok:image_url
+https://cdn.kpopping.com/idols/Hoshi/profile.webp,,1,KPopMember:49:Kwon Soonyoung:image_url
+https://cdn.kpopping.com/idols/Hoyoung/profile.webp,,1,KPopMember:292:Hoyoung:image_url
+https://cdn.kpopping.com/idols/Huening-Bahiyyih/profile.webp,,1,KPopMember:338:Huening Bahiyyih:image_url
+https://cdn.kpopping.com/idols/Huening-Kai/profile.webp,,1,KPopMember:107:Huening Kai:image_url
+https://cdn.kpopping.com/idols/Huh-Yunjin/profile.webp,,1,KPopMember:87:Huh Yunjin:image_url
+https://cdn.kpopping.com/idols/Hui/profile.webp,,1,KPopMember:299:Hui:image_url
+https://cdn.kpopping.com/idols/Hwang-Min-Hyun/profile.webp,,1,KPopMember:255:Hwang Min Hyun:image_url
+https://cdn.kpopping.com/idols/Hwasa/profile.webp,,1,KPopMember:219:Hwasa:image_url
+https://cdn.kpopping.com/idols/Hyein/profile.webp,,1,KPopMember:37:Lee Hyein:image_url
+https://cdn.kpopping.com/idols/Hyelin/profile.webp,,1,KPopMember:251:Hyelin:image_url
+https://cdn.kpopping.com/idols/Hyoyeon/profile.webp,,1,KPopMember:211:Hyoyeon:image_url
+https://cdn.kpopping.com/idols/Hyungwon/profile.webp,,1,KPopMember:178:Hyungwon:image_url
+https://cdn.kpopping.com/idols/Hyunjae/profile.webp,,1,KPopMember:310:Hyunjae:image_url
+https://cdn.kpopping.com/idols/Hyunjin2/profile.webp,,1,KPopMember:115:Hyunjin:image_url
+https://cdn.kpopping.com/idols/Hyunsik/profile.webp,,1,KPopMember:339:Hyunsik:image_url
+https://cdn.kpopping.com/idols/Hyunsuk/profile.webp,,2,KPopMember:148:Hyunsuk:image_url | KPopMember:267:Hyunsuk:image_url
+https://cdn.kpopping.com/idols/I-N/profile.webp,,1,KPopMember:119:I.N:image_url
+https://cdn.kpopping.com/idols/IU/profile.webp,,1,KPopMember:110:IU:image_url
+https://cdn.kpopping.com/idols/Irene/profile.webp,,1,KPopMember:181:Irene:image_url
+https://cdn.kpopping.com/idols/Iroha/profile.webp,,1,KPopMember:231:Iroha:image_url
+https://cdn.kpopping.com/idols/Isa/profile.webp,,1,KPopMember:329:Isa:image_url
+https://cdn.kpopping.com/idols/J/profile.webp,,1,KPopMember:332:J:image_url
+https://cdn.kpopping.com/idols/Jackson/profile.webp,,1,KPopMember:81:Jackson Wang:image_url
+https://cdn.kpopping.com/idols/Jacob/profile.webp,,1,KPopMember:308:Jacob:image_url
+https://cdn.kpopping.com/idols/Jaehyuk/profile.webp,,1,KPopMember:152:Jaehyuk:image_url
+https://cdn.kpopping.com/idols/Jaehyun/profile.webp,,2,KPopMember:74:Jung Jaehyun:image_url | KPopMember:192:Jaehyun:image_url
+https://cdn.kpopping.com/idols/Jaemin/profile.webp,,2,KPopMember:128:Jaemin:image_url | KPopMember:201:Jaemin:image_url
+https://cdn.kpopping.com/idols/Jake/profile.webp,,1,KPopMember:93:Sim Jaeyun:image_url
+https://cdn.kpopping.com/idols/Jay-B/profile.webp,,1,KPopMember:78:Im Jaebeom:image_url
+https://cdn.kpopping.com/idols/Jay/profile.webp,,1,KPopMember:92:Park Jongseong:image_url
+https://cdn.kpopping.com/idols/Jennie/profile.webp,,1,KPopMember:2:Kim Jennie:image_url
+https://cdn.kpopping.com/idols/Jeno/profile.webp,,3,KPopMember:126:Jeno:image_url | KPopMember:76:Lee Jeno:image_url | KPopMember:199:Jeno:image_url
+https://cdn.kpopping.com/idols/Jeonghan/profile.webp,,1,KPopMember:46:Yoon Jeonghan:image_url
+https://cdn.kpopping.com/idols/Jeonghwa/profile.webp,,1,KPopMember:252:Jeonghwa:image_url
+https://cdn.kpopping.com/idols/Jeongwoo/profile.webp,,1,KPopMember:156:Jeongwoo:image_url
+https://cdn.kpopping.com/idols/Jeongyeon/profile.webp,,1,KPopMember:21:Yoo Jeongyeon:image_url
+https://cdn.kpopping.com/idols/Jiheon/profile.webp,,1,KPopMember:290:Jiheon:image_url
+https://cdn.kpopping.com/idols/Jihoon/profile.webp,,2,KPopMember:149:Jihoon:image_url | KPopMember:173:Jihoon:image_url
+https://cdn.kpopping.com/idols/Jihyo/profile.webp,,1,KPopMember:24:Park Jihyo:image_url
+https://cdn.kpopping.com/idols/Jimin2/profile.webp,,1,KPopMember:9:Park Jimin:image_url
+https://cdn.kpopping.com/idols/Jin/profile.webp,,1,KPopMember:6:Kim Seokjin:image_url
+https://cdn.kpopping.com/idols/Jinho/profile.webp,,1,KPopMember:298:Jinho:image_url
+https://cdn.kpopping.com/idols/Jinjin/profile.webp,,1,KPopMember:233:Jinjin:image_url
+https://cdn.kpopping.com/idols/Jinyoung/profile.webp,,2,KPopMember:79:Park Jinyoung:image_url | KPopMember:261:Jinyoung:image_url
+https://cdn.kpopping.com/idols/Jisoo/profile.webp,,1,KPopMember:1:Kim Jisoo:image_url
+https://cdn.kpopping.com/idols/Jisung/profile.webp,,4,KPopMember:253:Jisung:image_url | KPopMember:130:Jisung:image_url | KPopMember:77:Park Jisung:image_url | KPopMember:204:Jisung:image_url
+https://cdn.kpopping.com/idols/Jiwon/profile.webp,,1,KPopMember:287:Jiwon:image_url
+https://cdn.kpopping.com/idols/Jo-Yuri/profile.webp,,1,KPopMember:245:Jo Yuri:image_url
+https://cdn.kpopping.com/idols/Johnny/profile.webp,,1,KPopMember:186:Johnny:image_url
+https://cdn.kpopping.com/idols/Jongho/profile.webp,,1,KPopMember:147:Jongho:image_url
+https://cdn.kpopping.com/idols/Joohoney/profile.webp,,1,KPopMember:179:Joohoney:image_url
+https://cdn.kpopping.com/idols/Joshua/profile.webp,,1,KPopMember:47:Hong Jisoo:image_url
+https://cdn.kpopping.com/idols/Joy/profile.webp,,1,KPopMember:184:Joy:image_url
+https://cdn.kpopping.com/idols/Julie/profile.webp,,1,KPopMember:282:Julie:image_url
+https://cdn.kpopping.com/idols/Jun/profile.webp,,1,KPopMember:48:Moon Junhui:image_url
+https://cdn.kpopping.com/idols/Junghwan/profile.webp,,1,KPopMember:157:Junghwan:image_url
+https://cdn.kpopping.com/idols/Jungkook/profile.webp,,2,KPopMember:109:Jungkook:image_url | KPopMember:11:Jeon Jungkook:image_url
+https://cdn.kpopping.com/idols/Jungwon/profile.webp,,1,KPopMember:90:Yang Jungwon:image_url
+https://cdn.kpopping.com/idols/Jungwoo/profile.webp,,2,KPopMember:72:Kim Jungwoo:image_url | KPopMember:194:Jungwoo:image_url
+https://cdn.kpopping.com/idols/Junkyu/profile.webp,,1,KPopMember:151:Junkyu:image_url
+https://cdn.kpopping.com/idols/Juyeon/profile.webp,,1,KPopMember:311:Juyeon:image_url
+https://cdn.kpopping.com/idols/Kai/profile.webp,,1,KPopMember:42:Kim Jongin:image_url
+https://cdn.kpopping.com/idols/Kang-Daniel/profile.webp,,1,KPopMember:258:Kang Daniel:image_url
+https://cdn.kpopping.com/idols/Kang-Hyewon/profile.webp,,1,KPopMember:238:Kang Hyewon:image_url
+https://cdn.kpopping.com/idols/Kang-Seung-Sik/profile.webp,,1,KPopMember:277:Kang Seung Sik:image_url
+https://cdn.kpopping.com/idols/Kangmin/profile.webp,,1,KPopMember:297:Kangmin:image_url
+https://cdn.kpopping.com/idols/Karina2/profile.webp,,1,KPopMember:29:Kim Minjeong:image_url
+https://cdn.kpopping.com/idols/Kazuha/profile.webp,,1,KPopMember:88:Kazuha Nakamura:image_url
+https://cdn.kpopping.com/idols/Keena/profile.webp,,1,KPopMember:322:Keena:image_url
+https://cdn.kpopping.com/idols/Keita/profile.webp,,1,KPopMember:317:Keita:image_url
+https://cdn.kpopping.com/idols/Kevin/profile.webp,,1,KPopMember:312:Kevin:image_url
+https://cdn.kpopping.com/idols/Key/profile.webp,,1,KPopMember:121:Key:image_url
+https://cdn.kpopping.com/idols/Kihyun/profile.webp,,1,KPopMember:177:Kihyun:image_url
+https://cdn.kpopping.com/idols/Kim-Chaewon/profile.webp,,1,KPopMember:241:Kim Chaewon:image_url
+https://cdn.kpopping.com/idols/Kim-Jaehwan/profile.webp,,1,KPopMember:257:Kim Jaehwan:image_url
+https://cdn.kpopping.com/idols/Kim-Jiwoong/profile.webp,,1,KPopMember:158:Kim Jiwoong:image_url
+https://cdn.kpopping.com/idols/Kim-Tae-Rae/profile.webp,,1,KPopMember:161:Kim Tae Rae:image_url
+https://cdn.kpopping.com/idols/Kino/profile.webp,,1,KPopMember:305:Kino:image_url
+https://cdn.kpopping.com/idols/Kuanlin/profile.webp,,1,KPopMember:263:Kuanlin:image_url
+https://cdn.kpopping.com/idols/Kun/profile.webp,,1,KPopMember:189:Kun:image_url
+https://cdn.kpopping.com/idols/Kwon-Eunbi/profile.webp,,1,KPopMember:236:Kwon Eunbi:image_url
+https://cdn.kpopping.com/idols/Kyuhyun/profile.webp,,1,KPopMember:139:Kyuhyun:image_url
+https://cdn.kpopping.com/idols/Kyungmin/profile.webp,,1,KPopMember:174:Kyungmin:image_url
+https://cdn.kpopping.com/idols/Lee-Chae-Yeon/profile.webp,,1,KPopMember:240:Lee Chae Yeon:image_url
+https://cdn.kpopping.com/idols/Lee-Jeong-Hyeon/profile.webp,,1,KPopMember:319:Lee Jeong Hyeon:image_url
+https://cdn.kpopping.com/idols/Lee-Know/profile.webp,,1,KPopMember:113:Lee Know:image_url
+https://cdn.kpopping.com/idols/Leeseo/profile.webp,,1,KPopMember:63:Lee Seo:image_url
+https://cdn.kpopping.com/idols/Leeteuk/profile.webp,,1,KPopMember:131:Leeteuk:image_url
+https://cdn.kpopping.com/idols/Leo/profile.webp,,1,KPopMember:347:Leo:image_url
+https://cdn.kpopping.com/idols/Lex/profile.webp,,1,KPopMember:341:Lex:image_url
+https://cdn.kpopping.com/idols/Lia/profile.webp,,1,KPopMember:68:Lia:image_url
+https://cdn.kpopping.com/idols/Lisa/profile.webp,,2,KPopMember:108:Lisa:image_url | KPopMember:4:Lalisa Manoban:image_url
+https://cdn.kpopping.com/idols/Liz/profile.webp,,1,KPopMember:61:Liz:image_url
+https://cdn.kpopping.com/idols/MJ/profile.webp,,1,KPopMember:232:MJ:image_url
+https://cdn.kpopping.com/idols/Mark/profile.webp,,4,KPopMember:124:Mark:image_url | KPopMember:80:Mark Tuan:image_url | KPopMember:75:Mark Lee:image_url | KPopMember:195:Mark:image_url
+https://cdn.kpopping.com/idols/Mina/profile.webp,,1,KPopMember:25:Myoui Mina:image_url
+https://cdn.kpopping.com/idols/Minchan/profile.webp,,1,KPopMember:293:Minchan:image_url
+https://cdn.kpopping.com/idols/Mingi/profile.webp,,1,KPopMember:145:Mingi:image_url
+https://cdn.kpopping.com/idols/Mingyu/profile.webp,,1,KPopMember:53:Kim Mingyu:image_url
+https://cdn.kpopping.com/idols/Minho/profile.webp,,1,KPopMember:122:Minho:image_url
+https://cdn.kpopping.com/idols/Minhyuk/profile.webp,,1,KPopMember:176:Minhyuk:image_url
+https://cdn.kpopping.com/idols/Minji/profile.webp,,1,KPopMember:33:Min Ji:image_url
+https://cdn.kpopping.com/idols/Minju/profile.webp,,2,KPopMember:228:Minju:image_url | KPopMember:242:Minju:image_url
+https://cdn.kpopping.com/idols/Minnie/profile.webp,,1,KPopMember:99:Minnie Nicha Yontararak:image_url
+https://cdn.kpopping.com/idols/Miyeon/profile.webp,,1,KPopMember:98:Cho Miyeon:image_url
+https://cdn.kpopping.com/idols/Moka/profile.webp,,1,KPopMember:229:Moka:image_url
+https://cdn.kpopping.com/idols/Momo/profile.webp,,1,KPopMember:22:Hirai Momo:image_url
+https://cdn.kpopping.com/idols/Moonbyul/profile.webp,,1,KPopMember:217:Moonbyul:image_url
+https://cdn.kpopping.com/idols/Mun-Jung-Hyun/profile.webp,,1,KPopMember:320:Mun Jung Hyun:image_url
+https://cdn.kpopping.com/idols/Nagyung/profile.webp,,1,KPopMember:289:Nagyung:image_url
+https://cdn.kpopping.com/idols/Nako/profile.webp,,1,KPopMember:243:Nako:image_url
+https://cdn.kpopping.com/idols/Natty/profile.webp,,1,KPopMember:283:Natty:image_url
+https://cdn.kpopping.com/idols/Nayeon/profile.webp,,1,KPopMember:20:Im Nayeon:image_url
+https://cdn.kpopping.com/idols/New/profile.webp,,1,KPopMember:313:New:image_url
+https://cdn.kpopping.com/idols/Ni-ki/profile.webp,,1,KPopMember:96:Nishimura Riki:image_url
+https://cdn.kpopping.com/idols/Onew/profile.webp,,1,KPopMember:120:Onew:image_url
+https://cdn.kpopping.com/idols/Park-Gun-Wook/profile.webp,,1,KPopMember:162:Park Gun Wook:image_url
+https://cdn.kpopping.com/idols/Park-Han-Bin/profile.webp,,1,KPopMember:318:Park Han Bin:image_url
+https://cdn.kpopping.com/idols/Park-Ji-Hoo/profile.webp,,1,KPopMember:321:Park Ji Hoo:image_url
+https://cdn.kpopping.com/idols/Park-Jihoon/profile.webp,,1,KPopMember:259:Park Jihoon:image_url
+https://cdn.kpopping.com/idols/Pharita/profile.webp,,1,KPopMember:221:Pharita:image_url
+https://cdn.kpopping.com/idols/Q/profile.webp,,1,KPopMember:314:Q:image_url
+https://cdn.kpopping.com/idols/RM/profile.webp,,1,KPopMember:5:Kim Namjoon:image_url
+https://cdn.kpopping.com/idols/Rami/profile.webp,,1,KPopMember:224:Rami:image_url
+https://cdn.kpopping.com/idols/Rei/profile.webp,,1,KPopMember:62:Rei:image_url
+https://cdn.kpopping.com/idols/Renjun/profile.webp,,2,KPopMember:125:Renjun:image_url | KPopMember:198:Renjun:image_url
+https://cdn.kpopping.com/idols/Rora/profile.webp,,1,KPopMember:225:Rora:image_url
+https://cdn.kpopping.com/idols/Rose/profile.webp,,1,KPopMember:3:Park Chaeyoung:image_url
+https://cdn.kpopping.com/idols/Ruka/profile.webp,,1,KPopMember:220:Ruka:image_url
+https://cdn.kpopping.com/idols/Ryeowook/profile.webp,,1,KPopMember:138:Ryeowook:image_url
+https://cdn.kpopping.com/idols/Ryujin/profile.webp,,1,KPopMember:64:Shin Ryujin:image_url
+https://cdn.kpopping.com/idols/S-Coups/profile.webp,,1,KPopMember:45:Choi Seungcheol:image_url
+https://cdn.kpopping.com/idols/Sakura/profile.webp,,2,KPopMember:86:Miyawaki Sakura:image_url | KPopMember:237:Sakura:image_url
+https://cdn.kpopping.com/idols/San/profile.webp,,1,KPopMember:144:San:image_url
+https://cdn.kpopping.com/idols/Sana/profile.webp,,1,KPopMember:23:Minatozaki Sana:image_url
+https://cdn.kpopping.com/idols/Sangyeon/profile.webp,,1,KPopMember:307:Sangyeon:image_url
+https://cdn.kpopping.com/idols/Sanha/profile.webp,,1,KPopMember:235:Sanha:image_url
+https://cdn.kpopping.com/idols/Seeun/profile.webp,,1,KPopMember:330:Seeun:image_url
+https://cdn.kpopping.com/idols/Sehun/profile.webp,,1,KPopMember:44:Oh Sehun:image_url
+https://cdn.kpopping.com/idols/Sejun/profile.webp,,1,KPopMember:278:Sejun:image_url
+https://cdn.kpopping.com/idols/Seohyun/profile.webp,,1,KPopMember:215:Seohyun:image_url
+https://cdn.kpopping.com/idols/Seok-Matthew/profile.webp,,1,KPopMember:160:Seok Matthew:image_url
+https://cdn.kpopping.com/idols/Seonghwa/profile.webp,,1,KPopMember:140:Seonghwa:image_url
+https://cdn.kpopping.com/idols/Seongwu/profile.webp,,1,KPopMember:256:Seongwu:image_url
+https://cdn.kpopping.com/idols/Seulgi/profile.webp,,1,KPopMember:182:Seulgi:image_url
+https://cdn.kpopping.com/idols/Seunghun/profile.webp,,1,KPopMember:265:Seunghun:image_url
+https://cdn.kpopping.com/idols/Seungkwan/profile.webp,,1,KPopMember:55:Boo Seungkwan:image_url
+https://cdn.kpopping.com/idols/Seungmin2/profile.webp,,1,KPopMember:118:Seungmin:image_url
+https://cdn.kpopping.com/idols/Shindong/profile.webp,,1,KPopMember:134:Shindong:image_url
+https://cdn.kpopping.com/idols/Shinwon/profile.webp,,1,KPopMember:301:Shinwon:image_url
+https://cdn.kpopping.com/idols/Shinyu/profile.webp,,1,KPopMember:169:Shinyu:image_url
+https://cdn.kpopping.com/idols/Shotaro/profile.webp,,1,KPopMember:163:Shotaro:image_url
+https://cdn.kpopping.com/idols/Shownu/profile.webp,,1,KPopMember:175:Shownu:image_url
+https://cdn.kpopping.com/idols/Shuhua/profile.webp,,1,KPopMember:102:Yeh Shuhua:image_url
+https://cdn.kpopping.com/idols/Sieun/profile.webp,,1,KPopMember:328:Sieun:image_url
+https://cdn.kpopping.com/idols/Sing/profile.webp,,1,KPopMember:345:Sing:image_url
+https://cdn.kpopping.com/idols/Siwon/profile.webp,,1,KPopMember:136:Siwon:image_url
+https://cdn.kpopping.com/idols/Sohee/profile.webp,,1,KPopMember:167:Sohee:image_url
+https://cdn.kpopping.com/idols/Solar/profile.webp,,1,KPopMember:216:Solar:image_url
+https://cdn.kpopping.com/idols/Solji/profile.webp,,1,KPopMember:248:Solji:image_url
+https://cdn.kpopping.com/idols/Soobin/profile.webp,,1,KPopMember:103:Choi Soobin:image_url
+https://cdn.kpopping.com/idols/Soojin/profile.webp,,1,KPopMember:100:Seo Soojin:image_url
+https://cdn.kpopping.com/idols/Sooyoung/profile.webp,,1,KPopMember:213:Sooyoung:image_url
+https://cdn.kpopping.com/idols/Soyeon/profile.webp,,1,KPopMember:97:Jeon Soyeon:image_url
+https://cdn.kpopping.com/idols/Subin/profile.webp,,1,KPopMember:281:Subin:image_url
+https://cdn.kpopping.com/idols/Suga/profile.webp,,1,KPopMember:7:Min Yoongi:image_url
+https://cdn.kpopping.com/idols/Suho/profile.webp,,1,KPopMember:38:Kim Junmyeon:image_url
+https://cdn.kpopping.com/idols/Sumin/profile.webp,,1,KPopMember:327:Sumin:image_url
+https://cdn.kpopping.com/idols/Sung-Hanbin/profile.webp,,1,KPopMember:159:Sung Hanbin:image_url
+https://cdn.kpopping.com/idols/Sungchan/profile.webp,,1,KPopMember:165:Sungchan:image_url
+https://cdn.kpopping.com/idols/Sunghoon/profile.webp,,1,KPopMember:94:Park Sunghoon:image_url
+https://cdn.kpopping.com/idols/Sungjin/profile.webp,,1,KPopMember:268:Sungjin:image_url
+https://cdn.kpopping.com/idols/Sunny/profile.webp,,1,KPopMember:209:Sunny:image_url
+https://cdn.kpopping.com/idols/Sunoo/profile.webp,,1,KPopMember:95:Kim Sunoo:image_url
+https://cdn.kpopping.com/idols/Sunwoo/profile.webp,,1,KPopMember:315:Sunwoo:image_url
+https://cdn.kpopping.com/idols/Taehyun/profile.webp,,1,KPopMember:106:Kang Taehyun:image_url
+https://cdn.kpopping.com/idols/Taeil/profile.webp,,1,KPopMember:69:Moon Taeil:image_url
+https://cdn.kpopping.com/idols/Taemin/profile.webp,,1,KPopMember:123:Taemin:image_url
+https://cdn.kpopping.com/idols/Taeyang/profile.webp,,3,KPopGroup:20:taeyang:image_url | KPopMember:111:Taeyang:image_url | KPopMember:205:Taeyang:image_url
+https://cdn.kpopping.com/idols/Taeyeon/profile.webp,,1,KPopMember:208:Taeyeon:image_url
+https://cdn.kpopping.com/idols/Taeyong/profile.webp,,2,KPopMember:70:Lee Taeyong:image_url | KPopMember:187:Taeyong:image_url
+https://cdn.kpopping.com/idols/Ten/profile.webp,,1,KPopMember:191:Ten:image_url
+https://cdn.kpopping.com/idols/The8/profile.webp,,1,KPopMember:54:Xu Minghao:image_url
+https://cdn.kpopping.com/idols/Tiffany-Young/profile.webp,,1,KPopMember:210:Tiffany Young:image_url
+https://cdn.kpopping.com/idols/Tzuyu/profile.webp,,1,KPopMember:28:Chou Tzuyu:image_url
+https://cdn.kpopping.com/idols/V/profile.webp,,1,KPopMember:10:Kim Taehyung:image_url
+https://cdn.kpopping.com/idols/Vernon/profile.webp,,1,KPopMember:56:Chwe Hansol:image_url
+https://cdn.kpopping.com/idols/Wain/profile.webp,,1,KPopMember:343:Wain:image_url
+https://cdn.kpopping.com/idols/Wendy/profile.webp,,1,KPopMember:183:Wendy:image_url
+https://cdn.kpopping.com/idols/Wheein/profile.webp,,1,KPopMember:218:Wheein:image_url
+https://cdn.kpopping.com/idols/WinWin/profile.webp,,1,KPopMember:193:WinWin:image_url
+https://cdn.kpopping.com/idols/Wonbin/profile.webp,,1,KPopMember:166:Wonbin:image_url
+https://cdn.kpopping.com/idols/Wonhee/profile.webp,,1,KPopMember:230:Wonhee:image_url
+https://cdn.kpopping.com/idols/Wonpil/profile.webp,,1,KPopMember:270:Wonpil:image_url
+https://cdn.kpopping.com/idols/Wonwoo/profile.webp,,1,KPopMember:50:Jeon Wonwoo:image_url
+https://cdn.kpopping.com/idols/Wonyoung/profile.webp,,2,KPopMember:60:Jang Wonyoung:image_url | KPopMember:247:Wonyoung:image_url
+https://cdn.kpopping.com/idols/Woojin/profile.webp,,1,KPopMember:260:Woojin:image_url
+https://cdn.kpopping.com/idols/Wooseok/profile.webp,,1,KPopMember:306:Wooseok:image_url
+https://cdn.kpopping.com/idols/Wooyoung/profile.webp,,1,KPopMember:146:Wooyoung:image_url
+https://cdn.kpopping.com/idols/Woozi/profile.webp,,1,KPopMember:51:Lee Jihoon:image_url
+https://cdn.kpopping.com/idols/Xiaojun/profile.webp,,1,KPopMember:196:Xiaojun:image_url
+https://cdn.kpopping.com/idols/Xiaoting/profile.webp,,1,KPopMember:334:Xiaoting:image_url
+https://cdn.kpopping.com/idols/Yanan/profile.webp,,1,KPopMember:303:Yanan:image_url
+https://cdn.kpopping.com/idols/YangYang/profile.webp,,1,KPopMember:202:YangYang:image_url
+https://cdn.kpopping.com/idols/Yeji/profile.webp,,1,KPopMember:66:Hwang Yeji:image_url
+https://cdn.kpopping.com/idols/Yena/profile.webp,,1,KPopMember:239:Yena:image_url
+https://cdn.kpopping.com/idols/Yeo-One/profile.webp,,1,KPopMember:302:Yeo One:image_url
+https://cdn.kpopping.com/idols/Yeonho/profile.webp,,1,KPopMember:295:Yeonho:image_url
+https://cdn.kpopping.com/idols/Yeonjun/profile.webp,,1,KPopMember:104:Choi Yeonjun:image_url
+https://cdn.kpopping.com/idols/Yeosang/profile.webp,,1,KPopMember:143:Yeosang:image_url
+https://cdn.kpopping.com/idols/Yeri/profile.webp,,1,KPopMember:185:Yeri:image_url
+https://cdn.kpopping.com/idols/Yesung/profile.webp,,1,KPopMember:133:Yesung:image_url
+https://cdn.kpopping.com/idols/Yewon/profile.webp,,1,KPopMember:324:Yewon:image_url
+https://cdn.kpopping.com/idols/Yonghee/profile.webp,,1,KPopMember:266:Yonghee:image_url
+https://cdn.kpopping.com/idols/Yongseung/profile.webp,,1,KPopMember:296:Yongseung:image_url
+https://cdn.kpopping.com/idols/Yoon/profile.webp,,1,KPopMember:331:Yoon:image_url
+https://cdn.kpopping.com/idols/Yoona/profile.webp,,1,KPopMember:214:Yoona:image_url
+https://cdn.kpopping.com/idols/Yoseop/profile.webp,,1,KPopMember:273:Yoseop:image_url
+https://cdn.kpopping.com/idols/Yoshi/profile.webp,,1,KPopMember:150:Yoshi:image_url
+https://cdn.kpopping.com/idols/Young-K/profile.webp,,1,KPopMember:269:Young K:image_url
+https://cdn.kpopping.com/idols/Younghoon/profile.webp,,1,KPopMember:309:Younghoon:image_url
+https://cdn.kpopping.com/idols/Youngjae/profile.webp,,2,KPopMember:171:Youngjae:image_url | KPopMember:82:Choi Youngjae:image_url
+https://cdn.kpopping.com/idols/Yugyeom/profile.webp,,1,KPopMember:84:Kim Yugyeom:image_url
+https://cdn.kpopping.com/idols/Yujin/profile.webp,,3,KPopMember:58:An Yujin:image_url | KPopMember:333:Yujin:image_url | KPopMember:246:Yujin:image_url
+https://cdn.kpopping.com/idols/Yuna/profile.webp,,1,KPopMember:67:Shin Yuna:image_url
+https://cdn.kpopping.com/idols/Yunah/profile.webp,,1,KPopMember:227:Yunah:image_url
+https://cdn.kpopping.com/idols/Yunho/profile.webp,,1,KPopMember:142:Yunho:image_url
+https://cdn.kpopping.com/idols/Yuqi/profile.webp,,1,KPopMember:101:Song Yuqi:image_url
+https://cdn.kpopping.com/idols/Yuri/profile.webp,,1,KPopMember:212:Yuri:image_url
+https://cdn.kpopping.com/idols/Yuta/profile.webp,,2,KPopMember:71:Nakamoto Yuta:image_url | KPopMember:188:Yuta:image_url
+https://cdn.kpopping.com/idols/Yuto/profile.webp,,1,KPopMember:304:Yuto:image_url
+https://cdn.kpopping.com/idols/Zayyan/profile.webp,,1,KPopMember:340:Zayyan:image_url
+https://cdn.kpopping.com/idols/giselle/profile.webp,,1,KPopMember:30:Yoo Jimin:image_url
+https://cdn.kpopping.com/idols/j-hope/profile.webp,,1,KPopMember:8:Jung Hoseok:image_url
+https://cdn.kpopping.com/idols/ningning/profile.webp,,1,KPopMember:31:Ning Yizhuo:image_url
+https://cdn.kpopping.com/idols/winter/profile.webp,,1,KPopMember:32:Uchinaga Aeri:image_url
+https://climatepledgearena.com/wp-content/uploads/2025/03/25-Babymonster_CPA-Web_1600x9001.jpg,,1,BlogArticle:164:babymonster-announces-2026-2027-world-tour:image
+https://external-preview.redd.it/260201-interview-full-version-enhypen-in-2026-we-want-v0-X46kE9orznhd1MWQM-Biy8_gy4Ta-gLhRBpvEmKUclQ.jpeg?format=pjpg&auto=webp&s=a3a28b3ab82865a75aa3a357121e234da9281e3c,,1,BlogArticle:179:belift-lab-threatens-enhypen-members-as-real-reason-behind-heeseungs-departure-sparks-fear:image
+https://external-preview.redd.it/btss-jungkook-expresses-his-frustration-towards-sasaeng-v0-_leDrwWAiRSjUb16EBW9QBIarOzsNTi6DESTv6FL-DQ.jpg?width=1080&crop=smart&auto=webp&s=72393e9d3d27a7d87e9bfd33b25f6cc4db1395a3,,1,BlogArticle:215:hybe-boy-group-member-gets-terrorized-by-sasaengs-after-interaction-with-popular-female-idol:image
+https://external-preview.redd.it/psa-hexennacht-will-no-longer-offer-the-8-5ml-roll-ons-due-v0-9swIp9JMEx1FEs9TVKzgHG9iJmKto267k0xTlcV5aHo.jpg?width=640&crop=smart&auto=webp&s=e4d570ed222b4444cea50586525ab05a8e6f9bca,,1,BlogArticle:187:generous-idol-ends-up-facing-backlash-after-surprise-fan-gift-spirals-into-messy-online-drama:image
+https://external-preview.redd.it/yena-x-lee-chaeyeon-x-itzy-chaeryeong-tvn-amazing-saturday-v0-mWd1vG4m9aWFKuCT4z1OaP8d0M7d7CNZuNxUwjoF0Q0.jpeg?format=pjpg&auto=webp&s=034311f21fc924bc57ee753280df22311b9d4208,,1,BlogArticle:160:watch-yena-itzys-chaeryeong-and-lee-chae-yeon-dance-to-ive-and-izone-in-amazing-saturday-preview:image
+https://i.guim.co.uk/img/media/3d35aa3d5ec0797563fa9bee420b8944904d04e7/0_78_3500_2100/master/3500.jpg?width=1200&height=900&quality=85&auto=format&fit=crop&s=4a7282e7499f191fbf07a7218128f746,,1,BlogArticle:188:boy-group-members-jokes-about-sexual-harassment-spark-disgust-response-earns-more-backlash:image
+https://i.ytimg.com/vi/2v-0LPUgfiA/sddefault.jpg,,1,BlogArticle:220:4th-gen-idol-is-unrecognizable-after-weight-loss-transformation:image
+https://i.ytimg.com/vi/HOKDZihThI0/sddefault.jpg,,1,BlogArticle:216:song-review-choco1-x-choco2-choco-family-frenzy:image
+https://i.ytimg.com/vi/K4HGzUnOMLw/maxresdefault.jpg,,1,BlogArticle:196:debt-disbandment-former-idol-is-going-viral-for-her-tea-on-the-harsh-reality-of-k-pop:image
+https://i.ytimg.com/vi/cDHn0U63LtQ/oardefault.jpg?sqp=-oaymwEYCJUDENAFSFqQAgHyq4qpAwcIARUAAIhC&rs=AOn4CLAHRKxnSqI7G4pW2Y-t5lEJxHABsQ&usqp=CCk,,1,BlogArticle:176:enhypen-sunghoons-comments-on-solo-activities-spark-heartbreak-after-heeseungs-exit:image
+https://i.ytimg.com/vi/dxH2b9D9KP0/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDyFFe6kFNjMe5nvok_w-JkE1S_RA,,1,BlogArticle:231:song-review-allhours-dead-man-walking:image
+https://i.ytimg.com/vi/g7R_c3XHNbU/maxresdefault.jpg,,1,BlogArticle:212:bts-jungkooks-whereabouts-during-night-out-spark-heated-debate:image
+https://i.ytimg.com/vi/vwc5zTayVJw/maxresdefault.jpg,,1,BlogArticle:219:bts-jungkooks-appearance-in-new-arirang-video-linked-to-controversial-drunk-live:image
+https://image.ajunews.com/content/image/2026/03/03/20260303104151475620.jpg,,1,BlogArticle:209:girls-generations-tiffany-finally-shows-off-massive-wedding-ring-after-marrying-byun-yo-han:image
+https://image.koreaboo.com/2026/03/FD2870-4-8.jpg,,1,BlogArticle:210:viral-post-sparks-controversy-about-bts-jungkooks-change-in-personality:image
+https://image.koreaboo.com/2026/03/FEATURED-IMAGE-2026-03-15T174405.677.jpg,,1,BlogArticle:186:enhypen-members-alleged-reactions-to-learning-of-heeseungs-departure-go-viral:image
+https://image.koreaboo.com/2026/03/Lee-Haein-Landlord-fi.jpg,,1,BlogArticle:171:idol-turned-actress-struggles-as-new-landlord-amid-rumors-surrounding-her-multi-million-building-purchase:image
+https://image.koreaboo.com/2026/03/jinoscarscameo-FI.jpg,,1,BlogArticle:195:bts-star-shocks-actress-with-viral-cameo-in-2026-oscars-interview-sort-of:image
+https://img9.yna.co.kr/photo/yna/YH/2022/08/29/PYH2022082904050000500_P2.jpg,,1,BlogArticle:211:blackpinks-shocking-music-show-win-hit-with-fraud-accusations:image
+https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/75/b4/d1/75b4d165-565d-8ee5-9230-57b39bbc01b0/SJ12_Digital_Cover_F.jpg/600x600bb.jpg,,1,KPopGroup:25:super-junior:image_url
+https://koreajoongangdaily.joins.com/data/photo/2026/03/16/a389710a-34a1-4f34-9e28-7d6909c77af2.jpg,,1,BlogArticle:198:kpop-demon-hunters-star-savagely-hits-back-at-2026-oscars-backlash:image
+https://kpoppost.com/wp-content/uploads/2025/03/TOP-30-Kpop-Girl-Group-Brand-Reputation-Rankings-in-March-2025.jpg,,1,BlogArticle:208:march-girl-group-member-brand-reputation-rankings-announced:image
+https://kprofiles.com/wp-content/uploads/2024/02/MARCH2024-900x506.jpg,,1,BlogArticle:204:this-week-in-k-pop-ranking-the-new-releases-from-march-8-14:image
+https://media-cdn.brookes.ac.uk/mediacontainer/medialibraries/oxfordbrookes/news-and-events-images/central%20news/2024/10/k-and-j-pop-800.jpg,,1,BlogArticle:206:new-noteworthy-j-pop-of-the-week-march-15-2026:image
+https://mustsharenews.com/wp-content/uploads/2026/03/10cm-singapore-concert-refund-1.jpg,,1,BlogArticle:173:top-korean-soloist-fully-refunds-concert-despite-performing:image
+https://pbs.twimg.com/card_img/2033594169009291264/SWYAwIXI?format=jpg&name=orig,,1,BlogArticle:224:riize-fan-gets-robbed-and-assaulted-by-locals-during-chile-concert:image
+https://people.com/thmb/v6F-5KoikHj9PJxe5vIlXcqksBk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(863x262:865x264)/Heeseung-031026-3-8a080be2a97e488f8ef92d8b84463865.jpg,,1,BlogArticle:197:new-ot7-enhypen-content-following-heeseungs-departure-sparks-major-confusion:image
+https://preview.redd.it/260216-chart-data-ateez-officially-ties-the-record-for-most-v0-zkovs2jkxpjg1.png?auto=webp&s=6b3569f4980b77fe456bbdd93f1591c0619826e5,,1,BlogArticle:162:ateez-enhypen-stray-kids-bts-cortis-newjeans-ive-and-illit-sweep-top-spots-on-billboard-world-albums-chart:image
+https://preview.redd.it/new-statement-from-belift-and-its-frustrating-v0-yjpcacpo57pg1.jpeg?width=640&crop=smart&auto=webp&s=e0d5c63af219666ee2007884c30b890de47d8b6a,,1,BlogArticle:182:heeseung-will-not-return-to-enhypen-belift-lab-insists:image
+https://preview.redd.it/new-statement-from-belift-lab-about-heeseung-departure-v0-0hgl15ffr6pg1.jpeg?width=640&crop=smart&auto=webp&s=bbd5610a826fe8e787145c09e87c8ec85a12af51,,1,BlogArticle:163:belift-lab-reaffirms-heeseung-is-not-returning-to-enhypen:image
+https://preview.redd.it/whats-your-best-kpop-concert-stage-design-v0-0t3tqrx16fff1.jpg?width=640&crop=smart&auto=webp&s=47adcdef59912515b97c154787e94d612b62727d,,1,BlogArticle:158:watch-nana-reveals-her-home-sings-catallena-and-gives-her-manager-a-headache-in-the-manager-preview:image
+https://pub-dc9a9c6ac2a64ba48bce426ced0ac56a.r2.dev/idols/I-M/profile.webp?v=1773703758227,,1,KPopMember:180:I.M:image_url
+"https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Fcdn.kpopping.com%2Fidols%2FJennie%2Fprofile.webp",,1,KPopGroup:58:jennie:image_url
+"https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Fcdn.kpopping.com%2Fidols%2FJimin2%2Fprofile.webp",,1,KPopGroup:61:jimin:image_url
+"https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Fcdn.kpopping.com%2Fidols%2FJin%2Fprofile.webp",,1,KPopGroup:68:jin:image_url
+"https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Fcdn.kpopping.com%2Fidols%2FLisa%2Fprofile.webp",,1,KPopGroup:17:lisa:image_url
+"https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Fcdn.kpopping.com%2Fidols%2FRose%2Fprofile.webp",,1,KPopGroup:59:rose:image_url
+"https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Fcdn.kpopping.com%2Fidols%2FYeonjun%2Fprofile.webp",,1,KPopGroup:80:yeonjun:image_url
+"https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Fcdn.kpopping.com%2Fidols%2Fj-hope%2Fprofile.webp",,1,KPopGroup:60:j-hope:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773326107/ksync/blog/watch-blackpink-takes-2nd-win-for-go-on-m-countdown-performa/img1.jpg,,1,BlogArticle:37:watch-blackpink-takes-2nd-win-for-go-on-m-countdown-performances-by-p1harmony-yena-and-more:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773326261/ksync/blog/jo-yoon-seos-scheme-begins-to-tear-yeonwoo-and-kim-hyun-jin-/img1.jpg,,1,BlogArticle:51:jo-yoon-seos-scheme-begins-to-tear-yeonwoo-and-kim-hyun-jin-apart-in-love-phobia:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773326645/ksync/blog/kang-mal-geum-keeps-both-koo-kyo-hwan-and-oh-jung-se-in-chec/img1.jpg,,1,BlogArticle:53:kang-mal-geum-keeps-both-koo-kyo-hwan-and-oh-jung-se-in-check-in-we-are-all-trying-here:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773327455/ksync/blog/yeonwoo-kim-hyun-jin-and-jo-yoon-seo-look-troubled-as-past-s/img1.jpg,,1,BlogArticle:55:yeonwoo-kim-hyun-jin-and-jo-yoon-seo-look-troubled-as-past-secrets-begin-to-unravel-in-love-phobia:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773327600/ksync/blog/watch-lee-sung-kyung-han-ji-hyeon-and-oh-ye-ju-clash-in-chil/img1.jpg,,1,BlogArticle:57:watch-lee-sung-kyung-han-ji-hyeon-and-oh-ye-ju-clash-in-childish-sibling-fight-in-in-your-radiant-season-preview:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773327742/ksync/blog/btob-drops-1st-teaser-for-upcoming-full-group-comeback-with-/img1.jpg,,1,BlogArticle:42:btob-drops-1st-teaser-for-upcoming-full-group-comeback-with-new-digital-single-we-together:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773327915/ksync/blog/stray-kids-seungmin-to-participate-in-upcoming-fan-meeting-i/img1.jpg,,1,BlogArticle:43:stray-kids-seungmin-to-participate-in-upcoming-fan-meeting-in-limited-capacity-due-to-injury:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773328146/ksync/blog/yoo-yeon-seok-is-full-of-dedication-on-set-of-phantom-lawyer/img1.jpg,,1,BlogArticle:59:yoo-yeon-seok-is-full-of-dedication-on-set-of-phantom-lawyer:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773328301/ksync/blog/woo-do-hwan-lee-sang-yi-and-rain-show-fierce-determination-t/img1.jpg,,1,BlogArticle:45:woo-do-hwan-lee-sang-yi-and-rain-show-fierce-determination-to-protect-what-they-value-in-new-drama-bloodhounds-2:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773328336/ksync/blog/bae-in-hyuk-and-roh-jeong-eui-anxiously-await-court-decision/img1.png,,1,BlogArticle:46:bae-in-hyuk-and-roh-jeong-eui-anxiously-await-court-decision-on-their-nephews-guardianship-in-our-universe-finale:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773328484/ksync/blog/seventeens-vernon-and-the8-to-launch-new-unit-group/img1.jpg,,1,BlogArticle:48:seventeens-vernon-and-the8-to-launch-new-unit-group:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773328644/ksync/blog/ioi-announces-stops-for-10th-anniversary-tour-loop/img1.jpg,,1,BlogArticle:49:ioi-announces-stops-for-10th-anniversary-tour-loop:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773329009/ksync/blog/march-idol-group-brand-reputation-rankings-announced/img1.jpg,,1,BlogArticle:50:march-idol-group-brand-reputation-rankings-announced:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773329171/ksync/blog/el-capitxn-speaks-up-about-heeseungs-departure-from-enhypen/img1.jpg,,1,BlogArticle:52:el-capitxn-speaks-up-about-heeseungs-departure-from-enhypen:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773329344/ksync/blog/txt-riize-and-twices-misamo-earn-platinum-and-gold-certifica/img1.jpg,,1,BlogArticle:54:txt-riize-and-twices-misamo-earn-platinum-and-gold-certifications-in-japan:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773329493/ksync/blog/xlovs-agency-acquired-by-rbw-subsidiary-wm-entertainment/img1.jpg,,1,BlogArticle:56:xlovs-agency-acquired-by-rbw-subsidiary-wm-entertainment:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773329638/ksync/blog/close-your-eyes-beyond-your-eyes-concert-in-kuala-lumpur-can/img1.jpg,,1,BlogArticle:58:close-your-eyes-beyond-your-eyes-concert-in-kuala-lumpur-canceled:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773329787/ksync/blog/treasures-so-jung-hwan-zerobaseones-park-gun-wook-and-kickfl/img1.jpg,,1,BlogArticle:60:treasures-so-jung-hwan-zerobaseones-park-gun-wook-and-kickflips-kyehoon-announced-as-new-m-countdown-mcs:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773329910/ksync/blog/japanese-rock-star-miyavi-makes-special-appearance-as-shim-e/img1.webp,,1,BlogArticle:61:japanese-rock-star-miyavi-makes-special-appearance-as-shim-eun-kyungs-villainous-boss-in-new-drama-mad-concrete-dreams:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773329944/ksync/blog/update-asia-star-entertainer-awards-asea-2026-reveals-first-/img1.jpg,,1,BlogArticle:62:update-asia-star-entertainer-awards-asea-2026-reveals-first-performer-lineup:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330081/ksync/blog/park-sung-woong-and-family-meet-colorful-villagers-as-they-a/img1.jpg,,1,BlogArticle:63:park-sung-woong-and-family-meet-colorful-villagers-as-they-adjust-to-rural-life-in-cabbage-your-life:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330112/ksync/blog/shinees-taemin-signs-with-g-dragon-and-song-kang-hos-agency/img1.jpg,,1,BlogArticle:64:shinees-taemin-signs-with-g-dragon-and-song-kang-hos-agency:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330238/ksync/blog/sul-kyung-gu-jeon-jong-seo-and-seo-eun-soo-confirmed-for-new/img1.jpg,,1,BlogArticle:66:sul-kyung-gu-jeon-jong-seo-and-seo-eun-soo-confirmed-for-new-occult-film:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330262/ksync/blog/btob-confirms-full-group-comeback-with-new-digital-single/img1.jpg,,1,BlogArticle:67:btob-confirms-full-group-comeback-with-new-digital-single:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330402/ksync/blog/watch-byeon-woo-seoks-life-begins-to-change-after-entering-a/img1.png,,1,BlogArticle:68:watch-byeon-woo-seoks-life-begins-to-change-after-entering-a-contract-marriage-with-iu-in-new-drama-perfect-crown-teaser:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330414/ksync/blog/bae-in-hyuk-and-roh-jeong-eui-enjoy-loving-moments-in-our-un/img1.jpg,,1,BlogArticle:69:bae-in-hyuk-and-roh-jeong-eui-enjoy-loving-moments-in-our-universe:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330572/ksync/blog/our-universe-maintains-steady-ratings-ahead-of-series-finale/img1.png,,1,BlogArticle:70:our-universe-maintains-steady-ratings-ahead-of-series-finale:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330585/ksync/blog/2026-weverse-con-festival-announces-first-lineup/img1.webp,,1,BlogArticle:71:2026-weverse-con-festival-announces-first-lineup:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330754/ksync/blog/watch-yoo-yeon-seok-winds-up-possessed-by-all-sorts-of-ghost/img1.jpg,,1,BlogArticle:72:watch-yoo-yeon-seok-winds-up-possessed-by-all-sorts-of-ghosts-in-phantom-lawyer-teaser:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330756/ksync/blog/blackpink-becomes-1st-female-k-pop-artist-to-score-11-entrie/img1.jpg,,1,BlogArticle:73:blackpink-becomes-1st-female-k-pop-artist-to-score-11-entries-on-billboard-hot-100:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330912/ksync/blog/i-dle-to-perform-on-the-kelly-clarkson-show/img1.jpg,,1,BlogArticle:74:i-dle-to-perform-on-the-kelly-clarkson-show:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773330915/ksync/blog/oh-jung-se-is-a-successful-film-director-with-inferiority-co/img1.jpg,,1,BlogArticle:75:oh-jung-se-is-a-successful-film-director-with-inferiority-complex-toward-koo-kyo-hwan-in-we-are-all-trying-here:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331068/ksync/blog/blackpink-ives-jang-won-young-kiiikiii-and-more-top-circle-w/img1.jpg,,1,BlogArticle:76:blackpink-ives-jang-won-young-kiiikiii-and-more-top-circle-weekly-charts:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331092/ksync/blog/lee-soo-kyung-talks-about-her-super-mom-role-and-chemistry-w/img1.webp,,1,BlogArticle:77:lee-soo-kyung-talks-about-her-super-mom-role-and-chemistry-with-park-sung-woong-in-cabbage-your-life:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331238/ksync/blog/enhypen-shares-message-for-fans-following-heeseungs-departur/img1.jpg,,1,BlogArticle:78:enhypen-shares-message-for-fans-following-heeseungs-departure:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331261/ksync/blog/yoon-jong-hun-uhm-hyun-kyung-jung-yoon-and-yoon-da-young-cro/img1.jpg,,1,BlogArticle:79:yoon-jong-hun-uhm-hyun-kyung-jung-yoon-and-yoon-da-young-cross-paths-in-poster-for-our-happy-days:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331424/ksync/blog/blackpinks-jisoo-to-receive-madame-figaro-rising-star-award-/img1.png,,1,BlogArticle:80:blackpinks-jisoo-to-receive-madame-figaro-rising-star-award-at-canneseries-2026:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331598/ksync/blog/kim-jae-joongs-galaxy-1986-fan-concert-in-bangkok-canceled/img1.png,,1,BlogArticle:81:kim-jae-joongs-galaxy-1986-fan-concert-in-bangkok-canceled:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331666/ksync/blog/nam-sang-ji-appears-hurt-as-chun-hee-joo-watches-with-tears-/img1.jpg,,1,BlogArticle:82:nam-sang-ji-appears-hurt-as-chun-hee-joo-watches-with-tears-in-pearl-in-red:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331778/ksync/blog/bi-announces-military-enlistment-date/img1.jpg,,1,BlogArticle:83:bi-announces-military-enlistment-date:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331818/ksync/blog/kim-nam-gil-makes-special-appearance-as-ha-jung-woos-brother/img1.jpg,,1,BlogArticle:84:kim-nam-gil-makes-special-appearance-as-ha-jung-woos-brother-in-law-in-new-drama-mad-concrete-dreams:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773331963/ksync/blog/watch-kim-hye-yoon-lee-jong-won-jang-da-a-and-more-fight-to-/img1.jpg,,1,BlogArticle:85:watch-kim-hye-yoon-lee-jong-won-jang-da-a-and-more-fight-to-survive-an-inescapable-reservoir-in-whispering-water:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332008/ksync/blog/veteran-postpones-filming-for-third-installment-starring-hwa/img1.jpg,,1,BlogArticle:87:veteran-postpones-filming-for-third-installment-starring-hwang-jung-min-lee-junho-and-chun-woo-hee:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332174/ksync/blog/sung-si-kyungs-new-season-of-the-seasons-confirms-broadcast-/img1.jpg,,1,BlogArticle:88:sung-si-kyungs-new-season-of-the-seasons-confirms-broadcast-schedule:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332350/ksync/blog/the-kings-warden-surpasses-12-million-moviegoers-overtakes-e/img1.jpg,,1,BlogArticle:89:the-kings-warden-surpasses-12-million-moviegoers-overtakes-exhuma-at-korean-all-time-box-office-rankings:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332353/ksync/blog/bae-in-hyuk-roh-jeong-eui-and-park-seo-ham-share-closing-rem/img1.jpg,,1,BlogArticle:90:bae-in-hyuk-roh-jeong-eui-and-park-seo-ham-share-closing-remarks-ahead-of-our-universe-final-episodes:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332488/ksync/blog/22-k-pop-idols-who-have-starred-in-bl-k-dramas/img1.jpg,,1,BlogArticle:91:22-k-pop-idols-who-have-starred-in-bl-k-dramas:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332534/ksync/blog/popular-4th-gen-girl-groups-recent-announcement-sparks-manag/img1.jpg,,1,BlogArticle:92:popular-4th-gen-girl-groups-recent-announcement-sparks-management-speculations-linked-to-hybe:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332706/ksync/blog/lee-yoo-mi-joins-kim-nam-gil-in-talks-for-new-sci-fi-drama/img1.jpg,,1,BlogArticle:93:lee-yoo-mi-joins-kim-nam-gil-in-talks-for-new-sci-fi-drama:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332722/ksync/blog/byeon-woo-seoks-acting-sparks-scathing-backlash-linked-to-bl/img1.jpg,,1,BlogArticle:94:byeon-woo-seoks-acting-sparks-scathing-backlash-linked-to-blackpink-jisoos-controversy:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332897/ksync/blog/girl-group-idol-admits-to-negative-feelings-when-comparing-p/img1.jpg,,1,BlogArticle:95:girl-group-idol-admits-to-negative-feelings-when-comparing-popularity-with-fellow-members:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773332903/ksync/blog/kim-go-eun-teases-the-new-season-with-a-radiant-smile-in-yum/img1.jpg,,1,BlogArticle:96:kim-go-eun-teases-the-new-season-with-a-radiant-smile-in-yumis-cells-3-poster:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773333078/ksync/blog/enhypens-jay-allegedly-shades-heeseungs-departure-in-latest-/img1.jpg,,1,BlogArticle:97:enhypens-jay-allegedly-shades-heeseungs-departure-in-latest-fan-call:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773333234/ksync/blog/prosecutors-demand-male-soloist-to-be-put-in-jail/img1.jpg,,1,BlogArticle:98:prosecutors-demand-male-soloist-to-be-put-in-jail:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773333382/ksync/blog/btss-upcoming-comeback-used-as-part-of-new-scam/img1.jpg,,1,BlogArticle:99:btss-upcoming-comeback-used-as-part-of-new-scam:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773333750/ksync/blog/enhypens-ni-kis-reacts-to-mention-of-heeseung-despite-compan/img1.jpg,,1,BlogArticle:100:enhypens-ni-kis-reacts-to-mention-of-heeseung-despite-companys-alleged-restrictions:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773333750/ksync/blog/week-in-review-32-to-38/img1.jpg,,1,BlogArticle:101:week-in-review-32-to-38:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773333911/ksync/blog/for-your-viewing-pleasure-next-in-neutrals/img1.jpg,,1,BlogArticle:103:for-your-viewing-pleasure-next-in-neutrals:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773334080/ksync/blog/the-sb-mixtape-02262026-sleeper-hits/img1.jpg,,1,BlogArticle:104:the-sb-mixtape-02262026-sleeper-hits:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773334322/ksync/blog/bite-review-ateez-return-to-the-tried-and-true-with-adrenali/img1.png,,1,BlogArticle:107:bite-review-ateez-return-to-the-tried-and-true-with-adrenaline:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773334493/ksync/blog/the-sb-mixtape-2052026-discombobulation/img1.jpg,,1,BlogArticle:108:the-sb-mixtape-2052026-discombobulation:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773334657/ksync/blog/song-review-odd-youth-babyface/img1.jpg,,1,BlogArticle:109:song-review-odd-youth-babyface:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773334810/ksync/blog/song-review-p1harmony-unique/img1.png,,1,BlogArticle:111:song-review-p1harmony-unique:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773334999/ksync/blog/song-review-atheart-butterfly-doors/img1.jpg,,1,BlogArticle:112:song-review-atheart-butterfly-doors:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773361228/ksync/blog/our-universe-ends-on-highest-ratings-of-its-entire-run/img1.jpg,,1,BlogArticle:113:our-universe-ends-on-highest-ratings-of-its-entire-run:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773361336/ksync/blog/watch-sf9-drops-1st-teaser-for-march-comeback-with-about-lov/img1.jpg,,1,BlogArticle:115:watch-sf9-drops-1st-teaser-for-march-comeback-with-about-love:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773361446/ksync/blog/plave-announces-april-comeback-date-for-caligo-pt2/img1.jpg,,1,BlogArticle:116:plave-announces-april-comeback-date-for-caligo-pt2:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773361563/ksync/blog/enhypens-weekly-en-o-clock-series-to-go-on-hiatus/img1.jpg,,1,BlogArticle:117:enhypens-weekly-en-o-clock-series-to-go-on-hiatus:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773361668/ksync/blog/kpop-demon-hunters-officially-announces-plans-for-sequel/img1.jpg,,1,BlogArticle:118:kpop-demon-hunters-officially-announces-plans-for-sequel:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773361771/ksync/blog/dating-newly-debuted-idol-addresses-inappropriate-photos-wit/img1.jpg,,1,BlogArticle:119:dating-newly-debuted-idol-addresses-inappropriate-photos-with-rumored-boyfriend:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773362035/ksync/blog/plans-for-a-black-ocean-during-upcoming-enhypen-performance-/img1.jpg,,1,BlogArticle:120:plans-for-a-black-ocean-during-upcoming-enhypen-performance-go-viral:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773362156/ksync/blog/popular-idol-gives-birth-3-months-after-announcing-marriage-/img1.jpg,,1,BlogArticle:121:popular-idol-gives-birth-3-months-after-announcing-marriage-and-pregnancy:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773362266/ksync/blog/former-k-pop-group-member-confirms-he-is-still-in-contact-wi/img1.jpg,,1,BlogArticle:122:former-k-pop-group-member-confirms-he-is-still-in-contact-with-ex-groupmates-after-departure:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773364728/ksync/blog/whib-announces-us-tour-dates-and-cities-for-go-up-our-era/img1.jpg,,1,BlogArticle:123:whib-announces-us-tour-dates-and-cities-for-go-up-our-era:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773364841/ksync/blog/park-jinyoung-and-kim-min-ju-sneak-into-her-house-for-a-secr/img1.jpg,,1,BlogArticle:124:park-jinyoung-and-kim-min-ju-sneak-into-her-house-for-a-secret-date-in-still-shining:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773364973/ksync/blog/bts-producer-exposes-he-couldnt-get-in-contact-with-heeseung/img1.jpg,,1,BlogArticle:127:bts-producer-exposes-he-couldnt-get-in-contact-with-heeseung-sparks-massive-concern:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773366656/ksync/blog/aespa-to-make-may-comeback/img1.jpg,,1,BlogArticle:128:aespa-to-make-may-comeback:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773366776/ksync/blog/park-shin-hye-makes-heartfelt-donation-for-single-parent-fam/img1.jpg,,1,BlogArticle:142:park-shin-hye-makes-heartfelt-donation-for-single-parent-families:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773405093/ksync/blog/park-hae-joon-is-a-reclusive-former-poet-and-koo-kyo-hwans-b/img1.jpg,,1,BlogArticle:131:park-hae-joon-is-a-reclusive-former-poet-and-koo-kyo-hwans-brother-in-we-are-all-trying-here:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773405268/ksync/blog/watch-ive-takes-8th-win-and-triple-crown-for-bang-bang-on-mu/img1.jpg,,1,BlogArticle:132:watch-ive-takes-8th-win-and-triple-crown-for-bang-bang-on-music-bank-performances-by-onew-kickflip-and-more:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773405435/ksync/blog/the-boyz-announces-new-seoul-concert-inter-zection/img1.jpg,,1,BlogArticle:134:the-boyz-announces-new-seoul-concert-inter-zection:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773405606/ksync/blog/itzy-to-perform-viral-hit-thats-a-no-no-on-m-countdown-6-yea/img1.jpg,,1,BlogArticle:135:itzy-to-perform-viral-hit-thats-a-no-no-on-m-countdown-6-years-after-its-release:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773405780/ksync/blog/bts-jungkooks-personal-netflix-recommendations/img1.jpg,,1,BlogArticle:136:bts-jungkooks-personal-netflix-recommendations:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773405981/ksync/blog/btss-newly-released-arirang-concept-photos-spark-massive-bac/img1.jpg,,1,BlogArticle:137:btss-newly-released-arirang-concept-photos-spark-massive-backlash:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773406135/ksync/blog/enhypen-member-spotted-wearing-heeseungs-clothes/img1.jpg,,1,BlogArticle:138:enhypen-member-spotted-wearing-heeseungs-clothes:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773406324/ksync/blog/bts-fans-enraged-at-enhypen-fans-holding-protest-in-front-of/img1.jpg,,1,BlogArticle:139:bts-fans-enraged-at-enhypen-fans-holding-protest-in-front-of-hybe:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773406497/ksync/blog/bts-allegedly-walking-the-kings-path-for-comeback-stage-trig/img1.jpg,,1,BlogArticle:140:bts-allegedly-walking-the-kings-path-for-comeback-stage-triggers-massive-backlash:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773406669/ksync/blog/enhypens-airport-photos-go-viral-amid-heeseungs-departure/img1.jpg,,1,BlogArticle:141:enhypens-airport-photos-go-viral-amid-heeseungs-departure:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773406832/ksync/blog/sick-in-the-heads-enhypen-fans-criticized-due-to-harassment-/img1.png,,1,BlogArticle:143:sick-in-the-heads-enhypen-fans-criticized-due-to-harassment-plans-over-heeseungs-departure:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773522246/ksync/blog/march-boy-group-member-brand-reputation-rankings-announced/img1.jpg,,1,BlogArticle:145:march-boy-group-member-brand-reputation-rankings-announced:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773522367/ksync/blog/4-times-han-ji-mins-dating-plans-backfired-in-episodes-3-4-o/img1.jpg,,1,BlogArticle:147:4-times-han-ji-mins-dating-plans-backfired-in-episodes-3-4-of-the-practical-guide-to-love:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773522475/ksync/blog/quiz-no-phones-allowed-build-a-k-pop-playlist-and-well-give-/img1.jpg,,1,BlogArticle:148:quiz-no-phones-allowed-build-a-k-pop-playlist-and-well-give-you-an-offline-hobby-to-try:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773522615/ksync/blog/illit-accused-of-plagiarizing-newjeans-choreography-for-new-/img1.jpg,,1,BlogArticle:149:illit-accused-of-plagiarizing-newjeans-choreography-for-new-song:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773522719/ksync/blog/former-girl-group-member-jenny-gets-married-after-six-years-/img1.jpg,,1,BlogArticle:150:former-girl-group-member-jenny-gets-married-after-six-years-of-secretly-dating:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773522834/ksync/blog/the-top-male-hybe-idols-with-the-best-fashion-sense-and-styl/img1.jpg,,1,BlogArticle:151:the-top-male-hybe-idols-with-the-best-fashion-sense-and-style-ranked:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773522972/ksync/blog/heated-rivalry-star-gets-dragged-into-heeseungs-exit-from-en/img1.jpg,,1,BlogArticle:152:heated-rivalry-star-gets-dragged-into-heeseungs-exit-from-enhypen:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773523087/ksync/blog/2ne1s-sandara-park-shares-view-on-human-relationships-amid-c/img1.jpg,,1,BlogArticle:153:2ne1s-sandara-park-shares-view-on-human-relationships-amid-controversy-with-park-bom:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773523197/ksync/blog/baby-6th-grade-army-formulated-the-most-genius-plan-to-convi/img1.webp,,1,BlogArticle:154:baby-6th-grade-army-formulated-the-most-genius-plan-to-convince-her-parents-to-buy-her-bts-merch:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773523308/ksync/blog/im-very-scared-k-pop-idol-group-struggles-with-zero-income-f/img1.jpg,,1,BlogArticle:155:im-very-scared-k-pop-idol-group-struggles-with-zero-income-for-seven-years:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773523425/ksync/blog/song-review-hoshi-seventeen-baby-honey/img1.jpg,,1,BlogArticle:156:song-review-hoshi-seventeen-baby-honey:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773523545/ksync/blog/buried-treasure-yena-spring-fever-ft-dindin-jung-hyung-don/img1.jpg,,1,BlogArticle:157:buried-treasure-yena-spring-fever-ft-dindin-jung-hyung-don:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773701314/ksync/blog/safety-measures-for-btss-comeback-concert-become-a-hot-topic/img1.jpg,,1,BlogArticle:227:safety-measures-for-btss-comeback-concert-become-a-hot-topic:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707711/kpop/idols/solo_top30/jungkook.webp,,1,KPopGroup:18:jungkook:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707712/kpop/idols/solo_top30/v-kim-taehyung.webp,,1,KPopGroup:57:v-kim-taehyung:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707714/kpop/idols/solo_top30/iu.webp,,1,KPopGroup:19:iu:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707716/kpop/idols/solo_top30/rm.webp,,1,KPopGroup:62:rm:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707719/kpop/idols/solo_top30/suga-agust-d.webp,,1,KPopGroup:63:suga-agust-d:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707723/kpop/idols/solo_top30/g-dragon.webp,,1,KPopGroup:64:g-dragon:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707724/kpop/idols/solo_top30/taemin.webp,,1,KPopGroup:65:taemin:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707725/kpop/idols/solo_top30/taeyeon.webp,,1,KPopGroup:66:taeyeon:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707726/kpop/idols/solo_top30/baekhyun.webp,,1,KPopGroup:67:baekhyun:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707728/kpop/idols/solo_top30/sunmi.webp,,1,KPopGroup:70:sunmi:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707728/kpop/idols/solo_top30/zico.webp,,1,KPopGroup:69:zico:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707729/kpop/idols/solo_top30/hyuna.webp,,1,KPopGroup:71:hyuna:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707730/kpop/idols/solo_top30/chungha.webp,,1,KPopGroup:72:chungha:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707731/kpop/idols/solo_top30/ailee.webp,,1,KPopGroup:73:ailee:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707733/kpop/idols/solo_top30/somi.webp,,1,KPopGroup:74:somi:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707734/kpop/idols/solo_top30/kang-daniel.webp,,1,KPopGroup:75:kang-daniel:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707735/kpop/idols/solo_top30/wonho.webp,,1,KPopGroup:76:wonho:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707736/kpop/idols/solo_top30/nayeon.webp,,1,KPopGroup:77:nayeon:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707737/kpop/idols/solo_top30/jackson-wang.webp,,1,KPopGroup:78:jackson-wang:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707738/kpop/idols/solo_top30/key.webp,,1,KPopGroup:79:key:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707739/kpop/idols/solo_top30/solar.webp,,1,KPopGroup:81:solar:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707740/kpop/idols/solo_top30/cl.webp,,1,KPopGroup:82:cl:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773707740/kpop/idols/solo_top30/hyolyn.webp,,1,KPopGroup:83:hyolyn:image_url
+https://res.cloudinary.com/diuanqnce/image/upload/v1773712741/ksync/blog/monsta-xs-hyungwon-and-ives-rei-to-host-day-1-of-asia-star-e/img1.jpg,,1,BlogArticle:238:monsta-xs-hyungwon-and-ives-rei-to-host-day-1-of-asia-star-entertainer-awards-2026:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773715261/ksync/blog/beloved-tv-star-gives-up-on-one-thing-he-loves-for-his-sick-/img1.jpg,,1,BlogArticle:240:beloved-tv-star-gives-up-on-one-thing-he-loves-for-his-sick-daughter:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773718871/ksync/blog/ives-rei-makes-a-confession-on-live-broadcast-triggers-massi/img1.jpg,,1,BlogArticle:242:ives-rei-makes-a-confession-on-live-broadcast-triggers-massive-reactions:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773720670/ksync/blog/active-airline-captain-murdered-in-busan-other-pilots-seek-p/img1.jpg,,1,BlogArticle:244:active-airline-captain-murdered-in-busan-other-pilots-seek-police-protection:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773720761/ksync/blog/47-year-old-actress-prepares-to-live-single-after-her-last-r/img1.webp,,1,BlogArticle:246:47-year-old-actress-prepares-to-live-single-after-her-last-relationship:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773720854/ksync/blog/zerobaseone-gyuvins-song-choice-during-last-concert-spark-di/img1.jpg,,1,BlogArticle:247:zerobaseone-gyuvins-song-choice-during-last-concert-spark-divided-reactions:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773744940/ksync/blog/dahyun-to-sit-out-twices-taipei-concerts-due-to-ankle-injury/img1.jpg,,1,BlogArticle:248:dahyun-to-sit-out-twices-taipei-concerts-due-to-ankle-injury:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745053/ksync/blog/nct-wish-confirmed-to-make-april-comeback-with-first-full-le/img1.jpg,,1,BlogArticle:249:nct-wish-confirmed-to-make-april-comeback-with-first-full-length-album:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745156/ksync/blog/zerobaseone-reported-to-make-spring-comeback-following-reorg/img1.jpg,,1,BlogArticle:250:zerobaseone-reported-to-make-spring-comeback-following-reorganization-as-5-member-group-agency-briefly-comments:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745240/ksync/blog/daftar-master-tur-k-pop-di-indonesia-tahun-2026-konser-fan-m/img1.jpg,,1,BlogArticle:251:daftar-master-tur-k-pop-di-indonesia-tahun-2026-konser-fan-meetings-dan-lainnya:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745330/ksync/blog/k-pop-2026/img1.webp,,1,BlogArticle:252:k-pop-2026:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745432/ksync/blog/senarai-induk-jelajah-k-pop-malaysia-2026-konsert-perjumpaan/img1.webp,,1,BlogArticle:253:senarai-induk-jelajah-k-pop-malaysia-2026-konsert-perjumpaan-dengan-peminat-dan-banyak-lagi:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745518/ksync/blog/bts-threatened-with-boycotts-due-to-arrogant-behavior/img1.jpg,,1,BlogArticle:254:bts-threatened-with-boycotts-due-to-arrogant-behavior:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745613/ksync/blog/article-about-btss-jungkook-ahead-of-comeback-sparks-malicio/img1.jpg,,1,BlogArticle:255:article-about-btss-jungkook-ahead-of-comeback-sparks-malicious-criticism-towards-idol:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745728/ksync/blog/enhypen-jays-now-deleted-comment-on-post-including-heeseung-/img1.jpg,,1,BlogArticle:256:enhypen-jays-now-deleted-comment-on-post-including-heeseung-triggers-serious-speculations:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745813/ksync/blog/schools-send-out-newsletters-regarding-safety-ahead-of-btss-/img1.jpg,,1,BlogArticle:257:schools-send-out-newsletters-regarding-safety-ahead-of-btss-large-scale-comeback-stage:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745894/ksync/blog/popular-female-idol-flaunts-sexy-figure-in-backless-dress/img1.jpg,,1,BlogArticle:258:popular-female-idol-flaunts-sexy-figure-in-backless-dress:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773745999/ksync/blog/ives-wonyoung-gains-attention-for-unexpected-habit/img1.jpg,,1,BlogArticle:259:ives-wonyoung-gains-attention-for-unexpected-habit:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773746096/ksync/blog/top-idol-turned-actor-goes-viral-for-how-he-treats-his-manag/img1.jpg,,1,BlogArticle:260:top-idol-turned-actor-goes-viral-for-how-he-treats-his-managers:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773746204/ksync/blog/heeseungs-update-for-enhypens-fan-sign-event-triggers-massiv/img1.jpg,,1,BlogArticle:261:heeseungs-update-for-enhypens-fan-sign-event-triggers-massive-backlash:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773746732/ksync/blog/kpop-demon-hunters-wins-2-oscars-at-2026-academy-awards/img1.jpg,,1,BlogArticle:262:kpop-demon-hunters-wins-2-oscars-at-2026-academy-awards:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773746815/ksync/blog/big-3-male-k-pop-idol-hit-with-major-criticism-for-his-behav/img1.jpg,,1,BlogArticle:263:big-3-male-k-pop-idol-hit-with-major-criticism-for-his-behavior-in-new-video:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773748974/ksync/blog/bts-jungkook-and-aespa-winters-favorite-date-spot-exposed-as/img1.jpg,,1,BlogArticle:265:bts-jungkook-and-aespa-winters-favorite-date-spot-exposed-as-proof-sparks-heated-debate:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773749066/ksync/blog/active-k-pop-star-is-brutally-honest-about-idols-having-a-fa/img1.jpg,,1,BlogArticle:266:active-k-pop-star-is-brutally-honest-about-idols-having-a-fake-personalities:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773749169/ksync/blog/woodzs-archive-1-is-boldly-ambitious-and-bracingly-honest/img1.jpg,,1,BlogArticle:267:woodzs-archive-1-is-boldly-ambitious-and-bracingly-honest:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773753372/ksync/blog/bts-accused-of-profiting-from-south-korean-presidents-favori/img1.jpg,,1,BlogArticle:268:bts-accused-of-profiting-from-south-korean-presidents-favoritism:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773755155/ksync/blog/le-sserafim-made-to-feel-uncomfortable-during-recent-fan-eve/img1.jpg,,1,BlogArticle:269:le-sserafim-made-to-feel-uncomfortable-during-recent-fan-event-sparking-fury:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773756958/ksync/blog/bts-concert-faces-cancellation-demands-as-police-warn-of-bom/img1.jpg,,1,BlogArticle:270:bts-concert-faces-cancellation-demands-as-police-warn-of-bomb-threats:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773757048/ksync/blog/underrated-k-pop-ranking-every-single-by-c-clown/img1.jpg,,1,BlogArticle:271:underrated-k-pop-ranking-every-single-by-c-clown:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773760620/ksync/blog/illit-wonhees-visuals-maliciously-mocked-in-viral-tweet-link/img1.png,,1,BlogArticle:272:illit-wonhees-visuals-maliciously-mocked-in-viral-tweet-linked-to-newjeans:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773760845/ksync/blog/shocking-first-look-into-btss-new-title-track-sparks-strong-/img1.jpg,,1,BlogArticle:273:shocking-first-look-into-btss-new-title-track-sparks-strong-reactions:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773782984/ksync/blog/blackpink-kiiikiii-ateez-huntrx-and-illit-top-circle-monthly/img1.jpg,,1,BlogArticle:275:blackpink-kiiikiii-ateez-huntrx-and-illit-top-circle-monthly-and-weekly-charts:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773783095/ksync/blog/watch-mnets-street-fighter-series-announces-new-all-gender-g/img1.jpg,,1,BlogArticle:277:watch-mnets-street-fighter-series-announces-new-all-gender-global-performance-director-survival-show:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773783222/ksync/blog/shinsegae-confirms-an-employee-stole-gift-certificates-bough/img1.jpg,,1,BlogArticle:278:shinsegae-confirms-an-employee-stole-gift-certificates-bought-by-ncts-jaemin-for-his-fans:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773783334/ksync/blog/le-sserafims-agency-to-restrict-weverse-dms-for-malicious-us/img1.jpg,,1,BlogArticle:279:le-sserafims-agency-to-restrict-weverse-dms-for-malicious-users:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773783442/ksync/blog/watch-illit-introduces-official-dearlit-characters/img1.jpg,,1,BlogArticle:280:watch-illit-introduces-official-dearlit-characters:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773783531/ksync/blog/stray-kids-to-release-new-single-stay-this-month/img1.jpg,,1,BlogArticle:281:stray-kids-to-release-new-single-stay-this-month:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773783652/ksync/blog/jennie-aespa-i-dle-and-cortis-to-perform-at-lollapalooza-202/img1.jpg,,1,BlogArticle:282:jennie-aespa-i-dle-and-cortis-to-perform-at-lollapalooza-2026:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773783746/ksync/blog/retiring-popular-idols-plans-for-part-time-work-abroad-gain-/img1.jpg,,1,BlogArticle:283:retiring-popular-idols-plans-for-part-time-work-abroad-gain-attention:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773783854/ksync/blog/active-4th-gen-idol-gets-real-about-ndas-and-dating-non-cele/img1.jpg,,1,BlogArticle:284:active-4th-gen-idol-gets-real-about-ndas-and-dating-non-celebrities:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773783958/ksync/blog/ncts-taeyong-accused-of-misogyny-and-body-shaming-sparking-f/img1.jpg,,1,BlogArticle:285:ncts-taeyong-accused-of-misogyny-and-body-shaming-sparking-fierce-responses:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773830713/ksync/blog/hybe-clarifies-use-of-red-lighting-for-btss-arirang-comeback/img1.gif,,1,BlogArticle:286:hybe-clarifies-use-of-red-lighting-for-btss-arirang-comeback-event:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773830827/ksync/blog/alpha-drive-one-reported-to-make-may-comeback-agency-briefly/img1.jpg,,1,BlogArticle:289:alpha-drive-one-reported-to-make-may-comeback-agency-briefly-comments:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773830947/ksync/blog/quiz-take-this-personality-quiz-to-find-out-which-bts-solo-t/img1.jpg,,1,BlogArticle:290:quiz-take-this-personality-quiz-to-find-out-which-bts-solo-track-you-are-just-in-time-for-their-comeback:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773831077/ksync/blog/zhang-hao-ricky-kim-gyu-vin-and-han-yu-jin-reported-to-make-/img1.webp,,1,BlogArticle:291:zhang-hao-ricky-kim-gyu-vin-and-han-yu-jin-reported-to-make-may-debut-in-new-group-agency-comments:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773831203/ksync/blog/2026-korea-grand-music-awards-kgma-announces-dates-and-new-v/img1.jpg,,1,BlogArticle:292:2026-korea-grand-music-awards-kgma-announces-dates-and-new-venue:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773831325/ksync/blog/march-drama-brand-reputation-rankings-announced/img1.jpg,,1,BlogArticle:293:march-drama-brand-reputation-rankings-announced:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773831445/ksync/blog/enhypen-alpha-drive-one-exo-seventeens-dxs-and-idntt-earn-ci/img1.jpg,,1,BlogArticle:294:enhypen-alpha-drive-one-exo-seventeens-dxs-and-idntt-earn-circle-double-million-and-platinum-certifications:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773831567/ksync/blog/blackpink-jennies-lollapalooza-announcement-stirs-up-major-c/img1.jpg,,1,BlogArticle:295:blackpink-jennies-lollapalooza-announcement-stirs-up-major-criticism-and-ridicule:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773831701/ksync/blog/stray-kids-han-embroiled-in-explosive-dating-rumors-as-proof/img1.jpg,,1,BlogArticle:296:stray-kids-han-embroiled-in-explosive-dating-rumors-as-proof-goes-viral:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773831812/ksync/blog/forced-shutdown-mode-activated-due-to-btss-comeback-sparks-f/img1.jpg,,1,BlogArticle:297:forced-shutdown-mode-activated-due-to-btss-comeback-sparks-fury:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773831941/ksync/blog/workers-complain-of-being-mistreated-due-to-bts-concert/img1.jpg,,1,BlogArticle:298:workers-complain-of-being-mistreated-due-to-bts-concert:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773832065/ksync/blog/belift-lab-sparks-fury-after-disprespecting-heeseung-in-new-/img1.jpg,,1,BlogArticle:299:belift-lab-sparks-fury-after-disprespecting-heeseung-in-new-post-about-enhypen:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773832210/ksync/blog/bts-hit-back-at-severe-accusations-of-far-right-political-in/img1.webp,,1,BlogArticle:300:bts-hit-back-at-severe-accusations-of-far-right-political-involvement:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773832337/ksync/blog/stray-kids-changbin-drops-millions-in-full-cash-payment-for-/img1.jpg,,1,BlogArticle:301:stray-kids-changbin-drops-millions-in-full-cash-payment-for-swanky-apartment:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773832413/ksync/blog/jyp-entertainment-announces-strong-legal-action-against-stal/img1.jpg,,1,BlogArticle:302:jyp-entertainment-announces-strong-legal-action-against-stalking-behavior-toward-2pm-member:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773832454/ksync/blog/sm-girl-groups-security-guards-hit-with-fierce-backlash-at-a/img1.jpg,,1,BlogArticle:304:sm-girl-groups-security-guards-hit-with-fierce-backlash-at-airport:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773832547/ksync/blog/bts-accused-of-uncreative-and-unprogressive-albums-by-indust/img1.jpg,,1,BlogArticle:307:bts-accused-of-uncreative-and-unprogressive-albums-by-industry-critics:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773832572/ksync/blog/for-your-viewing-pleasure-boldly-and-lovely/img1.jpg,,1,BlogArticle:308:for-your-viewing-pleasure-boldly-and-lovely:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773835998/ksync/blog/watch-p1harmony-takes-1st-win-for-unique-on-show-champion-pe/img1.jpg,,1,BlogArticle:310:watch-p1harmony-takes-1st-win-for-unique-on-show-champion-performances-by-kickflip-nouera-and-more:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773837349/ksync/blog/popular-male-idols-shockingly-excessive-fan-participation-re/img1.jpg,,1,BlogArticle:312:popular-male-idols-shockingly-excessive-fan-participation-requirements-sparks-major-reactions:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773847882/ksync/blog/watch-bts-to-return-to-the-tonight-show-for-2-separate-episo/img1.jpg,,1,BlogArticle:315:watch-bts-to-return-to-the-tonight-show-for-2-separate-episodes:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773848012/ksync/blog/nouera-announces-dates-and-cities-for-2026-world-tour-catch-/img1.jpg,,1,BlogArticle:318:nouera-announces-dates-and-cities-for-2026-world-tour-catch-the-wave:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773848135/ksync/blog/watch-2pm-reveals-new-version-of-official-light-stick/img1.jpg,,1,BlogArticle:319:watch-2pm-reveals-new-version-of-official-light-stick:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773848248/ksync/blog/park-ji-hoon-sweeps-no-1-in-both-drama-actor-and-boy-group-m/img1.jpg,,1,BlogArticle:320:park-ji-hoon-sweeps-no-1-in-both-drama-actor-and-boy-group-member-brand-reputation-rankings-for-march:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773848366/ksync/blog/popular-hybe-group-comes-under-fire-for-recent-tweet-incitin/img1.jpg,,1,BlogArticle:321:popular-hybe-group-comes-under-fire-for-recent-tweet-inciting-criticism:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773848476/ksync/blog/is-she-being-watched-chilling-detail-in-illit-mokas-photo-sp/img1.jpg,,1,BlogArticle:322:is-she-being-watched-chilling-detail-in-illit-mokas-photo-spooks-netizens:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773848602/ksync/blog/video-of-le-sserafim-yunjins-comments-about-the-k-pop-indust/img1.jpg,,1,BlogArticle:323:video-of-le-sserafim-yunjins-comments-about-the-k-pop-industry-trigger-major-backlash:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773848715/ksync/blog/btss-embarrassing-album-detail-leak-triggers-scathing-mocker/img1.jpg,,1,BlogArticle:324:btss-embarrassing-album-detail-leak-triggers-scathing-mockery-from-koreans:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773855611/ksync/blog/watch-itzys-lia-launches-personal-youtube-channel-reveals-he/img1.jpg,,1,BlogArticle:325:watch-itzys-lia-launches-personal-youtube-channel-reveals-her-home:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773856593/ksync/blog/viral-moment-shows-illits-wonhee-in-extremely-uncomfortable-/img1.jpg,,1,BlogArticle:327:viral-moment-shows-illits-wonhee-in-extremely-uncomfortable-fan-encounter:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773857393/ksync/blog/popular-western-artist-hit-with-backlash-for-disrespecting-b/img1.jpg,,1,BlogArticle:328:popular-western-artist-hit-with-backlash-for-disrespecting-btss-jungkook:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773861767/ksync/blog/popular-3rd-gen-boy-group-member-vents-about-getting-paid-sp/img1.jpg,,1,BlogArticle:330:popular-3rd-gen-boy-group-member-vents-about-getting-paid-sparking-speculation:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773862794/ksync/blog/actor-who-starred-in-rape-porn-film-receives-jail-sentence-f/img1.jpg,,1,BlogArticle:333:actor-who-starred-in-rape-porn-film-receives-jail-sentence-for-sexually-assaulting-two-actresses:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773865365/ksync/blog/national-pension-service-makes-official-statement-on-calls-a/img1.jpg,,1,BlogArticle:335:national-pension-service-makes-official-statement-on-calls-about-heeseungs-departure-from-enhypen:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773866395/ksync/blog/p1harmony-breaks-500000-1st-week-sales-for-1st-time-with-uni/img1.png,,1,BlogArticle:338:p1harmony-breaks-500000-1st-week-sales-for-1st-time-with-unique:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773868177/ksync/blog/two-members-of-the-same-boy-group-share-a-steamy-kiss-while-/img1.jpg,,1,BlogArticle:340:two-members-of-the-same-boy-group-share-a-steamy-kiss-while-undressing:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773869993/ksync/blog/blackpinks-songwriter-hints-at-members-involvement-in-her-se/img1.jpg,,1,BlogArticle:342:blackpinks-songwriter-hints-at-members-involvement-in-her-severe-mistreatment:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773871790/ksync/blog/singer-behind-k-pop-demon-hunters-jinu-picks-the-5-real-life/img1.jpg,,1,BlogArticle:344:singer-behind-k-pop-demon-hunters-jinu-picks-the-5-real-life-saja-boys:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773879946/ksync/blog/girl-group-member-departs-and-makes-porn-debut-just-to-debut/img1.jpg,,1,BlogArticle:346:girl-group-member-departs-and-makes-porn-debut-just-to-debut-as-an-idol-again:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773912349/ksync/blog/aespas-winter-makes-generous-donation/img1.jpg,,1,BlogArticle:347:aespas-winter-makes-generous-donation:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773912472/ksync/blog/viviz-lee-mujin-and-beo-notify-big-planet-made-of-contract-t/img1.jpg,,1,BlogArticle:349:viviz-lee-mujin-and-beo-notify-big-planet-made-of-contract-termination-agency-briefly-responds:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773912579/ksync/blog/one-hundred-responds-to-reports-of-the-boyzs-contract-termin/img1.webp,,1,BlogArticle:351:one-hundred-responds-to-reports-of-the-boyzs-contract-termination-members-release-official-statement:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773912720/ksync/blog/9-the-boyz-members-reportedly-notify-one-hundred-of-contract/img1.png,,1,BlogArticle:352:9-the-boyz-members-reportedly-notify-one-hundred-of-contract-termination:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773912853/ksync/blog/got7s-park-jinyoung-confirmed-to-make-spring-solo-comeback/img1.jpg,,1,BlogArticle:353:got7s-park-jinyoung-confirmed-to-make-spring-solo-comeback:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773913007/ksync/blog/update-modyssey-drops-promotion-scheduler-for-debut-single-a/img1.webp,,1,BlogArticle:354:update-modyssey-drops-promotion-scheduler-for-debut-single-album-1-got-hooked-an-addictive-symphony:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773913150/ksync/blog/k-pop-culture-is-bizarre-idol-treatment-comes-under-scrutiny/img1.jpg,,1,BlogArticle:355:k-pop-culture-is-bizarre-idol-treatment-comes-under-scrutiny:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773913298/ksync/blog/off-duty-female-officers-deployed-for-btss-comeback-stage-ra/img1.jpg,,1,BlogArticle:356:off-duty-female-officers-deployed-for-btss-comeback-stage-raises-eyebrows:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773913441/ksync/blog/boyfriend-on-demand-blackpinks-jisoo-and-seo-in-guk-get-hone/img1.png,,1,BlogArticle:357:boyfriend-on-demand-blackpinks-jisoo-and-seo-in-guk-get-honest-about-each-other:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773917830/ksync/blog/blackpink-songwriters-recent-mistreatment-tiktok-alluding-to/img1.jpg,,1,BlogArticle:358:blackpink-songwriters-recent-mistreatment-tiktok-alluding-to-members-linked-to-hybe-sparking-outrage:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773917950/ksync/blog/btss-new-teaser-for-swim-hit-with-backlash/img1.jpg,,1,BlogArticle:360:btss-new-teaser-for-swim-hit-with-backlash:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773926213/ksync/blog/watch-hearts2hearts-takes-3rd-win-for-rude-on-m-countdown-pe/img1.jpg,,1,BlogArticle:361:watch-hearts2hearts-takes-3rd-win-for-rude-on-m-countdown-performances-by-itzy-ab6ix-and-more:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773926351/ksync/blog/new-announced-schedule-including-both-enhypen-and-heeseung-t/img1.jpg,,1,BlogArticle:364:new-announced-schedule-including-both-enhypen-and-heeseung-triggers-major-anger:image
+https://res.cloudinary.com/diuanqnce/image/upload/v1773926489/ksync/blog/top-female-k-pop-idol-sparks-shock-with-seriously-sexy-tease/img1.jpg,,1,BlogArticle:365:top-female-k-pop-idol-sparks-shock-with-seriously-sexy-teaser-photos:image
+https://s.yimg.com/ny/api/res/1.2/WxNd2Gm.1_cEonv.lVKubQ--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyNDI7aD02NjA7Y2Y9d2VicA--/https://media.zenfs.com/en/nextshark_articles_509/ba78209dc7fc49188bb54469a6434310,,1,BlogArticle:213:3rd-gen-idol-sparks-backlash-after-her-actions-on-her-apartment-balcony:image
+https://s2.dmcdn.net/v/THXet1eoWEqlJwsNI/x240,,1,BlogArticle:174:bts-subtitles-that-completely-changed-what-the-members-said:image
+https://static01.nyt.com/images/2022/10/18/world/00xp-crush-01/00xp-crush-01-mediumSquareAt3X.jpg,,1,BlogArticle:225:cringe-k-pop-idol-video-triggers-backlash-sparks-korean-cultural-criticism-debate:image
+https://uploaded.celebconfirmed.com/0_e11b2c3d_ec16_4174_b087_bf8e7a1ad530_a7b090fd35.jpg,,1,BlogArticle:175:beloved-idols-tearful-final-concert-before-ending-activities-leaves-fans-heartbroken:image
+https://wimg.heraldcorp.com/news/cms/2026/03/16/news-p.v1.20260315.ce315697b2e2426fb02d1605a25ed6f0_P1.jpeg,,1,BlogArticle:223:nsfw-enhypen-is-7-protest-for-heeseungs-return-goes-viral:image
+https://www.allkpop.com/upload/2026/03/content/121058/1773327534-allkpop-stray-kids.jpg,,1,BlogArticle:184:stray-kids-txt-seventeen-jennie-huntrx-tws-illit-and-more-win-at-2026-japan-gold-disc-awards:image
+https://www.allkpop.com/upload/2026/03/content/160845/1773665120-133539781.jpg,,1,BlogArticle:193:watch-jisoo-showcases-perfect-chemistry-with-co-stars-seo-in-guk-kim-sung-cheol-seo-kang-jun-and-more-on-set-of-boyfriend-on-demand:image
+https://www.billboard.com/wp-content/uploads/2026/03/2266726473-e1773627943782.jpg?w=942&h=628&crop=1,,1,BlogArticle:200:kpop-demon-hunters-creator-sparks-major-controversy-with-2026-oscars-winners-speech:image
+https://www.chosun.com/resizer/v2/G4ZDEYZXGNRGEZDCMJTGMMBVHE.jpg?auth=4aaba602c3dbd451bfc5e1332c160033d8baad67f57d6f6d155e764f40c4ca9b&width=530&height=748&smart=true,,1,BlogArticle:192:park-ji-hoon-announces-2026-fan-meeting-in-seoul:image
+https://www.chosun.com/resizer/v2/GRSTQZLCGUZDQNZQMNSTKZRZGA.jpg?auth=728e46933ac39b6d7ba79757029e64b2355711a70a89b23c9fcb6e01e32c3c9f&width=616,,1,BlogArticle:177:illit-announces-april-comeback-date-for-its-me:image
+https://www.chosun.com/resizer/v2/GYYDEN3EMFRDCNJRHFSDANRTG4.jpg?auth=1b1fe392834e28c9d6f0d1bc3f9902b526918f793a4d7dc91d7dc44b2ba48f27&width=600&height=563&smart=true,,1,BlogArticle:218:5th-gen-male-and-female-idol-go-mega-viral-for-uncanny-resemblance:image
+https://www.chosun.com/resizer/v2/MMZDENDCGBSDIMTFMIZTOZRQHA.jpg?auth=5b289198407b13381b792b5118ede9f8a09a1a3bdd7e3c5e5008f7771b251a40&width=650&height=487&smart=true,,1,BlogArticle:167:2pms-nichkhun-to-press-charges-against-stalker-who-physically-assaulted-him:image
+https://www.chosun.com/resizer/v2/MU2WKYTCGQZWEM3CG5TDMNBUHA.jpg?auth=2f1b023fc1a0bb658925186e5b56f89ce30a3acccd2d84e7fb6df26c44012ee1&width=616,,1,BlogArticle:201:blackpinks-jisoo-shares-story-behind-meeting-with-the-return-of-superman-choo-sa-rang:image
+https://www.hollywoodreporter.com/wp-content/uploads/2026/03/GettyImages-2266724906.jpg?w=1296,,1,BlogArticle:199:kpop-demon-hunters-sparks-boos-at-2026-oscars-after-suffering-severe-disrespect:image
+https://www.hollywoodreporter.com/wp-content/uploads/2026/03/GettyImages-2266726473-EJAE-Oscars-2026-Show-H.jpg?w=1296&h=730&crop=1,,1,BlogArticle:190:kpop-demon-hunters-wins-oscar-for-best-animated-feature-film-at-2026-academy-awards:image
+https://www.hollywoodreporter.com/wp-content/uploads/2026/03/heeseung.jpg?w=1296&h=730&crop=1,,1,BlogArticle:226:week-in-review-39-to-315:image
+https://www.imperva.com/learn/wp-content/uploads/sites/13/2020/07/Ticket-Scalping-Bots.png,,1,BlogArticle:205:top-idol-turned-actors-agency-gets-praised-for-smart-solution-to-stopping-ticket-scalpers:image
+https://www.kedglobal.com/data/ked/image/2025/07/17/ked202507170013.jpg,,2,BlogArticle:172:boycott-heeseung-latest-statement-regarding-enhypens-future-line-up-causes-divide:image | BlogArticle:168:mad-concrete-dreams-premieres-to-strong-ratings-phantom-lawyer-rises-for-2nd-episode:image
+https://www.wowkorea.live/img/news/103/517518/425696_640W.webp,,1,BlogArticle:228:song-review-ab6ix-bottoms-up:image

@@ -10,6 +10,7 @@ from core.views import _chat, _do_blog_generate
 from core.digests import send_due_user_digests
 import urllib.request
 import urllib.parse
+from django.core.management import call_command
 
 logger = logging.getLogger(__name__)
 
@@ -309,6 +310,18 @@ def sync_radio_from_b2_job():
         logger.error("[scheduler] Backblaze radio sync failed: %s", e)
 
 
+def weekly_image_integrity_check_job():
+    """Background job: verify idol/blog image URLs return healthy image responses."""
+    logger.info("[scheduler] Starting weekly image integrity check...")
+    try:
+        limit = max(0, int(getattr(settings, 'IMAGE_INTEGRITY_CHECK_LIMIT', 0) or 0))
+        timeout = max(2.0, float(getattr(settings, 'IMAGE_INTEGRITY_CHECK_TIMEOUT_SECONDS', 15) or 15))
+        call_command('check_image_integrity', limit=limit, timeout=timeout)
+        logger.info("[scheduler] Weekly image integrity check complete.")
+    except Exception as e:
+        logger.error("[scheduler] Weekly image integrity check failed: %s", e)
+
+
 def start_scheduler():
     scheduler = BackgroundScheduler()
     # Schedule Daily: Run every day at 08:00 AM
@@ -361,6 +374,19 @@ def start_scheduler():
             'interval',
             minutes=interval_minutes,
             id='sync_radio_from_b2',
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+
+    if getattr(settings, 'IMAGE_INTEGRITY_CHECK_ENABLED', True):
+        scheduler.add_job(
+            weekly_image_integrity_check_job,
+            'cron',
+            day_of_week=getattr(settings, 'IMAGE_INTEGRITY_CHECK_DAY_OF_WEEK', 'sun'),
+            hour=int(getattr(settings, 'IMAGE_INTEGRITY_CHECK_HOUR', 3) or 3),
+            minute=int(getattr(settings, 'IMAGE_INTEGRITY_CHECK_MINUTE', 15) or 15),
+            id='weekly_image_integrity_check',
             replace_existing=True,
             max_instances=1,
             coalesce=True,
