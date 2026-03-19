@@ -695,18 +695,26 @@ Cast your vote now.
 <div x-show="voted" x-transition.duration.1000ms class="absolute left-0 top-0 bottom-0 bg-primary/20 z-0 transition-all duration-1000" :style="`width: ${option.percentage}%;`"></div>
 <div x-show="voted && selected === option.id" class="absolute left-0 top-0 bottom-0 w-2 bg-primary z-10"></div>
     
-<div class="relative z-10 flex items-center gap-4">
+<div class="relative z-10 w-full md:hidden flex flex-col gap-2">
+<div class="grid grid-cols-2 items-center gap-3">
 <div :class="{'bg-primary text-black border-transparent': selected === option.id, 'border-white/40 group-hover:border-primary text-white': selected !== option.id}" 
-     class="w-8 h-8 flex items-center justify-center border font-mono text-xs font-black transition-colors" x-text="String.fromCharCode(65 + index)">A</div>
+    class="w-8 h-8 flex items-center justify-center border font-mono text-xs font-black transition-colors" x-text="String.fromCharCode(65 + index)">A</div>
+<div class="text-right font-black text-xl text-primary" x-text="voted ? `${option.percentage}%` : '0%'">0%</div>
+</div>
+<span class="font-bold text-sm tracking-tight uppercase" x-text="option.text">Option</span>
+</div>
+<div class="relative z-10 hidden md:flex items-center gap-4">
+<div :class="{'bg-primary text-black border-transparent': selected === option.id, 'border-white/40 group-hover:border-primary text-white': selected !== option.id}" 
+    class="w-8 h-8 flex items-center justify-center border font-mono text-xs font-black transition-colors" x-text="String.fromCharCode(65 + index)">A</div>
 <span class="font-bold text-lg tracking-tight uppercase" x-text="option.text">Option</span>
 </div>
-<div x-show="voted" x-transition class="relative z-10 font-black text-xl text-primary" x-text="`${option.percentage}%`">0%</div>
+<div x-show="voted" x-transition class="relative z-10 hidden md:block font-black text-xl text-primary" x-text="`${option.percentage}%`">0%</div>
 </button>
 </template>
 
 </div>
 <p x-show="voted" x-transition class="text-primary font-mono text-[10px] uppercase tracking-widest mt-6 text-center">
-    Vote registered. Broadcast updates at 20:00 KST.
+    Vote registered. Broadcast updates at 11:00 UK (GMT) / 12:00 (BST).
 </p>
 </div>
 </div>
@@ -977,9 +985,10 @@ Experience the explosive energy of this generation's most dynamic self-producing
 <p class="text-black/80 text-sm font-mono tracking-widest uppercase mt-4">Join the community. Get exclusive access to artist fan-signs, concert ticket giveaways, and weekly chart updates.</p>
 </div>
 <div class="w-full md:w-1/2 reveal-left" style="transition-delay: 200ms;">
-<form class="flex flex-col w-full gap-4">
-<input class="w-full bg-black border border-black px-6 py-4 text-white placeholder:text-slate-500 focus:outline-none placeholder:font-mono placeholder:uppercase placeholder:text-xs placeholder:tracking-widest rounded-none text-sm" placeholder="Enter your email address" type="email"/>
-<button class="w-full bg-white hover:bg-black hover:text-white text-black font-black px-10 py-5 rounded-none transition-colors uppercase tracking-[0.2em] text-sm border border-black" type="button">
+<form id="homepage-email-promo-form" class="flex flex-col w-full gap-4" novalidate>
+<input id="homepage-email-promo-input" class="w-full bg-black border border-black px-6 py-4 text-white placeholder:text-slate-500 focus:outline-none placeholder:font-mono placeholder:uppercase placeholder:text-xs placeholder:tracking-widest rounded-none text-sm" placeholder="Enter your email address" type="email" required/>
+<p id="homepage-email-promo-feedback" class="hidden font-mono text-[10px] uppercase tracking-widest"></p>
+<button id="homepage-email-promo-submit" class="w-full bg-white hover:bg-black hover:text-white text-black font-black px-10 py-5 rounded-none transition-colors uppercase tracking-[0.2em] text-sm border border-black" type="submit">
                             SUBSCRIBE NOW
                         </button>
 </form>
@@ -1074,6 +1083,61 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshHomepageLiveBar();
     setInterval(refreshHomepageLiveBar, 15000);
 });
+
+function initHomepageEmailPromoForm() {
+    const form = document.getElementById('homepage-email-promo-form');
+    const input = document.getElementById('homepage-email-promo-input');
+    const feedback = document.getElementById('homepage-email-promo-feedback');
+    const submitBtn = document.getElementById('homepage-email-promo-submit');
+    if (!form || !input || !feedback || !submitBtn) return;
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const showFeedback = (message, type = 'error') => {
+        feedback.textContent = message;
+        feedback.classList.remove('hidden', 'text-black/80', 'text-red-900');
+        feedback.classList.add(type === 'success' ? 'text-black/80' : 'text-red-900');
+    };
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = String(input.value || '').trim().toLowerCase();
+
+        if (!email || !emailPattern.test(email)) {
+            showFeedback('Please enter a valid email address.', 'error');
+            input.focus();
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+        showFeedback('Submitting...', 'success');
+
+        try {
+            const res = await fetch('{% url "email_promotion_signup" %}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, source: 'homepage_newsletter' }),
+            });
+            const data = await res.json();
+
+            if (!res.ok || !data?.ok) {
+                showFeedback(data?.error || 'Unable to subscribe right now.', 'error');
+                return;
+            }
+
+            showFeedback('Thanks! You are subscribed for email promotions.', 'success');
+            form.reset();
+        } catch (err) {
+            showFeedback('Network error. Please try again.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initHomepageEmailPromoForm);
 
 // ── Hero Same-Day Stack Rotation ───────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {

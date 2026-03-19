@@ -15,6 +15,7 @@ urlpatterns = [
     path('games/', views.games, name='games'),
     path('api/schedule-data/', views.api_schedule_data, name='api_schedule_data'),
     path('api/prelaunch-signup/', views.prelaunch_signup, name='prelaunch_signup'),
+    path('api/email-promotions-signup/', views.email_promotion_signup, name='email_promotion_signup'),
     path('staff/login/', views.signups_login_view, name='signups_login'),
     path('staff/logout/', views.signups_logout_view, name='signups_logout'),
     path('staff/dashboard/', views.signups_dashboard_view, name='signups_dashboard'),

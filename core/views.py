@@ -14,6 +14,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from django.conf import settings
 import requests
 import urllib.parse
@@ -3057,6 +3059,36 @@ def prelaunch_signup(request):
         return JsonResponse({'ok': False, 'error': 'This email is already signed up!'})
     except (ValueError, TypeError):
         return JsonResponse({'ok': False, 'error': 'Invalid data.'}, status=400)
+
+
+@csrf_exempt
+@require_POST
+def email_promotion_signup(request):
+    from django.db import IntegrityError
+    from .models import EmailPromotionSignup
+
+    try:
+        data = json.loads(request.body)
+    except (TypeError, ValueError):
+        return JsonResponse({'ok': False, 'error': 'Invalid request payload.'}, status=400)
+
+    email = str(data.get('email', '')).strip().lower()
+    source = str(data.get('source', 'homepage_newsletter')).strip() or 'homepage_newsletter'
+
+    if not email:
+        return JsonResponse({'ok': False, 'error': 'Please enter your email address.'}, status=400)
+
+    try:
+        validate_email(email)
+    except ValidationError:
+        return JsonResponse({'ok': False, 'error': 'Please enter a valid email address.'}, status=400)
+
+    try:
+        EmailPromotionSignup.objects.create(email=email, source=source)
+    except IntegrityError:
+        return JsonResponse({'ok': False, 'error': 'This email is already subscribed.'}, status=409)
+
+    return JsonResponse({'ok': True, 'message': 'Thanks! You are subscribed.'})
 
 def signups_login_view(request):
     if request.user.is_authenticated and request.user.is_staff:

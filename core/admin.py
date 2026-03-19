@@ -3,6 +3,7 @@ from .models import (
     LivePoll, LivePollOption, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, PreLaunchSignup, BlogArticle,
+    EmailPromotionSignup,
     LimitedTimeEvent, EventBadgeDrop, EventParticipation,
     RadioTrack, RadioStationState,
     RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
@@ -122,6 +123,13 @@ class PreLaunchSignupAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'age', 'signed_up_at')
     list_filter = ('signed_up_at',)
     search_fields = ('name', 'email')
+
+
+@admin.register(EmailPromotionSignup)
+class EmailPromotionSignupAdmin(admin.ModelAdmin):
+    list_display = ('email', 'source', 'created_at')
+    list_filter = ('source', 'created_at')
+    search_fields = ('email',)
 
 
 @admin.register(BlogArticle)
