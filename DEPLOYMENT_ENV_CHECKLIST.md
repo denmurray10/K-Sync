@@ -2,25 +2,6 @@
 
 Use this checklist to keep production aligned with local runtime config.
 
-## Required Django production variables
-
-Set all of these in your hosting provider:
-
-- `DJANGO_SECRET_KEY` (long random value)
-- `DJANGO_DEBUG=false`
-- `DJANGO_ALLOWED_HOSTS` (comma-separated hostnames)
-- `CSRF_TRUSTED_ORIGINS` (comma-separated full origins, e.g. `https://kbeatsradio.co.uk`)
-- `DATABASE_URL` (production database URL)
-
-Recommended security flags:
-
-- `SECURE_SSL_REDIRECT=true`
-- `SESSION_COOKIE_SECURE=true`
-- `CSRF_COOKIE_SECURE=true`
-- `SECURE_HSTS_SECONDS=31536000`
-- `SECURE_HSTS_INCLUDE_SUBDOMAINS=true`
-- `SECURE_HSTS_PRELOAD=true`
-
 ## Required Cloudinary variables
 
 Set all of these in your hosting provider (Heroku/Render/etc):
@@ -50,12 +31,6 @@ Expected output:
 
 ```text
 True True True
-```
-
-And verify Django deployment checks:
-
-```bash
-python manage.py check --deploy
 ```
 
 ## Heroku quick set

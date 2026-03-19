@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
-import secrets
 import dj_database_url
 from pathlib import Path
 from decouple import config
@@ -23,31 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-def env_bool(name: str, default: bool = False) -> bool:
-    return str(os.environ.get(name, str(default))).strip().lower() in ('1', 'true', 'yes', 'on')
-
-
-def env_list(name: str, default: str = ''):
-    raw = str(os.environ.get(name, default) or '').strip()
-    if not raw:
-        return []
-    return [item.strip() for item in raw.split(',') if item.strip()]
-
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-*47mzio8v)0b=h0ue_bygkv@lm0=q4)%z7vir_+)r!e4h@y134'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_bool('DJANGO_DEBUG', False)
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    os.environ.get('DJANGO_SECRET_KEY')
-    or config('DJANGO_SECRET_KEY', default='')
-    or secrets.token_urlsafe(64)
-)
-
-ALLOWED_HOSTS = env_list(
-    'DJANGO_ALLOWED_HOSTS',
-    '127.0.0.1,localhost' if DEBUG else 'kbeatsradio.co.uk,www.kbeatsradio.co.uk,127.0.0.1,localhost'
-)
+ALLOWED_HOSTS = ['*'] # Relaxed for Heroku, adjust for production safety if needed
 
 
 # Application definition
@@ -96,8 +77,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ksync_project.wsgi.application'
 
 
-# Database configuration
-DEFAULT_DB_URL = f'sqlite:///{BASE_DIR / "db.sqlite3"}'
+# Database configuration - Using Neon PostgreSQL
+# Defaulting to the provided Neon URL, but allowing override via DATABASE_URL env var
+DEFAULT_DB_URL = 'postgresql://neondb_owner:npg_7BEvOGSUZY8R@ep-little-credit-aggzf1v2.c-2.eu-central-1.aws.neon.tech/stage_ditzy_error_436329'
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -166,17 +148,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ── AI API Keys ──────────────────────────────────────────────────────────────
 # In Heroku, add these via: heroku config:set DEEPSEEK_API_KEY=...
-DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', '')
-INWORLD_API_KEY = os.environ.get('INWORLD_API_KEY', '')
+DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', 'sk-16a74707578d4d589f9fb72db4954176')
+INWORLD_API_KEY = os.environ.get('INWORLD_API_KEY', 'bnJvOURJZVdBV3VvRThMZVZKV085UlU0b2NPRDd0QTE6S2JzdTdvQ2FBRVBDOFNLTDl5dzFQT3JlWDJpekhibnNnMDNqWGU5VkNaQjhRdjM5bWIxQVZ4ejlQRGFBWUU3Zw==')
 INWORLD_API_ROOT = os.environ.get('INWORLD_API_ROOT', 'https://api.inworld.ai')
 INWORLD_BASE_URL = os.environ.get('INWORLD_BASE_URL', 'https://api.inworld.ai/v1')
 INWORLD_CHAT_MODEL = os.environ.get('INWORLD_CHAT_MODEL', 'auto')
 INWORLD_TTS_MODEL = os.environ.get('INWORLD_TTS_MODEL', 'inworld-tts-1.5-max')
-GETIMG_API_KEY = os.environ.get('GETIMG_API_KEY', '')
+GETIMG_API_KEY = os.environ.get('GETIMG_API_KEY', 'key-3t583MrYM5GrTQMJuymWSCOlQkylmA90xhvX7KB7eVRXgq24GwLXDHSYCVMqCDEBrTdYQn5n5MTVguY9tsFI8ZbQM4T4dbQ2')
 # Free stock photos for blog articles — get a free key at pexels.com/api
-PEXELS_API_KEY = os.environ.get('PEXELS_API_KEY', '')
+PEXELS_API_KEY = os.environ.get('PEXELS_API_KEY', 'GPlKuBUuXNxu06VvSJIM4pCSUGtHBwp3NwT7Q0XfFWgL2dwGB7yMTRqP')
 # Serper.dev — Google image search for blog articles (2,500 free/month)
-SERPER_API_KEY = os.environ.get('SERPER_API_KEY', '')
+SERPER_API_KEY = os.environ.get('SERPER_API_KEY', 'f099f725535455f20dd5a70ca6f817ddc3dc76e5')
 
 # ── Facebook Page integration ────────────────────────────────────────────────
 # ── Site URL ─────────────────────────────────────────────────────────────────
@@ -185,8 +167,8 @@ GOOGLE_TAG_MANAGER_ID = os.environ.get('GOOGLE_TAG_MANAGER_ID', 'GTM-KDMN68PM')
 
 # ── Facebook ─────────────────────────────────────────────────────────────────
 # Required permissions: pages_manage_posts, pages_read_engagement
-FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '')
-FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', '')
+FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '966171646586881')
+FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUVcMgjdSoBQ0nyoLLbQTB7i3mrOIleDSuUZCcfL3Y2eEZAHzSnjKnLOeUreOxBtsDv8Wh52T4fgIfpZAn5vKEfVb7bvZC3xmBxTSjZCLXBv79sd0qibQxcNwBVyah8c08UKeyhpDbAClAbB3D0Xy2aNBqmyvUg80Ew811zlHXoYZCVvLlrCSZBfRI9DMbvOUnS2uV6QZDZD')
 FACEBOOK_PIXEL_ID = os.environ.get('FACEBOOK_PIXEL_ID', '1694492738408843').strip()
 
 # ── Instagram ─────────────────────────────────────────────────────────────────
@@ -211,23 +193,23 @@ PINTEREST_ACCESS_TOKEN = os.environ.get('PINTEREST_ACCESS_TOKEN', '')
 PINTEREST_BOARD_ID = os.environ.get('PINTEREST_BOARD_ID', '')
 
 # ── Cloudinary (image CDN) ───────────────────────────────────────────────────
-CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default='')
-CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY', default='')
+CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default='diuanqnce')
+CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY', default='285831974678743')
 CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET', default='')
 
 # ── Backblaze B2 (Audio Storage) ─────────────────────────────────────────────
-B2_KEY_ID = os.environ.get('B2_KEY_ID', '')
-B2_APPLICATION_KEY = os.environ.get('B2_APPLICATION_KEY', '')
+B2_KEY_ID = os.environ.get('B2_KEY_ID', 'a2e0a74c71c2')
+B2_APPLICATION_KEY = os.environ.get('B2_APPLICATION_KEY', '003309a8127932d4a086f5baf502ea6cada23f462d')
 B2_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME', 'StrayKids')
 B2_DOWNLOAD_URL = os.environ.get('B2_DOWNLOAD_URL', 'https://f003.backblazeb2.com')
 
 # Auto-sync radio library from Backblaze without manual runs
-B2_AUTO_SYNC_ENABLED = os.environ.get('B2_AUTO_SYNC_ENABLED', 'true').lower() == 'true'
-B2_AUTO_SYNC_INTERVAL_MINUTES = int(os.environ.get('B2_AUTO_SYNC_INTERVAL_MINUTES', '30'))
-B2_AUTO_SYNC_RUN_ON_STARTUP = os.environ.get('B2_AUTO_SYNC_RUN_ON_STARTUP', 'true').lower() == 'true'
-B2_AUTO_SYNC_NEW_ONLY = os.environ.get('B2_AUTO_SYNC_NEW_ONLY', 'true').lower() == 'true'
-B2_AUTO_SYNC_PRUNE_MISSING = os.environ.get('B2_AUTO_SYNC_PRUNE_MISSING', 'false').lower() == 'true'
-B2_AUTO_SYNC_INCLUDE_VERSIONS = os.environ.get('B2_AUTO_SYNC_INCLUDE_VERSIONS', 'false').lower() == 'true'
+B2_AUTO_SYNC_ENABLED = str(config('B2_AUTO_SYNC_ENABLED', default='true')).lower() == 'true'
+B2_AUTO_SYNC_INTERVAL_MINUTES = int(config('B2_AUTO_SYNC_INTERVAL_MINUTES', default='30'))
+B2_AUTO_SYNC_RUN_ON_STARTUP = str(config('B2_AUTO_SYNC_RUN_ON_STARTUP', default='true')).lower() == 'true'
+B2_AUTO_SYNC_NEW_ONLY = str(config('B2_AUTO_SYNC_NEW_ONLY', default='true')).lower() == 'true'
+B2_AUTO_SYNC_PRUNE_MISSING = str(config('B2_AUTO_SYNC_PRUNE_MISSING', default='false')).lower() == 'true'
+B2_AUTO_SYNC_INCLUDE_VERSIONS = str(config('B2_AUTO_SYNC_INCLUDE_VERSIONS', default='false')).lower() == 'true'
 
 # Shuffle playlist order once per week (keeps song+VO pairs together)
 PLAYLIST_WEEKLY_RANDOMIZE_ENABLED = os.environ.get('PLAYLIST_WEEKLY_RANDOMIZE_ENABLED', 'true').lower() == 'true'
@@ -251,20 +233,3 @@ IMAGE_INTEGRITY_CHECK_HOUR = int(os.environ.get('IMAGE_INTEGRITY_CHECK_HOUR', '3
 IMAGE_INTEGRITY_CHECK_MINUTE = int(os.environ.get('IMAGE_INTEGRITY_CHECK_MINUTE', '15'))
 IMAGE_INTEGRITY_CHECK_LIMIT = int(os.environ.get('IMAGE_INTEGRITY_CHECK_LIMIT', '0'))
 IMAGE_INTEGRITY_CHECK_TIMEOUT_SECONDS = float(os.environ.get('IMAGE_INTEGRITY_CHECK_TIMEOUT_SECONDS', '15'))
-
-# ── Security hardening (production defaults) ─────────────────────────────────
-SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', not DEBUG)
-SESSION_COOKIE_SECURE = env_bool('SESSION_COOKIE_SECURE', not DEBUG)
-CSRF_COOKIE_SECURE = env_bool('CSRF_COOKIE_SECURE', not DEBUG)
-SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '31536000' if not DEBUG else '0'))
-SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', not DEBUG)
-SECURE_HSTS_PRELOAD = env_bool('SECURE_HSTS_PRELOAD', not DEBUG)
-SECURE_REFERRER_POLICY = os.environ.get('SECURE_REFERRER_POLICY', 'same-origin')
-X_FRAME_OPTIONS = os.environ.get('X_FRAME_OPTIONS', 'DENY')
-
-_csrf_default = ''
-if SITE_URL:
-    _site = str(SITE_URL).strip().rstrip('/')
-    if _site.startswith('http://') or _site.startswith('https://'):
-        _csrf_default = _site
-CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS', _csrf_default)
