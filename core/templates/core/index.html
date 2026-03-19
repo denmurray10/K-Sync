@@ -571,15 +571,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 {% if homepage_programming %}
 {% for item in homepage_programming %}
 <div class="group flex flex-col md:flex-row items-start md:items-stretch border-b border-black hover:bg-black hover:text-white transition-colors cursor-pointer">
-<div class="w-full md:w-48 p-6 border-b md:border-b-0 md:border-r border-black flex flex-col justify-center shrink-0">
+<div class="w-full md:w-48 p-6 border-b-0 md:border-b-0 md:border-r border-black flex flex-col justify-center shrink-0">
 {% if item.status %}
 <span class="font-mono text-xs tracking-widest uppercase {% if item.status == 'On Air' %}font-bold text-primary group-hover:text-white{% else %}opacity-50 group-hover:opacity-100 transition-opacity{% endif %} mb-1">{{ item.status }}</span>
 {% endif %}
+<div class="flex items-center justify-between gap-3">
 <span class="font-black text-2xl tracking-tighter">{{ item.time_label }}</span>
+<span class="md:hidden text-lg font-black uppercase tracking-tighter truncate">{{ item.title }}</span>
+</div>
 <span class="font-mono text-[10px] tracking-widest uppercase text-black/60 group-hover:text-white/60 mt-1 transition-colors">{{ item.duration_label }}</span>
 </div>
 <div class="flex-1 p-6 flex flex-col justify-center">
-<h3 class="text-3xl font-black uppercase tracking-tighter mb-1">{{ item.title }}</h3>
+<h3 class="hidden md:block text-3xl font-black uppercase tracking-tighter mb-1">{{ item.title }}</h3>
 <p class="font-mono text-[10px] tracking-widest uppercase opacity-70">{{ item.description }}</p>
 </div>
 {% if forloop.first and item.status == 'On Air' %}
