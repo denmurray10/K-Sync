@@ -221,6 +221,57 @@ def _build_stream_audio_url(source_url):
     return f"https://res.cloudinary.com/{cloud_name}/video/fetch/{encoded}"
 
 
+def _build_stream_image_url(source_url):
+    """Optionally rewrite Backblaze image URLs through Cloudinary fetch CDN."""
+    raw = str(source_url or '').strip()
+    if not raw:
+        return raw
+
+    if not getattr(settings, 'IMAGE_STREAM_USE_CLOUDINARY_FETCH', False):
+        return raw
+
+    cloud_name = getattr(settings, 'CLOUDINARY_CLOUD_NAME', '')
+    if not cloud_name:
+        return raw
+
+    parsed = urllib.parse.urlparse(raw)
+    host = (parsed.netloc or '').lower()
+    if not host or 'res.cloudinary.com' in host:
+        return raw
+
+    b2_host = urllib.parse.urlparse(getattr(settings, 'B2_DOWNLOAD_URL', '')).netloc.lower()
+    is_backblaze = ('backblazeb2.com' in host) or (b2_host and host == b2_host)
+    if not is_backblaze:
+        return raw
+
+    transform = str(getattr(settings, 'IMAGE_STREAM_CLOUDINARY_TRANSFORM', '') or '').strip()
+    encoded = urllib.parse.quote(raw, safe='')
+    if transform:
+        return f"https://res.cloudinary.com/{cloud_name}/image/fetch/{transform}/{encoded}"
+    return f"https://res.cloudinary.com/{cloud_name}/image/fetch/{encoded}"
+
+
+def _apply_stream_image_to_field(obj, field_name):
+    if not obj or not field_name:
+        return
+    try:
+        current = getattr(obj, field_name, '')
+    except Exception:
+        return
+    try:
+        setattr(obj, field_name, _build_stream_image_url(current))
+    except Exception:
+        pass
+
+
+def _apply_stream_images_to_article(article):
+    if not article:
+        return
+    _apply_stream_image_to_field(article, 'image')
+    _apply_stream_image_to_field(article, 'image_2')
+    _apply_stream_image_to_field(article, 'image_3')
+
+
 def _normalize_show_color(raw_value):
     allowed = {'CYAN', 'PINK', 'PURPLE', 'GREEN', 'AMBER'}
     candidate = str(raw_value or '').strip().upper()
@@ -2600,7 +2651,9 @@ def idols(request):
     elif gender == 'female':
         groups = groups.filter(models.Q(group_type='GIRL') | models.Q(group_type='SOLO'))
 
-    groups = groups.filter(rank__isnull=False).order_by('rank', 'name')
+    groups = list(groups.filter(rank__isnull=False).order_by('rank', 'name'))
+    for group in groups:
+        _apply_stream_image_to_field(group, 'image_url')
     
     return render(request, 'core/idols.html', {
         'today_events': today_events, 
@@ -2673,12 +2726,16 @@ def profile(request):
 _news_cache = {'articles': [], 'ts': 0}
 
 def news(request):
-    all_blog = BlogArticle.objects.order_by('-created_at')
-    featured = all_blog.first()
-    remaining = list(all_blog[1:]) if all_blog.count() > 1 else []
+    all_blog_qs = BlogArticle.objects.order_by('-created_at')
+    all_blog = list(all_blog_qs)
+    for article in all_blog:
+        _apply_stream_images_to_article(article)
+
+    featured = all_blog[0] if all_blog else None
+    remaining = all_blog[1:] if len(all_blog) > 1 else []
 
     cats = list(
-        all_blog.order_by()
+        all_blog_qs.order_by()
         .values_list('category', flat=True)
         .distinct()
     )
@@ -2686,9 +2743,9 @@ def news(request):
     return render(request, 'core/news.html', {
         'featured': featured,
         'articles': remaining,
-        'all_articles': list(all_blog),
+        'all_articles': all_blog,
         'categories': cats,
-        'total_count': all_blog.count(),
+        'total_count': len(all_blog),
     })
 
 
@@ -5512,7 +5569,9 @@ def d_day_comeback_notification(request):
     return render(request, 'core/d_day_comeback_notification.html')
 
 def blog_page(request):
-    articles = BlogArticle.objects.order_by('-created_at')[:30]
+    articles = list(BlogArticle.objects.order_by('-created_at')[:30])
+    for article in articles:
+        _apply_stream_images_to_article(article)
     cats = list(
         BlogArticle.objects.order_by()
         .values_list('category', flat=True)
@@ -5527,11 +5586,15 @@ def blog_page(request):
 def blog_article_read(request, slug):
     from django.shortcuts import get_object_or_404
     article = get_object_or_404(BlogArticle, slug=slug)
+    _apply_stream_images_to_article(article)
     related = (
         BlogArticle.objects
         .filter(category=article.category)
         .exclude(pk=article.pk)[:3]
     )
+    related = list(related)
+    for related_article in related:
+        _apply_stream_images_to_article(related_article)
     return render(request, 'core/blog_article.html', {
         'article': article,
         'related': related,
@@ -6842,6 +6905,7 @@ def idol_page(request, slug):
     logger = logging.getLogger(__name__)
 
     group = get_object_or_404(KPopGroup, slug=slug)
+    _apply_stream_image_to_field(group, 'image_url')
 
     # Default accent colors per group type
     accent_map = {
@@ -6856,7 +6920,9 @@ def idol_page(request, slug):
     }
 
     # Get 3 related groups of the same type
-    related = KPopGroup.objects.filter(group_type=group.group_type).exclude(pk=group.pk).order_by('rank')[:3]
+    related = list(KPopGroup.objects.filter(group_type=group.group_type).exclude(pk=group.pk).order_by('rank')[:3])
+    for related_group in related:
+        _apply_stream_image_to_field(related_group, 'image_url')
 
     # Pull real releases, birthdays, and anniversaries from ComebackData
     now = timezone.now()
@@ -6878,7 +6944,7 @@ def idol_page(request, slug):
                 if name_lower in r.get('artist', '').lower():
                     comeback_albums.append({
                         'title': r.get('title', ''),
-                        'image': r.get('image', ''),
+                        'image': _build_stream_image_url(r.get('image', '')),
                         'type': r.get('type', 'Release'),
                         'date_str': date_key,
                     })
@@ -6917,7 +6983,7 @@ def idol_page(request, slug):
             if name_lower in item.get('artist', '').lower():
                 chart_tracks.append({
                     'title': item.get('track', ''),
-                    'image': item.get('artwork_url', ''),
+                    'image': _build_stream_image_url(item.get('artwork_url', '')),
                     'album': item.get('album', ''),
                 })
 

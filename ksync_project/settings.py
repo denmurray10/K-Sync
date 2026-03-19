@@ -219,3 +219,9 @@ PLAYLIST_WEEKLY_RANDOMIZE_ENABLED = os.environ.get('PLAYLIST_WEEKLY_RANDOMIZE_EN
 AUDIO_STREAM_USE_CLOUDINARY_FETCH = os.environ.get('AUDIO_STREAM_USE_CLOUDINARY_FETCH', 'false').lower() == 'true'
 # Cloudinary video transformations are used for audio resources as well.
 AUDIO_STREAM_CLOUDINARY_TRANSFORM = os.environ.get('AUDIO_STREAM_CLOUDINARY_TRANSFORM', 'q_auto:eco,br_96k,f_mp3')
+
+# ── Image delivery optimisation (Cloudinary Fetch in front of B2) ───────────
+# Set to true to rewrite Backblaze image URLs through Cloudinary image/fetch.
+IMAGE_STREAM_USE_CLOUDINARY_FETCH = os.environ.get('IMAGE_STREAM_USE_CLOUDINARY_FETCH', 'false').lower() == 'true'
+# Typical safe default for web images.
+IMAGE_STREAM_CLOUDINARY_TRANSFORM = os.environ.get('IMAGE_STREAM_CLOUDINARY_TRANSFORM', 'f_auto,q_auto')
