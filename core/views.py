@@ -4791,6 +4791,79 @@ def _shorten_text(value, max_len=210):
     return text[: max_len - 1].rstrip() + '…'
 
 
+def _lyrics_snippet_api_config():
+    api_url = (
+        getattr(settings, 'LYRICS_SNIPPET_API_URL', '')
+        or os.getenv('LYRICS_SNIPPET_API_URL', '')
+    ).strip()
+    api_key = (
+        getattr(settings, 'LYRICS_SNIPPET_API_KEY', '')
+        or os.getenv('LYRICS_SNIPPET_API_KEY', '')
+    ).strip()
+    return api_url, api_key
+
+
+def _fetch_licensed_lyric_snippet(track):
+    api_url, api_key = _lyrics_snippet_api_config()
+    if not api_url or not track:
+        return None
+
+    params = {
+        'artist': str(getattr(track, 'artist', '') or '').strip(),
+        'title': str(getattr(track, 'title', '') or '').strip(),
+    }
+    headers = {'Accept': 'application/json'}
+    if api_key:
+        headers['Authorization'] = f'Bearer {api_key}'
+
+    try:
+        response = requests.get(api_url, params=params, headers=headers, timeout=8)
+        if response.status_code != 200:
+            return None
+        data = response.json() if response.content else {}
+    except Exception:
+        return None
+
+    if not isinstance(data, dict):
+        return None
+
+    is_licensed = bool(data.get('is_licensed'))
+    if not is_licensed:
+        return None
+
+    snippet = _shorten_text(data.get('snippet') or '', 180)
+    source = _shorten_text(data.get('source') or 'Licensed lyrics', 80)
+    if not snippet:
+        return None
+
+    return {
+        'snippet': snippet,
+        'source': source,
+        'is_licensed': True,
+    }
+
+
+def _apply_licensed_lyric_snippet(payload, track):
+    normalized = _normalize_live_ai_payload(payload, track)
+    rich = normalized.get('rich_context') if isinstance(normalized.get('rich_context'), dict) else {}
+    lyric = rich.get('lyric') if isinstance(rich.get('lyric'), dict) else {}
+    if bool(lyric.get('is_licensed')) and str(lyric.get('body') or '').strip():
+        return normalized
+
+    snippet = _fetch_licensed_lyric_snippet(track)
+    if not snippet:
+        return normalized
+
+    rich['lyric'] = {
+        'title': 'Lyric Snippet',
+        'body': f"“{snippet['snippet']}”",
+        'source': snippet['source'],
+        'is_licensed': True,
+    }
+    normalized['rich_context'] = rich
+    return normalized
+
+
 def _comeback_context_text(group_name):
     if not group_name:
         return 'No official comeback bulletin is pinned right now, but rotation data still shows strong fan momentum and repeat-listen heat.'
@@ -4838,6 +4911,8 @@ def _default_live_rich_context(track):
         'lyric': {
             'title': 'Lyric Highlight',
             'body': _shorten_text(lyric_body, 240),
+            'source': '',
+            'is_licensed': False,
         },
         'comeback': {
             'title': 'Era Pulse',
@@ -4859,10 +4934,14 @@ def _normalize_live_rich_context(payload, track):
     def _section(name):
         raw = payload.get(name) if isinstance(payload.get(name), dict) else {}
         fallback_section = fallback[name]
-        return {
+        section = {
             'title': _shorten_text(raw.get('title') or fallback_section['title'], 80),
             'body': _shorten_text(raw.get('body') or fallback_section['body'], 260),
         }
+        if name == 'lyric':
+            section['source'] = _shorten_text(raw.get('source') or fallback_section.get('source') or '', 80)
+            section['is_licensed'] = bool(raw.get('is_licensed'))
+        return section
 
     artist_raw = payload.get('artist_profile') if isinstance(payload.get('artist_profile'), dict) else {}
     fallback_artist = fallback['artist_profile']
@@ -4990,11 +5069,11 @@ def _generate_live_ai_payload(track):
         start = raw.find('{')
         end = raw.rfind('}') + 1
         if start == -1 or end <= start:
-            return fallback
+            return _apply_licensed_lyric_snippet(fallback, track)
         parsed = json.loads(raw[start:end])
-        return _normalize_live_ai_payload(parsed, track)
+        return _apply_licensed_lyric_snippet(parsed, track)
     except Exception:
-        return fallback
+        return _apply_licensed_lyric_snippet(fallback, track)
 
 
 def _get_or_generate_live_ai_payload(track):
@@ -5010,7 +5089,15 @@ def _get_or_generate_live_ai_payload(track):
         and len(existing_paragraphs) >= 2
     )
     if has_existing and is_fresh_format:
-        return normalized_existing
+        enriched_existing = _apply_licensed_lyric_snippet(normalized_existing, track)
+        if enriched_existing != normalized_existing:
+            try:
+                track.live_ai_payload = enriched_existing
+                track.live_ai_generated_at = timezone.now()
+                track.save(update_fields=['live_ai_payload', 'live_ai_generated_at'])
+            except Exception:
+                pass
+        return enriched_existing
 
     generated = _generate_live_ai_payload(track)
     try:

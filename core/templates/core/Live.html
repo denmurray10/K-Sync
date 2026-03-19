@@ -490,6 +490,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <p id="live-rich-lyric-title" class="text-sm font-bold text-white uppercase tracking-tight">Lyric Highlight</p>
                 </div>
                 <p id="live-rich-lyric-body" class="text-sm text-slate-300 leading-relaxed font-light">High-impact lyric context for the current song appears here in real time.</p>
+                <p id="live-rich-lyric-source" class="mt-3 text-[10px] font-mono uppercase tracking-widest text-primary/80 hidden"></p>
             </div>
 
             <div class="p-6 border border-secondary/30 bg-secondary/5">
@@ -1363,6 +1364,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             setText('live-rich-lyric-title', lyric.title);
             setText('live-rich-lyric-body', lyric.body);
+            const lyricSource = String(lyric.source || '').trim();
+            const lyricSourceEl = document.getElementById('live-rich-lyric-source');
+            if (lyricSourceEl) {
+                if (lyricSource) {
+                    lyricSourceEl.textContent = `Source: ${lyricSource}`;
+                    lyricSourceEl.classList.remove('hidden');
+                } else {
+                    lyricSourceEl.textContent = '';
+                    lyricSourceEl.classList.add('hidden');
+                }
+            }
             setText('live-rich-comeback-title', comeback.title);
             setText('live-rich-comeback-body', comeback.body);
             setText('live-rich-artist-title', artistProfile.title);
