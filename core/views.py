@@ -274,6 +274,43 @@ def _apply_stream_images_to_article(article):
     _apply_stream_image_to_field(article, 'image_3')
 
 
+def _optimize_home_image_url(source_url, *, width=None, height=None):
+    raw = str(source_url or '').strip()
+    if not raw:
+        return raw
+
+    parsed = urllib.parse.urlparse(raw)
+    host = (parsed.netloc or '').lower()
+
+    # Right-size iTunes artwork URLs directly at source.
+    if 'is1-ssl.mzstatic.com' in host:
+        target = 100 if (width and int(width) <= 120) else 200
+        return re.sub(r'/\d+x\d+bb\.', f'/{target}x{target}bb.', raw)
+
+    cloud_name = str(getattr(settings, 'CLOUDINARY_CLOUD_NAME', '') or '').strip()
+    if not cloud_name:
+        return raw
+
+    transform_parts = ['f_auto', 'q_auto']
+    if width:
+        transform_parts.append(f'w_{int(width)}')
+    if height:
+        transform_parts.append(f'h_{int(height)}')
+    if width and height:
+        transform_parts.append('c_fill')
+    transform = ','.join(transform_parts)
+
+    if 'res.cloudinary.com' in host and '/image/upload/' in raw:
+        base, tail = raw.split('/image/upload/', 1)
+        return f'{base}/image/upload/{transform}/{tail}'
+
+    if 'cdn.kpopping.com' in host or 'backblazeb2.com' in host:
+        encoded = urllib.parse.quote(raw, safe='')
+        return f'https://res.cloudinary.com/{cloud_name}/image/fetch/{transform}/{encoded}'
+
+    return raw
+
+
 def _normalize_show_color(raw_value):
     allowed = {'CYAN', 'PINK', 'PURPLE', 'GREEN', 'AMBER'}
     candidate = str(raw_value or '').strip().upper()
@@ -2287,18 +2324,20 @@ def home(request):
                 # date_key is '2026-03-27' based on the error
                 resolved_date_str = date_key
                 for r in details['releases']:
-                    r['date_str'] = resolved_date_str
-                    r['iso_date'] = f"{resolved_date_str}T09:00:00Z"
-                    all_releases.append(r)
+                    release_item = dict(r)
+                    release_item['date_str'] = resolved_date_str
+                    release_item['iso_date'] = f"{resolved_date_str}T09:00:00Z"
+                    all_releases.append(release_item)
     
     if data_next:
         for date_key, details in data_next.data.items():
              if 'releases' in details:
                 resolved_date_str = date_key
                 for r in details['releases']:
-                    r['date_str'] = resolved_date_str
-                    r['iso_date'] = f"{resolved_date_str}T09:00:00Z"
-                    all_releases.append(r)
+                    release_item = dict(r)
+                    release_item['date_str'] = resolved_date_str
+                    release_item['iso_date'] = f"{resolved_date_str}T09:00:00Z"
+                    all_releases.append(release_item)
 
     all_releases.sort(key=lambda x: x['date_str'])
     today_str = now.strftime('%Y-%m-%d')
@@ -2320,7 +2359,9 @@ def home(request):
                 if str(release.get('date_str') or '').strip() == first_day
             ][:12]
 
-    upcoming = upcoming_all[:4]
+    upcoming = [dict(release) for release in upcoming_all[:4]]
+    for release in upcoming:
+        release['image'] = _optimize_home_image_url(release.get('image'), width=192, height=192)
     upcoming_ticker = upcoming_all[4:20]
     
     # Ensure ticker isn't empty if we have releases but not enough for a separate ticker
@@ -2364,7 +2405,7 @@ def home(request):
                 'rank': idx + 1,
                 'artist': item.get('artist'),
                 'title': item.get('track'),
-                'image': img_url,
+                'image': _optimize_home_image_url(img_url, width=100, height=100),
                 'trend_icon': trend_icon,
                 'trend_class': trend_class,
                 'trend_value': trend_value,
@@ -2415,6 +2456,8 @@ def home(request):
 
     # Latest news/blog articles
     news_articles = list(BlogArticle.objects.order_by('-created_at')[:3])
+    for article in news_articles:
+        article.image = _optimize_home_image_url(getattr(article, 'image', ''), width=900)
     featured_article = news_articles[0] if news_articles else None
 
     # Get the active LivePoll

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     # 'core.middleware.PreLaunchMiddleware',              # UNLOCKED
     'core.middleware.GoogleTagManagerMiddleware',
@@ -165,6 +166,10 @@ SERPER_API_KEY = os.environ.get('SERPER_API_KEY', 'f099f725535455f20dd5a70ca6f81
 # ── Site URL ─────────────────────────────────────────────────────────────────
 SITE_URL = os.environ.get('SITE_URL', 'https://kbeatsradio.co.uk')
 GOOGLE_TAG_MANAGER_ID = os.environ.get('GOOGLE_TAG_MANAGER_ID', 'GTM-KDMN68PM')
+ENABLE_THIRD_PARTY_TRACKING = os.environ.get(
+    'ENABLE_THIRD_PARTY_TRACKING',
+    'false' if DEBUG else 'true'
+).lower() == 'true'
 
 # ── Facebook ─────────────────────────────────────────────────────────────────
 # Required permissions: pages_manage_posts, pages_read_engagement

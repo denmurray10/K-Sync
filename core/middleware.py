@@ -56,6 +56,9 @@ class GoogleTagManagerMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
 
+        if not getattr(settings, 'ENABLE_THIRD_PARTY_TRACKING', True):
+            return response
+
         if isinstance(response, StreamingHttpResponse):
             return response
 
