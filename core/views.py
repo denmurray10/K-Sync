@@ -3071,6 +3071,9 @@ def _fetch_kpop_news():
 def shop(request):
     return render(request, 'core/shop.html')
 
+def pricing(request):
+    return render(request, 'core/pricing.html')
+
 def about_us(request):
     return render(request, 'core/about_us.html')
 
