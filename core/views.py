@@ -6888,9 +6888,10 @@ def comeback_timeline(request):
             continue
         for date_key, details in cb.data.items():
             for r in details.get('releases', []):
-                r['date_str'] = date_key
-                r['iso_date'] = f"{date_key}T09:00:00Z"
-                all_releases.append(r)
+                release_item = dict(r)
+                release_item['date_str'] = date_key
+                release_item['iso_date'] = f"{date_key}T09:00:00Z"
+                all_releases.append(release_item)
 
     all_releases.sort(key=lambda x: x['date_str'])
     upcoming = [r for r in all_releases if r['date_str'] >= today_str]
@@ -6899,6 +6900,11 @@ def comeback_timeline(request):
         key=lambda x: x['date_str'],
         reverse=True,
     )[:6]
+
+    for release in upcoming:
+        release['image'] = _optimize_home_image_url(release.get('image'), width=192, height=192)
+    for release in recent:
+        release['image'] = _optimize_home_image_url(release.get('image'), width=192, height=192)
 
     # Stats
     total_upcoming = len(upcoming)
