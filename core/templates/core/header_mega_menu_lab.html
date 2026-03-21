@@ -345,22 +345,6 @@
                                     <p id="stream-feature-note" class="mt-2 text-xs leading-relaxed text-slate-400">Heavy drops, tighter transitions, and stage-ready cuts stacked back to back.</p>
                                 </div>
                             </div>
-                            <div class="mt-5 grid gap-3 sm:grid-cols-2">
-                                <a href="{% url 'charts' %}" class="stream-mini-link p-4">
-                                    <div>
-                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Charts</p>
-                                        <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">See What Is Rising</p>
-                                    </div>
-                                    <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
-                                </a>
-                                <a href="{% url 'comeback_timeline' %}" class="stream-mini-link p-4">
-                                    <div>
-                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Comebacks</p>
-                                        <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Catch The Next Wave</p>
-                                    </div>
-                                    <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </section>
@@ -414,23 +398,6 @@
                             Compare Plans
                             <span class="material-symbols-outlined text-base">arrow_forward</span>
                         </a>
-                    </div>
-                    <div class="stream-shell-card p-5 sm:p-6">
-                        <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Quick Routes</p>
-                        <div class="mt-4 grid gap-2">
-                            <a href="{% url 'live' %}" class="stream-route-link px-4 py-3 text-sm font-black uppercase tracking-[0.08em] text-white">
-                                Open Full Player
-                                <span class="material-symbols-outlined text-base text-slate-400">headphones</span>
-                            </a>
-                            <a href="{% url 'news' %}" class="stream-route-link px-4 py-3 text-sm font-black uppercase tracking-[0.08em] text-white">
-                                Read Latest News
-                                <span class="material-symbols-outlined text-base text-slate-400">article</span>
-                            </a>
-                            <a href="{% url 'idols' %}" class="stream-route-link px-4 py-3 text-sm font-black uppercase tracking-[0.08em] text-white">
-                                Explore Artists
-                                <span class="material-symbols-outlined text-base text-slate-400">mic_external_on</span>
-                            </a>
-                        </div>
                     </div>
                 </section>
             </div>
@@ -592,62 +559,6 @@
                     perks: ['Save standout ballads into a personal queue', 'Read lyric highlights while you listen', 'Unlock full OST deep dives and piano cuts'],
                     panelLine: 'The menu should feel emotionally aware, not just visually different.'
                 },
-                {
-                    id: 'throwback',
-                    preset: 'Preset 04',
-                    name: 'Throwback',
-                    short: '2nd and 3rd gen classics only',
-                    tagline: 'Legacy hooks, iconic bridges, immediate recognition.',
-                    description: 'Legacy-mode station with iconic hooks, era-defining choruses, and nostalgia-heavy transitions.',
-                    genres: ['SHINee era', '2NE1 era', 'EXO era', 'SNSD classics'],
-                    accentRgb: '251, 191, 36',
-                    secondaryRgb: '249, 115, 22',
-                    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80',
-                    href: `${urls.live}?stream=throwback`,
-                    track: 'Sherlock',
-                    artist: 'SHINee',
-                    audience: '2,608 listening',
-                    tier: 'free',
-                    mood: 'Legacy rush',
-                    energy: 70,
-                    energyLabel: 'Nostalgia with real sing-along lift.',
-                    peak: 'Weekend rewind',
-                    peakNote: 'Built for shared listening and instant recognition.',
-                    peakShort: 'Weekend',
-                    bestFor: 'Cleaning sprees, group chats, and reminding people how good the classics were.',
-                    note: 'The channel leans on familiar intros, strong choruses, and era-defining sequencing.',
-                    rowTone: 'Classic era',
-                    perks: ['Replay by generation or era', 'Jump to themed nostalgia blocks', 'Unlock hidden 2nd-gen live sessions'],
-                    panelLine: 'A little nostalgia in the menu makes the whole station feel more lived-in.'
-                },
-                {
-                    id: 'next-wave',
-                    preset: 'Preset 05',
-                    name: 'Next Wave',
-                    short: '4th gen anthems and new-wave leaders',
-                    tagline: 'Fresh momentum, bigger swings, zero waiting around.',
-                    description: 'Current-gen power rotation built around hard-hitting new names and fast-moving fan momentum.',
-                    genres: ['4th gen', 'Performance-first', 'Rookie breakthroughs'],
-                    accentRgb: '132, 204, 22',
-                    secondaryRgb: '34, 211, 238',
-                    image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80',
-                    href: `${urls.live}?stream=next-wave`,
-                    track: 'Bouncy',
-                    artist: 'ATEEZ',
-                    audience: '3,301 listening',
-                    tier: 'free',
-                    mood: 'Current-gen heat',
-                    energy: 84,
-                    energyLabel: 'Fast, sharp, and fan-momentum driven.',
-                    peak: 'Fresh drop Fridays',
-                    peakNote: 'Feels best when releases are still hot.',
-                    peakShort: 'Friday',
-                    bestFor: 'Keeping up with new leaders, dance practice energy, and fresh-chart curiosity.',
-                    note: 'New names rotate fast here, but the sequencing still feels intentional rather than chaotic.',
-                    rowTone: 'Fresh heat',
-                    perks: ['Unlock early-access rotations on release nights', 'Follow debut-watch alerts inside the stream', 'Preview member-only first-spin blocks'],
-                    panelLine: 'The newest stream should sell motion and momentum before the click.'
-                }
             ];
 
             const panelTagline = document.getElementById('stream-panel-tagline');
