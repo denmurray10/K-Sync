@@ -782,7 +782,7 @@ Cast your vote now.
 <div class="relative w-full overflow-hidden bg-black border-y border-white/10 h-12 flex items-center reveal-up" style="transition-delay: 100ms;">
 <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
 <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
-<div class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
+<div data-ticker-role="trending" class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
     {% for track in trending_ticker_tracks %}
     <a href="{% url 'charts' %}" class="inline-flex items-center gap-3 group/t cursor-pointer shrink-0">
         <span class="font-black text-white/50 group-hover/t:text-white transition-colors">{{ track.rank }}</span>
@@ -916,7 +916,7 @@ Experience the explosive energy of this generation's most dynamic self-producing
 <div class="relative w-full overflow-hidden bg-black border-y border-white/10 h-12 flex items-center reveal-up" style="transition-delay: 100ms;">
 <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
 <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
-<div class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
+<div data-ticker-role="upcoming" class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
     {% for r in upcoming_ticker %}
     <a href="{% url 'comeback_timeline' %}" class="inline-flex items-center gap-3 group/t cursor-pointer shrink-0">
         <span class="font-black text-primary group-hover/t:text-white transition-colors">{{ r.date_str|slice:"5:" }}</span>
@@ -1152,7 +1152,32 @@ function updateCountdowns() {
 }
 updateCountdowns();
 setInterval(updateCountdowns, 60000);
-window.addEventListener('load', fetchLiveArtwork);
+
+function syncHomepageTickerSpeeds() {
+    const trendingTicker = document.querySelector('[data-ticker-role="trending"]');
+    const upcomingTicker = document.querySelector('[data-ticker-role="upcoming"]');
+    if (!trendingTicker || !upcomingTicker) return;
+
+    const trendingStyle = window.getComputedStyle(trendingTicker);
+    const trendingDuration = parseFloat(trendingStyle.animationDuration) || 40;
+    const trendingDistance = trendingTicker.scrollWidth / 2;
+    if (!trendingDuration || !trendingDistance) return;
+
+    const pixelsPerSecond = trendingDistance / trendingDuration;
+    const upcomingDistance = upcomingTicker.scrollWidth / 2;
+    if (!pixelsPerSecond || !upcomingDistance) return;
+
+    const upcomingDuration = upcomingDistance / pixelsPerSecond;
+    upcomingTicker.style.animationDuration = `${upcomingDuration}s`;
+}
+
+window.addEventListener('load', () => {
+    fetchLiveArtwork();
+    syncHomepageTickerSpeeds();
+});
+window.addEventListener('resize', () => {
+    window.requestAnimationFrame(syncHomepageTickerSpeeds);
+});
 
 // ── Homepage Live Bar Sync ──────────────────────────────────────
 async function refreshHomepageLiveBar() {

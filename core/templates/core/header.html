@@ -22,7 +22,7 @@
     [x-cloak] { display: none !important; }
 </style>
 
-{% if request.resolver_match.url_name == 'live' %}
+{% if request.resolver_match.url_name == '__legacy_live_header_disabled__' %}
 <!-- ───── LIVE PAGE HEADER ───── -->
 <header id="main-header" class="fixed top-0 left-0 right-0 z-50 px-6 py-8 bg-transparent border-none">
     <div class="container mx-auto flex items-center justify-between">
@@ -78,10 +78,10 @@
 </header>
 {% else %}
 <!-- ───── STANDARD HEADER ───── -->
-<header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 px-6 py-8 border-none">
-    <div class="container mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-10">
-            <a class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2" href="{% url 'home' %}">
+<header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-5 sm:py-8 border-none">
+    <div class="container mx-auto flex items-center justify-between min-w-0">
+        <div class="flex items-center gap-4 sm:gap-10 min-w-0">
+            <a class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
                 <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
                 <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
                 <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
@@ -95,14 +95,21 @@
                 <a class="{% if request.resolver_match.url_name == 'shop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'coming_soon' %}">Shop</a>
             </nav>
         </div>
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 sm:gap-4 md:gap-6 shrink-0">
             <form action="{% url 'results' %}" method="GET" class="hidden lg:flex items-center relative group">
                 <span class="material-symbols-outlined absolute left-3 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
                 <input name="q" class="bg-black/30 border border-primary/30 py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-64 placeholder:text-slate-500" placeholder="Search artist, song..." type="text"/>
             </form>
             <div class="flex gap-4 items-center">
+                <a
+                    href="{% url 'live' %}"
+                    class="sm:hidden inline-flex items-center justify-center w-10 h-10 border border-primary text-primary hover:bg-primary hover:text-black transition-all"
+                    aria-label="Go to live"
+                >
+                    <span class="material-symbols-outlined text-lg">radio</span>
+                </a>
                 <button
-                    class="group relative flex items-center gap-2 border border-primary px-6 py-3 font-black text-white hover:bg-primary hover:text-black transition-all"
+                    class="group relative hidden sm:flex items-center gap-2 border border-primary px-6 py-3 font-black text-white hover:bg-primary hover:text-black transition-all"
                     onclick="window.location.href='{% url 'live' %}'"
                 >
                     <span class="relative flex h-2.5 w-2.5">
