@@ -1,0 +1,905 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>K-Beats Header Mega Menu Lab</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#f425c0',
+                        secondary: '#00f0ff',
+                        'background-dark': '#000000'
+                    },
+                    fontFamily: {
+                        display: ['Montserrat', 'sans-serif'],
+                        impact: ['Bebas Neue', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --panel-open-duration: 220ms;
+            --stream-accent: 244, 37, 192;
+            --stream-secondary: 0, 240, 255;
+        }
+        body {
+            background:
+                radial-gradient(circle at 14% 12%, rgba(244, 37, 192, 0.18), transparent 30%),
+                radial-gradient(circle at 84% 20%, rgba(0, 240, 255, 0.15), transparent 30%),
+                linear-gradient(180deg, #040506 0%, #05070b 48%, #020304 100%);
+        }
+        .streams-trigger-active {
+            color: #f425c0 !important;
+            text-shadow: 0 0 12px rgba(244, 37, 192, 0.45);
+        }
+        #my-station-panel,
+        [aria-controls="my-station-panel"] {
+            display: none !important;
+        }
+        .streams-panel-shell {
+            transition: opacity var(--panel-open-duration) ease, transform var(--panel-open-duration) ease;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(var(--stream-accent), 0.18), transparent 34%),
+                radial-gradient(circle at 88% 8%, rgba(var(--stream-secondary), 0.16), transparent 28%),
+                linear-gradient(135deg, rgb(8 9 14), rgb(2 5 9) 58%, rgb(9 5 16));
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.58);
+        }
+        .streams-panel-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 42px 42px;
+            mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 80%);
+            opacity: 0.4;
+        }
+        .stream-shell-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.24);
+            backdrop-filter: blur(18px);
+        }
+        .stream-feature-shell::after {
+            content: "";
+            position: absolute;
+            inset: auto -18% -44% auto;
+            width: 260px;
+            height: 260px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(var(--stream-accent), 0.28) 0%, transparent 72%);
+            pointer-events: none;
+            opacity: 0.95;
+        }
+        .stream-card-image {
+            transition: background-image 260ms ease, transform 260ms ease, filter 260ms ease;
+            background-size: cover;
+            background-position: center;
+        }
+        .stream-card-image::before,
+        .stream-card-image::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+        .stream-card-image::before {
+            background: linear-gradient(180deg, rgba(4, 6, 10, 0.12) 0%, rgba(4, 6, 10, 0.82) 100%);
+        }
+        .stream-card-image::after {
+            background: linear-gradient(130deg, rgba(var(--stream-accent), 0.28) 0%, rgba(0, 0, 0, 0) 44%, rgba(var(--stream-secondary), 0.2) 100%);
+            mix-blend-mode: screen;
+        }
+        #stream-feature-kicker,
+        #stream-now-live-pill {
+            color: rgba(var(--stream-accent), 1);
+        }
+        #stream-now-live-pill {
+            border-color: rgba(var(--stream-accent), 0.42);
+            background: rgba(var(--stream-accent), 0.12);
+        }
+        .stream-waveform span,
+        .signal-bar {
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(var(--stream-secondary), 1), rgba(var(--stream-accent), 0.82));
+            animation: equalizer 1.5s ease-in-out infinite;
+            transform-origin: center bottom;
+        }
+        .stream-waveform span:nth-child(2),
+        .signal-bar:nth-child(2) {
+            animation-delay: 0.12s;
+        }
+        .stream-waveform span:nth-child(3),
+        .signal-bar:nth-child(3) {
+            animation-delay: 0.24s;
+        }
+        .stream-waveform span:nth-child(4),
+        .signal-bar:nth-child(4) {
+            animation-delay: 0.36s;
+        }
+        .stream-waveform span:nth-child(5),
+        .signal-bar:nth-child(5) {
+            animation-delay: 0.48s;
+        }
+        .stream-stat-card,
+        .lab-note-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
+        }
+        .stream-energy-track {
+            height: 10px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.36);
+        }
+        .stream-energy-fill {
+            display: block;
+            height: 100%;
+            width: 0;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(var(--stream-secondary), 1), rgba(var(--stream-accent), 1));
+            transition: width 220ms ease;
+        }
+        .stream-row {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
+        }
+        .stream-row::before,
+        .stream-row::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            transition: opacity 170ms ease, transform 170ms ease;
+        }
+        .stream-row::before {
+            inset: 10px auto 10px 0;
+            width: 3px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(var(--stream-accent), 1), rgba(var(--stream-secondary), 0.9));
+            opacity: 0;
+            transform: scaleY(0.72);
+        }
+        .stream-row::after {
+            inset: 0;
+            background: linear-gradient(135deg, rgba(var(--stream-accent), 0.18), rgba(255, 255, 255, 0) 48%, rgba(var(--stream-secondary), 0.08));
+            opacity: 0;
+        }
+        .stream-row:hover,
+        .stream-row:focus-visible,
+        .stream-row.active {
+            transform: translateX(8px);
+        }
+        .stream-row:hover::before,
+        .stream-row:focus-visible::before,
+        .stream-row.active::before,
+        .stream-row:hover::after,
+        .stream-row:focus-visible::after,
+        .stream-row.active::after {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+        .stream-row.active {
+            border-color: rgba(var(--stream-accent), 0.55) !important;
+            background: linear-gradient(135deg, rgba(var(--stream-accent), 0.16), rgba(255, 255, 255, 0.03) 52%, rgba(var(--stream-secondary), 0.08));
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
+        }
+        .stream-detail-chip {
+            border: 1px solid rgba(var(--stream-accent), 0.24);
+            background: rgba(var(--stream-accent), 0.08);
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .stream-mini-link,
+        .stream-route-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            transition: border-color 170ms ease, transform 170ms ease, background-color 170ms ease;
+        }
+        .stream-mini-link:hover,
+        .stream-mini-link:focus-visible,
+        .stream-route-link:hover,
+        .stream-route-link:focus-visible {
+            transform: translateY(-2px);
+            border-color: rgba(var(--stream-accent), 0.46);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        @keyframes equalizer {
+            0%, 100% {
+                transform: scaleY(0.45);
+                opacity: 0.56;
+            }
+            50% {
+                transform: scaleY(1);
+                opacity: 1;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .streams-panel-shell,
+            .stream-row,
+            .stream-card-image,
+            .stream-energy-fill,
+            .stream-mini-link,
+            .stream-route-link,
+            .stream-waveform span,
+            .signal-bar {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-white font-display min-h-screen overflow-x-hidden">
+    {% include 'core/header.html' %}
+
+    <div id="mega-menu-lab-panel" class="streams-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+        <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
+            <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="max-w-3xl">
+                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Streams</p>
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Pick Your Frequency</h1>
+                        <p id="stream-panel-tagline" class="max-w-xl text-[13px] leading-relaxed text-slate-300">Mood-led stations with enough live context to feel like a destination, not a drop-down.</p>
+                    </div>
+                </div>
+                <div class="grid gap-2 sm:grid-cols-3 xl:min-w-[400px]">
+                    <div class="stream-shell-card px-4 py-3">
+                        <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">Launch Lanes</p>
+                        <p class="mt-2 text-xl font-black uppercase tracking-tight text-white">5 Presets</p>
+                    </div>
+                    <div class="stream-shell-card px-4 py-3">
+                        <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">Live Rotation</p>
+                        <p class="mt-2 text-xl font-black uppercase tracking-tight text-white">24 / 7</p>
+                    </div>
+                    <div class="stream-shell-card px-4 py-3">
+                        <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">Member Hooks</p>
+                        <p class="mt-2 text-xl font-black uppercase tracking-tight text-white">3 Unlocks</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card stream-feature-shell lg:col-span-6">
+                    <div class="grid h-full xl:grid-cols-[minmax(0,1.45fr)_minmax(250px,0.85fr)]">
+                        <div class="relative min-h-[280px] overflow-hidden">
+                            <div id="stream-feature-image" class="stream-card-image absolute inset-0 bg-gradient-to-br from-rose-500/25 via-fuchsia-500/15 to-orange-500/20"></div>
+                            <div class="absolute inset-x-0 top-0 flex items-start justify-between gap-4 p-5 sm:p-6">
+                                <div class="space-y-2">
+                                    <p id="stream-feature-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase">Launch Stream</p>
+                                    <div id="stream-feature-frequency" class="inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                        <span class="h-2 w-2 rounded-full bg-white/80"></span>
+                                        Preset 01
+                                    </div>
+                                </div>
+                                <span id="stream-feature-tier" class="border border-emerald-300/50 bg-emerald-400/15 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-200">Free</span>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                                <p id="stream-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Arena-sized drops, zero polite energy.</p>
+                                <h2 id="stream-feature-title" class="mt-3 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">Hype Mode</h2>
+                                <p id="stream-feature-description" class="mt-3 max-w-xl text-sm leading-relaxed text-slate-200/90"></p>
+                                <div id="stream-feature-genres" class="mt-4 flex flex-wrap gap-2"></div>
+                                <div class="mt-5 flex flex-wrap items-center gap-3">
+                                    <a id="stream-feature-cta" href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-black transition-colors hover:border-white hover:bg-white">
+                                        Listen Now
+                                        <span class="material-symbols-outlined text-base">play_arrow</span>
+                                    </a>
+                                    <a href="{% url 'pricing' %}" class="inline-flex items-center gap-2 border border-white/30 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:border-secondary hover:text-secondary">
+                                        Unlock More
+                                        <span class="material-symbols-outlined text-base">bolt</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="stream-waveform pointer-events-none absolute bottom-7 right-6 hidden items-end gap-1.5 lg:flex" aria-hidden="true">
+                                <span style="height: 20px; width: 5px;"></span>
+                                <span style="height: 34px; width: 5px;"></span>
+                                <span style="height: 48px; width: 5px;"></span>
+                                <span style="height: 28px; width: 5px;"></span>
+                                <span style="height: 38px; width: 5px;"></span>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/10 bg-black/35 p-5 sm:p-6 xl:border-l xl:border-t-0">
+                            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                                <div class="stream-stat-card p-4">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Energy</p>
+                                        <p id="stream-feature-energy-value" class="text-xs font-black uppercase tracking-[0.18em] text-white">92%</p>
+                                    </div>
+                                    <div class="stream-energy-track mt-3">
+                                        <span id="stream-feature-energy-fill" class="stream-energy-fill"></span>
+                                    </div>
+                                    <p id="stream-feature-energy-label" class="mt-3 text-xs text-slate-300">Peak-time performance fuel.</p>
+                                </div>
+
+                                <div class="stream-stat-card p-4">
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Peak Window</p>
+                                    <p id="stream-feature-peak" class="mt-3 text-xl font-black uppercase tracking-tight text-white">After 9PM</p>
+                                    <p id="stream-feature-peak-note" class="mt-2 text-xs leading-relaxed text-slate-400">Best when the room needs to feel louder.</p>
+                                </div>
+
+                                <div class="stream-stat-card p-4 sm:col-span-2 xl:col-span-1">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Best For</p>
+                                        <p id="stream-feature-audience" class="font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500">3,842 listening</p>
+                                    </div>
+                                    <p id="stream-feature-best-for" class="mt-3 text-sm font-semibold text-white">Pre-show confidence, workouts, and big chorus cravings.</p>
+                                    <p id="stream-feature-note" class="mt-2 text-xs leading-relaxed text-slate-400">Heavy drops, tighter transitions, and stage-ready cuts stacked back to back.</p>
+                                </div>
+                            </div>
+                            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                                <a href="{% url 'charts' %}" class="stream-mini-link p-4">
+                                    <div>
+                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Charts</p>
+                                        <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">See What Is Rising</p>
+                                    </div>
+                                    <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
+                                </a>
+                                <a href="{% url 'comeback_timeline' %}" class="stream-mini-link p-4">
+                                    <div>
+                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Comebacks</p>
+                                        <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Catch The Next Wave</p>
+                                    </div>
+                                    <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5" aria-label="Launch streams list">
+                    <div class="mb-4 flex items-end justify-between gap-4">
+                        <div>
+                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Launch Presets</p>
+                            <h3 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Dial In</h3>
+                        </div>
+                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Hover or focus</p>
+                    </div>
+                    <div id="stream-list" class="space-y-3"></div>
+                </section>
+
+                <section class="lg:col-span-3 space-y-4">
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <div class="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Live Signal</p>
+                                <p id="stream-now-vibe" class="mt-2 text-lg font-black uppercase tracking-tight text-white">Peak-time power</p>
+                            </div>
+                            <span id="stream-now-live-pill" class="border px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Live</span>
+                        </div>
+                        <div class="mt-4 flex items-center gap-4">
+                            <div class="flex h-14 w-14 items-end gap-1 rounded-2xl border border-white/10 bg-black/35 p-2">
+                                <span class="signal-bar h-5 w-1.5"></span>
+                                <span class="signal-bar h-9 w-1.5"></span>
+                                <span class="signal-bar h-7 w-1.5"></span>
+                                <span class="signal-bar h-10 w-1.5"></span>
+                                <span class="signal-bar h-6 w-1.5"></span>
+                            </div>
+                            <div class="min-w-0">
+                                <p id="stream-now-track" class="text-sm font-black uppercase tracking-[0.08em] text-white">MANIAC</p>
+                                <p id="stream-now-artist" class="mt-1 text-xs text-slate-400">Stray Kids</p>
+                                <p id="stream-now-audience" class="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">3,842 listening</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Premium Hooks</p>
+                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Unlock Deeper Cuts</h3>
+                            </div>
+                            <span class="border border-white/15 bg-white/5 px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Plus</span>
+                        </div>
+                        <div id="stream-premium-list" class="mt-4 space-y-2 text-xs text-slate-300"></div>
+                        <a href="{% url 'pricing' %}" class="mt-4 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-secondary transition-colors hover:text-white">
+                            Compare Plans
+                            <span class="material-symbols-outlined text-base">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Quick Routes</p>
+                        <div class="mt-4 grid gap-2">
+                            <a href="{% url 'live' %}" class="stream-route-link px-4 py-3 text-sm font-black uppercase tracking-[0.08em] text-white">
+                                Open Full Player
+                                <span class="material-symbols-outlined text-base text-slate-400">headphones</span>
+                            </a>
+                            <a href="{% url 'news' %}" class="stream-route-link px-4 py-3 text-sm font-black uppercase tracking-[0.08em] text-white">
+                                Read Latest News
+                                <span class="material-symbols-outlined text-base text-slate-400">article</span>
+                            </a>
+                            <a href="{% url 'idols' %}" class="stream-route-link px-4 py-3 text-sm font-black uppercase tracking-[0.08em] text-white">
+                                Explore Artists
+                                <span class="material-symbols-outlined text-base text-slate-400">mic_external_on</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <main class="relative pt-36 pb-16">
+        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_15%,rgba(244,37,192,0.2),transparent_35%),radial-gradient(circle_at_78%_25%,rgba(0,240,255,0.2),transparent_35%)]"></div>
+        <section class="relative container mx-auto px-4 sm:px-6">
+            <div class="grid max-w-6xl gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+                <div class="stream-shell-card p-6 sm:p-8">
+                    <p class="font-mono text-[10px] uppercase tracking-[0.26em] text-slate-500">Prototype Goal</p>
+                    <h2 class="mt-4 font-impact text-5xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-6xl">Make the Streams menu feel like the front door to live radio.</h2>
+                    <p class="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300">This direction leans into preset-style discovery, stronger hierarchy, and mood-led copy so the mega menu feels like a scene worth entering instead of a flat navigation tray.</p>
+
+                    <div class="mt-6 grid gap-3 sm:grid-cols-3">
+                        <div class="lab-note-card p-4">
+                            <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Feature First</p>
+                            <p class="mt-3 text-sm font-semibold text-white">Lead with artwork, tone, and a reason to click.</p>
+                        </div>
+                        <div class="lab-note-card p-4">
+                            <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Preset System</p>
+                            <p class="mt-3 text-sm font-semibold text-white">Rows now read like stations, not filler navigation.</p>
+                        </div>
+                        <div class="lab-note-card p-4">
+                            <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Live Context</p>
+                            <p class="mt-3 text-sm font-semibold text-white">Signal, vibe, and upsell all reinforce the stream.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Lab Readout</p>
+                        <div class="mt-4 space-y-3 text-sm text-slate-300">
+                            <p class="border-l border-primary/60 pl-3">The hero tile now sells a mood before the user reads the details.</p>
+                            <p class="border-l border-secondary/60 pl-3">Preset rows get stronger signifiers, status, and a more deliberate hover state.</p>
+                            <p class="border-l border-white/20 pl-3">Right-rail cards support the chosen stream instead of competing with it.</p>
+                        </div>
+                    </div>
+
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Launch Channels</p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Hype Mode</span>
+                            <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Chill Hours</span>
+                            <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Comfort Zone</span>
+                            <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Throwback</span>
+                            <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Next Wave</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'core/footer.html' %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.getElementById('main-header');
+            const panel = document.getElementById('mega-menu-lab-panel');
+            if (!header || !panel) return;
+
+            const desktopNav = Array.from(header.querySelectorAll('nav')).find((nav) => nav.classList.contains('md:flex'));
+            if (!desktopNav) return;
+
+            const urls = {
+                live: "{% url 'live' %}",
+                charts: "{% url 'charts' %}",
+                idols: "{% url 'idols' %}",
+                timeline: "{% url 'comeback_timeline' %}",
+                pricing: "{% url 'pricing' %}",
+                news: "{% url 'news' %}"
+            };
+
+            const launchStreams = [
+                {
+                    id: 'hype-mode',
+                    preset: 'Preset 01',
+                    name: 'Hype Mode',
+                    short: 'Title tracks, performance anthems, full send',
+                    tagline: 'Arena-sized drops, zero polite energy.',
+                    description: 'High-voltage headline tracks with loud drops, heavy dance breaks, and pure stage-energy momentum.',
+                    genres: ['EDM-pop', 'Trap-pop', 'Noise', 'Drill-influenced'],
+                    accentRgb: '244, 37, 192',
+                    secondaryRgb: '255, 132, 56',
+                    image: 'https://images.unsplash.com/photo-1571266028243-d220c9f5f5dd?auto=format&fit=crop&w=1200&q=80',
+                    href: `${urls.live}?stream=hype-mode`,
+                    track: 'MANIAC',
+                    artist: 'Stray Kids',
+                    audience: '3,842 listening',
+                    tier: 'free',
+                    mood: 'Peak-time power',
+                    energy: 92,
+                    energyLabel: 'Peak-time performance fuel.',
+                    peak: 'After 9PM',
+                    peakNote: 'Best when the room needs to feel louder.',
+                    peakShort: 'Late',
+                    bestFor: 'Pre-show confidence, workouts, and big chorus cravings.',
+                    note: 'Heavy drops, tighter transitions, and stage-ready cuts stacked back to back.',
+                    rowTone: 'Performance fuel',
+                    perks: ['Replay each mix block after it airs', 'Vote into the next power-hour set', 'Unlock Baddie Hours after dark'],
+                    panelLine: 'Turn one hover into a full-on reason to listen live.'
+                },
+                {
+                    id: 'chill-hours',
+                    preset: 'Preset 02',
+                    name: 'Chill Hours',
+                    short: 'Low key, late night, no pressure',
+                    tagline: 'The soft landing after the loudest part of the day.',
+                    description: 'Late-hour mood channel for softer hooks, airy synths, and low-pressure repeat listening.',
+                    genres: ['Soft pop', 'Lo-fi K-pop', 'Mellow B-sides'],
+                    accentRgb: '0, 240, 255',
+                    secondaryRgb: '59, 130, 246',
+                    image: 'https://images.unsplash.com/photo-1520034475321-cbe63696469a?auto=format&fit=crop&w=1200&q=80',
+                    href: `${urls.live}?stream=chill-hours`,
+                    track: 'Polaroid Love',
+                    artist: 'ENHYPEN',
+                    audience: '2,944 listening',
+                    tier: 'free',
+                    mood: 'Midnight reset',
+                    energy: 44,
+                    energyLabel: 'Soft-focus, low-pressure replay.',
+                    peak: '11PM onwards',
+                    peakNote: 'Built for wind-down listening, not instant skips.',
+                    peakShort: '11PM',
+                    bestFor: 'Late trains, headphones on, and staring out the window.',
+                    note: 'Airier hooks, warmer mixes, and fewer sharp transitions keep the mood intact.',
+                    rowTone: 'Late-night calm',
+                    perks: ['Skip-free overnight listening block', 'Preview the next three songs in queue', 'Unlock Smooth Seoul and Study Hall'],
+                    panelLine: 'Show that not every stream needs to scream to feel worth clicking.'
+                },
+                {
+                    id: 'comfort-zone',
+                    preset: 'Preset 03',
+                    name: 'Comfort Zone',
+                    short: 'Emotional support in playlist form',
+                    tagline: 'The station you open when you want depth over speed.',
+                    description: 'Warm ballads, OST-adjacent solos, and slow R&B picks for when you want depth over speed.',
+                    genres: ['Ballads', 'OST moods', 'Slow R&B'],
+                    accentRgb: '168, 85, 247',
+                    secondaryRgb: '244, 114, 182',
+                    image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1200&q=80',
+                    href: `${urls.live}?stream=comfort-zone`,
+                    track: 'Love Wins All',
+                    artist: 'IU',
+                    audience: '2,117 listening',
+                    tier: 'free',
+                    mood: 'Soft-focus solace',
+                    energy: 36,
+                    energyLabel: 'Gentle pacing, heavier feelings.',
+                    peak: 'Rainy-day loops',
+                    peakNote: 'Ideal for the slower part of the night.',
+                    peakShort: 'All day',
+                    bestFor: 'Resetting after work, lyric-first listening, and quiet evenings.',
+                    note: 'More space between tracks, softer builds, and a stronger emotional arc through the hour.',
+                    rowTone: 'Comfort picks',
+                    perks: ['Save standout ballads into a personal queue', 'Read lyric highlights while you listen', 'Unlock full OST deep dives and piano cuts'],
+                    panelLine: 'The menu should feel emotionally aware, not just visually different.'
+                },
+                {
+                    id: 'throwback',
+                    preset: 'Preset 04',
+                    name: 'Throwback',
+                    short: '2nd and 3rd gen classics only',
+                    tagline: 'Legacy hooks, iconic bridges, immediate recognition.',
+                    description: 'Legacy-mode station with iconic hooks, era-defining choruses, and nostalgia-heavy transitions.',
+                    genres: ['SHINee era', '2NE1 era', 'EXO era', 'SNSD classics'],
+                    accentRgb: '251, 191, 36',
+                    secondaryRgb: '249, 115, 22',
+                    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80',
+                    href: `${urls.live}?stream=throwback`,
+                    track: 'Sherlock',
+                    artist: 'SHINee',
+                    audience: '2,608 listening',
+                    tier: 'free',
+                    mood: 'Legacy rush',
+                    energy: 70,
+                    energyLabel: 'Nostalgia with real sing-along lift.',
+                    peak: 'Weekend rewind',
+                    peakNote: 'Built for shared listening and instant recognition.',
+                    peakShort: 'Weekend',
+                    bestFor: 'Cleaning sprees, group chats, and reminding people how good the classics were.',
+                    note: 'The channel leans on familiar intros, strong choruses, and era-defining sequencing.',
+                    rowTone: 'Classic era',
+                    perks: ['Replay by generation or era', 'Jump to themed nostalgia blocks', 'Unlock hidden 2nd-gen live sessions'],
+                    panelLine: 'A little nostalgia in the menu makes the whole station feel more lived-in.'
+                },
+                {
+                    id: 'next-wave',
+                    preset: 'Preset 05',
+                    name: 'Next Wave',
+                    short: '4th gen anthems and new-wave leaders',
+                    tagline: 'Fresh momentum, bigger swings, zero waiting around.',
+                    description: 'Current-gen power rotation built around hard-hitting new names and fast-moving fan momentum.',
+                    genres: ['4th gen', 'Performance-first', 'Rookie breakthroughs'],
+                    accentRgb: '132, 204, 22',
+                    secondaryRgb: '34, 211, 238',
+                    image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80',
+                    href: `${urls.live}?stream=next-wave`,
+                    track: 'Bouncy',
+                    artist: 'ATEEZ',
+                    audience: '3,301 listening',
+                    tier: 'free',
+                    mood: 'Current-gen heat',
+                    energy: 84,
+                    energyLabel: 'Fast, sharp, and fan-momentum driven.',
+                    peak: 'Fresh drop Fridays',
+                    peakNote: 'Feels best when releases are still hot.',
+                    peakShort: 'Friday',
+                    bestFor: 'Keeping up with new leaders, dance practice energy, and fresh-chart curiosity.',
+                    note: 'New names rotate fast here, but the sequencing still feels intentional rather than chaotic.',
+                    rowTone: 'Fresh heat',
+                    perks: ['Unlock early-access rotations on release nights', 'Follow debut-watch alerts inside the stream', 'Preview member-only first-spin blocks'],
+                    panelLine: 'The newest stream should sell motion and momentum before the click.'
+                }
+            ];
+
+            const panelTagline = document.getElementById('stream-panel-tagline');
+            const featureImage = document.getElementById('stream-feature-image');
+            const featureKicker = document.getElementById('stream-feature-kicker');
+            const featureFrequency = document.getElementById('stream-feature-frequency');
+            const featureTagline = document.getElementById('stream-feature-tagline');
+            const featureTitle = document.getElementById('stream-feature-title');
+            const featureTier = document.getElementById('stream-feature-tier');
+            const featureDescription = document.getElementById('stream-feature-description');
+            const featureGenres = document.getElementById('stream-feature-genres');
+            const featureCta = document.getElementById('stream-feature-cta');
+            const featureEnergyValue = document.getElementById('stream-feature-energy-value');
+            const featureEnergyFill = document.getElementById('stream-feature-energy-fill');
+            const featureEnergyLabel = document.getElementById('stream-feature-energy-label');
+            const featurePeak = document.getElementById('stream-feature-peak');
+            const featurePeakNote = document.getElementById('stream-feature-peak-note');
+            const featureBestFor = document.getElementById('stream-feature-best-for');
+            const featureAudience = document.getElementById('stream-feature-audience');
+            const featureNote = document.getElementById('stream-feature-note');
+            const streamList = document.getElementById('stream-list');
+            const nowTrack = document.getElementById('stream-now-track');
+            const nowArtist = document.getElementById('stream-now-artist');
+            const nowAudience = document.getElementById('stream-now-audience');
+            const nowLivePill = document.getElementById('stream-now-live-pill');
+            const nowVibe = document.getElementById('stream-now-vibe');
+            const premiumList = document.getElementById('stream-premium-list');
+
+            if (
+                !panelTagline ||
+                !featureImage ||
+                !featureKicker ||
+                !featureFrequency ||
+                !featureTagline ||
+                !featureTitle ||
+                !featureTier ||
+                !featureDescription ||
+                !featureGenres ||
+                !featureCta ||
+                !featureEnergyValue ||
+                !featureEnergyFill ||
+                !featureEnergyLabel ||
+                !featurePeak ||
+                !featurePeakNote ||
+                !featureBestFor ||
+                !featureAudience ||
+                !featureNote ||
+                !streamList ||
+                !nowTrack ||
+                !nowArtist ||
+                !nowAudience ||
+                !nowLivePill ||
+                !nowVibe ||
+                !premiumList
+            ) return;
+
+            let activeStreamId = launchStreams[0].id;
+
+            const buildTierBadge = (stream) => stream.tier === 'free'
+                ? '<span class="border border-emerald-300/50 bg-emerald-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em] text-emerald-200">Free</span>'
+                : '<span class="border border-white/30 bg-white/10 px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em] text-white">Premium</span>';
+
+            const buildPerk = (perk, index) => {
+                const icons = ['history', 'queue_music', 'bolt'];
+                return `<div class="flex items-start gap-3 border border-white/10 bg-black/30 p-3">
+                    <span class="material-symbols-outlined text-sm text-slate-100">${icons[index] || 'stars'}</span>
+                    <p class="leading-relaxed">${perk}</p>
+                </div>`;
+            };
+
+            const buildRow = (stream) => {
+                const presetNumber = stream.preset.replace('Preset ', '');
+                return `<button type="button" data-stream-id="${stream.id}" class="stream-row w-full border border-white/12 bg-black/30 px-4 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" aria-label="Preview ${stream.name}" aria-pressed="false">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex min-w-0 gap-3">
+                            <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[10px] font-black uppercase tracking-[0.16em]" style="border: 1px solid rgba(${stream.accentRgb}, 0.35); background: rgba(${stream.accentRgb}, 0.12); color: rgba(${stream.accentRgb}, 1);">${presetNumber}</span>
+                            <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <p class="text-sm font-black uppercase tracking-[0.08em]" style="color: rgba(${stream.accentRgb}, 0.95)">${stream.name}</p>
+                                    <span class="text-[9px] font-mono uppercase tracking-[0.18em] text-slate-500">${stream.rowTone}</span>
+                                </div>
+                                <p class="mt-1.5 text-[11px] leading-relaxed text-slate-300">${stream.short}</p>
+                            </div>
+                        </div>
+                        ${buildTierBadge(stream)}
+                    </div>
+                    <div class="mt-3 flex items-center justify-between gap-3 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500">
+                        <span>${stream.mood}</span>
+                        <span>${stream.peakShort}</span>
+                    </div>
+                </button>`;
+            };
+
+            const renderList = () => {
+                streamList.innerHTML = launchStreams.map(buildRow).join('');
+                highlightActiveRow();
+            };
+
+            const highlightActiveRow = () => {
+                streamList.querySelectorAll('[data-stream-id]').forEach((row) => {
+                    const isActive = row.getAttribute('data-stream-id') === activeStreamId;
+                    row.classList.toggle('active', isActive);
+                    row.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            };
+
+            const setActiveStream = (streamId) => {
+                const stream = launchStreams.find((item) => item.id === streamId);
+                if (!stream) return;
+
+                activeStreamId = stream.id;
+                panel.style.setProperty('--stream-accent', stream.accentRgb);
+                panel.style.setProperty('--stream-secondary', stream.secondaryRgb);
+                panelTagline.textContent = stream.panelLine;
+                featureImage.className = 'stream-card-image absolute inset-0';
+                featureImage.style.backgroundImage = `linear-gradient(115deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.54) 100%), url('${stream.image}')`;
+                featureKicker.textContent = 'Launch Stream';
+                featureFrequency.innerHTML = `<span class="h-2 w-2 rounded-full bg-white/80"></span>${stream.preset}`;
+                featureTagline.textContent = stream.tagline;
+                featureTitle.textContent = stream.name;
+                featureDescription.textContent = stream.description;
+                featureCta.href = stream.href;
+
+                featureTier.textContent = stream.tier === 'free' ? 'Free' : 'Premium';
+                featureTier.className = stream.tier === 'free'
+                    ? 'border border-emerald-300/50 bg-emerald-400/15 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-200'
+                    : 'border border-white/30 bg-white/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white';
+
+                featureEnergyValue.textContent = `${stream.energy}%`;
+                featureEnergyFill.style.width = `${stream.energy}%`;
+                featureEnergyLabel.textContent = stream.energyLabel;
+                featurePeak.textContent = stream.peak;
+                featurePeakNote.textContent = stream.peakNote;
+                featureAudience.textContent = stream.audience;
+                featureBestFor.textContent = stream.bestFor;
+                featureNote.textContent = stream.note;
+                nowVibe.textContent = stream.mood;
+                nowTrack.textContent = stream.track;
+                nowArtist.textContent = stream.artist;
+                nowAudience.textContent = stream.audience;
+                nowLivePill.textContent = 'Live';
+
+                featureGenres.innerHTML = stream.genres
+                    .map((genre) => `<span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">${genre}</span>`)
+                    .join('');
+
+                premiumList.innerHTML = stream.perks.map(buildPerk).join('');
+                highlightActiveRow();
+            };
+
+            renderList();
+            setActiveStream(activeStreamId);
+
+            const previewStream = (event) => {
+                const row = event.target.closest('[data-stream-id]');
+                if (!row) return;
+                setActiveStream(row.getAttribute('data-stream-id'));
+            };
+
+            streamList.addEventListener('mouseover', previewStream);
+            streamList.addEventListener('focusin', previewStream);
+            streamList.addEventListener('click', previewStream);
+
+            let streamsTrigger = document.getElementById('mega-streams-trigger');
+            if (!streamsTrigger) {
+                streamsTrigger = document.createElement('button');
+                streamsTrigger.type = 'button';
+                streamsTrigger.id = 'mega-streams-trigger';
+                streamsTrigger.className = 'nav-cinzel flex items-center gap-1 text-slate-200 transition-colors hover:text-primary';
+                streamsTrigger.setAttribute('aria-expanded', 'false');
+                streamsTrigger.setAttribute('aria-controls', 'mega-menu-lab-panel');
+                streamsTrigger.innerHTML = 'Streams <span class="material-symbols-outlined text-sm">graphic_eq</span>';
+                desktopNav.insertBefore(streamsTrigger, desktopNav.firstChild);
+            }
+
+            const positionPanel = () => {
+                const rect = header.getBoundingClientRect();
+                panel.style.top = `${Math.max(0, Math.round(rect.bottom))}px`;
+            };
+
+            const isPanelVisible = () => !panel.classList.contains('pointer-events-none');
+            const desktopBreakpoint = 768;
+
+            let hideTimer = null;
+            let isPinnedOpen = false;
+
+            const showPanel = () => {
+                clearTimeout(hideTimer);
+                positionPanel();
+                panel.classList.remove('pointer-events-none', 'opacity-0', '-translate-y-2');
+                panel.classList.add('opacity-100', 'translate-y-0');
+                streamsTrigger.classList.add('streams-trigger-active');
+                streamsTrigger.setAttribute('aria-expanded', 'true');
+            };
+
+            const hidePanel = () => {
+                clearTimeout(hideTimer);
+                panel.classList.add('pointer-events-none', 'opacity-0', '-translate-y-2');
+                panel.classList.remove('opacity-100', 'translate-y-0');
+                streamsTrigger.classList.remove('streams-trigger-active');
+                streamsTrigger.setAttribute('aria-expanded', 'false');
+                isPinnedOpen = false;
+            };
+
+            const openPanel = ({ pinned = false } = {}) => {
+                if (window.innerWidth < desktopBreakpoint) return;
+                if (pinned) isPinnedOpen = true;
+                showPanel();
+            };
+
+            const queueClose = () => {
+                if (isPinnedOpen) return;
+                clearTimeout(hideTimer);
+                hideTimer = setTimeout(() => hidePanel(), 170);
+            };
+
+            streamsTrigger.addEventListener('mouseenter', () => openPanel());
+            streamsTrigger.addEventListener('focus', () => openPanel({ pinned: true }));
+            streamsTrigger.addEventListener('click', () => {
+                if (isPanelVisible() && isPinnedOpen) {
+                    hidePanel();
+                    return;
+                }
+                openPanel({ pinned: true });
+            });
+            streamsTrigger.addEventListener('mouseleave', queueClose);
+
+            panel.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+            panel.addEventListener('mouseleave', queueClose);
+            panel.addEventListener('focusin', () => clearTimeout(hideTimer));
+
+            document.addEventListener('click', (event) => {
+                if (event.target.closest('#mega-menu-lab-panel') || event.target.closest('#mega-streams-trigger')) return;
+                hidePanel();
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') hidePanel();
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth < desktopBreakpoint) {
+                    hidePanel();
+                    return;
+                }
+                if (isPanelVisible()) positionPanel();
+            });
+
+            window.addEventListener('scroll', () => {
+                if (isPanelVisible()) positionPanel();
+            }, { passive: true });
+        });
+    </script>
+</body>
+</html>

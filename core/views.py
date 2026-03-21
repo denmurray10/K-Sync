@@ -2712,6 +2712,10 @@ def upcoming_comebacks_design_lab(request):
     })
 
 
+def header_mega_menu_lab(request):
+    return render(request, 'core/header_mega_menu_lab.html')
+
+
 def charts(request):
     chart_type = request.GET.get('type', 'songs')
     
