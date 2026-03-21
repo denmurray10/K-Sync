@@ -31,6 +31,10 @@
             --panel-open-duration: 220ms;
             --stream-accent: 244, 37, 192;
             --stream-secondary: 0, 240, 255;
+            --live-accent: 0, 240, 255;
+            --live-secondary: 99, 102, 241;
+            --charts-accent: 250, 204, 21;
+            --charts-secondary: 244, 114, 182;
         }
         body {
             background:
@@ -38,6 +42,7 @@
                 radial-gradient(circle at 84% 20%, rgba(0, 240, 255, 0.15), transparent 30%),
                 linear-gradient(180deg, #040506 0%, #05070b 48%, #020304 100%);
         }
+        .mega-trigger-active,
         .streams-trigger-active {
             color: #f425c0 !important;
             text-shadow: 0 0 12px rgba(244, 37, 192, 0.45);
@@ -46,6 +51,7 @@
         [aria-controls="my-station-panel"] {
             display: none !important;
         }
+        .mega-panel-shell,
         .streams-panel-shell {
             transition: opacity var(--panel-open-duration) ease, transform var(--panel-open-duration) ease;
             background:
@@ -54,6 +60,7 @@
                 linear-gradient(135deg, rgb(8 9 14), rgb(2 5 9) 58%, rgb(9 5 16));
             box-shadow: 0 28px 80px rgba(0, 0, 0, 0.58);
         }
+        .mega-panel-shell::before,
         .streams-panel-shell::before {
             content: "";
             position: absolute;
@@ -66,6 +73,152 @@
             mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 80%);
             opacity: 0.4;
         }
+        .live-panel-shell {
+            background:
+                radial-gradient(circle at 14% 0%, rgba(var(--live-accent), 0.18), transparent 32%),
+                radial-gradient(circle at 82% 10%, rgba(var(--live-secondary), 0.18), transparent 28%),
+                linear-gradient(135deg, rgb(4 9 14), rgb(3 10 17) 56%, rgb(7 5 18));
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
+        }
+        .charts-panel-shell {
+            background:
+                radial-gradient(circle at 14% 0%, rgba(var(--charts-accent), 0.2), transparent 30%),
+                radial-gradient(circle at 84% 10%, rgba(var(--charts-secondary), 0.2), transparent 30%),
+                linear-gradient(135deg, rgb(14 10 4), rgb(13 8 15) 52%, rgb(6 5 13));
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
+        }
+        .charts-panel-shell::after {
+            content: "";
+            position: absolute;
+            inset: auto -8% -28% auto;
+            width: 320px;
+            height: 320px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(var(--charts-secondary), 0.18) 0%, transparent 72%);
+            pointer-events: none;
+            opacity: 0.95;
+        }
+        .live-panel-shell::after {
+            content: "";
+            position: absolute;
+            inset: auto auto -32% -8%;
+            width: 280px;
+            height: 280px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(var(--live-secondary), 0.18) 0%, transparent 72%);
+            pointer-events: none;
+            opacity: 0.9;
+        }
+        .live-hero-image::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(3, 8, 12, 0.16) 0%, rgba(3, 8, 12, 0.82) 100%),
+                linear-gradient(130deg, rgba(var(--live-accent), 0.18) 0%, rgba(0, 0, 0, 0) 46%, rgba(var(--live-secondary), 0.22) 100%);
+        }
+        .charts-hero-image::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(10, 8, 3, 0.2) 0%, rgba(10, 8, 3, 0.82) 100%),
+                linear-gradient(130deg, rgba(var(--charts-accent), 0.22) 0%, rgba(0, 0, 0, 0) 44%, rgba(var(--charts-secondary), 0.24) 100%);
+        }
+        .charts-hero-image::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0 0;
+            height: 46%;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(10, 8, 3, 0.82) 100%);
+        }
+        .live-hero-image::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0 0;
+            height: 42%;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(3, 8, 12, 0.78) 100%);
+        }
+        .live-chip {
+            border: 1px solid rgba(var(--live-accent), 0.24);
+            background: rgba(var(--live-accent), 0.1);
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .live-schedule-card {
+            position: relative;
+            overflow: hidden;
+            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
+        }
+        .live-schedule-card:hover,
+        .live-schedule-card:focus-visible {
+            transform: translateX(8px);
+            border-color: rgba(var(--live-accent), 0.42) !important;
+            background: linear-gradient(135deg, rgba(var(--live-accent), 0.14), rgba(255, 255, 255, 0.03) 52%, rgba(var(--live-secondary), 0.08));
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+        }
+        .live-stat-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
+        }
+        .request-feature-shell {
+            position: relative;
+            overflow: hidden;
+            background:
+                linear-gradient(135deg, rgba(var(--live-secondary), 0.18) 0%, rgba(255, 255, 255, 0.03) 42%, rgba(var(--live-accent), 0.1) 100%);
+        }
+        .request-feature-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 26px 26px;
+            mask-image: linear-gradient(135deg, rgba(255, 255, 255, 0.7), transparent 78%);
+            opacity: 0.28;
+        }
+        .request-feature-shell::after {
+            content: "";
+            position: absolute;
+            inset: auto -12% -55% auto;
+            width: 220px;
+            height: 220px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(var(--live-accent), 0.22) 0%, transparent 72%);
+            pointer-events: none;
+            opacity: 0.9;
+        }
+        .request-chip {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.22);
+            color: rgba(255, 255, 255, 0.88);
+        }
+        .request-queue-box {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(3, 8, 12, 0.4);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+        .live-next-card {
+            min-height: 86px;
+        }
+        .live-signal-box {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.35rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+        }
+        .live-signal-box span {
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(var(--live-accent), 1), rgba(var(--live-secondary), 0.9));
+            animation: equalizer 1.5s ease-in-out infinite;
+            transform-origin: center bottom;
+        }
+        .live-signal-box span:nth-child(2) { animation-delay: 0.12s; }
+        .live-signal-box span:nth-child(3) { animation-delay: 0.24s; }
+        .live-signal-box span:nth-child(4) { animation-delay: 0.36s; }
+        .live-signal-box span:nth-child(5) { animation-delay: 0.48s; }
         .stream-shell-card {
             position: relative;
             overflow: hidden;
@@ -82,6 +235,17 @@
             height: 260px;
             border-radius: 999px;
             background: radial-gradient(circle, rgba(var(--stream-accent), 0.28) 0%, transparent 72%);
+            pointer-events: none;
+            opacity: 0.95;
+        }
+        .charts-feature-shell::after {
+            content: "";
+            position: absolute;
+            inset: auto auto -42% -12%;
+            width: 280px;
+            height: 280px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(var(--charts-accent), 0.22) 0%, transparent 72%);
             pointer-events: none;
             opacity: 0.95;
         }
@@ -223,6 +387,60 @@
             border-color: rgba(var(--stream-accent), 0.46);
             background: rgba(255, 255, 255, 0.05);
         }
+        .chart-rank-card,
+        .chart-snapshot-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+        }
+        .chart-rank-card {
+            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
+        }
+        .charts-stat-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018));
+        }
+        .chart-rank-badge {
+            border: 1px solid rgba(var(--charts-accent), 0.42);
+            background: rgba(var(--charts-accent), 0.12);
+            color: rgba(var(--charts-accent), 1);
+        }
+        .chart-chip {
+            border: 1px solid rgba(var(--charts-accent), 0.22);
+            background: rgba(var(--charts-accent), 0.08);
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .chart-link:hover,
+        .chart-link:focus-visible {
+            border-color: rgba(var(--charts-accent), 0.46);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .chart-rank-card:hover,
+        .chart-rank-card:focus-visible,
+        .chart-rank-card.active {
+            transform: translateX(8px);
+            border-color: rgba(var(--charts-accent), 0.5);
+            background: linear-gradient(135deg, rgba(var(--charts-accent), 0.14), rgba(255, 255, 255, 0.03) 52%, rgba(var(--charts-secondary), 0.08));
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+        }
+        .chart-mini-pill {
+            border: 1px solid rgba(var(--charts-accent), 0.28);
+            background: rgba(var(--charts-accent), 0.1);
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .chart-trend-up {
+            color: rgba(var(--charts-accent), 1);
+            text-shadow: 0 0 14px rgba(var(--charts-accent), 0.32);
+        }
+        .chart-live-dot {
+            display: inline-flex;
+            height: 8px;
+            width: 8px;
+            border-radius: 999px;
+            background: rgba(var(--charts-accent), 1);
+            box-shadow: 0 0 12px rgba(var(--charts-accent), 0.7);
+        }
         @keyframes equalizer {
             0%, 100% {
                 transform: scaleY(0.45);
@@ -241,7 +459,8 @@
             .stream-mini-link,
             .stream-route-link,
             .stream-waveform span,
-            .signal-bar {
+            .signal-bar,
+            .chart-link {
                 transition: none !important;
                 animation: none !important;
             }
@@ -251,7 +470,129 @@
 <body class="bg-background-dark text-white font-display min-h-screen overflow-x-hidden">
     {% include 'core/header.html' %}
 
-    <div id="mega-menu-lab-panel" class="streams-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+    <div id="mega-live-lab-panel" class="mega-panel-shell live-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+        <div class="container mx-auto px-4 sm:px-6 py-5 sm:py-6">
+            <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="max-w-3xl">
+                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Live</p>
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.03em] text-white whitespace-nowrap sm:text-4xl">Drop Into The Broadcast</h1>
+                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">A live-first mega menu should feel like a studio window: what is on now, what is next, and how fast you can join.</p>
+                    </div>
+                </div>
+                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+                    </span>
+                    Studio Feed Active
+                </div>
+            </div>
+
+            <div class="grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card lg:col-span-6 min-h-[320px]">
+                    <div class="relative h-full overflow-hidden">
+                        <div class="live-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1400&q=80');"></div>
+                        <div class="absolute inset-0 p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200">Live Right Now</p>
+                                    <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                        <span class="relative flex h-2 w-2">
+                                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                                            <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+                                        </span>
+                                        Studio 1
+                                    </div>
+                                </div>
+                                <span class="border border-cyan-300/40 bg-cyan-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">On Air</span>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                                <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Tonight's live block is built to feel immediate, human, and impossible to miss.</p>
+                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">Live From Global Studio 1</h2>
+                                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">Jump into the live player, catch what is spinning now, and move into the lineup without losing the feeling of being in the room.</p>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <span class="live-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Now Playing: MANIAC</span>
+                                    <span class="live-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Presenter Link In 04:12</span>
+                                    <span class="live-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">3,842 Listening</span>
+                                </div>
+                                <div class="mt-4 flex flex-wrap items-center gap-3">
+                                    <a href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                        Enter Live
+                                        <span class="material-symbols-outlined text-base">play_arrow</span>
+                                    </a>
+                                    <a href="{% url 'schedule' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
+                                        View Schedule
+                                        <span class="material-symbols-outlined text-base">north_east</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="stream-shell-card lg:col-span-6 p-4 sm:p-5">
+                    <div class="flex items-end justify-between gap-4 border-b border-white/10 pb-3">
+                        <div>
+                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">On Deck</p>
+                            <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Next Up</h3>
+                        </div>
+                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">UK time</p>
+                    </div>
+                    <div class="mt-3 space-y-2">
+                        <a href="{% url 'schedule' %}" class="live-next-card live-schedule-card block border border-white/10 bg-black/25 p-3 text-left transition-colors hover:border-cyan-300/40">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">7:00 PM</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Drive Time Heat</p>
+                                </div>
+                                <span class="border border-white/10 bg-white/[0.04] px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Next</span>
+                            </div>
+                            <p class="mt-1.5 text-xs leading-relaxed text-slate-300">Headline tracks, presenter links, and a strong first hook.</p>
+                        </a>
+                        <a href="{% url 'schedule' %}" class="live-next-card live-schedule-card block border border-white/10 bg-black/25 p-3 text-left transition-colors hover:border-cyan-300/40">
+                            <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">9:00 PM</p>
+                            <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">After Hours</p>
+                            <p class="mt-1.5 text-xs leading-relaxed text-slate-300">A looser late-night lane with slower transitions and live requests.</p>
+                        </a>
+                        <a href="{% url 'schedule' %}" class="live-next-card live-schedule-card block border border-white/10 bg-black/25 p-3 text-left transition-colors hover:border-cyan-300/40">
+                            <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">11:00 PM</p>
+                            <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">Midnight Replay</p>
+                            <p class="mt-1.5 text-xs leading-relaxed text-slate-300">The most reacted-to moments, lined up for one more run.</p>
+                        </a>
+                    </div>
+                    <a href="{% url 'schedule' %}" class="mt-3 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-secondary transition-colors hover:text-white">
+                        Open Full Schedule
+                        <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    </a>
+                    <div class="request-feature-shell mt-4 border border-white/10 p-3 sm:p-4">
+                        <div class="relative z-10 grid gap-3 md:grid-cols-[minmax(0,1fr)_150px] md:items-center">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-300">Requests</p>
+                                <h3 class="mt-1 text-xl font-black uppercase tracking-tight text-white">Push A Track Into Tonight's Feed</h3>
+                                <p class="mt-2 text-sm leading-relaxed text-slate-200/90">A fast route for listeners to get picks in front of the presenter while the show is still moving.</p>
+                            </div>
+                            <div class="request-queue-box p-3">
+                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Queue Pulse</p>
+                                <p class="mt-2 text-2xl font-impact uppercase leading-none tracking-[0.04em] text-white">18 Picks</p>
+                                <p class="mt-1 text-xs leading-relaxed text-slate-300">In tonight's live queue.</p>
+                            </div>
+                        </div>
+                        <div class="relative z-10 mt-3 flex flex-wrap items-center gap-3">
+                            <a href="{% url 'request_track' %}" class="inline-flex items-center gap-2 border border-white bg-white px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.45)] hover:bg-primary hover:border-primary hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                Request A Track
+                                <span class="material-symbols-outlined text-base">queue_music</span>
+                            </a>
+                            <span class="request-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Open Requests</span>
+                            <span class="request-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Live Review</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="mega-menu-lab-panel" class="mega-panel-shell streams-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
         <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
@@ -284,22 +625,15 @@
                                 <p id="stream-feature-description" class="mt-3 max-w-xl text-sm leading-relaxed text-slate-200/90"></p>
                                 <div id="stream-feature-genres" class="mt-4 flex flex-wrap gap-2"></div>
                                 <div class="mt-5 flex flex-wrap items-center gap-3">
-                                    <a id="stream-feature-cta" href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                    <a id="stream-feature-cta" href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                         Listen Now
                                         <span class="material-symbols-outlined text-base">play_arrow</span>
                                     </a>
-                                    <a href="{% url 'pricing' %}" class="inline-flex items-center gap-2 bg-black px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                    <a href="{% url 'pricing' %}" class="inline-flex items-center gap-2 bg-black px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                         Unlock More
                                         <span class="material-symbols-outlined text-base">bolt</span>
                                     </a>
                                 </div>
-                            </div>
-                            <div class="stream-waveform pointer-events-none absolute bottom-7 right-6 hidden items-end gap-1.5 lg:flex" aria-hidden="true">
-                                <span style="height: 20px; width: 5px;"></span>
-                                <span style="height: 34px; width: 5px;"></span>
-                                <span style="height: 48px; width: 5px;"></span>
-                                <span style="height: 28px; width: 5px;"></span>
-                                <span style="height: 38px; width: 5px;"></span>
                             </div>
                         </div>
 
@@ -375,7 +709,7 @@
                         <div class="flex items-center justify-between gap-4">
                             <div>
                                 <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Premium Hooks</p>
-                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Unlock Deeper Cuts</h3>
+                                <h3 id="stream-premium-title" class="mt-2 text-xl font-black uppercase tracking-tight text-white">Unlock Deeper Cuts</h3>
                             </div>
                             <span class="border border-white/15 bg-white/5 px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Plus</span>
                         </div>
@@ -384,6 +718,360 @@
                             Compare Plans
                             <span class="material-symbols-outlined text-base">arrow_forward</span>
                         </a>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="mega-charts-lab-panel" class="mega-panel-shell charts-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+        <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
+            <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="max-w-3xl">
+                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Charts</p>
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-4xl">See What's Climbing</h1>
+                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">The Charts menu should feel like live momentum: who is rising, what is sticky, and where to jump next.</p>
+                    </div>
+                </div>
+                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
+                    <span class="h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_14px_rgba(250,204,21,0.8)]"></span>
+                    Updated This Hour
+                </div>
+            </div>
+
+            <div class="grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card charts-feature-shell lg:col-span-6">
+                    <div class="grid h-full xl:grid-cols-[minmax(0,1.5fr)_minmax(250px,0.8fr)]">
+                        <div class="relative min-h-[300px] overflow-hidden">
+                            <div id="charts-feature-image" class="charts-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1400&q=80');"></div>
+                            <div class="absolute inset-0 p-5 sm:p-6">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <p id="charts-feature-kicker" class="font-mono text-[10px] uppercase tracking-[0.22em] text-amber-200">This Week's Peak</p>
+                                        <div id="charts-feature-rankline" class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                            <span class="chart-rank-badge inline-flex h-6 min-w-6 items-center justify-center px-2 text-[9px] font-black">#1</span>
+                                            Global K-Beats Top 20
+                                        </div>
+                                    </div>
+                                    <span id="charts-feature-status" class="border border-amber-300/40 bg-amber-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-amber-100">Hot</span>
+                                </div>
+                                <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                                    <p id="charts-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Heavy replay value, social lift, and chart gravity all pointing the same way.</p>
+                                    <h2 id="charts-feature-title" class="mt-3 font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">Rosie Takes The Crown</h2>
+                                    <p id="charts-feature-description" class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">Make the first tile feel like a headline worth following, then pull the user into movers, breakdowns, and artist pages without the panel ever losing momentum.</p>
+                                    <div id="charts-feature-chips" class="mt-4 flex flex-wrap gap-2">
+                                        <span class="chart-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">24h +3</span>
+                                        <span class="chart-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">7.2M streams</span>
+                                        <span class="chart-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Fan vote leader</span>
+                                    </div>
+                                    <div class="mt-5 flex flex-wrap items-center gap-3">
+                                        <a id="charts-feature-primary-cta" href="{% url 'charts' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                            Open Charts
+                                            <span class="material-symbols-outlined text-base">bar_chart</span>
+                                        </a>
+                                        <a id="charts-feature-secondary-cta" href="{% url 'news' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
+                                            Read The Story
+                                            <span class="material-symbols-outlined text-base">north_east</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/10 bg-black/35 p-5 sm:p-6 xl:border-l xl:border-t-0">
+                            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                                <div class="charts-stat-card p-4">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Momentum</p>
+                                        <p id="charts-feature-momentum-value" class="text-xs font-black uppercase tracking-[0.18em] text-white">94%</p>
+                                    </div>
+                                    <p id="charts-feature-momentum-title" class="mt-3 text-xl font-black uppercase tracking-tight text-white">Locked In</p>
+                                    <p id="charts-feature-momentum-copy" class="mt-2 text-xs leading-relaxed text-slate-300">Streaming lift, social chatter, and repeat listens are all pulling in the same direction.</p>
+                                </div>
+
+                                <div class="charts-stat-card p-4">
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Fast Read</p>
+                                    <div id="charts-feature-fast-read" class="mt-3 flex flex-wrap gap-2">
+                                        <span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Peak replay</span>
+                                        <span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Social gain</span>
+                                        <span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Cross-market</span>
+                                    </div>
+                                    <p id="charts-feature-fast-copy" class="mt-3 text-xs leading-relaxed text-slate-300">The right rail now reads like a quick analyst desk instead of filler support copy.</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5">
+                    <div class="mb-4 flex items-end justify-between gap-4">
+                        <div>
+                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Top Movers</p>
+                            <h3 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Climbing Fast</h3>
+                        </div>
+                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">24h delta</p>
+                    </div>
+                    <div id="charts-movers-list" class="space-y-3">
+                        <a href="{% url 'charts' %}" data-chart-id="whiplash" class="chart-link chart-rank-card block p-4 transition-colors">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">#2</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Whiplash</p>
+                                    <p class="mt-2 text-xs leading-relaxed text-slate-300">aespa keeps climbing on replay velocity and share rate.</p>
+                                </div>
+                                <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">+5</span>
+                            </div>
+                        </a>
+                        <a href="{% url 'charts' %}" data-chart-id="plot-twist" class="chart-link chart-rank-card block p-4 transition-colors">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">#4</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Plot Twist</p>
+                                    <p class="mt-2 text-xs leading-relaxed text-slate-300">TWS is pulling younger listeners into the upper tier.</p>
+                                </div>
+                                <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">+7</span>
+                            </div>
+                        </a>
+                        <a href="{% url 'charts' %}" data-chart-id="magnetic" class="chart-link chart-rank-card block p-4 transition-colors">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">#7</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Magnetic</p>
+                                    <p class="mt-2 text-xs leading-relaxed text-slate-300">Still sticky, still viral, and not done moving yet.</p>
+                                </div>
+                                <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">+3</span>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="lg:col-span-3 space-y-4">
+                    <div class="chart-snapshot-card p-5 sm:p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Chart Lanes</p>
+                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Jump By Signal</h3>
+                            </div>
+                            <span class="border border-white/15 bg-white/5 px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Live Data</span>
+                        </div>
+                        <div class="mt-4 space-y-3">
+                            <a href="{% url 'charts' %}" class="chart-link stream-route-link p-4">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Top 20</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">See The Full Leaderboard</p>
+                                </div>
+                                <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
+                            </a>
+                            <a href="{% url 'news' %}" class="chart-link stream-route-link p-4">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Breakdowns</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Read Why Songs Are Moving</p>
+                                </div>
+                                <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
+                            </a>
+                            <a href="{% url 'idols' %}" class="chart-link stream-route-link p-4">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Artists</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Jump To The Idol Pages</p>
+                                </div>
+                                <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="chart-snapshot-card p-5 sm:p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Chart Pressure</p>
+                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Realtime Snapshot</h3>
+                            </div>
+                            <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">Live</span>
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-3">
+                            <div class="border border-white/10 bg-black/30 p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">New</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">2</p>
+                            </div>
+                            <div class="border border-white/10 bg-black/30 p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Gain</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">+7</p>
+                            </div>
+                            <div class="border border-white/10 bg-black/30 p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Shares</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">ROSIE</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="mega-idols-lab-panel" class="mega-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+        <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
+            <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="max-w-3xl">
+                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Idols</p>
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+                        <h1 class="font-impact text-[2.4rem] leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-[3rem]">Enter The Idol Universe</h1>
+                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">This version treats Idols like a discovery hub: featured act, fast jumps by intent, and visual routes into fandom depth.</p>
+                    </div>
+                </div>
+                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
+                    <span class="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_14px_rgba(244,37,192,0.8)]"></span>
+                    Artist Discovery Layer
+                </div>
+            </div>
+
+            <div class="grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card stream-feature-shell lg:col-span-6">
+                    <div class="grid h-full xl:grid-cols-[minmax(0,1.5fr)_minmax(250px,0.8fr)]">
+                        <div class="relative min-h-[340px] overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(120deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.6) 100%), url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1400&q=80');"></div>
+                            <div class="absolute inset-0 p-5 sm:p-6">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-primary">Featured Group</p>
+                                        <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                            <span class="h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_rgba(244,37,192,0.8)]"></span>
+                                            High fandom velocity
+                                        </div>
+                                    </div>
+                                    <span class="border border-primary/40 bg-primary/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-primary">Spotlight</span>
+                                </div>
+                                <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                                    <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Profile pages should feel like portals, not directories.</p>
+                                    <h2 class="mt-3 font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">Stray Kids Lead The Entry Point</h2>
+                                    <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">Lead with one magnetic hero so the Idols menu feels editorial. Then support it with routes into groups, members, bias tools, and fan-club actions.</p>
+                                    <div class="mt-4 flex flex-wrap gap-2">
+                                        <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Profiles</span>
+                                        <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Members</span>
+                                        <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Fan clubs</span>
+                                    </div>
+                                    <div class="mt-5 flex flex-wrap items-center gap-3">
+                                        <a href="{% url 'idols' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                            Open Idols
+                                            <span class="material-symbols-outlined text-base">arrow_outward</span>
+                                        </a>
+                                        <a href="{% url 'fan_clubs' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
+                                            View Fan Clubs
+                                            <span class="material-symbols-outlined text-base">groups</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/10 bg-black/35 p-5 sm:p-6 xl:border-l xl:border-t-0">
+                            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                                <div class="live-stat-card p-4">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Best For</p>
+                                        <p class="text-xs font-black uppercase tracking-[0.18em] text-white">Fast Start</p>
+                                    </div>
+                                    <p class="mt-3 text-xl font-black uppercase tracking-tight text-white">New Visitors</p>
+                                    <p class="mt-2 text-xs leading-relaxed text-slate-300">Give first-time users one clear featured artist instead of forcing a directory scan immediately.</p>
+                                </div>
+
+                                <div class="live-stat-card p-4">
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Bias Signal</p>
+                                    <div class="mt-3 flex flex-wrap gap-2">
+                                        <span class="live-chip px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Group pages</span>
+                                        <span class="live-chip px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Members</span>
+                                        <span class="live-chip px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Quiz</span>
+                                    </div>
+                                    <p class="mt-3 text-xs leading-relaxed text-slate-300">The right rail frames the kinds of discovery available before the user commits to a destination.</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5">
+                    <div class="mb-4 flex items-end justify-between gap-4">
+                        <div>
+                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Jump By Intent</p>
+                            <h3 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Quick Routes</h3>
+                        </div>
+                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Fast nav</p>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="{% url 'idols' %}" class="chart-link chart-rank-card block p-4 transition-colors">
+                            <div>
+                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Browse</p>
+                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">All Idol Pages</p>
+                                <p class="mt-2 text-xs leading-relaxed text-slate-300">Start broad with groups and visual cards.</p>
+                            </div>
+                        </a>
+                        <a href="{% url 'idol_universe' %}" class="chart-link chart-rank-card block p-4 transition-colors">
+                            <div>
+                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Explore</p>
+                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Idol Universe</p>
+                                <p class="mt-2 text-xs leading-relaxed text-slate-300">Use a more expansive discovery layer for visual browsing.</p>
+                            </div>
+                        </a>
+                        <a href="{% url 'bias_selector' %}" class="chart-link chart-rank-card block p-4 transition-colors">
+                            <div>
+                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Play</p>
+                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Bias Selector</p>
+                                <p class="mt-2 text-xs leading-relaxed text-slate-300">Turn exploration into a fun identity moment.</p>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="lg:col-span-3 space-y-4">
+                    <div class="chart-snapshot-card p-5 sm:p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Fandom Depth</p>
+                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">How Deep It Goes</h3>
+                            </div>
+                            <span class="border border-white/15 bg-white/5 px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Live routes</span>
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-3">
+                            <div class="border border-white/10 bg-black/30 p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Acts</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">250+</p>
+                            </div>
+                            <div class="border border-white/10 bg-black/30 p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Members</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Deep</p>
+                            </div>
+                            <div class="border border-white/10 bg-black/30 p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Clubs</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Join</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-snapshot-card p-5 sm:p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Community Layer</p>
+                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">From Browse To Belonging</h3>
+                            </div>
+                            <span class="border border-white/15 bg-white/5 px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Fandom</span>
+                        </div>
+                        <div class="mt-4 space-y-3">
+                            <a href="{% url 'fan_clubs' %}" class="chart-link stream-route-link p-4">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Join</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Enter Fan Clubs</p>
+                                </div>
+                                <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
+                            </a>
+                            <a href="{% url 'start_club' %}" class="chart-link stream-route-link p-4">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Create</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Start A Club</p>
+                                </div>
+                                <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
+                            </a>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -445,8 +1133,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const header = document.getElementById('main-header');
-            const panel = document.getElementById('mega-menu-lab-panel');
-            if (!header || !panel) return;
+            const streamPanel = document.getElementById('mega-menu-lab-panel');
+            const livePanel = document.getElementById('mega-live-lab-panel');
+            const chartsPanel = document.getElementById('mega-charts-lab-panel');
+            const idolsPanel = document.getElementById('mega-idols-lab-panel');
+            if (!header || !streamPanel || !livePanel || !chartsPanel || !idolsPanel) return;
 
             const desktopNav = Array.from(header.querySelectorAll('nav')).find((nav) => nav.classList.contains('md:flex'));
             if (!desktopNav) return;
@@ -571,7 +1262,24 @@
             const nowAudience = document.getElementById('stream-now-audience');
             const nowLivePill = document.getElementById('stream-now-live-pill');
             const nowVibe = document.getElementById('stream-now-vibe');
+            const premiumTitle = document.getElementById('stream-premium-title');
             const premiumList = document.getElementById('stream-premium-list');
+            const chartsFeatureImage = document.getElementById('charts-feature-image');
+            const chartsFeatureKicker = document.getElementById('charts-feature-kicker');
+            const chartsFeatureRankline = document.getElementById('charts-feature-rankline');
+            const chartsFeatureStatus = document.getElementById('charts-feature-status');
+            const chartsFeatureTagline = document.getElementById('charts-feature-tagline');
+            const chartsFeatureTitle = document.getElementById('charts-feature-title');
+            const chartsFeatureDescription = document.getElementById('charts-feature-description');
+            const chartsFeatureChips = document.getElementById('charts-feature-chips');
+            const chartsFeaturePrimaryCta = document.getElementById('charts-feature-primary-cta');
+            const chartsFeatureSecondaryCta = document.getElementById('charts-feature-secondary-cta');
+            const chartsFeatureMomentumValue = document.getElementById('charts-feature-momentum-value');
+            const chartsFeatureMomentumTitle = document.getElementById('charts-feature-momentum-title');
+            const chartsFeatureMomentumCopy = document.getElementById('charts-feature-momentum-copy');
+            const chartsFeatureFastRead = document.getElementById('charts-feature-fast-read');
+            const chartsFeatureFastCopy = document.getElementById('charts-feature-fast-copy');
+            const chartsMoversList = document.getElementById('charts-movers-list');
 
             if (
                 !panelTagline ||
@@ -598,10 +1306,17 @@
                 !nowAudience ||
                 !nowLivePill ||
                 !nowVibe ||
+                !premiumTitle ||
                 !premiumList
             ) return;
 
             let activeStreamId = launchStreams[0].id;
+            const premiumTitles = [
+                'Unlock Deeper Cuts',
+                'Unlock Smooth Seoul',
+                'Unlock Study Hall',
+                'Unlock Artist of the Week'
+            ];
 
             const buildTierBadge = (stream) => stream.tier === 'free'
                 ? '<span class="border border-emerald-300/50 bg-emerald-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em] text-emerald-200">Free</span>'
@@ -614,6 +1329,78 @@
                     <p class="leading-relaxed">${perk}</p>
                 </div>`;
             };
+
+            const chartMovers = [
+                {
+                    id: 'whiplash',
+                    kicker: 'Fastest Climber',
+                    rank: '#2',
+                    rankLine: 'Global K-Beats Top 20',
+                    status: 'Surging',
+                    title: 'Whiplash Cracks The Front Row',
+                    tagline: 'Replay velocity and share rate are finally lining up.',
+                    description: 'aespa is pulling this track upward on repeat-listen strength, stronger clip circulation, and cleaner crossover momentum.',
+                    chips: ['24h +5', '8.1M streams', 'share rate up'],
+                    image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1400&q=80',
+                    momentumValue: '91%',
+                    momentumTitle: 'Sharp Rise',
+                    momentumCopy: 'Momentum is being driven by repeat listening, stronger saves, and unusually clean day-over-day growth.',
+                    fastRead: ['High replay', 'Share spike', 'Crossover push'],
+                    fastCopy: 'This is the track most likely to break out of the current order if the pace holds.',
+                    primaryHref: urls.charts,
+                    primaryLabel: 'Open Charts',
+                    primaryIcon: 'bar_chart',
+                    secondaryHref: urls.news,
+                    secondaryLabel: 'Read The Story',
+                    secondaryIcon: 'north_east'
+                },
+                {
+                    id: 'plot-twist',
+                    kicker: 'Breakout Move',
+                    rank: '#4',
+                    rankLine: 'Global K-Beats Top 20',
+                    status: 'Breaking',
+                    title: 'Plot Twist Pulls New Listeners In',
+                    tagline: 'A cleaner, younger-skewing rise with real staying power.',
+                    description: 'TWS is climbing on conversion from casual listeners into repeat listeners, which makes this feel less like a spike and more like a real chart step.',
+                    chips: ['24h +7', '6.4M streams', 'new listeners'],
+                    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1400&q=80',
+                    momentumValue: '96%',
+                    momentumTitle: 'Breakout Energy',
+                    momentumCopy: 'This move is being powered by strong first-week discovery and above-normal save behavior.',
+                    fastRead: ['Young audience', 'Save lift', 'Fresh entry'],
+                    fastCopy: 'The signal here is discovery turning into repeat behavior faster than expected.',
+                    primaryHref: urls.charts,
+                    primaryLabel: 'See Leaderboard',
+                    primaryIcon: 'bar_chart',
+                    secondaryHref: urls.idols,
+                    secondaryLabel: 'Jump To Artists',
+                    secondaryIcon: 'groups'
+                },
+                {
+                    id: 'magnetic',
+                    kicker: 'Staying Power',
+                    rank: '#7',
+                    rankLine: 'Global K-Beats Top 20',
+                    status: 'Sticky',
+                    title: 'Magnetic Refuses To Let Go',
+                    tagline: 'Still viral, still replayed, still impossible to shake.',
+                    description: 'The rise is smaller, but the durability is the story here. The track keeps circulating because it remains highly shareable and easy to return to.',
+                    chips: ['24h +3', '5.8M streams', 'viral hold'],
+                    image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1400&q=80',
+                    momentumValue: '84%',
+                    momentumTitle: 'Long Tail Heat',
+                    momentumCopy: 'Less explosive than the others, but unusually resilient for how long it has already been moving.',
+                    fastRead: ['Viral hold', 'Replay loop', 'Share-friendly'],
+                    fastCopy: 'This is a stickiness story: the track keeps finding reasons to stay in the conversation.',
+                    primaryHref: urls.charts,
+                    primaryLabel: 'Open Charts',
+                    primaryIcon: 'bar_chart',
+                    secondaryHref: urls.news,
+                    secondaryLabel: 'Read Breakdown',
+                    secondaryIcon: 'north_east'
+                }
+            ];
 
             const buildRow = (stream) => {
                 const presetNumber = stream.preset.replace('Preset ', '');
@@ -656,8 +1443,8 @@
                 if (!stream) return;
 
                 activeStreamId = stream.id;
-                panel.style.setProperty('--stream-accent', stream.accentRgb);
-                panel.style.setProperty('--stream-secondary', stream.secondaryRgb);
+                streamPanel.style.setProperty('--stream-accent', stream.accentRgb);
+                streamPanel.style.setProperty('--stream-secondary', stream.secondaryRgb);
                 panelTagline.textContent = stream.panelLine;
                 featureImage.className = 'stream-card-image absolute inset-0';
                 featureImage.style.backgroundImage = `linear-gradient(115deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.54) 100%), url('${stream.image}')`;
@@ -695,8 +1482,59 @@
                 highlightActiveRow();
             };
 
+            let activeChartId = 'whiplash';
+
+            const highlightActiveChart = () => {
+                if (!chartsMoversList) return;
+                chartsMoversList.querySelectorAll('[data-chart-id]').forEach((row) => {
+                    row.classList.toggle('active', row.getAttribute('data-chart-id') === activeChartId);
+                });
+            };
+
+            const setActiveChart = (chartId) => {
+                const chart = chartMovers.find((item) => item.id === chartId);
+                if (!chart) return;
+
+                activeChartId = chart.id;
+                if (chartsFeatureImage) {
+                    chartsFeatureImage.style.backgroundImage = `url('${chart.image}')`;
+                }
+                if (chartsFeatureKicker) chartsFeatureKicker.textContent = chart.kicker;
+                if (chartsFeatureRankline) {
+                    chartsFeatureRankline.innerHTML = `<span class="chart-rank-badge inline-flex h-6 min-w-6 items-center justify-center px-2 text-[9px] font-black">${chart.rank}</span>${chart.rankLine}`;
+                }
+                if (chartsFeatureStatus) chartsFeatureStatus.textContent = chart.status;
+                if (chartsFeatureTagline) chartsFeatureTagline.textContent = chart.tagline;
+                if (chartsFeatureTitle) chartsFeatureTitle.textContent = chart.title;
+                if (chartsFeatureDescription) chartsFeatureDescription.textContent = chart.description;
+                if (chartsFeatureChips) {
+                    chartsFeatureChips.innerHTML = chart.chips
+                        .map((chip) => `<span class="chart-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">${chip}</span>`)
+                        .join('');
+                }
+                if (chartsFeaturePrimaryCta) {
+                    chartsFeaturePrimaryCta.href = chart.primaryHref;
+                    chartsFeaturePrimaryCta.innerHTML = `${chart.primaryLabel}<span class="material-symbols-outlined text-base">${chart.primaryIcon}</span>`;
+                }
+                if (chartsFeatureSecondaryCta) {
+                    chartsFeatureSecondaryCta.href = chart.secondaryHref;
+                    chartsFeatureSecondaryCta.innerHTML = `${chart.secondaryLabel}<span class="material-symbols-outlined text-base">${chart.secondaryIcon}</span>`;
+                }
+                if (chartsFeatureMomentumValue) chartsFeatureMomentumValue.textContent = chart.momentumValue;
+                if (chartsFeatureMomentumTitle) chartsFeatureMomentumTitle.textContent = chart.momentumTitle;
+                if (chartsFeatureMomentumCopy) chartsFeatureMomentumCopy.textContent = chart.momentumCopy;
+                if (chartsFeatureFastRead) {
+                    chartsFeatureFastRead.innerHTML = chart.fastRead
+                        .map((item) => `<span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">${item}</span>`)
+                        .join('');
+                }
+                if (chartsFeatureFastCopy) chartsFeatureFastCopy.textContent = chart.fastCopy;
+                highlightActiveChart();
+            };
+
             renderList();
             setActiveStream(activeStreamId);
+            setActiveChart(activeChartId);
 
             const previewStream = (event) => {
                 const row = event.target.closest('[data-stream-id]');
@@ -704,9 +1542,22 @@
                 setActiveStream(row.getAttribute('data-stream-id'));
             };
 
+            const previewChart = (event) => {
+                const row = event.target.closest('[data-chart-id]');
+                if (!row) return;
+                setActiveChart(row.getAttribute('data-chart-id'));
+            };
+
             streamList.addEventListener('mouseover', previewStream);
             streamList.addEventListener('focusin', previewStream);
             streamList.addEventListener('click', previewStream);
+            if (chartsMoversList) {
+                chartsMoversList.addEventListener('mouseover', previewChart);
+                chartsMoversList.addEventListener('focusin', previewChart);
+                chartsMoversList.addEventListener('click', previewChart);
+            }
+
+            let premiumTitleIndex = 0;
 
             let streamsTrigger = document.getElementById('mega-streams-trigger');
             if (!streamsTrigger) {
@@ -720,81 +1571,185 @@
                 desktopNav.insertBefore(streamsTrigger, desktopNav.firstChild);
             }
 
-            const positionPanel = () => {
+            const liveTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.live);
+            if (!liveTrigger) return;
+            const chartsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.charts);
+            if (!chartsTrigger) return;
+            const idolsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.idols);
+            if (!idolsTrigger) return;
+
+            liveTrigger.id = 'mega-live-trigger';
+            liveTrigger.setAttribute('aria-expanded', 'false');
+            liveTrigger.setAttribute('aria-controls', 'mega-live-lab-panel');
+            chartsTrigger.id = 'mega-charts-trigger';
+            chartsTrigger.setAttribute('aria-expanded', 'false');
+            chartsTrigger.setAttribute('aria-controls', 'mega-charts-lab-panel');
+            idolsTrigger.id = 'mega-idols-trigger';
+            idolsTrigger.setAttribute('aria-expanded', 'false');
+            idolsTrigger.setAttribute('aria-controls', 'mega-idols-lab-panel');
+
+            const positionPanel = (targetPanel) => {
                 const rect = header.getBoundingClientRect();
-                panel.style.top = `${Math.max(0, Math.round(rect.bottom))}px`;
+                targetPanel.style.top = `${Math.max(0, Math.round(rect.bottom))}px`;
             };
 
-            const isPanelVisible = () => !panel.classList.contains('pointer-events-none');
             const desktopBreakpoint = 768;
-
             let hideTimer = null;
-            let isPinnedOpen = false;
+            let activePanelKey = null;
+            let pinnedPanelKey = null;
 
-            const showPanel = () => {
-                clearTimeout(hideTimer);
-                positionPanel();
-                panel.classList.remove('pointer-events-none', 'opacity-0', '-translate-y-2');
-                panel.classList.add('opacity-100', 'translate-y-0');
-                streamsTrigger.classList.add('streams-trigger-active');
-                streamsTrigger.setAttribute('aria-expanded', 'true');
+            const panelConfigs = {
+                live: {
+                    trigger: liveTrigger,
+                    panel: livePanel,
+                    onShow: () => {}
+                },
+                charts: {
+                    trigger: chartsTrigger,
+                    panel: chartsPanel,
+                    onShow: () => {}
+                },
+                idols: {
+                    trigger: idolsTrigger,
+                    panel: idolsPanel,
+                    onShow: () => {}
+                },
+                streams: {
+                    trigger: streamsTrigger,
+                    panel: streamPanel,
+                    onShow: () => {
+                        premiumTitle.textContent = premiumTitles[premiumTitleIndex];
+                        premiumTitleIndex = (premiumTitleIndex + 1) % premiumTitles.length;
+                    }
+                }
             };
 
-            const hidePanel = () => {
-                clearTimeout(hideTimer);
-                panel.classList.add('pointer-events-none', 'opacity-0', '-translate-y-2');
-                panel.classList.remove('opacity-100', 'translate-y-0');
-                streamsTrigger.classList.remove('streams-trigger-active');
-                streamsTrigger.setAttribute('aria-expanded', 'false');
-                isPinnedOpen = false;
+            const setTriggerState = (key, active) => {
+                const config = panelConfigs[key];
+                if (!config) return;
+                config.trigger.classList.toggle('mega-trigger-active', active);
+                config.trigger.setAttribute('aria-expanded', active ? 'true' : 'false');
             };
 
-            const openPanel = ({ pinned = false } = {}) => {
+            const hideAllPanels = () => {
+                clearTimeout(hideTimer);
+                Object.entries(panelConfigs).forEach(([key, config]) => {
+                    config.panel.classList.add('pointer-events-none', 'opacity-0', '-translate-y-2');
+                    config.panel.classList.remove('opacity-100', 'translate-y-0');
+                    setTriggerState(key, false);
+                });
+                activePanelKey = null;
+                pinnedPanelKey = null;
+            };
+
+            const isPanelVisible = () => activePanelKey !== null;
+
+            const openPanel = (key, { pinned = false } = {}) => {
                 if (window.innerWidth < desktopBreakpoint) return;
-                if (pinned) isPinnedOpen = true;
-                showPanel();
+                clearTimeout(hideTimer);
+
+                Object.entries(panelConfigs).forEach(([otherKey, config]) => {
+                    if (otherKey === key) return;
+                    config.panel.classList.add('pointer-events-none', 'opacity-0', '-translate-y-2');
+                    config.panel.classList.remove('opacity-100', 'translate-y-0');
+                    setTriggerState(otherKey, false);
+                });
+
+                const config = panelConfigs[key];
+                if (!config) return;
+                config.onShow();
+                positionPanel(config.panel);
+                config.panel.classList.remove('pointer-events-none', 'opacity-0', '-translate-y-2');
+                config.panel.classList.add('opacity-100', 'translate-y-0');
+                setTriggerState(key, true);
+                activePanelKey = key;
+                pinnedPanelKey = pinned ? key : null;
             };
 
             const queueClose = () => {
-                if (isPinnedOpen) return;
+                if (pinnedPanelKey === activePanelKey && activePanelKey !== null) return;
                 clearTimeout(hideTimer);
-                hideTimer = setTimeout(() => hidePanel(), 170);
+                hideTimer = setTimeout(() => hideAllPanels(), 170);
             };
 
-            streamsTrigger.addEventListener('mouseenter', () => openPanel());
-            streamsTrigger.addEventListener('focus', () => openPanel({ pinned: true }));
-            streamsTrigger.addEventListener('click', () => {
-                if (isPanelVisible() && isPinnedOpen) {
-                    hidePanel();
+            liveTrigger.addEventListener('mouseenter', () => openPanel('live'));
+            liveTrigger.addEventListener('focus', () => openPanel('live', { pinned: true }));
+            liveTrigger.addEventListener('click', (event) => {
+                if (window.innerWidth < desktopBreakpoint) return;
+                event.preventDefault();
+                if (activePanelKey === 'live' && pinnedPanelKey === 'live') {
+                    hideAllPanels();
                     return;
                 }
-                openPanel({ pinned: true });
+                openPanel('live', { pinned: true });
+            });
+            liveTrigger.addEventListener('mouseleave', queueClose);
+
+            chartsTrigger.addEventListener('mouseenter', () => openPanel('charts'));
+            chartsTrigger.addEventListener('focus', () => openPanel('charts', { pinned: true }));
+            chartsTrigger.addEventListener('click', (event) => {
+                if (window.innerWidth < desktopBreakpoint) return;
+                if (activePanelKey === 'charts' && pinnedPanelKey === 'charts') return;
+                event.preventDefault();
+                openPanel('charts', { pinned: true });
+            });
+            chartsTrigger.addEventListener('mouseleave', queueClose);
+
+            idolsTrigger.addEventListener('mouseenter', () => openPanel('idols'));
+            idolsTrigger.addEventListener('focus', () => openPanel('idols', { pinned: true }));
+            idolsTrigger.addEventListener('click', (event) => {
+                if (window.innerWidth < desktopBreakpoint) return;
+                if (activePanelKey === 'idols' && pinnedPanelKey === 'idols') return;
+                event.preventDefault();
+                openPanel('idols', { pinned: true });
+            });
+            idolsTrigger.addEventListener('mouseleave', queueClose);
+
+            streamsTrigger.addEventListener('mouseenter', () => openPanel('streams'));
+            streamsTrigger.addEventListener('focus', () => openPanel('streams', { pinned: true }));
+            streamsTrigger.addEventListener('click', () => {
+                if (activePanelKey === 'streams' && pinnedPanelKey === 'streams') {
+                    hideAllPanels();
+                    return;
+                }
+                openPanel('streams', { pinned: true });
             });
             streamsTrigger.addEventListener('mouseleave', queueClose);
 
-            panel.addEventListener('mouseenter', () => clearTimeout(hideTimer));
-            panel.addEventListener('mouseleave', queueClose);
-            panel.addEventListener('focusin', () => clearTimeout(hideTimer));
+            [livePanel, chartsPanel, idolsPanel, streamPanel].forEach((targetPanel) => {
+                targetPanel.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+                targetPanel.addEventListener('mouseleave', queueClose);
+                targetPanel.addEventListener('focusin', () => clearTimeout(hideTimer));
+            });
 
             document.addEventListener('click', (event) => {
-                if (event.target.closest('#mega-menu-lab-panel') || event.target.closest('#mega-streams-trigger')) return;
-                hidePanel();
+                if (
+                    event.target.closest('#mega-menu-lab-panel') ||
+                    event.target.closest('#mega-live-lab-panel') ||
+                    event.target.closest('#mega-charts-lab-panel') ||
+                    event.target.closest('#mega-idols-lab-panel') ||
+                    event.target.closest('#mega-streams-trigger') ||
+                    event.target.closest('#mega-live-trigger') ||
+                    event.target.closest('#mega-charts-trigger') ||
+                    event.target.closest('#mega-idols-trigger')
+                ) return;
+                hideAllPanels();
             });
 
             document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape') hidePanel();
+                if (event.key === 'Escape') hideAllPanels();
             });
 
             window.addEventListener('resize', () => {
                 if (window.innerWidth < desktopBreakpoint) {
-                    hidePanel();
+                    hideAllPanels();
                     return;
                 }
-                if (isPanelVisible()) positionPanel();
+                if (activePanelKey) positionPanel(panelConfigs[activePanelKey].panel);
             });
 
             window.addEventListener('scroll', () => {
-                if (isPanelVisible()) positionPanel();
+                if (activePanelKey) positionPanel(panelConfigs[activePanelKey].panel);
             }, { passive: true });
         });
     </script>
