@@ -11,8 +11,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 
         <meta charset="utf-8" />
-        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-        <title>K-Beats Charts — {{ current_type|title }}</title>
+        
+{% include 'core/seo_meta.html' %}
+<title>K-Beats Charts — {{ current_type|title }}</title>
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <!-- Alpine.js pinned to 3.14.9 -->
         <script
@@ -976,3 +977,4 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </script>
     </body>
 </html>
+

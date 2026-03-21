@@ -423,7 +423,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"></div>
 </div>
 
-<div class="relative z-20 container mx-auto px-4 sm:px-6 max-w-[1400px] h-full flex flex-col md:flex-row items-center md:items-center justify-between pt-[30px] pb-[30px] md:py-16">
+<div class="relative z-20 container mx-auto px-4 sm:px-6 h-full flex flex-col md:flex-row items-center md:items-center justify-between pt-[30px] pb-[30px] md:py-16">
 <!-- Left Content: Massive Typography -->
 <div class="flex flex-col gap-0 max-w-4xl text-left relative z-30 pointer-events-none pt-0 md:pt-0">
                 <h1 class="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase relative z-20">
@@ -522,7 +522,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- Grain overlay -->
 <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
 
-<div class="container mx-auto max-w-[1400px] px-4 sm:px-6 flex items-center justify-between w-full relative z-10 gap-4 sm:gap-0">
+<div class="container mx-auto px-4 sm:px-6 flex items-center justify-between w-full relative z-10 gap-4 sm:gap-0">
 <!-- Left: Play button & Status -->
 <div class="flex items-center gap-3 md:gap-6">
 <div class="md:hidden w-14 h-14 border border-black shadow-[4px_4px_0px_#ffffff] overflow-hidden bg-black">
@@ -597,7 +597,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- Daily Radio Schedule (Brutalist Grid) -->
 <section class="w-full bg-white text-black py-8 md:py-16 border-b border-white/20">
-<div class="container mx-auto px-4 sm:px-6 max-w-[1400px]">
+<div class="container mx-auto px-4 sm:px-6">
 <div class="flex items-end justify-between mb-12">
 <div>
 <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">TODAY'S <br/>PROGRAMMING</h2>
@@ -701,7 +701,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 VOTE VOTE
 </div>
 
-<div class="container mx-auto px-4 sm:px-6 max-w-[1400px] relative z-10 flex flex-col lg:flex-row gap-10 md:gap-16 items-center">
+<div class="container mx-auto px-4 sm:px-6 relative z-10 flex flex-col lg:flex-row gap-10 md:gap-16 items-center">
 <!-- Left: Poll Context -->
 <div class="flex-1 w-full lg:max-w-xl reveal-left">
 <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 mb-6">
@@ -764,7 +764,7 @@ Cast your vote now.
 
 <!-- Trending Section (Brutalist Grid) -->
 <section class="w-full bg-black py-32 border-b border-white/10">
-<div class="container mx-auto px-4 sm:px-6 max-w-[1400px]">
+<div class="container mx-auto px-4 sm:px-6">
 <div class="flex items-end justify-between pb-4 border-b border-white/20">
 <div class="reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">TRENDING <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">NOW</span></h2>
@@ -811,10 +811,10 @@ Cast your vote now.
 <div class="flex flex-col border-t border-white/20 reveal-up">
 
 {% for track in trending_tracks %}
-<div class="group flex items-center justify-between border-b border-white/20 hover:bg-white hover:text-black transition-colors cursor-pointer p-4 sm:p-6" onclick="window.location.href='{% url 'charts' %}'">
-    <div class="flex items-center gap-6 md:gap-8 w-full">
+<div class="group flex items-center justify-between border-b border-white/20 hover:bg-white hover:text-black transition-colors cursor-pointer py-4 px-0 sm:p-6" onclick="window.location.href='{% url 'charts' %}'">
+    <div class="flex items-center gap-4 md:gap-8 w-full">
         <!-- Rank & Movement -->
-        <div class="flex flex-col items-center justify-center w-12 md:w-16 shrink-0">
+        <div class="flex flex-col items-start md:items-center justify-center w-8 md:w-16 shrink-0">
             <span class="font-black text-3xl md:text-4xl text-white group-hover:text-black leading-none tracking-tighter transition-colors">{{ track.rank }}</span>
             <div class="flex items-center gap-1 mt-1 font-mono text-[10px] uppercase font-bold {{ track.trend_class }}">
                 <span>{{ track.trend_icon }}</span> <span>{{ track.trend_value }}</span>
@@ -831,7 +831,7 @@ Cast your vote now.
         </div>
         
         <!-- Track Info -->
-        <div class="flex flex-col justify-center flex-1 min-w-0 pr-4">
+        <div class="flex flex-col justify-center flex-1 min-w-0 pr-0 md:pr-4">
             <h3 class="font-black text-white group-hover:text-black text-xl md:text-2xl uppercase tracking-tighter truncate transition-colors">{{ track.title }}</h3>
             <p class="font-mono text-slate-400 group-hover:text-black text-[10px] md:text-xs tracking-widest uppercase transition-colors truncate">{{ track.artist }}</p>
         </div>
@@ -856,7 +856,7 @@ Cast your vote now.
 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
 </div>
 
-<div class="container mx-auto px-4 sm:px-6 max-w-[1400px] relative z-20 flex flex-col md:flex-row items-end justify-between h-full pb-16 md:pb-24">
+<div class="container mx-auto px-4 sm:px-6 relative z-20 flex flex-col md:flex-row items-end justify-between h-full pb-16 md:pb-24">
 <!-- Left: Text -->
 <div class="flex flex-col max-w-2xl reveal-left">
 <div class="inline-flex items-center gap-2 px-3 py-1 border border-primary text-primary bg-primary/10 self-start mb-6">
@@ -900,7 +900,7 @@ Experience the explosive energy of this generation's most dynamic self-producing
 
 <!-- Upcoming Comebacks Calendar -->
 <section class="bg-black py-32 border-t border-white/5">
-<div class="container mx-auto px-4 sm:px-6 max-w-[1400px]">
+<div class="container mx-auto px-4 sm:px-6">
 <div class="flex items-end justify-between pb-4 border-b border-white/20">
 <div class="reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">UPCOMING <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">COMEBACKS</span></h2>
@@ -940,41 +940,91 @@ Experience the explosive energy of this generation's most dynamic self-producing
 </div>
 {% endif %}
 
-<div class="flex flex-col border-t border-white/20 reveal-up">
+<!-- Mobile: Option 2 (Broadcast Card Deck) -->
+<div class="md:hidden reveal-up mt-4">
+    <div class="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2">
+        {% for r in upcoming_comebacks %}
+        <a href="{% url 'comeback_timeline' %}" class="snap-start shrink-0 w-[220px] border border-white/10 bg-black/50 group">
+            <div class="aspect-square relative overflow-hidden">
+                <div class="cover-slot absolute inset-0">
+                    <img data-itunes-artist="{{ r.artist }}" data-itunes-track="{{ r.title }}" src="{{ r.image|default:'' }}" alt="{{ r.artist }} {{ r.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 {% if not r.image %}hidden{% endif %}" loading="lazy" decoding="async" onerror="this.classList.add('hidden'); this.closest('.cover-slot').querySelector('.cover-fallback').classList.remove('hidden');">
+                    <div class="cover-fallback absolute inset-0 {% if r.image %}hidden{% endif %}">
+                        <div class="w-full h-full bg-[radial-gradient(circle_at_20%_20%,rgba(244,37,192,0.35),transparent_56%),radial-gradient(circle_at_80%_80%,rgba(0,240,255,0.28),transparent_52%),#050505]"></div>
+                        <div class="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06)_0%,transparent_36%,rgba(255,255,255,0.03)_100%)]"></div>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                            <div class="w-16 h-16 rounded-full border border-white/35 bg-black/55 backdrop-blur-sm flex items-center justify-center">
+                                <span class="text-base font-black uppercase tracking-tight text-white">{{ r.artist|default:"KBEATS"|upper|slice:":3" }}</span>
+                            </div>
+                            <p class="mt-2 text-[9px] font-mono uppercase tracking-[0.2em] text-white/70">Artist Signal</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent pointer-events-none"></div>
+                <div class="absolute left-3 top-3 w-9 h-9 border border-white/30 bg-black/65 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+                    <span class="text-[10px] font-black uppercase tracking-tight text-white">{{ r.artist|default:"KB"|upper|slice:":2" }}</span>
+                </div>
+                <div class="absolute right-3 top-3 border border-white/20 bg-black/60 px-2 py-1 text-[9px] font-mono uppercase tracking-[0.16em] text-slate-200">{{ r.date_str|slice:"5:" }}</div>
+                <div class="absolute left-3 right-3 bottom-3">
+                    <span class="inline-block text-[9px] px-2 py-0.5 bg-primary text-black font-black uppercase tracking-[0.18em]">{{ r.type|default:"Release" }}</span>
+                    <h3 class="font-cinzel text-xl font-bold leading-none mt-2 line-clamp-2">{{ r.title }}</h3>
+                    <p class="text-[10px] font-mono uppercase tracking-[0.14em] text-slate-300 mt-1 truncate">{{ r.artist }}</p>
+                    <p class="text-[10px] font-black font-mono tracking-wide text-white mt-1.5" data-countdown="{{ r.iso_date }}">--d --h --m</p>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="w-full py-10 text-center opacity-30 border border-white/10">
+            <p class="text-sm font-bold uppercase tracking-widest">More comebacks loading</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
-{% for r in upcoming_comebacks %}
-<div class="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-6 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer" onclick="window.location.href='{% url 'comeback_timeline' %}'">
-<div class="flex items-center gap-6 w-full md:w-auto mb-4 md:mb-0">
-<div class="relative w-24 h-24 overflow-hidden bg-black shrink-0">
-<img class="w-full h-full object-cover grayscale transition-transform duration-700 ease-out group-hover:scale-110" alt="{{ r.artist }} {{ r.title }}" src="{{ r.image }}" width="96" height="96" sizes="96px" loading="lazy" decoding="async">
-</div>
-<div class="flex flex-col">
-<span class="inline-block bg-primary text-black text-[10px] font-black px-2 py-0.5 mb-2 uppercase tracking-widest w-max">{{ r.type }}</span>
-<h4 class="text-white font-black text-xl leading-tight uppercase tracking-tight group-hover:text-primary transition-colors truncate max-w-[200px] sm:max-w-xs md:max-w-md">{{ r.title }}</h4>
-<p class="text-slate-400 text-sm font-mono tracking-widest uppercase mt-1">{{ r.artist }}</p>
-</div>
-</div>
-
-<div class="flex flex-col md:items-end w-full md:w-auto">
-<span class="text-slate-400 text-xs font-mono tracking-widest uppercase flex items-center gap-2">
-<span class="material-symbols-outlined text-[14px]">schedule</span> {{ r.date_str }}
-</span>
-<span class="text-white text-lg font-black font-mono tracking-wider mt-1" data-countdown="{{ r.iso_date }}">--d --h --m</span>
-</div>
-</div>
-{% empty %}
-<div class="py-12 text-center opacity-30 border-b border-white/10">
-    <p class="text-sm font-bold uppercase tracking-widest">More comebacks loading</p>
-</div>
-{% endfor %}
-
+<!-- Desktop: Option 3 (Signal Matrix) -->
+<div class="hidden md:block border-t border-white/20 reveal-up mt-2">
+    <div class="py-2 space-y-2">
+        {% for r in upcoming_comebacks %}
+        <a href="{% url 'comeback_timeline' %}" class="border border-white/10 bg-black/55 p-3 hover:border-primary/45 hover:bg-white/[0.03] transition-colors block">
+            <div class="grid grid-cols-[84px_1fr_84px] gap-4 items-center">
+                <div class="h-20 border border-white/10 bg-white/[0.03] flex flex-col items-center justify-center">
+                    <p class="text-[9px] font-mono uppercase tracking-[0.16em] text-slate-300">{{ r.date_str|slice:"5:7" }}</p>
+                    <p class="text-2xl font-black leading-none">{{ r.date_str|slice:"8:10" }}</p>
+                </div>
+                <div class="min-w-0">
+                    <h4 class="text-lg font-black uppercase tracking-tight truncate">{{ r.title }}</h4>
+                    <p class="text-[10px] font-mono uppercase tracking-[0.14em] text-slate-400 mt-1 truncate">{{ r.artist }}</p>
+                    <div class="mt-2 flex items-center gap-2">
+                        <span class="text-[8px] px-2 py-0.5 border border-primary/40 text-primary font-black uppercase tracking-[0.16em]">{{ r.type|default:"Release" }}</span>
+                        <span class="text-[8px] px-2 py-0.5 border border-secondary/35 text-secondary font-black uppercase tracking-[0.16em]">Scheduled</span>
+                        <span class="text-[8px] px-2 py-0.5 border border-white/20 text-slate-300 font-black uppercase tracking-[0.16em]" data-countdown="{{ r.iso_date }}">--d --h --m</span>
+                    </div>
+                </div>
+                <div class="w-20 h-20 border border-white/10 overflow-hidden bg-black justify-self-end relative">
+                    <img data-itunes-artist="{{ r.artist }}" data-itunes-track="{{ r.title }}" src="{{ r.image|default:'' }}" alt="{{ r.artist }} {{ r.title }}" class="w-full h-full object-cover {% if not r.image %}hidden{% endif %}" loading="lazy" decoding="async" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                    <div class="w-full h-full bg-[radial-gradient(circle_at_15%_20%,rgba(244,37,192,0.35),transparent_56%),radial-gradient(circle_at_80%_80%,rgba(0,240,255,0.28),transparent_52%),#050505] {% if r.image %}hidden{% endif %}">
+                        <div class="w-full h-full flex flex-col items-center justify-center text-center px-1">
+                            <div class="w-10 h-10 rounded-full border border-white/35 bg-black/55 backdrop-blur-sm flex items-center justify-center">
+                                <span class="text-[11px] font-black uppercase tracking-tight text-white">{{ r.artist|default:"KBEATS"|upper|slice:":3" }}</span>
+                            </div>
+                            <p class="mt-1 text-[8px] font-mono uppercase tracking-[0.16em] text-white/70">Signal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="py-12 text-center opacity-30 border-b border-white/10">
+            <p class="text-sm font-bold uppercase tracking-widest">More comebacks loading</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 </div>
 </section>
 
 <!-- Latest News Section -->
 <section class="w-full bg-black py-32 border-t border-white/10">
-<div class="container mx-auto px-4 sm:px-6 max-w-[1400px]">
+<div class="container mx-auto px-4 sm:px-6">
 <div class="flex items-end justify-between mb-16 pb-4 border-b border-white/20">
 <div class="reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">LATEST <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">NEWS</span></h2>
@@ -1068,7 +1118,17 @@ async function fetchLiveArtwork() {
             const data = await resp.json();
             if (data.results && data.results.length > 0) {
                 const optimizedUrl = normalizeArtworkUrl(data.results[0].artworkUrl100);
-                targets.forEach(img => { img.src = optimizedUrl; });
+                targets.forEach(img => {
+                    img.src = optimizedUrl;
+                    img.classList.remove('hidden');
+
+                    const coverSlot = img.closest('.cover-slot');
+                    const coverFallback = coverSlot ? coverSlot.querySelector('.cover-fallback') : null;
+                    if (coverFallback) coverFallback.classList.add('hidden');
+
+                    const siblingFallback = img.nextElementSibling;
+                    if (siblingFallback) siblingFallback.classList.add('hidden');
+                });
             }
         } catch (e) { console.error(`Artwork fetch failed: ${artist} - ${track}`, e); }
     }

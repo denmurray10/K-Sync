@@ -11,8 +11,31 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 
         <meta charset="utf-8" />
-        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-        <title>K-Beats — {{ article.title }}</title>
+        
+{% include 'core/seo_meta.html' %}
+<title>{{ seo_title }}</title>
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": "{{ article.title|escapejs }}",
+            "description": "{{ seo_description|escapejs }}",
+            "datePublished": "{{ article.created_at|date:'c' }}",
+            "dateModified": "{{ article.created_at|date:'c' }}",
+            "mainEntityOfPage": "{{ canonical_url|escapejs }}",
+            "articleSection": "{{ article.category|escapejs }}",
+            "author": {
+                "@type": "Organization",
+                "name": "K-Beats Editorial"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "K-Beats Radio"
+            }{% if article.image %},
+            "image": "{{ article.image|escapejs }}"
+            {% endif %}
+        }
+        </script>
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <script
             defer
@@ -415,3 +438,4 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         {% include 'core/footer.html' %}
     </body>
 </html>
+

@@ -11,8 +11,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Draft Day — K-Beats</title>
+    
+{% include 'core/seo_meta.html' %}
+<title>Draft Day — K-Beats</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -47,11 +48,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+    {% include 'core/header.html' %}
 
-
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
-        <div class="px-6 py-4 flex items-center justify-between">
+    <section class="pt-24 px-6">
+        <div class="bg-black/80 backdrop-blur-md border border-white/10 px-4 py-4 md:px-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div class="flex items-center gap-4">
                 <a href="{% url 'games' %}" class="text-slate-400 hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-2xl">close</span>
@@ -62,7 +62,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
 
-            <div class="flex items-center gap-10">
+            <div class="flex items-center gap-6 md:gap-10">
                 <div class="text-right">
                     <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500 block">Remaining Budget</span>
                     <span class="text-xl font-black text-white" :class="budget < 50 ? 'text-red-400' : 'text-accent'" x-text="'£' + budget + 'M'"></span>
@@ -71,16 +71,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500 block">Team Power</span>
                     <span class="text-xl font-black text-secondary" x-text="teamPower"></span>
                 </div>
-                <button @click="finishDraft()" 
+                <button @click="finishDraft()"
                         :disabled="myTeam.length < 3 || budget < 0"
                         class="bg-white text-black px-6 py-2.5 font-black uppercase tracking-[0.1em] text-[10px] hover:bg-accent disabled:opacity-30 disabled:hover:bg-white transition-all">
                     Finalize Lineup
                 </button>
             </div>
         </div>
-    </header>
+    </section>
 
-    <main class="pt-28 md:pt-24 pb-12 px-6 flex flex-col lg:flex-row gap-8 min-h-screen">
+    <main class="pt-6 pb-12 px-6 flex flex-col lg:flex-row gap-8 min-h-screen">
         
         <!-- Selection Pool -->
         <div class="flex-1">
@@ -396,3 +396,5 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </script>
 </body>
 </html>
+
+

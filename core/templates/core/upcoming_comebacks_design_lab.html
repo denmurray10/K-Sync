@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    
+{% include 'core/seo_meta.html' %}
+<title>Upcoming Comebacks Design Lab</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
+    <style>
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        .lab-shell {
+            background:
+                radial-gradient(circle at 20% 0%, rgba(244, 37, 192, 0.12), transparent 45%),
+                radial-gradient(circle at 80% 100%, rgba(0, 240, 255, 0.1), transparent 40%),
+                #020202;
+        }
+        .neon-frame {
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+        .option-sheen {
+            background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+        }
+        .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(244, 37, 192, 0.45); }
+    </style>
+</head>
+<body class="lab-shell text-white font-display min-h-screen">
+{% include "core/header.html" %}
+
+<main class="pt-36 pb-20">
+    <section class="container mx-auto px-4 sm:px-6 max-w-[1400px]">
+        <div class="mb-10">
+            <p class="text-primary font-mono text-[10px] tracking-[0.28em] uppercase">Design Lab</p>
+            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none mt-2 font-cinzel">
+                Upcoming <span class="text-transparent [-webkit-text-stroke:1px_theme(colors.primary)]">Comebacks</span>
+            </h1>
+            <p class="text-slate-400 text-sm md:text-base mt-4 max-w-3xl">
+                Same releases, three distinct visual systems. We can pick the one that feels most premium and still scans fast on mobile.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+            <article class="neon-frame option-sheen backdrop-blur-sm overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-black/45">
+                    <p class="font-mono text-[10px] tracking-[0.25em] uppercase text-primary">Option 1</p>
+                    <h2 class="text-xl font-black uppercase tracking-tight mt-1">Neon Timeline Rail</h2>
+                    <p class="text-xs text-slate-400 mt-1">Date-forward editorial list with a strong vertical rhythm.</p>
+                </div>
+                <div class="p-4 relative">
+                    <div class="absolute left-[21px] top-4 bottom-4 w-px bg-gradient-to-b from-primary/70 via-white/10 to-secondary/70"></div>
+                    {% for r in upcoming_comebacks %}
+                    <div class="relative pl-9 py-3 border-b border-white/10 last:border-b-0">
+                        <span class="absolute left-[15px] top-5 w-3 h-3 rounded-full bg-primary border border-white/40"></span>
+                        <div class="grid grid-cols-[72px_1fr] gap-3 items-center">
+                            <div class="text-center border border-primary/30 bg-primary/10 py-2">
+                                <p class="text-[9px] font-mono uppercase tracking-[0.18em] text-slate-300">{{ r.date_str|slice:"5:7" }}</p>
+                                <p class="text-2xl font-black leading-none">{{ r.date_str|slice:"8:10" }}</p>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center justify-between gap-2">
+                                    <h3 class="font-black uppercase tracking-tight text-sm truncate">{{ r.title }}</h3>
+                                    <span class="text-[9px] px-2 py-0.5 border border-primary/40 text-primary font-black uppercase tracking-[0.16em]">{{ r.type|default:"Release" }}</span>
+                                </div>
+                                <p class="text-[11px] font-mono uppercase tracking-[0.14em] text-slate-400 mt-1 truncate">{{ r.artist }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-8 text-center text-slate-500 text-sm uppercase tracking-widest">No upcoming releases</div>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="neon-frame option-sheen backdrop-blur-sm overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-black/45">
+                    <p class="font-mono text-[10px] tracking-[0.25em] uppercase text-secondary">Option 2</p>
+                    <h2 class="text-xl font-black uppercase tracking-tight mt-1">Broadcast Card Deck</h2>
+                    <p class="text-xs text-slate-400 mt-1">Swipeable visual cards with strong cover-art energy.</p>
+                </div>
+                <div class="p-4">
+                    <div class="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-thin">
+                        {% for r in upcoming_comebacks %}
+                        <div class="snap-start shrink-0 w-[220px] border border-white/10 bg-black/50 group">
+                            <div class="aspect-square relative overflow-hidden">
+                            <div class="cover-slot absolute inset-0">
+                                <img src="{{ r.image|default:'' }}" alt="{{ r.artist }} {{ r.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 {% if not r.image %}hidden{% endif %}" loading="lazy" decoding="async" onerror="this.classList.add('hidden'); this.closest('.cover-slot').querySelector('.cover-fallback').classList.remove('hidden');">
+                                <div class="cover-fallback absolute inset-0 {% if r.image %}hidden{% endif %}">
+                                    <div class="w-full h-full bg-[radial-gradient(circle_at_20%_20%,rgba(244,37,192,0.35),transparent_56%),radial-gradient(circle_at_80%_80%,rgba(0,240,255,0.28),transparent_52%),#050505]"></div>
+                                    <div class="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06)_0%,transparent_36%,rgba(255,255,255,0.03)_100%)]"></div>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                                <div class="w-16 h-16 rounded-full border border-white/35 bg-black/55 backdrop-blur-sm flex items-center justify-center">
+                                    <span class="text-base font-black uppercase tracking-tight text-white">{{ r.artist|default:"KBEATS"|upper|slice:":3" }}</span>
+                                </div>
+                                <p class="mt-2 text-[9px] font-mono uppercase tracking-[0.2em] text-white/70">Artist Signal</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent pointer-events-none"></div>
+                            <div class="absolute left-3 top-3 w-9 h-9 border border-white/30 bg-black/65 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+                                <span class="text-[10px] font-black uppercase tracking-tight text-white">{{ r.artist|default:"KB"|upper|slice:":2" }}</span>
+                            </div>
+                            <div class="absolute left-3 right-3 bottom-3">
+                                <span class="inline-block text-[9px] px-2 py-0.5 bg-primary text-black font-black uppercase tracking-[0.18em]">{{ r.type|default:"Release" }}</span>
+                                <h3 class="font-cinzel text-xl font-bold leading-none mt-2 line-clamp-2">{{ r.title }}</h3>
+                                <p class="text-[10px] font-mono uppercase tracking-[0.14em] text-slate-300 mt-1 truncate">{{ r.artist }}</p>
+                            </div>
+                            <div class="absolute right-3 top-3 border border-white/20 bg-black/60 px-2 py-1 text-[9px] font-mono uppercase tracking-[0.16em] text-slate-200">{{ r.date_str|slice:"5:" }}</div>
+                        </div>
+                    </div>
+                        {% empty %}
+                        <div class="p-8 text-center text-slate-500 text-sm uppercase tracking-widest">No upcoming releases</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </article>
+
+            <article class="neon-frame option-sheen backdrop-blur-sm overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-black/45">
+                    <p class="font-mono text-[10px] tracking-[0.25em] uppercase text-white">Option 3</p>
+                    <h2 class="text-xl font-black uppercase tracking-tight mt-1">Signal Matrix</h2>
+                    <p class="text-xs text-slate-400 mt-1">High-contrast utility layout with bold information blocks.</p>
+                </div>
+                <div class="p-4 space-y-2">
+                    {% for r in upcoming_comebacks %}
+                    <div class="border border-white/10 bg-black/55 p-2.5 hover:border-primary/45 transition-colors">
+                        <div class="grid grid-cols-[64px_1fr_auto] gap-3 items-center">
+                            <div class="h-16 border border-white/10 bg-white/[0.03] flex flex-col items-center justify-center">
+                                <p class="text-[9px] font-mono uppercase tracking-[0.16em] text-slate-300">{{ r.date_str|slice:"5:7" }}</p>
+                                <p class="text-xl font-black leading-none">{{ r.date_str|slice:"8:10" }}</p>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-sm font-black uppercase tracking-tight truncate">{{ r.title }}</h3>
+                                <p class="text-[10px] font-mono uppercase tracking-[0.14em] text-slate-400 mt-1 truncate">{{ r.artist }}</p>
+                                <div class="mt-1.5 flex items-center gap-2">
+                                    <span class="text-[8px] px-2 py-0.5 border border-primary/40 text-primary font-black uppercase tracking-[0.16em]">{{ r.type|default:"Release" }}</span>
+                                    <span class="text-[8px] px-2 py-0.5 border border-secondary/35 text-secondary font-black uppercase tracking-[0.16em]">Scheduled</span>
+                                </div>
+                            </div>
+                            {% if r.image %}
+                            <img src="{{ r.image }}" alt="{{ r.artist }} {{ r.title }}" class="w-14 h-14 border border-white/10 object-cover">
+                            {% else %}
+                            <div class="w-14 h-14 border border-white/10 bg-[radial-gradient(circle_at_15%_20%,rgba(244,37,192,0.35),transparent_56%),radial-gradient(circle_at_80%_80%,rgba(0,240,255,0.28),transparent_52%),#050505]"></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-8 text-center text-slate-500 text-sm uppercase tracking-widest">No upcoming releases</div>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+{% include "core/footer.html" %}
+</body>
+</html>
+

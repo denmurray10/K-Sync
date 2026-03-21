@@ -1,0 +1,24 @@
+<meta name="description" content="{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}"/>
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/>
+<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
+
+<meta property="og:type" content="{% firstof seo_type 'website' %}"/>
+<meta property="og:site_name" content="K-Beats Radio"/>
+<meta property="og:title" content="{% firstof seo_title article.title contest.title group.name 'K-Beats Radio | Live K-Pop Music, Charts, News & Community' %}"/>
+<meta property="og:description" content="{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}"/>
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="{% firstof seo_title article.title contest.title group.name 'K-Beats Radio | Live K-Pop Music, Charts, News & Community' %}"/>
+<meta name="twitter:description" content="{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}"/>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "{% firstof seo_title article.title contest.title group.name 'K-Beats Radio' %}",
+    "description": "{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}",
+    "inLanguage": "en-GB"
+}
+</script>

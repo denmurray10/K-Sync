@@ -17,6 +17,7 @@ from django.views.decorators.http import require_POST
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.urls import reverse
 import requests
 import urllib.parse
 import re
@@ -309,6 +310,60 @@ def _optimize_home_image_url(source_url, *, width=None, height=None):
         return f'https://res.cloudinary.com/{cloud_name}/image/fetch/{transform}/{encoded}'
 
     return raw
+
+
+def _fetch_artwork_from_sources(artist, title):
+    artist_text = str(artist or '').strip()
+    title_text = str(title or '').strip()
+    query = f"{artist_text} {title_text}".strip()
+    if not query:
+        return ''
+
+    headers = {'User-Agent': 'Mozilla/5.0'}
+
+    # 1) iTunes Search API
+    try:
+        resp = requests.get(
+            'https://itunes.apple.com/search',
+            params={'term': query, 'entity': 'song', 'limit': 1},
+            headers=headers,
+            timeout=3,
+        )
+        if resp.ok:
+            data = resp.json() or {}
+            results = data.get('results') or []
+            if results:
+                art = str(results[0].get('artworkUrl100') or '').strip()
+                if art:
+                    return (
+                        art
+                        .replace('100x100bb', '600x600bb')
+                        .replace('60x60bb', '600x600bb')
+                    )
+    except Exception:
+        pass
+
+    # 2) Deezer Search API fallback
+    try:
+        resp = requests.get(
+            'https://api.deezer.com/search',
+            params={'q': query, 'limit': 1},
+            headers=headers,
+            timeout=3,
+        )
+        if resp.ok:
+            data = resp.json() or {}
+            rows = data.get('data') or []
+            if rows:
+                album = rows[0].get('album') or {}
+                for key in ('cover_xl', 'cover_big', 'cover_medium', 'cover'):
+                    art = str(album.get(key) or '').strip()
+                    if art:
+                        return art
+    except Exception:
+        pass
+
+    return ''
 
 
 def _normalize_show_color(raw_value):
@@ -2317,6 +2372,15 @@ def home(request):
     data_next = ComebackData.objects.filter(year=now.year if now.month < 12 else now.year + 1, 
                                             month=now.month + 1 if now.month < 12 else 1).first()
     
+    def _release_image_url(release):
+        if not isinstance(release, dict):
+            return ''
+        for key in ('image', 'image_url', 'cover', 'cover_url', 'thumbnail', 'artwork_url'):
+            value = str(release.get(key) or '').strip()
+            if value:
+                return value
+        return ''
+
     all_releases = []
     if data_current:
         for date_key, details in data_current.data.items():
@@ -2325,6 +2389,7 @@ def home(request):
                 resolved_date_str = date_key
                 for r in details['releases']:
                     release_item = dict(r)
+                    release_item['image'] = _release_image_url(release_item)
                     release_item['date_str'] = resolved_date_str
                     release_item['iso_date'] = f"{resolved_date_str}T09:00:00Z"
                     all_releases.append(release_item)
@@ -2335,6 +2400,7 @@ def home(request):
                 resolved_date_str = date_key
                 for r in details['releases']:
                     release_item = dict(r)
+                    release_item['image'] = _release_image_url(release_item)
                     release_item['date_str'] = resolved_date_str
                     release_item['iso_date'] = f"{resolved_date_str}T09:00:00Z"
                     all_releases.append(release_item)
@@ -2350,6 +2416,23 @@ def home(request):
                 station_group_names,
             ),
         )
+
+    # Fill comeback artwork from external providers (iTunes -> Deezer), then
+    # fall back to the source image from the feed when no match is found.
+    artwork_cache = {}
+    for release in upcoming_all:
+        source_image = str(release.get('image') or '').strip()
+        cache_key = (
+            str(release.get('artist') or '').strip().lower(),
+            str(release.get('title') or '').strip().lower(),
+        )
+        if cache_key not in artwork_cache:
+            artwork_cache[cache_key] = _fetch_artwork_from_sources(
+                release.get('artist'),
+                release.get('title'),
+            )
+        release['image'] = artwork_cache.get(cache_key, '') or source_image
+
     hero_day_events = []
     if upcoming_all:
         first_day = str(upcoming_all[0].get('date_str') or '').strip()
@@ -2573,6 +2656,59 @@ def home(request):
         'homepage_programming': homepage_programming,
         'my_station_profile': profile,
         'my_station_groups': station_group_names,
+    })
+
+
+def upcoming_comebacks_design_lab(request):
+    now = timezone.now()
+    data_current = ComebackData.objects.filter(year=now.year, month=now.month).first()
+    data_next = ComebackData.objects.filter(
+        year=now.year if now.month < 12 else now.year + 1,
+        month=now.month + 1 if now.month < 12 else 1,
+    ).first()
+
+    def _release_image_url(release):
+        if not isinstance(release, dict):
+            return ''
+        for key in ('image', 'image_url', 'cover', 'cover_url', 'thumbnail', 'artwork_url'):
+            value = str(release.get(key) or '').strip()
+            if value:
+                return value
+        return ''
+
+    all_releases = []
+    for data_obj in (data_current, data_next):
+        if not data_obj:
+            continue
+        for date_key, details in (data_obj.data or {}).items():
+            for r in (details or {}).get('releases', []) or []:
+                release_item = dict(r)
+                release_item['image'] = _release_image_url(release_item)
+                release_item['date_str'] = str(date_key).strip()
+                release_item['iso_date'] = f"{date_key}T09:00:00Z"
+                all_releases.append(release_item)
+
+    all_releases.sort(key=lambda x: x.get('date_str', ''))
+    today_str = now.strftime('%Y-%m-%d')
+    upcoming = [r for r in all_releases if str(r.get('date_str') or '') >= today_str][:9]
+    artwork_cache = {}
+    for release in upcoming:
+        source_image = str(release.get('image') or '').strip()
+        cache_key = (
+            str(release.get('artist') or '').strip().lower(),
+            str(release.get('title') or '').strip().lower(),
+        )
+        if cache_key not in artwork_cache:
+            artwork_cache[cache_key] = _fetch_artwork_from_sources(
+                release.get('artist'),
+                release.get('title'),
+            )
+        image_url = artwork_cache.get(cache_key, '') or source_image
+        release['image'] = _optimize_home_image_url(image_url, width=320, height=320)
+
+    return render(request, 'core/upcoming_comebacks_design_lab.html', {
+        'upcoming_comebacks': upcoming,
+        'current_month': now.strftime('%B %Y'),
     })
 
 
@@ -5658,7 +5794,124 @@ def blog_page(request):
     return render(request, 'core/blog_page.html', {
         'articles': articles,
         'categories': cats,
+        'canonical_url': request.build_absolute_uri(reverse('blog_page')),
+        'seo_type': 'website',
+        'seo_title': 'K-Beats Blog | K-Pop News, Comebacks, and Culture',
+        'seo_description': 'Explore K-Pop blog coverage from K-Beats including comeback updates, artist stories, charts, and fan culture.',
     })
+
+
+def _strip_html_tags(value):
+    text = re.sub(r'<[^>]+>', ' ', value or '')
+    return re.sub(r'\s+', ' ', text).strip()
+
+
+def _build_article_meta_title(article):
+    base_title = (article.title or '').strip()
+    if not base_title:
+        return 'K-Beats Blog'
+    title = f"{base_title} | K-Beats K-Pop Blog"
+    return title[:60].rstrip()
+
+
+def _build_article_meta_description(article):
+    candidates = [
+        (article.subtitle or '').strip(),
+        _strip_html_tags(article.body_html),
+    ]
+    for raw in candidates:
+        if not raw:
+            continue
+        text = raw[:157].rstrip()
+        if len(raw) > 157:
+            text = f"{text}..."
+        if len(text) >= 70:
+            return text
+        return f"{text} | K-Beats K-Pop blog update"
+    return "Read the latest K-Pop news, comebacks, and culture features on the K-Beats blog."
+
+
+def _inject_internal_links(html, article, all_articles):
+    body = html or ''
+    if not body:
+        return body, 0
+
+    # Keep links relevant and not spammy.
+    max_total_links = 6
+    max_article_links = 4
+    links_added = 0
+    article_links_added = 0
+
+    site_link_targets = [
+        (r'\blive (radio|stream)\b', reverse('live'), 'K-Beats live radio'),
+        (r'\bcharts?\b', reverse('charts'), 'K-Pop charts'),
+        (r'\bnews\b', reverse('news'), 'K-Pop news feed'),
+        (r'\bcomeback(s)?\b', reverse('comeback_timeline'), 'comeback timeline'),
+        (r'\bschedule\b', reverse('schedule'), 'radio schedule'),
+        (r'\bfan club(s)?\b', reverse('fan_clubs'), 'fan clubs'),
+    ]
+
+    article_targets = []
+    for candidate in all_articles:
+        if candidate.pk == article.pk:
+            continue
+        phrase = (candidate.title or '').strip()
+        if len(phrase) < 8:
+            continue
+        article_targets.append((phrase, reverse('blog_article_read', kwargs={'slug': candidate.slug})))
+
+    article_targets.sort(key=lambda item: len(item[0]), reverse=True)
+
+    chunks = re.split(r'(<a\b[^>]*>.*?</a>)', body, flags=re.IGNORECASE | re.DOTALL)
+    for idx, chunk in enumerate(chunks):
+        if links_added >= max_total_links:
+            break
+        if re.match(r'^<a\b', chunk or '', flags=re.IGNORECASE):
+            continue
+
+        segment = chunk
+        segment_lower = segment.lower()
+
+        # First add high-intent links to core website pages.
+        for pattern, url, title in site_link_targets:
+            if links_added >= max_total_links:
+                break
+            if url.lower() in segment_lower:
+                continue
+            replacement_pattern = re.compile(pattern, flags=re.IGNORECASE)
+            if not replacement_pattern.search(segment):
+                continue
+            segment = replacement_pattern.sub(
+                lambda m: f'<a href="{url}" title="{title}">{m.group(0)}</a>',
+                segment,
+                count=1,
+            )
+            links_added += 1
+            segment_lower = segment.lower()
+
+        # Then connect to related articles.
+        for phrase, url in article_targets:
+            if links_added >= max_total_links or article_links_added >= max_article_links:
+                break
+            if url.lower() in segment_lower:
+                continue
+            phrase_pattern = re.compile(rf'(?<!\w){re.escape(phrase)}(?!\w)', flags=re.IGNORECASE)
+            if not phrase_pattern.search(segment):
+                continue
+            segment = phrase_pattern.sub(
+                lambda m: (
+                    f'<a href="{url}" title="Read: {phrase}" rel="internal">{m.group(0)}</a>'
+                ),
+                segment,
+                count=1,
+            )
+            links_added += 1
+            article_links_added += 1
+            segment_lower = segment.lower()
+
+        chunks[idx] = segment
+
+    return ''.join(chunks), links_added
 
 
 def blog_article_read(request, slug):
@@ -5673,9 +5926,20 @@ def blog_article_read(request, slug):
     related = list(related)
     for related_article in related:
         _apply_stream_images_to_article(related_article)
+    canonical_url = request.build_absolute_uri(
+        reverse('blog_article_read', kwargs={'slug': article.slug})
+    )
+    meta_title = _build_article_meta_title(article)
+    meta_description = _build_article_meta_description(article)
     return render(request, 'core/blog_article.html', {
         'article': article,
         'related': related,
+        'canonical_url': canonical_url,
+        'meta_title': meta_title,
+        'meta_description': meta_description,
+        'seo_type': 'article',
+        'seo_title': meta_title,
+        'seo_description': meta_description,
     })
 
 
@@ -6547,66 +6811,30 @@ def blog_internal_link_pass(request):
     <a href="/blog/SLUG/"> hyperlinks wherever sibling article titles
     are naturally mentioned in the text.
     """
-    from django.shortcuts import redirect
+    gate = _staff_only_json(request)
+    if gate:
+        return gate
 
-    all_articles = list(BlogArticle.objects.all())
+    all_articles = list(BlogArticle.objects.order_by('-created_at'))
     if len(all_articles) < 2:
-        return redirect('news')
-
-    # Build a lookup of title -> slug for all articles
-    article_map = {a.title: a.slug for a in all_articles}
+        return JsonResponse({'ok': True, 'updated': 0, 'message': 'Not enough articles for linking.'})
 
     updated = 0
+    total_links_added = 0
     for article in all_articles:
-        # Collect other articles as link candidates
-        others = [
-            {'title': t, 'slug': s}
-            for t, s in article_map.items()
-            if t != article.title
-        ]
-        if not others:
+        updated_html, links_added = _inject_internal_links(article.body_html, article, all_articles)
+        if links_added <= 0 or updated_html == (article.body_html or ''):
             continue
+        BlogArticle.objects.filter(pk=article.pk).update(body_html=updated_html)
+        updated += 1
+        total_links_added += links_added
 
-        candidates = '\n'.join(
-            f'- "{o["title"]}" -> /blog/{o["slug"]}/'
-            for o in others[:15]
-        )
-
-        prompt = (
-            f"You are an SEO editor. Review the following HTML article and "
-            f"add hyperlinks (<a href=\"URL\">anchor text</a>) ONLY where "
-            f"the following article titles (or key subjects from them) are "
-            f"*naturally mentioned* in the text. Do not force links — only "
-            f"add them where they genuinely fit. Do NOT change any other "
-            f"content, wording, or HTML structure.\n\n"
-            f"Candidate links:\n{candidates}\n\n"
-            f"Article HTML:\n{article.body_html}\n\n"
-            f"Return ONLY the complete modified HTML with links added "
-            f"(or unchanged if no natural fits were found). "
-            f"No explanation, no markdown fences."
-        )
-
-        try:
-            updated_html = _chat(
-                prompt,
-                system=(
-                    "You are an expert SEO editor. You add internal hyperlinks "
-                    "to HTML articles without changing any other content. "
-                    "Return only the raw HTML."
-                ),
-            )
-            # Sanity check: make sure we got HTML back
-            if updated_html and '<p>' in updated_html:
-                article.body_html = updated_html
-                # Use update to skip bleach re-sanitization stripping new <a> tags
-                BlogArticle.objects.filter(pk=article.pk).update(
-                    body_html=updated_html
-                )
-                updated += 1
-        except Exception:
-            continue
-
-    return redirect('news')
+    return JsonResponse({
+        'ok': True,
+        'updated_articles': updated,
+        'total_links_added': total_links_added,
+        'scanned_articles': len(all_articles),
+    })
 
 
 def new_release_spotlight(request):

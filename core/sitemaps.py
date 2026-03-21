@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.contrib.sitemaps import Sitemap
+from .models import BlogArticle
 
 
 class StaticViewSitemap(Sitemap):
@@ -24,3 +25,18 @@ class StaticViewSitemap(Sitemap):
 
     def location(self, item):
         return reverse(item)
+
+
+class BlogArticleSitemap(Sitemap):
+    protocol = "https"
+    changefreq = "weekly"
+    priority = 0.9
+
+    def items(self):
+        return BlogArticle.objects.order_by('-created_at')
+
+    def lastmod(self, obj):
+        return obj.created_at
+
+    def location(self, obj):
+        return reverse('blog_article_read', kwargs={'slug': obj.slug})
