@@ -158,7 +158,7 @@
         .stream-row {
             position: relative;
             overflow: hidden;
-            border-radius: 20px;
+            border-radius: 0;
             transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
         }
         .stream-row::before,
@@ -261,20 +261,6 @@
                         <p id="stream-panel-tagline" class="max-w-xl text-[13px] leading-relaxed text-slate-300">Mood-led stations with enough live context to feel like a destination, not a drop-down.</p>
                     </div>
                 </div>
-                <div class="grid gap-2 sm:grid-cols-3 xl:min-w-[400px]">
-                    <div class="stream-shell-card px-4 py-3">
-                        <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">Launch Lanes</p>
-                        <p class="mt-2 text-xl font-black uppercase tracking-tight text-white">5 Presets</p>
-                    </div>
-                    <div class="stream-shell-card px-4 py-3">
-                        <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">Live Rotation</p>
-                        <p class="mt-2 text-xl font-black uppercase tracking-tight text-white">24 / 7</p>
-                    </div>
-                    <div class="stream-shell-card px-4 py-3">
-                        <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">Member Hooks</p>
-                        <p class="mt-2 text-xl font-black uppercase tracking-tight text-white">3 Unlocks</p>
-                    </div>
-                </div>
             </div>
 
             <div class="grid gap-5 lg:grid-cols-12">
@@ -298,11 +284,11 @@
                                 <p id="stream-feature-description" class="mt-3 max-w-xl text-sm leading-relaxed text-slate-200/90"></p>
                                 <div id="stream-feature-genres" class="mt-4 flex flex-wrap gap-2"></div>
                                 <div class="mt-5 flex flex-wrap items-center gap-3">
-                                    <a id="stream-feature-cta" href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-black transition-colors hover:border-white hover:bg-white">
+                                    <a id="stream-feature-cta" href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                         Listen Now
                                         <span class="material-symbols-outlined text-base">play_arrow</span>
                                     </a>
-                                    <a href="{% url 'pricing' %}" class="inline-flex items-center gap-2 border border-white/30 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:border-secondary hover:text-secondary">
+                                    <a href="{% url 'pricing' %}" class="inline-flex items-center gap-2 bg-black px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                         Unlock More
                                         <span class="material-symbols-outlined text-base">bolt</span>
                                     </a>
@@ -370,7 +356,7 @@
                             <span id="stream-now-live-pill" class="border px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Live</span>
                         </div>
                         <div class="mt-4 flex items-center gap-4">
-                            <div class="flex h-14 w-14 items-end gap-1 rounded-2xl border border-white/10 bg-black/35 p-2">
+                            <div class="flex h-14 w-14 items-end gap-1 border border-white/10 bg-black/35 p-2">
                                 <span class="signal-bar h-5 w-1.5"></span>
                                 <span class="signal-bar h-9 w-1.5"></span>
                                 <span class="signal-bar h-7 w-1.5"></span>
@@ -631,7 +617,7 @@
 
             const buildRow = (stream) => {
                 const presetNumber = stream.preset.replace('Preset ', '');
-                return `<button type="button" data-stream-id="${stream.id}" class="stream-row w-full border border-white/12 bg-black/30 px-4 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" aria-label="Preview ${stream.name}" aria-pressed="false">
+                return `<button type="button" data-stream-id="${stream.id}" class="stream-row w-full border border-white/10 bg-black/30 px-4 py-4 text-left focus-visible:outline-none focus-visible:ring-0" aria-label="Preview ${stream.name}" aria-pressed="false">
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex min-w-0 gap-3">
                             <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[10px] font-black uppercase tracking-[0.16em]" style="border: 1px solid rgba(${stream.accentRgb}, 0.35); background: rgba(${stream.accentRgb}, 0.12); color: rgba(${stream.accentRgb}, 1);">${presetNumber}</span>
