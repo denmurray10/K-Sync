@@ -2830,7 +2830,7 @@ def _build_header_mega_menu_context(request):
                 start_index = upcoming_today_index
 
         if schedule_items:
-            take_count = min(4, len(schedule_items))
+            take_count = min(3, len(schedule_items))
             selected_schedule_items = [schedule_items[(start_index + offset) % len(schedule_items)] for offset in range(take_count)]
 
             for offset, selected in enumerate(selected_schedule_items):
@@ -2897,11 +2897,12 @@ def _build_header_mega_menu_context(request):
 
                 title = show_name
                 status = 'On Air' if selected['is_current'] and offset == 0 else ('Up Next' if offset == 0 else '')
+                short_preview = _shorten_text(slot_data['playlist_preview'], 110)
                 live_programming.append({
                     'status': status,
                     'time_label': slot_data['time_hhmm'],
                     'title': title,
-                    'description': f"Hosted by {host_name} · {slot_data['playlist_preview']}",
+                    'description': f"Hosted by {host_name} · {short_preview}",
                 })
     except Exception:
         live_track = None
@@ -3012,7 +3013,7 @@ def _build_header_mega_menu_context(request):
 
     news_panel = {
         'featured': news_articles[0] if news_articles else None,
-        'items': news_articles[1:4] if len(news_articles) > 1 else [],
+        'items': news_articles[1:3] if len(news_articles) > 1 else [],
         'total_count': len(news_articles),
     }
     recent_request_count = SongRequest.objects.count()
@@ -3023,7 +3024,7 @@ def _build_header_mega_menu_context(request):
         'mega_menu_idols': idol_routes,
         'mega_menu_idol_stats': idol_stats,
         'mega_menu_live': live_panel,
-        'mega_menu_schedule': live_programming[:3],
+        'mega_menu_schedule': live_programming[:2],
         'mega_menu_comebacks_primary': comeback_primary,
         'mega_menu_comebacks': comeback_cards,
         'mega_menu_news': news_panel,
