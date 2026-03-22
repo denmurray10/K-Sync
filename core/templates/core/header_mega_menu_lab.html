@@ -497,6 +497,22 @@
             background: linear-gradient(135deg, rgba(var(--charts-accent), 0.16), rgba(255, 255, 255, 0.03) 52%, rgba(var(--charts-secondary), 0.08));
             color: #ffffff;
         }
+        .panel-filter-tab {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.28);
+            color: rgba(226, 232, 240, 0.9);
+            transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+        }
+        .panel-filter-tab:hover,
+        .panel-filter-tab:focus-visible {
+            border-color: rgba(255, 255, 255, 0.42);
+            color: #ffffff;
+        }
+        .panel-filter-tab.active {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
         .chart-trend-up {
             color: rgba(var(--charts-accent), 1);
             text-shadow: 0 0 14px rgba(var(--charts-accent), 0.32);
@@ -635,9 +651,14 @@
             <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Drop Into The Broadcast</h1>
-                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">A live-first mega menu should feel like a studio window: what is on now, what is next, and how fast you can join.</p>
+                        <h1 id="live-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Drop Into The Broadcast</h1>
+                        <p id="live-panel-copy" class="max-w-xl text-[13px] leading-relaxed text-slate-300">A live-first mega menu should feel like a studio window: what is on now, what is next, and how fast you can join.</p>
                     </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
+                    <button type="button" data-live-view="now" class="panel-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Now</button>
+                    <button type="button" data-live-view="next" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Up Next</button>
+                    <button type="button" data-live-view="studio" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Studio</button>
                 </div>
                 <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
                     <span class="relative flex h-2.5 w-2.5">
@@ -693,10 +714,10 @@
                 <section class="stream-shell-card lg:col-span-6 p-4 sm:p-5">
                     <div class="flex items-end justify-between gap-4 border-b border-white/10 pb-3">
                         <div>
-                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">On Deck</p>
-                            <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Next Up</h3>
+                            <p id="live-deck-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">On Deck</p>
+                            <h3 id="live-deck-title" class="mt-2 text-xl font-black uppercase tracking-tight text-white">Next Up</h3>
                         </div>
-                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">UK time</p>
+                        <p id="live-deck-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">UK time</p>
                     </div>
                     <div class="mt-3 space-y-2">
                         {% for item in mega_menu_schedule %}
@@ -752,9 +773,14 @@
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">PICK YOUR FEQUENCY</h1>
+                        <h1 id="streams-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">PICK YOUR FEQUENCY</h1>
                         <p id="stream-panel-tagline" class="max-w-xl text-[13px] leading-relaxed text-slate-300">{{ mega_menu_streams.0.panelLine|default:"Live programming pulled from the current station schedule." }}</p>
                     </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
+                    <button type="button" data-stream-view="discover" class="panel-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Discover</button>
+                    <button type="button" data-stream-view="moods" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Moods</button>
+                    <button type="button" data-stream-view="premium" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Premium</button>
                 </div>
             </div>
 
@@ -826,10 +852,10 @@
                 <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5" aria-label="Launch streams list">
                     <div class="mb-4 flex items-end justify-between gap-4">
                         <div>
-                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Launch Presets</p>
-                            <h3 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Dial In</h3>
+                            <p id="stream-list-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Launch Presets</p>
+                            <h3 id="stream-list-title" class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Dial In</h3>
                         </div>
-                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Hover or focus</p>
+                        <p id="stream-list-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Hover or focus</p>
                     </div>
                     <div id="stream-list" class="space-y-3"></div>
                 </section>
@@ -1029,9 +1055,14 @@
             <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Catch The Story Fast</h1>
-                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">A fast editorial read: one headline, three follow-ups, and the quickest route into the full story stack.</p>
+                        <h1 id="news-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Catch The Story Fast</h1>
+                        <p id="news-panel-copy" class="max-w-xl text-[13px] leading-relaxed text-slate-300">A fast editorial read: one headline, three follow-ups, and the quickest route into the full story stack.</p>
                     </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
+                    <button type="button" data-news-view="headlines" class="panel-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Headlines</button>
+                    <button type="button" data-news-view="analysis" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Analysis</button>
+                    <button type="button" data-news-view="buzz" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Buzz</button>
                 </div>
                 <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
                     <span class="h-2.5 w-2.5 rounded-full bg-red-300 shadow-[0_0_14px_rgba(248,113,113,0.8)]"></span>
@@ -1083,10 +1114,10 @@
                     <div class="stream-shell-card p-4 sm:p-5">
                         <div class="flex items-end justify-between gap-4 border-b border-white/10 pb-3">
                             <div>
-                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Fast Reads</p>
-                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">What To Open Next</h3>
+                                <p id="news-rail-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Fast Reads</p>
+                                <h3 id="news-rail-title" class="mt-2 text-xl font-black uppercase tracking-tight text-white">What To Open Next</h3>
                             </div>
-                            <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">{{ mega_menu_news.items|length }} stories</p>
+                            <p id="news-rail-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">{{ mega_menu_news.items|length }} stories</p>
                         </div>
                         <div class="mt-3 space-y-2">
                             {% for article in mega_menu_news.items %}
@@ -1137,9 +1168,14 @@
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Track The Next Drop</h1>
-                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">This menu leans release-first: who is returning soon, what deserves a reminder, and where to jump before launch day.</p>
+                        <h1 id="comebacks-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Track The Next Drop</h1>
+                        <p id="comebacks-panel-copy" class="max-w-xl text-[13px] leading-relaxed text-slate-300">This menu leans release-first: who is returning soon, what deserves a reminder, and where to jump before launch day.</p>
                     </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
+                    <button type="button" data-comeback-view="priority" class="panel-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Priority</button>
+                    <button type="button" data-comeback-view="countdown" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Countdown</button>
+                    <button type="button" data-comeback-view="coverage" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Coverage</button>
                 </div>
                 <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
                     <span class="h-2.5 w-2.5 rounded-full bg-pink-400 shadow-[0_0_14px_rgba(236,72,153,0.8)]"></span>
@@ -1189,10 +1225,10 @@
                 <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5">
                     <div class="mb-4 flex items-end justify-between gap-4">
                         <div>
-                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Countdown Board</p>
-                            <h3 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Priority Watch</h3>
+                            <p id="comebacks-board-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Countdown Board</p>
+                            <h3 id="comebacks-board-title" class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Priority Watch</h3>
                         </div>
-                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">This week</p>
+                        <p id="comebacks-board-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">This week</p>
                     </div>
                     <div class="space-y-3">
                         {% for item in mega_menu_comebacks %}
@@ -1274,9 +1310,14 @@
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Enter The Idol Universe</h1>
-                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">This version treats Idols like a discovery hub: featured act, fast jumps by intent, and visual routes into fandom depth.</p>
+                        <h1 id="idols-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Enter The Idol Universe</h1>
+                        <p id="idols-panel-copy" class="max-w-xl text-[13px] leading-relaxed text-slate-300">This version treats Idols like a discovery hub: featured act, fast jumps by intent, and visual routes into fandom depth.</p>
                     </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
+                    <button type="button" data-idol-view="discover" class="panel-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Discover</button>
+                    <button type="button" data-idol-view="routes" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Routes</button>
+                    <button type="button" data-idol-view="fandom" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Fandom</button>
                 </div>
                 <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
                     <span class="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_14px_rgba(244,37,192,0.8)]"></span>
@@ -1350,10 +1391,10 @@
                 <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5">
                     <div class="mb-4 flex items-end justify-between gap-4">
                         <div>
-                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Jump By Intent</p>
-                            <h3 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Quick Routes</h3>
+                            <p id="idols-routes-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Jump By Intent</p>
+                            <h3 id="idols-routes-title" class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Quick Routes</h3>
                         </div>
-                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Fast nav</p>
+                        <p id="idols-routes-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Fast nav</p>
                     </div>
                     <div class="space-y-3">
                         {% for item in mega_menu_idols %}
@@ -1507,6 +1548,11 @@
             const launchStreams = JSON.parse(document.getElementById('mega-menu-streams-data').textContent || '[]');
 
             const panelTagline = document.getElementById('stream-panel-tagline');
+            const streamsPanelTitle = document.getElementById('streams-panel-title');
+            const streamViewTabs = Array.from(document.querySelectorAll('[data-stream-view]'));
+            const streamListKicker = document.getElementById('stream-list-kicker');
+            const streamListTitle = document.getElementById('stream-list-title');
+            const streamListMeta = document.getElementById('stream-list-meta');
             const featureImage = document.getElementById('stream-feature-image');
             const featureKicker = document.getElementById('stream-feature-kicker');
             const featureFrequency = document.getElementById('stream-feature-frequency');
@@ -1532,6 +1578,30 @@
             const nowVibe = document.getElementById('stream-now-vibe');
             const premiumTitle = document.getElementById('stream-premium-title');
             const premiumList = document.getElementById('stream-premium-list');
+            const livePanelTitle = document.getElementById('live-panel-title');
+            const livePanelCopy = document.getElementById('live-panel-copy');
+            const liveViewTabs = Array.from(document.querySelectorAll('[data-live-view]'));
+            const liveDeckKicker = document.getElementById('live-deck-kicker');
+            const liveDeckTitle = document.getElementById('live-deck-title');
+            const liveDeckMeta = document.getElementById('live-deck-meta');
+            const newsPanelTitle = document.getElementById('news-panel-title');
+            const newsPanelCopy = document.getElementById('news-panel-copy');
+            const newsViewTabs = Array.from(document.querySelectorAll('[data-news-view]'));
+            const newsRailKicker = document.getElementById('news-rail-kicker');
+            const newsRailTitle = document.getElementById('news-rail-title');
+            const newsRailMeta = document.getElementById('news-rail-meta');
+            const comebacksPanelTitle = document.getElementById('comebacks-panel-title');
+            const comebacksPanelCopy = document.getElementById('comebacks-panel-copy');
+            const comebackViewTabs = Array.from(document.querySelectorAll('[data-comeback-view]'));
+            const comebacksBoardKicker = document.getElementById('comebacks-board-kicker');
+            const comebacksBoardTitle = document.getElementById('comebacks-board-title');
+            const comebacksBoardMeta = document.getElementById('comebacks-board-meta');
+            const idolsPanelTitle = document.getElementById('idols-panel-title');
+            const idolsPanelCopy = document.getElementById('idols-panel-copy');
+            const idolViewTabs = Array.from(document.querySelectorAll('[data-idol-view]'));
+            const idolsRoutesKicker = document.getElementById('idols-routes-kicker');
+            const idolsRoutesTitle = document.getElementById('idols-routes-title');
+            const idolsRoutesMeta = document.getElementById('idols-routes-meta');
             const idolsFeatureImage = document.getElementById('idols-feature-image');
             const idolsFeatureKicker = document.getElementById('idols-feature-kicker');
             const idolsFeatureChip = document.getElementById('idols-feature-chip');
@@ -1616,6 +1686,129 @@
                 'Unlock Study Hall',
                 'Unlock Artist of the Week'
             ];
+            let activeLiveView = 'now';
+            let activeStreamsView = 'discover';
+            let activeNewsView = 'headlines';
+            let activeComebackView = 'priority';
+            let activeIdolView = 'discover';
+            const streamViewRotationOffset = { discover: 0, moods: 1, premium: 2 };
+            const activeStreamByView = { discover: null, moods: null, premium: null };
+
+            const liveViewConfig = {
+                now: {
+                    panelTitle: 'Drop Into The Broadcast',
+                    panelCopy: 'A live-first mega menu should feel like a studio window: what is on now, what is next, and how fast you can join.',
+                    deckKicker: 'On Deck',
+                    deckTitle: 'Next Up',
+                    deckMeta: 'UK time'
+                },
+                next: {
+                    panelTitle: 'Queue The Next Show',
+                    panelCopy: 'Use this mode to scan what is coming up and jump into the schedule before the next handoff.',
+                    deckKicker: 'Schedule Focus',
+                    deckTitle: 'Up Next',
+                    deckMeta: 'coming soon'
+                },
+                studio: {
+                    panelTitle: 'Inside The Studio',
+                    panelCopy: 'Studio mode focuses on live energy and presenter flow so listeners can join the vibe instantly.',
+                    deckKicker: 'Studio Flow',
+                    deckTitle: 'Current + Next',
+                    deckMeta: 'live desk'
+                }
+            };
+            const streamsViewConfig = {
+                discover: { panelTitle: 'PICK YOUR FEQUENCY', listKicker: 'Launch Presets', listTitle: 'Dial In', listMeta: 'hover or focus' },
+                moods: { panelTitle: 'MATCH YOUR MOOD', listKicker: 'Mood Presets', listTitle: 'Pick A Vibe', listMeta: 'quick switch' },
+                premium: { panelTitle: 'UNLOCK DEEPER LISTENING', listKicker: 'Premium Presets', listTitle: 'Plus Modes', listMeta: 'upgrade paths' }
+            };
+            const newsViewConfig = {
+                headlines: { panelTitle: 'Catch The Story Fast', panelCopy: 'A fast editorial read: one headline, three follow-ups, and the quickest route into the full story stack.', railKicker: 'Fast Reads', railTitle: 'What To Open Next', railMeta: '{{ mega_menu_news.items|length }} stories' },
+                analysis: { panelTitle: 'Read The Why Behind The Headlines', panelCopy: 'Analysis mode prioritizes context and movement so users can understand what is driving each story.', railKicker: 'Context Stack', railTitle: 'Deepen The Read', railMeta: 'analysis mode' },
+                buzz: { panelTitle: 'See What Fans Are Talking About', panelCopy: 'Buzz mode surfaces the stories with the fastest fan pull across charts, idols, and comebacks.', railKicker: 'Buzz Picks', railTitle: 'Open The Heat', railMeta: 'trending now' }
+            };
+            const comebackViewConfig = {
+                priority: { panelTitle: 'Track The Next Drop', panelCopy: 'This menu leans release-first: who is returning soon, what deserves a reminder, and where to jump before launch day.', boardKicker: 'Countdown Board', boardTitle: 'Priority Watch', boardMeta: 'this week' },
+                countdown: { panelTitle: 'Watch The Countdown Clock', panelCopy: 'Countdown mode keeps timing front and center so the next release window is always clear.', boardKicker: 'Timeboard', boardTitle: 'Days To Go', boardMeta: 'countdown' },
+                coverage: { panelTitle: 'Follow The Comeback Coverage', panelCopy: 'Coverage mode pushes users toward launch-day context, teaser reads, and full timeline updates.', boardKicker: 'Coverage Board', boardTitle: 'Story Watch', boardMeta: 'editor feed' }
+            };
+            const idolViewConfig = {
+                discover: { panelTitle: 'Enter The Idol Universe', panelCopy: 'This version treats Idols like a discovery hub: featured act, fast jumps by intent, and visual routes into fandom depth.', routesKicker: 'Jump By Intent', routesTitle: 'Quick Routes', routesMeta: 'fast nav' },
+                routes: { panelTitle: 'Navigate Idol Routes Faster', panelCopy: 'Routes mode prioritizes direct paths into profiles, members, and fan layers for quicker exploration.', routesKicker: 'Route Shortcuts', routesTitle: 'Jump Faster', routesMeta: 'direct links' },
+                fandom: { panelTitle: 'Move From Browse To Fandom', panelCopy: 'Fandom mode emphasizes community depth and belonging paths around each featured act.', routesKicker: 'Fandom Routes', routesTitle: 'Belonging Paths', routesMeta: 'community first' }
+            };
+
+            const renderLiveViewFrame = () => {
+                const view = liveViewConfig[activeLiveView] || liveViewConfig.now;
+                liveViewTabs.forEach((button) => {
+                    const active = button.getAttribute('data-live-view') === activeLiveView;
+                    button.classList.toggle('active', active);
+                    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+                });
+                if (livePanelTitle) livePanelTitle.textContent = view.panelTitle;
+                if (livePanelCopy) livePanelCopy.textContent = view.panelCopy;
+                if (liveDeckKicker) liveDeckKicker.textContent = view.deckKicker;
+                if (liveDeckTitle) liveDeckTitle.textContent = view.deckTitle;
+                if (liveDeckMeta) liveDeckMeta.textContent = view.deckMeta;
+            };
+            const getDefaultStreamIdForView = (view, preferStored = true) => {
+                if (!launchStreams.length) return null;
+                const stored = activeStreamByView[view];
+                if (preferStored && stored && launchStreams.some((stream) => stream.id === stored)) return stored;
+                const offset = streamViewRotationOffset[view] || 0;
+                return launchStreams[Math.min(offset, launchStreams.length - 1)].id;
+            };
+            const renderStreamsViewFrame = () => {
+                const view = streamsViewConfig[activeStreamsView] || streamsViewConfig.discover;
+                streamViewTabs.forEach((button) => {
+                    const active = button.getAttribute('data-stream-view') === activeStreamsView;
+                    button.classList.toggle('active', active);
+                    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+                });
+                if (streamsPanelTitle) streamsPanelTitle.textContent = view.panelTitle;
+                if (streamListKicker) streamListKicker.textContent = view.listKicker;
+                if (streamListTitle) streamListTitle.textContent = view.listTitle;
+                if (streamListMeta) streamListMeta.textContent = view.listMeta;
+            };
+            const renderNewsViewFrame = () => {
+                const view = newsViewConfig[activeNewsView] || newsViewConfig.headlines;
+                newsViewTabs.forEach((button) => {
+                    const active = button.getAttribute('data-news-view') === activeNewsView;
+                    button.classList.toggle('active', active);
+                    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+                });
+                if (newsPanelTitle) newsPanelTitle.textContent = view.panelTitle;
+                if (newsPanelCopy) newsPanelCopy.textContent = view.panelCopy;
+                if (newsRailKicker) newsRailKicker.textContent = view.railKicker;
+                if (newsRailTitle) newsRailTitle.textContent = view.railTitle;
+                if (newsRailMeta) newsRailMeta.textContent = view.railMeta;
+            };
+            const renderComebackViewFrame = () => {
+                const view = comebackViewConfig[activeComebackView] || comebackViewConfig.priority;
+                comebackViewTabs.forEach((button) => {
+                    const active = button.getAttribute('data-comeback-view') === activeComebackView;
+                    button.classList.toggle('active', active);
+                    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+                });
+                if (comebacksPanelTitle) comebacksPanelTitle.textContent = view.panelTitle;
+                if (comebacksPanelCopy) comebacksPanelCopy.textContent = view.panelCopy;
+                if (comebacksBoardKicker) comebacksBoardKicker.textContent = view.boardKicker;
+                if (comebacksBoardTitle) comebacksBoardTitle.textContent = view.boardTitle;
+                if (comebacksBoardMeta) comebacksBoardMeta.textContent = view.boardMeta;
+            };
+            const renderIdolViewFrame = () => {
+                const view = idolViewConfig[activeIdolView] || idolViewConfig.discover;
+                idolViewTabs.forEach((button) => {
+                    const active = button.getAttribute('data-idol-view') === activeIdolView;
+                    button.classList.toggle('active', active);
+                    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+                });
+                if (idolsPanelTitle) idolsPanelTitle.textContent = view.panelTitle;
+                if (idolsPanelCopy) idolsPanelCopy.textContent = view.panelCopy;
+                if (idolsRoutesKicker) idolsRoutesKicker.textContent = view.routesKicker;
+                if (idolsRoutesTitle) idolsRoutesTitle.textContent = view.routesTitle;
+                if (idolsRoutesMeta) idolsRoutesMeta.textContent = view.routesMeta;
+            };
 
             const buildTierBadge = (stream) => stream.tier === 'free'
                 ? '<span class="border border-emerald-300/50 bg-emerald-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em] text-emerald-200">Free</span>'
@@ -1672,6 +1865,9 @@
                 if (!stream) return;
 
                 activeStreamId = stream.id;
+                if (Object.prototype.hasOwnProperty.call(activeStreamByView, activeStreamsView)) {
+                    activeStreamByView[activeStreamsView] = stream.id;
+                }
                 streamPanel.style.setProperty('--stream-accent', stream.accentRgb);
                 streamPanel.style.setProperty('--stream-secondary', stream.secondaryRgb);
                 panelTagline.textContent = stream.panelLine;
@@ -2099,8 +2295,15 @@
             };
 
             renderList();
+            renderLiveViewFrame();
+            renderStreamsViewFrame();
+            renderNewsViewFrame();
+            renderComebackViewFrame();
+            renderIdolViewFrame();
             renderChartViewFrame();
             renderChartsMoversList();
+            const initialStreamId = getDefaultStreamIdForView(activeStreamsView, false);
+            if (initialStreamId) activeStreamId = initialStreamId;
             const initialChartId = getDefaultChartIdForView(activeChartView, false);
             if (initialChartId) activeChartId = initialChartId;
             setActiveStream(activeStreamId);
@@ -2142,6 +2345,48 @@
                     renderChartsMoversList();
                     const nextChartId = getDefaultChartIdForView(activeChartView, true);
                     if (nextChartId) setActiveChart(nextChartId);
+                });
+            });
+            liveViewTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const nextView = tab.getAttribute('data-live-view');
+                    if (!nextView || nextView === activeLiveView) return;
+                    activeLiveView = nextView;
+                    renderLiveViewFrame();
+                });
+            });
+            streamViewTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const nextView = tab.getAttribute('data-stream-view');
+                    if (!nextView || nextView === activeStreamsView) return;
+                    activeStreamsView = nextView;
+                    renderStreamsViewFrame();
+                    const nextStreamId = getDefaultStreamIdForView(activeStreamsView, true);
+                    if (nextStreamId) setActiveStream(nextStreamId);
+                });
+            });
+            newsViewTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const nextView = tab.getAttribute('data-news-view');
+                    if (!nextView || nextView === activeNewsView) return;
+                    activeNewsView = nextView;
+                    renderNewsViewFrame();
+                });
+            });
+            comebackViewTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const nextView = tab.getAttribute('data-comeback-view');
+                    if (!nextView || nextView === activeComebackView) return;
+                    activeComebackView = nextView;
+                    renderComebackViewFrame();
+                });
+            });
+            idolViewTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const nextView = tab.getAttribute('data-idol-view');
+                    if (!nextView || nextView === activeIdolView) return;
+                    activeIdolView = nextView;
+                    renderIdolViewFrame();
                 });
             });
             document.querySelectorAll('[data-idol-route]').forEach((row) => {
@@ -2220,7 +2465,10 @@
                 live: {
                     trigger: liveTrigger,
                     panel: livePanel,
-                    onShow: () => {}
+                    onShow: () => {
+                        activeLiveView = 'now';
+                        renderLiveViewFrame();
+                    }
                 },
                 charts: {
                     trigger: chartsTrigger,
@@ -2236,24 +2484,36 @@
                 news: {
                     trigger: newsTrigger,
                     panel: newsPanel,
-                    onShow: () => {}
+                    onShow: () => {
+                        activeNewsView = 'headlines';
+                        renderNewsViewFrame();
+                    }
                 },
                 comebacks: {
                     trigger: comebacksTrigger,
                     panel: comebacksPanel,
                     onShow: () => {
+                        activeComebackView = 'priority';
+                        renderComebackViewFrame();
                         syncAllPanelHeightsNoScroll();
                     }
                 },
                 idols: {
                     trigger: idolsTrigger,
                     panel: idolsPanel,
-                    onShow: () => {}
+                    onShow: () => {
+                        activeIdolView = 'discover';
+                        renderIdolViewFrame();
+                    }
                 },
                 streams: {
                     trigger: streamsTrigger,
                     panel: streamPanel,
                     onShow: () => {
+                        activeStreamsView = 'discover';
+                        renderStreamsViewFrame();
+                        const defaultStreamId = getDefaultStreamIdForView(activeStreamsView, false);
+                        if (defaultStreamId) setActiveStream(defaultStreamId);
                         premiumTitle.textContent = premiumTitles[premiumTitleIndex];
                         premiumTitleIndex = (premiumTitleIndex + 1) % premiumTitles.length;
                         syncAllPanelHeightsNoScroll();
