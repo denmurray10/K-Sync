@@ -1,4 +1,4 @@
-import json
+﻿import json
 import logging
 import os
 import uuid
@@ -113,6 +113,17 @@ def _tier_meets_requirement(user_tier, min_tier):
     return TIER_RANK.get(str(user_tier or 'FREE').upper(), 0) >= TIER_RANK.get(str(min_tier or 'FREE').upper(), 0)
 
 
+def _user_highest_tier(user):
+    if not user or not user.is_authenticated:
+        return 'FREE'
+    highest = 'FREE'
+    for membership_tier in FanClubMembership.objects.filter(user=user).values_list('tier', flat=True):
+        normalized_tier = str(membership_tier or 'FREE').upper()
+        if TIER_RANK.get(normalized_tier, 0) > TIER_RANK.get(highest, 0):
+            highest = normalized_tier
+    return highest
+
+
 def _is_poll_early_access_locked(request, poll):
     if not poll or not poll.early_access_starts_at or not poll.early_access_group:
         return False
@@ -181,9 +192,9 @@ def _run_progression_unlocks(user):
     if best_game_streak >= 10:
         _award_user_badge(user, 'Streak Spark')
     if streaks['current'] >= 3:
-        _award_user_badge(user, 'Daily Pulse · 3 Day')
+        _award_user_badge(user, 'Daily Pulse - 3 Day')
     if streaks['current'] >= 7:
-        _award_user_badge(user, 'Daily Pulse · 7 Day')
+        _award_user_badge(user, 'Daily Pulse - 7 Day')
 
     return {
         'radio_total': radio_total,
@@ -380,7 +391,7 @@ def _sanitize_playlist_name(name):
     cleaned = re.sub(r'\b(AI|DATE|TIME)\b', ' ', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\b\d{4}-\d{2}-\d{2}(?:\s+\d{1,2}:\d{2})?\b', ' ', cleaned)
     cleaned = re.sub(r'\b\d{1,2}:\d{2}\b', ' ', cleaned)
-    cleaned = re.sub(r'[\-–—|]+', ' ', cleaned)
+    cleaned = re.sub(r'[\---|]+', ' ', cleaned)
     cleaned = re.sub(r'\s{2,}', ' ', cleaned).strip()
 
     return cleaned or str(name or '').strip()
@@ -641,9 +652,9 @@ def my_station_onboarding(request):
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
     eras = [
-        ('2nd_gen', '2nd Gen Classics (2008–2013)'),
-        ('3rd_gen', '3rd Gen Golden Era (2014–2019)'),
-        ('4th_gen', '4th Gen Power Wave (2020–2023)'),
+        ('2nd_gen', '2nd Gen Classics (2008-2013)'),
+        ('3rd_gen', '3rd Gen Golden Era (2014-2019)'),
+        ('4th_gen', '4th Gen Power Wave (2020-2023)'),
         ('5th_gen', '5th Gen Rising Era (2024+)'),
     ]
     timezone_choices = [
@@ -1574,56 +1585,56 @@ def api_voiceover_ai_scripts(request):
         selected_indices.append(len(tracks) - 1)
 
     intro_pool = [
-        "Right then, let’s keep things moving with this next one.",
-        "You’re locked in with us, and this one’s a proper vibe.",
-        "Keeping the momentum rolling, here’s what’s up next.",
+        "Right then, let's keep things moving with this next one.",
+        "You're locked in with us, and this one's a proper vibe.",
+        "Keeping the momentum rolling, here's what's up next.",
         "Time for another pick from the playlist that hits just right.",
-        "Let’s dip into something a little special right here.",
-        "If you’re just joining us, perfect timing for this track.",
+        "Let's dip into something a little special right here.",
+        "If you're just joining us, perfect timing for this track.",
         "Straight back into the music with another standout tune.",
-        "Let’s bring the energy up a notch with this next song.",
-        "We’re not slowing down—here comes another great one.",
+        "Let's bring the energy up a notch with this next song.",
+        "We're not slowing down-here comes another great one.",
         "Fresh from the queue, this next track deserves your attention.",
         "Settle in, this next moment is one for the fans.",
-        "Back to back quality—here’s what we’ve lined up now.",
+        "Back to back quality-here's what we've lined up now.",
         "Big mood incoming with this one.",
         "This next song is a lovely switch in flavour.",
-        "From one great tune to another, let’s go.",
-        "Let’s stay in that groove and keep it flowing.",
+        "From one great tune to another, let's go.",
+        "Let's stay in that groove and keep it flowing.",
         "Your K-pop soundtrack continues right now.",
         "A quick reset, then straight into this next track.",
-        "No filler, just bangers—here’s the next one.",
-        "Let’s queue up something that always lands.",
-        "This one’s for everyone still singing along at home.",
+        "No filler, just bangers-here's the next one.",
+        "Let's queue up something that always lands.",
+        "This one's for everyone still singing along at home.",
         "Another brilliant entry coming in hot.",
-        "Let’s pivot into this next track—trust me on this.",
+        "Let's pivot into this next track-trust me on this.",
         "Keeping it smooth and steady with this next tune.",
-        "Here’s one that always gets a reaction.",
-        "Ready for another? Let’s get into it.",
-        "Let’s jump to the next chapter in tonight’s playlist.",
-        "We’ve got a strong follow-up coming your way.",
+        "Here's one that always gets a reaction.",
+        "Ready for another? Let's get into it.",
+        "Let's jump to the next chapter in tonight's playlist.",
+        "We've got a strong follow-up coming your way.",
         "Back in the mix now with a fan favourite.",
         "Time to lean into this next song.",
         "This next pick fits the mood perfectly.",
-        "Let’s carry that feeling forward with this track.",
+        "Let's carry that feeling forward with this track.",
         "A little something to keep the night moving.",
         "Here comes another one worth turning up for.",
-        "I’ve got a great one lined up right here.",
+        "I've got a great one lined up right here.",
         "This next cut keeps the set looking sharp.",
-        "Let’s move into something with real character.",
+        "Let's move into something with real character.",
         "From the same lane but a different flavour, here we go.",
-        "You know the drill—another top track incoming.",
+        "You know the drill-another top track incoming.",
         "Plenty more to come, starting with this one.",
-        "Let’s keep this run going with another gem.",
+        "Let's keep this run going with another gem.",
         "This next selection deserves a proper listen.",
         "Coming in now with a solid follow-on track.",
-        "Stay with me—this next one is excellent.",
-        "The playlist’s in great form, and here’s proof.",
+        "Stay with me-this next one is excellent.",
+        "The playlist's in great form, and here's proof.",
         "Next up, a tune that sits beautifully in this set.",
-        "No long talk—let’s get straight to the music.",
-        "We’re right in the sweet spot now, here’s the next track.",
+        "No long talk-let's get straight to the music.",
+        "We're right in the sweet spot now, here's the next track.",
         "This next song keeps the quality bar high.",
-        "Let’s roll straight into this one.",
+        "Let's roll straight into this one.",
     ]
     random.shuffle(intro_pool)
 
@@ -1633,9 +1644,9 @@ def api_voiceover_ai_scripts(request):
         "we moved quickly past a few tunes",
         "we took a quick leap in the running order",
         "we skimmed ahead a touch in the playlist",
-        "we’ve hopped forward through a couple of entries",
+        "we've hopped forward through a couple of entries",
         "we zipped past a few songs in the queue",
-        "we’ve advanced a little in the set",
+        "we've advanced a little in the set",
         "we rolled forward through a handful of tracks",
         "we took a quick step forward in the playlist",
     ]
@@ -2285,7 +2296,7 @@ def api_schedule_template_delete(request, template_id):
 
 logger = logging.getLogger(__name__)
 
-# ── DeepSeek client ──────────────────────────────────────────────────────────
+# â”€â”€ DeepSeek client â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def _ds_client():
     return OpenAI(
         api_key=settings.DEEPSEEK_API_KEY,
@@ -2353,7 +2364,7 @@ def _inworld_chat(prompt, system="You are an expert K-Pop radio assistant."):
     message = choices[0].get('message') or {}
     return (message.get('content') or '').strip()
 
-# ── Page views ───────────────────────────────────────────────────────────────
+# â”€â”€ Page views â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def home(request):
@@ -2466,21 +2477,21 @@ def home(request):
             trend_raw = item.get('trend')
             if trend_raw and trend_raw != '-':
                 # Handle actual movement from the scraped data
-                if '+' in trend_raw or '▲' in trend_raw:
-                    trend_icon = '▲'
+                if '+' in trend_raw or 'â–²' in trend_raw:
+                    trend_icon = 'â–²'
                     trend_class = 'text-primary'
                     trend_value = ''.join(filter(str.isdigit, trend_raw))
-                elif '-' in trend_raw or '▼' in trend_raw:
-                    trend_icon = '▼'
+                elif '-' in trend_raw or 'â–¼' in trend_raw:
+                    trend_icon = 'â–¼'
                     trend_class = 'text-slate-500'
                     trend_value = ''.join(filter(str.isdigit, trend_raw))
                 else:
-                    trend_icon = '—'
+                    trend_icon = '-'
                     trend_class = 'text-slate-500'
                     trend_value = ''
             else:
                 # Flatline for no movement
-                trend_icon = '—'
+                trend_icon = '-'
                 trend_class = 'text-slate-500'
                 trend_value = ''
             
@@ -2519,7 +2530,7 @@ def home(request):
                 'artist': r.get('artist'),
                 'title': r.get('title'),
                 'image': r.get('image'),
-                'trend_icon': '—',
+                'trend_icon': '-',
                 'trend_class': 'text-slate-500',
                 'trend_value': '',
             })
@@ -2532,7 +2543,7 @@ def home(request):
                 'artist': r.get('artist'),
                 'title': r.get('title'),
                 'image': r.get('image'),
-                'trend_icon': '—',
+                'trend_icon': '-',
                 'trend_class': 'text-slate-500',
                 'trend_value': '',
             })
@@ -2612,7 +2623,7 @@ def home(request):
                 status = ''
             host_name = slot_data['host_name'] or 'Yang'
             playlist_preview = slot_data['playlist_preview']
-            description = f"Hosted by {host_name} · {playlist_preview}"
+            description = f"Hosted by {host_name} - {playlist_preview}"
             homepage_programming.append({
                 'status': status,
                 'time_label': slot_data['time_hhmm'],
@@ -2842,59 +2853,8 @@ def _build_header_mega_menu_context(request):
                     assigned_host_by_day,
                     global_assigned_host,
                 )
-                playlist_tracks = list(
-                    RadioPlaylistTrack.objects
-                    .select_related('track')
-                    .filter(playlist=slot.playlist)
-                    .order_by('order', 'id')[:6]
-                )
-                first_real_track = next(
-                    (playlist_track.track for playlist_track in playlist_tracks if playlist_track.track and not _is_generated_voice_track(playlist_track.track)),
-                    None,
-                )
-                card_track = live_track if selected['is_current'] and live_track else first_real_track
-                card_image = _optimize_home_image_url(
-                    (card_track.album_art if card_track else ''),
-                    width=1200,
-                    height=1200,
-                )
-                genre_label = str(slot.genre or 'Music').strip().title()
                 host_name = slot_data['host_name'] or 'K-Beats'
                 show_name = str(slot.description or '').strip() or slot_data['playlist_name']
-                card_id = _safe_id(slot.playlist.id, slot.day, slot.start_time.strftime('%H%M'))
-                stream_cards.append({
-                    'id': card_id,
-                    'preset': 'Live Now' if selected['is_current'] and offset == 0 else ('Up Next' if offset == 0 else f"Slot {offset + 1:02d}"),
-                    'name': slot_data['playlist_name'],
-                    'short': _shorten_text(slot_data['playlist_preview'], 84),
-                    'tagline': show_name,
-                    'description': _shorten_text(slot_data['playlist_preview'], 180),
-                    'genres': [genre_label, host_name, slot_data['time_hhmm']],
-                    'accentRgb': '244, 37, 192' if selected['is_current'] else ('0, 240, 255' if offset == 1 else '168, 85, 247'),
-                    'secondaryRgb': '255, 132, 56' if selected['is_current'] else ('59, 130, 246' if offset == 1 else '244, 114, 182'),
-                    'image': card_image,
-                    'href': reverse('live'),
-                    'track': card_track.title if card_track else slot_data['playlist_name'],
-                    'artist': card_track.artist if card_track else host_name,
-                    'audience': listeners_label,
-                    'tier': 'free',
-                    'mood': genre_label,
-                    'energy': max(18, min(100, len(playlist_tracks) * 12)) if playlist_tracks else 24,
-                    'energyLabel': f"{len(playlist_tracks)} tracks queued in this block." if playlist_tracks else 'Live block ready.',
-                    'peak': f"Until {slot_data['until_hhmm']}",
-                    'peakNote': f"Hosted by {host_name}.",
-                    'peakShort': slot_data['until_hhmm'],
-                    'bestFor': _shorten_text(show_name, 72),
-                    'note': _shorten_text(slot_data['voice_over'] or slot_data['playlist_preview'], 120),
-                    'rowTone': 'On Air' if selected['is_current'] else ('Up Next' if offset == 1 else 'Later'),
-                    'perks': [
-                        'Open the live player for the current track.',
-                        'View the full schedule for the next block.',
-                        'Send a request into the station queue.',
-                    ],
-                    'panelLine': _shorten_text(slot_data['playlist_preview'], 120),
-                })
-
                 title = show_name
                 status = 'On Air' if selected['is_current'] and offset == 0 else ('Up Next' if offset == 0 else '')
                 short_preview = _shorten_text(slot_data['playlist_preview'], 110)
@@ -2902,8 +2862,42 @@ def _build_header_mega_menu_context(request):
                     'status': status,
                     'time_label': slot_data['time_hhmm'],
                     'title': title,
-                    'description': f"Hosted by {host_name} · {short_preview}",
+                    'description': f"Hosted by {host_name} - {short_preview}",
                 })
+
+        base_track_title = getattr(live_track, 'title', '') or 'K-Beats Live'
+        base_track_artist = getattr(live_track, 'artist', '') or 'K-Beats'
+        base_track_image = _optimize_home_image_url(getattr(live_track, 'album_art', ''), width=1200, height=1200)
+        for preset in _stream_presets():
+            required_tier = str(preset.get('required_tier') or 'FREE').upper()
+            stream_cards.append({
+                'id': preset['slug'],
+                'preset': preset['preset'],
+                'name': preset['name'],
+                'short': _shorten_text(preset['tagline'], 84),
+                'tagline': preset['tagline'],
+                'description': _shorten_text(preset['description'], 180),
+                'genres': list(preset.get('genres') or []),
+                'accentRgb': preset['accent'],
+                'secondaryRgb': preset['secondary'],
+                'image': base_track_image,
+                'href': reverse('stream_player', args=[preset['slug']]),
+                'track': base_track_title,
+                'artist': base_track_artist,
+                'audience': listeners_label,
+                'tier': 'free' if required_tier == 'FREE' else 'premium',
+                'mood': preset['mood'],
+                'energy': 92 if required_tier == 'ULTRA' else (76 if required_tier == 'PLUS' else 64),
+                'energyLabel': preset['description'],
+                'peak': preset['preset'],
+                'peakNote': preset['note'],
+                'peakShort': required_tier,
+                'bestFor': preset['best_for'],
+                'note': preset['note'],
+                'rowTone': 'Premium' if required_tier != 'FREE' else 'Open',
+                'perks': list(preset.get('perks') or []),
+                'panelLine': _shorten_text(preset['tagline'], 120),
+            })
     except Exception:
         live_track = None
         stream_cards = []
@@ -2922,10 +2916,10 @@ def _build_header_mega_menu_context(request):
             'rank': f"#{idx + 1}",
             'rankLine': 'Latest daily sync',
             'status': trend_text,
-            'title': f"{item.get('track') or 'Untitled'} · {item.get('artist') or 'Unknown artist'}",
+            'title': f"{item.get('track') or 'Untitled'} - {item.get('artist') or 'Unknown artist'}",
             'tagline': metric_support or 'Latest chart position from the current K-Beats ranking sync.',
             'description': metric_support or 'Current daily chart placement based on the latest ranking import.',
-            'chips': [f"Artist · {item.get('artist') or 'Unknown'}", f"Trend · {trend_text}", f"Type · Daily"],
+            'chips': [f"Artist - {item.get('artist') or 'Unknown'}", f"Trend - {trend_text}", f"Type - Daily"],
             'image': img_url,
             'momentumValue': trend_text,
             'momentumTitle': 'Trend',
@@ -3033,8 +3027,89 @@ def _build_header_mega_menu_context(request):
     }
 
 
+def _serialize_header_mega_menu_payload(context):
+    now_local = timezone.localtime()
+
+    def _relative_time_label(value):
+        if not value:
+            return 'Updated recently'
+        delta = now_local - timezone.localtime(value)
+        total_seconds = max(int(delta.total_seconds()), 0)
+        if total_seconds < 60:
+            return 'Updated just now'
+        total_minutes = total_seconds // 60
+        if total_minutes < 60:
+            return f'Updated {total_minutes}m ago'
+        total_hours = total_minutes // 60
+        if total_hours < 24:
+            return f'Updated {total_hours}h ago'
+        total_days = total_hours // 24
+        return f'Updated {total_days}d ago'
+
+    def _serialize_article(article):
+        if not article:
+            return None
+        return {
+            'slug': article.slug,
+            'title': article.title,
+            'subtitle': article.subtitle or article.source_title or '',
+            'category': article.category or 'News',
+            'source_name': article.source_name or '',
+            'reading_time': article.reading_time,
+            'image': getattr(article, 'image', '') or '',
+            'created_at': article.created_at.isoformat() if article.created_at else None,
+            'created_at_label': _relative_time_label(article.created_at),
+        }
+
+    news_panel = context.get('mega_menu_news') or {}
+    featured_article = _serialize_article(news_panel.get('featured'))
+    items = [_serialize_article(article) for article in news_panel.get('items') or [] if article]
+
+    return {
+        'streams': context.get('mega_menu_streams') or [],
+        'charts': context.get('mega_menu_charts') or [],
+        'idols': context.get('mega_menu_idols') or [],
+        'idol_stats': context.get('mega_menu_idol_stats') or {},
+        'live': context.get('mega_menu_live') or {},
+        'schedule': context.get('mega_menu_schedule') or [],
+        'comebacks_primary': context.get('mega_menu_comebacks_primary') or {},
+        'comebacks': context.get('mega_menu_comebacks') or [],
+        'news': {
+            'featured': featured_article,
+            'items': items,
+            'total_count': news_panel.get('total_count') or len(items) + (1 if featured_article else 0),
+        },
+        'last_chart_sync': context.get('mega_menu_last_chart_sync').isoformat() if context.get('mega_menu_last_chart_sync') else None,
+        'request_count': context.get('mega_menu_request_count') or 0,
+        'generated_at': now_local.isoformat(),
+    }
+
+
 def header_mega_menu_lab(request):
-    return render(request, 'core/header_mega_menu_lab.html', _build_header_mega_menu_context(request))
+    context = _build_header_mega_menu_context(request)
+    payload = _serialize_header_mega_menu_payload(context)
+    context.update({
+        'mega_menu_streams_json': payload['streams'],
+        'mega_menu_charts_json': payload['charts'],
+        'mega_menu_idols_json': payload['idols'],
+        'mega_menu_live_json': payload['live'],
+        'mega_menu_schedule_json': payload['schedule'],
+        'mega_menu_news_json': payload['news'],
+        'mega_menu_comebacks_primary_json': payload['comebacks_primary'],
+        'mega_menu_comebacks_json': payload['comebacks'],
+        'mega_menu_idol_stats_json': payload['idol_stats'],
+        'mega_menu_request_count_json': payload['request_count'],
+        'mega_menu_last_chart_sync_json': payload['last_chart_sync'],
+    })
+    return render(request, 'core/header_mega_menu_lab.html', context)
+
+
+def api_header_mega_menu_data(request):
+    context = _build_header_mega_menu_context(request)
+    return JsonResponse({
+        'ok': True,
+        'payload': _serialize_header_mega_menu_payload(context),
+    })
 
 
 def charts(request):
@@ -3055,20 +3130,20 @@ def charts(request):
         
         trend_raw = item.get('trend')
         if trend_raw and trend_raw != '-' and trend_raw != 'Stable':
-            if '+' in trend_raw or '▲' in trend_raw:
-                trend_icon = '▲'
+            if '+' in trend_raw or 'â–²' in trend_raw:
+                trend_icon = 'â–²'
                 trend_class = 'text-primary'
                 trend_value = ''.join(filter(str.isdigit, trend_raw))
-            elif '-' in trend_raw or '▼' in trend_raw:
-                trend_icon = '▼'
+            elif '-' in trend_raw or 'â–¼' in trend_raw:
+                trend_icon = 'â–¼'
                 trend_class = 'text-slate-500'
                 trend_value = ''.join(filter(str.isdigit, trend_raw))
             else:
-                trend_icon = '—'
+                trend_icon = '-'
                 trend_class = 'text-slate-500'
                 trend_value = ''
         else:
-            trend_icon = '—'
+            trend_icon = '-'
             trend_class = 'text-slate-500'
             trend_value = ''
         
@@ -3332,7 +3407,7 @@ def _fetch_kpop_news():
         'solo artist', 'rapper', 'soloist',
     ]
 
-    # Keywords that indicate K-drama / general celebrity gossip — not K-pop
+    # Keywords that indicate K-drama / general celebrity gossip - not K-pop
     DRAMA_EXCLUSIONS = [
         'drama recap', 'episode recap', 'k-drama', 'kdrama',
         'drama review', 'drama cast', 'drama series', 'drama premiere',
@@ -3383,7 +3458,7 @@ def _fetch_kpop_news():
                 if not title:
                     continue
 
-                # K-pop relevance filter — skip drama recaps and non-kpop content
+                # K-pop relevance filter - skip drama recaps and non-kpop content
                 categories = [
                     c.text for c in item.findall('category') if c.text
                 ]
@@ -3391,7 +3466,7 @@ def _fetch_kpop_news():
                     logger.info("[RSS] Skipping non-kpop: %r", title)
                     continue
 
-                # Cross-feed duplicate check — skip if very similar title already collected
+                # Cross-feed duplicate check - skip if very similar title already collected
                 if _is_duplicate_title(title, seen_titles):
                     logger.info("[RSS] Skipping near-duplicate: %r", title)
                     continue
@@ -3504,7 +3579,7 @@ def _fetch_kpop_news():
                 'title': "SEVENTEEN Announces 'Right Here' World Tour"
                          " Extension",
                 'excerpt': "10 new cities added including London, Paris,"
-                           " and São Paulo for the 2026 leg.",
+                           " and SÃ£o Paulo for the 2026 leg.",
                 'date': 'Mar 02, 2026',
                 'time_ago': '5d ago',
                 'source': 'Soompi',
@@ -3821,7 +3896,7 @@ def dashboard(request):
         )
     )
 
-    # Hot pick artists — top 20 most chosen as bias
+    # Hot pick artists - top 20 most chosen as bias
     hot_pick_ids = list(
         KPopGroup.objects.annotate(
             bias_count=Count('biased_by')
@@ -3884,7 +3959,7 @@ def dashboard(request):
         ).order_by('rank')[:8]
     )
 
-    # Stats — mix platform + personal
+    # Stats - mix platform + personal
     stats = {
         'total_artists': KPopGroup.objects.count(),
         'total_favourites': FavouriteSong.objects.filter(
@@ -3997,7 +4072,7 @@ def dashboard(request):
         'badges': badges,
         'weekly_stream_total': weekly_stream_total,
         'weekly_top_streams': weekly_top_streams,
-        'weekly_stream_range_label': f"{week_cutoff.strftime('%d %b')} – {now.strftime('%d %b')}",
+        'weekly_stream_range_label': f"{week_cutoff.strftime('%d %b')} - {now.strftime('%d %b')}",
         'daily_quests': daily_quests,
         'daily_quests_completed': sum(1 for quest in daily_quests if quest['completed']),
         'current_activity_streak': progression.get('current_streak', 0),
@@ -4351,7 +4426,7 @@ def save_game_score(request):
 def idol_scramble(request):
     names = []
     for g in KPopGroup.objects.all()[:60]:
-        hint = f"{g.get_group_type_display()} · {g.label}"
+        hint = f"{g.get_group_type_display()} - {g.label}"
         names.append({'name': g.name, 'hint': hint})
     for m in KPopMember.objects.select_related('group').all()[:60]:
         hint = f"Member of {m.group.name}"
@@ -4535,7 +4610,7 @@ def beat_streak(request):
 
 
 def beat_streak_v2(request):
-    """Beat Streak v2 — same data pipeline, upgraded template."""
+    """Beat Streak v2 - same data pipeline, upgraded template."""
     import random
     import urllib.request
     import urllib.parse
@@ -5002,7 +5077,7 @@ def bias_quiz_result(request):
         "You are a K-Pop bias matchmaker. "
         "Based on the following quiz answers, pick the BEST matching "
         "K-Pop artist from the provided list. You MUST pick exactly "
-        "one name from the list — do not invent new names.\n\n"
+        "one name from the list - do not invent new names.\n\n"
         f"Available artists: {', '.join(pool_names)}\n\n"
         "Quiz answers:\n"
     )
@@ -5037,7 +5112,7 @@ def bias_quiz_result(request):
             result['group_type'] = group.get_group_type_display()
             result['label'] = group.label or ''
         except KPopGroup.DoesNotExist:
-            # Fallback — pick first in pool
+            # Fallback - pick first in pool
             if pool_names:
                 fb = KPopGroup.objects.filter(
                     name__in=pool_names
@@ -5362,7 +5437,7 @@ def _extract_primary_artist_name(raw_artist):
         idx = lowered.find(sep)
         if idx != -1:
             cut_idx = min(cut_idx, idx)
-    primary = text[:cut_idx].strip(' -–—|')
+    primary = text[:cut_idx].strip(' ---|')
     return re.sub(r'\s{2,}', ' ', primary).strip()
 
 
@@ -5384,7 +5459,7 @@ def _shorten_text(value, max_len=210):
         return ''
     if len(text) <= max_len:
         return text
-    return text[: max_len - 1].rstrip() + '…'
+    return text[: max_len - 1].rstrip() + 'â€¦'
 
 
 def _lyrics_snippet_api_config():
@@ -5452,7 +5527,7 @@ def _apply_licensed_lyric_snippet(payload, track):
 
     rich['lyric'] = {
         'title': 'Lyric Snippet',
-        'body': f"“{snippet['snippet']}”",
+        'body': f'"{snippet["snippet"]}"',
         'source': snippet['source'],
         'is_licensed': True,
     }
@@ -5704,7 +5779,7 @@ def _get_or_generate_live_ai_payload(track):
         pass
     return generated
 
-def live(request):
+def _build_live_page_context(request):
     from datetime import timedelta
 
     profile = None
@@ -5786,10 +5861,22 @@ def live(request):
         elapsed = timezone.now() - state.started_at
         current_offset = max(0, int(elapsed.total_seconds()))
 
-    return render(request, 'core/Live.html', {
+    current_track_payload = None
+    if current_track:
+        current_track_payload = {
+            'id': current_track.id,
+            'title': current_track.title,
+            'artist': current_track.artist,
+            'album_art': current_track.album_art,
+            'audio_url': current_track.audio_url,
+            'duration_seconds': int(current_track.duration_seconds or 0),
+        }
+
+    return {
         'requested_titles': requested_titles,
         'state': state,
         'current_track': current_track,
+        'current_track_json': json.dumps(current_track_payload),
         'current_track_id': (current_track.id if current_track else None),
         'current_track_duration_seconds': (current_track.duration_seconds if current_track else 0),
         'current_voice_overlay_json': json.dumps(current_voice_overlay),
@@ -5807,7 +5894,264 @@ def live(request):
         'current_offset': current_offset,
         'live_ai_payload': live_ai_payload,
         'live_ai_payload_json': json.dumps(live_ai_payload),
+    }
+
+
+def _get_live_experience_suggestions():
+    return [
+        {
+            'eyebrow': 'Return Hook 01',
+            'title': 'Make live listening feel like an appointment',
+            'summary': 'Promote the next show, give each slot a stronger personality, and turn countdowns into a reason to come back at a specific time.',
+            'impact': 'Listeners build habits when the schedule feels eventful instead of anonymous.',
+        },
+        {
+            'eyebrow': 'Return Hook 02',
+            'title': 'Turn the page into a shared room, not just a player',
+            'summary': 'Lean on live chat, fan reactions, and visible listener energy so the page feels active even before a user presses play.',
+            'impact': 'Community presence increases session length and repeat visits.',
+        },
+        {
+            'eyebrow': 'Return Hook 03',
+            'title': 'Reward people for saving moments',
+            'summary': 'Package "Save This Moment" as a collectible memory feature tied to favourite songs, peak broadcasts, and shareable snapshots.',
+            'impact': 'Collecting creates emotional ownership and a reason to return to a personal archive.',
+        },
+        {
+            'eyebrow': 'Return Hook 04',
+            'title': 'Surface fan influence more clearly',
+            'summary': 'Highlight request-driven songs, member-only perks, and polls so listeners can see where their actions shape the station.',
+            'impact': 'When people feel agency, they are more likely to come back and participate again.',
+        },
+        {
+            'eyebrow': 'Return Hook 05',
+            'title': 'Build lightweight loyalty loops',
+            'summary': 'Add streaks, reminder nudges, and "come back tonight" prompts tied to artist eras, themed shows, or premium drops.',
+            'impact': 'Small recurring rituals help transform casual visitors into regulars.',
+        },
+    ]
+
+
+def _resolve_live_page_context(request):
+    context = _build_live_page_context(request)
+    if not isinstance(context, dict):
+        return context
+
+    context['live_experience_suggestions'] = _get_live_experience_suggestions()
+    return context
+
+
+def _stream_presets():
+    return [
+        {
+            'slug': 'live-now',
+            'name': 'Live Now',
+            'preset': 'Free Signal',
+            'tagline': 'The full station feed with the same real-time energy as the main Live page.',
+            'description': 'Drop into the live K-Beats rotation with the current on-air track, next-up queue, and live editorial context.',
+            'mood': 'On Air',
+            'tier': 'FREE',
+            'accent': '244, 37, 192',
+            'secondary': '0, 240, 255',
+            'best_for': 'Jumping straight into the broadcast without the extra chrome of the main Live page.',
+            'note': 'Built for listeners who want the full player experience in a dedicated Stream layout.',
+            'genres': ['Live', 'Schedule Sync', 'Free'],
+            'perks': [
+                'Real-time now-playing sync with the main station.',
+                'A focused player layout for listening sessions.',
+                'Quick links into the queue and related presets.',
+            ],
+            'required_tier': 'FREE',
+        },
+        {
+            'slug': 'chart-heat',
+            'name': 'Chart Heat',
+            'preset': 'Mood Preset',
+            'tagline': 'A sharper, brighter take on the live player for peak-hour listening.',
+            'description': 'Styled like a high-velocity stream lane with bolder chart-driven copy, hot accents, and the same live audio core.',
+            'mood': 'Peak Energy',
+            'tier': 'FREE',
+            'accent': '255, 96, 64',
+            'secondary': '255, 210, 63',
+            'best_for': 'Listeners who want a louder visual treatment while the live station is in full motion.',
+            'note': "Same live source, but framed like the station's momentum channel.",
+            'genres': ['Charts', 'High Energy', 'Free'],
+            'perks': [
+                'Shares the active live radio source.',
+                'Pushes chart-led visuals and hotter color treatment.',
+                'Keeps queue awareness front and center.',
+            ],
+            'required_tier': 'FREE',
+        },
+        {
+            'slug': 'after-midnight',
+            'name': 'After Midnight',
+            'preset': 'Mood Preset',
+            'tagline': 'A calmer stream shell for late-night sessions and lower-stim listening.',
+            'description': 'Softens the palette while keeping the same live sync underneath, giving the player a more after-hours, headphones-on feel.',
+            'mood': 'After Hours',
+            'tier': 'FREE',
+            'accent': '96, 165, 250',
+            'secondary': '56, 189, 248',
+            'best_for': 'Background listening, night drives, and a more chilled player mood.',
+            'note': 'Same station, tuned visually for slower sessions.',
+            'genres': ['Night Shift', 'Low Glow', 'Free'],
+            'perks': [
+                'Keeps the live station available in a softer visual frame.',
+                'Designed for long listening sessions and lower visual noise.',
+                'Uses the same now-playing and queue sync as Live.',
+            ],
+            'required_tier': 'FREE',
+        },
+        {
+            'slug': 'deeper-cuts',
+            'name': 'Deeper Cuts',
+            'preset': 'Premium Preset',
+            'tagline': 'Premium framing for listeners who want the station to feel more editorial and collector-led.',
+            'description': 'A premium stream skin with richer copy blocks, collector positioning, and access messaging for paid listeners.',
+            'mood': 'Collector Mode',
+            'tier': 'PLUS',
+            'accent': '255, 255, 255',
+            'secondary': '244, 37, 192',
+            'best_for': 'Fans who want a more premium, editorial listening space around the live feed.',
+            'note': 'Requires a Plus-tier fan-club membership or higher.',
+            'genres': ['Premium', 'Editorial', 'Plus'],
+            'perks': [
+                'Premium visual framing with collector-style messaging.',
+                'Dedicated membership gating and upsell surface.',
+                'A more polished lounge feel around the same live player core.',
+            ],
+            'required_tier': 'PLUS',
+        },
+        {
+            'slug': 'smooth-seoul',
+            'name': 'Smooth Seoul',
+            'preset': 'Premium Preset',
+            'tagline': 'A luxe, lounge-coded version of the player for softer sessions.',
+            'description': 'Leans into premium late-night listening with smoother gradients, cleaner spacing, and a calmer premium tone.',
+            'mood': 'Lounge Glow',
+            'tier': 'PLUS',
+            'accent': '45, 212, 191',
+            'secondary': '244, 114, 182',
+            'best_for': 'Late-night listening, quieter sessions, and premium members who want a softer atmosphere.',
+            'note': 'Requires a Plus-tier fan-club membership or higher.',
+            'genres': ['Premium', 'Lounge', 'Plus'],
+            'perks': [
+                'Premium-only presentation built for calmer listening.',
+                'Same synced live station with a softer visual identity.',
+                'Fast path into premium membership upsell when locked.',
+            ],
+            'required_tier': 'PLUS',
+        },
+        {
+            'slug': 'study-hall',
+            'name': 'Study Hall',
+            'preset': 'Premium Preset',
+            'tagline': 'A cleaner utility-first player page for focused work sessions.',
+            'description': 'Keeps the player prominent, lowers visual distraction, and frames the stream like a premium focus tool.',
+            'mood': 'Focus Mode',
+            'tier': 'PLUS',
+            'accent': '192, 132, 252',
+            'secondary': '96, 165, 250',
+            'best_for': 'Long focus blocks, studying, and a more minimal premium stream shell.',
+            'note': 'Requires a Plus-tier fan-club membership or higher.',
+            'genres': ['Premium', 'Focus', 'Plus'],
+            'perks': [
+                'Reduced-noise layout for long sessions.',
+                'Keeps queue and now-playing context easy to scan.',
+                'Premium gate can upsell directly into plan selection.',
+            ],
+            'required_tier': 'PLUS',
+        },
+        {
+            'slug': 'artist-of-the-week',
+            'name': 'Artist Of The Week',
+            'preset': 'Ultra Preset',
+            'tagline': 'The top-tier stream shell with the most elevated editorial framing.',
+            'description': 'A hero-led premium player variant built for Ultra listeners, with stronger spotlight language and collector-forward positioning.',
+            'mood': 'Spotlight',
+            'tier': 'ULTRA',
+            'accent': '250, 204, 21',
+            'secondary': '244, 114, 182',
+            'best_for': 'Ultra members who want the stream presented like a flagship feature.',
+            'note': 'Requires an Ultra-tier fan-club membership.',
+            'genres': ['Ultra', 'Spotlight', 'Premium'],
+            'perks': [
+                'Top-tier premium framing for the live feed.',
+                'Strongest spotlight treatment and membership positioning.',
+                'Reserved for Ultra listeners.',
+            ],
+            'required_tier': 'ULTRA',
+        },
+    ]
+
+
+def _get_stream_preset(slug):
+    for preset in _stream_presets():
+        if preset['slug'] == slug:
+            return preset
+    raise Http404('Stream preset not found')
+
+
+def live(request):
+    context = _resolve_live_page_context(request)
+    if not isinstance(context, dict):
+        return context
+    return render(request, 'core/live_experience.html', context)
+
+
+def test_page(request):
+    context = _resolve_live_page_context(request)
+    if not isinstance(context, dict):
+        return context
+    return render(request, 'core/test_page.html', context)
+
+
+def stream_hub(request):
+    context = _build_live_page_context(request)
+    if not isinstance(context, dict):
+        return context
+    user_tier = _user_highest_tier(request.user)
+    presets = []
+    for preset in _stream_presets():
+        stream_data = dict(preset)
+        stream_data['href'] = reverse('stream_player', args=[preset['slug']])
+        stream_data['locked'] = not _tier_meets_requirement(user_tier, preset['required_tier'])
+        presets.append(stream_data)
+
+    context.update({
+        'stream_presets': presets,
+        'stream_presets_free': [preset for preset in presets if preset['required_tier'] == 'FREE'],
+        'stream_presets_premium': [preset for preset in presets if preset['required_tier'] != 'FREE'],
+        'user_stream_tier': user_tier,
     })
+    return render(request, 'core/stream_hub.html', context)
+
+
+def stream_player(request, slug):
+    context = _build_live_page_context(request)
+    if not isinstance(context, dict):
+        return context
+    preset = dict(_get_stream_preset(slug))
+    user_tier = _user_highest_tier(request.user)
+    has_access = _tier_meets_requirement(user_tier, preset['required_tier'])
+    preset['href'] = reverse('stream_player', args=[preset['slug']])
+
+    related_presets = []
+    for item in _stream_presets():
+        item_copy = dict(item)
+        item_copy['href'] = reverse('stream_player', args=[item['slug']])
+        item_copy['locked'] = not _tier_meets_requirement(user_tier, item['required_tier'])
+        related_presets.append(item_copy)
+
+    context.update({
+        'stream_preset': preset,
+        'stream_has_access': has_access,
+        'stream_required_tier': preset['required_tier'],
+        'user_stream_tier': user_tier,
+        'stream_related_presets': related_presets,
+    })
+    return render(request, 'core/stream_player.html', context)
 
 def api_live_rotate_track(request):
     """
@@ -6421,7 +6765,7 @@ def _fetch_blog_image(title, category, excerpt='', variant=1):
                     except Exception as upload_err:
                         logger.warning(
                             "[blog image %d] Cloudinary upload failed "
-                            "for %r: %s — trying next item",
+                            "for %r: %s - trying next item",
                             variant, img_url, upload_err,
                         )
                         continue
@@ -6432,7 +6776,7 @@ def _fetch_blog_image(title, category, excerpt='', variant=1):
 
 def _do_blog_generate():
     """
-    Core blog generation logic — fetch RSS articles and write new ones via AI.
+    Core blog generation logic - fetch RSS articles and write new ones via AI.
     Called by both the blog_generate view and the background scheduler job.
     Returns the number of articles created.
     """
@@ -6500,7 +6844,7 @@ def _do_blog_generate():
             "<a href=\"/news/\">our News page</a> where contextually appropriate."
         )
 
-        # ── DeepSeek Reasoner article ──
+        # â”€â”€ DeepSeek Reasoner article â”€â”€
         prompt = (
             f"Write an original, in-depth K-Pop news article based on this headline:\n\n"
             f"Title: {title}\n"
@@ -6523,12 +6867,12 @@ def _do_blog_generate():
             f"- Use <ul>/<ol>/<li> for lists where appropriate\n"
             f"- Do NOT use <h1> tags (the page already has an h1 title)\n\n"
             f"Content Sections Required:\n"
-            f"1. Opening — hook the reader and introduce the story\n"
-            f"2. Background — artist/group history and context\n"
-            f"3. The News — detailed breakdown of the main story\n"
-            f"4. Fan & Community Reaction — what fans are saying\n"
-            f"5. Industry Analysis — impact and significance\n"
-            f"6. What's Next — forward-looking conclusion\n\n"
+            f"1. Opening - hook the reader and introduce the story\n"
+            f"2. Background - artist/group history and context\n"
+            f"3. The News - detailed breakdown of the main story\n"
+            f"4. Fan & Community Reaction - what fans are saying\n"
+            f"5. Industry Analysis - impact and significance\n"
+            f"6. What's Next - forward-looking conclusion\n\n"
             f"Rules:\n"
             f"- Write completely original content, do NOT copy the source\n"
             f"- Total length: minimum 1,500 words\n"
@@ -6575,7 +6919,7 @@ def _do_blog_generate():
         word_count = len(re.sub(r'<[^>]+>', '', body).split())
         reading_time = max(1, word_count // 200)
 
-        # ── Fetch image via Serper ──
+        # â”€â”€ Fetch image via Serper â”€â”€
         try:
             image_1 = _fetch_blog_image(title, category, excerpt, variant=1)
         except Exception as e:
@@ -6616,7 +6960,7 @@ def _do_blog_generate():
             except Exception as e:
                 logger.warning("[x] Post failed for %r: %s", title, e)
         else:
-            logger.info("[x] Posting disabled — skipping for %r", title)
+            logger.info("[x] Posting disabled - skipping for %r", title)
 
         # Post to Pinterest
         try:
@@ -6627,7 +6971,7 @@ def _do_blog_generate():
         # Keep inter-linking list current for subsequent articles
         existing_articles.append({'slug': base_slug, 'title': title})
 
-    logger.info("[blog] Auto-generate run complete — created %d article(s).", created)
+    logger.info("[blog] Auto-generate run complete - created %d article(s).", created)
     return created
 
 
@@ -6643,11 +6987,11 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
     page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
     token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
     if not page_id or not token:
-        logger.debug("[facebook] No credentials configured — skipping scheduled post.")
+        logger.debug("[facebook] No credentials configured - skipping scheduled post.")
         return
 
     if article.facebook_posted_at or article.facebook_post_id:
-        logger.debug("[facebook] Already handled article %r — skipping.", article.slug)
+        logger.debug("[facebook] Already handled article %r - skipping.", article.slug)
         return
 
     # Default: schedule 1 hour from now
@@ -6692,12 +7036,12 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
                 facebook_post_id=result['id'],
             )
             logger.info(
-                "[facebook] Scheduled link post created for %r — post id: %s",
+                "[facebook] Scheduled link post created for %r - post id: %s",
                 article.title, result['id'],
             )
         else:
             logger.warning(
-                "[facebook] Scheduled post failed for %r — %s",
+                "[facebook] Scheduled post failed for %r - %s",
                 article.title, result,
             )
     except Exception as e:
@@ -6719,7 +7063,7 @@ def _post_to_instagram(article):
         return
 
     if not article.image:
-        logger.warning("[instagram] No image for %r — skipping.", article.title)
+        logger.warning("[instagram] No image for %r - skipping.", article.title)
         return
 
     # Resolve linked Instagram Business Account ID
@@ -6762,7 +7106,7 @@ def _post_to_instagram(article):
         timeout=15,
     ).json()
     if 'id' in result:
-        logger.info("[instagram] Posted %r — id: %s", article.title, result['id'])
+        logger.info("[instagram] Posted %r - id: %s", article.title, result['id'])
     else:
         logger.warning("[instagram] Publish failed: %s", result)
 
@@ -6793,7 +7137,7 @@ def _article_opening_excerpt(article, max_chars=180):
     cut = text[:max_chars]
     if ' ' in cut:
         cut = cut.rsplit(' ', 1)[0]
-    return cut.rstrip('.,;:!') + '…'
+    return cut.rstrip('.,;:!') + 'â€¦'
 
 
 def _social_article_url(article, source):
@@ -6843,10 +7187,10 @@ def _social_hook(article):
     """Generate a short hook line for social posts."""
     cat = (article.category or 'news').strip()
     if cat.lower() == 'review':
-        return "🎧 New review dropped"
+        return "ðŸŽ§ New review dropped"
     if cat.lower() == 'comeback':
-        return "🚨 Comeback alert"
-    return "🔥 New K-Pop update"
+        return "ðŸš¨ Comeback alert"
+    return "ðŸ”¥ New K-Pop update"
 
 
 def _x_teaser_line(article, max_chars=120):
@@ -6889,7 +7233,7 @@ def _x_compose_text(title_text, teaser, article_url, hashtags):
     while trimmed and _x_text_length(
         f"{title_text}\n\n{trimmed}\n\n{article_url}\n\n{hashtags}"
     ) > 280:
-        trimmed = trimmed[:-2].rstrip() + '…' if len(trimmed) > 2 else ''
+        trimmed = trimmed[:-2].rstrip() + 'â€¦' if len(trimmed) > 2 else ''
 
     if trimmed:
         return f"{title_text}\n\n{trimmed}\n\n{article_url}\n\n{hashtags}"
@@ -6959,7 +7303,7 @@ def _post_to_x(article):
     Requires X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET.
     """
     if not getattr(settings, 'X_POST_ENABLED', False):
-        logger.debug("[x] Posting disabled via X_POST_ENABLED — skipping.")
+        logger.debug("[x] Posting disabled via X_POST_ENABLED - skipping.")
         return
 
     api_key = getattr(settings, 'X_API_KEY', '')
@@ -6967,11 +7311,11 @@ def _post_to_x(article):
     access_token = getattr(settings, 'X_ACCESS_TOKEN', '')
     access_secret = getattr(settings, 'X_ACCESS_TOKEN_SECRET', '')
     if not all([api_key, api_secret, access_token, access_secret]):
-        logger.debug("[x] Credentials not configured — skipping.")
+        logger.debug("[x] Credentials not configured - skipping.")
         return
 
     if article.x_posted_at:
-        logger.debug("[x] Already posted article %r — skipping.", article.slug)
+        logger.debug("[x] Already posted article %r - skipping.", article.slug)
         return
 
     article_url = _social_article_url(article, source='x')
@@ -6981,7 +7325,7 @@ def _post_to_x(article):
 
     title_text = f"{hook}: {title}"
     if len(title_text) > 110:
-        title_text = title_text[:109].rstrip() + '…'
+        title_text = title_text[:109].rstrip() + 'â€¦'
 
     # Reserve room dynamically with URL-aware length counting.
     base_len = _x_text_length(f"{title_text}\n\n{article_url}\n\n{hashtags}")
@@ -7066,7 +7410,7 @@ def _post_to_x(article):
             x_post_id=result['data']['id'],
             x_posted_at=timezone.now(),
         )
-        logger.info("[x] Tweeted %r — id: %s", article.title, result['data']['id'])
+        logger.info("[x] Tweeted %r - id: %s", article.title, result['data']['id'])
     else:
         logger.warning("[x] Tweet failed: %s", result)
 
@@ -7079,15 +7423,15 @@ def _post_to_pinterest(article):
     access_token = getattr(settings, 'PINTEREST_ACCESS_TOKEN', '')
     board_id = getattr(settings, 'PINTEREST_BOARD_ID', '')
     if not access_token or not board_id:
-        logger.debug("[pinterest] Credentials not configured — skipping.")
+        logger.debug("[pinterest] Credentials not configured - skipping.")
         return
 
     if article.pinterest_posted_at:
-        logger.debug("[pinterest] Already posted article %r — skipping.", article.slug)
+        logger.debug("[pinterest] Already posted article %r - skipping.", article.slug)
         return
 
     if not article.image:
-        logger.warning("[pinterest] No image for %r — skipping.", article.title)
+        logger.warning("[pinterest] No image for %r - skipping.", article.title)
         return
 
     article_url = _social_article_url(article, source='pinterest')
@@ -7117,7 +7461,7 @@ def _post_to_pinterest(article):
             pinterest_post_id=result['id'],
             pinterest_posted_at=timezone.now(),
         )
-        logger.info("[pinterest] Pin created for %r — id: %s",
+        logger.info("[pinterest] Pin created for %r - id: %s",
                     article.title, result['id'])
     else:
         logger.warning("[pinterest] Pin failed: %s", result)
@@ -7171,7 +7515,7 @@ def streaming_party_chat(request):
 def confetti_rain(request):
     return render(request, 'core/confetti_rain.html')
 
-# ── AI Endpoints ─────────────────────────────────────────────────────────────
+# â”€â”€ AI Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @csrf_exempt
 @require_POST
@@ -7280,7 +7624,7 @@ def ai_commentary(request):
                      if prev else 'nothing yet')
 
         prompt = (
-            f"You are an enthusiastic K-Pop radio DJ. Write a punchy 1–2 sentence "
+            f"You are an enthusiastic K-Pop radio DJ. Write a punchy 1-2 sentence "
             f"on-air commentary introducing '{song}' by {artist}. "
             f"Previous songs included: {prev_text}. "
             f"Be energetic, use emojis sparingly, keep it under 50 words. "
@@ -7308,7 +7652,7 @@ def ai_theme(request):
         prompt = (
             f"The K-Pop song '{song}' by {artist} is playing on a live radio page. "
             f"Generate a 3-colour neon/dark palette that matches the song's mood and energy. "
-            f"Return ONLY valid JSON in this exact format — no markdown, no explanation: "
+            f"Return ONLY valid JSON in this exact format - no markdown, no explanation: "
             f'{{"primary": "#hexcode", "secondary": "#hexcode", "accent": "#hexcode", "mood": "one word"}}'
         )
         raw = _chat(prompt, system="You are a UI designer who picks colour palettes for K-Pop music apps.")
@@ -7397,7 +7741,7 @@ def comeback_timeline(request):
     else:
         next_year, next_month = nav_year, nav_month + 1
 
-    # ── Build calendar grid ──────────────────────────────
+    # â”€â”€ Build calendar grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     first_weekday, num_days = py_calendar.monthrange(nav_year, nav_month)
     empty_cells = (first_weekday + 1) % 7  # Sunday-start
 
@@ -7427,7 +7771,7 @@ def comeback_timeline(request):
             'is_past': day_key < today_str,
         })
 
-    # ── Build upcoming timeline (current + next 2 months) ──
+    # â”€â”€ Build upcoming timeline (current + next 2 months) â”€â”€
     months_to_check = []
     for offset in range(3):
         m = nav_month + offset
@@ -7624,7 +7968,7 @@ def idol_page(request, slug):
                     'album': item.get('album', ''),
                 })
 
-    # ── iTunes: Fetch discography + top songs ────────────────────────────
+    # â”€â”€ iTunes: Fetch discography + top songs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     itunes_albums = []
     itunes_tracks = []
 
@@ -7685,7 +8029,7 @@ def idol_page(request, slug):
         'accent_color': accent_map.get(group.group_type, '#FF8EAF'),
         'accent_rgb': accent_rgb_map.get(group.group_type, '255,142,175'),
         'related_groups': related,
-        'description': group.description or f"Explore the world of {group.name} — members, discography, top tracks, and more.",
+        'description': group.description or f"Explore the world of {group.name} - members, discography, top tracks, and more.",
         'members': [
             {
                 'name': m.stage_name or m.name,
@@ -7704,7 +8048,7 @@ def idol_page(request, slug):
 
 
 def album_detail(request, slug, collection_id):
-    """Album detail page — fetches tracklist from iTunes."""
+    """Album detail page - fetches tracklist from iTunes."""
     from django.shortcuts import get_object_or_404
     import urllib.request
     import urllib.parse
@@ -7863,9 +8207,9 @@ def vote_poll(request):
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 
-# ────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #  STAFF-ONLY CONTEST MANAGEMENT API
-# ────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def _staff_required(request):
     """Return a 403 JsonResponse if the user is not staff, else None."""
@@ -8437,3 +8781,4 @@ def cookie_policy(request):
 
 def terms_of_service(request):
     return render(request, 'core/terms_of_service.html')
+

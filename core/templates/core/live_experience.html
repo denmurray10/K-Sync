@@ -1,0 +1,1705 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+
+<meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+<title>K-Beats Live | The K-Pop Radio Experience</title>
+<meta name="description" content="Listen live on K-Beats with real-time now playing, queue awareness, fan chat, AI DJ insights, and a stronger reason to come back every day."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#ff4db8",
+                    secondary: "#35f2ff",
+                    ink: "#050816",
+                    panel: "#091122",
+                    panelSoft: "#0d1830",
+                    sunrise: "#ff8a3d",
+                },
+                fontFamily: {
+                    display: ["Syne", "sans-serif"],
+                    body: ["Space Grotesk", "sans-serif"],
+                },
+                boxShadow: {
+                    neon: "0 0 40px rgba(255, 77, 184, 0.2)",
+                    cyan: "0 0 30px rgba(53, 242, 255, 0.18)",
+                },
+            },
+        },
+    }
+</script>
+<style>
+    :root { color-scheme: dark; }
+    body {
+        background:
+            radial-gradient(circle at 0% 0%, rgba(255, 77, 184, 0.17), transparent 34%),
+            radial-gradient(circle at 82% 14%, rgba(53, 242, 255, 0.14), transparent 26%),
+            linear-gradient(180deg, #050816 0%, #08101f 42%, #050816 100%);
+    }
+    .page-grid {
+        background-image:
+            linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+        background-size: 38px 38px;
+        mask-image: linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.2), transparent);
+    }
+    .glass-panel {
+        background: rgba(7, 12, 26, 0.72);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+    .glass-hero {
+        background:
+            linear-gradient(135deg, rgba(255, 77, 184, 0.14), rgba(255,255,255,0.03) 48%, rgba(53, 242, 255, 0.12)),
+            rgba(7, 12, 26, 0.72);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    .album-bg { animation: drift-scale 26s ease-in-out infinite; }
+    .hero-ring {
+        position: absolute;
+        inset: -18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        pointer-events: none;
+    }
+    .chat-msg { animation: chat-slide 0.35s ease-out forwards; }
+    .reveal-up {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.85s ease, transform 0.85s ease;
+    }
+    .reveal-up.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(255, 77, 184, 1), rgba(53, 242, 255, 1)); }
+    .signal-bar {
+        width: 4px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(53, 242, 255, 1), rgba(255, 77, 184, 1));
+        transform-origin: bottom;
+        animation: equalize 1.1s ease-in-out infinite;
+    }
+    .signal-bar:nth-child(2) { animation-delay: 0.12s; }
+    .signal-bar:nth-child(3) { animation-delay: 0.24s; }
+    .signal-bar:nth-child(4) { animation-delay: 0.36s; }
+    .signal-bar:nth-child(5) { animation-delay: 0.48s; }
+    .signal-bar-lg {
+        width: 6px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255, 77, 184, 1), rgba(53, 242, 255, 0.88));
+        transform-origin: bottom;
+        animation: equalize-lg 1.25s ease-in-out infinite;
+    }
+    .signal-bar-lg:nth-child(2) { animation-delay: 0.11s; }
+    .signal-bar-lg:nth-child(3) { animation-delay: 0.22s; }
+    .signal-bar-lg:nth-child(4) { animation-delay: 0.33s; }
+    .signal-bar-lg:nth-child(5) { animation-delay: 0.44s; }
+    .signal-bar-lg:nth-child(6) { animation-delay: 0.55s; }
+    .pulse-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
+    .track-orbit { animation: orbit 12s linear infinite; }
+    .floating-orb { animation: float-orb 10s ease-in-out infinite; }
+    .floating-orb.alt { animation-delay: 1.8s; }
+    @keyframes equalize {
+        0% { height: 24%; }
+        25% { height: 88%; }
+        50% { height: 42%; }
+        75% { height: 100%; }
+        100% { height: 28%; }
+    }
+    @keyframes equalize-lg {
+        0% { height: 18%; }
+        20% { height: 94%; }
+        40% { height: 56%; }
+        60% { height: 100%; }
+        80% { height: 34%; }
+        100% { height: 18%; }
+    }
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 0 rgba(255, 77, 184, 0), 0 0 0 rgba(53, 242, 255, 0); }
+        50% { box-shadow: 0 0 28px rgba(255, 77, 184, 0.28), 0 0 48px rgba(53, 242, 255, 0.14); }
+    }
+    @keyframes drift-scale {
+        0%, 100% { transform: scale(1.02) translate3d(0, 0, 0); }
+        50% { transform: scale(1.08) translate3d(0, -10px, 0); }
+    }
+    @keyframes orbit {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    @keyframes float-orb {
+        0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.45; }
+        50% { transform: translate3d(18px, -20px, 0); opacity: 0.85; }
+    }
+    @keyframes chat-slide {
+        from { opacity: 0; transform: translateX(14px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+</style>
+</head>
+<body class="bg-ink text-white font-body min-h-screen overflow-x-hidden">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+{% include 'core/header.html' %}
+
+<audio id="live-audio" preload="auto">
+    {% if current_track and current_track.audio_url %}
+    <source src="{{ current_track.audio_url }}" {% with lower_audio_url=current_track.audio_url|lower %}type="{% if '.m4a' in lower_audio_url %}audio/mp4{% elif '.wav' in lower_audio_url %}audio/wav{% else %}audio/mpeg{% endif %}"{% endwith %}>
+    {% endif %}
+</audio>
+<audio id="live-vo-audio" preload="auto"></audio>
+
+<main class="relative">
+    <div class="pointer-events-none absolute inset-0 page-grid opacity-50"></div>
+
+    <section class="relative isolate overflow-hidden pt-32 pb-12">
+        <div class="absolute inset-0 overflow-hidden">
+            <img id="album-bg-img" src="{% if current_track and current_track.album_art %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}" alt="" class="album-bg h-full w-full object-cover opacity-20 blur-3xl"/>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,77,184,0.22),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(53,242,255,0.16),transparent_26%)]"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-ink/30 to-ink"></div>
+            <div class="absolute -top-16 -left-12 h-56 w-56 rounded-full bg-primary/25 blur-3xl floating-orb"></div>
+            <div class="absolute right-0 top-28 h-64 w-64 rounded-full bg-secondary/18 blur-3xl floating-orb alt"></div>
+        </div>
+
+        <div class="relative container mx-auto max-w-[1320px] px-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-7">
+                <div class="inline-flex items-center gap-3 border border-white/10 bg-white/[0.03] px-4 py-2">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+                    </span>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-200">Live Right Now</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.03] px-4 py-2">
+                        <span class="material-symbols-outlined text-secondary text-base">headphones</span>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">Listeners</span>
+                        <span id="listener-count" class="text-sm font-display text-white">{% if state %}{{ state.listeners_count }}{% else %}3847{% endif %}</span>
+                    </div>
+                    <a href="{% url 'test_page' %}" class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.03] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.26em] text-slate-300 hover:border-secondary hover:text-secondary transition-colors">
+                        View Test Page
+                        <span class="material-symbols-outlined text-base">arrow_outward</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_420px]">
+                <div class="glass-hero border border-white/10 p-7 md:p-10 shadow-neon reveal-up">
+                    <div class="flex flex-wrap items-start justify-between gap-6">
+                        <div class="max-w-3xl">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.34em] text-secondary">K-Pop Radio, Reframed</p>
+                            <h1 id="hero-title" class="mt-4 font-display text-5xl md:text-7xl lg:text-[5.4rem] leading-[0.88] uppercase tracking-tight">
+                                {% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}
+                            </h1>
+                            <p id="hero-artist" class="mt-4 text-sm md:text-xl uppercase tracking-[0.3em] text-slate-300">
+                                {% if current_track %}{{ current_track.artist }}{% else %}24/7 K-Pop Rotation{% endif %}
+                            </p>
+                            <p class="mt-6 max-w-2xl text-sm md:text-lg text-slate-300 leading-relaxed">
+                                The station now feels less like a plain stream and more like a destination: live status, social energy, next-show momentum, and reasons for fans to check back in later.
+                            </p>
+                        </div>
+
+                        <div class="hidden md:flex items-end gap-2 h-20">
+                            <span class="signal-bar-lg h-5"></span>
+                            <span class="signal-bar-lg h-16"></span>
+                            <span class="signal-bar-lg h-10"></span>
+                            <span class="signal-bar-lg h-20"></span>
+                            <span class="signal-bar-lg h-8"></span>
+                            <span class="signal-bar-lg h-14"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <button id="play-btn" class="pulse-glow inline-flex items-center gap-3 bg-primary px-6 py-4 text-black border border-primary text-[11px] font-black uppercase tracking-[0.22em] hover:bg-white transition-colors">
+                            <span class="material-symbols-outlined text-2xl">play_arrow</span>
+                            Listen Live
+                        </button>
+                        <a href="{% url 'request_track' %}" class="inline-flex items-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                            Request A Track
+                            <span class="material-symbols-outlined text-lg">queue_music</span>
+                        </a>
+                        <a href="#community" class="inline-flex items-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                            Join The Room
+                            <span class="material-symbols-outlined text-lg">forum</span>
+                        </a>
+                        <a href="{% url 'live_player_popout' %}" class="inline-flex items-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-white hover:text-white transition-colors">
+                            Popout Player
+                            <span class="material-symbols-outlined text-lg">open_in_new</span>
+                        </a>
+                    </div>
+
+                    <div class="mt-8 grid gap-5 md:grid-cols-[minmax(0,1fr)_320px] items-end">
+                        <div class="border border-white/10 bg-black/25 p-5">
+                            <div class="flex items-center justify-between gap-4">
+                                <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">Playback Sync</p>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-primary">Live Feed</p>
+                            </div>
+                            <div class="mt-4 h-1.5 bg-white/10 overflow-hidden">
+                                <div id="live-progress-fill" class="h-full bg-gradient-to-r from-primary via-sunrise to-secondary transition-[width] duration-200" style="width: 0%"></div>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                                <span id="live-progress-current">0:00</span>
+                                <span id="live-progress-total">{% if current_track %}{{ current_track.duration }}{% else %}3:00{% endif %}</span>
+                            </div>
+                        </div>
+
+                        <div class="border border-white/10 bg-black/25 p-5">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">Volume</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-slate-400 text-lg">volume_down</span>
+                                    <span class="material-symbols-outlined text-slate-400 text-lg">volume_up</span>
+                                </div>
+                            </div>
+                            <input type="range" id="volume-slider" min="0" max="100" value="75" class="mt-4 w-full h-1 accent-primary cursor-pointer bg-white/10 appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer"/>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="glass-panel border border-white/10 p-6 md:p-7 shadow-cyan reveal-up" style="transition-delay: 120ms;">
+                    <div class="relative">
+                        <div class="absolute inset-0 track-orbit rounded-full border border-white/10 scale-110"></div>
+                        <div class="absolute inset-3 track-orbit rounded-full border border-secondary/20 scale-110 [animation-direction:reverse] [animation-duration:16s]"></div>
+                        <div class="relative mx-auto w-[220px] max-w-full border border-white/10 bg-black/30 p-3 md:w-[260px]">
+                            <div class="hero-ring"></div>
+                            <img id="hero-album-art" src="{% if current_track and current_track.album_art %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}" alt="{% if current_track %}{{ current_track.title }} by {{ current_track.artist }}{% else %}K-Beats Live artwork{% endif %}" class="w-full aspect-square object-cover shadow-neon"/>
+                        </div>
+                    </div>
+
+                    <div class="mt-7 border border-white/10 bg-white/[0.03] p-5">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-secondary">Share Card</p>
+                                <p class="mt-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">Now Playing On K-Beats</p>
+                            </div>
+                            <span class="material-symbols-outlined text-primary">ios_share</span>
+                        </div>
+                        <p id="share-card-title" class="mt-4 font-display text-3xl uppercase leading-none tracking-tight">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
+                        <p id="share-card-artist" class="mt-2 text-[11px] uppercase tracking-[0.24em] text-slate-400">{% if current_track %}{{ current_track.artist }}{% else %}Always On Air{% endif %}</p>
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            <button id="share-now-playing-btn" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors">
+                                Share
+                                <span class="material-symbols-outlined text-base">send</span>
+                            </button>
+                            <button id="save-moment-btn" class="inline-flex items-center gap-2 border border-white/15 bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white hover:border-secondary hover:text-secondary transition-colors">
+                                Save This Moment
+                                <span class="material-symbols-outlined text-base">bookmark</span>
+                            </button>
+                        </div>
+                        <p id="share-now-playing-status" class="mt-3 min-h-[1rem] text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500" aria-live="polite"></p>
+                    </div>
+
+                    <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                        <div class="border border-white/10 bg-white/[0.03] p-4">
+                            <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Why This Feels Better</p>
+                            <p class="mt-3 text-sm text-slate-300 leading-relaxed">The player is now surrounded by context, so every visit tells fans what is happening now and what is worth returning for later.</p>
+                        </div>
+                        <div class="border border-white/10 bg-white/[0.03] p-4">
+                            <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Built To Keep Momentum</p>
+                            <p class="mt-3 text-sm text-slate-300 leading-relaxed">Queue visibility, AI commentary, chat, and show countdowns all support the same goal: make live listening feel active, social, and collectible.</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <div id="sticky-info-bar" class="sticky top-[96px] z-40 border-y border-white/10 bg-black/80 backdrop-blur-xl transition-[top] duration-300">
+        <div class="container mx-auto max-w-[1320px] px-6 py-4">
+            <div class="grid items-center gap-4 md:grid-cols-[auto_1fr_auto]">
+                <div class="flex items-center gap-4 min-w-0">
+                    <div class="flex h-10 items-end gap-1.5">
+                        <span class="signal-bar h-4"></span>
+                        <span class="signal-bar h-8"></span>
+                        <span class="signal-bar h-5"></span>
+                        <span class="signal-bar h-9"></span>
+                        <span class="signal-bar h-6"></span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Now Playing</p>
+                        <p id="sticky-track-title" class="font-display text-2xl uppercase leading-none truncate">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
+                        <p id="sticky-track-artist" class="mt-1 text-[10px] uppercase tracking-[0.25em] text-slate-400 truncate">{% if current_track %}{{ current_track.artist }}{% else %}Always On Air{% endif %}</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center justify-center gap-3">
+                    <span class="material-symbols-outlined text-secondary">headphones</span>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Listening Now</span>
+                    <span id="listener-count-bar" class="font-display text-xl text-white">{% if state %}{{ state.listeners_count }}{% else %}3847{% endif %}</span>
+                </div>
+                <div class="flex justify-start md:justify-end gap-3">
+                    <a href="{% url 'request_track' %}" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors">
+                        Request Song
+                        <span class="material-symbols-outlined text-base">queue_music</span>
+                    </a>
+                    <a href="#community" class="inline-flex items-center gap-2 border border-white/15 bg-white/[0.04] px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                        Community
+                        <span class="material-symbols-outlined text-base">forum</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="relative py-16">
+        <div class="container mx-auto max-w-[1320px] px-6">
+            <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_380px]">
+                <article class="glass-panel border border-white/10 p-6 reveal-up">
+                    <div class="flex items-end justify-between gap-4">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Coming Up</p>
+                            <h2 class="mt-3 font-display text-4xl uppercase leading-none">Up Next</h2>
+                        </div>
+                        <span class="material-symbols-outlined text-3xl text-slate-500">queue_music</span>
+                    </div>
+                    <div id="up-next-container" class="mt-6 flex flex-col gap-3">
+                        {% for track in up_next_tracks %}
+                        <div class="group flex items-center gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 hover:border-primary/45 hover:bg-primary/5{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
+                            <span class="w-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-600">{{ forloop.counter|stringformat:"02d" }}</span>
+                            <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
+                                {% if track.album_art %}
+                                <img src="{{ track.album_art }}" class="h-full w-full object-cover" alt=""/>
+                                {% else %}
+                                <div class="flex h-full w-full items-center justify-center">
+                                    <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">{{ track.title }}</p>
+                                <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ track.artist }}</p>
+                            </div>
+                            <span id="up-next-eta-{{ forloop.counter0 }}" class="text-[10px] uppercase tracking-[0.2em] text-slate-500">In --:--</span>
+                        </div>
+                        {% empty %}
+                        <p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Queue loading</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <article class="glass-panel border border-white/10 p-6 reveal-up" style="transition-delay: 100ms;">
+                    <div class="flex items-end justify-between gap-4">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Recently Aired</p>
+                            <h2 class="mt-3 font-display text-4xl uppercase leading-none">Recently Played</h2>
+                        </div>
+                        <span class="material-symbols-outlined text-3xl text-slate-500">history</span>
+                    </div>
+                    <div id="recently-played-container" class="mt-6 flex flex-col gap-3">
+                        {% for track in recently_played_tracks %}
+                        <div class="group flex items-center gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 hover:border-secondary/45 hover:bg-secondary/5{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
+                            <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
+                                {% if track.album_art %}
+                                <img src="{{ track.album_art }}" class="h-full w-full object-cover" alt=""/>
+                                {% else %}
+                                <div class="flex h-full w-full items-center justify-center">
+                                    <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-bold uppercase tracking-tight text-white group-hover:text-secondary transition-colors">{{ track.title }}</p>
+                                <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ track.artist }}</p>
+                            </div>
+                            <span class="text-[10px] uppercase tracking-[0.2em] text-slate-600">Played</span>
+                        </div>
+                        {% empty %}
+                        <p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Broadcast starting</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <aside class="flex flex-col gap-6 reveal-up" style="transition-delay: 200ms;">
+                    <article class="glass-panel border border-white/10 p-6">
+                        <div class="flex items-end justify-between gap-4">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Schedule Feed</p>
+                                <h2 class="mt-3 font-display text-4xl uppercase leading-none">Upcoming Shows</h2>
+                            </div>
+                            <span class="material-symbols-outlined text-3xl text-slate-500">event_upcoming</span>
+                        </div>
+                        <div id="upcoming-shows-column-list" class="mt-6 flex flex-col gap-3">
+                            <p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Loading upcoming shows</p>
+                        </div>
+                    </article>
+
+                    <article class="glass-panel border border-white/10 p-6">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Return Signal</p>
+                        <h3 class="mt-3 font-display text-3xl uppercase leading-none">Why fans come back</h3>
+                        <ul class="mt-5 space-y-3 text-sm text-slate-300 leading-relaxed">
+                            <li class="border border-white/10 bg-white/[0.03] p-4">Clear show countdowns make it easier to build appointment listening habits.</li>
+                            <li class="border border-white/10 bg-white/[0.03] p-4">The player now surfaces more community energy, not just audio controls.</li>
+                            <li class="border border-white/10 bg-white/[0.03] p-4">Saved moments, live requests, and chat give the page memory and agency.</li>
+                        </ul>
+                    </article>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative py-16 border-y border-white/10 bg-black/20">
+        <div class="container mx-auto max-w-[1320px] px-6">
+            <div class="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_340px]">
+                <div class="glass-panel border border-secondary/20 p-6 md:p-8 reveal-up">
+                    <div class="flex items-start justify-between gap-5">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">AI DJ Layer</p>
+                            <h2 class="mt-3 font-display text-4xl uppercase leading-none">DJ Insights</h2>
+                        </div>
+                        <button id="live-ai-helpful-btn" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-secondary hover:text-white transition-colors">
+                            <span id="live-ai-helpful-icon" class="material-symbols-outlined text-base">thumb_up</span>
+                            Helpful
+                        </button>
+                    </div>
+
+                    <div class="mt-6 border border-white/10 bg-white/[0.03] p-5">
+                        <p id="live-ai-about-label" class="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">{{ live_ai_payload.about_label }}</p>
+                        <p id="live-ai-commentary" class="mt-3 text-base leading-relaxed text-slate-300">{{ live_ai_payload.commentary }}</p>
+                    </div>
+
+                    <div class="mt-6 grid gap-4 md:grid-cols-3">
+                        <div class="border border-white/10 bg-white/[0.03] p-5">
+                            <p id="live-ai-card-1-label" class="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">{{ live_ai_payload.cards.0.label }}</p>
+                            <p id="live-ai-card-1-value" class="mt-3 font-display text-4xl uppercase">{{ live_ai_payload.cards.0.value }}</p>
+                            <p id="live-ai-card-1-subtext" class="mt-3 text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ live_ai_payload.cards.0.subtext }}</p>
+                        </div>
+                        <div class="border border-white/10 bg-white/[0.03] p-5">
+                            <p id="live-ai-card-2-label" class="text-[10px] font-bold uppercase tracking-[0.25em] text-secondary">{{ live_ai_payload.cards.1.label }}</p>
+                            <p id="live-ai-card-2-value" class="mt-3 font-display text-4xl uppercase">{{ live_ai_payload.cards.1.value }}</p>
+                            <p id="live-ai-card-2-subtext" class="mt-3 text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ live_ai_payload.cards.1.subtext }}</p>
+                        </div>
+                        <div class="border border-white/10 bg-white/[0.03] p-5">
+                            <p id="live-ai-card-3-label" class="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">{{ live_ai_payload.cards.2.label }}</p>
+                            <p id="live-ai-card-3-value" class="mt-3 font-display text-4xl uppercase">{{ live_ai_payload.cards.2.value }}</p>
+                            <p id="live-ai-card-3-subtext" class="mt-3 text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ live_ai_payload.cards.2.subtext }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 reveal-up" style="transition-delay: 120ms;">
+                    <article class="glass-panel border border-primary/20 p-5">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">lyrics</span>
+                            <p id="live-rich-lyric-title" class="font-display text-2xl uppercase leading-none">Lyric Highlight</p>
+                        </div>
+                        <p id="live-rich-lyric-body" class="mt-4 text-sm leading-relaxed text-slate-300">High-impact lyric context for the current song appears here in real time.</p>
+                        <p id="live-rich-lyric-source" class="mt-4 hidden text-[10px] uppercase tracking-[0.22em] text-primary/80"></p>
+                    </article>
+
+                    <article class="glass-panel border border-secondary/20 p-5">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-secondary">rocket_launch</span>
+                            <p id="live-rich-comeback-title" class="font-display text-2xl uppercase leading-none">Era Pulse</p>
+                        </div>
+                        <p id="live-rich-comeback-body" class="mt-4 text-sm leading-relaxed text-slate-300">Comeback momentum and era signals update as the playlist rotates.</p>
+                    </article>
+
+                    <article class="glass-panel border border-white/10 p-5">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-white">group</span>
+                            <p id="live-rich-artist-title" class="font-display text-2xl uppercase leading-none">Artist Snapshot</p>
+                        </div>
+                        <p id="live-rich-artist-body" class="mt-4 text-sm leading-relaxed text-slate-300">A quick artist snapshot will appear here.</p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span id="live-rich-artist-chip-1" class="border border-white/15 px-2 py-1 text-[10px] uppercase tracking-[0.22em] text-slate-300">Artist Focus</span>
+                            <span id="live-rich-artist-chip-2" class="border border-white/15 px-2 py-1 text-[10px] uppercase tracking-[0.22em] text-slate-300">Stage Energy</span>
+                            <span id="live-rich-artist-chip-3" class="border border-white/15 px-2 py-1 text-[10px] uppercase tracking-[0.22em] text-slate-300">Fan Momentum</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="community" class="relative py-16">
+        <div class="container mx-auto max-w-[1320px] px-6">
+            <div class="grid gap-6 xl:grid-cols-[minmax(0,1.08fr)_420px]">
+                <article class="glass-panel border border-white/10 p-6 reveal-up">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Community Layer</p>
+                            <h2 class="mt-3 font-display text-4xl uppercase leading-none">Listener Chat</h2>
+                        </div>
+                        {% if not user.is_authenticated %}
+                        <a href="{% url 'login' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                            Log In To Join
+                            <span class="material-symbols-outlined text-base">login</span>
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <p class="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300">
+                        This is the social layer that makes the station feel alive. Even when someone lands in the middle of a song, they can see there is already a room around the music.
+                    </p>
+
+                    <div class="mt-6 border border-white/10 bg-black/25 p-4">
+                        <div id="chat-messages" class="custom-scrollbar max-h-[340px] space-y-4 overflow-y-auto pr-2">
+                            <p class="py-6 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Loading chat</p>
+                        </div>
+                        <p id="chat-error" class="hidden mt-4 text-[11px] uppercase tracking-[0.22em] text-primary"></p>
+                        <div class="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+                            <input id="chat-input" type="text" {% if not user.is_authenticated %}disabled{% endif %} placeholder="{% if user.is_authenticated %}Drop a message into the room{% else %}Log in to join the live room{% endif %}" class="border border-white/10 bg-white/[0.04] px-4 py-4 text-sm text-white placeholder:text-slate-500 focus:border-secondary focus:outline-none {% if not user.is_authenticated %}opacity-60 cursor-not-allowed{% endif %}"/>
+                            <button id="chat-send-btn" {% if not user.is_authenticated %}disabled{% endif %} class="inline-flex items-center justify-center gap-2 bg-primary px-5 py-4 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                                Send
+                                <span class="material-symbols-outlined text-base">north_east</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <aside class="flex flex-col gap-6 reveal-up" style="transition-delay: 120ms;">
+                    <article class="glass-panel border border-white/10 p-6">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Experience Principles</p>
+                        <div class="mt-5 space-y-3">
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Clarity First</p>
+                                <p class="mt-2 text-sm text-slate-300">People should know what is playing, what is next, and what they can do within seconds.</p>
+                            </div>
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Live Energy</p>
+                                <p class="mt-2 text-sm text-slate-300">Motion, listener counts, chat, and AI context all reinforce that the station is active right now.</p>
+                            </div>
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Return Value</p>
+                                <p class="mt-2 text-sm text-slate-300">Show countdowns and collectible moments give fans a reason to come back after they leave.</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="glass-panel border border-white/10 p-6">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Suggested Next Improvements</p>
+                        <div class="mt-5 space-y-3">
+                            {% for item in live_experience_suggestions|slice:":3" %}
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">{{ item.eyebrow }}</p>
+                                <p class="mt-2 font-display text-2xl uppercase leading-tight">{{ item.title }}</p>
+                                <p class="mt-3 text-sm text-slate-300 leading-relaxed">{{ item.summary }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </article>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative py-16 border-t border-white/10 bg-black/25">
+        <div class="container mx-auto max-w-[1320px] px-6">
+            <div class="flex flex-wrap items-end justify-between gap-4 reveal-up">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Suggested Improvements</p>
+                    <h2 class="mt-3 font-display text-4xl uppercase leading-none">What I'd test next to deepen return visits</h2>
+                </div>
+                <a href="{% url 'test_page' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                    Open The Test Page
+                    <span class="material-symbols-outlined text-base">arrow_outward</span>
+                </a>
+            </div>
+
+            <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                {% for item in live_experience_suggestions %}
+                <article class="glass-panel border border-white/10 p-5 reveal-up" style="transition-delay: {{ forloop.counter0 }}00ms;">
+                    <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">{{ item.eyebrow }}</p>
+                    <h3 class="mt-3 font-display text-2xl uppercase leading-tight">{{ item.title }}</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-300">{{ item.summary }}</p>
+                    <p class="mt-4 text-[10px] uppercase tracking-[0.22em] text-primary">{{ item.impact }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {% include 'core/footer.html' %}
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-up').forEach((el) => observer.observe(el));
+
+        const playBtn = document.getElementById('play-btn');
+        const audio = document.getElementById('live-audio');
+        const voiceAudio = document.getElementById('live-vo-audio');
+        const progressFillEl = document.getElementById('live-progress-fill');
+        const progressCurrentEl = document.getElementById('live-progress-current');
+        const progressTotalEl = document.getElementById('live-progress-total');
+
+        if (playBtn && audio) {
+            let currentLiveAiPayload = {{ live_ai_payload_json|default:"{}"|safe }};
+            let currentTrackId = Number({{ current_track_id|default:0 }} || 0);
+            const helpfulSelectedTrackIds = new Set();
+            let isPlaying = false;
+            const initialServerOffset = {{ current_offset|default:0 }};
+            let currentTrackDurationSeconds = Number({{ current_track_duration_seconds|default:0 }} || 0);
+            let currentVoiceOverlay = {{ current_voice_overlay_json|default:"null"|safe }};
+            let voiceStartTimer = null;
+            let rotateWatchdogTimer = null;
+            let rotateInFlight = false;
+            let playbackGuardInterval = null;
+            let mainFadeInterval = null;
+            const pageLoadTime = Date.now();
+            const shareNowPlayingBtn = document.getElementById('share-now-playing-btn');
+            const shareNowPlayingStatus = document.getElementById('share-now-playing-status');
+            const saveMomentBtn = document.getElementById('save-moment-btn');
+            const saveMomentDefaultLabel = 'Save This Moment';
+            const upcomingShowsColumnListEl = document.getElementById('upcoming-shows-column-list');
+            let currentUpNextTracks = {{ up_next_tracks_json|default:"[]"|safe }};
+            let scheduleSlotsCache = [];
+
+            const parseDurationLabelSeconds = (value) => {
+                const raw = String(value || '').trim();
+                if (!raw) return 0;
+                const parts = raw.split(':').map((p) => parseInt(p, 10));
+                if (parts.some((p) => Number.isNaN(p))) return 0;
+                if (parts.length === 2) return Math.max(0, (parts[0] * 60) + parts[1]);
+                if (parts.length === 3) return Math.max(0, (parts[0] * 3600) + (parts[1] * 60) + parts[2]);
+                return 0;
+            };
+
+            const formatClock = (seconds) => {
+                const safe = Math.max(0, Math.floor(Number(seconds || 0)));
+                const mins = Math.floor(safe / 60);
+                const secs = safe % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            const formatCountdownClock = (seconds) => {
+                const safe = Math.max(0, Math.floor(Number(seconds || 0)));
+                const hours = Math.floor(safe / 3600);
+                const mins = Math.floor((safe % 3600) / 60);
+                const secs = safe % 60;
+                if (hours > 0) {
+                    return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            const getNowPlayingSharePayload = () => {
+                const title = (document.getElementById('hero-title')?.textContent || '').trim() || 'K-BEATS LIVE';
+                const artist = (document.getElementById('hero-artist')?.textContent || '').trim() || 'K-BEATS ON AIR';
+                const liveUrl = `${window.location.origin}/live/`;
+                return {
+                    title,
+                    artist,
+                    text: `Now playing on K-Beats: ${title} by ${artist}. Listen live: ${liveUrl}`,
+                    url: liveUrl,
+                };
+            };
+
+            const setShareStatus = (text) => {
+                if (!shareNowPlayingStatus) return;
+                shareNowPlayingStatus.textContent = String(text || '').trim();
+                if (shareNowPlayingStatus.textContent) {
+                    setTimeout(() => {
+                        if (shareNowPlayingStatus) shareNowPlayingStatus.textContent = '';
+                    }, 2400);
+                }
+            };
+
+            const updateShareCard = (track) => {
+                if (!track || typeof track !== 'object') return;
+                const titleEl = document.getElementById('share-card-title');
+                const artistEl = document.getElementById('share-card-artist');
+                if (titleEl && track.title) titleEl.textContent = track.title;
+                if (artistEl && track.artist) artistEl.textContent = track.artist;
+            };
+
+            const setSaveMomentSelected = (isSelected) => {
+                if (!saveMomentBtn) return;
+                saveMomentBtn.classList.toggle('bg-emerald-400', !!isSelected);
+                saveMomentBtn.classList.toggle('text-black', !!isSelected);
+                saveMomentBtn.classList.toggle('border-emerald-300', !!isSelected);
+                saveMomentBtn.classList.toggle('bg-black', !isSelected);
+                saveMomentBtn.classList.toggle('text-white', !isSelected);
+                saveMomentBtn.classList.toggle('border-white/15', !isSelected);
+                saveMomentBtn.textContent = isSelected ? 'Saved' : saveMomentDefaultLabel;
+            };
+
+            setSaveMomentSelected(false);
+
+            const saveCurrentMoment = async () => {
+                if (!saveMomentBtn) return;
+                saveMomentBtn.disabled = true;
+                try {
+                    const title = (document.getElementById('hero-title')?.textContent || '').trim();
+                    const artist = (document.getElementById('hero-artist')?.textContent || '').trim();
+                    const artworkUrl = (document.getElementById('hero-album-art')?.src || '').trim();
+                    const audioUrl = String(audio?.currentSrc || audio?.src || '').trim();
+
+                    const resp = await fetch('/api/live/save-moment/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({
+                            track_id: Number(currentTrackId || 0),
+                            title,
+                            artist,
+                            artwork_url: artworkUrl,
+                            audio_url: audioUrl,
+                        }),
+                    });
+                    const data = await resp.json();
+                    if (!data?.ok) {
+                        if (resp.status === 302 || resp.status === 403) {
+                            setShareStatus('Login required');
+                            return;
+                        }
+                        setShareStatus(data?.error || 'Save failed');
+                        return;
+                    }
+                    setShareStatus(data.already_saved ? 'Already saved' : 'Saved');
+                    setSaveMomentSelected(true);
+                } catch (err) {
+                    setShareStatus('Save failed');
+                } finally {
+                    saveMomentBtn.disabled = false;
+                }
+            };
+
+            if (saveMomentBtn) {
+                saveMomentBtn.addEventListener('click', saveCurrentMoment);
+            }
+
+            if (shareNowPlayingBtn) {
+                shareNowPlayingBtn.addEventListener('click', async () => {
+                    const payload = getNowPlayingSharePayload();
+                    try {
+                        if (navigator.share) {
+                            await navigator.share({
+                                title: `${payload.title} - K-Beats`,
+                                text: payload.text,
+                                url: payload.url,
+                            });
+                            setShareStatus('Shared');
+                            return;
+                        }
+                        await navigator.clipboard.writeText(payload.text);
+                        setShareStatus('Copied');
+                    } catch (err) {
+                        if (err && err.name === 'AbortError') {
+                            return;
+                        }
+                        setShareStatus('Share failed');
+                    }
+                });
+            }
+
+            const getEffectiveDurationSeconds = () => {
+                const audioDuration = Number(audio.duration || 0);
+                if (Number.isFinite(audioDuration) && audioDuration > 0) return audioDuration;
+                const knownDuration = Number(currentTrackDurationSeconds || 0);
+                if (Number.isFinite(knownDuration) && knownDuration > 0) return knownDuration;
+                if (progressTotalEl) return parseDurationLabelSeconds(progressTotalEl.textContent || '');
+                return 0;
+            };
+
+            const getCurrentTrackRemainingSeconds = () => {
+                const duration = getEffectiveDurationSeconds();
+                const current = Math.max(0, Number(audio.currentTime || 0));
+                if (!duration || duration <= 0) return 0;
+                return Math.max(0, Math.floor(duration - current));
+            };
+
+            const updateUpNextCountdownTimers = () => {
+                const queue = Array.isArray(currentUpNextTracks) ? currentUpNextTracks : [];
+                let running = getCurrentTrackRemainingSeconds();
+                queue.forEach((track, idx) => {
+                    const etaEl = document.getElementById(`up-next-eta-${idx}`);
+                    if (!etaEl) return;
+                    etaEl.textContent = `In ${formatCountdownClock(running)}`;
+                    const duration = Math.max(0, Number(track?.duration_seconds || 0));
+                    running += duration;
+                });
+            };
+
+            const parseShowDate = (dayCode, hhmm) => {
+                const dayMap = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
+                const targetDay = dayMap[String(dayCode || '').toUpperCase()];
+                if (typeof targetDay !== 'number') return null;
+                const parts = String(hhmm || '').split(':');
+                if (parts.length < 2) return null;
+                const hour = parseInt(parts[0], 10);
+                const minute = parseInt(parts[1], 10);
+                if (Number.isNaN(hour) || Number.isNaN(minute)) return null;
+
+                const now = new Date();
+                const candidate = new Date(now);
+                const diff = (targetDay - now.getDay() + 7) % 7;
+                candidate.setDate(now.getDate() + diff);
+                candidate.setHours(hour, minute, 0, 0);
+                if (candidate <= now) {
+                    candidate.setDate(candidate.getDate() + 7);
+                }
+                return candidate;
+            };
+
+            const parseShowDateThisWeek = (dayCode, hhmm) => {
+                const dayMap = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
+                const targetDay = dayMap[String(dayCode || '').toUpperCase()];
+                if (typeof targetDay !== 'number') return null;
+                const parts = String(hhmm || '').split(':');
+                if (parts.length < 2) return null;
+                const hour = parseInt(parts[0], 10);
+                const minute = parseInt(parts[1], 10);
+                if (Number.isNaN(hour) || Number.isNaN(minute)) return null;
+
+                const now = new Date();
+                const candidate = new Date(now);
+                const diff = targetDay - now.getDay();
+                candidate.setDate(now.getDate() + diff);
+                candidate.setHours(hour, minute, 0, 0);
+                return candidate;
+            };
+
+            const renderUpcomingShowsColumn = () => {
+                if (!upcomingShowsColumnListEl) return;
+                if (!Array.isArray(scheduleSlotsCache) || !scheduleSlotsCache.length) {
+                    upcomingShowsColumnListEl.innerHTML = '<p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Upcoming shows unavailable</p>';
+                    return;
+                }
+
+                const now = new Date();
+                const items = scheduleSlotsCache
+                    .map((slot) => {
+                        const startAt = parseShowDate(slot.day, slot.time);
+                        if (!startAt) return null;
+                        const diff = Math.max(0, Math.floor((startAt.getTime() - Date.now()) / 1000));
+                        return {
+                            label: String(slot.show_name || slot.name || 'Show').trim(),
+                            day: String(slot.day || ''),
+                            time: String(slot.time || ''),
+                            startAt,
+                            diff,
+                        };
+                    })
+                    .filter(Boolean)
+                    .filter((item) => item.startAt > now)
+                    .sort((a, b) => a.startAt - b.startAt)
+                    .slice(0, 12);
+
+                const currentCandidates = scheduleSlotsCache
+                    .map((slot) => {
+                        const thisWeek = parseShowDateThisWeek(slot.day, slot.time);
+                        if (!thisWeek) return null;
+                        const thisWeekTime = thisWeek.getTime();
+                        const nowTime = now.getTime();
+                        const startAt = thisWeekTime <= nowTime ? thisWeek : new Date(thisWeekTime - (7 * 24 * 60 * 60 * 1000));
+                        return {
+                            label: String(slot.show_name || slot.name || 'Show').trim(),
+                            day: String(slot.day || ''),
+                            time: String(slot.time || ''),
+                            startAt,
+                        };
+                    })
+                    .filter(Boolean)
+                    .filter((item) => item.startAt <= now)
+                    .sort((a, b) => b.startAt - a.startAt);
+
+                const currentShow = currentCandidates.length ? currentCandidates[0] : null;
+
+                if (!items.length && !currentShow) {
+                    upcomingShowsColumnListEl.innerHTML = '<p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">No upcoming shows right now</p>';
+                    return;
+                }
+
+                const renderShowRow = (item, mode = 'queued') => {
+                    const hh = String(item.startAt.getHours()).padStart(2, '0');
+                    const mm = String(item.startAt.getMinutes()).padStart(2, '0');
+                    const countdown = mode === 'live' ? 'LIVE' : `In ${formatCountdownClock(item.diff)}`;
+                    const leftIcon = mode === 'live' ? 'radio_button_checked' : (mode === 'next' ? 'schedule' : 'event');
+                    const highlightClass = mode === 'live'
+                        ? 'border-secondary/40 bg-gradient-to-r from-secondary/18 via-secondary/8 to-transparent hover:border-secondary/55'
+                        : (mode === 'next'
+                            ? 'border-primary/40 bg-gradient-to-r from-primary/18 via-primary/8 to-transparent hover:border-primary/55'
+                            : 'hover:border-primary/35 hover:bg-primary/5');
+                    const chipClass = mode === 'live' ? 'text-secondary' : (mode === 'next' ? 'text-primary' : 'text-slate-500');
+
+                    return `
+                        <div class="group flex items-center gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 ${highlightClass}">
+                            <div class="flex h-12 w-12 items-center justify-center border border-white/10 bg-black/20">
+                                <span class="material-symbols-outlined text-slate-300 group-hover:text-white transition-colors">${leftIcon}</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2">
+                                    <p class="truncate text-sm font-bold uppercase tracking-tight text-white">${item.label}</p>
+                                    ${mode === 'live' ? '<span class="shrink-0 bg-secondary px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.22em] text-black">On Air</span>' : ''}
+                                    ${mode === 'next' ? '<span class="shrink-0 bg-primary px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.22em] text-black">Next</span>' : ''}
+                                </div>
+                                <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">${item.day} ${hh}:${mm}</p>
+                            </div>
+                            <span class="text-[10px] uppercase tracking-[0.2em] ${chipClass}">${countdown}</span>
+                        </div>
+                    `;
+                };
+
+                const rows = [];
+                if (currentShow) {
+                    rows.push(renderShowRow({ ...currentShow, diff: 0 }, 'live'));
+                }
+
+                const MAX_SHOW_ROWS = 6;
+                if (items.length && rows.length < MAX_SHOW_ROWS) {
+                    rows.push(renderShowRow(items[0], 'next'));
+                    const remainingSlots = Math.max(0, MAX_SHOW_ROWS - rows.length);
+                    items.slice(1, 1 + remainingSlots).forEach((item) => rows.push(renderShowRow(item, 'queued')));
+                }
+
+                if (!rows.length) {
+                    upcomingShowsColumnListEl.innerHTML = '<p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">No upcoming shows right now</p>';
+                    return;
+                }
+
+                upcomingShowsColumnListEl.innerHTML = rows.join('');
+            };
+
+            const loadNextShowRail = async () => {
+                try {
+                    const resp = await fetch(`/api/schedule-data/?_ts=${Date.now()}`, { cache: 'no-store' });
+                    const data = await resp.json();
+                    const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+                    const slots = [];
+                    days.forEach((day) => {
+                        const daySlots = Array.isArray(data?.[day]) ? data[day] : [];
+                        daySlots.forEach((slot) => {
+                            if (!slot) return;
+                            slots.push({
+                                day,
+                                time: slot.time,
+                                name: slot.name,
+                                show_name: slot.show_name,
+                            });
+                        });
+                    });
+                    scheduleSlotsCache = slots;
+                } catch (e) {
+                    scheduleSlotsCache = [];
+                }
+                renderUpcomingShowsColumn();
+            };
+
+            const updateProgressUI = (explicitCurrent = null) => {
+                const duration = getEffectiveDurationSeconds();
+                const current = explicitCurrent === null ? Number(audio.currentTime || 0) : Number(explicitCurrent || 0);
+                const safeCurrent = Math.max(0, current);
+
+                if (progressCurrentEl) {
+                    progressCurrentEl.textContent = formatClock(safeCurrent);
+                }
+
+                if (duration > 0) {
+                    if (progressTotalEl) {
+                        progressTotalEl.textContent = formatClock(duration);
+                    }
+                    const pct = Math.max(0, Math.min(100, (safeCurrent / duration) * 100));
+                    if (progressFillEl) {
+                        progressFillEl.style.width = `${pct}%`;
+                    }
+                } else if (progressFillEl) {
+                    progressFillEl.style.width = '0%';
+                }
+            };
+
+            const getSliderVolume = () => {
+                const volumeSlider = document.getElementById('volume-slider');
+                if (!volumeSlider) return 0.75;
+                const sliderVal = Number(volumeSlider.value);
+                if (!Number.isFinite(sliderVal)) return 0.75;
+                return Math.max(0, Math.min(1, sliderVal / 100));
+            };
+
+            const clearVoiceOverlayPlayback = () => {
+                if (voiceStartTimer) {
+                    clearTimeout(voiceStartTimer);
+                    voiceStartTimer = null;
+                }
+                if (voiceAudio) {
+                    try {
+                        voiceAudio.pause();
+                        voiceAudio.currentTime = 0;
+                        voiceAudio.src = '';
+                    } catch (e) {}
+                }
+                audio.volume = getSliderVolume();
+            };
+
+            const clearMainFadeIn = () => {
+                if (!mainFadeInterval) return;
+                clearInterval(mainFadeInterval);
+                mainFadeInterval = null;
+            };
+
+            const startMainTrackFadeIn = (durationMs = 10000) => {
+                clearMainFadeIn();
+                if (audio.muted) return;
+
+                const targetVolume = getSliderVolume();
+                const totalMs = Math.max(1000, Number(durationMs || 10000));
+                const stepMs = 100;
+                const steps = Math.max(1, Math.floor(totalMs / stepMs));
+                let step = 0;
+
+                audio.volume = 0;
+                mainFadeInterval = setInterval(() => {
+                    if (audio.muted) {
+                        clearMainFadeIn();
+                        return;
+                    }
+                    if (voiceAudio && !voiceAudio.paused) {
+                        return;
+                    }
+                    step += 1;
+                    const nextVolume = Math.min(targetVolume, targetVolume * (step / steps));
+                    audio.volume = nextVolume;
+                    if (step >= steps) {
+                        audio.volume = targetVolume;
+                        clearMainFadeIn();
+                    }
+                }, stepMs);
+            };
+
+            const clearRotateWatchdog = () => {
+                if (rotateWatchdogTimer) {
+                    clearTimeout(rotateWatchdogTimer);
+                    rotateWatchdogTimer = null;
+                }
+            };
+
+            const scheduleRotateWatchdog = () => {
+                clearRotateWatchdog();
+                const dur = Number(currentTrackDurationSeconds || 0);
+                if (!Number.isFinite(dur) || dur <= 0) return;
+                const remaining = Math.max(0, dur - Number(audio.currentTime || 0));
+                const delayMs = Math.max(600, Math.round((remaining + 0.35) * 1000));
+                rotateWatchdogTimer = setTimeout(() => {
+                    triggerRotate('watchdog');
+                }, delayMs);
+            };
+
+            const startPlaybackGuard = () => {
+                if (playbackGuardInterval) return;
+                playbackGuardInterval = setInterval(() => {
+                    if (rotateInFlight) return;
+                    const dur = Number(currentTrackDurationSeconds || 0);
+                    if (!Number.isFinite(dur) || dur <= 0) return;
+                    const nowTime = Number(audio.currentTime || 0);
+                    if (nowTime >= Math.max(0, dur - 0.35)) {
+                        triggerRotate('guard-near-end');
+                    }
+                }, 500);
+            };
+
+            const stopPlaybackGuard = () => {
+                if (!playbackGuardInterval) return;
+                clearInterval(playbackGuardInterval);
+                playbackGuardInterval = null;
+            };
+
+            const scheduleVoiceOverlayForOffset = (trackOffsetSeconds) => {
+                clearVoiceOverlayPlayback();
+
+                if (!voiceAudio || !currentVoiceOverlay || !currentVoiceOverlay.audio_url) {
+                    return;
+                }
+
+                const startSeconds = Math.max(0, Number(currentVoiceOverlay.start_seconds || 0));
+                const overlayDuration = Math.max(0, Number(currentVoiceOverlay.duration_seconds || 0));
+                const configuredDuck = Math.max(0, Math.min(1, Number(currentVoiceOverlay.duck_volume ?? 0.1)));
+                const duckVolume = Math.min(getSliderVolume(), configuredDuck, 0.05);
+                const safeOffset = Math.max(0, Number(trackOffsetSeconds || 0));
+
+                if (overlayDuration > 0 && safeOffset >= startSeconds + overlayDuration) {
+                    return;
+                }
+
+                const startOverlayNow = (overlaySeek = 0) => {
+                    try {
+                        voiceAudio.src = currentVoiceOverlay.audio_url;
+                        voiceAudio.muted = audio.muted;
+                        voiceAudio.currentTime = Math.max(0, overlaySeek);
+                        audio.volume = duckVolume;
+                        voiceAudio.play().catch(() => {
+                            audio.volume = getSliderVolume();
+                        });
+                    } catch (e) {
+                        audio.volume = getSliderVolume();
+                    }
+                };
+
+                if (safeOffset >= startSeconds) {
+                    const voElapsed = safeOffset - startSeconds;
+                    startOverlayNow(voElapsed);
+                } else {
+                    const waitMs = Math.max(0, Math.round((startSeconds - safeOffset) * 1000));
+                    voiceStartTimer = setTimeout(() => {
+                        voiceStartTimer = null;
+                        startOverlayNow(0);
+                    }, waitMs);
+                }
+            };
+
+            if (voiceAudio) {
+                voiceAudio.onended = () => {
+                    audio.volume = getSliderVolume();
+                };
+            }
+
+            const getGlobalOffset = () => {
+                const elapsedSinceLoad = (Date.now() - pageLoadTime) / 1000;
+                return Math.floor(initialServerOffset + elapsedSinceLoad);
+            };
+
+            const syncAudio = () => {
+                const targetTime = getGlobalOffset();
+                if (Math.abs(audio.currentTime - targetTime) > 2) {
+                    audio.currentTime = targetTime;
+                }
+                scheduleVoiceOverlayForOffset(targetTime);
+                scheduleRotateWatchdog();
+                updateProgressUI(targetTime);
+            };
+
+            audio.addEventListener('timeupdate', () => updateProgressUI());
+            audio.addEventListener('loadedmetadata', () => updateProgressUI());
+            audio.addEventListener('durationchange', () => updateProgressUI());
+
+            if (initialServerOffset > 0) {
+                audio.addEventListener('canplay', () => {
+                    syncAudio();
+                }, { once: true });
+            }
+
+            playBtn.addEventListener('click', async () => {
+                if (isPlaying) {
+                    const wasMuted = audio.muted;
+                    audio.muted = !audio.muted;
+                    if (voiceAudio) voiceAudio.muted = audio.muted;
+
+                    if (wasMuted && !audio.muted) {
+                        syncAudio();
+                    }
+
+                    playBtn.querySelector('.material-symbols-outlined').textContent = audio.muted ? 'play_arrow' : 'pause';
+                    playBtn.classList.toggle('pulse-glow', audio.muted);
+                } else {
+                    try {
+                        const mobileMenuAudio = document.getElementById('mobile-menu-live-audio');
+                        if (mobileMenuAudio && !mobileMenuAudio.paused) {
+                            mobileMenuAudio.pause();
+                        }
+
+                        if (!audio.src || audio.src === '') {
+                            audio.load();
+                        }
+
+                        audio.muted = false;
+                        await audio.play();
+                        syncAudio();
+                    } catch (error) {
+                        try {
+                            audio.muted = true;
+                            await audio.play();
+                            syncAudio();
+                            playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
+                            playBtn.classList.add('pulse-glow');
+                        } catch (e) {
+                            console.error('Critical playback failure:', e);
+                        }
+                    }
+                }
+            });
+
+            audio.onplay = () => {
+                isPlaying = true;
+                if (voiceAudio) voiceAudio.muted = audio.muted;
+                playBtn.querySelector('.material-symbols-outlined').textContent = audio.muted ? 'play_arrow' : 'pause';
+                playBtn.classList.toggle('pulse-glow', audio.muted);
+                scheduleRotateWatchdog();
+                startPlaybackGuard();
+            };
+
+            audio.onpause = () => {
+                isPlaying = false;
+                clearVoiceOverlayPlayback();
+                clearMainFadeIn();
+                clearRotateWatchdog();
+                stopPlaybackGuard();
+                playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
+                playBtn.classList.add('pulse-glow');
+            };
+
+            const volumeSlider = document.getElementById('volume-slider');
+            if (volumeSlider) {
+                audio.volume = volumeSlider.value / 100;
+                volumeSlider.addEventListener('input', (e) => {
+                    if (!voiceAudio || voiceAudio.paused) {
+                        audio.volume = e.target.value / 100;
+                    }
+                    if (audio.muted && audio.volume > 0) {
+                        audio.muted = false;
+                        if (voiceAudio) voiceAudio.muted = false;
+                        playBtn.querySelector('.material-symbols-outlined').textContent = 'pause';
+                        playBtn.classList.remove('pulse-glow');
+                    }
+                });
+            }
+
+            async function rotateTrack() {
+                try {
+                    const response = await fetch(`/api/live/rotate/?advance=1&_ts=${Date.now()}`, { cache: 'no-store' });
+                    const data = await response.json();
+
+                    if (data.ok) {
+                        const track = data.current_track;
+                        currentTrackId = Number(track.id || 0);
+                        const serverOffset = Number(data.current_offset || 0);
+                        const durationFromPayload = Number(track.duration_seconds || 0);
+                        currentTrackDurationSeconds = durationFromPayload > 0
+                            ? durationFromPayload
+                            : parseDurationLabelSeconds(track.duration);
+                        if (progressTotalEl) {
+                            progressTotalEl.textContent = String(track.duration || formatClock(currentTrackDurationSeconds || 0));
+                        }
+                        currentVoiceOverlay = data.voice_overlay || null;
+                        const previousSrc = String(audio.currentSrc || audio.src || '');
+                        const nextSrc = String(track.audio_url || '');
+                        const normalizedPrev = previousSrc.split('?')[0];
+                        const normalizedNext = nextSrc.split('?')[0];
+                        const isSameTrack = !!normalizedPrev && !!normalizedNext && normalizedPrev === normalizedNext;
+
+                        clearVoiceOverlayPlayback();
+                        if (!isSameTrack) {
+                            audio.src = track.audio_url;
+                            audio.load();
+                        }
+
+                        const tryPlay = async () => {
+                            try {
+                                audio.muted = false;
+                                await audio.play();
+                            } catch (err) {
+                                audio.muted = true;
+                                await audio.play();
+                            }
+                        };
+
+                        await tryPlay();
+                        if (!isSameTrack) {
+                            startMainTrackFadeIn(10000);
+                        }
+                        if (Number.isFinite(serverOffset) && serverOffset > 0) {
+                            const seekTo = Math.max(0, Math.floor(serverOffset));
+                            if (Math.abs(audio.currentTime - seekTo) > 2) {
+                                audio.currentTime = seekTo;
+                            }
+                        }
+                        scheduleVoiceOverlayForOffset(serverOffset);
+                        scheduleRotateWatchdog();
+                        updateProgressUI(serverOffset);
+
+                        document.getElementById('hero-title').textContent = track.title;
+                        document.getElementById('hero-artist').textContent = track.artist;
+                        document.getElementById('hero-album-art').src = track.album_art;
+                        const stickyTitle = document.getElementById('sticky-track-title');
+                        const stickyArtist = document.getElementById('sticky-track-artist');
+                        if (stickyTitle) stickyTitle.textContent = track.title;
+                        if (stickyArtist) stickyArtist.textContent = track.artist;
+                        const bgImg = document.getElementById('album-bg-img');
+                        if (bgImg) bgImg.src = track.album_art;
+                        updateShareCard(track);
+                        setSaveMomentSelected(false);
+
+                        currentLiveAiPayload = data.live_ai_payload || {};
+                        applyLiveAiPayload(currentLiveAiPayload);
+
+                        updatePlaylistUI('up-next-container', data.up_next, 'primary');
+                        currentUpNextTracks = Array.isArray(data.up_next) ? data.up_next : [];
+                        updateUpNextCountdownTimers();
+                        updatePlaylistUI('recently-played-container', data.recently_played, 'secondary');
+                    }
+                } catch (error) {
+                    console.error('Rotation failed:', error);
+                    setTimeout(() => {
+                        triggerRotate('retry');
+                    }, 1000);
+                }
+            }
+
+            async function triggerRotate(reason = 'ended') {
+                if (rotateInFlight) return;
+                rotateInFlight = true;
+                clearRotateWatchdog();
+                try {
+                    await rotateTrack();
+                } finally {
+                    rotateInFlight = false;
+                }
+            }
+
+            audio.addEventListener('ended', () => triggerRotate('ended'));
+            updateProgressUI(initialServerOffset || 0);
+            updatePlaylistUI('up-next-container', currentUpNextTracks, 'primary');
+            updateUpNextCountdownTimers();
+            loadNextShowRail();
+            setInterval(updateUpNextCountdownTimers, 1000);
+            setInterval(renderUpcomingShowsColumn, 1000);
+            applyLiveAiPayload(currentLiveAiPayload);
+            updateShareCard({
+                title: document.getElementById('hero-title')?.textContent || 'K-BEATS LIVE',
+                artist: document.getElementById('hero-artist')?.textContent || 'K-BEATS ON AIR',
+            });
+
+            const helpfulBtn = document.getElementById('live-ai-helpful-btn');
+            const helpfulIcon = document.getElementById('live-ai-helpful-icon');
+            const updateHelpfulIconState = () => {
+                if (!helpfulIcon) return;
+                const isSelected = currentTrackId && helpfulSelectedTrackIds.has(currentTrackId);
+                helpfulIcon.style.fontVariationSettings = isSelected ? "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" : "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+            };
+            updateHelpfulIconState();
+
+            if (helpfulBtn) {
+                helpfulBtn.addEventListener('click', async () => {
+                    if (!currentTrackId) return;
+                    if (helpfulSelectedTrackIds.has(currentTrackId)) return;
+                    helpfulBtn.disabled = true;
+                    try {
+                        const response = await fetch('/api/live/ai/helpful/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ track_id: currentTrackId }),
+                        });
+                        const data = await response.json();
+                        if (data && data.ok) {
+                            helpfulSelectedTrackIds.add(currentTrackId);
+                            updateHelpfulIconState();
+                            if (!currentLiveAiPayload || typeof currentLiveAiPayload !== 'object') {
+                                currentLiveAiPayload = {};
+                            }
+                            currentLiveAiPayload.helpful_count = Number(data.helpful_count || 0);
+                            applyLiveAiPayload(currentLiveAiPayload);
+                        }
+                    } catch (err) {
+                        console.error('Failed to record helpful click:', err);
+                    } finally {
+                        helpfulBtn.disabled = false;
+                    }
+                });
+            }
+
+            const originalApplyLiveAiPayload = applyLiveAiPayload;
+            applyLiveAiPayload = (payload) => {
+                originalApplyLiveAiPayload(payload);
+                updateHelpfulIconState();
+            };
+        }
+
+        function applyLiveAiPayload(payload) {
+            if (!payload || typeof payload !== 'object') return;
+
+            const safeCards = Array.isArray(payload.cards) ? payload.cards : [];
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const text = String(value || '').trim();
+                if (text) el.textContent = text;
+            };
+
+            const setChip = (id, value) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const text = String(value || '').trim();
+                if (text) {
+                    el.textContent = text;
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            };
+
+            setText('live-ai-about-label', payload.about_label);
+            setText('live-ai-commentary', payload.commentary);
+
+            for (let idx = 0; idx < 3; idx += 1) {
+                const card = safeCards[idx] || {};
+                const slot = idx + 1;
+                setText(`live-ai-card-${slot}-label`, card.label);
+                setText(`live-ai-card-${slot}-value`, card.value);
+                setText(`live-ai-card-${slot}-subtext`, card.subtext);
+            }
+
+            const rich = payload.rich_context && typeof payload.rich_context === 'object' ? payload.rich_context : {};
+            const lyric = rich.lyric && typeof rich.lyric === 'object' ? rich.lyric : {};
+            const comeback = rich.comeback && typeof rich.comeback === 'object' ? rich.comeback : {};
+            const artistProfile = rich.artist_profile && typeof rich.artist_profile === 'object' ? rich.artist_profile : {};
+
+            setText('live-rich-lyric-title', lyric.title);
+            setText('live-rich-lyric-body', lyric.body);
+            const lyricSource = String(lyric.source || '').trim();
+            const lyricSourceEl = document.getElementById('live-rich-lyric-source');
+            if (lyricSourceEl) {
+                if (lyricSource) {
+                    lyricSourceEl.textContent = `Source: ${lyricSource}`;
+                    lyricSourceEl.classList.remove('hidden');
+                } else {
+                    lyricSourceEl.textContent = '';
+                    lyricSourceEl.classList.add('hidden');
+                }
+            }
+            setText('live-rich-comeback-title', comeback.title);
+            setText('live-rich-comeback-body', comeback.body);
+            setText('live-rich-artist-title', artistProfile.title);
+            setText('live-rich-artist-body', artistProfile.body);
+
+            const chips = Array.isArray(artistProfile.chips) ? artistProfile.chips : [];
+            setChip('live-rich-artist-chip-1', chips[0]);
+            setChip('live-rich-artist-chip-2', chips[1]);
+            setChip('live-rich-artist-chip-3', chips[2]);
+        }
+
+        function sanitizePlaylistTitle(title) {
+            if (!title || typeof title !== 'string') return '';
+            let sanitized = title;
+            sanitized = sanitized.replace(/\bAI\b/gi, '');
+            sanitized = sanitized.replace(/\b\d{4}-\d{2}-\d{2}(?:\s+\d{1,2}:\d{2})?\b/g, '');
+            sanitized = sanitized.replace(/\b\d{1,2}:\d{2}\b/g, '');
+            sanitized = sanitized.replace(/[\---|]+/g, ' ');
+            sanitized = sanitized.replace(/\s{2,}/g, ' ').trim();
+            return sanitized || title;
+        }
+
+        function updatePlaylistUI(containerId, tracks, colorClass) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const palette = colorClass === 'secondary'
+                ? {
+                    hover: 'hover:border-secondary/45 hover:bg-secondary/5',
+                    text: 'group-hover:text-secondary',
+                }
+                : {
+                    hover: 'hover:border-primary/45 hover:bg-primary/5',
+                    text: 'group-hover:text-primary',
+                };
+
+            container.innerHTML = tracks.map((track, idx) => {
+                const title = sanitizePlaylistTitle(track.title);
+                const upNextEta = 'In --:--';
+                return `
+                    <div class="group flex items-center gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 ${palette.hover}">
+                        ${containerId === 'up-next-container' ? `<span class="w-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-600">${(idx + 1).toString().padStart(2, '0')}</span>` : ''}
+                        <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
+                            ${track.album_art ? `<img src="${track.album_art}" class="h-full w-full object-cover" alt="">` : `<div class="flex h-full w-full items-center justify-center"><span class="material-symbols-outlined text-slate-500 ${palette.text} transition-colors">album</span></div>`}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-bold uppercase tracking-tight text-white ${palette.text} transition-colors">${title}</p>
+                            <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">${track.artist}</p>
+                        </div>
+                        ${containerId === 'up-next-container' ? `<span id="up-next-eta-${idx}" class="text-[10px] uppercase tracking-[0.2em] text-slate-500">${upNextEta}</span>` : `<span class="text-[10px] uppercase tracking-[0.2em] text-slate-600">Played</span>`}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateListeners() {
+            const base = {% if state %}{{ state.listeners_count }}{% else %}3847{% endif %};
+            const variation = Math.floor(Math.random() * 50) - 25;
+            const count = (base + variation).toLocaleString();
+            ['listener-count', 'listener-count-bar'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = count;
+            });
+        }
+        setInterval(updateListeners, 5000);
+
+        const stickyBar = document.getElementById('sticky-info-bar');
+        if (stickyBar) {
+            const updateStickyTop = () => {
+                if (window.scrollY > 20) {
+                    stickyBar.style.top = window.innerWidth < 768 ? '64px' : '72px';
+                } else {
+                    stickyBar.style.top = window.innerWidth < 768 ? '80px' : '96px';
+                }
+            };
+
+            let ticking = false;
+            const onScrollResize = () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        updateStickyTop();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            };
+
+            window.addEventListener('scroll', onScrollResize);
+            window.addEventListener('resize', onScrollResize);
+            updateStickyTop();
+        }
+
+        const chatContainer = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatError = document.getElementById('chat-error');
+        const isChatMember = {% if user.is_authenticated %}true{% else %}false{% endif %};
+        let lastChatMessageId = 0;
+
+        function setChatError(message) {
+            if (!chatError) return;
+            const text = String(message || '').trim();
+            if (!text) {
+                chatError.textContent = '';
+                chatError.classList.add('hidden');
+                return;
+            }
+            chatError.textContent = text;
+            chatError.classList.remove('hidden');
+        }
+
+        function escapeHtml(text) {
+            return String(text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderChatMessages(messages) {
+            if (!chatContainer) return;
+            chatContainer.innerHTML = '';
+
+            if (!Array.isArray(messages) || !messages.length) {
+                const emptyState = document.createElement('p');
+                emptyState.className = 'py-6 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500';
+                emptyState.textContent = 'No chat messages yet';
+                chatContainer.appendChild(emptyState);
+                return;
+            }
+
+            messages.forEach((item) => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chat-msg';
+
+                const usernameClass = item.is_me ? 'text-primary' : 'text-secondary';
+                const borderClass = item.is_me ? 'border-primary' : 'border-secondary';
+                const safeUser = escapeHtml(item.username || 'Member');
+                const safeMessage = escapeHtml(item.message || '');
+
+                msgDiv.innerHTML = `
+                    <span class="mb-2 block text-[10px] font-bold uppercase tracking-[0.24em] ${usernameClass}">${safeUser}</span>
+                    <div class="border-l-2 ${borderClass} bg-white/[0.03] p-3 text-sm text-white leading-relaxed">${safeMessage}</div>
+                `;
+                chatContainer.appendChild(msgDiv);
+
+                const numericId = Number(item.id || 0);
+                if (numericId > lastChatMessageId) lastChatMessageId = numericId;
+            });
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function refreshLiveChat() {
+            if (!isChatMember || !chatContainer) return;
+            try {
+                const resp = await fetch(`/api/live/chat/messages/?t=${Date.now()}`, { cache: 'no-store' });
+                const data = await resp.json();
+                if (!data?.ok) return;
+                renderChatMessages(data.messages || []);
+            } catch (e) {
+            }
+        }
+
+        async function sendLiveChatMessage() {
+            if (!isChatMember || !chatInput) return;
+            const text = String(chatInput.value || '').trim();
+            if (!text) return;
+            setChatError('');
+
+            chatInput.disabled = true;
+            if (chatSendBtn) chatSendBtn.disabled = true;
+
+            try {
+                const resp = await fetch('/api/live/chat/send/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ message: text }),
+                });
+                const data = await resp.json();
+                if (!data?.ok) {
+                    setChatError(data?.error || 'Message rejected');
+                    return;
+                }
+                chatInput.value = '';
+                await refreshLiveChat();
+            } catch (e) {
+                setChatError('Could not send message right now');
+            } finally {
+                chatInput.disabled = !isChatMember;
+                if (chatSendBtn) chatSendBtn.disabled = !isChatMember;
+                if (isChatMember) chatInput.focus();
+            }
+        }
+
+        if (isChatMember && chatContainer) {
+            refreshLiveChat();
+            setInterval(refreshLiveChat, 5000);
+        }
+
+        if (chatSendBtn) {
+            chatSendBtn.addEventListener('click', sendLiveChatMessage);
+        }
+
+        if (chatInput) {
+            chatInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    sendLiveChatMessage();
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
+

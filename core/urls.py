@@ -60,6 +60,7 @@ urlpatterns = [
     path('comeback-timeline/', views.comeback_timeline, name='comeback_timeline'),
     path('comeback-design-lab/', views.upcoming_comebacks_design_lab, name='upcoming_comebacks_design_lab'),
     path('header-mega-menu-lab/', views.header_mega_menu_lab, name='header_mega_menu_lab'),
+    path('api/header-mega-menu-data/', views.api_header_mega_menu_data, name='api_header_mega_menu_data'),
     path('calendar/', views.calendar, name='calendar'),
     path('fan-clubs/', views.fan_clubs, name='fan_clubs'),
     path('fan-clubs/start/', views.start_club_view, name='start_club'),
@@ -96,6 +97,7 @@ urlpatterns = [
     path('purchase-successful-celebration-modal/', views.purchase_successful_celebration_modal, name='purchase_successful_celebration_modal'),
     path('gift-to-a-friend/', views.gift_to_a_friend, name='gift_to_a_friend'),
     path('d-day-comeback-notification/', views.d_day_comeback_notification, name='d_day_comeback_notification'),
+    path('test-page/', views.test_page, name='test_page'),
     path('blog-page/', views.blog_page, name='blog_page'),
     path('blog/generate/', views.blog_generate, name='blog_generate'),
     path('blog/link-pass/', views.blog_internal_link_pass, name='blog_internal_link_pass'),
@@ -111,6 +113,8 @@ urlpatterns = [
     path('live/ai/theme/', views.ai_theme, name='ai_theme'),
     path('charts/ai/ranking/', views.ai_generate_ranking, name='ai_generate_ranking'),
     path('vote-poll/', views.vote_poll, name='vote_poll'),
+    path('stream/', views.stream_hub, name='stream_hub'),
+    path('stream/<slug:slug>/', views.stream_player, name='stream_player'),
 
     # ── Dynamic Idol Pages ────────────────────────────────────────────────
     path('idols/<slug:slug>/', views.idol_page, name='idol_page'),

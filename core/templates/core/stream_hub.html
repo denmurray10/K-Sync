@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+<title>K-Beats Stream Presets</title>
+<meta name="description" content="Browse K-Beats Stream player presets, including premium listening modes built in the same style as the Live page."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#f425c0",
+                    secondary: "#00f0ff",
+                    ink: "#050505",
+                },
+                fontFamily: {
+                    display: ["Montserrat", "sans-serif"]
+                },
+                borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+            }
+        }
+    }
+</script>
+<style>
+    body {
+        background:
+            radial-gradient(circle at top left, rgba(244, 37, 192, 0.20), transparent 32%),
+            radial-gradient(circle at top right, rgba(0, 240, 255, 0.18), transparent 28%),
+            linear-gradient(180deg, #050505 0%, #000 100%);
+    }
+    .glass-panel {
+        background: rgba(0, 0, 0, 0.68);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+    }
+    .neon-border {
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 0 24px rgba(244, 37, 192, 0.15);
+    }
+    .card-shift:hover {
+        transform: translateY(-6px);
+    }
+</style>
+</head>
+<body class="min-h-screen bg-black text-white font-display overflow-x-hidden">
+{% include 'core/header.html' %}
+
+<main class="relative">
+    <section class="relative overflow-hidden border-b border-white/10">
+        <div class="absolute inset-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-black via-black/65 to-black"></div>
+            {% if current_track %}
+            <img src="{{ current_track.album_art }}" alt="" class="h-full w-full object-cover opacity-20 blur-[50px] scale-110"/>
+            {% endif %}
+        </div>
+        <div class="relative mx-auto max-w-7xl px-6 pb-16 pt-28 lg:px-8 lg:pb-20 lg:pt-36">
+            <div class="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_380px] lg:items-end">
+                <div>
+                    <p class="font-mono text-[11px] uppercase tracking-[0.28em] text-secondary">Stream Presets</p>
+                    <h1 class="mt-5 max-w-4xl text-5xl font-black uppercase tracking-[-0.04em] text-white md:text-7xl">Pick A Player Lane</h1>
+                    <p class="mt-6 max-w-2xl text-base leading-relaxed text-slate-300">These Stream pages reuse the current live player system, but each preset gives it a distinct listening shell. Free modes stay open, while Premium presets can gate access by fan-club tier.</p>
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <a href="#free-streams" class="border border-primary bg-primary px-5 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-black shadow-[5px_5px_0px_rgba(255,255,255,1)] transition-all hover:translate-x-[5px] hover:translate-y-[5px] hover:shadow-none">Browse Free</a>
+                        <a href="#premium-streams" class="border border-white/20 bg-white/5 px-5 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-white transition-colors hover:border-secondary hover:text-secondary">Browse Premium</a>
+                    </div>
+                </div>
+                <div class="glass-panel neon-border p-6">
+                    <p class="font-mono text-[11px] uppercase tracking-[0.24em] text-slate-400">Live Signal</p>
+                    <div class="mt-5 flex items-center gap-4">
+                        <div class="h-20 w-20 border border-white/15 bg-white/5 p-2">
+                            <img src="{% if current_track %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}" alt="" class="h-full w-full object-cover"/>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-black uppercase tracking-[0.18em] text-primary">Now Playing</p>
+                            <p class="mt-2 truncate text-2xl font-black uppercase tracking-tight">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
+                            <p class="mt-1 truncate text-sm uppercase tracking-[0.24em] text-slate-400">{% if current_track %}{{ current_track.artist }}{% else %}On Air{% endif %}</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 grid grid-cols-2 gap-3 text-[11px] uppercase tracking-[0.18em]">
+                        <div class="border border-white/10 bg-white/[0.04] p-3">
+                            <p class="font-mono text-slate-500">Your Tier</p>
+                            <p class="mt-2 font-black text-white">{{ user_stream_tier }}</p>
+                        </div>
+                        <div class="border border-white/10 bg-white/[0.04] p-3">
+                            <p class="font-mono text-slate-500">Presets</p>
+                            <p class="mt-2 font-black text-white">{{ stream_presets|length }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="free-streams" class="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+        <div class="mb-8 flex items-end justify-between gap-4">
+            <div>
+                <p class="font-mono text-[11px] uppercase tracking-[0.26em] text-secondary">Free Stream Pages</p>
+                <h2 class="mt-3 text-3xl font-black uppercase tracking-tight text-white">Open To Everyone</h2>
+            </div>
+            <a href="{% url 'live' %}" class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-300 transition-colors hover:text-primary">Open Main Live Page</a>
+        </div>
+        <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {% for preset in stream_presets_free %}
+            <article class="glass-panel neon-border card-shift flex h-full flex-col border border-white/10 transition-transform duration-300">
+                <div class="border-b border-white/10 p-6">
+                    <div class="flex items-center justify-between gap-4">
+                        <span class="border border-emerald-300/40 bg-emerald-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-200">Free</span>
+                        <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ preset.preset }}</span>
+                    </div>
+                    <h3 class="mt-5 text-3xl font-black uppercase tracking-tight text-white">{{ preset.name }}</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-300">{{ preset.description }}</p>
+                </div>
+                <div class="flex flex-1 flex-col p-6">
+                    <div class="flex flex-wrap gap-2">
+                        {% for chip in preset.genres %}
+                        <span class="border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-300">{{ chip }}</span>
+                        {% endfor %}
+                    </div>
+                    <p class="mt-5 text-[12px] uppercase tracking-[0.22em] text-slate-500">Best For</p>
+                    <p class="mt-2 text-sm text-white">{{ preset.best_for }}</p>
+                    <a href="{{ preset.href }}" class="mt-6 inline-flex items-center justify-center gap-2 border border-primary bg-primary px-5 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-black shadow-[4px_4px_0px_rgba(255,255,255,1)] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none">
+                        Open Player
+                        <span class="material-symbols-outlined text-base">play_arrow</span>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section id="premium-streams" class="border-t border-white/10 bg-white/[0.02]">
+        <div class="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+            <div class="mb-8 flex items-end justify-between gap-4">
+                <div>
+                    <p class="font-mono text-[11px] uppercase tracking-[0.26em] text-primary">Premium Stream Pages</p>
+                    <h2 class="mt-3 text-3xl font-black uppercase tracking-tight text-white">Locked Listening Modes</h2>
+                </div>
+                <a href="{% url 'pricing' %}" class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-300 transition-colors hover:text-primary">Compare Plans</a>
+            </div>
+            <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+                {% for preset in stream_presets_premium %}
+                <article class="glass-panel card-shift flex h-full flex-col border border-white/10 transition-transform duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white">{{ preset.required_tier }}</span>
+                            {% if preset.locked %}
+                            <span class="text-[10px] font-mono uppercase tracking-[0.18em] text-amber-300">Locked</span>
+                            {% else %}
+                            <span class="text-[10px] font-mono uppercase tracking-[0.18em] text-emerald-300">Open</span>
+                            {% endif %}
+                        </div>
+                        <h3 class="mt-5 text-2xl font-black uppercase tracking-tight text-white">{{ preset.name }}</h3>
+                        <p class="mt-3 text-sm leading-relaxed text-slate-300">{{ preset.tagline }}</p>
+                        <div class="mt-5 flex flex-wrap gap-2">
+                            {% for chip in preset.genres %}
+                            <span class="border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-300">{{ chip }}</span>
+                            {% endfor %}
+                        </div>
+                        <p class="mt-5 text-[12px] uppercase tracking-[0.22em] text-slate-500">Access Note</p>
+                        <p class="mt-2 text-sm text-white">{{ preset.note }}</p>
+                    </div>
+                    <div class="mt-auto border-t border-white/10 p-6">
+                        <a href="{{ preset.href }}" class="inline-flex w-full items-center justify-center gap-2 border {% if preset.locked %}border-white/20 bg-white/5 text-white{% else %}border-primary bg-primary text-black shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none{% endif %} px-5 py-3 text-[11px] font-black uppercase tracking-[0.18em] transition-all">
+                            {% if preset.locked %}Preview & Unlock{% else %}Open Player{% endif %}
+                            <span class="material-symbols-outlined text-base">{% if preset.locked %}lock{% else %}play_arrow{% endif %}</span>
+                        </a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</main>
+
+{% include 'core/footer.html' %}
+</body>
+</html>

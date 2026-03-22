@@ -672,12 +672,12 @@
             <div class="grid gap-5 lg:grid-cols-12">
                 <section class="stream-shell-card lg:col-span-6 min-h-[320px]">
                     <div class="relative h-full overflow-hidden">
-                        <div class="live-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_live.image|default:'' }}');"></div>
+                        <div id="live-feature-image" class="live-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_live.image|default:'' }}');"></div>
                         <div class="absolute inset-0 p-5 sm:p-6">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200">{{ mega_menu_live.eyebrow|default:"Live Right Now" }}</p>
-                                    <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                    <p id="live-feature-eyebrow" class="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200">{{ mega_menu_live.eyebrow|default:"Live Right Now" }}</p>
+                                    <div id="live-feature-studio-label" class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                         <span class="relative flex h-2 w-2">
                                             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                                             <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
@@ -685,23 +685,23 @@
                                         {{ mega_menu_live.studio_label|default:"K-Beats Live" }}
                                     </div>
                                 </div>
-                                <span class="border border-cyan-300/40 bg-cyan-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">{{ mega_menu_live.status|default:"On Air" }}</span>
+                                <span id="live-feature-status" class="border border-cyan-300/40 bg-cyan-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">{{ mega_menu_live.status|default:"On Air" }}</span>
                             </div>
                             <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                                <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_live.tagline|default:"Join the live player and see what is on now." }}</p>
-                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_live.title|default:"K-Beats Live" }}</h2>
-                                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_live.description|default:"Open the live player for the current track and next-up schedule." }}</p>
-                                <div class="mt-3 flex flex-wrap gap-2">
+                                <p id="live-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_live.tagline|default:"Join the live player and see what is on now." }}</p>
+                                <h2 id="live-feature-title" class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_live.title|default:"K-Beats Live" }}</h2>
+                                <p id="live-feature-description" class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_live.description|default:"Open the live player for the current track and next-up schedule." }}</p>
+                                <div id="live-feature-chips" class="mt-3 flex flex-wrap gap-2">
                                     {% for chip in mega_menu_live.chips %}
                                     <span class="live-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ chip }}</span>
                                     {% endfor %}
                                 </div>
                                 <div class="mt-4 flex flex-wrap items-center gap-3">
-                                    <a href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                    <a id="live-feature-primary-cta" href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                         Enter Live
                                         <span class="material-symbols-outlined text-base">play_arrow</span>
                                     </a>
-                                    <a href="{% url 'schedule' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
+                                    <a id="live-feature-secondary-cta" href="{% url 'schedule' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
                                         View Schedule
                                         <span class="material-symbols-outlined text-base">north_east</span>
                                     </a>
@@ -719,7 +719,7 @@
                         </div>
                         <p id="live-deck-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">UK time</p>
                     </div>
-                    <div class="mt-3 space-y-2">
+                    <div id="live-schedule-list" class="mt-3 space-y-2">
                         {% for item in mega_menu_schedule %}
                         <a href="{% url 'schedule' %}" class="live-next-card live-schedule-card block border border-white/10 bg-black/25 p-3 text-left transition-colors hover:border-cyan-300/40">
                             <div class="flex items-start justify-between gap-3">
@@ -750,7 +750,7 @@
                             </div>
                             <div class="request-queue-box p-3">
                                 <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Queue Pulse</p>
-                                <p class="mt-2 text-2xl font-impact uppercase leading-none tracking-[0.04em] text-white">{{ mega_menu_request_count }} Picks</p>
+                                <p id="live-request-count" class="mt-2 text-2xl font-impact uppercase leading-none tracking-[0.04em] text-white">{{ mega_menu_request_count }} Picks</p>
                                 <p class="mt-1 text-xs leading-relaxed text-slate-300">Current request entries.</p>
                             </div>
                         </div>
@@ -773,8 +773,8 @@
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 id="streams-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">PICK YOUR FEQUENCY</h1>
-                        <p id="stream-panel-tagline" class="max-w-xl text-[13px] leading-relaxed text-slate-300">{{ mega_menu_streams.0.panelLine|default:"Live programming pulled from the current station schedule." }}</p>
+                        <h1 id="streams-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">PICK YOUR FREQUENCY</h1>
+                        <p id="stream-panel-tagline" class="max-w-xl text-[13px] leading-relaxed text-slate-300">{{ mega_menu_streams.0.panelLine|default:"Stream presets built from the current K-Beats live player experience." }}</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
@@ -791,7 +791,7 @@
                             <div id="stream-feature-image" class="stream-card-image absolute inset-0" {% if mega_menu_streams.0.image %}style="background-image: linear-gradient(115deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.54) 100%), url('{{ mega_menu_streams.0.image }}');"{% endif %}></div>
                             <div class="absolute inset-x-0 top-0 flex items-start justify-between gap-4 p-5 sm:p-6">
                                 <div class="space-y-2">
-                                    <p id="stream-feature-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase">Live Programming</p>
+                                    <p id="stream-feature-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase">Stream Preset</p>
                                     <div id="stream-feature-frequency" class="inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                         <span class="h-2 w-2 rounded-full bg-white/80"></span>
                                         {{ mega_menu_streams.0.preset|default:"Live Now" }}
@@ -800,7 +800,7 @@
                                 <span id="stream-feature-tier" class="border border-emerald-300/50 bg-emerald-400/15 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-200">{{ mega_menu_streams.0.tier|default:"free"|title }}</span>
                             </div>
                             <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                                <p id="stream-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_streams.0.tagline|default:"Live programming from the active station schedule." }}</p>
+                                <p id="stream-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_streams.0.tagline|default:"Preset-led listening modes built around the live K-Beats player." }}</p>
                                 <h2 id="stream-feature-title" class="mt-3 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_streams.0.name|default:"K-Beats Live" }}</h2>
                                 <p id="stream-feature-description" class="mt-3 max-w-xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_streams.0.description }}</p>
                                 <div id="stream-feature-genres" class="mt-4 flex flex-wrap gap-2">{% for genre in mega_menu_streams.0.genres %}<span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ genre }}</span>{% endfor %}</div>
@@ -831,7 +831,7 @@
                                 </div>
 
                                 <div class="stream-stat-card p-4">
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Peak Window</p>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Access</p>
                                     <p id="stream-feature-peak" class="mt-3 text-xl font-black uppercase tracking-tight text-white">{{ mega_menu_streams.0.peak }}</p>
                                     <p id="stream-feature-peak-note" class="mt-2 text-xs leading-relaxed text-slate-400">{{ mega_menu_streams.0.peakNote }}</p>
                                 </div>
@@ -1073,34 +1073,34 @@
             <div class="grid gap-5 lg:grid-cols-12">
                 <section class="stream-shell-card lg:col-span-7 min-h-[300px]">
                     <div class="relative h-full overflow-hidden">
-                        <div class="news-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_news.featured.image|default:'' }}');"></div>
+                        <div id="news-feature-image" class="news-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_news.featured.image|default:'' }}');"></div>
                         <div class="absolute inset-0 p-5 sm:p-6">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-red-200">Lead Story</p>
-                                    <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                    <p id="news-feature-eyebrow" class="font-mono text-[10px] uppercase tracking-[0.22em] text-red-200">Lead Story</p>
+                                    <div id="news-feature-timestamp" class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                         <span class="h-2 w-2 rounded-full bg-red-300"></span>
                                         {% if mega_menu_news.featured %}Updated {{ mega_menu_news.featured.created_at|timesince }} ago{% else %}Editorial Desk{% endif %}
                                     </div>
                                 </div>
-                                <span class="news-chip px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]">{% if mega_menu_news.featured.category %}{{ mega_menu_news.featured.category }}{% else %}News{% endif %}</span>
+                                <span id="news-feature-status" class="news-chip px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]">{% if mega_menu_news.featured.category %}{{ mega_menu_news.featured.category }}{% else %}News{% endif %}</span>
                             </div>
                             <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                                <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Open with the headline fans will click first.</p>
-                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_news.featured.title|default:"Latest K-Beats Story" }}</h2>
-                                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_news.featured.subtitle|default:"Open the news desk for the latest chart, comeback, and artist coverage." }}</p>
-                                <div class="mt-3 flex flex-wrap items-center gap-2">
+                                <p id="news-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Open with the headline fans will click first.</p>
+                                <h2 id="news-feature-title" class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_news.featured.title|default:"Latest K-Beats Story" }}</h2>
+                                <p id="news-feature-description" class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_news.featured.subtitle|default:"Open the news desk for the latest chart, comeback, and artist coverage." }}</p>
+                                <div id="news-feature-chips" class="mt-3 flex flex-wrap items-center gap-2">
                                     <span class="news-meta-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Most Read</span>
                                     {% if mega_menu_news.featured.category %}<span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_news.featured.category }}</span>{% endif %}
                                     {% if mega_menu_news.featured.source_name %}<span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_news.featured.source_name }}</span>{% endif %}
                                     {% if mega_menu_news.featured.reading_time %}<span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_news.featured.reading_time }} min read</span>{% endif %}
                                 </div>
                                 <div class="mt-4 flex flex-wrap items-center gap-3">
-                                    <a href="{% if mega_menu_news.featured %}{% url 'blog_article_read' mega_menu_news.featured.slug %}{% else %}{% url 'news' %}{% endif %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                    <a id="news-feature-primary-cta" href="{% if mega_menu_news.featured %}{% url 'blog_article_read' mega_menu_news.featured.slug %}{% else %}{% url 'news' %}{% endif %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                         Read Top Story
                                         <span class="material-symbols-outlined text-base">article</span>
                                     </a>
-                                    <a href="{% url 'charts' %}" class="news-link-ghost inline-flex items-center gap-2 py-2 text-[11px] font-bold uppercase tracking-[0.16em]">
+                                    <a id="news-feature-secondary-cta" href="{% url 'charts' %}" class="news-link-ghost inline-flex items-center gap-2 py-2 text-[11px] font-bold uppercase tracking-[0.16em]">
                                         See Charts Context
                                         <span class="material-symbols-outlined text-base">north_east</span>
                                     </a>
@@ -1119,7 +1119,7 @@
                             </div>
                             <p id="news-rail-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">{{ mega_menu_news.items|length }} stories</p>
                         </div>
-                        <div class="mt-3 space-y-2">
+                        <div id="news-items-list" class="mt-3 space-y-2">
                             {% for article in mega_menu_news.items %}
                             <a href="{% url 'blog_article_read' article.slug %}" class="news-card block p-3">
                                 <div class="flex items-center justify-between gap-3">
@@ -1146,15 +1146,15 @@
                         <div class="mt-4 grid grid-cols-3 gap-3">
                             <div class="border border-white/10 bg-black/30 p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">New</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_news.total_count }}</p>
+                                <p id="news-snapshot-new" class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_news.total_count }}</p>
                             </div>
                             <div class="border border-white/10 bg-black/30 p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Lead</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_news.featured.category|default:"News" }}</p>
+                                <p id="news-snapshot-lead" class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_news.featured.category|default:"News" }}</p>
                             </div>
                             <div class="border border-white/10 bg-black/30 p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Trend</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{% if mega_menu_news.featured %}Live{% else %}Ready{% endif %}</p>
+                                <p id="news-snapshot-trend" class="mt-2 text-lg font-black uppercase tracking-tight text-white">{% if mega_menu_news.featured %}Live{% else %}Ready{% endif %}</p>
                             </div>
                         </div>
                     </div>
@@ -1186,33 +1186,33 @@
             <div class="grid gap-5 lg:grid-cols-12">
                 <section class="stream-shell-card lg:col-span-6 min-h-[320px]">
                     <div class="relative h-full overflow-hidden">
-                        <div class="comeback-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_comebacks_primary.image|default:'' }}');"></div>
+                        <div id="comebacks-feature-image" class="comeback-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_comebacks_primary.image|default:'' }}');"></div>
                         <div class="absolute inset-0 p-5 sm:p-6">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] comeback-kicker">Next Priority</p>
-                                    <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                    <p id="comebacks-feature-eyebrow" class="font-mono text-[10px] uppercase tracking-[0.22em] comeback-kicker">Next Priority</p>
+                                    <div id="comebacks-feature-date" class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                         <span class="h-2 w-2 rounded-full bg-pink-400"></span>
                                         {{ mega_menu_comebacks_primary.date_str|default:"This Week" }}
                                     </div>
                                 </div>
-                                <span class="comeback-chip px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]">High Anticipation</span>
+                                <span id="comebacks-feature-status" class="comeback-chip px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]">High Anticipation</span>
                             </div>
                             <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                                <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Lead with the release fans are most likely to save now.</p>
-                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_comebacks_primary.artist|default:"Comeback Calendar" }}</h2>
-                                <p class="mt-2 max-w-xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_comebacks_primary.title|default:"Open the comeback timeline for the next release cycle." }}</p>
-                                <div class="mt-3 flex flex-wrap gap-2">
+                                <p id="comebacks-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Lead with the release fans are most likely to save now.</p>
+                                <h2 id="comebacks-feature-title" class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_comebacks_primary.artist|default:"Comeback Calendar" }}</h2>
+                                <p id="comebacks-feature-description" class="mt-2 max-w-xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_comebacks_primary.title|default:"Open the comeback timeline for the next release cycle." }}</p>
+                                <div id="comebacks-feature-chips" class="mt-3 flex flex-wrap gap-2">
                                     <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_comebacks_primary.type|default:"Release" }}</span>
                                     <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_comebacks|length }} featured</span>
                                     <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_comebacks_primary.date_str|default:"Upcoming" }}</span>
                                 </div>
                                 <div class="mt-4 flex flex-wrap items-center gap-3">
-                                    <a href="{% url 'comeback_timeline' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                    <a id="comebacks-feature-primary-cta" href="{% url 'comeback_timeline' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                         Open Timeline
                                         <span class="material-symbols-outlined text-base">calendar_month</span>
                                     </a>
-                                    <a href="{% url 'news' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
+                                    <a id="comebacks-feature-secondary-cta" href="{% url 'news' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
                                         Read Comeback News
                                         <span class="material-symbols-outlined text-base">north_east</span>
                                     </a>
@@ -1230,7 +1230,7 @@
                         </div>
                         <p id="comebacks-board-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">This week</p>
                     </div>
-                    <div class="space-y-3">
+                    <div id="comebacks-list" class="space-y-3">
                         {% for item in mega_menu_comebacks %}
                         <a href="{{ item.href }}" class="{% if forloop.first %}comeback-priority-card{% else %}comeback-row border border-white/10 bg-black/30{% endif %} block p-4">
                             <div class="flex items-start gap-3">
@@ -1396,7 +1396,7 @@
                         </div>
                         <p id="idols-routes-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Fast nav</p>
                     </div>
-                    <div class="space-y-3">
+                    <div id="idols-routes-list" class="space-y-3">
                         {% for item in mega_menu_idols %}
                         <a href="{{ item.primaryHref }}" data-idol-route="{{ item.id }}" class="idols-route-card block p-4">
                             <div>
@@ -1423,15 +1423,15 @@
                         <div class="mt-4 grid grid-cols-3 gap-3">
                             <div class="idols-mini-stat p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Acts</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_idol_stats.acts }}</p>
+                                <p id="idols-stat-acts" class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_idol_stats.acts }}</p>
                             </div>
                             <div class="idols-mini-stat p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Members</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_idol_stats.members }}</p>
+                                <p id="idols-stat-members" class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_idol_stats.members }}</p>
                             </div>
                             <div class="idols-mini-stat p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Clubs</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_idol_stats.clubs }}</p>
+                                <p id="idols-stat-clubs" class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_idol_stats.clubs }}</p>
                             </div>
                         </div>
                     </div>
@@ -1518,9 +1518,17 @@
 
     {% include 'core/footer.html' %}
 
-    {{ mega_menu_streams|json_script:"mega-menu-streams-data" }}
-    {{ mega_menu_charts|json_script:"mega-menu-charts-data" }}
-    {{ mega_menu_idols|json_script:"mega-menu-idols-data" }}
+    {{ mega_menu_streams_json|json_script:"mega-menu-streams-data" }}
+    {{ mega_menu_charts_json|json_script:"mega-menu-charts-data" }}
+    {{ mega_menu_idols_json|json_script:"mega-menu-idols-data" }}
+    {{ mega_menu_live_json|json_script:"mega-menu-live-data" }}
+    {{ mega_menu_schedule_json|json_script:"mega-menu-schedule-data" }}
+    {{ mega_menu_news_json|json_script:"mega-menu-news-data" }}
+    {{ mega_menu_comebacks_primary_json|json_script:"mega-menu-comeback-primary-data" }}
+    {{ mega_menu_comebacks_json|json_script:"mega-menu-comebacks-data" }}
+    {{ mega_menu_idol_stats_json|json_script:"mega-menu-idol-stats-data" }}
+    {{ mega_menu_request_count_json|json_script:"mega-menu-request-count-data" }}
+    {{ mega_menu_last_chart_sync_json|json_script:"mega-menu-last-chart-sync-data" }}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const header = document.getElementById('main-header');
@@ -1542,10 +1550,20 @@
                 idols: "{% url 'idols' %}",
                 timeline: "{% url 'comeback_timeline' %}",
                 pricing: "{% url 'pricing' %}",
-                news: "{% url 'news' %}"
+                news: "{% url 'news' %}",
+                schedule: "{% url 'schedule' %}",
+                megaMenuData: "{% url 'api_header_mega_menu_data' %}"
             };
 
-            const launchStreams = JSON.parse(document.getElementById('mega-menu-streams-data').textContent || '[]');
+            let launchStreams = JSON.parse(document.getElementById('mega-menu-streams-data').textContent || '[]');
+            let livePanelData = JSON.parse(document.getElementById('mega-menu-live-data').textContent || '{}');
+            let liveScheduleData = JSON.parse(document.getElementById('mega-menu-schedule-data').textContent || '[]');
+            let newsPanelData = JSON.parse(document.getElementById('mega-menu-news-data').textContent || '{}');
+            let comebackPrimaryData = JSON.parse(document.getElementById('mega-menu-comeback-primary-data').textContent || '{}');
+            let comebackCardsData = JSON.parse(document.getElementById('mega-menu-comebacks-data').textContent || '[]');
+            let requestCountData = JSON.parse(document.getElementById('mega-menu-request-count-data').textContent || '0');
+            let idolStatsData = JSON.parse(document.getElementById('mega-menu-idol-stats-data').textContent || '{}');
+            let lastChartSyncData = JSON.parse(document.getElementById('mega-menu-last-chart-sync-data').textContent || 'null');
 
             const panelTagline = document.getElementById('stream-panel-tagline');
             const streamsPanelTitle = document.getElementById('streams-panel-title');
@@ -1584,24 +1602,65 @@
             const liveDeckKicker = document.getElementById('live-deck-kicker');
             const liveDeckTitle = document.getElementById('live-deck-title');
             const liveDeckMeta = document.getElementById('live-deck-meta');
+            const liveFeatureImage = document.getElementById('live-feature-image');
+            const liveFeatureEyebrow = document.getElementById('live-feature-eyebrow');
+            const liveFeatureStudioLabel = document.getElementById('live-feature-studio-label');
+            const liveFeatureStatus = document.getElementById('live-feature-status');
+            const liveFeatureTagline = document.getElementById('live-feature-tagline');
+            const liveFeatureTitle = document.getElementById('live-feature-title');
+            const liveFeatureDescription = document.getElementById('live-feature-description');
+            const liveFeatureChips = document.getElementById('live-feature-chips');
+            const liveFeaturePrimaryCta = document.getElementById('live-feature-primary-cta');
+            const liveFeatureSecondaryCta = document.getElementById('live-feature-secondary-cta');
+            const liveScheduleList = document.getElementById('live-schedule-list');
+            const liveRequestCount = document.getElementById('live-request-count');
             const newsPanelTitle = document.getElementById('news-panel-title');
             const newsPanelCopy = document.getElementById('news-panel-copy');
             const newsViewTabs = Array.from(document.querySelectorAll('[data-news-view]'));
             const newsRailKicker = document.getElementById('news-rail-kicker');
             const newsRailTitle = document.getElementById('news-rail-title');
             const newsRailMeta = document.getElementById('news-rail-meta');
+            const newsFeatureImage = document.getElementById('news-feature-image');
+            const newsFeatureEyebrow = document.getElementById('news-feature-eyebrow');
+            const newsFeatureTimestamp = document.getElementById('news-feature-timestamp');
+            const newsFeatureStatus = document.getElementById('news-feature-status');
+            const newsFeatureTagline = document.getElementById('news-feature-tagline');
+            const newsFeatureTitle = document.getElementById('news-feature-title');
+            const newsFeatureDescription = document.getElementById('news-feature-description');
+            const newsFeatureChips = document.getElementById('news-feature-chips');
+            const newsFeaturePrimaryCta = document.getElementById('news-feature-primary-cta');
+            const newsFeatureSecondaryCta = document.getElementById('news-feature-secondary-cta');
+            const newsItemsList = document.getElementById('news-items-list');
+            const newsSnapshotNew = document.getElementById('news-snapshot-new');
+            const newsSnapshotLead = document.getElementById('news-snapshot-lead');
+            const newsSnapshotTrend = document.getElementById('news-snapshot-trend');
             const comebacksPanelTitle = document.getElementById('comebacks-panel-title');
             const comebacksPanelCopy = document.getElementById('comebacks-panel-copy');
             const comebackViewTabs = Array.from(document.querySelectorAll('[data-comeback-view]'));
             const comebacksBoardKicker = document.getElementById('comebacks-board-kicker');
             const comebacksBoardTitle = document.getElementById('comebacks-board-title');
             const comebacksBoardMeta = document.getElementById('comebacks-board-meta');
+            const comebacksFeatureImage = document.getElementById('comebacks-feature-image');
+            const comebacksFeatureEyebrow = document.getElementById('comebacks-feature-eyebrow');
+            const comebacksFeatureDate = document.getElementById('comebacks-feature-date');
+            const comebacksFeatureStatus = document.getElementById('comebacks-feature-status');
+            const comebacksFeatureTagline = document.getElementById('comebacks-feature-tagline');
+            const comebacksFeatureTitle = document.getElementById('comebacks-feature-title');
+            const comebacksFeatureDescription = document.getElementById('comebacks-feature-description');
+            const comebacksFeatureChips = document.getElementById('comebacks-feature-chips');
+            const comebacksFeaturePrimaryCta = document.getElementById('comebacks-feature-primary-cta');
+            const comebacksFeatureSecondaryCta = document.getElementById('comebacks-feature-secondary-cta');
+            const comebacksList = document.getElementById('comebacks-list');
             const idolsPanelTitle = document.getElementById('idols-panel-title');
             const idolsPanelCopy = document.getElementById('idols-panel-copy');
             const idolViewTabs = Array.from(document.querySelectorAll('[data-idol-view]'));
             const idolsRoutesKicker = document.getElementById('idols-routes-kicker');
             const idolsRoutesTitle = document.getElementById('idols-routes-title');
             const idolsRoutesMeta = document.getElementById('idols-routes-meta');
+            const idolsRoutesList = document.getElementById('idols-routes-list');
+            const idolsStatActs = document.getElementById('idols-stat-acts');
+            const idolsStatMembers = document.getElementById('idols-stat-members');
+            const idolsStatClubs = document.getElementById('idols-stat-clubs');
             const idolsFeatureImage = document.getElementById('idols-feature-image');
             const idolsFeatureKicker = document.getElementById('idols-feature-kicker');
             const idolsFeatureChip = document.getElementById('idols-feature-chip');
@@ -1718,7 +1777,7 @@
                 }
             };
             const streamsViewConfig = {
-                discover: { panelTitle: 'PICK YOUR FEQUENCY', listKicker: 'Launch Presets', listTitle: 'Dial In', listMeta: 'hover or focus' },
+                discover: { panelTitle: 'PICK YOUR FREQUENCY', listKicker: 'Launch Presets', listTitle: 'Dial In', listMeta: 'hover or focus' },
                 moods: { panelTitle: 'MATCH YOUR MOOD', listKicker: 'Mood Presets', listTitle: 'Pick A Vibe', listMeta: 'quick switch' },
                 premium: { panelTitle: 'UNLOCK DEEPER LISTENING', listKicker: 'Premium Presets', listTitle: 'Plus Modes', listMeta: 'upgrade paths' }
             };
@@ -1781,7 +1840,11 @@
                 if (newsPanelCopy) newsPanelCopy.textContent = view.panelCopy;
                 if (newsRailKicker) newsRailKicker.textContent = view.railKicker;
                 if (newsRailTitle) newsRailTitle.textContent = view.railTitle;
-                if (newsRailMeta) newsRailMeta.textContent = view.railMeta;
+                if (newsRailMeta) {
+                    newsRailMeta.textContent = activeNewsView === 'headlines'
+                        ? `${(newsPanelData && newsPanelData.items ? newsPanelData.items.length : 0)} stories`
+                        : view.railMeta;
+                }
             };
             const renderComebackViewFrame = () => {
                 const view = comebackViewConfig[activeComebackView] || comebackViewConfig.priority;
@@ -1809,6 +1872,265 @@
                 if (idolsRoutesTitle) idolsRoutesTitle.textContent = view.routesTitle;
                 if (idolsRoutesMeta) idolsRoutesMeta.textContent = view.routesMeta;
             };
+            const escapeHtml = (value) => String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+            const buildChipMarkup = (items, className) => ensureArray(items)
+                .filter((item) => String(item || '').trim())
+                .map((item) => `<span class="${className}">${escapeHtml(item)}</span>`)
+                .join('');
+            const renderLiveContent = () => {
+                const schedule = ensureArray(liveScheduleData);
+                const upcoming = schedule[1] || schedule[0] || null;
+                const liveBase = livePanelData || {};
+                let hero = {
+                    eyebrow: liveBase.eyebrow || 'Live Right Now',
+                    studioLabel: liveBase.studio_label || 'K-Beats Live',
+                    status: liveBase.status || 'Live',
+                    tagline: liveBase.tagline || 'Join the live player and see what is on now.',
+                    title: liveBase.title || 'K-Beats Live',
+                    description: liveBase.description || 'Open the live player for the current track and next-up schedule.',
+                    chips: ensureArray(liveBase.chips),
+                    image: liveBase.image || '',
+                    primaryHref: urls.live,
+                    primaryLabel: 'Enter Live',
+                    primaryIcon: 'play_arrow',
+                    secondaryHref: urls.schedule,
+                    secondaryLabel: 'View Schedule',
+                    secondaryIcon: 'north_east',
+                };
+                if (activeLiveView === 'next' && upcoming) {
+                    hero = {
+                        eyebrow: 'Up Next',
+                        studioLabel: upcoming.time_label || 'Coming Soon',
+                        status: upcoming.status || 'Soon',
+                        tagline: 'See the next handoff before the current block ends.',
+                        title: upcoming.title || hero.title,
+                        description: upcoming.description || hero.description,
+                        chips: [upcoming.time_label || 'Next slot', liveBase.audience || 'Live now', 'Schedule focus'],
+                        image: liveBase.image || '',
+                        primaryHref: urls.schedule,
+                        primaryLabel: 'Open Schedule',
+                        primaryIcon: 'calendar_month',
+                        secondaryHref: urls.live,
+                        secondaryLabel: 'Stay Live',
+                        secondaryIcon: 'north_east',
+                    };
+                } else if (activeLiveView === 'studio') {
+                    hero = {
+                        eyebrow: 'Studio Feed',
+                        studioLabel: liveBase.studio_label || 'K-Beats Live',
+                        status: 'Studio',
+                        tagline: 'Follow the presenter energy, requests, and live desk pulse.',
+                        title: liveBase.studio_label || hero.title,
+                        description: liveBase.description || hero.description,
+                        chips: [liveBase.audience || 'Live now', liveBase.vibe || 'Studio', `${requestCountData || 0} requests`],
+                        image: liveBase.image || '',
+                        primaryHref: urls.live,
+                        primaryLabel: 'Open Studio',
+                        primaryIcon: 'radio',
+                        secondaryHref: urls.schedule,
+                        secondaryLabel: 'See The Rundown',
+                        secondaryIcon: 'north_east',
+                    };
+                }
+                if (liveFeatureImage) liveFeatureImage.style.backgroundImage = `url('${hero.image || ''}')`;
+                if (liveFeatureEyebrow) liveFeatureEyebrow.textContent = hero.eyebrow;
+                if (liveFeatureStudioLabel) {
+                    liveFeatureStudioLabel.innerHTML = `<span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span></span>${escapeHtml(hero.studioLabel)}`;
+                }
+                if (liveFeatureStatus) liveFeatureStatus.textContent = hero.status;
+                if (liveFeatureTagline) liveFeatureTagline.textContent = hero.tagline;
+                if (liveFeatureTitle) liveFeatureTitle.textContent = hero.title;
+                if (liveFeatureDescription) liveFeatureDescription.textContent = hero.description;
+                if (liveFeatureChips) liveFeatureChips.innerHTML = buildChipMarkup(hero.chips, 'live-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]');
+                if (liveFeaturePrimaryCta) liveFeaturePrimaryCta.innerHTML = `${hero.primaryLabel}<span class="material-symbols-outlined text-base">${hero.primaryIcon}</span>`;
+                if (liveFeaturePrimaryCta) liveFeaturePrimaryCta.href = hero.primaryHref;
+                if (liveFeatureSecondaryCta) liveFeatureSecondaryCta.innerHTML = `${hero.secondaryLabel}<span class="material-symbols-outlined text-base">${hero.secondaryIcon}</span>`;
+                if (liveFeatureSecondaryCta) liveFeatureSecondaryCta.href = hero.secondaryHref;
+                if (liveScheduleList) {
+                    liveScheduleList.innerHTML = schedule.length ? schedule.map((item) => `
+                        <a href="${urls.schedule}" class="live-next-card live-schedule-card block border border-white/10 bg-black/25 p-3 text-left transition-colors hover:border-cyan-300/40">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">${escapeHtml(item.time_label || '')}</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">${escapeHtml(item.title || '')}</p>
+                                </div>
+                                ${item.status ? `<span class="border border-white/10 bg-white/[0.04] px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">${escapeHtml(item.status)}</span>` : ''}
+                            </div>
+                            <p class="mt-1.5 text-xs leading-relaxed text-slate-300">${escapeHtml(item.description || '')}</p>
+                        </a>
+                    `).join('') : '<div class="border border-white/10 bg-black/25 p-3 text-xs text-slate-400">Schedule data is not available yet.</div>';
+                }
+                if (liveRequestCount) liveRequestCount.textContent = `${requestCountData || 0} Picks`;
+            };
+            const getNewsFeatureForView = () => {
+                const featured = newsPanelData.featured || null;
+                const items = ensureArray(newsPanelData.items);
+                if (activeNewsView === 'analysis') return items[0] || featured;
+                if (activeNewsView === 'buzz') return items[1] || items[0] || featured;
+                return featured || items[0] || null;
+            };
+            const renderNewsContent = () => {
+                const feature = getNewsFeatureForView();
+                const items = ensureArray(newsPanelData.items);
+                const orderedItems = activeNewsView === 'buzz' ? [...items].reverse() : items;
+                const featureTaglineByView = {
+                    headlines: 'Open with the headline fans will click first.',
+                    analysis: 'Lead with the story that explains the movement behind the moment.',
+                    buzz: 'Lead with the story fans are most likely to share right now.',
+                };
+                if (newsFeatureImage) newsFeatureImage.style.backgroundImage = `url('${(feature && feature.image) || ''}')`;
+                if (newsFeatureEyebrow) newsFeatureEyebrow.textContent = activeNewsView === 'analysis' ? 'Analysis Pick' : (activeNewsView === 'buzz' ? 'Buzz Story' : 'Lead Story');
+                if (newsFeatureTimestamp) newsFeatureTimestamp.innerHTML = `<span class="h-2 w-2 rounded-full bg-red-300"></span>${escapeHtml((feature && feature.created_at_label) || 'Editorial Desk')}`;
+                if (newsFeatureStatus) newsFeatureStatus.textContent = (feature && feature.category) || 'News';
+                if (newsFeatureTagline) newsFeatureTagline.textContent = featureTaglineByView[activeNewsView] || featureTaglineByView.headlines;
+                if (newsFeatureTitle) newsFeatureTitle.textContent = (feature && feature.title) || 'Latest K-Beats Story';
+                if (newsFeatureDescription) newsFeatureDescription.textContent = (feature && feature.subtitle) || 'Open the news desk for the latest chart, comeback, and artist coverage.';
+                if (newsFeatureChips) {
+                    const chips = [];
+                    if (activeNewsView === 'headlines') chips.push('Most Read');
+                    if (activeNewsView === 'analysis') chips.push('Context');
+                    if (activeNewsView === 'buzz') chips.push('Trending');
+                    if (feature && feature.category) chips.push(feature.category);
+                    if (feature && feature.source_name) chips.push(feature.source_name);
+                    if (feature && feature.reading_time) chips.push(`${feature.reading_time} min read`);
+                    newsFeatureChips.innerHTML = buildChipMarkup(chips, 'news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]');
+                }
+                if (newsFeaturePrimaryCta) newsFeaturePrimaryCta.href = feature && feature.slug ? `/blog/${feature.slug}/` : urls.news;
+                if (newsFeatureSecondaryCta) newsFeatureSecondaryCta.href = activeNewsView === 'analysis' ? urls.charts : urls.news;
+                if (newsFeaturePrimaryCta) newsFeaturePrimaryCta.innerHTML = `${activeNewsView === 'analysis' ? 'Read Analysis' : activeNewsView === 'buzz' ? 'Open Buzz Story' : 'Read Top Story'}<span class="material-symbols-outlined text-base">article</span>`;
+                if (newsFeatureSecondaryCta) newsFeatureSecondaryCta.innerHTML = `${activeNewsView === 'buzz' ? 'See More News' : 'See Charts Context'}<span class="material-symbols-outlined text-base">north_east</span>`;
+                if (newsItemsList) {
+                    newsItemsList.innerHTML = orderedItems.length ? orderedItems.map((article, index) => `
+                        <a href="${article.slug ? `/blog/${article.slug}/` : urls.news}" class="news-card block p-3">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] ${index === 0 ? 'news-rail-kicker' : 'text-slate-500'}">${escapeHtml(article.category || 'News')}</p>
+                                <span class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">${escapeHtml(article.created_at_label || 'Fresh')}</span>
+                            </div>
+                            <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">${escapeHtml(article.title || '')}</p>
+                            <p class="mt-1.5 text-xs leading-relaxed text-slate-300">${escapeHtml(article.subtitle || article.source_name || '')}</p>
+                        </a>
+                    `).join('') : '<div class="news-card block p-3 text-xs text-slate-400">News articles are not available yet.</div>';
+                }
+                if (newsSnapshotNew) newsSnapshotNew.textContent = String(newsPanelData.total_count || 0);
+                if (newsSnapshotLead) newsSnapshotLead.textContent = (feature && feature.category) || 'News';
+                if (newsSnapshotTrend) newsSnapshotTrend.textContent = activeNewsView === 'analysis' ? 'Context' : (activeNewsView === 'buzz' ? 'Buzz' : 'Live');
+            };
+            const getComebackFeatureForView = () => {
+                if (activeComebackView === 'countdown') return comebackCardsData[1] || comebackPrimaryData || comebackCardsData[0] || null;
+                if (activeComebackView === 'coverage') return comebackCardsData[2] || comebackPrimaryData || comebackCardsData[0] || null;
+                return comebackPrimaryData || comebackCardsData[0] || null;
+            };
+            const renderComebackContent = () => {
+                const feature = getComebackFeatureForView() || {};
+                const cards = ensureArray(comebackCardsData);
+                const orderedCards = activeComebackView === 'countdown'
+                    ? [...cards].sort((a, b) => Number(a.countdown || 999) - Number(b.countdown || 999))
+                    : cards;
+                if (comebacksFeatureImage) comebacksFeatureImage.style.backgroundImage = `url('${feature.image || comebackPrimaryData.image || ''}')`;
+                if (comebacksFeatureEyebrow) comebacksFeatureEyebrow.textContent = activeComebackView === 'coverage' ? 'Coverage Focus' : (activeComebackView === 'countdown' ? 'Closest Drop' : 'Next Priority');
+                if (comebacksFeatureDate) comebacksFeatureDate.innerHTML = `<span class="h-2 w-2 rounded-full bg-pink-400"></span>${escapeHtml(feature.date_str || 'This Week')}`;
+                if (comebacksFeatureStatus) comebacksFeatureStatus.textContent = activeComebackView === 'coverage' ? 'Story Ready' : (feature.status || 'High Anticipation');
+                if (comebacksFeatureTagline) comebacksFeatureTagline.textContent = activeComebackView === 'coverage' ? 'Lead with the release that needs the strongest editorial context.' : activeComebackView === 'countdown' ? 'Lead with the drop landing soonest on the calendar.' : 'Lead with the release fans are most likely to save now.';
+                if (comebacksFeatureTitle) comebacksFeatureTitle.textContent = feature.artist || feature.title || 'Comeback Calendar';
+                if (comebacksFeatureDescription) comebacksFeatureDescription.textContent = feature.title || feature.description || 'Open the comeback timeline for the next release cycle.';
+                if (comebacksFeatureChips) {
+                    comebacksFeatureChips.innerHTML = buildChipMarkup([
+                        feature.type || feature.subtitle || 'Release',
+                        `${orderedCards.length || 0} featured`,
+                        feature.date_str || 'Upcoming'
+                    ], 'comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]');
+                }
+                if (comebacksFeaturePrimaryCta) comebacksFeaturePrimaryCta.href = urls.timeline;
+                if (comebacksFeatureSecondaryCta) comebacksFeatureSecondaryCta.href = urls.news;
+                if (comebacksFeaturePrimaryCta) comebacksFeaturePrimaryCta.innerHTML = `${activeComebackView === 'countdown' ? 'Open Countdown' : 'Open Timeline'}<span class="material-symbols-outlined text-base">calendar_month</span>`;
+                if (comebacksFeatureSecondaryCta) comebacksFeatureSecondaryCta.innerHTML = `${activeComebackView === 'coverage' ? 'Read Coverage' : 'Read Comeback News'}<span class="material-symbols-outlined text-base">north_east</span>`;
+                if (comebacksList) {
+                    comebacksList.innerHTML = orderedCards.length ? orderedCards.map((item, index) => `
+                        <a href="${escapeHtml(item.href || urls.timeline)}" class="${index === 0 ? 'comeback-priority-card' : 'comeback-row border border-white/10 bg-black/30'} block p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="comeback-count-badge shrink-0 px-3 py-2 text-center">
+                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em]">Days</p>
+                                    <p class="mt-1 ${index === 0 ? 'text-2xl' : 'text-xl'} font-black leading-none">${escapeHtml(item.countdown || '--')}</p>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p class="font-mono text-[9px] uppercase tracking-[0.18em] ${index === 0 ? 'text-pink-200' : 'text-slate-500'}">${escapeHtml(item.status || '')}</p>
+                                            <h4 class="mt-1.5 ${index === 0 ? 'text-base' : 'text-sm'} font-black uppercase tracking-tight text-white">${escapeHtml(item.title || '')}</h4>
+                                        </div>
+                                        <span class="text-[10px] font-black uppercase tracking-[0.16em] ${index === 0 ? 'text-slate-400' : 'text-slate-500'}">${escapeHtml(item.subtitle || '')}</span>
+                                    </div>
+                                    <p class="mt-1.5 ${index === 0 ? 'text-[12px] leading-relaxed text-slate-300' : 'text-[11px] text-slate-400'}">${escapeHtml(item.description || '')}</p>
+                                </div>
+                            </div>
+                        </a>
+                    `).join('') : '<div class="border border-white/10 bg-black/30 p-4 text-xs text-slate-400">No upcoming comeback data is available yet.</div>';
+                }
+            };
+            const getDefaultIdolRouteIdForView = () => {
+                if (!idolRoutes.length) return null;
+                const offset = activeIdolView === 'routes' ? 1 : (activeIdolView === 'fandom' ? 2 : 0);
+                return idolRoutes[Math.min(offset, idolRoutes.length - 1)].id;
+            };
+            const renderIdolRoutesList = () => {
+                if (!idolsRoutesList) return;
+                const copyByView = {
+                    discover: (item) => item.tagline || 'Artist profile, members, and fandom context.',
+                    routes: (item) => `Open ${item.title || 'artist'} with the fastest route into profile depth.`,
+                    fandom: (item) => `Move from ${item.title || 'artist'} into clubs, members, and community layers.`,
+                };
+                idolsRoutesList.innerHTML = idolRoutes.length ? idolRoutes.map((item) => `
+                    <a href="${escapeHtml(item.primaryHref || urls.idols)}" data-idol-route="${escapeHtml(item.id)}" class="idols-route-card block p-4">
+                        <div>
+                            <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">${escapeHtml(item.status || 'Artist')}</p>
+                            <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">${escapeHtml(item.title || '')}</p>
+                            <p class="mt-2 text-xs leading-relaxed text-slate-300">${escapeHtml(copyByView[activeIdolView](item))}</p>
+                        </div>
+                    </a>
+                `).join('') : '<div class="idols-route-card block p-4 text-xs text-slate-400">Artist data is not available yet.</div>';
+            };
+            const renderIdolStats = () => {
+                if (idolsStatActs) idolsStatActs.textContent = String(idolStatsData.acts || 0);
+                if (idolsStatMembers) idolsStatMembers.textContent = String(idolStatsData.members || 0);
+                if (idolsStatClubs) idolsStatClubs.textContent = String(idolStatsData.clubs || 0);
+            };
+            const applyMegaMenuPayload = (payload) => {
+                launchStreams = ensureArray(payload.streams);
+                allChartMovers = ensureArray(payload.charts);
+                idolRoutes = ensureArray(payload.idols);
+                idolStatsData = payload.idol_stats || {};
+                livePanelData = payload.live || {};
+                liveScheduleData = ensureArray(payload.schedule);
+                newsPanelData = payload.news || {};
+                comebackPrimaryData = payload.comebacks_primary || {};
+                comebackCardsData = ensureArray(payload.comebacks);
+                requestCountData = payload.request_count || 0;
+                lastChartSyncData = payload.last_chart_sync || null;
+                renderList();
+                renderStreamsViewFrame();
+                renderLiveViewFrame();
+                renderLiveContent();
+                renderNewsViewFrame();
+                renderNewsContent();
+                renderComebackViewFrame();
+                renderComebackContent();
+                renderIdolViewFrame();
+                renderIdolStats();
+                renderIdolRoutesList();
+                renderChartViewFrame();
+                renderChartsMoversList();
+                const nextStreamId = launchStreams.some((item) => item.id === activeStreamId) ? activeStreamId : getDefaultStreamIdForView(activeStreamsView, false);
+                if (nextStreamId) setActiveStream(nextStreamId);
+                const nextChartId = allChartMovers.some((item) => item.id === activeChartId) ? activeChartId : getDefaultChartIdForView(activeChartView, false);
+                if (nextChartId) setActiveChart(nextChartId);
+                const nextIdolRouteId = idolRoutes.some((item) => item.id === activeIdolRouteId) ? activeIdolRouteId : getDefaultIdolRouteIdForView();
+                if (nextIdolRouteId) setActiveIdolRoute(nextIdolRouteId);
+            };
 
             const buildTierBadge = (stream) => stream.tier === 'free'
                 ? '<span class="border border-emerald-300/50 bg-emerald-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em] text-emerald-200">Free</span>'
@@ -1822,9 +2144,9 @@
                 </div>`;
             };
 
-            const allChartMovers = JSON.parse(document.getElementById('mega-menu-charts-data').textContent || '[]');
+            let allChartMovers = JSON.parse(document.getElementById('mega-menu-charts-data').textContent || '[]');
 
-            const idolRoutes = JSON.parse(document.getElementById('mega-menu-idols-data').textContent || '[]');
+            let idolRoutes = JSON.parse(document.getElementById('mega-menu-idols-data').textContent || '[]');
 
             const buildRow = (stream) => {
                 return `<button type="button" data-stream-id="${stream.id}" class="stream-row w-full border border-white/10 bg-black/30 px-4 py-4 text-left focus-visible:outline-none focus-visible:ring-0" aria-label="Preview ${stream.name}" aria-pressed="false">
@@ -1872,8 +2194,8 @@
                 streamPanel.style.setProperty('--stream-secondary', stream.secondaryRgb);
                 panelTagline.textContent = stream.panelLine;
                 featureImage.className = 'stream-card-image absolute inset-0';
-                featureImage.style.backgroundImage = `linear-gradient(115deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.54) 100%), url('${stream.image}')`;
-                featureKicker.textContent = 'Launch Stream';
+                        featureImage.style.backgroundImage = `linear-gradient(115deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.54) 100%), url('${stream.image}')`;
+                        featureKicker.textContent = 'Stream Preset';
                 featureFrequency.innerHTML = `<span class="h-2 w-2 rounded-full bg-white/80"></span>${stream.preset}`;
                 featureTagline.textContent = stream.tagline;
                 featureTitle.textContent = stream.name;
@@ -1929,8 +2251,10 @@
                 return '';
             };
             const getChartNames = (chart) => {
-                const normalizedTitle = String(chart.title || '').replace(/Â/g, '');
-                const [trackRaw, artistRaw] = normalizedTitle.split('\u00b7').map((part) => part.trim());
+                const normalizedTitle = String(chart.title || '')
+                    .replace(/\u00C2/g, '')
+                    .replace(/\u00B7/g, '|');
+                const [trackRaw, artistRaw] = normalizedTitle.split('|').map((part) => part.trim());
                 return {
                     track: trackRaw || 'Untitled',
                     artist: artistRaw || 'Unknown Artist'
@@ -2302,10 +2626,17 @@
             renderIdolViewFrame();
             renderChartViewFrame();
             renderChartsMoversList();
+            renderLiveContent();
+            renderNewsContent();
+            renderComebackContent();
+            renderIdolStats();
+            renderIdolRoutesList();
             const initialStreamId = getDefaultStreamIdForView(activeStreamsView, false);
             if (initialStreamId) activeStreamId = initialStreamId;
             const initialChartId = getDefaultChartIdForView(activeChartView, false);
             if (initialChartId) activeChartId = initialChartId;
+            const initialIdolRouteId = getDefaultIdolRouteIdForView();
+            if (initialIdolRouteId) activeIdolRouteId = initialIdolRouteId;
             setActiveStream(activeStreamId);
             if (activeChartId) setActiveChart(activeChartId);
             setActiveIdolRoute(activeIdolRouteId);
@@ -2353,6 +2684,7 @@
                     if (!nextView || nextView === activeLiveView) return;
                     activeLiveView = nextView;
                     renderLiveViewFrame();
+                    renderLiveContent();
                 });
             });
             streamViewTabs.forEach((tab) => {
@@ -2371,6 +2703,7 @@
                     if (!nextView || nextView === activeNewsView) return;
                     activeNewsView = nextView;
                     renderNewsViewFrame();
+                    renderNewsContent();
                 });
             });
             comebackViewTabs.forEach((tab) => {
@@ -2379,6 +2712,7 @@
                     if (!nextView || nextView === activeComebackView) return;
                     activeComebackView = nextView;
                     renderComebackViewFrame();
+                    renderComebackContent();
                 });
             });
             idolViewTabs.forEach((tab) => {
@@ -2387,13 +2721,16 @@
                     if (!nextView || nextView === activeIdolView) return;
                     activeIdolView = nextView;
                     renderIdolViewFrame();
+                    renderIdolRoutesList();
+                    const nextIdolRouteId = getDefaultIdolRouteIdForView();
+                    if (nextIdolRouteId) setActiveIdolRoute(nextIdolRouteId);
                 });
             });
-            document.querySelectorAll('[data-idol-route]').forEach((row) => {
-                row.addEventListener('mouseover', previewIdolRoute);
-                row.addEventListener('focus', previewIdolRoute);
-                row.addEventListener('click', previewIdolRoute);
-            });
+            if (idolsRoutesList) {
+                idolsRoutesList.addEventListener('mouseover', previewIdolRoute);
+                idolsRoutesList.addEventListener('focusin', previewIdolRoute);
+                idolsRoutesList.addEventListener('click', previewIdolRoute);
+            }
 
             let premiumTitleIndex = 0;
 
@@ -2460,6 +2797,54 @@
             let hideTimer = null;
             let activePanelKey = null;
             let pinnedPanelKey = null;
+            let megaMenuRefreshTimer = null;
+            let megaMenuRefreshInFlight = false;
+
+            const refreshMegaMenuData = async () => {
+                if (megaMenuRefreshInFlight || document.hidden) return;
+                megaMenuRefreshInFlight = true;
+                try {
+                    const response = await fetch(urls.megaMenuData, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin'
+                    });
+                    if (!response.ok) return;
+                    const data = await response.json();
+                    if (!data || !data.ok || !data.payload) return;
+                    applyMegaMenuPayload(data.payload);
+                    syncAllPanelHeightsNoScroll();
+                } catch (error) {
+                    console.warn('Mega menu refresh failed', error);
+                } finally {
+                    megaMenuRefreshInFlight = false;
+                }
+            };
+
+            const startMegaMenuAutoRefresh = () => {
+                if (megaMenuRefreshTimer) return;
+                megaMenuRefreshTimer = window.setInterval(() => {
+                    refreshMegaMenuData();
+                }, 90000);
+            };
+
+            const stopMegaMenuAutoRefresh = () => {
+                if (!megaMenuRefreshTimer) return;
+                window.clearInterval(megaMenuRefreshTimer);
+                megaMenuRefreshTimer = null;
+            };
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopMegaMenuAutoRefresh();
+                    return;
+                }
+                startMegaMenuAutoRefresh();
+                refreshMegaMenuData();
+            });
+
+            startMegaMenuAutoRefresh();
 
             const panelConfigs = {
                 live: {
@@ -2468,6 +2853,7 @@
                     onShow: () => {
                         activeLiveView = 'now';
                         renderLiveViewFrame();
+                        renderLiveContent();
                     }
                 },
                 charts: {
@@ -2487,6 +2873,7 @@
                     onShow: () => {
                         activeNewsView = 'headlines';
                         renderNewsViewFrame();
+                        renderNewsContent();
                     }
                 },
                 comebacks: {
@@ -2495,6 +2882,7 @@
                     onShow: () => {
                         activeComebackView = 'priority';
                         renderComebackViewFrame();
+                        renderComebackContent();
                         syncAllPanelHeightsNoScroll();
                     }
                 },
@@ -2504,6 +2892,9 @@
                     onShow: () => {
                         activeIdolView = 'discover';
                         renderIdolViewFrame();
+                        renderIdolRoutesList();
+                        const defaultIdolRouteId = getDefaultIdolRouteIdForView();
+                        if (defaultIdolRouteId) setActiveIdolRoute(defaultIdolRouteId);
                     }
                 },
                 streams: {

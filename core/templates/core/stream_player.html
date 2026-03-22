@@ -1,0 +1,399 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+<title>{{ stream_preset.name }} | K-Beats Stream</title>
+<meta name="description" content="{{ stream_preset.description }}"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#f425c0",
+                    secondary: "#00f0ff",
+                },
+                fontFamily: {
+                    display: ["Montserrat", "sans-serif"]
+                },
+                borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+            }
+        }
+    }
+</script>
+<style>
+    :root {
+        --stream-accent: {{ stream_preset.accent }};
+        --stream-secondary: {{ stream_preset.secondary }};
+    }
+    body {
+        background:
+            radial-gradient(circle at top left, rgba(var(--stream-accent), 0.18), transparent 30%),
+            radial-gradient(circle at top right, rgba(var(--stream-secondary), 0.18), transparent 28%),
+            linear-gradient(180deg, #050505 0%, #000 100%);
+    }
+    .glass-panel {
+        background: rgba(0, 0, 0, 0.68);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+    }
+    .stream-outline {
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 0 26px rgba(var(--stream-accent), 0.15);
+    }
+    .signal-bar {
+        background: linear-gradient(180deg, rgba(var(--stream-secondary), 1), rgba(var(--stream-accent), 0.92));
+        animation: equalize 1.15s ease-in-out infinite;
+        transform-origin: bottom;
+    }
+    .signal-bar:nth-child(2) { animation-delay: 0.12s; }
+    .signal-bar:nth-child(3) { animation-delay: 0.24s; }
+    .signal-bar:nth-child(4) { animation-delay: 0.36s; }
+    .signal-bar:nth-child(5) { animation-delay: 0.48s; }
+    @keyframes equalize {
+        0% { height: 25%; }
+        25% { height: 78%; }
+        50% { height: 40%; }
+        75% { height: 100%; }
+        100% { height: 28%; }
+    }
+    .player-progress-fill {
+        background: linear-gradient(90deg, rgba(var(--stream-secondary), 1), rgba(var(--stream-accent), 1));
+    }
+</style>
+</head>
+<body class="min-h-screen bg-black text-white font-display overflow-x-hidden">
+{% include 'core/header.html' %}
+
+<audio id="stream-audio" preload="auto" {% if not stream_has_access %}data-locked="true"{% endif %}></audio>
+
+<main class="relative">
+    <section class="relative overflow-hidden border-b border-white/10">
+        <div class="absolute inset-0">
+            <div class="absolute inset-0 bg-black/45"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black"></div>
+            <img id="stream-bg-art" src="{% if current_track %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}" alt="" class="h-full w-full object-cover opacity-25 blur-[60px] scale-110"/>
+        </div>
+
+        <div class="relative mx-auto max-w-7xl px-6 pb-16 pt-28 lg:px-8 lg:pb-20 lg:pt-36">
+            <div class="mb-6 flex flex-wrap items-center gap-3 text-[11px] font-black uppercase tracking-[0.18em]">
+                <a href="{% url 'stream_hub' %}" class="text-slate-400 transition-colors hover:text-white">Stream</a>
+                <span class="text-slate-600">/</span>
+                <span style="color: rgba(var(--stream-accent), 1)">{{ stream_preset.name }}</span>
+                <span class="border border-white/15 bg-white/5 px-2 py-1 text-[10px] text-slate-200">{{ stream_preset.required_tier }}</span>
+            </div>
+
+            <div class="grid gap-8 xl:grid-cols-[minmax(0,1.2fr)_380px] xl:items-start">
+                <div class="glass-panel stream-outline border border-white/10 p-6 md:p-8">
+                    <div class="grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-center">
+                        <div>
+                            <div class="border border-white/10 bg-white/[0.04] p-3">
+                                <img id="stream-cover-art" src="{% if current_track %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}" alt="" class="aspect-square w-full object-cover"/>
+                            </div>
+                            <div class="mt-4 grid grid-cols-2 gap-3 text-[10px] uppercase tracking-[0.18em]">
+                                <div class="border border-white/10 bg-white/[0.04] p-3">
+                                    <p class="font-mono text-slate-500">Mood</p>
+                                    <p class="mt-2 font-black text-white">{{ stream_preset.mood }}</p>
+                                </div>
+                                <div class="border border-white/10 bg-white/[0.04] p-3">
+                                    <p class="font-mono text-slate-500">Preset</p>
+                                    <p class="mt-2 font-black text-white">{{ stream_preset.preset }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="font-mono text-[11px] uppercase tracking-[0.26em]" style="color: rgba(var(--stream-secondary), 1)">{{ stream_preset.tagline }}</p>
+                            <h1 class="mt-5 text-5xl font-black uppercase tracking-[-0.04em] text-white md:text-6xl">{{ stream_preset.name }}</h1>
+                            <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-300">{{ stream_preset.description }}</p>
+
+                            {% if stream_has_access %}
+                            <div class="mt-8 flex flex-wrap items-center gap-4">
+                                <button id="stream-play-toggle" class="flex h-16 w-16 items-center justify-center border border-white bg-white text-black transition-colors hover:bg-primary hover:border-primary" aria-label="Play or pause stream">
+                                    <span id="stream-play-icon" class="material-symbols-outlined text-4xl">play_arrow</span>
+                                </button>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-black uppercase tracking-[0.18em]" style="color: rgba(var(--stream-accent), 1)">Now Playing</p>
+                                    <p id="stream-track-title" class="mt-2 truncate text-3xl font-black uppercase tracking-tight">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
+                                    <p id="stream-track-artist" class="mt-1 truncate text-sm uppercase tracking-[0.24em] text-slate-400">{% if current_track %}{{ current_track.artist }}{% else %}On Air{% endif %}</p>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <div class="h-2 w-full overflow-hidden border border-white/10 bg-white/5">
+                                    <div id="stream-progress-fill" class="player-progress-fill h-full w-0"></div>
+                                </div>
+                                <div class="mt-2 flex items-center justify-between text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500">
+                                    <span id="stream-progress-current">00:00</span>
+                                    <span id="stream-progress-duration">{% if current_track_duration_seconds %}{{ current_track_duration_seconds }} sec{% else %}Live{% endif %}</span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="mt-8 border border-amber-300/30 bg-amber-400/10 p-5">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-3xl text-amber-300">lock</span>
+                                    <div>
+                                        <p class="text-sm font-black uppercase tracking-[0.18em] text-amber-200">{{ stream_preset.required_tier }} Access Required</p>
+                                        <p class="mt-1 text-sm leading-relaxed text-slate-200">This player page is built and ready, but playback stays locked until your fan-club membership reaches {{ stream_preset.required_tier }}.</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex flex-wrap gap-3">
+                                    <a href="{% url 'pricing' %}" class="border border-white bg-white px-5 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-black transition-colors hover:bg-primary hover:border-primary">Compare Plans</a>
+                                    <a href="{% url 'fan_clubs' %}" class="border border-white/20 bg-white/5 px-5 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-white transition-colors hover:border-secondary hover:text-secondary">View Fan Clubs</a>
+                                </div>
+                            </div>
+                            <div class="mt-8">
+                                <p class="text-xs font-black uppercase tracking-[0.18em]" style="color: rgba(var(--stream-accent), 1)">Previewing Current Broadcast</p>
+                                <p id="stream-track-title" class="mt-2 truncate text-3xl font-black uppercase tracking-tight">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
+                                <p id="stream-track-artist" class="mt-1 truncate text-sm uppercase tracking-[0.24em] text-slate-400">{% if current_track %}{{ current_track.artist }}{% else %}On Air{% endif %}</p>
+                            </div>
+                            {% endif %}
+
+                            <div class="mt-8 flex flex-wrap gap-2">
+                                {% for chip in stream_preset.genres %}
+                                <span class="border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-300">{{ chip }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="space-y-6">
+                    <div class="glass-panel border border-white/10 p-5">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Live Signal</p>
+                                <p class="mt-2 text-xl font-black uppercase tracking-tight text-white">{{ stream_preset.mood }}</p>
+                            </div>
+                            <div class="flex h-14 w-14 items-end gap-1 border border-white/10 bg-black/35 p-2">
+                                <span class="signal-bar h-5 w-1.5"></span>
+                                <span class="signal-bar h-9 w-1.5"></span>
+                                <span class="signal-bar h-7 w-1.5"></span>
+                                <span class="signal-bar h-10 w-1.5"></span>
+                                <span class="signal-bar h-6 w-1.5"></span>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-300">{{ stream_preset.best_for }}</p>
+                        <p class="mt-4 border-l-2 pl-4 text-sm leading-relaxed text-slate-400" style="border-color: rgba(var(--stream-accent), 0.6)">{{ stream_preset.note }}</p>
+                    </div>
+
+                    <div class="glass-panel border border-white/10 p-5">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">What You Get</p>
+                                <p class="mt-2 text-xl font-black uppercase tracking-tight text-white">Preset Perks</p>
+                            </div>
+                            <span class="border border-white/15 bg-white/5 px-2 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-200">{{ stream_preset.required_tier }}</span>
+                        </div>
+                        <div class="mt-4 space-y-3">
+                            {% for perk in stream_preset.perks %}
+                            <div class="border border-white/10 bg-white/[0.04] p-3 text-sm leading-relaxed text-slate-300">{{ perk }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+        <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
+            <div class="space-y-8">
+                <div class="glass-panel stream-outline border border-white/10 p-6">
+                    <div class="flex items-end justify-between gap-4">
+                        <div>
+                            <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">On Deck</p>
+                            <h2 class="mt-2 text-3xl font-black uppercase tracking-tight text-white">Up Next</h2>
+                        </div>
+                        <a href="{% url 'schedule' %}" class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-300 transition-colors hover:text-primary">Full Schedule</a>
+                    </div>
+                    <div id="stream-up-next" class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                        {% for track in up_next_tracks %}
+                        <article class="border border-white/10 bg-white/[0.04] p-4">
+                            <p class="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500">Queued</p>
+                            <p class="mt-2 text-sm font-black uppercase tracking-tight text-white">{{ track.title }}</p>
+                            <p class="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ track.artist }}</p>
+                        </article>
+                        {% empty %}
+                        <p class="text-sm text-slate-400">Queue information will appear here once the live scheduler responds.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="glass-panel border border-white/10 p-6">
+                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Live Commentary</p>
+                    <h2 class="mt-2 text-3xl font-black uppercase tracking-tight text-white">Current Context</h2>
+                    <p id="stream-editorial-copy" class="mt-5 max-w-3xl text-sm leading-7 text-slate-300">{{ live_ai_payload.commentary|default:"The live editorial summary will appear here when available." }}</p>
+                </div>
+            </div>
+
+            <aside class="glass-panel border border-white/10 p-6">
+                <div class="flex items-end justify-between gap-4">
+                    <div>
+                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">More Presets</p>
+                        <h2 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Switch Streams</h2>
+                    </div>
+                    <a href="{% url 'stream_hub' %}" class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-300 transition-colors hover:text-primary">All Presets</a>
+                </div>
+                <div class="mt-6 space-y-3">
+                    {% for preset in stream_related_presets %}
+                    <a href="{{ preset.href }}" class="block border {% if preset.slug == stream_preset.slug %}border-white bg-white/10{% else %}border-white/10 bg-white/[0.04] hover:border-white/30{% endif %} p-4 transition-colors">
+                        <div class="flex items-center justify-between gap-3">
+                            <p class="text-sm font-black uppercase tracking-tight text-white">{{ preset.name }}</p>
+                            <span class="text-[10px] font-mono uppercase tracking-[0.18em] {% if preset.locked and preset.slug != stream_preset.slug %}text-amber-300{% else %}text-slate-400{% endif %}">
+                                {% if preset.locked and preset.slug != stream_preset.slug %}Locked{% else %}{{ preset.required_tier }}{% endif %}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-[11px] leading-relaxed text-slate-400">{{ preset.tagline }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </aside>
+        </div>
+    </section>
+</main>
+
+{{ current_track_json|json_script:"stream-current-track" }}
+{{ up_next_tracks_json|json_script:"stream-up-next-data" }}
+{{ live_ai_payload_json|json_script:"stream-live-ai" }}
+<script>
+(() => {
+    const audio = document.getElementById('stream-audio');
+    const toggle = document.getElementById('stream-play-toggle');
+    const icon = document.getElementById('stream-play-icon');
+    const titleEl = document.getElementById('stream-track-title');
+    const artistEl = document.getElementById('stream-track-artist');
+    const artEl = document.getElementById('stream-cover-art');
+    const bgEl = document.getElementById('stream-bg-art');
+    const progressFill = document.getElementById('stream-progress-fill');
+    const progressCurrent = document.getElementById('stream-progress-current');
+    const progressDuration = document.getElementById('stream-progress-duration');
+    const upNextEl = document.getElementById('stream-up-next');
+    const editorialEl = document.getElementById('stream-editorial-copy');
+    const locked = audio && audio.dataset.locked === 'true';
+    let currentTrack = JSON.parse(JSON.parse(document.getElementById('stream-current-track').textContent || '"null"') || 'null');
+    let upNext = JSON.parse(JSON.parse(document.getElementById('stream-up-next-data').textContent || '"[]"') || '[]');
+    const liveAi = JSON.parse(JSON.parse(document.getElementById('stream-live-ai').textContent || '"{}"') || '{}');
+    const initialOffset = {{ current_offset|default:0 }};
+
+    const formatTime = (value) => {
+        const safe = Math.max(0, Math.floor(Number(value) || 0));
+        const minutes = Math.floor(safe / 60);
+        const seconds = String(safe % 60).padStart(2, '0');
+        return `${String(minutes).padStart(2, '0')}:${seconds}`;
+    };
+
+    const renderQueue = () => {
+        if (!upNextEl) return;
+        if (!Array.isArray(upNext) || !upNext.length) {
+            upNextEl.innerHTML = '<p class="text-sm text-slate-400">Queue information will appear here once the live scheduler responds.</p>';
+            return;
+        }
+        upNextEl.innerHTML = upNext.map((track) => `
+            <article class="border border-white/10 bg-white/[0.04] p-4">
+                <p class="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500">Queued</p>
+                <p class="mt-2 text-sm font-black uppercase tracking-tight text-white">${track.title || 'Untitled'}</p>
+                <p class="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">${track.artist || 'Unknown artist'}</p>
+            </article>
+        `).join('');
+    };
+
+    const renderTrack = (track) => {
+        if (!track) return;
+        currentTrack = track;
+        if (titleEl) titleEl.textContent = track.title || 'K-Beats Live';
+        if (artistEl) artistEl.textContent = track.artist || 'On Air';
+        if (artEl && track.album_art) artEl.src = track.album_art;
+        if (bgEl && track.album_art) bgEl.src = track.album_art;
+        if (progressDuration) {
+            const duration = Number(track.duration_seconds || 0);
+            progressDuration.textContent = duration ? formatTime(duration) : 'Live';
+        }
+    };
+
+    const syncAudioSource = (track, offset = 0) => {
+        if (!audio || !track || !track.audio_url || locked) return;
+        const currentUrl = audio.getAttribute('src') || '';
+        const shouldAutoplay = !audio.paused;
+        if (currentUrl !== track.audio_url) {
+            audio.src = track.audio_url;
+            audio.load();
+            audio.addEventListener('loadedmetadata', () => {
+                if (offset && Number.isFinite(offset) && offset < audio.duration) {
+                    audio.currentTime = offset;
+                }
+            }, { once: true });
+            if (shouldAutoplay) {
+                audio.play().catch(() => {});
+            }
+        }
+    };
+
+    const refreshStatus = async () => {
+        try {
+            const response = await fetch(`/api/live/status/?_ts=${Date.now()}`, { cache: 'no-store' });
+            if (!response.ok) return;
+            const data = await response.json();
+            if (!data.ok || !data.current_track) return;
+            renderTrack(data.current_track);
+            upNext = Array.isArray(data.up_next) ? data.up_next : [];
+            renderQueue();
+            syncAudioSource(data.current_track, data.current_offset || 0);
+        } catch (error) {
+            console.warn('Stream status refresh failed', error);
+        }
+    };
+
+    if (editorialEl && liveAi && liveAi.commentary) {
+        editorialEl.textContent = liveAi.commentary;
+    }
+
+    renderTrack(currentTrack);
+    renderQueue();
+    syncAudioSource(currentTrack, initialOffset);
+
+    if (audio) {
+        audio.addEventListener('timeupdate', () => {
+            const current = Number(audio.currentTime || 0);
+            const duration = Number(audio.duration || currentTrack?.duration_seconds || 0);
+            if (progressCurrent) progressCurrent.textContent = formatTime(current);
+            if (progressDuration && duration) progressDuration.textContent = formatTime(duration);
+            if (progressFill && duration > 0) {
+                progressFill.style.width = `${Math.max(0, Math.min(100, (current / duration) * 100))}%`;
+            }
+        });
+        audio.addEventListener('play', () => {
+            if (icon) icon.textContent = 'pause';
+        });
+        audio.addEventListener('pause', () => {
+            if (icon) icon.textContent = 'play_arrow';
+        });
+    }
+
+    if (toggle && audio && !locked) {
+        toggle.addEventListener('click', async () => {
+            if (!audio.getAttribute('src') && currentTrack) {
+                syncAudioSource(currentTrack, initialOffset);
+            }
+            if (audio.paused) {
+                try {
+                    await audio.play();
+                } catch (error) {
+                    console.warn('Unable to start playback', error);
+                }
+                return;
+            }
+            audio.pause();
+        });
+    }
+
+    window.setInterval(refreshStatus, 30000);
+})();
+</script>
+
+{% include 'core/footer.html' %}
+</body>
+</html>

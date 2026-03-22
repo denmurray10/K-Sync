@@ -1,0 +1,167 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    {% include 'core/seo_meta.html' %}
+    <title>K-Beats Test Page | Live Experience Lab</title>
+    <meta name="description" content="Preview the K-Beats Live experience direction and the suggested improvements designed to make fans come back more often."/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#ff4db8",
+                        secondary: "#35f2ff",
+                        ink: "#050816",
+                        panel: "#0b1020",
+                        aurora: "#6d28d9",
+                    },
+                    fontFamily: {
+                        display: ["Syne", "sans-serif"],
+                        body: ["Space Grotesk", "sans-serif"],
+                    },
+                    boxShadow: {
+                        neon: "0 0 30px rgba(255, 77, 184, 0.28)",
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(255, 77, 184, 0.16), transparent 36%),
+                radial-gradient(circle at 82% 18%, rgba(53, 242, 255, 0.14), transparent 28%),
+                linear-gradient(180deg, #050816 0%, #090d1c 44%, #050816 100%);
+        }
+        .grid-glow {
+            background-image:
+                linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 38px 38px;
+            mask-image: linear-gradient(180deg, rgba(0,0,0,0.9), transparent);
+        }
+        .glass-panel {
+            background: rgba(8, 12, 28, 0.76);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+    </style>
+</head>
+<body class="font-body text-white min-h-screen overflow-x-hidden">
+    {% include 'core/header.html' %}
+
+    <main class="relative">
+        <div class="pointer-events-none absolute inset-0 grid-glow opacity-40"></div>
+
+        <section class="relative pt-32 pb-12">
+            <div class="container mx-auto max-w-[1280px] px-6">
+                <div class="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_380px] items-start">
+                    <div class="glass-panel border border-white/10 p-8 md:p-10 shadow-neon">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.35em] text-secondary">Test Page</p>
+                        <h1 class="mt-4 font-display text-5xl md:text-7xl leading-[0.9] uppercase tracking-tight">
+                            Live Experience
+                            <span class="text-primary">Lab</span>
+                        </h1>
+                        <p class="mt-6 max-w-2xl text-sm md:text-lg text-slate-300 leading-relaxed">
+                            This page captures the direction behind the redesigned live experience: stronger atmosphere, clearer community energy, and more reasons for listeners to come back beyond a single session.
+                        </p>
+
+                        <div class="mt-8 flex flex-wrap gap-3">
+                            <a href="{% url 'live' %}" class="inline-flex items-center gap-2 bg-primary text-black px-6 py-3 text-[11px] font-black uppercase tracking-[0.22em] hover:bg-white transition-colors">
+                                Open Redesigned Live
+                                <span class="material-symbols-outlined text-base">arrow_forward</span>
+                            </a>
+                            <a href="{% url 'request_track' %}" class="inline-flex items-center gap-2 border border-white/20 px-6 py-3 text-[11px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                                Request A Track
+                                <span class="material-symbols-outlined text-base">queue_music</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <aside class="glass-panel border border-white/10 p-6">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-primary">Snapshot</p>
+                        <div class="mt-5 flex items-center gap-4">
+                            <img src="{% if current_track and current_track.album_art %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}" alt="" class="h-20 w-20 border border-white/10 object-cover"/>
+                            <div class="min-w-0">
+                                <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Now Playing</p>
+                                <p class="mt-2 text-2xl font-display uppercase leading-none truncate">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
+                                <p class="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400 truncate">{% if current_track %}{{ current_track.artist }}{% else %}Always On Air{% endif %}</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 grid grid-cols-2 gap-3">
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Listeners</p>
+                                <p class="mt-2 text-3xl font-display">{% if state %}{{ state.listeners_count }}{% else %}3847{% endif %}</p>
+                            </div>
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Up Next</p>
+                                <p class="mt-2 text-3xl font-display">{{ up_next_tracks|length }}</p>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <section class="relative pb-10">
+            <div class="container mx-auto max-w-[1280px] px-6">
+                <div class="grid gap-6 md:grid-cols-3">
+                    <div class="glass-panel border border-white/10 p-6">
+                        <p class="text-[10px] uppercase tracking-[0.25em] text-primary">What Changed</p>
+                        <h2 class="mt-3 font-display text-2xl uppercase">More atmosphere</h2>
+                        <p class="mt-3 text-sm text-slate-300 leading-relaxed">The live page now opens like a destination, with a stronger hero, clearer status cues, and a better sense that something is happening right now.</p>
+                    </div>
+                    <div class="glass-panel border border-white/10 p-6">
+                        <p class="text-[10px] uppercase tracking-[0.25em] text-secondary">What Changed</p>
+                        <h2 class="mt-3 font-display text-2xl uppercase">More community</h2>
+                        <p class="mt-3 text-sm text-slate-300 leading-relaxed">A real chat panel and stronger queue visibility make the page feel social, not passive. That helps the station feel alive even between interactions.</p>
+                    </div>
+                    <div class="glass-panel border border-white/10 p-6">
+                        <p class="text-[10px] uppercase tracking-[0.25em] text-primary">What Changed</p>
+                        <h2 class="mt-3 font-display text-2xl uppercase">More return value</h2>
+                        <p class="mt-3 text-sm text-slate-300 leading-relaxed">The redesign now surfaces countdowns, saved moments, and "what's next" cues so listeners have a reason to come back later, not just listen once.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="relative pb-20">
+            <div class="container mx-auto max-w-[1280px] px-6">
+                <div class="glass-panel border border-white/10 p-8 md:p-10">
+                    <div class="flex items-end justify-between gap-4 flex-wrap">
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-secondary">Suggested Improvements</p>
+                            <h2 class="mt-3 font-display text-4xl uppercase leading-none">What I'd build next</h2>
+                        </div>
+                        <a href="{% url 'live' %}" class="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
+                            Review on live page
+                            <span class="material-symbols-outlined text-base">north_east</span>
+                        </a>
+                    </div>
+
+                    <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        {% for item in live_experience_suggestions %}
+                        <article class="border border-white/10 bg-white/[0.03] p-5">
+                            <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">{{ item.eyebrow }}</p>
+                            <h3 class="mt-3 font-display text-2xl uppercase leading-tight">{{ item.title }}</h3>
+                            <p class="mt-3 text-sm text-slate-300 leading-relaxed">{{ item.summary }}</p>
+                            <p class="mt-4 text-xs uppercase tracking-[0.2em] text-primary">{{ item.impact }}</p>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'core/footer.html' %}
+</body>
+</html>
+
