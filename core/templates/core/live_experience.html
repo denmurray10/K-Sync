@@ -60,6 +60,24 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
     }
+    .reverse-live-panel {
+        background: #ffffff;
+        color: #000000;
+        border-color: rgba(0, 0, 0, 0.88);
+    }
+    .reverse-live-row {
+        border: 1px solid rgba(15, 23, 42, 0.18);
+        background: rgba(248, 245, 248, 0.92);
+    }
+    .reverse-live-row:hover,
+    .reverse-live-row:focus-within {
+        border-color: rgba(244, 37, 192, 0.52);
+        background: rgba(244, 37, 192, 0.05);
+    }
+    .reverse-live-icon-box {
+        border: 1px solid rgba(15, 23, 42, 0.14);
+        background: rgba(15, 23, 42, 0.04);
+    }
     .glass-hero {
         background:
             linear-gradient(135deg, rgba(244, 37, 192, 0.08), rgba(255,255,255,0.02) 46%, rgba(0, 0, 0, 0.02)),
@@ -164,6 +182,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .request-chip span:last-child {
         letter-spacing: 0.08em;
         color: rgba(255,255,255,0.82);
+    }
+    .request-chip--light {
+        border-color: rgba(244, 37, 192, 0.4);
+        background: rgba(244, 37, 192, 0.08);
+    }
+    .request-chip--light span:last-child {
+        color: rgba(15, 23, 42, 0.72);
     }
     .section-eyebrow {
         font-size: 10px;
@@ -503,16 +528,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="relative bg-white py-16">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_380px]">
-                <article class="glass-panel solid-black-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up">
+                <article class="reverse-live-panel min-w-0 border p-4 sm:p-6 reveal-up">
                     <div>
                         <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Coming Up</p>
-                        <h2 class="mt-3 font-display text-3xl uppercase leading-none xl:text-[2rem]">Up Next</h2>
+                        <h2 class="mt-3 font-display text-3xl uppercase leading-none text-black xl:text-[2rem]">Up Next</h2>
                     </div>
                     <div id="up-next-container" class="mt-6 flex flex-col gap-3">
                         {% for track in up_next_tracks %}
-                        <div class="group flex min-w-0 flex-wrap items-start gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 sm:flex-nowrap sm:items-center hover:border-primary/45 hover:bg-primary/5{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                            <span class="w-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-600">{{ forloop.counter|stringformat:"02d" }}</span>
-                            <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
+                        <div class="reverse-live-row group flex min-w-0 flex-wrap items-start gap-4 p-4 transition-all duration-300 sm:flex-nowrap sm:items-center{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
+                            <span class="w-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-500">{{ forloop.counter|stringformat:"02d" }}</span>
+                            <div class="reverse-live-icon-box h-12 w-12 overflow-hidden">
                                 {% if track.album_art %}
                                 <img src="{{ track.album_art }}" class="h-full w-full object-cover" alt=""/>
                                 {% else %}
@@ -522,7 +547,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 {% endif %}
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="truncate text-sm font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">{{ track.title }}</p>
+                                <p class="truncate text-sm font-bold uppercase tracking-tight text-slate-950 group-hover:text-primary transition-colors">{{ track.title }}</p>
                                 <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ track.artist }}</p>
                             </div>
                             <span id="up-next-eta-{{ forloop.counter0 }}" class="w-full pl-[5.5rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-500 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">In --:--</span>
@@ -533,15 +558,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                 </article>
 
-                <article class="glass-panel solid-black-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up" style="transition-delay: 100ms;">
+                <article class="reverse-live-panel min-w-0 border p-4 sm:p-6 reveal-up" style="transition-delay: 100ms;">
                     <div>
                         <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Recently Aired</p>
-                        <h2 class="mt-3 font-display text-3xl uppercase leading-none xl:text-[2rem]">Recently Played</h2>
+                        <h2 class="mt-3 font-display text-3xl uppercase leading-none text-black xl:text-[2rem]">Recently Played</h2>
                     </div>
                     <div id="recently-played-container" class="mt-6 flex flex-col gap-3">
                         {% for track in recently_played_tracks %}
-                        <div class="group flex min-w-0 flex-wrap items-start gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 sm:flex-nowrap sm:items-center hover:border-primary/45 hover:bg-primary/5{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
-                            <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
+                        <div class="reverse-live-row group flex min-w-0 flex-wrap items-start gap-4 p-4 transition-all duration-300 sm:flex-nowrap sm:items-center{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
+                            <div class="reverse-live-icon-box h-12 w-12 overflow-hidden">
                                 {% if track.album_art %}
                                 <img src="{{ track.album_art }}" class="h-full w-full object-cover" alt=""/>
                                 {% else %}
@@ -551,10 +576,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 {% endif %}
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="truncate text-sm font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">{{ track.title }}</p>
+                                <p class="truncate text-sm font-bold uppercase tracking-tight text-slate-950 group-hover:text-primary transition-colors">{{ track.title }}</p>
                                 <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ track.artist }}</p>
                             </div>
-                            <span class="w-full pl-[4rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-600 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">Played</span>
+                            <span class="w-full pl-[4rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-500 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">Played</span>
                         </div>
                         {% empty %}
                         <p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Broadcast starting</p>
@@ -563,10 +588,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </article>
 
                 <aside class="min-w-0 flex flex-col gap-6 reveal-up" style="transition-delay: 200ms;">
-                    <article class="glass-panel solid-black-panel min-w-0 border border-white/10 p-4 sm:p-6">
+                    <article class="reverse-live-panel min-w-0 border p-4 sm:p-6">
                         <div>
                             <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Schedule Feed</p>
-                            <h2 class="mt-3 font-display text-3xl uppercase leading-none xl:text-[2rem]">Upcoming Shows</h2>
+                            <h2 class="mt-3 font-display text-3xl uppercase leading-none text-black xl:text-[2rem]">Upcoming Shows</h2>
                         </div>
                         <div id="upcoming-shows-column-list" class="mt-6 flex flex-col gap-3">
                             <p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Loading upcoming shows</p>
@@ -1518,20 +1543,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     const countdown = mode === 'live' ? 'LIVE' : `In ${formatCountdownClock(item.diff)}`;
                     const leftIcon = mode === 'live' ? 'radio_button_checked' : (mode === 'next' ? 'schedule' : 'event');
                     const highlightClass = mode === 'live'
-                        ? 'border-primary/40 bg-gradient-to-r from-primary/16 via-primary/8 to-transparent hover:border-primary/55'
+                        ? 'border-primary/50 bg-gradient-to-r from-primary/10 via-primary/4 to-transparent'
                         : (mode === 'next'
-                            ? 'border-primary/40 bg-gradient-to-r from-primary/18 via-primary/8 to-transparent hover:border-primary/55'
-                            : 'hover:border-primary/35 hover:bg-primary/5');
+                            ? 'border-primary/50 bg-gradient-to-r from-primary/10 via-primary/4 to-transparent'
+                            : '');
                     const chipClass = mode === 'live' ? 'text-secondary' : (mode === 'next' ? 'text-primary' : 'text-slate-500');
 
                     return `
-                        <div class="group flex items-center gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 ${highlightClass}">
-                            <div class="flex h-12 w-12 items-center justify-center border border-white/10 bg-black/20">
-                                <span class="material-symbols-outlined text-slate-300 group-hover:text-white transition-colors">${leftIcon}</span>
+                        <div class="reverse-live-row group flex items-center gap-4 p-4 transition-all duration-300 ${highlightClass}">
+                            <div class="reverse-live-icon-box flex h-12 w-12 items-center justify-center">
+                                <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">${leftIcon}</span>
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2">
-                                    <p class="truncate text-sm font-bold uppercase tracking-tight text-white">${item.label}</p>
+                                    <p class="truncate text-sm font-bold uppercase tracking-tight text-slate-950">${item.label}</p>
                                     ${mode === 'live' ? '<span class="shrink-0 bg-secondary px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.22em] text-black">On Air</span>' : ''}
                                     ${mode === 'next' ? '<span class="shrink-0 bg-primary px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.22em] text-black">Next</span>' : ''}
                                 </div>
@@ -2310,18 +2335,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 const upNextEta = 'In --:--';
                 const requestMeta = containerId === 'up-next-container' ? getRequestedTrackMeta(track.title) : null;
                 const requestChip = requestMeta
-                    ? `<span class="request-chip"><span>Fan Pick</span><span>${escapeHtml(requestMeta.listener_name)}</span></span>`
+                    ? `<span class="request-chip request-chip--light"><span>Fan Pick</span><span>${escapeHtml(requestMeta.listener_name)}</span></span>`
                     : '';
                 const requestRowClass = requestMeta ? 'border-l-2 border-l-primary' : '';
                 return `
-                    <div class="group flex min-w-0 flex-wrap items-start gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 sm:flex-nowrap sm:items-center ${palette.hover} ${requestRowClass}">
-                        ${containerId === 'up-next-container' ? `<span class="w-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-600">${(idx + 1).toString().padStart(2, '0')}</span>` : ''}
-                        <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
+                    <div class="reverse-live-row group flex min-w-0 flex-wrap items-start gap-4 p-4 transition-all duration-300 sm:flex-nowrap sm:items-center ${palette.hover} ${requestRowClass}">
+                        ${containerId === 'up-next-container' ? `<span class="w-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-500">${(idx + 1).toString().padStart(2, '0')}</span>` : ''}
+                        <div class="reverse-live-icon-box h-12 w-12 overflow-hidden">
                             ${track.album_art ? `<img src="${track.album_art}" class="h-full w-full object-cover" alt="">` : `<div class="flex h-full w-full items-center justify-center"><span class="material-symbols-outlined text-slate-500 ${palette.text} transition-colors">album</span></div>`}
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="flex flex-wrap items-center gap-2">
-                                <p class="truncate text-sm font-bold uppercase tracking-tight text-white ${palette.text} transition-colors">${title}</p>
+                                <p class="truncate text-sm font-bold uppercase tracking-tight text-slate-950 ${palette.text} transition-colors">${title}</p>
                                 ${requestChip}
                             </div>
                             <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">${track.artist}</p>
