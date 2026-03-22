@@ -15,7 +15,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <title>K-Beats Live | The K-Pop Radio Experience</title>
 <meta name="description" content="Listen live on K-Beats with real-time now playing, queue awareness, fan chat, AI DJ insights, and a stronger reason to come back every day."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
     tailwind.config = {
@@ -23,20 +23,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         theme: {
             extend: {
                 colors: {
-                    primary: "#ff4db8",
-                    secondary: "#35f2ff",
-                    ink: "#050816",
-                    panel: "#091122",
-                    panelSoft: "#0d1830",
-                    sunrise: "#ff8a3d",
+                    primary: "#f425c0",
+                    secondary: "#00f0ff",
+                    ink: "#000000",
+                    panel: "#050505",
+                    panelSoft: "#101010",
+                    sunrise: "#f425c0",
                 },
                 fontFamily: {
-                    display: ["Syne", "sans-serif"],
-                    body: ["Space Grotesk", "sans-serif"],
+                    display: ["Cinzel", "serif"],
+                    body: ["Montserrat", "sans-serif"],
                 },
                 boxShadow: {
-                    neon: "0 0 40px rgba(255, 77, 184, 0.2)",
-                    cyan: "0 0 30px rgba(53, 242, 255, 0.18)",
+                    neon: "0 0 28px rgba(244, 37, 192, 0.16)",
+                    cyan: "0 0 20px rgba(244, 37, 192, 0.1)",
                 },
             },
         },
@@ -46,28 +46,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     :root { color-scheme: dark; }
     body {
         background:
-            radial-gradient(circle at 0% 0%, rgba(255, 77, 184, 0.17), transparent 34%),
-            radial-gradient(circle at 82% 14%, rgba(53, 242, 255, 0.14), transparent 26%),
-            linear-gradient(180deg, #050816 0%, #08101f 42%, #050816 100%);
-    }
-    .page-grid {
-        background-image:
-            linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-        background-size: 38px 38px;
-        mask-image: linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.2), transparent);
+            radial-gradient(circle at 16% 8%, rgba(244, 37, 192, 0.12), transparent 24%),
+            radial-gradient(circle at 88% 14%, rgba(0, 240, 255, 0.08), transparent 18%),
+            linear-gradient(180deg, #000000 0%, #020202 42%, #000000 100%);
     }
     .glass-panel {
-        background: rgba(7, 12, 26, 0.72);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
+        background: rgba(0, 0, 0, 0.78);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
     }
     .glass-hero {
         background:
-            linear-gradient(135deg, rgba(255, 77, 184, 0.14), rgba(255,255,255,0.03) 48%, rgba(53, 242, 255, 0.12)),
-            rgba(7, 12, 26, 0.72);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+            linear-gradient(135deg, rgba(244, 37, 192, 0.08), rgba(255,255,255,0.02) 46%, rgba(0, 0, 0, 0.02)),
+            rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
     }
     .album-bg { animation: drift-scale 26s ease-in-out infinite; }
     .hero-ring {
@@ -88,11 +81,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(255, 77, 184, 1), rgba(53, 242, 255, 1)); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(244, 37, 192, 1), rgba(255, 255, 255, 0.75)); }
     .signal-bar {
         width: 4px;
         border-radius: 999px;
-        background: linear-gradient(180deg, rgba(53, 242, 255, 1), rgba(255, 77, 184, 1));
+        background: linear-gradient(180deg, rgba(244, 37, 192, 1), rgba(255, 255, 255, 0.75));
         transform-origin: bottom;
         animation: equalize 1.1s ease-in-out infinite;
     }
@@ -103,7 +96,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .signal-bar-lg {
         width: 6px;
         border-radius: 999px;
-        background: linear-gradient(180deg, rgba(255, 77, 184, 1), rgba(53, 242, 255, 0.88));
+        background: linear-gradient(180deg, rgba(244, 37, 192, 1), rgba(255, 255, 255, 0.7));
         transform-origin: bottom;
         animation: equalize-lg 1.25s ease-in-out infinite;
     }
@@ -116,6 +109,55 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .track-orbit { animation: orbit 12s linear infinite; }
     .floating-orb { animation: float-orb 10s ease-in-out infinite; }
     .floating-orb.alt { animation-delay: 1.8s; }
+    .live-primary-btn {
+        border: 1px solid #f425c0;
+        background: #f425c0;
+        color: #000000;
+        box-shadow: 4px 4px 0 rgba(255,255,255,1);
+        transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .live-primary-btn:hover,
+    .live-primary-btn:focus-visible {
+        background: #000000;
+        color: #f425c0;
+        box-shadow: none;
+        transform: translate(4px, 4px);
+        outline: none;
+    }
+    .live-primary-btn .material-symbols-outlined {
+        transition: color 0.2s ease;
+    }
+    .live-volume-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        padding: 0.45rem 0.7rem;
+        color: #cbd5e1;
+        transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    }
+    .live-volume-toggle:hover,
+    .live-volume-toggle:focus-visible {
+        border-color: rgba(244, 37, 192, 0.55);
+        color: #ffffff;
+        background: rgba(244, 37, 192, 0.08);
+        outline: none;
+    }
+    .live-volume-toggle.is-muted {
+        border-color: rgba(244, 37, 192, 0.5);
+        color: #f425c0;
+        background: rgba(244, 37, 192, 0.12);
+    }
+    .section-eyebrow {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+    }
+    .hero-title-balance {
+        max-width: 10ch;
+    }
     @keyframes equalize {
         0% { height: 24%; }
         25% { height: 88%; }
@@ -132,8 +174,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         100% { height: 18%; }
     }
     @keyframes pulse-glow {
-        0%, 100% { box-shadow: 0 0 0 rgba(255, 77, 184, 0), 0 0 0 rgba(53, 242, 255, 0); }
-        50% { box-shadow: 0 0 28px rgba(255, 77, 184, 0.28), 0 0 48px rgba(53, 242, 255, 0.14); }
+        0%, 100% { box-shadow: 0 0 0 rgba(244, 37, 192, 0); }
+        50% { box-shadow: 0 0 24px rgba(244, 37, 192, 0.22); }
     }
     @keyframes drift-scale {
         0%, 100% { transform: scale(1.02) translate3d(0, 0, 0); }
@@ -159,6 +201,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             scroll-behavior: auto !important;
         }
     }
+    @media (max-width: 767px) {
+        .hero-title-balance {
+            max-width: none;
+        }
+    }
 </style>
 </head>
 <body class="bg-ink text-white font-body min-h-screen overflow-x-hidden">
@@ -177,19 +224,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <audio id="live-vo-audio" preload="auto"></audio>
 
 <main class="relative">
-    <div class="pointer-events-none absolute inset-0 page-grid opacity-50"></div>
-
-    <section class="relative isolate overflow-hidden pt-32 pb-12">
+    <section class="relative isolate overflow-hidden pt-28 pb-12 md:pt-32">
         <div class="absolute inset-0 overflow-hidden">
             <img id="album-bg-img" src="{% if current_track and current_track.album_art %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}" alt="" class="album-bg h-full w-full object-cover opacity-20 blur-3xl"/>
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,77,184,0.22),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(53,242,255,0.16),transparent_26%)]"></div>
             <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-ink/30 to-ink"></div>
             <div class="absolute -top-16 -left-12 h-56 w-56 rounded-full bg-primary/25 blur-3xl floating-orb"></div>
-            <div class="absolute right-0 top-28 h-64 w-64 rounded-full bg-secondary/18 blur-3xl floating-orb alt"></div>
+            <div class="absolute right-0 top-28 h-64 w-64 rounded-full bg-primary/10 blur-3xl floating-orb alt"></div>
         </div>
 
-        <div class="relative container mx-auto max-w-[1320px] px-6">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-7">
+        <div class="relative container mx-auto px-4 sm:px-6">
+            <div class="mb-7 flex flex-wrap items-center justify-between gap-3">
                 <div class="inline-flex items-center gap-3 border border-white/10 bg-white/[0.03] px-4 py-2">
                     <span class="relative flex h-2.5 w-2.5">
                         <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
@@ -199,30 +244,37 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.03] px-4 py-2">
-                        <span class="material-symbols-outlined text-secondary text-base">headphones</span>
+                        <span class="material-symbols-outlined text-primary text-base">headphones</span>
                         <span class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">Listeners</span>
                         <span id="listener-count" class="text-sm font-display text-white">{% if state %}{{ state.listeners_count }}{% else %}3847{% endif %}</span>
                     </div>
-                    <a href="{% url 'test_page' %}" class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.03] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.26em] text-slate-300 hover:border-secondary hover:text-secondary transition-colors">
-                        View Test Page
-                        <span class="material-symbols-outlined text-base">arrow_outward</span>
+                    {% if live_show_snapshot.current %}
+                    <div class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.03] px-4 py-2">
+                        <span class="material-symbols-outlined text-primary text-base">mic_external_on</span>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">On Air Host</span>
+                        <span class="text-sm font-display text-white">{{ live_show_snapshot.current.host_name }}</span>
+                    </div>
+                    {% endif %}
+                    <a href="{% url 'schedule' %}" class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.03] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.26em] text-slate-300 hover:border-primary hover:text-primary transition-colors">
+                        Full Schedule
+                        <span class="material-symbols-outlined text-base">event</span>
                     </a>
                 </div>
             </div>
 
-            <div class="grid items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_420px]">
-                <div class="glass-hero border border-white/10 p-7 md:p-10 shadow-neon reveal-up">
+            <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_420px]">
+                <div class="glass-hero min-w-0 border border-white/10 p-6 sm:p-7 md:p-10 shadow-neon reveal-up">
                     <div class="flex flex-wrap items-start justify-between gap-6">
                         <div class="max-w-3xl">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.34em] text-secondary">K-Pop Radio, Reframed</p>
-                            <h1 id="hero-title" class="mt-4 font-display text-5xl md:text-7xl lg:text-[5.4rem] leading-[0.88] uppercase tracking-tight">
+                            <p class="section-eyebrow text-primary">K-Beats Live Broadcast</p>
+                            <h1 id="hero-title" class="hero-title-balance mt-4 font-display text-4xl leading-[0.9] uppercase tracking-tight sm:text-5xl md:text-6xl lg:text-[5rem]">
                                 {% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}
                             </h1>
-                            <p id="hero-artist" class="mt-4 text-sm md:text-xl uppercase tracking-[0.3em] text-slate-300">
+                            <p id="hero-artist" class="mt-4 text-sm uppercase tracking-[0.28em] text-slate-300 md:text-lg">
                                 {% if current_track %}{{ current_track.artist }}{% else %}24/7 K-Pop Rotation{% endif %}
                             </p>
-                            <p class="mt-6 max-w-2xl text-sm md:text-lg text-slate-300 leading-relaxed">
-                                The station now feels less like a plain stream and more like a destination: live status, social energy, next-show momentum, and reasons for fans to check back in later.
+                            <p class="mt-6 max-w-2xl text-sm leading-relaxed text-slate-300 md:text-lg">
+                                Live K-pop, fan energy, and real return moments all live in one place. Tune in now, follow the next handoff, and stay close to what the room is feeling.
                             </p>
                             <div class="mt-6 flex flex-wrap gap-3">
                                 <span id="fan-requested-pill" class="inline-flex items-center gap-2 border border-primary/35 bg-primary/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-primary {% if not live_request_momentum.current_track_requested %}hidden{% endif %}">
@@ -232,11 +284,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 {% if live_show_snapshot.next %}
                                 <span class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-300">
                                     Next Handoff {{ live_show_snapshot.next.relative_day_label }} {{ live_show_snapshot.next.time_label }}
-                                    <span class="material-symbols-outlined text-sm text-secondary">schedule</span>
+                                    <span class="material-symbols-outlined text-sm text-primary">schedule</span>
                                 </span>
                                 {% endif %}
                                 <span class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-300">
-                                    {{ live_request_momentum.requests_last_24h }} requests in the last 24h
+                                    {{ live_request_momentum.requests_last_24h }} fan requests today
                                     <span class="material-symbols-outlined text-sm text-primary">queue_music</span>
                                 </span>
                             </div>
@@ -252,20 +304,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                     </div>
 
-                    <div class="mt-8 flex flex-wrap gap-3">
-                        <button id="play-btn" class="pulse-glow inline-flex items-center gap-3 bg-primary px-6 py-4 text-black border border-primary text-[11px] font-black uppercase tracking-[0.22em] hover:bg-white transition-colors">
+                    <div class="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        <button id="play-btn" class="live-primary-btn pulse-glow inline-flex items-center justify-center gap-3 px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] sm:col-span-2 xl:col-span-1">
                             <span class="material-symbols-outlined text-2xl">play_arrow</span>
                             Listen Live
                         </button>
-                        <a href="{% url 'request_track' %}" class="inline-flex items-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                        <a href="{% url 'request_track' %}" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                             Request A Track
                             <span class="material-symbols-outlined text-lg">queue_music</span>
                         </a>
-                        <a href="#community" class="inline-flex items-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                        <a href="#community" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                             Join The Room
                             <span class="material-symbols-outlined text-lg">forum</span>
                         </a>
-                        <a href="{% url 'live_player_popout' %}" class="inline-flex items-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-white hover:text-white transition-colors">
+                        <a href="{% url 'schedule' %}" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-white hover:text-white transition-colors">
+                            Tonight's Schedule
+                            <span class="material-symbols-outlined text-lg">event_upcoming</span>
+                        </a>
+                        <a href="{% url 'live_player_popout' %}" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-white hover:text-white transition-colors sm:col-span-2 xl:col-span-1">
                             Popout Player
                             <span class="material-symbols-outlined text-lg">open_in_new</span>
                         </a>
@@ -278,7 +334,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-primary">Live Feed</p>
                             </div>
                             <div class="mt-4 h-1.5 bg-white/10 overflow-hidden">
-                                <div id="live-progress-fill" class="h-full bg-gradient-to-r from-primary via-sunrise to-secondary transition-[width] duration-200" style="width: 0%"></div>
+                                <div id="live-progress-fill" class="h-full bg-gradient-to-r from-primary to-white/80 transition-[width] duration-200" style="width: 0%"></div>
                             </div>
                             <div class="mt-3 flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-slate-500">
                                 <span id="live-progress-current">0:00</span>
@@ -290,19 +346,66 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <div class="flex items-center justify-between gap-3">
                                 <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">Volume</p>
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-slate-400 text-lg">volume_down</span>
+                                    <button id="volume-mute-btn" type="button" class="live-volume-toggle" aria-pressed="false" aria-label="Mute live player">
+                                        <span id="volume-mute-icon" class="material-symbols-outlined text-lg">volume_down</span>
+                                        <span id="volume-status" class="text-[10px] font-bold uppercase tracking-[0.2em]">Audio On</span>
+                                    </button>
                                     <span class="material-symbols-outlined text-slate-400 text-lg">volume_up</span>
                                 </div>
                             </div>
                             <input type="range" id="volume-slider" min="0" max="100" value="75" class="mt-4 w-full h-1 accent-primary cursor-pointer bg-white/10 appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer"/>
                         </div>
                     </div>
+
+                    <article class="mt-5 border border-white/10 bg-white/[0.03] p-4">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Appointment Layer</p>
+                                <p id="spotlight-current-show-name" class="mt-3 font-display text-2xl uppercase leading-none">
+                                    {% if live_show_snapshot.current %}{{ live_show_snapshot.current.show_name }}{% else %}Live schedule syncing{% endif %}
+                                </p>
+                            </div>
+                            <span class="material-symbols-outlined text-primary">event_upcoming</span>
+                        </div>
+                        <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
+                            <div class="border border-white/10 bg-black/25 p-3">
+                                <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">On Air Host</p>
+                                <p id="spotlight-current-show-host" class="mt-2 text-sm font-bold uppercase tracking-[0.18em] text-white">
+                                    {% if live_show_snapshot.current %}{{ live_show_snapshot.current.host_name }}{% else %}Auto DJ{% endif %}
+                                </p>
+                                <p id="spotlight-current-show-window" class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-400">
+                                    {% if live_show_snapshot.current %}{{ live_show_snapshot.current.time_range_label }}{% else %}Now on air{% endif %}
+                                </p>
+                            </div>
+                            <div class="border border-primary/20 bg-primary/10 p-3">
+                                <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Next Return Window</p>
+                                <p id="spotlight-next-show-name" class="mt-2 text-sm font-bold uppercase tracking-[0.18em] text-white">
+                                    {% if live_show_snapshot.next %}{{ live_show_snapshot.next.show_name }}{% else %}Schedule loading{% endif %}
+                                </p>
+                                <p id="spotlight-next-show-time" class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-300">
+                                    {% if live_show_snapshot.next %}{{ live_show_snapshot.next.relative_day_label }} {{ live_show_snapshot.next.time_label }}{% else %}We are pulling the next handoff{% endif %}
+                                </p>
+                                <p id="spotlight-next-show-countdown" class="mt-3 text-[10px] font-black uppercase tracking-[0.24em] text-primary">
+                                    {% if live_show_snapshot.next %}{{ live_show_snapshot.next.countdown_prefix }} {{ live_show_snapshot.next.time_label }}{% else %}Watch this space{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <p id="spotlight-show-description" class="mt-4 text-sm text-slate-300 leading-relaxed">
+                            {% if live_show_snapshot.current %}
+                            {{ live_show_snapshot.current.description }}
+                            {% elif live_show_snapshot.next %}
+                            {{ live_show_snapshot.next.description }}
+                            {% else %}
+                            The page now keeps the next show visible so listeners always have a reason to come back at a specific time.
+                            {% endif %}
+                        </p>
+                    </article>
                 </div>
 
-                <aside class="glass-panel border border-white/10 p-6 md:p-7 shadow-cyan reveal-up" style="transition-delay: 120ms;">
+                <aside class="glass-panel min-w-0 border border-white/10 p-5 sm:p-6 md:p-7 shadow-neon reveal-up" style="transition-delay: 120ms;">
                     <div class="relative">
                         <div class="absolute inset-0 track-orbit rounded-full border border-white/10 scale-110"></div>
-                        <div class="absolute inset-3 track-orbit rounded-full border border-secondary/20 scale-110 [animation-direction:reverse] [animation-duration:16s]"></div>
+                        <div class="absolute inset-3 track-orbit rounded-full border border-primary/15 scale-110 [animation-direction:reverse] [animation-duration:16s]"></div>
                         <div class="relative mx-auto w-[220px] max-w-full border border-white/10 bg-black/30 p-3 md:w-[260px]">
                             <div class="hero-ring"></div>
                             <img id="hero-album-art" src="{% if current_track and current_track.album_art %}{{ current_track.album_art }}{% else %}https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album{% endif %}" alt="{% if current_track %}{{ current_track.title }} by {{ current_track.artist }}{% else %}K-Beats Live artwork{% endif %}" class="w-full aspect-square object-cover shadow-neon"/>
@@ -312,7 +415,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="mt-7 border border-white/10 bg-white/[0.03] p-5">
                         <div class="flex items-start justify-between gap-4">
                             <div>
-                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-secondary">Share Card</p>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-primary">Share Card</p>
                                 <p class="mt-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">Now Playing On K-Beats</p>
                             </div>
                             <span class="material-symbols-outlined text-primary">ios_share</span>
@@ -320,11 +423,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p id="share-card-title" class="mt-4 font-display text-3xl uppercase leading-none tracking-tight">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
                         <p id="share-card-artist" class="mt-2 text-[11px] uppercase tracking-[0.24em] text-slate-400">{% if current_track %}{{ current_track.artist }}{% else %}Always On Air{% endif %}</p>
                         <div class="mt-5 flex flex-wrap gap-3">
-                            <button id="share-now-playing-btn" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors">
+                            <button id="share-now-playing-btn" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
                                 Share
                                 <span class="material-symbols-outlined text-base">send</span>
                             </button>
-                            <button id="save-moment-btn" class="inline-flex items-center gap-2 border border-white/15 bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white hover:border-secondary hover:text-secondary transition-colors">
+                            <button id="save-moment-btn" class="inline-flex items-center gap-2 border border-white/15 bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white hover:border-primary hover:text-primary transition-colors">
                                 Save This Moment
                                 <span class="material-symbols-outlined text-base">bookmark</span>
                             </button>
@@ -336,61 +439,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <article class="border border-white/10 bg-white/[0.03] p-4">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Appointment Layer</p>
-                                    <p id="spotlight-current-show-name" class="mt-3 font-display text-2xl uppercase leading-none">
-                                        {% if live_show_snapshot.current %}{{ live_show_snapshot.current.show_name }}{% else %}Live schedule syncing{% endif %}
-                                    </p>
-                                </div>
-                                <span class="material-symbols-outlined text-secondary">event_upcoming</span>
-                            </div>
-                            <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                                <div class="border border-white/10 bg-black/25 p-3">
-                                    <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">On Air Host</p>
-                                    <p id="spotlight-current-show-host" class="mt-2 text-sm font-bold uppercase tracking-[0.18em] text-white">
-                                        {% if live_show_snapshot.current %}{{ live_show_snapshot.current.host_name }}{% else %}Auto DJ{% endif %}
-                                    </p>
-                                    <p id="spotlight-current-show-window" class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-400">
-                                        {% if live_show_snapshot.current %}{{ live_show_snapshot.current.time_range_label }}{% else %}Now on air{% endif %}
-                                    </p>
-                                </div>
-                                <div class="border border-primary/20 bg-primary/10 p-3">
-                                    <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Next Return Window</p>
-                                    <p id="spotlight-next-show-name" class="mt-2 text-sm font-bold uppercase tracking-[0.18em] text-white">
-                                        {% if live_show_snapshot.next %}{{ live_show_snapshot.next.show_name }}{% else %}Schedule loading{% endif %}
-                                    </p>
-                                    <p id="spotlight-next-show-time" class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-300">
-                                        {% if live_show_snapshot.next %}{{ live_show_snapshot.next.relative_day_label }} {{ live_show_snapshot.next.time_label }}{% else %}We are pulling the next handoff{% endif %}
-                                    </p>
-                                    <p id="spotlight-next-show-countdown" class="mt-3 text-[10px] font-black uppercase tracking-[0.24em] text-primary">
-                                        {% if live_show_snapshot.next %}{{ live_show_snapshot.next.countdown_prefix }} {{ live_show_snapshot.next.time_label }}{% else %}Watch this space{% endif %}
-                                    </p>
-                                </div>
-                            </div>
-                            <p id="spotlight-show-description" class="mt-4 text-sm text-slate-300 leading-relaxed">
-                                {% if live_show_snapshot.current %}
-                                {{ live_show_snapshot.current.description }}
-                                {% elif live_show_snapshot.next %}
-                                {{ live_show_snapshot.next.description }}
-                                {% else %}
-                                The page now keeps the next show visible so listeners always have a reason to come back at a specific time.
-                                {% endif %}
-                            </p>
-                        </article>
-
-                        <article class="border border-white/10 bg-white/[0.03] p-4">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
                                     <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Moment Archive</p>
                                     <p id="saved-moment-count" class="mt-3 font-display text-4xl uppercase leading-none">{{ live_return_profile.saved_moments_count }}</p>
                                     <p class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-400">Saved live moments</p>
                                 </div>
                                 {% if live_return_profile.is_authenticated %}
-                                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 border border-white/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 border border-white/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                                     Open Archive
                                     <span class="material-symbols-outlined text-sm">north_east</span>
                                 </a>
                                 {% else %}
-                                <a href="{% url 'login' %}" class="inline-flex items-center gap-2 border border-white/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                                <a href="{% url 'login' %}" class="inline-flex items-center gap-2 border border-white/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                                     Log In
                                     <span class="material-symbols-outlined text-sm">login</span>
                                 </a>
@@ -415,9 +474,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </section>
 
-    <div id="sticky-info-bar" class="sticky top-[96px] z-40 border-y border-white/10 bg-black/80 backdrop-blur-xl transition-[top] duration-300">
-        <div class="container mx-auto max-w-[1320px] px-6 py-4">
-            <div class="grid items-center gap-4 md:grid-cols-[auto_1fr_auto]">
+    <div id="sticky-info-bar" class="sticky top-[96px] z-40 border-y border-white/10 bg-black/85 backdrop-blur-xl transition-[top] duration-300">
+        <div class="container mx-auto px-4 py-4 sm:px-6">
+            <div class="grid items-center gap-3 md:grid-cols-[auto_1fr_auto]">
                 <div class="flex items-center gap-4 min-w-0">
                     <div class="flex h-10 items-end gap-1.5">
                         <span class="signal-bar h-4"></span>
@@ -432,17 +491,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p id="sticky-track-artist" class="mt-1 text-[10px] uppercase tracking-[0.25em] text-slate-400 truncate">{% if current_track %}{{ current_track.artist }}{% else %}Always On Air{% endif %}</p>
                     </div>
                 </div>
-                <div class="hidden md:flex items-center justify-center gap-3">
-                    <span class="material-symbols-outlined text-secondary">headphones</span>
-                    <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Listening Now</span>
-                    <span id="listener-count-bar" class="font-display text-xl text-white">{% if state %}{{ state.listeners_count }}{% else %}3847{% endif %}</span>
+                <div class="flex items-center justify-start gap-3 md:justify-center">
+                    <span class="material-symbols-outlined text-primary">headphones</span>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Listening</span>
+                    <span id="listener-count-bar" class="font-display text-lg text-white md:text-xl">{% if state %}{{ state.listeners_count }}{% else %}3847{% endif %}</span>
                 </div>
-                <div class="flex justify-start md:justify-end gap-3">
-                    <a href="{% url 'request_track' %}" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors">
+                <div class="flex flex-wrap justify-start gap-3 md:justify-end">
+                    <a href="{% url 'request_track' %}" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
                         Request Song
                         <span class="material-symbols-outlined text-base">queue_music</span>
                     </a>
-                    <a href="#community" class="inline-flex items-center gap-2 border border-white/15 bg-white/[0.04] px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                    <a href="#community" class="inline-flex items-center gap-2 border border-white/15 bg-white/[0.04] px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                         Community
                         <span class="material-symbols-outlined text-base">forum</span>
                     </a>
@@ -452,19 +511,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <section class="relative py-16">
-        <div class="container mx-auto max-w-[1320px] px-6">
-            <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_380px]">
-                <article class="glass-panel border border-white/10 p-6 reveal-up">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_380px]">
+                <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up">
                     <div class="flex items-end justify-between gap-4">
                         <div>
-                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Coming Up</p>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Coming Up</p>
                             <h2 class="mt-3 font-display text-4xl uppercase leading-none">Up Next</h2>
                         </div>
                         <span class="material-symbols-outlined text-3xl text-slate-500">queue_music</span>
                     </div>
                     <div id="up-next-container" class="mt-6 flex flex-col gap-3">
                         {% for track in up_next_tracks %}
-                        <div class="group flex items-center gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 hover:border-primary/45 hover:bg-primary/5{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
+                        <div class="group flex min-w-0 flex-wrap items-start gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 sm:flex-nowrap sm:items-center hover:border-primary/45 hover:bg-primary/5{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
                             <span class="w-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-600">{{ forloop.counter|stringformat:"02d" }}</span>
                             <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
                                 {% if track.album_art %}
@@ -479,7 +538,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <p class="truncate text-sm font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">{{ track.title }}</p>
                                 <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ track.artist }}</p>
                             </div>
-                            <span id="up-next-eta-{{ forloop.counter0 }}" class="text-[10px] uppercase tracking-[0.2em] text-slate-500">In --:--</span>
+                            <span id="up-next-eta-{{ forloop.counter0 }}" class="w-full pl-[5.5rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-500 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">In --:--</span>
                         </div>
                         {% empty %}
                         <p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Queue loading</p>
@@ -487,7 +546,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                 </article>
 
-                <article class="glass-panel border border-white/10 p-6 reveal-up" style="transition-delay: 100ms;">
+                <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up" style="transition-delay: 100ms;">
                     <div class="flex items-end justify-between gap-4">
                         <div>
                             <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Recently Aired</p>
@@ -497,21 +556,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                     <div id="recently-played-container" class="mt-6 flex flex-col gap-3">
                         {% for track in recently_played_tracks %}
-                        <div class="group flex items-center gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 hover:border-secondary/45 hover:bg-secondary/5{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
+                        <div class="group flex min-w-0 flex-wrap items-start gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 sm:flex-nowrap sm:items-center hover:border-primary/45 hover:bg-primary/5{% if track.title|lower in requested_titles %} border-l-2 border-l-primary{% endif %}">
                             <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
                                 {% if track.album_art %}
                                 <img src="{{ track.album_art }}" class="h-full w-full object-cover" alt=""/>
                                 {% else %}
                                 <div class="flex h-full w-full items-center justify-center">
-                                    <span class="material-symbols-outlined text-slate-500 group-hover:text-secondary transition-colors">album</span>
+                                    <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">album</span>
                                 </div>
                                 {% endif %}
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="truncate text-sm font-bold uppercase tracking-tight text-white group-hover:text-secondary transition-colors">{{ track.title }}</p>
+                                <p class="truncate text-sm font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">{{ track.title }}</p>
                                 <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ track.artist }}</p>
                             </div>
-                            <span class="text-[10px] uppercase tracking-[0.2em] text-slate-600">Played</span>
+                            <span class="w-full pl-[4rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-600 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">Played</span>
                         </div>
                         {% empty %}
                         <p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Broadcast starting</p>
@@ -519,11 +578,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                 </article>
 
-                <aside class="flex flex-col gap-6 reveal-up" style="transition-delay: 200ms;">
-                    <article class="glass-panel border border-white/10 p-6">
+                <aside class="min-w-0 flex flex-col gap-6 reveal-up" style="transition-delay: 200ms;">
+                    <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6">
                         <div class="flex items-end justify-between gap-4">
                             <div>
-                                <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Schedule Feed</p>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Schedule Feed</p>
                                 <h2 class="mt-3 font-display text-4xl uppercase leading-none">Upcoming Shows</h2>
                             </div>
                             <span class="material-symbols-outlined text-3xl text-slate-500">event_upcoming</span>
@@ -533,7 +592,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                     </article>
 
-                    <article class="glass-panel border border-white/10 p-6">
+                    <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6">
                         <div class="flex items-end justify-between gap-4">
                             <div>
                                 <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Fan Influence</p>
@@ -603,15 +662,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </section>
 
     <section class="relative py-16 border-y border-white/10 bg-black/20">
-        <div class="container mx-auto max-w-[1320px] px-6">
-            <div class="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_340px]">
-                <div class="glass-panel border border-secondary/20 p-6 md:p-8 reveal-up">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.15fr)_340px]">
+                <div class="glass-panel min-w-0 border border-secondary/20 p-4 sm:p-6 md:p-8 reveal-up">
                     <div class="flex items-start justify-between gap-5">
                         <div>
-                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">AI DJ Layer</p>
-                            <h2 class="mt-3 font-display text-4xl uppercase leading-none">DJ Insights</h2>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Signal Desk</p>
+                            <h2 class="mt-3 font-display text-4xl uppercase leading-none">DJ Notes</h2>
                         </div>
-                        <button id="live-ai-helpful-btn" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-secondary hover:text-white transition-colors">
+                        <button id="live-ai-helpful-btn" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
                             <span id="live-ai-helpful-icon" class="material-symbols-outlined text-base">thumb_up</span>
                             Helpful
                         </button>
@@ -629,7 +688,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <p id="live-ai-card-1-subtext" class="mt-3 text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ live_ai_payload.cards.0.subtext }}</p>
                         </div>
                         <div class="border border-white/10 bg-white/[0.03] p-5">
-                            <p id="live-ai-card-2-label" class="text-[10px] font-bold uppercase tracking-[0.25em] text-secondary">{{ live_ai_payload.cards.1.label }}</p>
+                            <p id="live-ai-card-2-label" class="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">{{ live_ai_payload.cards.1.label }}</p>
                             <p id="live-ai-card-2-value" class="mt-3 font-display text-4xl uppercase">{{ live_ai_payload.cards.1.value }}</p>
                             <p id="live-ai-card-2-subtext" class="mt-3 text-[11px] uppercase tracking-[0.22em] text-slate-500">{{ live_ai_payload.cards.1.subtext }}</p>
                         </div>
@@ -653,7 +712,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                     <article class="glass-panel border border-secondary/20 p-5">
                         <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-secondary">rocket_launch</span>
+                            <span class="material-symbols-outlined text-primary">rocket_launch</span>
                             <p id="live-rich-comeback-title" class="font-display text-2xl uppercase leading-none">Era Pulse</p>
                         </div>
                         <p id="live-rich-comeback-body" class="mt-4 text-sm leading-relaxed text-slate-300">Comeback momentum and era signals update as the playlist rotates.</p>
@@ -677,16 +736,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </section>
 
     <section id="community" class="relative py-16">
-        <div class="container mx-auto max-w-[1320px] px-6">
-            <div class="grid gap-6 xl:grid-cols-[minmax(0,1.08fr)_420px]">
-                <article class="glass-panel border border-white/10 p-6 reveal-up">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.08fr)_420px]">
+                <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up">
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Community Layer</p>
                             <h2 class="mt-3 font-display text-4xl uppercase leading-none">Listener Chat</h2>
                         </div>
                         {% if not user.is_authenticated %}
-                        <a href="{% url 'login' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                        <a href="{% url 'login' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                             Log In To Join
                             <span class="material-symbols-outlined text-base">login</span>
                         </a>
@@ -704,7 +763,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p id="chat-error" class="hidden mt-4 text-[11px] uppercase tracking-[0.22em] text-primary"></p>
                         <div class="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
                             <input id="chat-input" type="text" {% if not user.is_authenticated %}disabled{% endif %} placeholder="{% if user.is_authenticated %}Drop a message into the room{% else %}Log in to join the live room{% endif %}" class="border border-white/10 bg-white/[0.04] px-4 py-4 text-sm text-white placeholder:text-slate-500 focus:border-secondary focus:outline-none {% if not user.is_authenticated %}opacity-60 cursor-not-allowed{% endif %}"/>
-                            <button id="chat-send-btn" {% if not user.is_authenticated %}disabled{% endif %} class="inline-flex items-center justify-center gap-2 bg-primary px-5 py-4 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                            <button id="chat-send-btn" {% if not user.is_authenticated %}disabled{% endif %} class="live-primary-btn inline-flex items-center justify-center gap-2 px-5 py-4 text-[10px] font-black uppercase tracking-[0.22em] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[4px_4px_0px_rgba(255,255,255,1)]">
                                 Send
                                 <span class="material-symbols-outlined text-base">north_east</span>
                             </button>
@@ -712,9 +771,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                 </article>
 
-                <aside class="flex flex-col gap-6 reveal-up" style="transition-delay: 120ms;">
-                    <article class="glass-panel border border-white/10 p-6">
-                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Experience Principles</p>
+                <aside class="min-w-0 flex flex-col gap-6 reveal-up" style="transition-delay: 120ms;">
+                    <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Experience Principles</p>
                         <div class="mt-5 space-y-3">
                             <div class="border border-white/10 bg-white/[0.03] p-4">
                                 <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Clarity First</p>
@@ -731,7 +790,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                     </article>
 
-                    <article class="glass-panel border border-white/10 p-6">
+                    <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6">
                         <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Return Loop</p>
                         <h3 class="mt-3 font-display text-3xl uppercase leading-none">Keep The Habit Alive</h3>
 
@@ -755,20 +814,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                         <div class="mt-5 flex flex-wrap gap-3">
                             {% if live_return_profile.is_authenticated %}
-                            <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors">
+                            <a href="{% url 'dashboard' %}" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
                                 Open Dashboard
                                 <span class="material-symbols-outlined text-base">dashboard</span>
                             </a>
-                            <a href="{% url 'profile_personalization_settings' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                            <a href="{% url 'profile_personalization_settings' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                                 Reminder Settings
                                 <span class="material-symbols-outlined text-base">notifications</span>
                             </a>
                             {% else %}
-                            <a href="{% url 'login' %}" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors">
+                            <a href="{% url 'login' %}" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
                                 Log In To Track
                                 <span class="material-symbols-outlined text-base">login</span>
                             </a>
-                            <a href="{% url 'beat_streak_v2' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                            <a href="{% url 'beat_streak_v2' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                                 Open Beat Streak
                                 <span class="material-symbols-outlined text-base">sports_esports</span>
                             </a>
@@ -780,28 +839,69 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </section>
 
-    <section class="relative py-16 border-t border-white/10 bg-black/25">
-        <div class="container mx-auto max-w-[1320px] px-6">
+    <section class="relative border-t border-white/10 bg-black/25 py-16">
+        <div class="container mx-auto px-4 sm:px-6">
             <div class="flex flex-wrap items-end justify-between gap-4 reveal-up">
                 <div>
-                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Now Built Into Live</p>
-                    <h2 class="mt-3 font-display text-4xl uppercase leading-none">What now makes this worth returning to</h2>
+                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Stay Locked In</p>
+                    <h2 class="mt-3 font-display text-4xl uppercase leading-none">Keep The Station In Your Rotation</h2>
                 </div>
-                <a href="{% url 'test_page' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
-                    Open The Test Page
-                    <span class="material-symbols-outlined text-base">arrow_outward</span>
+                <a href="{% url 'schedule' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                    View Full Schedule
+                    <span class="material-symbols-outlined text-base">event</span>
                 </a>
             </div>
 
-            <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-                {% for item in live_experience_suggestions %}
-                <article class="glass-panel border border-white/10 p-5 reveal-up" style="transition-delay: {{ forloop.counter0 }}00ms;">
-                    <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">{{ item.eyebrow }}</p>
-                    <h3 class="mt-3 font-display text-2xl uppercase leading-tight">{{ item.title }}</h3>
-                    <p class="mt-3 text-sm leading-relaxed text-slate-300">{{ item.summary }}</p>
-                    <p class="mt-4 text-[10px] uppercase tracking-[0.22em] text-primary">{{ item.impact }}</p>
+            <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <article class="glass-panel border border-white/10 p-5 reveal-up">
+                    <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Live Queue</p>
+                    <h3 class="mt-3 font-display text-2xl uppercase leading-tight">Know What Is Coming Next</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-300">The Up Next rail gives listeners instant context, so dropping into the stream never feels random or disconnected.</p>
+                    <a href="#up-next-container" class="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
+                        Jump To Queue
+                        <span class="material-symbols-outlined text-sm">south</span>
+                    </a>
                 </article>
-                {% endfor %}
+                <article class="glass-panel border border-white/10 p-5 reveal-up" style="transition-delay: 100ms;">
+                    <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Fan Influence</p>
+                    <h3 class="mt-3 font-display text-2xl uppercase leading-tight">Push Songs Into The Room</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-300">Requests and live voting make the station feel participatory instead of passive, especially when the queue starts moving.</p>
+                    <a href="{% url 'request_track' %}" class="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
+                        Request A Track
+                        <span class="material-symbols-outlined text-sm">queue_music</span>
+                    </a>
+                </article>
+                <article class="glass-panel border border-white/10 p-5 reveal-up" style="transition-delay: 200ms;">
+                    <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Return Window</p>
+                    <h3 class="mt-3 font-display text-2xl uppercase leading-tight">Catch The Next Handoff</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-300">
+                        {% if live_show_snapshot.next %}
+                        {{ live_show_snapshot.next.show_name }} lands {{ live_show_snapshot.next.relative_day_label|lower }} at {{ live_show_snapshot.next.time_label }}, giving fans a real reason to come back at a specific time.
+                        {% else %}
+                        The upcoming show rail makes the schedule feel alive, so the stream always has another moment worth returning for.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'schedule' %}" class="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
+                        Open Schedule
+                        <span class="material-symbols-outlined text-sm">event_upcoming</span>
+                    </a>
+                </article>
+                <article class="glass-panel border border-white/10 p-5 reveal-up" style="transition-delay: 300ms;">
+                    <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Listener Ritual</p>
+                    <h3 class="mt-3 font-display text-2xl uppercase leading-tight">Save The Songs You Catch Live</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-300">Saved moments, chat, and your return streak turn one session into something collectible and worth building over time.</p>
+                    {% if live_return_profile.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
+                        Open My Archive
+                        <span class="material-symbols-outlined text-sm">bookmark</span>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
+                        Log In To Save
+                        <span class="material-symbols-outlined text-sm">login</span>
+                    </a>
+                    {% endif %}
+                </article>
             </div>
         </div>
     </section>
@@ -861,6 +961,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             let livePollSelected = livePollData ? Number(localStorage.getItem(livePollSelectedKey) || 0) : 0;
             let currentUpNextTracks = {{ up_next_tracks_json|default:"[]"|safe }};
             let scheduleSlotsCache = [];
+            const volumeSlider = document.getElementById('volume-slider');
+            const volumeMuteBtn = document.getElementById('volume-mute-btn');
+            const volumeMuteIcon = document.getElementById('volume-mute-icon');
+            const volumeStatus = document.getElementById('volume-status');
+            let lastAudibleVolume = 0.75;
 
             const parseDurationLabelSeconds = (value) => {
                 const raw = String(value || '').trim();
@@ -1259,7 +1364,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     const countdown = mode === 'live' ? 'LIVE' : `In ${formatCountdownClock(item.diff)}`;
                     const leftIcon = mode === 'live' ? 'radio_button_checked' : (mode === 'next' ? 'schedule' : 'event');
                     const highlightClass = mode === 'live'
-                        ? 'border-secondary/40 bg-gradient-to-r from-secondary/18 via-secondary/8 to-transparent hover:border-secondary/55'
+                        ? 'border-primary/40 bg-gradient-to-r from-primary/16 via-primary/8 to-transparent hover:border-primary/55'
                         : (mode === 'next'
                             ? 'border-primary/40 bg-gradient-to-r from-primary/18 via-primary/8 to-transparent hover:border-primary/55'
                             : 'hover:border-primary/35 hover:bg-primary/5');
@@ -1472,11 +1577,50 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             };
 
             const getSliderVolume = () => {
-                const volumeSlider = document.getElementById('volume-slider');
                 if (!volumeSlider) return 0.75;
                 const sliderVal = Number(volumeSlider.value);
                 if (!Number.isFinite(sliderVal)) return 0.75;
                 return Math.max(0, Math.min(1, sliderVal / 100));
+            };
+
+            const updateMuteUI = () => {
+                const sliderVolume = getSliderVolume();
+                const effectivelyMuted = audio.muted || sliderVolume <= 0;
+                if (volumeMuteBtn) {
+                    volumeMuteBtn.classList.toggle('is-muted', effectivelyMuted);
+                    volumeMuteBtn.setAttribute('aria-pressed', effectivelyMuted ? 'true' : 'false');
+                    volumeMuteBtn.setAttribute('aria-label', effectivelyMuted ? 'Unmute live player' : 'Mute live player');
+                }
+                if (volumeMuteIcon) {
+                    volumeMuteIcon.textContent = effectivelyMuted ? 'volume_off' : 'volume_down';
+                }
+                if (volumeStatus) {
+                    volumeStatus.textContent = effectivelyMuted ? 'Muted' : 'Audio On';
+                }
+            };
+
+            const applyMutedState = (muted) => {
+                const nextMuted = Boolean(muted);
+                const sliderVolume = getSliderVolume();
+
+                if (!nextMuted && sliderVolume <= 0 && volumeSlider) {
+                    const restored = Math.max(0.15, Math.min(1, lastAudibleVolume || 0.75));
+                    volumeSlider.value = String(Math.round(restored * 100));
+                }
+
+                if (volumeSlider && getSliderVolume() > 0) {
+                    lastAudibleVolume = getSliderVolume();
+                }
+
+                audio.muted = nextMuted;
+                if (!voiceAudio || voiceAudio.paused) {
+                    audio.volume = getSliderVolume();
+                }
+                if (voiceAudio) {
+                    voiceAudio.muted = nextMuted;
+                }
+
+                updateMuteUI();
             };
 
             const clearVoiceOverlayPlayback = () => {
@@ -1643,8 +1787,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             playBtn.addEventListener('click', async () => {
                 if (isPlaying) {
                     const wasMuted = audio.muted;
-                    audio.muted = !audio.muted;
-                    if (voiceAudio) voiceAudio.muted = audio.muted;
+                    applyMutedState(!audio.muted);
 
                     if (wasMuted && !audio.muted) {
                         syncAudio();
@@ -1663,12 +1806,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             audio.load();
                         }
 
-                        audio.muted = false;
+                        applyMutedState(false);
                         await audio.play();
                         syncAudio();
                     } catch (error) {
                         try {
-                            audio.muted = true;
+                            applyMutedState(true);
                             await audio.play();
                             syncAudio();
                             playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
@@ -1685,6 +1828,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (voiceAudio) voiceAudio.muted = audio.muted;
                 playBtn.querySelector('.material-symbols-outlined').textContent = audio.muted ? 'play_arrow' : 'pause';
                 playBtn.classList.toggle('pulse-glow', audio.muted);
+                updateMuteUI();
                 scheduleRotateWatchdog();
                 startPlaybackGuard();
             };
@@ -1697,23 +1841,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 stopPlaybackGuard();
                 playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
                 playBtn.classList.add('pulse-glow');
+                updateMuteUI();
             };
 
-            const volumeSlider = document.getElementById('volume-slider');
             if (volumeSlider) {
                 audio.volume = volumeSlider.value / 100;
                 volumeSlider.addEventListener('input', (e) => {
-                    if (!voiceAudio || voiceAudio.paused) {
-                        audio.volume = e.target.value / 100;
+                    const nextVolume = Number(e.target.value || 0) / 100;
+                    if (nextVolume > 0) {
+                        lastAudibleVolume = nextVolume;
                     }
-                    if (audio.muted && audio.volume > 0) {
-                        audio.muted = false;
-                        if (voiceAudio) voiceAudio.muted = false;
+                    if (!voiceAudio || voiceAudio.paused) {
+                        audio.volume = nextVolume;
+                    }
+                    if (nextVolume <= 0) {
+                        applyMutedState(true);
+                    } else if (audio.muted) {
+                        applyMutedState(false);
                         playBtn.querySelector('.material-symbols-outlined').textContent = 'pause';
                         playBtn.classList.remove('pulse-glow');
+                    } else {
+                        updateMuteUI();
                     }
                 });
             }
+
+            if (volumeMuteBtn) {
+                volumeMuteBtn.addEventListener('click', () => {
+                    const wasMuted = audio.muted || getSliderVolume() <= 0;
+                    applyMutedState(!wasMuted);
+                    if (wasMuted && isPlaying) {
+                        syncAudio();
+                        playBtn.querySelector('.material-symbols-outlined').textContent = 'pause';
+                        playBtn.classList.remove('pulse-glow');
+                    } else if (!wasMuted && isPlaying) {
+                        playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
+                        playBtn.classList.add('pulse-glow');
+                    }
+                });
+            }
+
+            updateMuteUI();
 
             async function rotateTrack() {
                 try {
@@ -1745,8 +1913,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         }
 
                         const tryPlay = async () => {
+                            const shouldStayMuted = audio.muted;
                             try {
-                                audio.muted = false;
+                                audio.muted = shouldStayMuted;
                                 await audio.play();
                             } catch (err) {
                                 audio.muted = true;
@@ -1947,8 +2116,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             const palette = colorClass === 'secondary'
                 ? {
-                    hover: 'hover:border-secondary/45 hover:bg-secondary/5',
-                    text: 'group-hover:text-secondary',
+                    hover: 'hover:border-primary/45 hover:bg-primary/5',
+                    text: 'group-hover:text-primary',
                 }
                 : {
                     hover: 'hover:border-primary/45 hover:bg-primary/5',
@@ -1959,7 +2128,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 const title = sanitizePlaylistTitle(track.title);
                 const upNextEta = 'In --:--';
                 return `
-                    <div class="group flex items-center gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 ${palette.hover}">
+                    <div class="group flex min-w-0 flex-wrap items-start gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 sm:flex-nowrap sm:items-center ${palette.hover}">
                         ${containerId === 'up-next-container' ? `<span class="w-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-600">${(idx + 1).toString().padStart(2, '0')}</span>` : ''}
                         <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
                             ${track.album_art ? `<img src="${track.album_art}" class="h-full w-full object-cover" alt="">` : `<div class="flex h-full w-full items-center justify-center"><span class="material-symbols-outlined text-slate-500 ${palette.text} transition-colors">album</span></div>`}
@@ -1968,7 +2137,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <p class="truncate text-sm font-bold uppercase tracking-tight text-white ${palette.text} transition-colors">${title}</p>
                             <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">${track.artist}</p>
                         </div>
-                        ${containerId === 'up-next-container' ? `<span id="up-next-eta-${idx}" class="text-[10px] uppercase tracking-[0.2em] text-slate-500">${upNextEta}</span>` : `<span class="text-[10px] uppercase tracking-[0.2em] text-slate-600">Played</span>`}
+                        ${containerId === 'up-next-container'
+                            ? `<span id="up-next-eta-${idx}" class="w-full pl-[5.5rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-500 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">${upNextEta}</span>`
+                            : `<span class="w-full pl-[4rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-600 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">Played</span>`}
                     </div>
                 `;
             }).join('');

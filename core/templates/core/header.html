@@ -1,5 +1,6 @@
 {% load static %}
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
   .nav-cinzel { font-family: 'Cinzel', serif; letter-spacing: 0.2rem; font-size: 12px; }
   h1, h2, h3, h4, h5, h6 { font-family: 'Cinzel', serif; }
@@ -32,7 +33,7 @@
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
         </a>
         <div class="flex justify-center min-w-0">
-            <nav class="hidden md:flex items-center justify-center gap-6">
+            <nav id="desktop-primary-nav" class="hidden md:flex items-center justify-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'live' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
                 <a class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
                 <a class="{% if request.resolver_match.url_name == 'charts' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
@@ -86,8 +87,7 @@
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
         </a>
         <div class="flex justify-center min-w-0">
-            <nav class="hidden md:flex items-center justify-center gap-6">
-                <a class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
+            <nav id="desktop-primary-nav" class="hidden md:flex items-center justify-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
                 <a class="{% if request.resolver_match.url_name == 'charts' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
                 <a class="{% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'idols' %}">Idols</a>
@@ -130,6 +130,10 @@
         </div>
     </div>
 </header>
+{% endif %}
+
+{% if request.resolver_match.url_name != 'header_mega_menu_lab' %}
+{% include 'core/header_mega_menu_lab.html' with embed_mode=True %}
 {% endif %}
 
 <!-- ───── MOBILE SITE MENU ───── -->
@@ -365,7 +369,7 @@
         id="my-station-panel"
         role="dialog"
         aria-modal="true"
-        class="fixed top-1/2 right-0 -translate-y-1/2 w-[340px] border border-white/20 bg-black/95 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform z-[71]"
+        class="fixed top-1/2 right-0 translate-x-full -translate-y-1/2 w-[340px] border border-white/20 bg-black/95 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform z-[71]"
         :class="open ? 'translate-x-0' : 'translate-x-full'"
     >
         <div class="p-6 border-b border-white/10">
@@ -447,7 +451,7 @@
 
     <button
         @click="open = !open"
-        class="fixed top-1/2 -translate-y-1/2 h-36 w-10 bg-primary text-black border border-primary font-black uppercase text-[10px] leading-none shadow-[2px_2px_0px_#ffffff] hover:shadow-none transition-[right,transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[right,transform] flex items-center justify-center"
+        class="fixed top-1/2 right-0 -translate-y-1/2 h-36 w-10 bg-primary text-black border border-primary font-black uppercase text-[10px] leading-none shadow-[2px_2px_0px_#ffffff] hover:shadow-none transition-[right,transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[right,transform] flex items-center justify-center"
         :class="open ? 'right-[340px] z-[72]' : 'right-0 z-[72]'"
         :aria-expanded="open.toString()"
         aria-controls="my-station-panel"

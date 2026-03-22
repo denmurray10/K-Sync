@@ -1,4 +1,5 @@
 {% load static %}
+{% if not embed_mode %}
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
@@ -26,7 +27,11 @@
             }
         }
     </script>
-    <style>
+{% else %}
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+{% endif %}
+    <style id="mega-menu-lab-styles">
         :root {
             --panel-open-duration: 220ms;
             --stream-accent: 244, 37, 192;
@@ -40,7 +45,7 @@
             --comeback-accent: 236, 72, 153;
             --comeback-secondary: 59, 130, 246;
         }
-        body {
+        .mega-menu-lab-page {
             background:
                 radial-gradient(circle at 14% 12%, rgba(244, 37, 192, 0.18), transparent 30%),
                 radial-gradient(circle at 84% 20%, rgba(0, 240, 255, 0.15), transparent 30%),
@@ -50,10 +55,6 @@
         .streams-trigger-active {
             color: #f425c0 !important;
             text-shadow: 0 0 12px rgba(244, 37, 192, 0.45);
-        }
-        #my-station-panel,
-        [aria-controls="my-station-panel"] {
-            display: none !important;
         }
         .mega-panel-shell,
         .streams-panel-shell {
@@ -76,6 +77,18 @@
             background-size: 42px 42px;
             mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 80%);
             opacity: 0.4;
+        }
+        .mega-panel-hidden {
+            opacity: 0;
+            transform: translateY(-0.5rem);
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .mega-panel-open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            visibility: visible;
         }
         .live-panel-shell {
             background:
@@ -642,11 +655,13 @@
             }
         }
     </style>
+{% if not embed_mode %}
 </head>
-<body class="bg-background-dark text-white font-display min-h-screen overflow-x-hidden">
+<body class="mega-menu-lab-page bg-background-dark text-white font-display min-h-screen overflow-x-hidden">
     {% include 'core/header.html' %}
+{% endif %}
 
-    <div id="mega-live-lab-panel" class="mega-panel-shell live-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+    <div id="mega-live-lab-panel" class="mega-panel-shell live-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
         <div class="container mx-auto px-4 sm:px-6 py-5 sm:py-6">
             <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
@@ -768,7 +783,7 @@
         </div>
     </div>
 
-    <div id="mega-menu-lab-panel" class="mega-panel-shell streams-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+    <div id="mega-menu-lab-panel" class="mega-panel-shell streams-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
         <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
@@ -904,7 +919,7 @@
         </div>
     </div>
 
-    <div id="mega-charts-lab-panel" class="mega-panel-shell charts-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+    <div id="mega-charts-lab-panel" class="mega-panel-shell charts-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
         <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
@@ -1050,7 +1065,7 @@
         </div>
     </div>
 
-    <div id="mega-news-lab-panel" class="mega-panel-shell news-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+    <div id="mega-news-lab-panel" class="mega-panel-shell news-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
         <div class="container mx-auto px-4 sm:px-6 py-5 sm:py-6">
             <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
@@ -1163,7 +1178,7 @@
         </div>
     </div>
 
-    <div id="mega-comebacks-lab-panel" class="mega-panel-shell comebacks-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+    <div id="mega-comebacks-lab-panel" class="mega-panel-shell comebacks-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
         <div id="mega-comebacks-lab-panel-inner" class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
@@ -1305,7 +1320,7 @@
         </div>
     </div>
 
-    <div id="mega-idols-lab-panel" class="mega-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+    <div id="mega-idols-lab-panel" class="mega-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
         <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
@@ -1466,6 +1481,7 @@
         </div>
     </div>
 
+{% if not embed_mode %}
     <main class="relative pt-36 pb-16">
         <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_15%,rgba(244,37,192,0.2),transparent_35%),radial-gradient(circle_at_78%_25%,rgba(0,240,255,0.2),transparent_35%)]"></div>
         <section class="relative container mx-auto px-4 sm:px-6">
@@ -1517,6 +1533,7 @@
     </main>
 
     {% include 'core/footer.html' %}
+{% endif %}
 
     {{ mega_menu_streams_json|json_script:"mega-menu-streams-data" }}
     {{ mega_menu_charts_json|json_script:"mega-menu-charts-data" }}
@@ -1530,8 +1547,10 @@
     {{ mega_menu_request_count_json|json_script:"mega-menu-request-count-data" }}
     {{ mega_menu_last_chart_sync_json|json_script:"mega-menu-last-chart-sync-data" }}
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        (() => {
+            const initMegaMenuLab = () => {
             const header = document.getElementById('main-header');
+            if (header?.dataset.desktopMegaMenuInit === 'true') return;
             const streamPanel = document.getElementById('mega-menu-lab-panel');
             const livePanel = document.getElementById('mega-live-lab-panel');
             const chartsPanel = document.getElementById('mega-charts-lab-panel');
@@ -1540,12 +1559,14 @@
             const comebacksPanelInner = document.getElementById('mega-comebacks-lab-panel-inner');
             const idolsPanel = document.getElementById('mega-idols-lab-panel');
             if (!header || !streamPanel || !livePanel || !chartsPanel || !newsPanel || !comebacksPanel || !idolsPanel) return;
+            header.dataset.desktopMegaMenuInit = 'true';
 
             const desktopNav = Array.from(header.querySelectorAll('nav')).find((nav) => nav.classList.contains('md:flex'));
             if (!desktopNav) return;
 
             const urls = {
                 live: "{% url 'live' %}",
+                streamHub: "{% url 'stream_hub' %}",
                 charts: "{% url 'charts' %}",
                 idols: "{% url 'idols' %}",
                 timeline: "{% url 'comeback_timeline' %}",
@@ -1555,15 +1576,36 @@
                 megaMenuData: "{% url 'api_header_mega_menu_data' %}"
             };
 
-            let launchStreams = JSON.parse(document.getElementById('mega-menu-streams-data').textContent || '[]');
-            let livePanelData = JSON.parse(document.getElementById('mega-menu-live-data').textContent || '{}');
-            let liveScheduleData = JSON.parse(document.getElementById('mega-menu-schedule-data').textContent || '[]');
-            let newsPanelData = JSON.parse(document.getElementById('mega-menu-news-data').textContent || '{}');
-            let comebackPrimaryData = JSON.parse(document.getElementById('mega-menu-comeback-primary-data').textContent || '{}');
-            let comebackCardsData = JSON.parse(document.getElementById('mega-menu-comebacks-data').textContent || '[]');
-            let requestCountData = JSON.parse(document.getElementById('mega-menu-request-count-data').textContent || '0');
-            let idolStatsData = JSON.parse(document.getElementById('mega-menu-idol-stats-data').textContent || '{}');
-            let lastChartSyncData = JSON.parse(document.getElementById('mega-menu-last-chart-sync-data').textContent || 'null');
+            const readMegaMenuJson = (id, fallback) => {
+                const node = document.getElementById(id);
+                if (!node) return fallback;
+                const raw = node.textContent || '';
+                if (!raw.trim()) return fallback;
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (typeof parsed === 'string') {
+                        if (!parsed.trim()) return fallback;
+                        try {
+                            return JSON.parse(parsed);
+                        } catch (nestedError) {
+                            return fallback;
+                        }
+                    }
+                    return parsed;
+                } catch (error) {
+                    return fallback;
+                }
+            };
+
+            let launchStreams = readMegaMenuJson('mega-menu-streams-data', []);
+            let livePanelData = readMegaMenuJson('mega-menu-live-data', {});
+            let liveScheduleData = readMegaMenuJson('mega-menu-schedule-data', []);
+            let newsPanelData = readMegaMenuJson('mega-menu-news-data', {});
+            let comebackPrimaryData = readMegaMenuJson('mega-menu-comeback-primary-data', {});
+            let comebackCardsData = readMegaMenuJson('mega-menu-comebacks-data', []);
+            let requestCountData = readMegaMenuJson('mega-menu-request-count-data', 0);
+            let idolStatsData = readMegaMenuJson('mega-menu-idol-stats-data', {});
+            let lastChartSyncData = readMegaMenuJson('mega-menu-last-chart-sync-data', null);
 
             const panelTagline = document.getElementById('stream-panel-tagline');
             const streamsPanelTitle = document.getElementById('streams-panel-title');
@@ -1737,8 +1779,7 @@
                 !premiumList
             ) return;
 
-            if (!launchStreams.length) return;
-            let activeStreamId = launchStreams[0].id;
+            let activeStreamId = launchStreams[0] ? launchStreams[0].id : null;
             const premiumTitles = [
                 'Unlock Deeper Cuts',
                 'Unlock Smooth Seoul',
@@ -2144,9 +2185,9 @@
                 </div>`;
             };
 
-            let allChartMovers = JSON.parse(document.getElementById('mega-menu-charts-data').textContent || '[]');
+            let allChartMovers = readMegaMenuJson('mega-menu-charts-data', []);
 
-            let idolRoutes = JSON.parse(document.getElementById('mega-menu-idols-data').textContent || '[]');
+            let idolRoutes = readMegaMenuJson('mega-menu-idols-data', []);
 
             const buildRow = (stream) => {
                 return `<button type="button" data-stream-id="${stream.id}" class="stream-row w-full border border-white/10 bg-black/30 px-4 py-4 text-left focus-visible:outline-none focus-visible:ring-0" aria-label="Preview ${stream.name}" aria-pressed="false">
@@ -2734,44 +2775,49 @@
 
             let premiumTitleIndex = 0;
 
-            let streamsTrigger = document.getElementById('mega-streams-trigger');
+            let streamsTrigger = Array.from(desktopNav.querySelectorAll('a, button')).find((item) => item.getAttribute('href') === urls.streamHub) || document.getElementById('mega-streams-trigger');
             if (!streamsTrigger) {
                 streamsTrigger = document.createElement('button');
                 streamsTrigger.type = 'button';
-                streamsTrigger.id = 'mega-streams-trigger';
-                streamsTrigger.className = 'nav-cinzel flex items-center gap-1 whitespace-nowrap text-slate-200 transition-colors hover:text-primary';
-                streamsTrigger.setAttribute('aria-expanded', 'false');
-                streamsTrigger.setAttribute('aria-controls', 'mega-menu-lab-panel');
-                streamsTrigger.innerHTML = 'Streams <span class="material-symbols-outlined text-sm">graphic_eq</span>';
                 desktopNav.insertBefore(streamsTrigger, desktopNav.firstChild);
             }
+            streamsTrigger.id = 'mega-streams-trigger';
+            streamsTrigger.className = 'nav-cinzel flex items-center gap-1 whitespace-nowrap text-slate-200 transition-colors hover:text-primary';
+            streamsTrigger.setAttribute('aria-expanded', 'false');
+            streamsTrigger.setAttribute('aria-controls', 'mega-menu-lab-panel');
+            streamsTrigger.innerHTML = 'Streams <span class="material-symbols-outlined text-sm">graphic_eq</span>';
 
             const liveTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.live);
-            if (!liveTrigger) return;
             const chartsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.charts);
-            if (!chartsTrigger) return;
             const newsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.news);
-            if (!newsTrigger) return;
             const comebacksTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.timeline);
-            if (!comebacksTrigger) return;
             const idolsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.idols);
-            if (!idolsTrigger) return;
 
-            liveTrigger.id = 'mega-live-trigger';
-            liveTrigger.setAttribute('aria-expanded', 'false');
-            liveTrigger.setAttribute('aria-controls', 'mega-live-lab-panel');
-            chartsTrigger.id = 'mega-charts-trigger';
-            chartsTrigger.setAttribute('aria-expanded', 'false');
-            chartsTrigger.setAttribute('aria-controls', 'mega-charts-lab-panel');
-            newsTrigger.id = 'mega-news-trigger';
-            newsTrigger.setAttribute('aria-expanded', 'false');
-            newsTrigger.setAttribute('aria-controls', 'mega-news-lab-panel');
-            comebacksTrigger.id = 'mega-comebacks-trigger';
-            comebacksTrigger.setAttribute('aria-expanded', 'false');
-            comebacksTrigger.setAttribute('aria-controls', 'mega-comebacks-lab-panel');
-            idolsTrigger.id = 'mega-idols-trigger';
-            idolsTrigger.setAttribute('aria-expanded', 'false');
-            idolsTrigger.setAttribute('aria-controls', 'mega-idols-lab-panel');
+            if (liveTrigger) {
+                liveTrigger.id = 'mega-live-trigger';
+                liveTrigger.setAttribute('aria-expanded', 'false');
+                liveTrigger.setAttribute('aria-controls', 'mega-live-lab-panel');
+            }
+            if (chartsTrigger) {
+                chartsTrigger.id = 'mega-charts-trigger';
+                chartsTrigger.setAttribute('aria-expanded', 'false');
+                chartsTrigger.setAttribute('aria-controls', 'mega-charts-lab-panel');
+            }
+            if (newsTrigger) {
+                newsTrigger.id = 'mega-news-trigger';
+                newsTrigger.setAttribute('aria-expanded', 'false');
+                newsTrigger.setAttribute('aria-controls', 'mega-news-lab-panel');
+            }
+            if (comebacksTrigger) {
+                comebacksTrigger.id = 'mega-comebacks-trigger';
+                comebacksTrigger.setAttribute('aria-expanded', 'false');
+                comebacksTrigger.setAttribute('aria-controls', 'mega-comebacks-lab-panel');
+            }
+            if (idolsTrigger) {
+                idolsTrigger.id = 'mega-idols-trigger';
+                idolsTrigger.setAttribute('aria-expanded', 'false');
+                idolsTrigger.setAttribute('aria-controls', 'mega-idols-lab-panel');
+            }
 
             const positionPanel = (targetPanel) => {
                 const rect = header.getBoundingClientRect();
@@ -2845,9 +2891,11 @@
             });
 
             startMegaMenuAutoRefresh();
+            refreshMegaMenuData();
 
-            const panelConfigs = {
-                live: {
+            const panelConfigs = {};
+            if (liveTrigger && livePanel) {
+                panelConfigs.live = {
                     trigger: liveTrigger,
                     panel: livePanel,
                     onShow: () => {
@@ -2855,8 +2903,10 @@
                         renderLiveViewFrame();
                         renderLiveContent();
                     }
-                },
-                charts: {
+                };
+            }
+            if (chartsTrigger && chartsPanel) {
+                panelConfigs.charts = {
                     trigger: chartsTrigger,
                     panel: chartsPanel,
                     onShow: () => {
@@ -2866,8 +2916,10 @@
                         const defaultChartId = getDefaultChartIdForView(activeChartView, false);
                         if (defaultChartId) setActiveChart(defaultChartId);
                     }
-                },
-                news: {
+                };
+            }
+            if (newsTrigger && newsPanel) {
+                panelConfigs.news = {
                     trigger: newsTrigger,
                     panel: newsPanel,
                     onShow: () => {
@@ -2875,8 +2927,10 @@
                         renderNewsViewFrame();
                         renderNewsContent();
                     }
-                },
-                comebacks: {
+                };
+            }
+            if (comebacksTrigger && comebacksPanel) {
+                panelConfigs.comebacks = {
                     trigger: comebacksTrigger,
                     panel: comebacksPanel,
                     onShow: () => {
@@ -2885,8 +2939,10 @@
                         renderComebackContent();
                         syncAllPanelHeightsNoScroll();
                     }
-                },
-                idols: {
+                };
+            }
+            if (idolsTrigger && idolsPanel) {
+                panelConfigs.idols = {
                     trigger: idolsTrigger,
                     panel: idolsPanel,
                     onShow: () => {
@@ -2896,8 +2952,10 @@
                         const defaultIdolRouteId = getDefaultIdolRouteIdForView();
                         if (defaultIdolRouteId) setActiveIdolRoute(defaultIdolRouteId);
                     }
-                },
-                streams: {
+                };
+            }
+            if (streamsTrigger && streamPanel) {
+                panelConfigs.streams = {
                     trigger: streamsTrigger,
                     panel: streamPanel,
                     onShow: () => {
@@ -2909,8 +2967,8 @@
                         premiumTitleIndex = (premiumTitleIndex + 1) % premiumTitles.length;
                         syncAllPanelHeightsNoScroll();
                     }
-                }
-            };
+                };
+            }
 
             const setTriggerState = (key, active) => {
                 const config = panelConfigs[key];
@@ -2922,8 +2980,8 @@
             const hideAllPanels = () => {
                 clearTimeout(hideTimer);
                 Object.entries(panelConfigs).forEach(([key, config]) => {
-                    config.panel.classList.add('pointer-events-none', 'opacity-0', '-translate-y-2');
-                    config.panel.classList.remove('opacity-100', 'translate-y-0');
+                    config.panel.classList.add('mega-panel-hidden');
+                    config.panel.classList.remove('mega-panel-open');
                     setTriggerState(key, false);
                 });
                 activePanelKey = null;
@@ -2938,8 +2996,8 @@
 
                 Object.entries(panelConfigs).forEach(([otherKey, config]) => {
                     if (otherKey === key) return;
-                    config.panel.classList.add('pointer-events-none', 'opacity-0', '-translate-y-2');
-                    config.panel.classList.remove('opacity-100', 'translate-y-0');
+                    config.panel.classList.add('mega-panel-hidden');
+                    config.panel.classList.remove('mega-panel-open');
                     setTriggerState(otherKey, false);
                 });
 
@@ -2947,8 +3005,8 @@
                 if (!config) return;
                 config.onShow();
                 positionPanel(config.panel);
-                config.panel.classList.remove('pointer-events-none', 'opacity-0', '-translate-y-2');
-                config.panel.classList.add('opacity-100', 'translate-y-0');
+                config.panel.classList.remove('mega-panel-hidden');
+                config.panel.classList.add('mega-panel-open');
                 setTriggerState(key, true);
                 activePanelKey = key;
                 pinnedPanelKey = pinned ? key : null;
@@ -2960,71 +3018,65 @@
                 hideTimer = setTimeout(() => hideAllPanels(), 170);
             };
 
-            liveTrigger.addEventListener('mouseenter', () => openPanel('live'));
-            liveTrigger.addEventListener('focus', () => openPanel('live', { pinned: true }));
-            liveTrigger.addEventListener('click', (event) => {
-                if (window.innerWidth < desktopBreakpoint) return;
-                event.preventDefault();
-                if (activePanelKey === 'live' && pinnedPanelKey === 'live') {
-                    hideAllPanels();
-                    return;
-                }
-                openPanel('live', { pinned: true });
-            });
-            liveTrigger.addEventListener('mouseleave', queueClose);
+            const getTriggerKeyFromElement = (element) => {
+                const trigger = element?.closest?.('#mega-live-trigger, #mega-streams-trigger, #mega-charts-trigger, #mega-news-trigger, #mega-comebacks-trigger, #mega-idols-trigger');
+                if (!trigger) return null;
+                if (trigger.id === 'mega-live-trigger') return 'live';
+                if (trigger.id === 'mega-streams-trigger') return 'streams';
+                if (trigger.id === 'mega-charts-trigger') return 'charts';
+                if (trigger.id === 'mega-news-trigger') return 'news';
+                if (trigger.id === 'mega-comebacks-trigger') return 'comebacks';
+                if (trigger.id === 'mega-idols-trigger') return 'idols';
+                return null;
+            };
 
-            chartsTrigger.addEventListener('mouseenter', () => openPanel('charts'));
-            chartsTrigger.addEventListener('focus', () => openPanel('charts', { pinned: true }));
-            chartsTrigger.addEventListener('click', (event) => {
-                if (window.innerWidth < desktopBreakpoint) return;
-                if (activePanelKey === 'charts' && pinnedPanelKey === 'charts') return;
-                event.preventDefault();
-                openPanel('charts', { pinned: true });
-            });
-            chartsTrigger.addEventListener('mouseleave', queueClose);
+            if (liveTrigger) {
+                liveTrigger.addEventListener('mouseenter', () => openPanel('live', { pinned: true }));
+                liveTrigger.addEventListener('focus', () => openPanel('live', { pinned: true }));
+                liveTrigger.addEventListener('mouseleave', queueClose);
+            }
 
-            newsTrigger.addEventListener('mouseenter', () => openPanel('news'));
-            newsTrigger.addEventListener('focus', () => openPanel('news', { pinned: true }));
-            newsTrigger.addEventListener('click', (event) => {
-                if (window.innerWidth < desktopBreakpoint) return;
-                if (activePanelKey === 'news' && pinnedPanelKey === 'news') return;
-                event.preventDefault();
-                openPanel('news', { pinned: true });
-            });
-            newsTrigger.addEventListener('mouseleave', queueClose);
+            if (chartsTrigger) {
+                chartsTrigger.addEventListener('mouseenter', () => openPanel('charts', { pinned: true }));
+                chartsTrigger.addEventListener('focus', () => openPanel('charts', { pinned: true }));
+                chartsTrigger.addEventListener('mouseleave', queueClose);
+            }
 
-            comebacksTrigger.addEventListener('mouseenter', () => openPanel('comebacks'));
-            comebacksTrigger.addEventListener('focus', () => openPanel('comebacks', { pinned: true }));
-            comebacksTrigger.addEventListener('click', (event) => {
-                if (window.innerWidth < desktopBreakpoint) return;
-                if (activePanelKey === 'comebacks' && pinnedPanelKey === 'comebacks') return;
-                event.preventDefault();
-                openPanel('comebacks', { pinned: true });
-            });
-            comebacksTrigger.addEventListener('mouseleave', queueClose);
+            if (newsTrigger) {
+                newsTrigger.addEventListener('mouseenter', () => openPanel('news', { pinned: true }));
+                newsTrigger.addEventListener('focus', () => openPanel('news', { pinned: true }));
+                newsTrigger.addEventListener('mouseleave', queueClose);
+            }
 
-            idolsTrigger.addEventListener('mouseenter', () => openPanel('idols'));
-            idolsTrigger.addEventListener('focus', () => openPanel('idols', { pinned: true }));
-            idolsTrigger.addEventListener('click', (event) => {
-                if (window.innerWidth < desktopBreakpoint) return;
-                if (activePanelKey === 'idols' && pinnedPanelKey === 'idols') return;
-                event.preventDefault();
-                openPanel('idols', { pinned: true });
-            });
-            idolsTrigger.addEventListener('mouseleave', queueClose);
+            if (comebacksTrigger) {
+                comebacksTrigger.addEventListener('mouseenter', () => openPanel('comebacks', { pinned: true }));
+                comebacksTrigger.addEventListener('focus', () => openPanel('comebacks', { pinned: true }));
+                comebacksTrigger.addEventListener('mouseleave', queueClose);
+            }
 
-            streamsTrigger.addEventListener('mouseenter', () => openPanel('streams'));
-            streamsTrigger.addEventListener('focus', () => openPanel('streams', { pinned: true }));
-            streamsTrigger.addEventListener('click', () => {
-                if (activePanelKey === 'streams' && pinnedPanelKey === 'streams') {
-                    hideAllPanels();
-                    return;
-                }
-                openPanel('streams', { pinned: true });
-            });
-            streamsTrigger.addEventListener('mouseleave', queueClose);
+            if (idolsTrigger) {
+                idolsTrigger.addEventListener('mouseenter', () => openPanel('idols', { pinned: true }));
+                idolsTrigger.addEventListener('focus', () => openPanel('idols', { pinned: true }));
+                idolsTrigger.addEventListener('mouseleave', queueClose);
+            }
 
-            [livePanel, chartsPanel, newsPanel, comebacksPanel, idolsPanel, streamPanel].forEach((targetPanel) => {
+            if (streamsTrigger) {
+                streamsTrigger.addEventListener('mouseenter', () => openPanel('streams', { pinned: true }));
+                streamsTrigger.addEventListener('focus', () => openPanel('streams', { pinned: true }));
+                streamsTrigger.addEventListener('mouseleave', queueClose);
+            }
+
+            document.addEventListener('mouseover', (event) => {
+                const key = getTriggerKeyFromElement(event.target);
+                if (!key) return;
+                openPanel(key, { pinned: true });
+            });
+            document.addEventListener('focusin', (event) => {
+                const key = getTriggerKeyFromElement(event.target);
+                if (!key) return;
+                openPanel(key, { pinned: true });
+            });
+            [livePanel, chartsPanel, newsPanel, comebacksPanel, idolsPanel, streamPanel].filter(Boolean).forEach((targetPanel) => {
                 targetPanel.addEventListener('mouseenter', () => clearTimeout(hideTimer));
                 targetPanel.addEventListener('mouseleave', queueClose);
                 targetPanel.addEventListener('focusin', () => clearTimeout(hideTimer));
@@ -3066,7 +3118,18 @@
             }, { passive: true });
 
             syncAllPanelHeightsNoScroll();
-        });
+            };
+
+            window.KbeatsMegaMenuLabInit = initMegaMenuLab;
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initMegaMenuLab, { once: true });
+            } else {
+                initMegaMenuLab();
+            }
+        })();
     </script>
+{% if not embed_mode %}
 </body>
 </html>
+{% endif %}

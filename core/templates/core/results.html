@@ -97,7 +97,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              HERO — Search Header
              ══════════════════════════════════════════════════════════════ -->
         <section class="relative w-full bg-black border-b border-white/10 overflow-hidden">
-            <div class="container mx-auto px-6 max-w-[1400px] pt-48 pb-20 md:pb-28">
+            <div class="container mx-auto px-4 sm:px-6 pt-48 pb-20 md:pb-28">
                 <!-- Breadcrumb -->
                 <div class="flex items-center gap-2 mb-6 reveal-left">
                     <a href="{% url 'home' %}" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors">Home</a>
@@ -220,7 +220,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              FILTER TABS
              ══════════════════════════════════════════════════════════════ -->
         <section class="sticky top-0 z-40 w-full bg-black/90 backdrop-blur-lg border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px] flex items-center gap-0 overflow-x-auto">
+            <div class="container mx-auto px-4 sm:px-6 flex items-center gap-0 overflow-x-auto">
                 <button @click="setFilter('all')"
                     class="shrink-0 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors"
                     :class="filter === 'all' ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white hover:border-white/20'">
@@ -276,7 +276,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              ══════════════════════════════════════════════════════════════ -->
         {% if artists %}
         <section x-show="show('artists')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="container mx-auto px-4 sm:px-6">
                 <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
                     <div>
                         <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
@@ -315,7 +315,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              ══════════════════════════════════════════════════════════════ -->
         {% if members %}
         <section x-show="show('members')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="container mx-auto px-4 sm:px-6">
                 <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
                     <div>
                         <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
@@ -354,7 +354,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              ══════════════════════════════════════════════════════════════ -->
         {% if songs %}
         <section x-show="show('songs')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="container mx-auto px-4 sm:px-6">
                 <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
                     <div>
                         <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
@@ -423,7 +423,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              ══════════════════════════════════════════════════════════════ -->
         {% if albums %}
         <section x-show="show('albums')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="container mx-auto px-4 sm:px-6">
                 <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
                     <div>
                         <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
@@ -465,7 +465,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              ══════════════════════════════════════════════════════════════ -->
         {% if comebacks %}
         <section x-show="show('comebacks')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="container mx-auto px-4 sm:px-6">
                 <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
                     <div>
                         <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
@@ -526,7 +526,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              ══════════════════════════════════════════════════════════════ -->
         {% if articles %}
         <section x-show="show('articles')" x-transition class="w-full bg-black py-16 md:py-24 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="container mx-auto px-4 sm:px-6">
                 <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
                     <div>
                         <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
@@ -572,7 +572,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              ══════════════════════════════════════════════════════════════ -->
         {% if not artists and not members and not songs and not albums and not articles and not comebacks %}
         <section class="w-full bg-black py-32 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px] text-center reveal-up">
+            <div class="container mx-auto px-4 sm:px-6 text-center reveal-up">
                 <span class="material-symbols-outlined text-8xl text-white/10 mb-6 block">search_off</span>
                 <h2 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
                     No results for "<span class="text-primary">{{ q }}</span>"
@@ -601,7 +601,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         {% if trending_artists %}
         <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="container mx-auto px-4 sm:px-6">
                 <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
                     <div>
                         <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
@@ -640,7 +640,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         {% if latest_articles %}
         <section class="w-full bg-black py-16 md:py-24 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px]">
+            <div class="container mx-auto px-4 sm:px-6">
                 <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-12 reveal-left">
                     <div>
                         <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tighter uppercase">
@@ -683,7 +683,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         {% if not trending_artists and not latest_articles %}
         <!-- Fallback quick links -->
         <section class="w-full bg-black py-32 border-b border-white/10">
-            <div class="container mx-auto px-6 max-w-[1400px] text-center reveal-up">
+            <div class="container mx-auto px-4 sm:px-6 text-center reveal-up">
                 <span class="material-symbols-outlined text-8xl text-white/10 mb-6 block">manage_search</span>
                 <h2 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight">Search the K-Pop universe</h2>
                 <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-4 max-w-md mx-auto">Find your favourite artists, groups, songs, albums, and articles</p>
