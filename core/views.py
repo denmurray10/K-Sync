@@ -5957,6 +5957,25 @@ def _build_live_request_momentum(current_track, up_next_tracks, requested_titles
 
 
 def _build_live_poll_context(request):
+    display_question = "Who's your artist of the week?"
+    display_heading = "Artist Of The Week"
+    display_intro = (
+        "Cast your vote for this week's takeover. The winner gets a dedicated K-Beats "
+        "station playing nothing but their biggest hits all week, so don't miss your chance to decide it."
+    )
+    display_status_prompt = (
+        "Cast your vote now to decide which artist gets the next full-week takeover station."
+    )
+    display_status_voted = "Vote locked in. You just pushed this week's takeover race."
+    display_leader_label = "Takeover Leader"
+    display_option_labels = [
+        "BTS",
+        "BLACKPINK",
+        "ATEEZ",
+        "BABYMONSTER",
+        "STRAY KIDS",
+    ]
+
     poll = (
         LivePoll.objects
         .select_related('early_access_group')
@@ -5978,27 +5997,33 @@ def _build_live_poll_context(request):
             f'until {unlocks_at:%a %H:%M}.'
         )
 
-    options_payload = [
-        {
+    options_payload = []
+    for idx, option in enumerate(poll.options.all()):
+        display_text = display_option_labels[idx] if idx < len(display_option_labels) else option.text
+        options_payload.append({
             'id': option.id,
-            'text': option.text,
+            'text': display_text,
             'votes': option.votes,
             'percentage': option.percentage(),
-        }
-        for option in poll.options.all()
-    ]
+        })
+
     leading_option = None
     if options_payload and total_votes > 0:
         leading_option = max(options_payload, key=lambda item: (item['votes'], item['percentage']))
 
     return {
         'id': poll.id,
-        'question': poll.question,
+        'heading': display_heading,
+        'intro': display_intro,
+        'question': display_question,
         'locked': locked,
         'locked_message': (
             'Early access is reserved for eligible fan-club members right now.'
             if locked else ''
         ),
+        'leader_label': display_leader_label,
+        'status_prompt': display_status_prompt,
+        'status_voted': display_status_voted,
         'early_access_note': early_access_note,
         'total_votes': total_votes,
         'leading_option': leading_option,

@@ -78,6 +78,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         border: 1px solid rgba(15, 23, 42, 0.14);
         background: rgba(15, 23, 42, 0.04);
     }
+    .live-full-bleed-band {
+        background:
+            radial-gradient(circle at top left, rgba(244, 37, 192, 0.1), transparent 28%),
+            linear-gradient(180deg, #000000 0%, #050505 100%);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(255,255,255,0.08);
+    }
     .glass-hero {
         background:
             linear-gradient(135deg, rgba(244, 37, 192, 0.08), rgba(255,255,255,0.02) 46%, rgba(0, 0, 0, 0.02)),
@@ -599,23 +605,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </article>
                 </aside>
             </div>
+        </div>
+    </section>
 
-            <article class="glass-panel solid-black-panel mt-6 border border-white/10 p-4 sm:p-6 reveal-up" style="transition-delay: 240ms;">
+    <section class="live-full-bleed-band relative py-10 sm:py-12">
+        <div class="container mx-auto px-4 sm:px-6">
+            <article class="glass-panel solid-black-panel border border-white/10 p-4 sm:p-6 reveal-up" style="transition-delay: 240ms;">
                 <div class="grid gap-6 xl:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)]">
                     <div>
                         <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Shape The Room</p>
-                        <h3 class="mt-3 font-display text-3xl uppercase leading-none sm:text-4xl">The Room Vote</h3>
+                        <h3 class="mt-3 font-display text-3xl uppercase leading-none sm:text-4xl">{{ live_poll.heading|default:"Artist Of The Week" }}</h3>
                         <p class="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300">
-                            Requests, votes, and queue movement now work together so listeners can actually feel the room shifting in real time.
+                            {{ live_poll.intro|default:"Cast your vote for this week's takeover. The winner gets a dedicated K-Beats station playing nothing but their biggest hits all week, so don't miss your chance to decide it." }}
                         </p>
 
                         <div id="live-poll-leading" class="mt-5 border border-primary/20 bg-primary/10 px-4 py-4{% if not live_poll or not live_poll.leading_option %} hidden{% endif %}">
-                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary">Room Momentum</p>
+                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary">{{ live_poll.leader_label|default:"Takeover Leader" }}</p>
                             <p class="mt-3 text-sm font-bold uppercase tracking-[0.18em] text-white">
                                 {% if live_poll and live_poll.leading_option %}
-                                The room is backing {{ live_poll.leading_option.text }} right now.
+                                {{ live_poll.leading_option.text }} is leading this week's station takeover right now.
                                 {% else %}
-                                The room is starting to form a winner.
+                                The takeover vote is starting to form a front-runner.
                                 {% endif %}
                             </p>
                         </div>
@@ -663,7 +673,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                         {% if live_poll %}
                         <div id="live-poll-panel" class="mt-6" data-poll-id="{{ live_poll.id }}">
-                            <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Live Poll</p>
+                            <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Weekly Takeover Vote</p>
                             <p id="live-poll-question" class="mt-3 font-display text-2xl uppercase leading-tight text-white">{{ live_poll.question }}</p>
                             <p id="live-poll-total" class="mt-3 text-[10px] uppercase tracking-[0.22em] text-slate-400">{{ live_poll.total_votes }} votes cast</p>
 
@@ -693,7 +703,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
 
                             <p id="live-poll-status" class="mt-4 text-[10px] font-black uppercase tracking-[0.22em] {% if live_poll.locked %}text-primary{% else %}text-slate-400{% endif %}">
-                                {% if live_poll.locked %}{{ live_poll.locked_message }}{% else %}Vote to push the room's momentum and make listener preference visible on air.{% endif %}
+                                {% if live_poll.locked %}{{ live_poll.locked_message }}{% else %}{{ live_poll.status_prompt }}{% endif %}
                             </p>
                             {% if live_poll.early_access_note %}
                             <p class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ live_poll.early_access_note }}</p>
@@ -1098,6 +1108,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 .replace(/'/g, '&#39;');
 
             const getRequestedTrackMeta = (title) => requestedTrackLookup[normalizeTitleKey(title)] || null;
+            const getPollLeaderMessage = (leaderText) => `${leaderText} is leading this week's station takeover right now.`;
 
             const getPollLeader = () => {
                 if (!livePollData || !Array.isArray(livePollData.options) || !livePollData.options.length) return null;
@@ -1166,7 +1177,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     const bodyEl = livePollLeadingEl.querySelector('p:last-child');
                     livePollLeadingEl.classList.toggle('hidden', !leader);
                     if (leader && bodyEl) {
-                        bodyEl.textContent = `The room is backing ${leader.text} right now.`;
+                        bodyEl.textContent = getPollLeaderMessage(leader.text);
                     }
                 }
                 if (roomEmptyStateEl) {
@@ -1672,9 +1683,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     if (livePollData.locked) {
                         livePollStatusEl.textContent = livePollData.locked_message || 'Voting is locked right now.';
                     } else if (livePollVoted) {
-                        livePollStatusEl.textContent = 'Vote registered. The room momentum just updated.';
+                        livePollStatusEl.textContent = livePollData.status_voted || 'Vote registered. You just backed this week\'s takeover race.';
                     } else {
-                        livePollStatusEl.textContent = 'Vote to push the room\'s momentum and make listener preference visible on air.';
+                        livePollStatusEl.textContent = livePollData.status_prompt || 'Cast your vote now to decide which artist gets the next full-week takeover station.';
                     }
                 }
                 updateRoomHypeUI();
