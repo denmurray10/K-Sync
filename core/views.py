@@ -2712,8 +2712,328 @@ def upcoming_comebacks_design_lab(request):
     })
 
 
+def _build_header_mega_menu_context(request):
+    now_local = timezone.localtime()
+    today_str = now_local.strftime('%Y-%m-%d')
+
+    def _safe_id(*parts):
+        text = '-'.join([str(part or '').strip().lower() for part in parts if str(part or '').strip()])
+        text = re.sub(r'[^a-z0-9]+', '-', text).strip('-')
+        return text or f'item-{uuid.uuid4().hex[:8]}'
+
+    def _release_image_url(release):
+        if not isinstance(release, dict):
+            return ''
+        for key in ('image', 'image_url', 'cover', 'cover_url', 'thumbnail', 'artwork_url'):
+            value = str(release.get(key) or '').strip()
+            if value:
+                return value
+        return ''
+
+    def _format_listener_count(value):
+        try:
+            return f"{int(value):,} listening"
+        except Exception:
+            return "Live now"
+
+    data_current = ComebackData.objects.filter(year=now_local.year, month=now_local.month).first()
+    data_next = ComebackData.objects.filter(
+        year=now_local.year if now_local.month < 12 else now_local.year + 1,
+        month=now_local.month + 1 if now_local.month < 12 else 1,
+    ).first()
+
+    all_releases = []
+    for data_obj in (data_current, data_next):
+        if not data_obj:
+            continue
+        for date_key, details in (data_obj.data or {}).items():
+            for release in (details or {}).get('releases', []) or []:
+                item = dict(release)
+                item['date_str'] = str(date_key).strip()
+                item['image'] = _release_image_url(item)
+                all_releases.append(item)
+
+    all_releases.sort(key=lambda item: item.get('date_str', ''))
+    upcoming_releases = [item for item in all_releases if str(item.get('date_str') or '') >= today_str]
+    artwork_cache = {}
+    for release in upcoming_releases[:12]:
+        source_image = str(release.get('image') or '').strip()
+        cache_key = (
+            str(release.get('artist') or '').strip().lower(),
+            str(release.get('title') or '').strip().lower(),
+        )
+        if cache_key not in artwork_cache:
+            artwork_cache[cache_key] = _fetch_artwork_from_sources(
+                release.get('artist'),
+                release.get('title'),
+            )
+        image_url = artwork_cache.get(cache_key, '') or source_image
+        release['image'] = _optimize_home_image_url(image_url, width=720, height=720)
+
+    live_track = None
+    schedule_context = None
+    listeners_label = "Live now"
+    live_programming = []
+    stream_cards = []
+    try:
+        state, _ = RadioStationState.objects.get_or_create(id=1)
+        schedule_context = _compute_schedule_live_context(now_local)
+        if schedule_context:
+            state = _sync_state_with_schedule_context(state, schedule_context)
+            current_track = schedule_context.get('current_track')
+            live_track = current_track
+        else:
+            state = _auto_rotate_station(state)
+            live_track = state.current_track if state else None
+
+        listeners_label = _format_listener_count(getattr(state, 'listeners_count', 0))
+
+        all_schedules = list(RadioSchedule.objects.select_related('playlist').all())
+        playlist_by_id = {slot.playlist.id: slot.playlist for slot in all_schedules if slot.playlist_id}
+        playlist_preview_by_id = _build_playlist_preview_by_id(playlist_by_id)
+        assigned_host_by_playlist, assigned_host_by_day, global_assigned_host = _build_assigned_host_maps()
+        day_keys = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+        current_day_index = now_local.weekday()
+        current_minutes = (now_local.hour * 60) + now_local.minute
+        schedule_items = []
+
+        for slot in all_schedules:
+            day_key = str(slot.day or '').upper()
+            if day_key not in day_keys:
+                continue
+            day_index = day_keys.index(day_key)
+            day_delta = (day_index - current_day_index) % 7
+            start_minutes = (slot.start_time.hour * 60) + slot.start_time.minute
+            end_minutes = (slot.end_time.hour * 60) + slot.end_time.minute
+            is_current = day_delta == 0 and start_minutes <= current_minutes < end_minutes
+            schedule_items.append({
+                'slot': slot,
+                'day_delta': day_delta,
+                'start_minutes': start_minutes,
+                'is_current': is_current,
+            })
+
+        schedule_items.sort(key=lambda item: (item['day_delta'], item['start_minutes']))
+        start_index = 0
+        current_index = next((idx for idx, item in enumerate(schedule_items) if item['is_current']), None)
+        if current_index is not None:
+            start_index = current_index
+        else:
+            upcoming_today_index = next(
+                (
+                    idx for idx, item in enumerate(schedule_items)
+                    if item['day_delta'] == 0 and item['start_minutes'] >= current_minutes
+                ),
+                None,
+            )
+            if upcoming_today_index is not None:
+                start_index = upcoming_today_index
+
+        if schedule_items:
+            take_count = min(4, len(schedule_items))
+            selected_schedule_items = [schedule_items[(start_index + offset) % len(schedule_items)] for offset in range(take_count)]
+
+            for offset, selected in enumerate(selected_schedule_items):
+                slot = selected['slot']
+                slot_data = _serialize_schedule_slot_common(
+                    slot,
+                    playlist_preview_by_id,
+                    assigned_host_by_playlist,
+                    assigned_host_by_day,
+                    global_assigned_host,
+                )
+                playlist_tracks = list(
+                    RadioPlaylistTrack.objects
+                    .select_related('track')
+                    .filter(playlist=slot.playlist)
+                    .order_by('order', 'id')[:6]
+                )
+                first_real_track = next(
+                    (playlist_track.track for playlist_track in playlist_tracks if playlist_track.track and not _is_generated_voice_track(playlist_track.track)),
+                    None,
+                )
+                card_track = live_track if selected['is_current'] and live_track else first_real_track
+                card_image = _optimize_home_image_url(
+                    (card_track.album_art if card_track else ''),
+                    width=1200,
+                    height=1200,
+                )
+                genre_label = str(slot.genre or 'Music').strip().title()
+                host_name = slot_data['host_name'] or 'K-Beats'
+                show_name = str(slot.description or '').strip() or slot_data['playlist_name']
+                card_id = _safe_id(slot.playlist.id, slot.day, slot.start_time.strftime('%H%M'))
+                stream_cards.append({
+                    'id': card_id,
+                    'preset': 'Live Now' if selected['is_current'] and offset == 0 else ('Up Next' if offset == 0 else f"Slot {offset + 1:02d}"),
+                    'name': slot_data['playlist_name'],
+                    'short': _shorten_text(slot_data['playlist_preview'], 84),
+                    'tagline': show_name,
+                    'description': _shorten_text(slot_data['playlist_preview'], 180),
+                    'genres': [genre_label, host_name, slot_data['time_hhmm']],
+                    'accentRgb': '244, 37, 192' if selected['is_current'] else ('0, 240, 255' if offset == 1 else '168, 85, 247'),
+                    'secondaryRgb': '255, 132, 56' if selected['is_current'] else ('59, 130, 246' if offset == 1 else '244, 114, 182'),
+                    'image': card_image,
+                    'href': reverse('live'),
+                    'track': card_track.title if card_track else slot_data['playlist_name'],
+                    'artist': card_track.artist if card_track else host_name,
+                    'audience': listeners_label,
+                    'tier': 'free',
+                    'mood': genre_label,
+                    'energy': max(18, min(100, len(playlist_tracks) * 12)) if playlist_tracks else 24,
+                    'energyLabel': f"{len(playlist_tracks)} tracks queued in this block." if playlist_tracks else 'Live block ready.',
+                    'peak': f"Until {slot_data['until_hhmm']}",
+                    'peakNote': f"Hosted by {host_name}.",
+                    'peakShort': slot_data['until_hhmm'],
+                    'bestFor': _shorten_text(show_name, 72),
+                    'note': _shorten_text(slot_data['voice_over'] or slot_data['playlist_preview'], 120),
+                    'rowTone': 'On Air' if selected['is_current'] else ('Up Next' if offset == 1 else 'Later'),
+                    'perks': [
+                        'Open the live player for the current track.',
+                        'View the full schedule for the next block.',
+                        'Send a request into the station queue.',
+                    ],
+                    'panelLine': _shorten_text(slot_data['playlist_preview'], 120),
+                })
+
+                title = show_name
+                status = 'On Air' if selected['is_current'] and offset == 0 else ('Up Next' if offset == 0 else '')
+                live_programming.append({
+                    'status': status,
+                    'time_label': slot_data['time_hhmm'],
+                    'title': title,
+                    'description': f"Hosted by {host_name} · {slot_data['playlist_preview']}",
+                })
+    except Exception:
+        live_track = None
+        stream_cards = []
+        live_programming = []
+
+    rankings = []
+    ranking_obj = Ranking.objects.filter(timeframe='daily').first()
+    raw_rankings = list((ranking_obj.ranking_data or []) if ranking_obj else [])
+    for idx, item in enumerate(raw_rankings[:3]):
+        trend_text = str(item.get('trend') or '').strip() or 'Stable'
+        metric_support = _shorten_text(item.get('primary_metric_support') or '', 120)
+        img_url = _optimize_home_image_url(item.get('artwork_url') or '', width=1200, height=1200)
+        rankings.append({
+            'id': _safe_id(item.get('artist'), item.get('track'), idx + 1),
+            'kicker': f"Rank #{idx + 1}",
+            'rank': f"#{idx + 1}",
+            'rankLine': 'Latest daily sync',
+            'status': trend_text,
+            'title': f"{item.get('track') or 'Untitled'} · {item.get('artist') or 'Unknown artist'}",
+            'tagline': metric_support or 'Latest chart position from the current K-Beats ranking sync.',
+            'description': metric_support or 'Current daily chart placement based on the latest ranking import.',
+            'chips': [f"Artist · {item.get('artist') or 'Unknown'}", f"Trend · {trend_text}", f"Type · Daily"],
+            'image': img_url,
+            'momentumValue': trend_text,
+            'momentumTitle': 'Trend',
+            'momentumCopy': metric_support or 'No extra chart note available in the current ranking payload.',
+            'fastRead': [f"Rank {idx + 1}", item.get('artist') or 'Artist', item.get('track') or 'Track'],
+            'fastCopy': metric_support or 'Open charts for the full leaderboard.',
+            'primaryHref': reverse('charts'),
+            'primaryLabel': 'Open Charts',
+            'primaryIcon': 'bar_chart',
+            'secondaryHref': reverse('news'),
+            'secondaryLabel': 'Read News',
+            'secondaryIcon': 'north_east',
+        })
+
+    idol_routes = []
+    for idx, group in enumerate(list(KPopGroup.objects.filter(rank__isnull=False).order_by('rank', 'name')[:3])):
+        _apply_stream_image_to_field(group, 'image_url')
+        idol_routes.append({
+            'id': _safe_id(group.slug or group.name),
+            'kicker': f"Ranked #{group.rank}" if group.rank else 'Featured Group',
+            'chip': group.get_group_type_display(),
+            'status': group.label or 'Artist',
+            'tagline': _shorten_text(group.description or '', 96) or 'Artist profile, members, and fandom context.',
+            'title': group.name,
+            'copy': _shorten_text(group.description or '', 180) or f"Open {group.name} for profile details, members, and related artist coverage.",
+            'image': _optimize_home_image_url(group.image_url, width=1400, height=1400),
+            'tags': [group.label or 'Label', group.get_group_type_display(), f"Members {group.members.count()}"],
+            'primaryHref': reverse('idol_page', args=[group.slug]),
+            'primaryLabel': 'Open Profile',
+            'primaryIcon': 'arrow_outward',
+            'secondaryHref': reverse('fan_clubs'),
+            'secondaryLabel': 'View Fan Clubs',
+            'secondaryIcon': 'groups',
+        })
+    idol_stats = {
+        'acts': KPopGroup.objects.count(),
+        'members': KPopMember.objects.count(),
+        'clubs': FanClubMembership.objects.values('group_id').distinct().count(),
+    }
+
+    news_articles = list(BlogArticle.objects.order_by('-created_at')[:4])
+    for article in news_articles:
+        _apply_stream_images_to_article(article)
+
+    live_track_image = _optimize_home_image_url(getattr(live_track, 'album_art', ''), width=1400, height=1400) if live_track else ''
+    live_track_ai = _normalize_live_ai_payload((live_track.live_ai_payload or {}) if live_track else {}, live_track) if live_track else {}
+    live_panel = {
+        'eyebrow': 'Live Right Now',
+        'studio_label': schedule_context['slot'].playlist.name if schedule_context and schedule_context.get('slot') else 'K-Beats Live',
+        'status': 'On Air' if live_track else 'Live',
+        'tagline': _shorten_text((live_track_ai or {}).get('commentary') or '', 110) if live_track else 'Join the live player and see what is on now.',
+        'title': live_track.title if live_track else 'K-Beats Live',
+        'description': _shorten_text(((live_track_ai or {}).get('rich_context') or {}).get('profile_body') or '', 180) if live_track else 'Open the live player for the current track and next-up schedule.',
+        'chips': [
+            f"Now Playing: {live_track.title}" if live_track else 'Live feed active',
+            listeners_label,
+            f"Up next: {live_programming[1]['title']}" if len(live_programming) > 1 else 'Schedule available',
+        ],
+        'image': live_track_image,
+        'track_title': live_track.title if live_track else 'K-Beats Live',
+        'track_artist': live_track.artist if live_track else 'On Air',
+        'audience': listeners_label,
+        'vibe': str(schedule_context['slot'].genre or 'Live').strip().title() if schedule_context and schedule_context.get('slot') else 'Live',
+    }
+
+    comeback_primary = upcoming_releases[0] if upcoming_releases else None
+    comeback_cards = []
+    for idx, release in enumerate(upcoming_releases[:3]):
+        date_label = str(release.get('date_str') or '')
+        delta_label = ''
+        try:
+            release_date = datetime.strptime(date_label, '%Y-%m-%d').date()
+            day_delta = (release_date - now_local.date()).days
+            delta_label = f"{max(day_delta, 0):02d}"
+        except Exception:
+            delta_label = '--'
+        comeback_cards.append({
+            'countdown': delta_label,
+            'status': 'Most anticipated' if idx == 0 else ('Closing soon' if idx == 1 else 'On radar'),
+            'title': release.get('artist') or release.get('title') or 'Upcoming release',
+            'subtitle': release.get('type') or 'Release',
+            'description': _shorten_text(release.get('title') or '', 80) or 'Upcoming release on the K-Beats calendar.',
+            'href': reverse('comeback_timeline'),
+        })
+
+    news_panel = {
+        'featured': news_articles[0] if news_articles else None,
+        'items': news_articles[1:4] if len(news_articles) > 1 else [],
+        'total_count': len(news_articles),
+    }
+    recent_request_count = SongRequest.objects.count()
+
+    return {
+        'mega_menu_streams': stream_cards,
+        'mega_menu_charts': rankings,
+        'mega_menu_idols': idol_routes,
+        'mega_menu_idol_stats': idol_stats,
+        'mega_menu_live': live_panel,
+        'mega_menu_schedule': live_programming[:3],
+        'mega_menu_comebacks_primary': comeback_primary,
+        'mega_menu_comebacks': comeback_cards,
+        'mega_menu_news': news_panel,
+        'mega_menu_last_chart_sync': ranking_obj.created_at if ranking_obj else None,
+        'mega_menu_request_count': recent_request_count,
+    }
+
+
 def header_mega_menu_lab(request):
-    return render(request, 'core/header_mega_menu_lab.html')
+    return render(request, 'core/header_mega_menu_lab.html', _build_header_mega_menu_context(request))
 
 
 def charts(request):

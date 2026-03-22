@@ -649,29 +649,29 @@
             <div class="grid gap-5 lg:grid-cols-12">
                 <section class="stream-shell-card lg:col-span-6 min-h-[320px]">
                     <div class="relative h-full overflow-hidden">
-                        <div class="live-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1400&q=80');"></div>
+                        <div class="live-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_live.image|default:'' }}');"></div>
                         <div class="absolute inset-0 p-5 sm:p-6">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200">Live Right Now</p>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200">{{ mega_menu_live.eyebrow|default:"Live Right Now" }}</p>
                                     <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                         <span class="relative flex h-2 w-2">
                                             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                                             <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
                                         </span>
-                                        Studio 1
+                                        {{ mega_menu_live.studio_label|default:"K-Beats Live" }}
                                     </div>
                                 </div>
-                                <span class="border border-cyan-300/40 bg-cyan-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">On Air</span>
+                                <span class="border border-cyan-300/40 bg-cyan-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">{{ mega_menu_live.status|default:"On Air" }}</span>
                             </div>
                             <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                                <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Tonight's live block is built to feel immediate, human, and impossible to miss.</p>
-                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">Live From Global Studio 1</h2>
-                                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">Jump into the live player, catch what is spinning now, and move into the lineup without losing the feeling of being in the room.</p>
+                                <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_live.tagline|default:"Join the live player and see what is on now." }}</p>
+                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_live.title|default:"K-Beats Live" }}</h2>
+                                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_live.description|default:"Open the live player for the current track and next-up schedule." }}</p>
                                 <div class="mt-3 flex flex-wrap gap-2">
-                                    <span class="live-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Now Playing: MANIAC</span>
-                                    <span class="live-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Presenter Link In 04:12</span>
-                                    <span class="live-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">3,842 Listening</span>
+                                    {% for chip in mega_menu_live.chips %}
+                                    <span class="live-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ chip }}</span>
+                                    {% endfor %}
                                 </div>
                                 <div class="mt-4 flex flex-wrap items-center gap-3">
                                     <a href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
@@ -697,26 +697,22 @@
                         <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">UK time</p>
                     </div>
                     <div class="mt-3 space-y-2">
+                        {% for item in mega_menu_schedule %}
                         <a href="{% url 'schedule' %}" class="live-next-card live-schedule-card block border border-white/10 bg-black/25 p-3 text-left transition-colors hover:border-cyan-300/40">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">7:00 PM</p>
-                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Drive Time Heat</p>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.time_label }}</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">{{ item.title }}</p>
                                 </div>
-                                <span class="border border-white/10 bg-white/[0.04] px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Next</span>
+                                {% if item.status %}
+                                <span class="border border-white/10 bg-white/[0.04] px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">{{ item.status }}</span>
+                                {% endif %}
                             </div>
-                            <p class="mt-1.5 text-xs leading-relaxed text-slate-300">Headline tracks, presenter links, and a strong first hook.</p>
+                            <p class="mt-1.5 text-xs leading-relaxed text-slate-300">{{ item.description }}</p>
                         </a>
-                        <a href="{% url 'schedule' %}" class="live-next-card live-schedule-card block border border-white/10 bg-black/25 p-3 text-left transition-colors hover:border-cyan-300/40">
-                            <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">9:00 PM</p>
-                            <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">After Hours</p>
-                            <p class="mt-1.5 text-xs leading-relaxed text-slate-300">A looser late-night lane with slower transitions and live requests.</p>
-                        </a>
-                        <a href="{% url 'schedule' %}" class="live-next-card live-schedule-card block border border-white/10 bg-black/25 p-3 text-left transition-colors hover:border-cyan-300/40">
-                            <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">11:00 PM</p>
-                            <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">Midnight Replay</p>
-                            <p class="mt-1.5 text-xs leading-relaxed text-slate-300">The most reacted-to moments, lined up for one more run.</p>
-                        </a>
+                        {% empty %}
+                        <div class="border border-white/10 bg-black/25 p-3 text-xs text-slate-400">Schedule data is not available yet.</div>
+                        {% endfor %}
                     </div>
                     <a href="{% url 'schedule' %}" class="mt-3 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-secondary transition-colors hover:text-white">
                         Open Full Schedule
@@ -731,8 +727,8 @@
                             </div>
                             <div class="request-queue-box p-3">
                                 <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Queue Pulse</p>
-                                <p class="mt-2 text-2xl font-impact uppercase leading-none tracking-[0.04em] text-white">18 Picks</p>
-                                <p class="mt-1 text-xs leading-relaxed text-slate-300">In tonight's live queue.</p>
+                                <p class="mt-2 text-2xl font-impact uppercase leading-none tracking-[0.04em] text-white">{{ mega_menu_request_count }} Picks</p>
+                                <p class="mt-1 text-xs leading-relaxed text-slate-300">Current request entries.</p>
                             </div>
                         </div>
                         <div class="relative z-10 mt-3 flex flex-wrap items-center gap-3">
@@ -756,7 +752,7 @@
                     <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Streams</p>
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
                         <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Pick Your Frequency</h1>
-                        <p id="stream-panel-tagline" class="max-w-xl text-[13px] leading-relaxed text-slate-300">Mood-led stations with enough live context to feel like a destination, not a drop-down.</p>
+                        <p id="stream-panel-tagline" class="max-w-xl text-[13px] leading-relaxed text-slate-300">{{ mega_menu_streams.0.panelLine|default:"Live programming pulled from the current station schedule." }}</p>
                     </div>
                 </div>
             </div>
@@ -765,24 +761,24 @@
                 <section class="stream-shell-card stream-feature-shell lg:col-span-6">
                     <div class="grid h-full xl:grid-cols-[minmax(0,1.45fr)_minmax(250px,0.85fr)]">
                         <div class="relative min-h-[280px] overflow-hidden">
-                            <div id="stream-feature-image" class="stream-card-image absolute inset-0 bg-gradient-to-br from-rose-500/25 via-fuchsia-500/15 to-orange-500/20"></div>
+                            <div id="stream-feature-image" class="stream-card-image absolute inset-0" {% if mega_menu_streams.0.image %}style="background-image: linear-gradient(115deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.54) 100%), url('{{ mega_menu_streams.0.image }}');"{% endif %}></div>
                             <div class="absolute inset-x-0 top-0 flex items-start justify-between gap-4 p-5 sm:p-6">
                                 <div class="space-y-2">
-                                    <p id="stream-feature-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase">Launch Stream</p>
+                                    <p id="stream-feature-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase">Live Programming</p>
                                     <div id="stream-feature-frequency" class="inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                         <span class="h-2 w-2 rounded-full bg-white/80"></span>
-                                        Preset 01
+                                        {{ mega_menu_streams.0.preset|default:"Live Now" }}
                                     </div>
                                 </div>
-                                <span id="stream-feature-tier" class="border border-emerald-300/50 bg-emerald-400/15 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-200">Free</span>
+                                <span id="stream-feature-tier" class="border border-emerald-300/50 bg-emerald-400/15 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-200">{{ mega_menu_streams.0.tier|default:"free"|title }}</span>
                             </div>
                             <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                                <p id="stream-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Arena-sized drops, zero polite energy.</p>
-                                <h2 id="stream-feature-title" class="mt-3 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">Hype Mode</h2>
-                                <p id="stream-feature-description" class="mt-3 max-w-xl text-sm leading-relaxed text-slate-200/90"></p>
-                                <div id="stream-feature-genres" class="mt-4 flex flex-wrap gap-2"></div>
+                                <p id="stream-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_streams.0.tagline|default:"Live programming from the active station schedule." }}</p>
+                                <h2 id="stream-feature-title" class="mt-3 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_streams.0.name|default:"K-Beats Live" }}</h2>
+                                <p id="stream-feature-description" class="mt-3 max-w-xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_streams.0.description }}</p>
+                                <div id="stream-feature-genres" class="mt-4 flex flex-wrap gap-2">{% for genre in mega_menu_streams.0.genres %}<span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ genre }}</span>{% endfor %}</div>
                                 <div class="mt-5 flex flex-wrap items-center gap-3">
-                                    <a id="stream-feature-cta" href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                    <a id="stream-feature-cta" href="{{ mega_menu_streams.0.href|default:'' }}{% if not mega_menu_streams.0.href %}{% url 'live' %}{% endif %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                         Listen Now
                                         <span class="material-symbols-outlined text-base">play_arrow</span>
                                     </a>
@@ -799,27 +795,27 @@
                                 <div class="stream-stat-card p-4">
                                     <div class="flex items-center justify-between gap-3">
                                         <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Energy</p>
-                                        <p id="stream-feature-energy-value" class="text-xs font-black uppercase tracking-[0.18em] text-white">92%</p>
+                                        <p id="stream-feature-energy-value" class="text-xs font-black uppercase tracking-[0.18em] text-white">{{ mega_menu_streams.0.energy|default:0 }}%</p>
                                     </div>
                                     <div class="stream-energy-track mt-3">
                                         <span id="stream-feature-energy-fill" class="stream-energy-fill"></span>
                                     </div>
-                                    <p id="stream-feature-energy-label" class="mt-3 text-xs text-slate-300">Peak-time performance fuel.</p>
+                                    <p id="stream-feature-energy-label" class="mt-3 text-xs text-slate-300">{{ mega_menu_streams.0.energyLabel }}</p>
                                 </div>
 
                                 <div class="stream-stat-card p-4">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Peak Window</p>
-                                    <p id="stream-feature-peak" class="mt-3 text-xl font-black uppercase tracking-tight text-white">After 9PM</p>
-                                    <p id="stream-feature-peak-note" class="mt-2 text-xs leading-relaxed text-slate-400">Best when the room needs to feel louder.</p>
+                                    <p id="stream-feature-peak" class="mt-3 text-xl font-black uppercase tracking-tight text-white">{{ mega_menu_streams.0.peak }}</p>
+                                    <p id="stream-feature-peak-note" class="mt-2 text-xs leading-relaxed text-slate-400">{{ mega_menu_streams.0.peakNote }}</p>
                                 </div>
 
                                 <div class="stream-stat-card p-4 sm:col-span-2 xl:col-span-1">
                                     <div class="flex items-center justify-between gap-3">
                                         <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Best For</p>
-                                        <p id="stream-feature-audience" class="font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500">3,842 listening</p>
+                                        <p id="stream-feature-audience" class="font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500">{{ mega_menu_streams.0.audience }}</p>
                                     </div>
-                                    <p id="stream-feature-best-for" class="mt-3 text-sm font-semibold text-white">Pre-show confidence, workouts, and big chorus cravings.</p>
-                                    <p id="stream-feature-note" class="mt-2 text-xs leading-relaxed text-slate-400">Heavy drops, tighter transitions, and stage-ready cuts stacked back to back.</p>
+                                    <p id="stream-feature-best-for" class="mt-3 text-sm font-semibold text-white">{{ mega_menu_streams.0.bestFor }}</p>
+                                    <p id="stream-feature-note" class="mt-2 text-xs leading-relaxed text-slate-400">{{ mega_menu_streams.0.note }}</p>
                                 </div>
                             </div>
                         </div>
@@ -842,7 +838,7 @@
                         <div class="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
                             <div>
                                 <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Live Signal</p>
-                                <p id="stream-now-vibe" class="mt-2 text-lg font-black uppercase tracking-tight text-white">Peak-time power</p>
+                                <p id="stream-now-vibe" class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_streams.0.mood|default:"Live" }}</p>
                             </div>
                             <span id="stream-now-live-pill" class="border px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Live</span>
                         </div>
@@ -855,9 +851,9 @@
                                 <span class="signal-bar h-6 w-1.5"></span>
                             </div>
                             <div class="min-w-0">
-                                <p id="stream-now-track" class="text-sm font-black uppercase tracking-[0.08em] text-white">MANIAC</p>
-                                <p id="stream-now-artist" class="mt-1 text-xs text-slate-400">Stray Kids</p>
-                                <p id="stream-now-audience" class="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">3,842 listening</p>
+                                <p id="stream-now-track" class="text-sm font-black uppercase tracking-[0.08em] text-white">{{ mega_menu_live.track_title|default:"K-Beats Live" }}</p>
+                                <p id="stream-now-artist" class="mt-1 text-xs text-slate-400">{{ mega_menu_live.track_artist|default:"On Air" }}</p>
+                                <p id="stream-now-audience" class="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">{{ mega_menu_live.audience|default:"Live now" }}</p>
                             </div>
                         </div>
                     </div>
@@ -901,26 +897,24 @@
                 <section class="stream-shell-card charts-feature-shell lg:col-span-6">
                     <div class="grid h-full xl:grid-cols-[minmax(0,1.5fr)_minmax(250px,0.8fr)]">
                         <div class="relative min-h-[300px] overflow-hidden">
-                            <div id="charts-feature-image" class="charts-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1400&q=80');"></div>
+                            <div id="charts-feature-image" class="charts-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_charts.0.image|default:'' }}');"></div>
                             <div class="absolute inset-0 p-5 sm:p-6">
                                 <div class="flex items-start justify-between gap-4">
                                     <div>
-                                        <p id="charts-feature-kicker" class="font-mono text-[10px] uppercase tracking-[0.22em] text-amber-200">This Week's Peak</p>
+                                        <p id="charts-feature-kicker" class="font-mono text-[10px] uppercase tracking-[0.22em] text-amber-200">{{ mega_menu_charts.0.kicker|default:"Rank #1" }}</p>
                                         <div id="charts-feature-rankline" class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
-                                            <span class="chart-rank-badge inline-flex h-6 min-w-6 items-center justify-center px-2 text-[9px] font-black">#1</span>
-                                            Global K-Beats Top 20
+                                            <span class="chart-rank-badge inline-flex h-6 min-w-6 items-center justify-center px-2 text-[9px] font-black">{{ mega_menu_charts.0.rank|default:"#1" }}</span>
+                                            {{ mega_menu_charts.0.rankLine|default:"Latest daily sync" }}
                                         </div>
                                     </div>
-                                    <span id="charts-feature-status" class="border border-amber-300/40 bg-amber-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-amber-100">Hot</span>
+                                    <span id="charts-feature-status" class="border border-amber-300/40 bg-amber-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-amber-100">{{ mega_menu_charts.0.status|default:"Live" }}</span>
                                 </div>
                                 <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                                    <p id="charts-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Heavy replay value, social lift, and chart gravity all pointing the same way.</p>
-                                    <h2 id="charts-feature-title" class="mt-3 font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">Rosie Takes The Crown</h2>
-                                    <p id="charts-feature-description" class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">Make the first tile feel like a headline worth following, then pull the user into movers, breakdowns, and artist pages without the panel ever losing momentum.</p>
+                                    <p id="charts-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_charts.0.tagline }}</p>
+                                    <h2 id="charts-feature-title" class="mt-3 font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">{{ mega_menu_charts.0.title|default:"Latest Chart Leader" }}</h2>
+                                    <p id="charts-feature-description" class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_charts.0.description }}</p>
                                     <div id="charts-feature-chips" class="mt-4 flex flex-wrap gap-2">
-                                        <span class="chart-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">24h +3</span>
-                                        <span class="chart-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">7.2M streams</span>
-                                        <span class="chart-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Fan vote leader</span>
+                                        {% for chip in mega_menu_charts.0.chips %}<span class="chart-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ chip }}</span>{% endfor %}
                                     </div>
                                     <div class="mt-5 flex flex-wrap items-center gap-3">
                                         <a id="charts-feature-primary-cta" href="{% url 'charts' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
@@ -941,20 +935,18 @@
                                 <div class="charts-stat-card p-4">
                                     <div class="flex items-center justify-between gap-3">
                                         <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Momentum</p>
-                                        <p id="charts-feature-momentum-value" class="text-xs font-black uppercase tracking-[0.18em] text-white">94%</p>
+                                        <p id="charts-feature-momentum-value" class="text-xs font-black uppercase tracking-[0.18em] text-white">{{ mega_menu_charts.0.momentumValue }}</p>
                                     </div>
-                                    <p id="charts-feature-momentum-title" class="mt-3 text-xl font-black uppercase tracking-tight text-white">Locked In</p>
-                                    <p id="charts-feature-momentum-copy" class="mt-2 text-xs leading-relaxed text-slate-300">Streaming lift, social chatter, and repeat listens are all pulling in the same direction.</p>
+                                    <p id="charts-feature-momentum-title" class="mt-3 text-xl font-black uppercase tracking-tight text-white">{{ mega_menu_charts.0.momentumTitle }}</p>
+                                    <p id="charts-feature-momentum-copy" class="mt-2 text-xs leading-relaxed text-slate-300">{{ mega_menu_charts.0.momentumCopy }}</p>
                                 </div>
 
                                 <div class="charts-stat-card p-4">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Fast Read</p>
                                     <div id="charts-feature-fast-read" class="mt-3 flex flex-wrap gap-2">
-                                        <span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Peak replay</span>
-                                        <span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Social gain</span>
-                                        <span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Cross-market</span>
+                                        {% for item in mega_menu_charts.0.fastRead %}<span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">{{ item }}</span>{% endfor %}
                                     </div>
-                                    <p id="charts-feature-fast-copy" class="mt-3 text-xs leading-relaxed text-slate-300">The right rail now reads like a quick analyst desk instead of filler support copy.</p>
+                                    <p id="charts-feature-fast-copy" class="mt-3 text-xs leading-relaxed text-slate-300">{{ mega_menu_charts.0.fastCopy }}</p>
                                 </div>
 
                             </div>
@@ -971,36 +963,20 @@
                         <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">24h delta</p>
                     </div>
                     <div id="charts-movers-list" class="space-y-3">
-                        <a href="{% url 'charts' %}" data-chart-id="whiplash" class="chart-link chart-rank-card block p-4 transition-colors">
+                        {% for item in mega_menu_charts %}
+                        <a href="{% url 'charts' %}" data-chart-id="{{ item.id }}" class="chart-link chart-rank-card block p-4 transition-colors">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">#2</p>
-                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Whiplash</p>
-                                    <p class="mt-2 text-xs leading-relaxed text-slate-300">aespa keeps climbing on replay velocity and share rate.</p>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.rank }}</p>
+                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">{{ item.title }}</p>
+                                    <p class="mt-2 text-xs leading-relaxed text-slate-300">{{ item.description }}</p>
                                 </div>
-                                <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">+5</span>
+                                <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">{{ item.status }}</span>
                             </div>
                         </a>
-                        <a href="{% url 'charts' %}" data-chart-id="plot-twist" class="chart-link chart-rank-card block p-4 transition-colors">
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">#4</p>
-                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Plot Twist</p>
-                                    <p class="mt-2 text-xs leading-relaxed text-slate-300">TWS is pulling younger listeners into the upper tier.</p>
-                                </div>
-                                <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">+7</span>
-                            </div>
-                        </a>
-                        <a href="{% url 'charts' %}" data-chart-id="magnetic" class="chart-link chart-rank-card block p-4 transition-colors">
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">#7</p>
-                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Magnetic</p>
-                                    <p class="mt-2 text-xs leading-relaxed text-slate-300">Still sticky, still viral, and not done moving yet.</p>
-                                </div>
-                                <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">+3</span>
-                            </div>
-                        </a>
+                        {% empty %}
+                        <div class="chart-rank-card block p-4 text-xs text-slate-400">Chart ranking data is not available yet.</div>
+                        {% endfor %}
                     </div>
                 </section>
 
@@ -1049,15 +1025,15 @@
                         <div class="mt-4 grid grid-cols-3 gap-3">
                             <div class="border border-white/10 bg-black/30 p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">New</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">2</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_charts|length }}</p>
                             </div>
                             <div class="border border-white/10 bg-black/30 p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Gain</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">+7</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_charts.0.status|default:"Live" }}</p>
                             </div>
                             <div class="border border-white/10 bg-black/30 p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Shares</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">ROSIE</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_charts.0.rank|default:"#1" }}</p>
                             </div>
                         </div>
                     </div>
@@ -1085,30 +1061,30 @@
             <div class="grid gap-5 lg:grid-cols-12">
                 <section class="stream-shell-card lg:col-span-7 min-h-[300px]">
                     <div class="relative h-full overflow-hidden">
-                        <div class="news-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1400&q=80');"></div>
+                        <div class="news-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_news.featured.image|default:'' }}');"></div>
                         <div class="absolute inset-0 p-5 sm:p-6">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-red-200">Lead Story</p>
                                     <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                         <span class="h-2 w-2 rounded-full bg-red-300"></span>
-                                        Updated 12 min ago
+                                        {% if mega_menu_news.featured %}Updated {{ mega_menu_news.featured.created_at|timesince }} ago{% else %}Editorial Desk{% endif %}
                                     </div>
                                 </div>
-                                <span class="news-chip px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]">Breaking</span>
+                                <span class="news-chip px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]">{% if mega_menu_news.featured.category %}{{ mega_menu_news.featured.category }}{% else %}News{% endif %}</span>
                             </div>
                             <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
                                 <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Open with the headline fans will click first.</p>
-                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">The Story Fans Are Opening First</h2>
-                                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">Frame News like a front page: one dominant story, fast context, and clean jumps into chart, comeback, and idol coverage.</p>
+                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_news.featured.title|default:"Latest K-Beats Story" }}</h2>
+                                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_news.featured.subtitle|default:"Open the news desk for the latest chart, comeback, and artist coverage." }}</p>
                                 <div class="mt-3 flex flex-wrap items-center gap-2">
                                     <span class="news-meta-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Most Read</span>
-                                    <span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Charts reaction</span>
-                                    <span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Comeback update</span>
-                                    <span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Fan pulse</span>
+                                    {% if mega_menu_news.featured.category %}<span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_news.featured.category }}</span>{% endif %}
+                                    {% if mega_menu_news.featured.source_name %}<span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_news.featured.source_name }}</span>{% endif %}
+                                    {% if mega_menu_news.featured.reading_time %}<span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_news.featured.reading_time }} min read</span>{% endif %}
                                 </div>
                                 <div class="mt-4 flex flex-wrap items-center gap-3">
-                                    <a href="{% url 'news' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                    <a href="{% if mega_menu_news.featured %}{% url 'blog_article_read' mega_menu_news.featured.slug %}{% else %}{% url 'news' %}{% endif %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                         Read Top Story
                                         <span class="material-symbols-outlined text-base">article</span>
                                     </a>
@@ -1129,33 +1105,21 @@
                                 <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Fast Reads</p>
                                 <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">What To Open Next</h3>
                             </div>
-                            <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">3 stories</p>
+                            <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">{{ mega_menu_news.items|length }} stories</p>
                         </div>
                         <div class="mt-3 space-y-2">
-                            <a href="{% url 'news' %}" class="news-card block p-3">
+                            {% for article in mega_menu_news.items %}
+                            <a href="{% url 'blog_article_read' article.slug %}" class="news-card block p-3">
                                 <div class="flex items-center justify-between gap-3">
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] news-rail-kicker">Charts</p>
-                                    <span class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">6 min</span>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] {% if forloop.first %}news-rail-kicker{% else %}text-slate-500{% endif %}">{{ article.category|default:"News" }}</p>
+                                    <span class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">{{ article.created_at|timesince }} ago</span>
                                 </div>
-                                <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">Who jumped today</p>
-                                <p class="mt-1.5 text-xs leading-relaxed text-slate-300">The quickest route from chart movement into the story behind it.</p>
+                                <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">{{ article.title }}</p>
+                                <p class="mt-1.5 text-xs leading-relaxed text-slate-300">{{ article.subtitle|default:article.source_title }}</p>
                             </a>
-                            <a href="{% url 'news' %}" class="news-card block p-3">
-                                <div class="flex items-center justify-between gap-3">
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Comebacks</p>
-                                    <span class="news-meta-pill px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.16em]">Trending</span>
-                                </div>
-                                <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">Teaser cycle shifts</p>
-                                <p class="mt-1.5 text-xs leading-relaxed text-slate-300">What dropped, what changed, and what fans are watching next.</p>
-                            </a>
-                            <a href="{% url 'news' %}" class="news-card block p-3">
-                                <div class="flex items-center justify-between gap-3">
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Idols</p>
-                                    <span class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">12 min</span>
-                                </div>
-                                <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">Agency and fandom watch</p>
-                                <p class="mt-1.5 text-xs leading-relaxed text-slate-300">A fast pass into the stories fans are already talking about.</p>
-                            </a>
+                            {% empty %}
+                            <div class="news-card block p-3 text-xs text-slate-400">News articles are not available yet.</div>
+                            {% endfor %}
                         </div>
                     </div>
 
@@ -1170,15 +1134,15 @@
                         <div class="mt-4 grid grid-cols-3 gap-3">
                             <div class="border border-white/10 bg-black/30 p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">New</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">6</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_news.total_count }}</p>
                             </div>
                             <div class="border border-white/10 bg-black/30 p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Lead</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Charts</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_news.featured.category|default:"News" }}</p>
                             </div>
                             <div class="border border-white/10 bg-black/30 p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Trend</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Buzz</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{% if mega_menu_news.featured %}Live{% else %}Ready{% endif %}</p>
                             </div>
                         </div>
                     </div>
@@ -1206,26 +1170,26 @@
             <div class="grid gap-5 lg:grid-cols-12">
                 <section class="stream-shell-card lg:col-span-6 min-h-[320px]">
                     <div class="relative h-full overflow-hidden">
-                        <div class="comeback-image absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1400&q=80');"></div>
+                        <div class="comeback-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_comebacks_primary.image|default:'' }}');"></div>
                         <div class="absolute inset-0 p-5 sm:p-6">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <p class="font-mono text-[10px] uppercase tracking-[0.22em] comeback-kicker">Next Priority</p>
                                     <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                         <span class="h-2 w-2 rounded-full bg-pink-400"></span>
-                                        This Week
+                                        {{ mega_menu_comebacks_primary.date_str|default:"This Week" }}
                                     </div>
                                 </div>
                                 <span class="comeback-chip px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]">High Anticipation</span>
                             </div>
                             <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
                                 <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Lead with the release fans are most likely to save now.</p>
-                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">Comeback Calendar Spotlight</h2>
-                                <p class="mt-2 max-w-xl text-sm leading-relaxed text-slate-200/90">One headline drop, one fast countdown, and one clean jump into the full rollout.</p>
+                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_comebacks_primary.artist|default:"Comeback Calendar" }}</h2>
+                                <p class="mt-2 max-w-xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_comebacks_primary.title|default:"Open the comeback timeline for the next release cycle." }}</p>
                                 <div class="mt-3 flex flex-wrap gap-2">
-                                    <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Most anticipated</span>
-                                    <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">12 scheduled</span>
-                                    <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">2 debuts</span>
+                                    <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_comebacks_primary.type|default:"Release" }}</span>
+                                    <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_comebacks|length }} featured</span>
+                                    <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ mega_menu_comebacks_primary.date_str|default:"Upcoming" }}</span>
                                 </div>
                                 <div class="mt-4 flex flex-wrap items-center gap-3">
                                     <a href="{% url 'comeback_timeline' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
@@ -1251,60 +1215,28 @@
                         <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">This week</p>
                     </div>
                     <div class="space-y-3">
-                        <a href="{% url 'comeback_timeline' %}" class="comeback-priority-card block p-4">
+                        {% for item in mega_menu_comebacks %}
+                        <a href="{{ item.href }}" class="{% if forloop.first %}comeback-priority-card{% else %}comeback-row border border-white/10 bg-black/30{% endif %} block p-4">
                             <div class="flex items-start gap-3">
                                 <div class="comeback-count-badge shrink-0 px-3 py-2 text-center">
-                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em]">DAYS</p>
-                                    <p class="mt-1 text-2xl font-black leading-none">02</p>
+                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em]">Days</p>
+                                    <p class="mt-1 {% if forloop.first %}text-2xl{% else %}text-xl{% endif %} font-black leading-none">{{ item.countdown }}</p>
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-start justify-between gap-3">
                                         <div>
-                                            <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-pink-200">Most anticipated</p>
-                                            <h4 class="mt-1.5 text-base font-black uppercase tracking-tight text-white">Le Sserafim</h4>
+                                            <p class="font-mono text-[9px] uppercase tracking-[0.18em] {% if forloop.first %}text-pink-200{% else %}text-slate-500{% endif %}">{{ item.status }}</p>
+                                            <h4 class="mt-1.5 {% if forloop.first %}text-base{% else %}text-sm{% endif %} font-black uppercase tracking-tight text-white">{{ item.title }}</h4>
                                         </div>
-                                        <span class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Mini</span>
+                                        <span class="text-[10px] font-black uppercase tracking-[0.16em] {% if forloop.first %}text-slate-400{% else %}text-slate-500{% endif %}">{{ item.subtitle }}</span>
                                     </div>
-                                    <p class="mt-2 text-[12px] leading-relaxed text-slate-300">Final teaser push and strongest reminder candidate.</p>
+                                    <p class="mt-1.5 {% if forloop.first %}text-[12px] leading-relaxed text-slate-300{% else %}text-[11px] text-slate-400{% endif %}">{{ item.description }}</p>
                                 </div>
                             </div>
                         </a>
-                        <a href="{% url 'comeback_timeline' %}" class="comeback-row block border border-white/10 bg-black/30 p-4">
-                            <div class="flex items-start gap-3">
-                                <div class="comeback-count-badge shrink-0 px-3 py-2 text-center">
-                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em]">DAYS</p>
-                                    <p class="mt-1 text-xl font-black leading-none">04</p>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-start justify-between gap-3">
-                                        <div>
-                                            <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Closing soon</p>
-                                            <h4 class="mt-1.5 text-sm font-black uppercase tracking-tight text-white">Aespa</h4>
-                                        </div>
-                                        <span class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Album</span>
-                                    </div>
-                                    <p class="mt-1.5 text-[11px] text-slate-400">Concept photos and mood film are driving buzz.</p>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="{% url 'comeback_timeline' %}" class="comeback-row block border border-white/10 bg-black/30 p-4">
-                            <div class="flex items-start gap-3">
-                                <div class="comeback-count-badge shrink-0 px-3 py-2 text-center">
-                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em]">DAYS</p>
-                                    <p class="mt-1 text-xl font-black leading-none">07</p>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-start justify-between gap-3">
-                                        <div>
-                                            <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">On radar</p>
-                                            <h4 class="mt-1.5 text-sm font-black uppercase tracking-tight text-white">RIIZE</h4>
-                                        </div>
-                                        <span class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Single</span>
-                                    </div>
-                                    <p class="mt-1.5 text-[11px] text-slate-400">Performance teaser still to come.</p>
-                                </div>
-                            </div>
-                        </a>
+                        {% empty %}
+                        <div class="border border-white/10 bg-black/30 p-4 text-xs text-slate-400">No upcoming comeback data is available yet.</div>
+                        {% endfor %}
                     </div>
                 </section>
 
@@ -1377,26 +1309,24 @@
                 <section class="stream-shell-card stream-feature-shell lg:col-span-6">
                     <div class="grid h-full xl:grid-cols-[minmax(0,1.5fr)_minmax(250px,0.8fr)]">
                         <div class="relative min-h-[340px] overflow-hidden">
-                            <div id="idols-feature-image" class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(120deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.6) 100%), url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1400&q=80');"></div>
+                            <div id="idols-feature-image" class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(120deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.6) 100%), url('{{ mega_menu_idols.0.image|default:'' }}');"></div>
                             <div class="absolute inset-0 p-5 sm:p-6">
                                 <div class="flex items-start justify-between gap-4">
                                     <div>
-                                        <p id="idols-feature-kicker" class="font-mono text-[10px] uppercase tracking-[0.22em] text-primary">Featured Group</p>
+                                        <p id="idols-feature-kicker" class="font-mono text-[10px] uppercase tracking-[0.22em] text-primary">{{ mega_menu_idols.0.kicker|default:"Featured Group" }}</p>
                                         <div id="idols-feature-chip" class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                             <span class="h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_rgba(244,37,192,0.8)]"></span>
-                                            High fandom velocity
+                                            {{ mega_menu_idols.0.chip|default:"Artist" }}
                                         </div>
                                     </div>
-                                    <span id="idols-feature-status" class="border border-primary/40 bg-primary/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-primary">Spotlight</span>
+                                    <span id="idols-feature-status" class="border border-primary/40 bg-primary/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-primary">{{ mega_menu_idols.0.status|default:"Spotlight" }}</span>
                                 </div>
                                 <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                                    <p id="idols-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Profile pages should feel like portals, not directories.</p>
-                                    <h2 id="idols-feature-title" class="mt-3 font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">Stray Kids Lead The Entry Point</h2>
-                                    <p id="idols-feature-copy" class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">Lead with one magnetic hero so the Idols menu feels editorial. Then support it with routes into groups, members, bias tools, and fan-club actions.</p>
+                                    <p id="idols-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_idols.0.tagline }}</p>
+                                    <h2 id="idols-feature-title" class="mt-3 font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">{{ mega_menu_idols.0.title|default:"Featured Artist" }}</h2>
+                                    <p id="idols-feature-copy" class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_idols.0.copy }}</p>
                                     <div id="idols-feature-tags" class="mt-4 flex flex-wrap gap-2">
-                                        <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Profiles</span>
-                                        <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Members</span>
-                                        <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Fan clubs</span>
+                                        {% for tag in mega_menu_idols.0.tags %}<span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ tag }}</span>{% endfor %}
                                     </div>
                                     <div class="mt-5 flex flex-wrap items-center gap-3">
                                         <a id="idols-feature-primary-cta" href="{% url 'idols' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
@@ -1447,27 +1377,17 @@
                         <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Fast nav</p>
                     </div>
                     <div class="space-y-3">
-                        <a href="{% url 'idols' %}" data-idol-route="browse" class="idols-route-card block p-4">
+                        {% for item in mega_menu_idols %}
+                        <a href="{{ item.primaryHref }}" data-idol-route="{{ item.id }}" class="idols-route-card block p-4">
                             <div>
-                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Browse</p>
-                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">All Idol Pages</p>
-                                <p class="mt-2 text-xs leading-relaxed text-slate-300">Start broad with groups and visual cards.</p>
+                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.status }}</p>
+                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">{{ item.title }}</p>
+                                <p class="mt-2 text-xs leading-relaxed text-slate-300">{{ item.tagline }}</p>
                             </div>
                         </a>
-                        <a href="{% url 'idol_universe' %}" data-idol-route="explore" class="idols-route-card block p-4">
-                            <div>
-                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Explore</p>
-                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Idol Universe</p>
-                                <p class="mt-2 text-xs leading-relaxed text-slate-300">Use a more expansive discovery layer for visual browsing.</p>
-                            </div>
-                        </a>
-                        <a href="{% url 'bias_selector' %}" data-idol-route="play" class="idols-route-card block p-4">
-                            <div>
-                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Play</p>
-                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Bias Selector</p>
-                                <p class="mt-2 text-xs leading-relaxed text-slate-300">Turn exploration into a fun identity moment.</p>
-                            </div>
-                        </a>
+                        {% empty %}
+                        <div class="idols-route-card block p-4 text-xs text-slate-400">Artist data is not available yet.</div>
+                        {% endfor %}
                     </div>
                 </section>
 
@@ -1483,15 +1403,15 @@
                         <div class="mt-4 grid grid-cols-3 gap-3">
                             <div class="idols-mini-stat p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Acts</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">250+</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_idol_stats.acts }}</p>
                             </div>
                             <div class="idols-mini-stat p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Members</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Deep</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_idol_stats.members }}</p>
                             </div>
                             <div class="idols-mini-stat p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Clubs</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Join</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_idol_stats.clubs }}</p>
                             </div>
                         </div>
                     </div>
@@ -1578,6 +1498,9 @@
 
     {% include 'core/footer.html' %}
 
+    {{ mega_menu_streams|json_script:"mega-menu-streams-data" }}
+    {{ mega_menu_charts|json_script:"mega-menu-charts-data" }}
+    {{ mega_menu_idols|json_script:"mega-menu-idols-data" }}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const header = document.getElementById('main-header');
@@ -1602,92 +1525,7 @@
                 news: "{% url 'news' %}"
             };
 
-            const launchStreams = [
-                {
-                    id: 'hype-mode',
-                    preset: 'Preset 01',
-                    name: 'Hype Mode',
-                    short: 'Title tracks, performance anthems, full send',
-                    tagline: 'Arena-sized drops, zero polite energy.',
-                    description: 'High-voltage headline tracks with loud drops, heavy dance breaks, and pure stage-energy momentum.',
-                    genres: ['EDM-pop', 'Trap-pop', 'Noise', 'Drill-influenced'],
-                    accentRgb: '244, 37, 192',
-                    secondaryRgb: '255, 132, 56',
-                    image: 'https://images.unsplash.com/photo-1571266028243-d220c9f5f5dd?auto=format&fit=crop&w=1200&q=80',
-                    href: `${urls.live}?stream=hype-mode`,
-                    track: 'MANIAC',
-                    artist: 'Stray Kids',
-                    audience: '3,842 listening',
-                    tier: 'free',
-                    mood: 'Peak-time power',
-                    energy: 92,
-                    energyLabel: 'Peak-time performance fuel.',
-                    peak: 'After 9PM',
-                    peakNote: 'Best when the room needs to feel louder.',
-                    peakShort: 'Late',
-                    bestFor: 'Pre-show confidence, workouts, and big chorus cravings.',
-                    note: 'Heavy drops, tighter transitions, and stage-ready cuts stacked back to back.',
-                    rowTone: 'Performance fuel',
-                    perks: ['Replay each mix block after it airs', 'Vote into the next power-hour set', 'Unlock Baddie Hours after dark'],
-                    panelLine: 'Turn one hover into a full-on reason to listen live.'
-                },
-                {
-                    id: 'chill-hours',
-                    preset: 'Preset 02',
-                    name: 'Chill Hours',
-                    short: 'Low key, late night, no pressure',
-                    tagline: 'The soft landing after the loudest part of the day.',
-                    description: 'Late-hour mood channel for softer hooks, airy synths, and low-pressure repeat listening.',
-                    genres: ['Soft pop', 'Lo-fi K-pop', 'Mellow B-sides'],
-                    accentRgb: '0, 240, 255',
-                    secondaryRgb: '59, 130, 246',
-                    image: 'https://images.unsplash.com/photo-1520034475321-cbe63696469a?auto=format&fit=crop&w=1200&q=80',
-                    href: `${urls.live}?stream=chill-hours`,
-                    track: 'Polaroid Love',
-                    artist: 'ENHYPEN',
-                    audience: '2,944 listening',
-                    tier: 'free',
-                    mood: 'Midnight reset',
-                    energy: 44,
-                    energyLabel: 'Soft-focus, low-pressure replay.',
-                    peak: '11PM onwards',
-                    peakNote: 'Built for wind-down listening, not instant skips.',
-                    peakShort: '11PM',
-                    bestFor: 'Late trains, headphones on, and staring out the window.',
-                    note: 'Airier hooks, warmer mixes, and fewer sharp transitions keep the mood intact.',
-                    rowTone: 'Late-night calm',
-                    perks: ['Skip-free overnight listening block', 'Preview the next three songs in queue', 'Unlock Smooth Seoul and Study Hall'],
-                    panelLine: 'Show that not every stream needs to scream to feel worth clicking.'
-                },
-                {
-                    id: 'comfort-zone',
-                    preset: 'Preset 03',
-                    name: 'Comfort Zone',
-                    short: 'Emotional support in playlist form',
-                    tagline: 'The station you open when you want depth over speed.',
-                    description: 'Warm ballads, OST-adjacent solos, and slow R&B picks for when you want depth over speed.',
-                    genres: ['Ballads', 'OST moods', 'Slow R&B'],
-                    accentRgb: '168, 85, 247',
-                    secondaryRgb: '244, 114, 182',
-                    image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1200&q=80',
-                    href: `${urls.live}?stream=comfort-zone`,
-                    track: 'Love Wins All',
-                    artist: 'IU',
-                    audience: '2,117 listening',
-                    tier: 'free',
-                    mood: 'Soft-focus solace',
-                    energy: 36,
-                    energyLabel: 'Gentle pacing, heavier feelings.',
-                    peak: 'Rainy-day loops',
-                    peakNote: 'Ideal for the slower part of the night.',
-                    peakShort: 'All day',
-                    bestFor: 'Resetting after work, lyric-first listening, and quiet evenings.',
-                    note: 'More space between tracks, softer builds, and a stronger emotional arc through the hour.',
-                    rowTone: 'Comfort picks',
-                    perks: ['Save standout ballads into a personal queue', 'Read lyric highlights while you listen', 'Unlock full OST deep dives and piano cuts'],
-                    panelLine: 'The menu should feel emotionally aware, not just visually different.'
-                },
-            ];
+            const launchStreams = JSON.parse(document.getElementById('mega-menu-streams-data').textContent || '[]');
 
             const panelTagline = document.getElementById('stream-panel-tagline');
             const featureImage = document.getElementById('stream-feature-image');
@@ -1771,6 +1609,7 @@
                 !premiumList
             ) return;
 
+            if (!launchStreams.length) return;
             let activeStreamId = launchStreams[0].id;
             const premiumTitles = [
                 'Unlock Deeper Cuts',
@@ -1791,131 +1630,9 @@
                 </div>`;
             };
 
-            const chartMovers = [
-                {
-                    id: 'whiplash',
-                    kicker: 'Fastest Climber',
-                    rank: '#2',
-                    rankLine: 'Global K-Beats Top 20',
-                    status: 'Surging',
-                    title: 'Whiplash Cracks The Front Row',
-                    tagline: 'Replay velocity and share rate are finally lining up.',
-                    description: 'aespa is pulling this track upward on repeat-listen strength, stronger clip circulation, and cleaner crossover momentum.',
-                    chips: ['24h +5', '8.1M streams', 'share rate up'],
-                    image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1400&q=80',
-                    momentumValue: '91%',
-                    momentumTitle: 'Sharp Rise',
-                    momentumCopy: 'Momentum is being driven by repeat listening, stronger saves, and unusually clean day-over-day growth.',
-                    fastRead: ['High replay', 'Share spike', 'Crossover push'],
-                    fastCopy: 'This is the track most likely to break out of the current order if the pace holds.',
-                    primaryHref: urls.charts,
-                    primaryLabel: 'Open Charts',
-                    primaryIcon: 'bar_chart',
-                    secondaryHref: urls.news,
-                    secondaryLabel: 'Read The Story',
-                    secondaryIcon: 'north_east'
-                },
-                {
-                    id: 'plot-twist',
-                    kicker: 'Breakout Move',
-                    rank: '#4',
-                    rankLine: 'Global K-Beats Top 20',
-                    status: 'Breaking',
-                    title: 'Plot Twist Pulls New Listeners In',
-                    tagline: 'A cleaner, younger-skewing rise with real staying power.',
-                    description: 'TWS is climbing on conversion from casual listeners into repeat listeners, which makes this feel less like a spike and more like a real chart step.',
-                    chips: ['24h +7', '6.4M streams', 'new listeners'],
-                    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1400&q=80',
-                    momentumValue: '96%',
-                    momentumTitle: 'Breakout Energy',
-                    momentumCopy: 'This move is being powered by strong first-week discovery and above-normal save behavior.',
-                    fastRead: ['Young audience', 'Save lift', 'Fresh entry'],
-                    fastCopy: 'The signal here is discovery turning into repeat behavior faster than expected.',
-                    primaryHref: urls.charts,
-                    primaryLabel: 'See Leaderboard',
-                    primaryIcon: 'bar_chart',
-                    secondaryHref: urls.idols,
-                    secondaryLabel: 'Jump To Artists',
-                    secondaryIcon: 'groups'
-                },
-                {
-                    id: 'magnetic',
-                    kicker: 'Staying Power',
-                    rank: '#7',
-                    rankLine: 'Global K-Beats Top 20',
-                    status: 'Sticky',
-                    title: 'Magnetic Refuses To Let Go',
-                    tagline: 'Still viral, still replayed, still impossible to shake.',
-                    description: 'The rise is smaller, but the durability is the story here. The track keeps circulating because it remains highly shareable and easy to return to.',
-                    chips: ['24h +3', '5.8M streams', 'viral hold'],
-                    image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1400&q=80',
-                    momentumValue: '84%',
-                    momentumTitle: 'Long Tail Heat',
-                    momentumCopy: 'Less explosive than the others, but unusually resilient for how long it has already been moving.',
-                    fastRead: ['Viral hold', 'Replay loop', 'Share-friendly'],
-                    fastCopy: 'This is a stickiness story: the track keeps finding reasons to stay in the conversation.',
-                    primaryHref: urls.charts,
-                    primaryLabel: 'Open Charts',
-                    primaryIcon: 'bar_chart',
-                    secondaryHref: urls.news,
-                    secondaryLabel: 'Read Breakdown',
-                    secondaryIcon: 'north_east'
-                }
-            ];
+            const chartMovers = JSON.parse(document.getElementById('mega-menu-charts-data').textContent || '[]');
 
-            const idolRoutes = [
-                {
-                    id: 'browse',
-                    kicker: 'Featured Group',
-                    chip: 'High fandom velocity',
-                    status: 'Spotlight',
-                    tagline: 'Profile pages should feel like portals, not directories.',
-                    title: 'Stray Kids Lead The Entry Point',
-                    copy: 'Lead with one magnetic hero so the Idols menu feels editorial. Then support it with routes into groups, members, bias tools, and fan-club actions.',
-                    image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1400&q=80',
-                    tags: ['Profiles', 'Members', 'Fan clubs'],
-                    primaryHref: urls.idols,
-                    primaryLabel: 'Open Idols',
-                    primaryIcon: 'arrow_outward',
-                    secondaryHref: "{% url 'fan_clubs' %}",
-                    secondaryLabel: 'View Fan Clubs',
-                    secondaryIcon: 'groups'
-                },
-                {
-                    id: 'explore',
-                    kicker: 'Discovery Layer',
-                    chip: 'Visual browse mode',
-                    status: 'Explore',
-                    tagline: 'Build a wider discovery path for visitors who want to wander before they commit.',
-                    title: 'Idol Universe Opens The Map',
-                    copy: 'This state shifts the hero from one act to a broader exploration mode, letting the menu serve curiosity as well as fandom intent.',
-                    image: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1400&q=80',
-                    tags: ['Visual browse', 'Discovery', 'Universe'],
-                    primaryHref: "{% url 'idol_universe' %}",
-                    primaryLabel: 'Open Universe',
-                    primaryIcon: 'travel_explore',
-                    secondaryHref: urls.idols,
-                    secondaryLabel: 'See All Idols',
-                    secondaryIcon: 'grid_view'
-                },
-                {
-                    id: 'play',
-                    kicker: 'Interactive Route',
-                    chip: 'Identity-first entry',
-                    status: 'Play',
-                    tagline: 'Give newer users a playful first step instead of only a directory.',
-                    title: 'Bias Selector Becomes The Hook',
-                    copy: 'This version turns the hero into a game-led route, ideal for visitors who want instant fandom chemistry and personality-led onboarding.',
-                    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1400&q=80',
-                    tags: ['Quiz', 'Bias game', 'Onboarding'],
-                    primaryHref: "{% url 'bias_selector' %}",
-                    primaryLabel: 'Play Bias Selector',
-                    primaryIcon: 'sports_esports',
-                    secondaryHref: urls.idols,
-                    secondaryLabel: 'Browse Profiles',
-                    secondaryIcon: 'person_search'
-                }
-            ];
+            const idolRoutes = JSON.parse(document.getElementById('mega-menu-idols-data').textContent || '[]');
 
             const buildRow = (stream) => {
                 const presetNumber = stream.preset.replace('Preset ', '');
@@ -1997,8 +1714,8 @@
                 highlightActiveRow();
             };
 
-            let activeChartId = 'whiplash';
-            let activeIdolRouteId = 'browse';
+            let activeChartId = chartMovers.length ? chartMovers[0].id : null;
+            let activeIdolRouteId = idolRoutes.length ? idolRoutes[0].id : null;
 
             const highlightActiveChart = () => {
                 if (!chartsMoversList) return;
