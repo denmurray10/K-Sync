@@ -33,8 +33,12 @@
             --stream-secondary: 0, 240, 255;
             --live-accent: 0, 240, 255;
             --live-secondary: 99, 102, 241;
+            --news-accent: 248, 113, 113;
+            --news-secondary: 251, 191, 36;
             --charts-accent: 250, 204, 21;
             --charts-secondary: 244, 114, 182;
+            --comeback-accent: 236, 72, 153;
+            --comeback-secondary: 59, 130, 246;
         }
         body {
             background:
@@ -87,6 +91,20 @@
                 linear-gradient(135deg, rgb(14 10 4), rgb(13 8 15) 52%, rgb(6 5 13));
             box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
         }
+        .news-panel-shell {
+            background:
+                radial-gradient(circle at 14% 0%, rgba(var(--news-accent), 0.2), transparent 30%),
+                radial-gradient(circle at 84% 10%, rgba(var(--news-secondary), 0.16), transparent 28%),
+                linear-gradient(135deg, rgb(14 6 6), rgb(15 10 7) 54%, rgb(8 6 15));
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
+        }
+        .comebacks-panel-shell {
+            background:
+                radial-gradient(circle at 14% 0%, rgba(var(--comeback-accent), 0.22), transparent 30%),
+                radial-gradient(circle at 84% 10%, rgba(var(--comeback-secondary), 0.2), transparent 30%),
+                linear-gradient(135deg, rgb(14 6 12), rgb(8 8 18) 52%, rgb(4 6 13));
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
+        }
         .charts-panel-shell::after {
             content: "";
             position: absolute;
@@ -97,6 +115,17 @@
             background: radial-gradient(circle, rgba(var(--charts-secondary), 0.18) 0%, transparent 72%);
             pointer-events: none;
             opacity: 0.95;
+        }
+        .news-panel-shell::after {
+            content: "";
+            position: absolute;
+            inset: auto auto -38% -8%;
+            width: 260px;
+            height: 260px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(var(--news-secondary), 0.18) 0%, transparent 72%);
+            pointer-events: none;
+            opacity: 0.9;
         }
         .live-panel-shell::after {
             content: "";
@@ -131,6 +160,21 @@
             inset: auto 0 0 0;
             height: 46%;
             background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(10, 8, 3, 0.82) 100%);
+        }
+        .news-hero-image::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(12, 7, 6, 0.18) 0%, rgba(12, 7, 6, 0.84) 100%),
+                linear-gradient(130deg, rgba(var(--news-accent), 0.22) 0%, rgba(0, 0, 0, 0) 44%, rgba(var(--news-secondary), 0.24) 100%);
+        }
+        .news-hero-image::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0 0;
+            height: 44%;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(12, 7, 6, 0.84) 100%);
         }
         .live-hero-image::after {
             content: "";
@@ -219,6 +263,27 @@
         .live-signal-box span:nth-child(3) { animation-delay: 0.24s; }
         .live-signal-box span:nth-child(4) { animation-delay: 0.36s; }
         .live-signal-box span:nth-child(5) { animation-delay: 0.48s; }
+        .idols-accent-pill {
+            border: 1px solid rgba(74, 222, 128, 0.38);
+            background: rgba(74, 222, 128, 0.12);
+            color: rgb(187 247 208);
+        }
+        .idols-route-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
+        }
+        .idols-route-card:hover,
+        .idols-route-card:focus-visible {
+            border-color: rgba(74, 222, 128, 0.45);
+            background: linear-gradient(180deg, rgba(74, 222, 128, 0.12), rgba(255, 255, 255, 0.03));
+            box-shadow: inset 0 0 0 1px rgba(74, 222, 128, 0.12);
+            transform: translateY(-1px);
+        }
+        .idols-mini-stat {
+            border: 1px solid rgba(74, 222, 128, 0.18);
+            background: linear-gradient(180deg, rgba(74, 222, 128, 0.08), rgba(255, 255, 255, 0.02));
+        }
         .stream-shell-card {
             position: relative;
             overflow: hidden;
@@ -441,6 +506,97 @@
             background: rgba(var(--charts-accent), 1);
             box-shadow: 0 0 12px rgba(var(--charts-accent), 0.7);
         }
+        .news-chip {
+            border: 1px solid rgba(var(--news-accent), 0.28);
+            background: rgba(var(--news-accent), 0.1);
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .news-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018));
+            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease;
+        }
+        .news-card:hover,
+        .news-card:focus-visible {
+            transform: translateX(8px);
+            border-color: rgba(var(--news-accent), 0.46);
+            background: linear-gradient(135deg, rgba(var(--news-accent), 0.14), rgba(255, 255, 255, 0.03) 52%, rgba(var(--news-secondary), 0.08));
+        }
+        .news-meta-pill {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.82);
+        }
+        .news-link-ghost {
+            color: rgba(255, 255, 255, 0.82);
+            border-bottom: 1px solid rgba(var(--news-accent), 0.3);
+            transition: color 170ms ease, border-color 170ms ease;
+        }
+        .news-link-ghost:hover,
+        .news-link-ghost:focus-visible {
+            color: rgba(var(--news-secondary), 1);
+            border-color: rgba(var(--news-secondary), 0.55);
+        }
+        .news-rail-kicker {
+            color: rgba(var(--news-secondary), 1);
+        }
+        .comeback-kicker {
+            color: rgba(var(--comeback-accent), 1);
+        }
+        .comeback-image::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(8, 5, 10, 0.16) 0%, rgba(8, 5, 10, 0.82) 100%),
+                linear-gradient(130deg, rgba(var(--comeback-accent), 0.24) 0%, rgba(0, 0, 0, 0) 44%, rgba(var(--comeback-secondary), 0.22) 100%);
+        }
+        .comeback-chip {
+            border: 1px solid rgba(var(--comeback-accent), 0.28);
+            background: rgba(var(--comeback-accent), 0.1);
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .comeback-priority-card {
+            border: 1px solid rgba(var(--comeback-accent), 0.24);
+            background: linear-gradient(180deg, rgba(var(--comeback-accent), 0.12), rgba(255, 255, 255, 0.02));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+        .comeback-priority-card:hover,
+        .comeback-priority-card:focus-visible {
+            border-color: rgba(var(--comeback-accent), 0.5);
+            background: linear-gradient(135deg, rgba(var(--comeback-accent), 0.16), rgba(255, 255, 255, 0.03) 52%, rgba(var(--comeback-secondary), 0.08));
+            transform: translateX(8px);
+        }
+        .comeback-row {
+            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease;
+        }
+        .comeback-row:hover,
+        .comeback-row:focus-visible {
+            transform: translateX(8px);
+            border-color: rgba(var(--comeback-accent), 0.46) !important;
+            background: linear-gradient(135deg, rgba(var(--comeback-accent), 0.14), rgba(255, 255, 255, 0.03) 52%, rgba(var(--comeback-secondary), 0.08));
+        }
+        .comeback-stat {
+            border: 1px solid rgba(var(--comeback-accent), 0.18);
+            background: linear-gradient(180deg, rgba(var(--comeback-accent), 0.08), rgba(255, 255, 255, 0.02));
+        }
+        .comeback-count-badge {
+            min-width: 64px;
+            border: 1px solid rgba(var(--comeback-accent), 0.3);
+            background: rgba(var(--comeback-accent), 0.12);
+            color: rgb(252 231 243);
+        }
+        .comeback-utility-link {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.28);
+            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease;
+        }
+        .comeback-utility-link:hover,
+        .comeback-utility-link:focus-visible {
+            transform: translateX(8px);
+            border-color: rgba(var(--comeback-accent), 0.42);
+            background: linear-gradient(135deg, rgba(var(--comeback-accent), 0.12), rgba(255, 255, 255, 0.03) 52%, rgba(var(--comeback-secondary), 0.08));
+        }
         @keyframes equalizer {
             0%, 100% {
                 transform: scaleY(0.45);
@@ -460,7 +616,8 @@
             .stream-route-link,
             .stream-waveform span,
             .signal-bar,
-            .chart-link {
+            .chart-link,
+            .comeback-row {
                 transition: none !important;
                 animation: none !important;
             }
@@ -909,13 +1066,304 @@
         </div>
     </div>
 
+    <div id="mega-news-lab-panel" class="mega-panel-shell news-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+        <div class="container mx-auto px-4 sm:px-6 py-5 sm:py-6">
+            <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="max-w-3xl">
+                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / News</p>
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-4xl">Catch The Story Fast</h1>
+                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">A fast editorial read: one headline, three follow-ups, and the quickest route into the full story stack.</p>
+                    </div>
+                </div>
+                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
+                    <span class="h-2.5 w-2.5 rounded-full bg-red-300 shadow-[0_0_14px_rgba(248,113,113,0.8)]"></span>
+                    Editorial Desk Live
+                </div>
+            </div>
+
+            <div class="grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card lg:col-span-7 min-h-[300px]">
+                    <div class="relative h-full overflow-hidden">
+                        <div class="news-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1400&q=80');"></div>
+                        <div class="absolute inset-0 p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-red-200">Lead Story</p>
+                                    <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                        <span class="h-2 w-2 rounded-full bg-red-300"></span>
+                                        Updated 12 min ago
+                                    </div>
+                                </div>
+                                <span class="news-chip px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]">Breaking</span>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                                <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Open with the headline fans will click first.</p>
+                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">The Story Fans Are Opening First</h2>
+                                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">Frame News like a front page: one dominant story, fast context, and clean jumps into chart, comeback, and idol coverage.</p>
+                                <div class="mt-3 flex flex-wrap items-center gap-2">
+                                    <span class="news-meta-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Most Read</span>
+                                    <span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Charts reaction</span>
+                                    <span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Comeback update</span>
+                                    <span class="news-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Fan pulse</span>
+                                </div>
+                                <div class="mt-4 flex flex-wrap items-center gap-3">
+                                    <a href="{% url 'news' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                        Read Top Story
+                                        <span class="material-symbols-outlined text-base">article</span>
+                                    </a>
+                                    <a href="{% url 'charts' %}" class="news-link-ghost inline-flex items-center gap-2 py-2 text-[11px] font-bold uppercase tracking-[0.16em]">
+                                        See Charts Context
+                                        <span class="material-symbols-outlined text-base">north_east</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="lg:col-span-5 grid gap-4 content-start">
+                    <div class="stream-shell-card p-4 sm:p-5">
+                        <div class="flex items-end justify-between gap-4 border-b border-white/10 pb-3">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Fast Reads</p>
+                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">What To Open Next</h3>
+                            </div>
+                            <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">3 stories</p>
+                        </div>
+                        <div class="mt-3 space-y-2">
+                            <a href="{% url 'news' %}" class="news-card block p-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] news-rail-kicker">Charts</p>
+                                    <span class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">6 min</span>
+                                </div>
+                                <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">Who jumped today</p>
+                                <p class="mt-1.5 text-xs leading-relaxed text-slate-300">The quickest route from chart movement into the story behind it.</p>
+                            </a>
+                            <a href="{% url 'news' %}" class="news-card block p-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Comebacks</p>
+                                    <span class="news-meta-pill px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.16em]">Trending</span>
+                                </div>
+                                <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">Teaser cycle shifts</p>
+                                <p class="mt-1.5 text-xs leading-relaxed text-slate-300">What dropped, what changed, and what fans are watching next.</p>
+                            </a>
+                            <a href="{% url 'news' %}" class="news-card block p-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Idols</p>
+                                    <span class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">12 min</span>
+                                </div>
+                                <p class="mt-1.5 text-sm font-black uppercase tracking-[0.08em] text-white">Agency and fandom watch</p>
+                                <p class="mt-1.5 text-xs leading-relaxed text-slate-300">A fast pass into the stories fans are already talking about.</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="stream-shell-card p-4 sm:p-5">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Desk Snapshot</p>
+                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Coverage Mix</h3>
+                            </div>
+                            <span class="news-chip px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Fresh</span>
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-3">
+                            <div class="border border-white/10 bg-black/30 p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">New</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">6</p>
+                            </div>
+                            <div class="border border-white/10 bg-black/30 p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Lead</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Charts</p>
+                            </div>
+                            <div class="border border-white/10 bg-black/30 p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Trend</p>
+                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Buzz</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="mega-comebacks-lab-panel" class="mega-panel-shell comebacks-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
+        <div id="mega-comebacks-lab-panel-inner" class="container mx-auto overflow-y-auto px-4 sm:px-6 py-6 sm:py-7">
+            <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="max-w-3xl">
+                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Comebacks</p>
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-4xl">Track The Next Drop</h1>
+                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">This menu leans release-first: who is returning soon, what deserves a reminder, and where to jump before launch day.</p>
+                    </div>
+                </div>
+                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
+                    <span class="h-2.5 w-2.5 rounded-full bg-pink-400 shadow-[0_0_14px_rgba(236,72,153,0.8)]"></span>
+                    Release Watch Active
+                </div>
+            </div>
+
+            <div class="grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card lg:col-span-6 min-h-[320px]">
+                    <div class="relative h-full overflow-hidden">
+                        <div class="comeback-image absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1400&q=80');"></div>
+                        <div class="absolute inset-0 p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] comeback-kicker">Next Priority</p>
+                                    <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                        <span class="h-2 w-2 rounded-full bg-pink-400"></span>
+                                        This Week
+                                    </div>
+                                </div>
+                                <span class="comeback-chip px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]">High Anticipation</span>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                                <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Lead with the release fans are most likely to save now.</p>
+                                <h2 class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">Comeback Calendar Spotlight</h2>
+                                <p class="mt-2 max-w-xl text-sm leading-relaxed text-slate-200/90">One headline drop, one fast countdown, and one clean jump into the full rollout.</p>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Most anticipated</span>
+                                    <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">12 scheduled</span>
+                                    <span class="comeback-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">2 debuts</span>
+                                </div>
+                                <div class="mt-4 flex flex-wrap items-center gap-3">
+                                    <a href="{% url 'comeback_timeline' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                        Open Timeline
+                                        <span class="material-symbols-outlined text-base">calendar_month</span>
+                                    </a>
+                                    <a href="{% url 'news' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
+                                        Read Comeback News
+                                        <span class="material-symbols-outlined text-base">north_east</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5">
+                    <div class="mb-4 flex items-end justify-between gap-4">
+                        <div>
+                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Countdown Board</p>
+                            <h3 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Priority Watch</h3>
+                        </div>
+                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">This week</p>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="{% url 'comeback_timeline' %}" class="comeback-priority-card block p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="comeback-count-badge shrink-0 px-3 py-2 text-center">
+                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em]">DAYS</p>
+                                    <p class="mt-1 text-2xl font-black leading-none">02</p>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-pink-200">Most anticipated</p>
+                                            <h4 class="mt-1.5 text-base font-black uppercase tracking-tight text-white">Le Sserafim</h4>
+                                        </div>
+                                        <span class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Mini</span>
+                                    </div>
+                                    <p class="mt-2 text-[12px] leading-relaxed text-slate-300">Final teaser push and strongest reminder candidate.</p>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="{% url 'comeback_timeline' %}" class="comeback-row block border border-white/10 bg-black/30 p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="comeback-count-badge shrink-0 px-3 py-2 text-center">
+                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em]">DAYS</p>
+                                    <p class="mt-1 text-xl font-black leading-none">04</p>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Closing soon</p>
+                                            <h4 class="mt-1.5 text-sm font-black uppercase tracking-tight text-white">Aespa</h4>
+                                        </div>
+                                        <span class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Album</span>
+                                    </div>
+                                    <p class="mt-1.5 text-[11px] text-slate-400">Concept photos and mood film are driving buzz.</p>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="{% url 'comeback_timeline' %}" class="comeback-row block border border-white/10 bg-black/30 p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="comeback-count-badge shrink-0 px-3 py-2 text-center">
+                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em]">DAYS</p>
+                                    <p class="mt-1 text-xl font-black leading-none">07</p>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">On radar</p>
+                                            <h4 class="mt-1.5 text-sm font-black uppercase tracking-tight text-white">RIIZE</h4>
+                                        </div>
+                                        <span class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Single</span>
+                                    </div>
+                                    <p class="mt-1.5 text-[11px] text-slate-400">Performance teaser still to come.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="lg:col-span-3 space-y-4">
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Fast Read</p>
+                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Open First</h3>
+                            </div>
+                            <span class="comeback-chip px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Guide</span>
+                        </div>
+                        <div class="mt-4 grid gap-3">
+                            <div class="comeback-stat p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400">Teasers</p>
+                                <p class="mt-2 text-sm font-semibold text-white">Concept drops and video previews first.</p>
+                            </div>
+                            <div class="comeback-stat p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400">Timeline</p>
+                                <p class="mt-2 text-sm font-semibold text-white">See the full rollout in one view.</p>
+                            </div>
+                            <div class="comeback-stat p-3">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400">Coverage</p>
+                                <p class="mt-2 text-sm font-semibold text-white">Move straight into launch-day coverage.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Recommended Jumps</p>
+                        <div class="mt-4 space-y-3 text-xs text-slate-300">
+                            <a href="{% url 'comeback_timeline' %}" class="comeback-utility-link flex items-center justify-between gap-3 p-3">
+                                <div>
+                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Timeline</p>
+                                    <span class="mt-1 block font-black uppercase tracking-[0.14em] text-white">Full rollout</span>
+                                </div>
+                                <span class="material-symbols-outlined text-base text-pink-200">arrow_forward</span>
+                            </a>
+                            <a href="{% url 'news' %}" class="comeback-utility-link flex items-center justify-between gap-3 p-3">
+                                <div>
+                                    <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">News</p>
+                                    <span class="mt-1 block font-black uppercase tracking-[0.14em] text-white">Comeback coverage</span>
+                                </div>
+                                <span class="material-symbols-outlined text-base text-pink-200">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
     <div id="mega-idols-lab-panel" class="mega-panel-shell pointer-events-none fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10 opacity-0 -translate-y-2">
         <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Idols</p>
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact text-[2.4rem] leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-[3rem]">Enter The Idol Universe</h1>
+                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-4xl">Enter The Idol Universe</h1>
                         <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">This version treats Idols like a discovery hub: featured act, fast jumps by intent, and visual routes into fandom depth.</p>
                     </div>
                 </div>
@@ -929,33 +1377,33 @@
                 <section class="stream-shell-card stream-feature-shell lg:col-span-6">
                     <div class="grid h-full xl:grid-cols-[minmax(0,1.5fr)_minmax(250px,0.8fr)]">
                         <div class="relative min-h-[340px] overflow-hidden">
-                            <div class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(120deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.6) 100%), url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1400&q=80');"></div>
+                            <div id="idols-feature-image" class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(120deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.6) 100%), url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1400&q=80');"></div>
                             <div class="absolute inset-0 p-5 sm:p-6">
                                 <div class="flex items-start justify-between gap-4">
                                     <div>
-                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-primary">Featured Group</p>
-                                        <div class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                        <p id="idols-feature-kicker" class="font-mono text-[10px] uppercase tracking-[0.22em] text-primary">Featured Group</p>
+                                        <div id="idols-feature-chip" class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
                                             <span class="h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_rgba(244,37,192,0.8)]"></span>
                                             High fandom velocity
                                         </div>
                                     </div>
-                                    <span class="border border-primary/40 bg-primary/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-primary">Spotlight</span>
+                                    <span id="idols-feature-status" class="border border-primary/40 bg-primary/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-primary">Spotlight</span>
                                 </div>
                                 <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                                    <p class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Profile pages should feel like portals, not directories.</p>
-                                    <h2 class="mt-3 font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">Stray Kids Lead The Entry Point</h2>
-                                    <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">Lead with one magnetic hero so the Idols menu feels editorial. Then support it with routes into groups, members, bias tools, and fan-club actions.</p>
-                                    <div class="mt-4 flex flex-wrap gap-2">
+                                    <p id="idols-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Profile pages should feel like portals, not directories.</p>
+                                    <h2 id="idols-feature-title" class="mt-3 font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">Stray Kids Lead The Entry Point</h2>
+                                    <p id="idols-feature-copy" class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">Lead with one magnetic hero so the Idols menu feels editorial. Then support it with routes into groups, members, bias tools, and fan-club actions.</p>
+                                    <div id="idols-feature-tags" class="mt-4 flex flex-wrap gap-2">
                                         <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Profiles</span>
                                         <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Members</span>
                                         <span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Fan clubs</span>
                                     </div>
                                     <div class="mt-5 flex flex-wrap items-center gap-3">
-                                        <a href="{% url 'idols' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                        <a id="idols-feature-primary-cta" href="{% url 'idols' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                                             Open Idols
                                             <span class="material-symbols-outlined text-base">arrow_outward</span>
                                         </a>
-                                        <a href="{% url 'fan_clubs' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
+                                        <a id="idols-feature-secondary-cta" href="{% url 'fan_clubs' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
                                             View Fan Clubs
                                             <span class="material-symbols-outlined text-base">groups</span>
                                         </a>
@@ -999,21 +1447,21 @@
                         <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Fast nav</p>
                     </div>
                     <div class="space-y-3">
-                        <a href="{% url 'idols' %}" class="chart-link chart-rank-card block p-4 transition-colors">
+                        <a href="{% url 'idols' %}" data-idol-route="browse" class="idols-route-card block p-4">
                             <div>
                                 <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Browse</p>
                                 <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">All Idol Pages</p>
                                 <p class="mt-2 text-xs leading-relaxed text-slate-300">Start broad with groups and visual cards.</p>
                             </div>
                         </a>
-                        <a href="{% url 'idol_universe' %}" class="chart-link chart-rank-card block p-4 transition-colors">
+                        <a href="{% url 'idol_universe' %}" data-idol-route="explore" class="idols-route-card block p-4">
                             <div>
                                 <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Explore</p>
                                 <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Idol Universe</p>
                                 <p class="mt-2 text-xs leading-relaxed text-slate-300">Use a more expansive discovery layer for visual browsing.</p>
                             </div>
                         </a>
-                        <a href="{% url 'bias_selector' %}" class="chart-link chart-rank-card block p-4 transition-colors">
+                        <a href="{% url 'bias_selector' %}" data-idol-route="play" class="idols-route-card block p-4">
                             <div>
                                 <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Play</p>
                                 <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Bias Selector</p>
@@ -1030,18 +1478,18 @@
                                 <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Fandom Depth</p>
                                 <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">How Deep It Goes</h3>
                             </div>
-                            <span class="border border-white/15 bg-white/5 px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Live routes</span>
+                            <span class="idols-accent-pill px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Live routes</span>
                         </div>
                         <div class="mt-4 grid grid-cols-3 gap-3">
-                            <div class="border border-white/10 bg-black/30 p-3">
+                            <div class="idols-mini-stat p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Acts</p>
                                 <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">250+</p>
                             </div>
-                            <div class="border border-white/10 bg-black/30 p-3">
+                            <div class="idols-mini-stat p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Members</p>
                                 <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Deep</p>
                             </div>
-                            <div class="border border-white/10 bg-black/30 p-3">
+                            <div class="idols-mini-stat p-3">
                                 <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Clubs</p>
                                 <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">Join</p>
                             </div>
@@ -1054,17 +1502,17 @@
                                 <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Community Layer</p>
                                 <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">From Browse To Belonging</h3>
                             </div>
-                            <span class="border border-white/15 bg-white/5 px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Fandom</span>
+                            <span class="idols-accent-pill px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Fandom</span>
                         </div>
                         <div class="mt-4 space-y-3">
-                            <a href="{% url 'fan_clubs' %}" class="chart-link stream-route-link p-4">
+                            <a href="{% url 'fan_clubs' %}" class="idols-route-card stream-route-link p-4">
                                 <div>
                                     <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Join</p>
                                     <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Enter Fan Clubs</p>
                                 </div>
                                 <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
                             </a>
-                            <a href="{% url 'start_club' %}" class="chart-link stream-route-link p-4">
+                            <a href="{% url 'start_club' %}" class="idols-route-card stream-route-link p-4">
                                 <div>
                                     <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Create</p>
                                     <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Start A Club</p>
@@ -1136,8 +1584,11 @@
             const streamPanel = document.getElementById('mega-menu-lab-panel');
             const livePanel = document.getElementById('mega-live-lab-panel');
             const chartsPanel = document.getElementById('mega-charts-lab-panel');
+            const newsPanel = document.getElementById('mega-news-lab-panel');
+            const comebacksPanel = document.getElementById('mega-comebacks-lab-panel');
+            const comebacksPanelInner = document.getElementById('mega-comebacks-lab-panel-inner');
             const idolsPanel = document.getElementById('mega-idols-lab-panel');
-            if (!header || !streamPanel || !livePanel || !chartsPanel || !idolsPanel) return;
+            if (!header || !streamPanel || !livePanel || !chartsPanel || !newsPanel || !comebacksPanel || !idolsPanel) return;
 
             const desktopNav = Array.from(header.querySelectorAll('nav')).find((nav) => nav.classList.contains('md:flex'));
             if (!desktopNav) return;
@@ -1264,6 +1715,16 @@
             const nowVibe = document.getElementById('stream-now-vibe');
             const premiumTitle = document.getElementById('stream-premium-title');
             const premiumList = document.getElementById('stream-premium-list');
+            const idolsFeatureImage = document.getElementById('idols-feature-image');
+            const idolsFeatureKicker = document.getElementById('idols-feature-kicker');
+            const idolsFeatureChip = document.getElementById('idols-feature-chip');
+            const idolsFeatureStatus = document.getElementById('idols-feature-status');
+            const idolsFeatureTagline = document.getElementById('idols-feature-tagline');
+            const idolsFeatureTitle = document.getElementById('idols-feature-title');
+            const idolsFeatureCopy = document.getElementById('idols-feature-copy');
+            const idolsFeatureTags = document.getElementById('idols-feature-tags');
+            const idolsFeaturePrimaryCta = document.getElementById('idols-feature-primary-cta');
+            const idolsFeatureSecondaryCta = document.getElementById('idols-feature-secondary-cta');
             const chartsFeatureImage = document.getElementById('charts-feature-image');
             const chartsFeatureKicker = document.getElementById('charts-feature-kicker');
             const chartsFeatureRankline = document.getElementById('charts-feature-rankline');
@@ -1402,6 +1863,60 @@
                 }
             ];
 
+            const idolRoutes = [
+                {
+                    id: 'browse',
+                    kicker: 'Featured Group',
+                    chip: 'High fandom velocity',
+                    status: 'Spotlight',
+                    tagline: 'Profile pages should feel like portals, not directories.',
+                    title: 'Stray Kids Lead The Entry Point',
+                    copy: 'Lead with one magnetic hero so the Idols menu feels editorial. Then support it with routes into groups, members, bias tools, and fan-club actions.',
+                    image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1400&q=80',
+                    tags: ['Profiles', 'Members', 'Fan clubs'],
+                    primaryHref: urls.idols,
+                    primaryLabel: 'Open Idols',
+                    primaryIcon: 'arrow_outward',
+                    secondaryHref: "{% url 'fan_clubs' %}",
+                    secondaryLabel: 'View Fan Clubs',
+                    secondaryIcon: 'groups'
+                },
+                {
+                    id: 'explore',
+                    kicker: 'Discovery Layer',
+                    chip: 'Visual browse mode',
+                    status: 'Explore',
+                    tagline: 'Build a wider discovery path for visitors who want to wander before they commit.',
+                    title: 'Idol Universe Opens The Map',
+                    copy: 'This state shifts the hero from one act to a broader exploration mode, letting the menu serve curiosity as well as fandom intent.',
+                    image: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1400&q=80',
+                    tags: ['Visual browse', 'Discovery', 'Universe'],
+                    primaryHref: "{% url 'idol_universe' %}",
+                    primaryLabel: 'Open Universe',
+                    primaryIcon: 'travel_explore',
+                    secondaryHref: urls.idols,
+                    secondaryLabel: 'See All Idols',
+                    secondaryIcon: 'grid_view'
+                },
+                {
+                    id: 'play',
+                    kicker: 'Interactive Route',
+                    chip: 'Identity-first entry',
+                    status: 'Play',
+                    tagline: 'Give newer users a playful first step instead of only a directory.',
+                    title: 'Bias Selector Becomes The Hook',
+                    copy: 'This version turns the hero into a game-led route, ideal for visitors who want instant fandom chemistry and personality-led onboarding.',
+                    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1400&q=80',
+                    tags: ['Quiz', 'Bias game', 'Onboarding'],
+                    primaryHref: "{% url 'bias_selector' %}",
+                    primaryLabel: 'Play Bias Selector',
+                    primaryIcon: 'sports_esports',
+                    secondaryHref: urls.idols,
+                    secondaryLabel: 'Browse Profiles',
+                    secondaryIcon: 'person_search'
+                }
+            ];
+
             const buildRow = (stream) => {
                 const presetNumber = stream.preset.replace('Preset ', '');
                 return `<button type="button" data-stream-id="${stream.id}" class="stream-row w-full border border-white/10 bg-black/30 px-4 py-4 text-left focus-visible:outline-none focus-visible:ring-0" aria-label="Preview ${stream.name}" aria-pressed="false">
@@ -1483,6 +1998,7 @@
             };
 
             let activeChartId = 'whiplash';
+            let activeIdolRouteId = 'browse';
 
             const highlightActiveChart = () => {
                 if (!chartsMoversList) return;
@@ -1532,9 +2048,47 @@
                 highlightActiveChart();
             };
 
+            const highlightActiveIdolRoute = () => {
+                document.querySelectorAll('[data-idol-route]').forEach((row) => {
+                    const isActive = row.getAttribute('data-idol-route') === activeIdolRouteId;
+                    row.classList.toggle('active', isActive);
+                    row.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            };
+
+            const setActiveIdolRoute = (routeId) => {
+                const route = idolRoutes.find((item) => item.id === routeId);
+                if (!route) return;
+                activeIdolRouteId = route.id;
+                if (idolsFeatureImage) {
+                    idolsFeatureImage.style.backgroundImage = `linear-gradient(120deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.6) 100%), url('${route.image}')`;
+                }
+                if (idolsFeatureKicker) idolsFeatureKicker.textContent = route.kicker;
+                if (idolsFeatureChip) {
+                    idolsFeatureChip.innerHTML = `<span class="h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_rgba(244,37,192,0.8)]"></span>${route.chip}`;
+                }
+                if (idolsFeatureStatus) idolsFeatureStatus.textContent = route.status;
+                if (idolsFeatureTagline) idolsFeatureTagline.textContent = route.tagline;
+                if (idolsFeatureTitle) idolsFeatureTitle.textContent = route.title;
+                if (idolsFeatureCopy) idolsFeatureCopy.textContent = route.copy;
+                if (idolsFeatureTags) {
+                    idolsFeatureTags.innerHTML = route.tags.map((tag) => `<span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">${tag}</span>`).join('');
+                }
+                if (idolsFeaturePrimaryCta) {
+                    idolsFeaturePrimaryCta.href = route.primaryHref;
+                    idolsFeaturePrimaryCta.innerHTML = `${route.primaryLabel}<span class="material-symbols-outlined text-base">${route.primaryIcon}</span>`;
+                }
+                if (idolsFeatureSecondaryCta) {
+                    idolsFeatureSecondaryCta.href = route.secondaryHref;
+                    idolsFeatureSecondaryCta.innerHTML = `${route.secondaryLabel}<span class="material-symbols-outlined text-base">${route.secondaryIcon}</span>`;
+                }
+                highlightActiveIdolRoute();
+            };
+
             renderList();
             setActiveStream(activeStreamId);
             setActiveChart(activeChartId);
+            setActiveIdolRoute(activeIdolRouteId);
 
             const previewStream = (event) => {
                 const row = event.target.closest('[data-stream-id]');
@@ -1548,6 +2102,12 @@
                 setActiveChart(row.getAttribute('data-chart-id'));
             };
 
+            const previewIdolRoute = (event) => {
+                const row = event.target.closest('[data-idol-route]');
+                if (!row) return;
+                setActiveIdolRoute(row.getAttribute('data-idol-route'));
+            };
+
             streamList.addEventListener('mouseover', previewStream);
             streamList.addEventListener('focusin', previewStream);
             streamList.addEventListener('click', previewStream);
@@ -1556,6 +2116,11 @@
                 chartsMoversList.addEventListener('focusin', previewChart);
                 chartsMoversList.addEventListener('click', previewChart);
             }
+            document.querySelectorAll('[data-idol-route]').forEach((row) => {
+                row.addEventListener('mouseover', previewIdolRoute);
+                row.addEventListener('focus', previewIdolRoute);
+                row.addEventListener('click', previewIdolRoute);
+            });
 
             let premiumTitleIndex = 0;
 
@@ -1575,6 +2140,10 @@
             if (!liveTrigger) return;
             const chartsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.charts);
             if (!chartsTrigger) return;
+            const newsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.news);
+            if (!newsTrigger) return;
+            const comebacksTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.timeline);
+            if (!comebacksTrigger) return;
             const idolsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.idols);
             if (!idolsTrigger) return;
 
@@ -1584,6 +2153,12 @@
             chartsTrigger.id = 'mega-charts-trigger';
             chartsTrigger.setAttribute('aria-expanded', 'false');
             chartsTrigger.setAttribute('aria-controls', 'mega-charts-lab-panel');
+            newsTrigger.id = 'mega-news-trigger';
+            newsTrigger.setAttribute('aria-expanded', 'false');
+            newsTrigger.setAttribute('aria-controls', 'mega-news-lab-panel');
+            comebacksTrigger.id = 'mega-comebacks-trigger';
+            comebacksTrigger.setAttribute('aria-expanded', 'false');
+            comebacksTrigger.setAttribute('aria-controls', 'mega-comebacks-lab-panel');
             idolsTrigger.id = 'mega-idols-trigger';
             idolsTrigger.setAttribute('aria-expanded', 'false');
             idolsTrigger.setAttribute('aria-controls', 'mega-idols-lab-panel');
@@ -1591,6 +2166,17 @@
             const positionPanel = (targetPanel) => {
                 const rect = header.getBoundingClientRect();
                 targetPanel.style.top = `${Math.max(0, Math.round(rect.bottom))}px`;
+            };
+
+            const syncComebacksPanelHeight = () => {
+                if (!comebacksPanelInner) return;
+                comebacksPanel.style.maxHeight = '';
+                comebacksPanelInner.style.maxHeight = '';
+                const streamHeight = streamPanel.scrollHeight;
+                if (!streamHeight) return;
+                const cushionedHeight = streamHeight + 72;
+                comebacksPanel.style.maxHeight = `${cushionedHeight}px`;
+                comebacksPanelInner.style.maxHeight = `${cushionedHeight}px`;
             };
 
             const desktopBreakpoint = 768;
@@ -1608,6 +2194,18 @@
                     trigger: chartsTrigger,
                     panel: chartsPanel,
                     onShow: () => {}
+                },
+                news: {
+                    trigger: newsTrigger,
+                    panel: newsPanel,
+                    onShow: () => {}
+                },
+                comebacks: {
+                    trigger: comebacksTrigger,
+                    panel: comebacksPanel,
+                    onShow: () => {
+                        syncComebacksPanelHeight();
+                    }
                 },
                 idols: {
                     trigger: idolsTrigger,
@@ -1695,6 +2293,26 @@
             });
             chartsTrigger.addEventListener('mouseleave', queueClose);
 
+            newsTrigger.addEventListener('mouseenter', () => openPanel('news'));
+            newsTrigger.addEventListener('focus', () => openPanel('news', { pinned: true }));
+            newsTrigger.addEventListener('click', (event) => {
+                if (window.innerWidth < desktopBreakpoint) return;
+                if (activePanelKey === 'news' && pinnedPanelKey === 'news') return;
+                event.preventDefault();
+                openPanel('news', { pinned: true });
+            });
+            newsTrigger.addEventListener('mouseleave', queueClose);
+
+            comebacksTrigger.addEventListener('mouseenter', () => openPanel('comebacks'));
+            comebacksTrigger.addEventListener('focus', () => openPanel('comebacks', { pinned: true }));
+            comebacksTrigger.addEventListener('click', (event) => {
+                if (window.innerWidth < desktopBreakpoint) return;
+                if (activePanelKey === 'comebacks' && pinnedPanelKey === 'comebacks') return;
+                event.preventDefault();
+                openPanel('comebacks', { pinned: true });
+            });
+            comebacksTrigger.addEventListener('mouseleave', queueClose);
+
             idolsTrigger.addEventListener('mouseenter', () => openPanel('idols'));
             idolsTrigger.addEventListener('focus', () => openPanel('idols', { pinned: true }));
             idolsTrigger.addEventListener('click', (event) => {
@@ -1716,7 +2334,7 @@
             });
             streamsTrigger.addEventListener('mouseleave', queueClose);
 
-            [livePanel, chartsPanel, idolsPanel, streamPanel].forEach((targetPanel) => {
+            [livePanel, chartsPanel, newsPanel, comebacksPanel, idolsPanel, streamPanel].forEach((targetPanel) => {
                 targetPanel.addEventListener('mouseenter', () => clearTimeout(hideTimer));
                 targetPanel.addEventListener('mouseleave', queueClose);
                 targetPanel.addEventListener('focusin', () => clearTimeout(hideTimer));
@@ -1727,10 +2345,14 @@
                     event.target.closest('#mega-menu-lab-panel') ||
                     event.target.closest('#mega-live-lab-panel') ||
                     event.target.closest('#mega-charts-lab-panel') ||
+                    event.target.closest('#mega-news-lab-panel') ||
+                    event.target.closest('#mega-comebacks-lab-panel') ||
                     event.target.closest('#mega-idols-lab-panel') ||
                     event.target.closest('#mega-streams-trigger') ||
                     event.target.closest('#mega-live-trigger') ||
                     event.target.closest('#mega-charts-trigger') ||
+                    event.target.closest('#mega-news-trigger') ||
+                    event.target.closest('#mega-comebacks-trigger') ||
                     event.target.closest('#mega-idols-trigger')
                 ) return;
                 hideAllPanels();
@@ -1745,12 +2367,15 @@
                     hideAllPanels();
                     return;
                 }
+                syncComebacksPanelHeight();
                 if (activePanelKey) positionPanel(panelConfigs[activePanelKey].panel);
             });
 
             window.addEventListener('scroll', () => {
                 if (activePanelKey) positionPanel(panelConfigs[activePanelKey].panel);
             }, { passive: true });
+
+            syncComebacksPanelHeight();
         });
     </script>
 </body>
