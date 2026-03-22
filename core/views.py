@@ -5893,36 +5893,66 @@ def _build_live_show_snapshot(now_local):
 
 
 def _build_live_request_momentum(current_track, up_next_tracks, requested_titles):
+    def _normalize_title(value):
+        return str(value or '').strip().lower()
+
+    def _relative_request_time(created_at):
+        if not created_at:
+            return 'Just now'
+        delta_seconds = max(0, int((timezone.now() - created_at).total_seconds()))
+        if delta_seconds < 60:
+            return 'Just now'
+        if delta_seconds < 3600:
+            minutes = max(1, delta_seconds // 60)
+            return f'{minutes} min ago' if minutes == 1 else f'{minutes} mins ago'
+        if delta_seconds < 86400:
+            hours = max(1, delta_seconds // 3600)
+            return f'{hours} hr ago' if hours == 1 else f'{hours} hrs ago'
+        days = max(1, delta_seconds // 86400)
+        return f'{days} day ago' if days == 1 else f'{days} days ago'
+
     requested_lookup = {
-        str(title or '').strip().lower()
+        _normalize_title(title)
         for title in (requested_titles or [])
-        if str(title or '').strip()
+        if _normalize_title(title)
     }
     recent_request_qs = SongRequest.objects.filter(
         created_at__gte=timezone.now() - timedelta(hours=24)
     ).order_by('-created_at')
-    recent_requests = list(recent_request_qs[:4])
+    requests_last_24h = recent_request_qs.count()
+    recent_requests = list(recent_request_qs[:5])
     queued_requested_count = sum(
         1
         for track in (up_next_tracks or [])
-        if str(getattr(track, 'title', '') or '').strip().lower() in requested_lookup
+        if _normalize_title(getattr(track, 'title', '')) in requested_lookup
     )
     current_track_requested = bool(
         current_track
-        and str(getattr(current_track, 'title', '') or '').strip().lower() in requested_lookup
+        and _normalize_title(getattr(current_track, 'title', '')) in requested_lookup
     )
+    request_lookup = {}
+    latest_requests_payload = []
+    for req in recent_requests:
+        normalized_song = _normalize_title(req.song_title)
+        request_payload = {
+            'song_title': req.song_title,
+            'artist': req.artist,
+            'listener_name': req.listener_name or 'Listener',
+            'time_ago': _relative_request_time(req.created_at),
+        }
+        latest_requests_payload.append(request_payload)
+        if normalized_song and normalized_song not in request_lookup:
+            request_lookup[normalized_song] = {
+                'listener_name': request_payload['listener_name'],
+                'time_ago': request_payload['time_ago'],
+            }
     return {
-        'requests_last_24h': recent_request_qs.count(),
+        'requests_last_24h': requests_last_24h,
         'queued_requested_count': queued_requested_count,
         'current_track_requested': current_track_requested,
-        'latest_requests': [
-            {
-                'song_title': req.song_title,
-                'artist': req.artist,
-                'listener_name': req.listener_name or 'Listener',
-            }
-            for req in recent_requests
-        ],
+        'has_activity': bool(requests_last_24h or queued_requested_count or current_track_requested),
+        'latest_requests': latest_requests_payload,
+        'request_lookup': request_lookup,
     }
 
 
@@ -5948,6 +5978,19 @@ def _build_live_poll_context(request):
             f'until {unlocks_at:%a %H:%M}.'
         )
 
+    options_payload = [
+        {
+            'id': option.id,
+            'text': option.text,
+            'votes': option.votes,
+            'percentage': option.percentage(),
+        }
+        for option in poll.options.all()
+    ]
+    leading_option = None
+    if options_payload and total_votes > 0:
+        leading_option = max(options_payload, key=lambda item: (item['votes'], item['percentage']))
+
     return {
         'id': poll.id,
         'question': poll.question,
@@ -5958,15 +6001,49 @@ def _build_live_poll_context(request):
         ),
         'early_access_note': early_access_note,
         'total_votes': total_votes,
-        'options': [
-            {
-                'id': option.id,
-                'text': option.text,
-                'votes': option.votes,
-                'percentage': option.percentage(),
-            }
-            for option in poll.options.all()
-        ],
+        'leading_option': leading_option,
+        'options': options_payload,
+    }
+
+
+def _build_live_room_hype(live_request_momentum, live_poll):
+    requests_last_24h = int((live_request_momentum or {}).get('requests_last_24h') or 0)
+    queued_requested_count = int((live_request_momentum or {}).get('queued_requested_count') or 0)
+    current_track_requested = bool((live_request_momentum or {}).get('current_track_requested'))
+    latest_requests_count = len((live_request_momentum or {}).get('latest_requests') or [])
+    total_votes = int((live_poll or {}).get('total_votes') or 0)
+
+    score = min(
+        100,
+        (requests_last_24h * 10)
+        + (queued_requested_count * 18)
+        + (total_votes * 4)
+        + (latest_requests_count * 8)
+        + (12 if current_track_requested else 0),
+    )
+
+    if score >= 75:
+        return {
+            'label': 'On Fire',
+            'percent': score,
+            'summary': 'Requests, votes, and queue movement are all lighting up the room right now.',
+        }
+    if score >= 45:
+        return {
+            'label': 'Buzzing',
+            'percent': score,
+            'summary': 'The room has momentum and fan choices are starting to shape what lands next.',
+        }
+    if score >= 15:
+        return {
+            'label': 'Building',
+            'percent': score,
+            'summary': 'A few early votes and requests are warming the room up for the next handoff.',
+        }
+    return {
+        'label': 'Warm Up',
+        'percent': max(score, 8),
+        'summary': 'The room is ready for its first push. One request or vote can set tonight’s energy.',
     }
 
 
@@ -6129,6 +6206,7 @@ def _build_live_page_context(request):
         requested_titles,
     )
     live_poll = _build_live_poll_context(request)
+    live_room_hype = _build_live_room_hype(live_request_momentum, live_poll)
     live_return_profile = _build_live_return_profile(request.user, profile, current_track)
 
     # Calculate offset for synchronization
@@ -6164,8 +6242,10 @@ def _build_live_page_context(request):
         'recently_played_tracks': recently_played_tracks,
         'live_show_snapshot': live_show_snapshot,
         'live_request_momentum': live_request_momentum,
+        'requested_track_lookup_json': json.dumps(live_request_momentum.get('request_lookup', {})),
         'live_poll': live_poll,
         'live_poll_json': json.dumps(live_poll),
+        'live_room_hype': live_room_hype,
         'live_return_profile': live_return_profile,
         'up_next_tracks_json': json.dumps([
             {

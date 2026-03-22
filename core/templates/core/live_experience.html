@@ -55,6 +55,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
     }
+    .solid-black-panel {
+        background: #000000;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
     .glass-hero {
         background:
             linear-gradient(135deg, rgba(244, 37, 192, 0.08), rgba(255,255,255,0.02) 46%, rgba(0, 0, 0, 0.02)),
@@ -82,29 +87,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(244, 37, 192, 1), rgba(255, 255, 255, 0.75)); }
-    .signal-bar {
-        width: 4px;
-        border-radius: 999px;
-        background: linear-gradient(180deg, rgba(244, 37, 192, 1), rgba(255, 255, 255, 0.75));
-        transform-origin: bottom;
-        animation: equalize 1.1s ease-in-out infinite;
-    }
-    .signal-bar:nth-child(2) { animation-delay: 0.12s; }
-    .signal-bar:nth-child(3) { animation-delay: 0.24s; }
-    .signal-bar:nth-child(4) { animation-delay: 0.36s; }
-    .signal-bar:nth-child(5) { animation-delay: 0.48s; }
-    .signal-bar-lg {
-        width: 6px;
-        border-radius: 999px;
-        background: linear-gradient(180deg, rgba(244, 37, 192, 1), rgba(255, 255, 255, 0.7));
-        transform-origin: bottom;
-        animation: equalize-lg 1.25s ease-in-out infinite;
-    }
-    .signal-bar-lg:nth-child(2) { animation-delay: 0.11s; }
-    .signal-bar-lg:nth-child(3) { animation-delay: 0.22s; }
-    .signal-bar-lg:nth-child(4) { animation-delay: 0.33s; }
-    .signal-bar-lg:nth-child(5) { animation-delay: 0.44s; }
-    .signal-bar-lg:nth-child(6) { animation-delay: 0.55s; }
     .pulse-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
     .track-orbit { animation: orbit 12s linear infinite; }
     .floating-orb { animation: float-orb 10s ease-in-out infinite; }
@@ -149,6 +131,40 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         color: #f425c0;
         background: rgba(244, 37, 192, 0.12);
     }
+    .request-ticker {
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.03);
+    }
+    .request-ticker-track {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        width: max-content;
+        padding: 0.9rem 1rem;
+        animation: request-ticker 28s linear infinite;
+    }
+    .request-ticker:hover .request-ticker-track {
+        animation-play-state: paused;
+    }
+    .request-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid rgba(244, 37, 192, 0.3);
+        background: rgba(244, 37, 192, 0.1);
+        padding: 0.2rem 0.45rem;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #f425c0;
+        white-space: nowrap;
+    }
+    .request-chip span:last-child {
+        letter-spacing: 0.08em;
+        color: rgba(255,255,255,0.82);
+    }
     .section-eyebrow {
         font-size: 10px;
         font-weight: 700;
@@ -157,21 +173,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
     .hero-title-balance {
         max-width: 10ch;
-    }
-    @keyframes equalize {
-        0% { height: 24%; }
-        25% { height: 88%; }
-        50% { height: 42%; }
-        75% { height: 100%; }
-        100% { height: 28%; }
-    }
-    @keyframes equalize-lg {
-        0% { height: 18%; }
-        20% { height: 94%; }
-        40% { height: 56%; }
-        60% { height: 100%; }
-        80% { height: 34%; }
-        100% { height: 18%; }
     }
     @keyframes pulse-glow {
         0%, 100% { box-shadow: 0 0 0 rgba(244, 37, 192, 0); }
@@ -188,6 +189,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     @keyframes float-orb {
         0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.45; }
         50% { transform: translate3d(18px, -20px, 0); opacity: 0.85; }
+    }
+    @keyframes request-ticker {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
     }
     @keyframes chat-slide {
         from { opacity: 0; transform: translateX(14px); }
@@ -294,14 +299,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                         </div>
 
-                        <div class="hidden md:flex items-end gap-2 h-20">
-                            <span class="signal-bar-lg h-5"></span>
-                            <span class="signal-bar-lg h-16"></span>
-                            <span class="signal-bar-lg h-10"></span>
-                            <span class="signal-bar-lg h-20"></span>
-                            <span class="signal-bar-lg h-8"></span>
-                            <span class="signal-bar-lg h-14"></span>
-                        </div>
                     </div>
 
                     <div class="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -474,34 +471,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </section>
 
-    <div id="sticky-info-bar" class="sticky top-[96px] z-40 border-y border-white/10 bg-black/85 backdrop-blur-xl transition-[top] duration-300">
+    <div id="sticky-info-bar" class="sticky top-[96px] z-40 border-y border-white/20 bg-primary transition-[top] duration-300">
         <div class="container mx-auto px-4 py-4 sm:px-6">
             <div class="grid items-center gap-3 md:grid-cols-[auto_1fr_auto]">
                 <div class="flex items-center gap-4 min-w-0">
-                    <div class="flex h-10 items-end gap-1.5">
-                        <span class="signal-bar h-4"></span>
-                        <span class="signal-bar h-8"></span>
-                        <span class="signal-bar h-5"></span>
-                        <span class="signal-bar h-9"></span>
-                        <span class="signal-bar h-6"></span>
-                    </div>
                     <div class="min-w-0">
-                        <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Now Playing</p>
-                        <p id="sticky-track-title" class="font-display text-2xl uppercase leading-none truncate">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
-                        <p id="sticky-track-artist" class="mt-1 text-[10px] uppercase tracking-[0.25em] text-slate-400 truncate">{% if current_track %}{{ current_track.artist }}{% else %}Always On Air{% endif %}</p>
+                        <p class="text-[10px] uppercase tracking-[0.25em] text-black/60">Now Playing</p>
+                        <p id="sticky-track-title" class="font-display text-2xl uppercase leading-none truncate text-black">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
+                        <p id="sticky-track-artist" class="mt-1 text-[10px] uppercase tracking-[0.25em] text-black/70 truncate">{% if current_track %}{{ current_track.artist }}{% else %}Always On Air{% endif %}</p>
                     </div>
                 </div>
                 <div class="flex items-center justify-start gap-3 md:justify-center">
-                    <span class="material-symbols-outlined text-primary">headphones</span>
-                    <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Listening</span>
-                    <span id="listener-count-bar" class="font-display text-lg text-white md:text-xl">{% if state %}{{ state.listeners_count }}{% else %}3847{% endif %}</span>
+                    <span class="material-symbols-outlined text-black">headphones</span>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-black/60">Listening</span>
+                    <span id="listener-count-bar" class="font-display text-lg text-black md:text-xl">{% if state %}{{ state.listeners_count }}{% else %}3847{% endif %}</span>
                 </div>
                 <div class="flex flex-wrap justify-start gap-3 md:justify-end">
-                    <a href="{% url 'request_track' %}" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
+                    <a href="{% url 'request_track' %}" class="inline-flex items-center gap-2 border border-black bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white shadow-[4px_4px_0px_#ffffff] transition-colors hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                         Request Song
                         <span class="material-symbols-outlined text-base">queue_music</span>
                     </a>
-                    <a href="#community" class="inline-flex items-center gap-2 border border-white/15 bg-white/[0.04] px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                    <a href="#community" class="inline-flex items-center gap-2 border border-black bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white shadow-[4px_4px_0px_#ffffff] transition-colors hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                         Community
                         <span class="material-symbols-outlined text-base">forum</span>
                     </a>
@@ -510,16 +500,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 
-    <section class="relative py-16">
+    <section class="relative bg-white py-16">
         <div class="container mx-auto px-4 sm:px-6">
-            <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_380px]">
-                <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up">
-                    <div class="flex items-end justify-between gap-4">
-                        <div>
-                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Coming Up</p>
-                            <h2 class="mt-3 font-display text-4xl uppercase leading-none">Up Next</h2>
-                        </div>
-                        <span class="material-symbols-outlined text-3xl text-slate-500">queue_music</span>
+            <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_380px]">
+                <article class="glass-panel solid-black-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up">
+                    <div>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Coming Up</p>
+                        <h2 class="mt-3 font-display text-3xl uppercase leading-none xl:text-[2rem]">Up Next</h2>
                     </div>
                     <div id="up-next-container" class="mt-6 flex flex-col gap-3">
                         {% for track in up_next_tracks %}
@@ -546,13 +533,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                 </article>
 
-                <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up" style="transition-delay: 100ms;">
-                    <div class="flex items-end justify-between gap-4">
-                        <div>
-                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Recently Aired</p>
-                            <h2 class="mt-3 font-display text-4xl uppercase leading-none">Recently Played</h2>
-                        </div>
-                        <span class="material-symbols-outlined text-3xl text-slate-500">history</span>
+                <article class="glass-panel solid-black-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up" style="transition-delay: 100ms;">
+                    <div>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Recently Aired</p>
+                        <h2 class="mt-3 font-display text-3xl uppercase leading-none xl:text-[2rem]">Recently Played</h2>
                     </div>
                     <div id="recently-played-container" class="mt-6 flex flex-col gap-3">
                         {% for track in recently_played_tracks %}
@@ -579,58 +563,105 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </article>
 
                 <aside class="min-w-0 flex flex-col gap-6 reveal-up" style="transition-delay: 200ms;">
-                    <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6">
-                        <div class="flex items-end justify-between gap-4">
-                            <div>
-                                <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Schedule Feed</p>
-                                <h2 class="mt-3 font-display text-4xl uppercase leading-none">Upcoming Shows</h2>
-                            </div>
-                            <span class="material-symbols-outlined text-3xl text-slate-500">event_upcoming</span>
+                    <article class="glass-panel solid-black-panel min-w-0 border border-white/10 p-4 sm:p-6">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Schedule Feed</p>
+                            <h2 class="mt-3 font-display text-3xl uppercase leading-none xl:text-[2rem]">Upcoming Shows</h2>
                         </div>
                         <div id="upcoming-shows-column-list" class="mt-6 flex flex-col gap-3">
                             <p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">Loading upcoming shows</p>
                         </div>
                     </article>
+                </aside>
+            </div>
 
-                    <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6">
-                        <div class="flex items-end justify-between gap-4">
-                            <div>
-                                <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Fan Influence</p>
-                                <h3 class="mt-3 font-display text-3xl uppercase leading-none">Requests And Room Vote</h3>
-                            </div>
-                            <span class="material-symbols-outlined text-3xl text-slate-500">how_to_vote</span>
-                        </div>
-
-                        <div class="mt-5 grid gap-3 sm:grid-cols-2">
-                            <div class="border border-white/10 bg-white/[0.03] p-4">
-                                <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Requests Last 24h</p>
-                                <p class="mt-2 font-display text-3xl text-white">{{ live_request_momentum.requests_last_24h }}</p>
-                            </div>
-                            <div class="border border-white/10 bg-white/[0.03] p-4">
-                                <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Queued From Fans</p>
-                                <p class="mt-2 font-display text-3xl text-white">{{ live_request_momentum.queued_requested_count }}</p>
-                            </div>
-                        </div>
-
-                        {% if live_request_momentum.current_track_requested %}
-                        <p class="mt-4 border border-primary/20 bg-primary/10 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-primary">
-                            The current track is riding direct fan demand right now.
+            <article class="glass-panel solid-black-panel mt-6 border border-white/10 p-4 sm:p-6 reveal-up" style="transition-delay: 240ms;">
+                <div class="grid gap-6 xl:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)]">
+                    <div>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Shape The Room</p>
+                        <h3 class="mt-3 font-display text-3xl uppercase leading-none sm:text-4xl">The Room Vote</h3>
+                        <p class="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300">
+                            Requests, votes, and queue movement now work together so listeners can actually feel the room shifting in real time.
                         </p>
+
+                        <div id="live-poll-leading" class="mt-5 border border-primary/20 bg-primary/10 px-4 py-4{% if not live_poll or not live_poll.leading_option %} hidden{% endif %}">
+                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary">Room Momentum</p>
+                            <p class="mt-3 text-sm font-bold uppercase tracking-[0.18em] text-white">
+                                {% if live_poll and live_poll.leading_option %}
+                                The room is backing {{ live_poll.leading_option.text }} right now.
+                                {% else %}
+                                The room is starting to form a winner.
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% if not live_request_momentum.has_activity %}
+                        <div id="room-empty-state" class="mt-5 border border-dashed border-primary/35 bg-primary/10 px-4 py-5">
+                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary">First Move</p>
+                            <p class="mt-3 font-display text-2xl uppercase leading-none text-white">Be the first to shape tonight’s room.</p>
+                            <p class="mt-3 max-w-xl text-sm leading-relaxed text-slate-300">
+                                No requests have landed yet, which means the first vote or fan pick can set the energy for everyone listening.
+                            </p>
+                            <a href="{% url 'request_track' %}" class="live-primary-btn mt-4 inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
+                                Request A Track
+                                <span class="material-symbols-outlined text-base">queue_music</span>
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        {% if live_request_momentum.latest_requests %}
+                        <div class="mt-5">
+                            <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Request Feed</p>
+                            <div class="request-ticker mt-3">
+                                <div class="request-ticker-track">
+                                    {% for item in live_request_momentum.latest_requests %}
+                                    <span class="whitespace-nowrap text-[11px] uppercase tracking-[0.18em] text-slate-300">
+                                        <span class="text-primary">{{ item.listener_name }}</span>
+                                        requested
+                                        <span class="text-white">{{ item.song_title }}</span>
+                                        by {{ item.artist }}
+                                        <span class="text-slate-500">· {{ item.time_ago }}</span>
+                                    </span>
+                                    {% endfor %}
+                                    {% for item in live_request_momentum.latest_requests %}
+                                    <span class="whitespace-nowrap text-[11px] uppercase tracking-[0.18em] text-slate-300" aria-hidden="true">
+                                        <span class="text-primary">{{ item.listener_name }}</span>
+                                        requested
+                                        <span class="text-white">{{ item.song_title }}</span>
+                                        by {{ item.artist }}
+                                        <span class="text-slate-500">· {{ item.time_ago }}</span>
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
                         {% endif %}
 
                         {% if live_poll %}
-                        <div id="live-poll-panel" class="mt-5" data-poll-id="{{ live_poll.id }}">
+                        <div id="live-poll-panel" class="mt-6" data-poll-id="{{ live_poll.id }}">
                             <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Live Poll</p>
                             <p id="live-poll-question" class="mt-3 font-display text-2xl uppercase leading-tight text-white">{{ live_poll.question }}</p>
                             <p id="live-poll-total" class="mt-3 text-[10px] uppercase tracking-[0.22em] text-slate-400">{{ live_poll.total_votes }} votes cast</p>
 
                             <div class="mt-4 space-y-3">
                                 {% for option in live_poll.options %}
-                                <button type="button" data-poll-option="{{ option.id }}" class="group relative w-full overflow-hidden border border-white/10 bg-white/[0.03] p-4 text-left transition-colors hover:border-primary/45 disabled:cursor-not-allowed disabled:opacity-60" {% if live_poll.locked %}disabled{% endif %}>
-                                    <span data-poll-bar class="absolute inset-y-0 left-0 bg-primary/15 transition-[width] duration-500" style="width: {% if live_poll.locked %}0{% else %}{{ option.percentage }}%{% endif %}"></span>
-                                    <span class="relative z-10 flex items-center justify-between gap-3">
-                                        <span class="text-sm font-bold uppercase tracking-tight text-white">{{ option.text }}</span>
-                                        <span data-poll-percent class="text-[11px] font-black uppercase tracking-[0.22em] text-primary">{% if live_poll.locked %}Locked{% else %}{{ option.percentage }}%{% endif %}</span>
+                                <button type="button" data-poll-option="{{ option.id }}" class="group relative w-full overflow-hidden border border-white/20 bg-white/5 p-4 md:p-6 text-left transition-all duration-300 hover:border-primary hover:bg-black disabled:cursor-not-allowed disabled:opacity-60" {% if live_poll.locked %}disabled{% endif %}>
+                                    <span data-poll-bar class="absolute inset-y-0 left-0 bg-primary/20 z-0 transition-all duration-1000" style="width: {% if live_poll.locked %}0{% else %}{{ option.percentage }}%{% endif %}"></span>
+                                    <span data-poll-selected-bar class="absolute left-0 top-0 bottom-0 w-2 bg-primary z-10 hidden"></span>
+
+                                    <span class="relative z-10 w-full md:hidden flex flex-col gap-2">
+                                        <span class="grid grid-cols-2 items-center gap-3">
+                                            <span data-poll-letter class="w-8 h-8 flex items-center justify-center border border-white/40 font-mono text-xs font-black text-white transition-colors group-hover:border-primary">{{ forloop.counter }}</span>
+                                            <span data-poll-percent class="text-right font-black text-xl text-primary">{% if live_poll.locked %}Locked{% else %}{{ option.percentage }}%{% endif %}</span>
+                                        </span>
+                                        <span class="font-bold text-sm tracking-tight uppercase text-white">{{ option.text }}</span>
+                                    </span>
+
+                                    <span class="relative z-10 hidden md:flex items-center justify-between gap-4">
+                                        <span class="flex items-center gap-4">
+                                            <span data-poll-letter class="w-8 h-8 flex items-center justify-center border border-white/40 font-mono text-xs font-black text-white transition-colors group-hover:border-primary">{{ forloop.counter }}</span>
+                                            <span class="font-bold text-lg tracking-tight uppercase text-white">{{ option.text }}</span>
+                                        </span>
+                                        <span data-poll-percent class="font-black text-xl text-primary">{% if live_poll.locked %}Locked{% else %}{{ option.percentage }}%{% endif %}</span>
                                     </span>
                                 </button>
                                 {% endfor %}
@@ -644,20 +675,50 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             {% endif %}
                         </div>
                         {% endif %}
+                    </div>
 
-                        <div class="mt-5 space-y-2">
-                            {% for item in live_request_momentum.latest_requests %}
-                            <div class="border border-white/10 bg-black/25 p-3">
-                                <p class="text-sm font-bold uppercase tracking-tight text-white">{{ item.song_title }}</p>
-                                <p class="mt-1 text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ item.artist }} - {{ item.listener_name }}</p>
+                    <aside class="space-y-4">
+                        <div class="border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+                            <div class="flex items-end justify-between gap-4">
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Room Hype</p>
+                                    <p id="room-hype-label" class="mt-2 font-display text-3xl uppercase leading-none text-white">{{ live_room_hype.label }}</p>
+                                </div>
+                                <span id="room-hype-percent" class="text-[10px] font-black uppercase tracking-[0.22em] text-primary">{{ live_room_hype.percent }}%</span>
                             </div>
-                            {% empty %}
-                            <p class="border border-dashed border-white/10 bg-black/25 p-4 text-[11px] uppercase tracking-[0.22em] text-slate-500">No new requests yet. The request rail will light up once listeners start submitting tracks.</p>
-                            {% endfor %}
+                            <div class="mt-4 h-2 overflow-hidden bg-white/10">
+                                <div id="room-hype-fill" class="h-full bg-gradient-to-r from-primary to-secondary transition-[width] duration-700" style="width: {{ live_room_hype.percent }}%"></div>
+                            </div>
+                            <p id="room-hype-copy" class="mt-3 text-sm leading-relaxed text-slate-300">{{ live_room_hype.summary }}</p>
                         </div>
-                    </article>
-                </aside>
-            </div>
+
+                        <div class="border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+                            <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Queue Impact</p>
+                            {% if live_request_momentum.queued_requested_count or live_request_momentum.current_track_requested %}
+                            <p class="mt-3 font-display text-5xl uppercase leading-none text-white">{{ live_request_momentum.queued_requested_count }}</p>
+                            <p class="mt-3 text-sm leading-relaxed text-slate-300">
+                                {% if live_request_momentum.queued_requested_count == 1 %}
+                                Fan-picked track is waiting in the next rail right now.
+                                {% else %}
+                                Fan-picked tracks are already sitting in Up Next and nudging the station forward.
+                                {% endif %}
+                            </p>
+                            {% if live_request_momentum.current_track_requested %}
+                            <p class="mt-4 border border-primary/20 bg-primary/10 px-3 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-primary">
+                                A requested track is already live on air.
+                            </p>
+                            {% endif %}
+                            {% else %}
+                            <p class="mt-3 text-sm leading-relaxed text-slate-300">No fan picks are in the queue yet, so the next request can be the one that changes the room.</p>
+                            <a href="{% url 'request_track' %}" class="mt-4 inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                                Be The First
+                                <span class="material-symbols-outlined text-base">north_east</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </aside>
+                </div>
+            </article>
         </div>
     </section>
 
@@ -948,12 +1009,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const saveMomentDefaultLabel = 'Save This Moment';
             const initialTrackSaved = {% if current_track_saved %}true{% else %}false{% endif %};
             const requestedTitleLookup = new Set(({{ requested_titles_json|default:"[]"|safe }} || []).map((item) => String(item || '').trim().toLowerCase()));
+            const requestedTrackLookup = {{ requested_track_lookup_json|default:"{}"|safe }};
             const upcomingShowsColumnListEl = document.getElementById('upcoming-shows-column-list');
             const savedMomentCountEl = document.getElementById('saved-moment-count');
             const savedMomentArchiveListEl = document.getElementById('saved-moment-archive-list');
             const livePollData = {{ live_poll_json|default:"null"|safe }};
             const livePollStatusEl = document.getElementById('live-poll-status');
             const livePollTotalEl = document.getElementById('live-poll-total');
+            const livePollLeadingEl = document.getElementById('live-poll-leading');
             const livePollButtons = Array.from(document.querySelectorAll('[data-poll-option]'));
             const livePollVoteKey = livePollData ? `poll_voted_${livePollData.id}` : '';
             const livePollSelectedKey = livePollData ? `poll_selected_${livePollData.id}` : '';
@@ -961,6 +1024,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             let livePollSelected = livePollData ? Number(localStorage.getItem(livePollSelectedKey) || 0) : 0;
             let currentUpNextTracks = {{ up_next_tracks_json|default:"[]"|safe }};
             let scheduleSlotsCache = [];
+            const roomEmptyStateEl = document.getElementById('room-empty-state');
+            const roomHypeLabelEl = document.getElementById('room-hype-label');
+            const roomHypePercentEl = document.getElementById('room-hype-percent');
+            const roomHypeFillEl = document.getElementById('room-hype-fill');
+            const roomHypeCopyEl = document.getElementById('room-hype-copy');
             const volumeSlider = document.getElementById('volume-slider');
             const volumeMuteBtn = document.getElementById('volume-mute-btn');
             const volumeMuteIcon = document.getElementById('volume-mute-icon');
@@ -993,6 +1061,92 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 }
                 return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            const normalizeTitleKey = (value) => String(value || '').trim().toLowerCase();
+
+            const escapeHtml = (value) => String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+
+            const getRequestedTrackMeta = (title) => requestedTrackLookup[normalizeTitleKey(title)] || null;
+
+            const getPollLeader = () => {
+                if (!livePollData || !Array.isArray(livePollData.options) || !livePollData.options.length) return null;
+                const totalVotes = Number(livePollData.total_votes || 0);
+                if (!Number.isFinite(totalVotes) || totalVotes <= 0) return null;
+                return [...livePollData.options]
+                    .sort((a, b) => {
+                        const voteDiff = Number(b?.votes || 0) - Number(a?.votes || 0);
+                        if (voteDiff !== 0) return voteDiff;
+                        return Number(b?.percentage || 0) - Number(a?.percentage || 0);
+                    })[0] || null;
+            };
+
+            const computeRoomHypeState = () => {
+                const requestsLast24h = Number({{ live_request_momentum.requests_last_24h|default:0 }} || 0);
+                const queuedRequestedCount = Number({{ live_request_momentum.queued_requested_count|default:0 }} || 0);
+                const latestRequestCount = Number({{ live_request_momentum.latest_requests|length }} || 0);
+                const currentTrackRequested = {% if live_request_momentum.current_track_requested %}true{% else %}false{% endif %};
+                const totalVotes = Number(livePollData?.total_votes || 0);
+                const score = Math.min(
+                    100,
+                    (requestsLast24h * 10)
+                    + (queuedRequestedCount * 18)
+                    + (totalVotes * 4)
+                    + (latestRequestCount * 8)
+                    + (currentTrackRequested ? 12 : 0)
+                );
+
+                if (score >= 75) {
+                    return {
+                        label: 'On Fire',
+                        percent: score,
+                        summary: 'Requests, votes, and queue movement are all lighting up the room right now.',
+                    };
+                }
+                if (score >= 45) {
+                    return {
+                        label: 'Buzzing',
+                        percent: score,
+                        summary: 'The room has momentum and fan choices are starting to shape what lands next.',
+                    };
+                }
+                if (score >= 15) {
+                    return {
+                        label: 'Building',
+                        percent: score,
+                        summary: 'A few early votes and requests are warming the room up for the next handoff.',
+                    };
+                }
+                return {
+                    label: 'Warm Up',
+                    percent: Math.max(score, 8),
+                    summary: 'The room is ready for its first push. One request or vote can set tonight’s energy.',
+                };
+            };
+
+            const updateRoomHypeUI = () => {
+                const hypeState = computeRoomHypeState();
+                if (roomHypeLabelEl) roomHypeLabelEl.textContent = hypeState.label;
+                if (roomHypePercentEl) roomHypePercentEl.textContent = `${hypeState.percent}%`;
+                if (roomHypeFillEl) roomHypeFillEl.style.width = `${hypeState.percent}%`;
+                if (roomHypeCopyEl) roomHypeCopyEl.textContent = hypeState.summary;
+
+                const leader = getPollLeader();
+                if (livePollLeadingEl) {
+                    const bodyEl = livePollLeadingEl.querySelector('p:last-child');
+                    livePollLeadingEl.classList.toggle('hidden', !leader);
+                    if (leader && bodyEl) {
+                        bodyEl.textContent = `The room is backing ${leader.text} right now.`;
+                    }
+                }
+                if (roomEmptyStateEl) {
+                    roomEmptyStateEl.classList.toggle('hidden', !!leader || hypeState.percent > 14);
+                }
             };
 
             const getNowPlayingSharePayload = () => {
@@ -1452,27 +1606,53 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                     const isSelected = livePollSelected === optionId;
                     button.classList.toggle('border-primary', isSelected);
-                    button.classList.toggle('border-white/10', !isSelected);
+                    button.classList.toggle('border-white/20', !isSelected);
+                    button.classList.toggle('bg-black', !livePollVoted && !livePollData.locked);
                     button.disabled = !!livePollData.locked || !!livePollVoted;
 
                     const percentEl = button.querySelector('[data-poll-percent]');
                     const barEl = button.querySelector('[data-poll-bar]');
+                    const selectedBarEl = button.querySelector('[data-poll-selected-bar]');
+                    const letterEls = button.querySelectorAll('[data-poll-letter]');
                     if (percentEl) {
                         percentEl.textContent = livePollData.locked ? 'Locked' : `${option.percentage}%`;
                     }
                     if (barEl) {
-                        barEl.style.width = livePollData.locked ? '0%' : `${option.percentage}%`;
+                        barEl.style.width = (livePollVoted || livePollData.locked) ? `${option.percentage}%` : '0%';
+                    }
+                    if (selectedBarEl) {
+                        selectedBarEl.classList.toggle('hidden', !(livePollVoted && isSelected));
+                    }
+                    letterEls.forEach((letterEl) => {
+                        letterEl.classList.toggle('bg-primary', isSelected);
+                        letterEl.classList.toggle('text-black', isSelected);
+                        letterEl.classList.toggle('border-transparent', isSelected);
+                        letterEl.classList.toggle('text-white', !isSelected);
+                        letterEl.classList.toggle('border-white/40', !isSelected);
+                        const optionIndex = Array.isArray(livePollData.options)
+                            ? livePollData.options.findIndex((item) => Number(item.id) === optionId)
+                            : -1;
+                        if (optionIndex >= 0) {
+                            letterEl.textContent = String.fromCharCode(65 + optionIndex);
+                        }
+                    });
+                    if (!livePollVoted && !livePollData.locked) {
+                        button.classList.remove('cursor-default');
+                    } else {
+                        button.classList.add('cursor-default');
                     }
                 });
 
-                if (!livePollStatusEl) return;
-                if (livePollData.locked) {
-                    livePollStatusEl.textContent = livePollData.locked_message || 'Voting is locked right now.';
-                } else if (livePollVoted) {
-                    livePollStatusEl.textContent = 'Vote registered. The room momentum just updated.';
-                } else {
-                    livePollStatusEl.textContent = 'Vote to push the room\'s momentum and make listener preference visible on air.';
+                if (livePollStatusEl) {
+                    if (livePollData.locked) {
+                        livePollStatusEl.textContent = livePollData.locked_message || 'Voting is locked right now.';
+                    } else if (livePollVoted) {
+                        livePollStatusEl.textContent = 'Vote registered. The room momentum just updated.';
+                    } else {
+                        livePollStatusEl.textContent = 'Vote to push the room\'s momentum and make listener preference visible on air.';
+                    }
                 }
+                updateRoomHypeUI();
             };
 
             const submitLivePollVote = async (optionId) => {
@@ -1553,6 +1733,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 });
                 updateLivePollUI();
             }
+            updateRoomHypeUI();
 
             const updateProgressUI = (explicitCurrent = null) => {
                 const duration = getEffectiveDurationSeconds();
@@ -2127,14 +2308,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             container.innerHTML = tracks.map((track, idx) => {
                 const title = sanitizePlaylistTitle(track.title);
                 const upNextEta = 'In --:--';
+                const requestMeta = containerId === 'up-next-container' ? getRequestedTrackMeta(track.title) : null;
+                const requestChip = requestMeta
+                    ? `<span class="request-chip"><span>Fan Pick</span><span>${escapeHtml(requestMeta.listener_name)}</span></span>`
+                    : '';
+                const requestRowClass = requestMeta ? 'border-l-2 border-l-primary' : '';
                 return `
-                    <div class="group flex min-w-0 flex-wrap items-start gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 sm:flex-nowrap sm:items-center ${palette.hover}">
+                    <div class="group flex min-w-0 flex-wrap items-start gap-4 border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 sm:flex-nowrap sm:items-center ${palette.hover} ${requestRowClass}">
                         ${containerId === 'up-next-container' ? `<span class="w-6 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-600">${(idx + 1).toString().padStart(2, '0')}</span>` : ''}
                         <div class="h-12 w-12 overflow-hidden border border-white/10 bg-white/5">
                             ${track.album_art ? `<img src="${track.album_art}" class="h-full w-full object-cover" alt="">` : `<div class="flex h-full w-full items-center justify-center"><span class="material-symbols-outlined text-slate-500 ${palette.text} transition-colors">album</span></div>`}
                         </div>
                         <div class="min-w-0 flex-1">
-                            <p class="truncate text-sm font-bold uppercase tracking-tight text-white ${palette.text} transition-colors">${title}</p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <p class="truncate text-sm font-bold uppercase tracking-tight text-white ${palette.text} transition-colors">${title}</p>
+                                ${requestChip}
+                            </div>
                             <p class="truncate text-[11px] uppercase tracking-[0.22em] text-slate-500">${track.artist}</p>
                         </div>
                         ${containerId === 'up-next-container'
