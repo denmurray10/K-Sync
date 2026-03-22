@@ -481,6 +481,22 @@
             background: rgba(var(--charts-accent), 0.1);
             color: rgba(255, 255, 255, 0.92);
         }
+        .chart-filter-tab {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.28);
+            color: rgba(226, 232, 240, 0.9);
+            transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+        }
+        .chart-filter-tab:hover,
+        .chart-filter-tab:focus-visible {
+            border-color: rgba(var(--charts-accent), 0.42);
+            color: #ffffff;
+        }
+        .chart-filter-tab.active {
+            border-color: rgba(var(--charts-accent), 0.58);
+            background: linear-gradient(135deg, rgba(var(--charts-accent), 0.16), rgba(255, 255, 255, 0.03) 52%, rgba(var(--charts-secondary), 0.08));
+            color: #ffffff;
+        }
         .chart-trend-up {
             color: rgba(var(--charts-accent), 1);
             text-shadow: 0 0 14px rgba(var(--charts-accent), 0.32);
@@ -618,9 +634,8 @@
         <div class="container mx-auto px-4 sm:px-6 py-5 sm:py-6">
             <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
-                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Live</p>
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.03em] text-white whitespace-nowrap sm:text-4xl">Drop Into The Broadcast</h1>
+                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Drop Into The Broadcast</h1>
                         <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">A live-first mega menu should feel like a studio window: what is on now, what is next, and how fast you can join.</p>
                     </div>
                 </div>
@@ -736,7 +751,6 @@
         <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
-                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Streams</p>
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
                         <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">PICK YOUR FEQUENCY</h1>
                         <p id="stream-panel-tagline" class="max-w-xl text-[13px] leading-relaxed text-slate-300">{{ mega_menu_streams.0.panelLine|default:"Live programming pulled from the current station schedule." }}</p>
@@ -868,13 +882,17 @@
         <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
-                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Charts</p>
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-4xl">See What's Climbing</h1>
+                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">See What's Climbing</h1>
                         <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">The Charts menu should feel like live momentum: who is rising, what is sticky, and where to jump next.</p>
                     </div>
                 </div>
-                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
+                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
+                    <button type="button" data-chart-view="climbing" class="chart-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Climbing</button>
+                    <button type="button" data-chart-view="momentum" class="chart-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Momentum</button>
+                    <button type="button" data-chart-view="spotlight" class="chart-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Spotlight</button>
+                </div>
+                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300 xl:self-center">
                     <span class="h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_14px_rgba(250,204,21,0.8)]"></span>
                     Updated This Hour
                 </div>
@@ -944,10 +962,10 @@
                 <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5">
                     <div class="mb-4 flex items-end justify-between gap-4">
                         <div>
-                            <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Top Movers</p>
-                            <h3 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Climbing Fast</h3>
+                            <p id="charts-movers-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Top Movers</p>
+                            <h3 id="charts-movers-title" class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Climbing Fast</h3>
                         </div>
-                        <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">24h delta</p>
+                        <p id="charts-movers-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">24h delta</p>
                     </div>
                     <div id="charts-movers-list" class="space-y-3">
                         {% for item in mega_menu_charts %}
@@ -967,7 +985,7 @@
                     </div>
                 </section>
 
-                <section class="lg:col-span-3 space-y-4">
+                <section class="lg:col-span-3">
                     <div class="chart-snapshot-card p-5 sm:p-6">
                         <div class="flex items-center justify-between gap-4">
                             <div>
@@ -1000,31 +1018,8 @@
                             </a>
                         </div>
                     </div>
-
-                    <div class="chart-snapshot-card p-5 sm:p-6">
-                        <div class="flex items-center justify-between gap-4">
-                            <div>
-                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Chart Pressure</p>
-                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Realtime Snapshot</h3>
-                            </div>
-                            <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">Live</span>
-                        </div>
-                        <div class="mt-4 grid grid-cols-3 gap-3">
-                            <div class="border border-white/10 bg-black/30 p-3">
-                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">New</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_charts|length }}</p>
-                            </div>
-                            <div class="border border-white/10 bg-black/30 p-3">
-                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Gain</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_charts.0.status|default:"Live" }}</p>
-                            </div>
-                            <div class="border border-white/10 bg-black/30 p-3">
-                                <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Shares</p>
-                                <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_charts.0.rank|default:"#1" }}</p>
-                            </div>
-                        </div>
-                    </div>
                 </section>
+
             </div>
         </div>
     </div>
@@ -1033,9 +1028,8 @@
         <div class="container mx-auto px-4 sm:px-6 py-5 sm:py-6">
             <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
-                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / News</p>
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-4xl">Catch The Story Fast</h1>
+                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Catch The Story Fast</h1>
                         <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">A fast editorial read: one headline, three follow-ups, and the quickest route into the full story stack.</p>
                     </div>
                 </div>
@@ -1142,9 +1136,8 @@
         <div id="mega-comebacks-lab-panel-inner" class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
-                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Comebacks</p>
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-4xl">Track The Next Drop</h1>
+                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Track The Next Drop</h1>
                         <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">This menu leans release-first: who is returning soon, what deserves a reminder, and where to jump before launch day.</p>
                     </div>
                 </div>
@@ -1280,9 +1273,8 @@
         <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
-                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-400">Mega Menu Lab / Idols</p>
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white whitespace-nowrap sm:text-4xl">Enter The Idol Universe</h1>
+                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Enter The Idol Universe</h1>
                         <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">This version treats Idols like a discovery hub: featured act, fast jumps by intent, and visual routes into fandom depth.</p>
                     </div>
                 </div>
@@ -1566,6 +1558,10 @@
             const chartsFeatureFastRead = document.getElementById('charts-feature-fast-read');
             const chartsFeatureFastCopy = document.getElementById('charts-feature-fast-copy');
             const chartsMoversList = document.getElementById('charts-movers-list');
+            const chartViewTabs = Array.from(document.querySelectorAll('[data-chart-view]'));
+            const chartsMoversKicker = document.getElementById('charts-movers-kicker');
+            const chartsMoversTitle = document.getElementById('charts-movers-title');
+            const chartsMoversMeta = document.getElementById('charts-movers-meta');
 
             if (
                 !panelTagline ||
@@ -1617,7 +1613,7 @@
                 </div>`;
             };
 
-            const chartMovers = JSON.parse(document.getElementById('mega-menu-charts-data').textContent || '[]');
+            const allChartMovers = JSON.parse(document.getElementById('mega-menu-charts-data').textContent || '[]');
 
             const idolRoutes = JSON.parse(document.getElementById('mega-menu-idols-data').textContent || '[]');
 
@@ -1699,8 +1695,84 @@
                 highlightActiveRow();
             };
 
-            let activeChartId = chartMovers.length ? chartMovers[0].id : null;
+            let activeChartId = allChartMovers.length ? allChartMovers[0].id : null;
             let activeIdolRouteId = idolRoutes.length ? idolRoutes[0].id : null;
+            let activeChartView = 'climbing';
+
+            const getRankNumber = (chart) => {
+                const rankText = String(chart.rank || '').replace('#', '').trim();
+                const rankNumber = Number.parseInt(rankText, 10);
+                return Number.isFinite(rankNumber) ? rankNumber : 9999;
+            };
+
+            const getMomentumNumber = (chart) => {
+                const momentumText = String(chart.momentumValue || '').replace(/[^\d.-]/g, '');
+                const momentumNumber = Number.parseFloat(momentumText);
+                return Number.isFinite(momentumNumber) ? momentumNumber : 0;
+            };
+
+            const getChartMoversForView = (view) => {
+                const list = [...allChartMovers];
+                if (view === 'momentum') {
+                    return list.sort((a, b) => getMomentumNumber(b) - getMomentumNumber(a));
+                }
+                if (view === 'spotlight') {
+                    return list.sort((a, b) => {
+                        const aHasLive = String(a.status || '').toLowerCase().includes('live') ? 1 : 0;
+                        const bHasLive = String(b.status || '').toLowerCase().includes('live') ? 1 : 0;
+                        if (aHasLive !== bHasLive) return bHasLive - aHasLive;
+                        return getRankNumber(a) - getRankNumber(b);
+                    });
+                }
+                return list.sort((a, b) => getRankNumber(a) - getRankNumber(b));
+            };
+
+            const renderChartsMoversList = () => {
+                if (!chartsMoversList) return;
+                const movers = getChartMoversForView(activeChartView);
+                if (!movers.length) {
+                    chartsMoversList.innerHTML = '<div class="chart-rank-card block p-4 text-xs text-slate-400">Chart ranking data is not available yet.</div>';
+                    return;
+                }
+                chartsMoversList.innerHTML = movers.map((item) => `
+                    <a href="{% url 'charts' %}" data-chart-id="${item.id}" class="chart-link chart-rank-card block p-4 transition-colors">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">${item.rank || ''}</p>
+                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">${item.title || ''}</p>
+                                <p class="mt-2 text-xs leading-relaxed text-slate-300">${item.description || ''}</p>
+                            </div>
+                            <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">${item.status || 'Live'}</span>
+                        </div>
+                    </a>
+                `).join('');
+            };
+
+            const refreshChartViewTabs = () => {
+                chartViewTabs.forEach((button) => {
+                    const isActive = button.getAttribute('data-chart-view') === activeChartView;
+                    button.classList.toggle('active', isActive);
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+
+                if (chartsMoversKicker && chartsMoversTitle && chartsMoversMeta) {
+                    if (activeChartView === 'momentum') {
+                        chartsMoversKicker.textContent = 'Momentum Leaders';
+                        chartsMoversTitle.textContent = 'Most Accelerating';
+                        chartsMoversMeta.textContent = 'speed index';
+                        return;
+                    }
+                    if (activeChartView === 'spotlight') {
+                        chartsMoversKicker.textContent = 'Live Focus';
+                        chartsMoversTitle.textContent = 'Spotlight Picks';
+                        chartsMoversMeta.textContent = 'editor watch';
+                        return;
+                    }
+                    chartsMoversKicker.textContent = 'Top Movers';
+                    chartsMoversTitle.textContent = 'Climbing Fast';
+                    chartsMoversMeta.textContent = '24h delta';
+                }
+            };
 
             const highlightActiveChart = () => {
                 if (!chartsMoversList) return;
@@ -1710,7 +1782,7 @@
             };
 
             const setActiveChart = (chartId) => {
-                const chart = chartMovers.find((item) => item.id === chartId);
+                const chart = allChartMovers.find((item) => item.id === chartId);
                 if (!chart) return;
 
                 activeChartId = chart.id;
@@ -1788,6 +1860,10 @@
             };
 
             renderList();
+            refreshChartViewTabs();
+            renderChartsMoversList();
+            const initialCharts = getChartMoversForView(activeChartView);
+            if (initialCharts.length) activeChartId = initialCharts[0].id;
             setActiveStream(activeStreamId);
             setActiveChart(activeChartId);
             setActiveIdolRoute(activeIdolRouteId);
@@ -1818,6 +1894,19 @@
                 chartsMoversList.addEventListener('focusin', previewChart);
                 chartsMoversList.addEventListener('click', previewChart);
             }
+            chartViewTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const nextView = tab.getAttribute('data-chart-view');
+                    if (!nextView || nextView === activeChartView) return;
+                    activeChartView = nextView;
+                    refreshChartViewTabs();
+                    renderChartsMoversList();
+                    const movers = getChartMoversForView(activeChartView);
+                    if (movers.length) {
+                        setActiveChart(movers[0].id);
+                    }
+                });
+            });
             document.querySelectorAll('[data-idol-route]').forEach((row) => {
                 row.addEventListener('mouseover', previewIdolRoute);
                 row.addEventListener('focus', previewIdolRoute);
