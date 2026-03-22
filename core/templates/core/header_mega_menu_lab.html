@@ -883,8 +883,8 @@
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-                        <h1 class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">See What's Climbing</h1>
-                        <p class="max-w-xl text-[13px] leading-relaxed text-slate-300">The Charts menu should feel like live momentum: who is rising, what is sticky, and where to jump next.</p>
+                        <h1 id="charts-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">See What's Climbing</h1>
+                        <p id="charts-panel-copy" class="max-w-xl text-[13px] leading-relaxed text-slate-300">The Charts menu should feel like live momentum: who is rising, what is sticky, and where to jump next.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
@@ -939,7 +939,7 @@
                             <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                                 <div class="charts-stat-card p-4">
                                     <div class="flex items-center justify-between gap-3">
-                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Momentum</p>
+                                        <p id="charts-feature-momentum-label" class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Momentum</p>
                                         <p id="charts-feature-momentum-value" class="text-xs font-black uppercase tracking-[0.18em] text-white">{{ mega_menu_charts.0.momentumValue }}</p>
                                     </div>
                                     <p id="charts-feature-momentum-title" class="mt-3 text-xl font-black uppercase tracking-tight text-white">{{ mega_menu_charts.0.momentumTitle }}</p>
@@ -947,7 +947,7 @@
                                 </div>
 
                                 <div class="charts-stat-card p-4">
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Fast Read</p>
+                                    <p id="charts-feature-fast-label" class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Fast Read</p>
                                     <div id="charts-feature-fast-read" class="mt-3 flex flex-wrap gap-2">
                                         {% for item in mega_menu_charts.0.fastRead %}<span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">{{ item }}</span>{% endfor %}
                                     </div>
@@ -989,30 +989,30 @@
                     <div class="chart-snapshot-card p-5 sm:p-6">
                         <div class="flex items-center justify-between gap-4">
                             <div>
-                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Chart Lanes</p>
-                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Jump By Signal</h3>
+                                <p id="charts-lanes-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Chart Lanes</p>
+                                <h3 id="charts-lanes-title" class="mt-2 text-xl font-black uppercase tracking-tight text-white">Jump By Signal</h3>
                             </div>
-                            <span class="border border-white/15 bg-white/5 px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Live Data</span>
+                            <span id="charts-lanes-status" class="border border-white/15 bg-white/5 px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-slate-200">Live Data</span>
                         </div>
                         <div class="mt-4 space-y-3">
-                            <a href="{% url 'charts' %}" class="chart-link stream-route-link p-4">
+                            <a id="charts-lane-link-1" href="{% url 'charts' %}" class="chart-link stream-route-link p-4">
                                 <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Top 20</p>
-                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">See The Full Leaderboard</p>
+                                    <p id="charts-lane-1-kicker" class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Top 20</p>
+                                    <p id="charts-lane-1-title" class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">See The Full Leaderboard</p>
                                 </div>
                                 <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
                             </a>
-                            <a href="{% url 'news' %}" class="chart-link stream-route-link p-4">
+                            <a id="charts-lane-link-2" href="{% url 'news' %}" class="chart-link stream-route-link p-4">
                                 <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Breakdowns</p>
-                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Read Why Songs Are Moving</p>
+                                    <p id="charts-lane-2-kicker" class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Breakdowns</p>
+                                    <p id="charts-lane-2-title" class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Read Why Songs Are Moving</p>
                                 </div>
                                 <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
                             </a>
-                            <a href="{% url 'idols' %}" class="chart-link stream-route-link p-4">
+                            <a id="charts-lane-link-3" href="{% url 'idols' %}" class="chart-link stream-route-link p-4">
                                 <div>
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Artists</p>
-                                    <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Jump To The Idol Pages</p>
+                                    <p id="charts-lane-3-kicker" class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Artists</p>
+                                    <p id="charts-lane-3-title" class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">Jump To The Idol Pages</p>
                                 </div>
                                 <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
                             </a>
@@ -1543,6 +1543,8 @@
             const idolsFeaturePrimaryCta = document.getElementById('idols-feature-primary-cta');
             const idolsFeatureSecondaryCta = document.getElementById('idols-feature-secondary-cta');
             const chartsFeatureImage = document.getElementById('charts-feature-image');
+            const chartsPanelTitle = document.getElementById('charts-panel-title');
+            const chartsPanelCopy = document.getElementById('charts-panel-copy');
             const chartsFeatureKicker = document.getElementById('charts-feature-kicker');
             const chartsFeatureRankline = document.getElementById('charts-feature-rankline');
             const chartsFeatureStatus = document.getElementById('charts-feature-status');
@@ -1552,9 +1554,11 @@
             const chartsFeatureChips = document.getElementById('charts-feature-chips');
             const chartsFeaturePrimaryCta = document.getElementById('charts-feature-primary-cta');
             const chartsFeatureSecondaryCta = document.getElementById('charts-feature-secondary-cta');
+            const chartsFeatureMomentumLabel = document.getElementById('charts-feature-momentum-label');
             const chartsFeatureMomentumValue = document.getElementById('charts-feature-momentum-value');
             const chartsFeatureMomentumTitle = document.getElementById('charts-feature-momentum-title');
             const chartsFeatureMomentumCopy = document.getElementById('charts-feature-momentum-copy');
+            const chartsFeatureFastLabel = document.getElementById('charts-feature-fast-label');
             const chartsFeatureFastRead = document.getElementById('charts-feature-fast-read');
             const chartsFeatureFastCopy = document.getElementById('charts-feature-fast-copy');
             const chartsMoversList = document.getElementById('charts-movers-list');
@@ -1562,6 +1566,18 @@
             const chartsMoversKicker = document.getElementById('charts-movers-kicker');
             const chartsMoversTitle = document.getElementById('charts-movers-title');
             const chartsMoversMeta = document.getElementById('charts-movers-meta');
+            const chartsLanesKicker = document.getElementById('charts-lanes-kicker');
+            const chartsLanesTitle = document.getElementById('charts-lanes-title');
+            const chartsLanesStatus = document.getElementById('charts-lanes-status');
+            const chartsLane1Link = document.getElementById('charts-lane-link-1');
+            const chartsLane2Link = document.getElementById('charts-lane-link-2');
+            const chartsLane3Link = document.getElementById('charts-lane-link-3');
+            const chartsLane1Kicker = document.getElementById('charts-lane-1-kicker');
+            const chartsLane2Kicker = document.getElementById('charts-lane-2-kicker');
+            const chartsLane3Kicker = document.getElementById('charts-lane-3-kicker');
+            const chartsLane1Title = document.getElementById('charts-lane-1-title');
+            const chartsLane2Title = document.getElementById('charts-lane-2-title');
+            const chartsLane3Title = document.getElementById('charts-lane-3-title');
 
             if (
                 !panelTagline ||
@@ -1698,6 +1714,204 @@
             let activeChartId = allChartMovers.length ? allChartMovers[0].id : null;
             let activeIdolRouteId = idolRoutes.length ? idolRoutes[0].id : null;
             let activeChartView = 'climbing';
+            const chartViewRotationOffset = {
+                climbing: 0,
+                momentum: 1,
+                spotlight: 2
+            };
+            const activeChartByView = {
+                climbing: null,
+                momentum: null,
+                spotlight: null
+            };
+            const ensureArray = (value) => Array.isArray(value) ? value : [];
+            const firstNonEmpty = (...values) => {
+                for (const value of values) {
+                    const text = String(value || '').trim();
+                    if (text) return text;
+                }
+                return '';
+            };
+            const getChartNames = (chart) => {
+                const normalizedTitle = String(chart.title || '').replace(/Â/g, '');
+                const [trackRaw, artistRaw] = normalizedTitle.split('\u00b7').map((part) => part.trim());
+                return {
+                    track: trackRaw || 'Untitled',
+                    artist: artistRaw || 'Unknown Artist'
+                };
+            };
+            const shortLine = (value, maxWords = 14) => {
+                const clean = String(value || '').replace(/\s+/g, ' ').trim();
+                if (!clean) return '';
+                const words = clean.split(' ');
+                if (words.length <= maxWords) return clean;
+                return `${words.slice(0, maxWords).join(' ')}...`;
+            };
+            const chartCardLead = {
+                climbing: ['Fast climb', 'Steady rise', 'Breakout push'],
+                momentum: ['Acceleration', 'Velocity spike', 'Surge watch'],
+                spotlight: ['Why now', 'Editor pick', 'Fan focus']
+            };
+            const chartViewConfig = {
+                climbing: {
+                    panelTitle: "See What's Climbing",
+                    panelCopy: 'The Charts menu should feel like live momentum: who is rising, what is sticky, and where to jump next.',
+                    moversKicker: 'Top Movers',
+                    moversTitle: 'Climbing Fast',
+                    moversMeta: '24h delta',
+                    momentumLabel: 'Momentum',
+                    fastLabel: 'Fast Read',
+                    lanesKicker: 'Chart Lanes',
+                    lanesTitle: 'Jump By Signal',
+                    lanesStatus: 'Live Data',
+                    lanes: [
+                        { href: urls.charts, kicker: 'Top 20', title: 'See The Full Leaderboard' },
+                        { href: urls.news, kicker: 'Breakdowns', title: 'Read Why Songs Are Moving' },
+                        { href: urls.idols, kicker: 'Artists', title: 'Jump To The Idol Pages' }
+                    ],
+                    featureKicker: (chart) => chart.kicker || `Rank ${chart.rank || '#1'}`,
+                    featureTagline: (chart) => firstNonEmpty(chart.tagline, chart.momentumCopy, 'Tracking the songs climbing fastest this hour.'),
+                    featureTitle: (chart) => firstNonEmpty(chart.title, `${getChartNames(chart).track} - ${getChartNames(chart).artist}`),
+                    featureStatus: (chart) => firstNonEmpty(chart.status, 'Moving'),
+                    featureDescription: (chart) => firstNonEmpty(chart.description, chart.momentumCopy, 'Open Charts for the full movement feed.'),
+                    rankline: (chart) => chart.rankLine || 'Latest daily sync',
+                    featureChips: (chart) => {
+                        const chips = ensureArray(chart.chips).filter(Boolean);
+                        if (chips.length) return chips;
+                        const names = getChartNames(chart);
+                        return [`Artist ${names.artist}`, `Rank ${chart.rank || '#1'}`, 'Daily chart'];
+                    },
+                    primaryLabel: (chart) => chart.primaryLabel || 'Open Charts',
+                    primaryHref: (chart) => chart.primaryHref || urls.charts,
+                    primaryIcon: (chart) => chart.primaryIcon || 'bar_chart',
+                    secondaryLabel: (chart) => chart.secondaryLabel || 'Read The Story',
+                    secondaryHref: (chart) => chart.secondaryHref || urls.news,
+                    secondaryIcon: (chart) => chart.secondaryIcon || 'north_east',
+                    momentumValue: (chart) => chart.momentumValue || chart.rank || '#1',
+                    momentumTitle: (chart) => firstNonEmpty(chart.momentumTitle, 'Chart Heat'),
+                    momentumCopy: (chart) => firstNonEmpty(chart.momentumCopy, chart.description, 'Momentum details are syncing.'),
+                    fastRead: (chart) => {
+                        const rows = ensureArray(chart.fastRead).filter(Boolean);
+                        if (rows.length) return rows.slice(0, 3);
+                        const names = getChartNames(chart);
+                        return [`Rank ${chart.rank || '#1'}`, names.artist, names.track];
+                    },
+                    fastCopy: (chart) => firstNonEmpty(chart.fastCopy, chart.tagline, 'Quick context updates hourly.'),
+                    cardTitle: (chart) => firstNonEmpty(chart.title, `${getChartNames(chart).track} - ${getChartNames(chart).artist}`),
+                    cardCopy: (chart, index) => {
+                        const lead = chartCardLead.climbing[index % chartCardLead.climbing.length];
+                        const body = shortLine(firstNonEmpty(chart.description, chart.tagline, chart.momentumCopy), 13);
+                        return `${lead}: ${body || 'Tracking this mover now.'}`;
+                    }
+                },
+                momentum: {
+                    panelTitle: 'Track Pure Momentum',
+                    panelCopy: 'Momentum mode reshuffles the board by acceleration so you can catch songs gaining fastest right now.',
+                    moversKicker: 'Momentum Leaders',
+                    moversTitle: 'Most Accelerating',
+                    moversMeta: 'speed index',
+                    momentumLabel: 'Velocity',
+                    fastLabel: 'Signal Notes',
+                    lanesKicker: 'Momentum Lanes',
+                    lanesTitle: 'Follow The Surge',
+                    lanesStatus: 'Velocity Mode',
+                    lanes: [
+                        { href: urls.charts, kicker: 'Velocity Board', title: 'Open Fastest Rising Tracks' },
+                        { href: urls.news, kicker: 'Why Rising', title: 'Read Momentum Breakdowns' },
+                        { href: urls.live, kicker: 'On Air Lift', title: 'Hear What Is Gaining Spins' }
+                    ],
+                    featureKicker: (chart) => `Momentum ${firstNonEmpty(chart.momentumValue, chart.rank, '#1')}`,
+                    featureTagline: (chart) => firstNonEmpty(chart.momentumTitle, chart.tagline, 'This song is accelerating across charts.'),
+                    featureTitle: (chart) => `${getChartNames(chart).track} Surge`,
+                    featureStatus: (chart) => firstNonEmpty(chart.momentumValue, chart.status, 'Surging'),
+                    featureDescription: (chart) => firstNonEmpty(chart.momentumCopy, chart.description, 'Momentum details are updating live.'),
+                    rankline: (chart) => `Momentum lane - ${chart.rankLine || 'Hourly sync'}`,
+                    featureChips: (chart) => {
+                        const names = getChartNames(chart);
+                        return [
+                            `Speed ${firstNonEmpty(chart.momentumValue, chart.status, 'Live')}`,
+                            `Artist ${names.artist}`,
+                            `Rank ${chart.rank || '#1'}`
+                        ];
+                    },
+                    primaryLabel: () => 'Open Momentum Board',
+                    primaryHref: (chart) => chart.primaryHref || urls.charts,
+                    primaryIcon: () => 'bolt',
+                    secondaryLabel: () => 'Read The Breakdown',
+                    secondaryHref: (chart) => chart.secondaryHref || urls.news,
+                    secondaryIcon: () => 'north_east',
+                    momentumValue: (chart) => chart.momentumValue || chart.rank || '#1',
+                    momentumTitle: (chart) => firstNonEmpty(chart.momentumTitle, `${getChartNames(chart).track} acceleration`),
+                    momentumCopy: (chart) => firstNonEmpty(chart.momentumCopy, chart.description, 'Velocity context unavailable.'),
+                    fastRead: (chart) => {
+                        const rows = ensureArray(chart.fastRead).filter(Boolean);
+                        if (rows.length) return rows.slice(0, 3);
+                        const names = getChartNames(chart);
+                        return [names.artist, names.track, 'Velocity'];
+                    },
+                    fastCopy: (chart) => firstNonEmpty(chart.fastCopy, chart.tagline, 'Speed signals refresh each cycle.'),
+                    cardTitle: (chart) => `${getChartNames(chart).track} Velocity`,
+                    cardCopy: (chart, index) => {
+                        const lead = chartCardLead.momentum[index % chartCardLead.momentum.length];
+                        const body = shortLine(firstNonEmpty(chart.momentumCopy, chart.fastCopy, chart.description), 13);
+                        return `${lead}: ${body || 'Momentum note is updating.'}`;
+                    }
+                },
+                spotlight: {
+                    panelTitle: 'Spotlight The Live Pulse',
+                    panelCopy: 'Spotlight mode highlights live and editorial picks so you can jump straight into what fans are watching now.',
+                    moversKicker: 'Live Focus',
+                    moversTitle: 'Spotlight Picks',
+                    moversMeta: 'editor watch',
+                    momentumLabel: 'Spotlight',
+                    fastLabel: 'Context',
+                    lanesKicker: 'Spotlight Lanes',
+                    lanesTitle: 'Jump By Story',
+                    lanesStatus: 'Spotlight Mode',
+                    lanes: [
+                        { href: urls.news, kicker: 'Feature Story', title: 'Open The Lead Chart Story' },
+                        { href: urls.idols, kicker: 'Artist Radar', title: 'Jump To The Featured Idol' },
+                        { href: urls.charts, kicker: 'Full Board', title: 'See Every Spotlight Rank' }
+                    ],
+                    featureKicker: (chart) => `Spotlight ${getChartNames(chart).artist}`,
+                    featureTagline: (chart) => firstNonEmpty(chart.tagline, chart.fastCopy, 'Editor-selected highlights from the board.'),
+                    featureTitle: (chart) => `${getChartNames(chart).artist} In Focus`,
+                    featureStatus: (chart) => firstNonEmpty(chart.status, 'Featured'),
+                    featureDescription: (chart) => firstNonEmpty(chart.fastCopy, chart.description, 'Spotlight context is updating.'),
+                    rankline: (chart) => `Editor focus - ${chart.rankLine || 'Live sync'}`,
+                    featureChips: (chart) => {
+                        const names = getChartNames(chart);
+                        return [
+                            'Spotlight pick',
+                            `Artist ${names.artist}`,
+                            `Track ${names.track}`
+                        ];
+                    },
+                    primaryLabel: () => 'Open Spotlight',
+                    primaryHref: (chart) => chart.primaryHref || urls.charts,
+                    primaryIcon: () => 'star',
+                    secondaryLabel: () => 'Open Artist Context',
+                    secondaryHref: () => urls.idols,
+                    secondaryIcon: () => 'north_east',
+                    momentumValue: (chart) => chart.status || chart.rank || 'Live',
+                    momentumTitle: (chart) => `${getChartNames(chart).track} highlight`,
+                    momentumCopy: (chart) => firstNonEmpty(chart.fastCopy, chart.description, 'Spotlight summary unavailable.'),
+                    fastRead: (chart) => {
+                        const chipRows = ensureArray(chart.chips).filter(Boolean);
+                        if (chipRows.length) return chipRows.slice(0, 3);
+                        const names = getChartNames(chart);
+                        return [firstNonEmpty(chart.status, 'Featured'), names.artist, names.track];
+                    },
+                    fastCopy: (chart) => firstNonEmpty(chart.description, chart.momentumCopy, 'Dive into the featured story thread.'),
+                    cardTitle: (chart) => `${getChartNames(chart).artist} Spotlight`,
+                    cardCopy: (chart, index) => {
+                        const lead = chartCardLead.spotlight[index % chartCardLead.spotlight.length];
+                        const body = shortLine(firstNonEmpty(chart.tagline, chart.fastCopy, chart.description), 13);
+                        return `${lead}: ${body || 'Spotlight summary is updating.'}`;
+                    }
+                }
+            };
+            const getChartViewConfig = () => chartViewConfig[activeChartView] || chartViewConfig.climbing;
 
             const getRankNumber = (chart) => {
                 const rankText = String(chart.rank || '').replace('#', '').trim();
@@ -1727,20 +1941,35 @@
                 return list.sort((a, b) => getRankNumber(a) - getRankNumber(b));
             };
 
+            const getDefaultChartIdForView = (view, preferStored = true) => {
+                const movers = getChartMoversForView(view);
+                if (!movers.length) return null;
+
+                const storedChartId = activeChartByView[view];
+                if (preferStored && storedChartId && movers.some((item) => item.id === storedChartId)) {
+                    return storedChartId;
+                }
+
+                const offset = chartViewRotationOffset[view] || 0;
+                const index = ((offset % movers.length) + movers.length) % movers.length;
+                return movers[index].id;
+            };
+
             const renderChartsMoversList = () => {
                 if (!chartsMoversList) return;
                 const movers = getChartMoversForView(activeChartView);
+                const view = getChartViewConfig();
                 if (!movers.length) {
                     chartsMoversList.innerHTML = '<div class="chart-rank-card block p-4 text-xs text-slate-400">Chart ranking data is not available yet.</div>';
                     return;
                 }
-                chartsMoversList.innerHTML = movers.map((item) => `
+                chartsMoversList.innerHTML = movers.map((item, index) => `
                     <a href="{% url 'charts' %}" data-chart-id="${item.id}" class="chart-link chart-rank-card block p-4 transition-colors">
                         <div class="flex items-start justify-between gap-3">
                             <div>
                                 <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">${item.rank || ''}</p>
-                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">${item.title || ''}</p>
-                                <p class="mt-2 text-xs leading-relaxed text-slate-300">${item.description || ''}</p>
+                                <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">${view.cardTitle(item, index)}</p>
+                                <p class="mt-2 text-xs leading-relaxed text-slate-300">${view.cardCopy(item, index)}</p>
                             </div>
                             <span class="chart-rank-badge px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em]">${item.status || 'Live'}</span>
                         </div>
@@ -1748,30 +1977,36 @@
                 `).join('');
             };
 
-            const refreshChartViewTabs = () => {
+            const renderChartViewFrame = () => {
+                const view = getChartViewConfig();
+                if (chartsPanelTitle) chartsPanelTitle.textContent = view.panelTitle;
+                if (chartsPanelCopy) chartsPanelCopy.textContent = view.panelCopy;
                 chartViewTabs.forEach((button) => {
                     const isActive = button.getAttribute('data-chart-view') === activeChartView;
                     button.classList.toggle('active', isActive);
                     button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
                 });
+                if (chartsMoversKicker) chartsMoversKicker.textContent = view.moversKicker;
+                if (chartsMoversTitle) chartsMoversTitle.textContent = view.moversTitle;
+                if (chartsMoversMeta) chartsMoversMeta.textContent = view.moversMeta;
+                if (chartsFeatureMomentumLabel) chartsFeatureMomentumLabel.textContent = view.momentumLabel;
+                if (chartsFeatureFastLabel) chartsFeatureFastLabel.textContent = view.fastLabel;
+                if (chartsLanesKicker) chartsLanesKicker.textContent = view.lanesKicker;
+                if (chartsLanesTitle) chartsLanesTitle.textContent = view.lanesTitle;
+                if (chartsLanesStatus) chartsLanesStatus.textContent = view.lanesStatus;
 
-                if (chartsMoversKicker && chartsMoversTitle && chartsMoversMeta) {
-                    if (activeChartView === 'momentum') {
-                        chartsMoversKicker.textContent = 'Momentum Leaders';
-                        chartsMoversTitle.textContent = 'Most Accelerating';
-                        chartsMoversMeta.textContent = 'speed index';
-                        return;
-                    }
-                    if (activeChartView === 'spotlight') {
-                        chartsMoversKicker.textContent = 'Live Focus';
-                        chartsMoversTitle.textContent = 'Spotlight Picks';
-                        chartsMoversMeta.textContent = 'editor watch';
-                        return;
-                    }
-                    chartsMoversKicker.textContent = 'Top Movers';
-                    chartsMoversTitle.textContent = 'Climbing Fast';
-                    chartsMoversMeta.textContent = '24h delta';
-                }
+                const laneElements = [
+                    { link: chartsLane1Link, kicker: chartsLane1Kicker, title: chartsLane1Title },
+                    { link: chartsLane2Link, kicker: chartsLane2Kicker, title: chartsLane2Title },
+                    { link: chartsLane3Link, kicker: chartsLane3Kicker, title: chartsLane3Title }
+                ];
+                laneElements.forEach((elements, index) => {
+                    const lane = view.lanes[index];
+                    if (!lane) return;
+                    if (elements.link) elements.link.href = lane.href;
+                    if (elements.kicker) elements.kicker.textContent = lane.kicker;
+                    if (elements.title) elements.title.textContent = lane.title;
+                });
             };
 
             const highlightActiveChart = () => {
@@ -1784,41 +2019,45 @@
             const setActiveChart = (chartId) => {
                 const chart = allChartMovers.find((item) => item.id === chartId);
                 if (!chart) return;
+                const view = getChartViewConfig();
 
                 activeChartId = chart.id;
+                if (Object.prototype.hasOwnProperty.call(activeChartByView, activeChartView)) {
+                    activeChartByView[activeChartView] = chart.id;
+                }
                 if (chartsFeatureImage) {
                     chartsFeatureImage.style.backgroundImage = `url('${chart.image}')`;
                 }
-                if (chartsFeatureKicker) chartsFeatureKicker.textContent = chart.kicker;
+                if (chartsFeatureKicker) chartsFeatureKicker.textContent = view.featureKicker(chart);
                 if (chartsFeatureRankline) {
-                    chartsFeatureRankline.innerHTML = `<span class="chart-rank-badge inline-flex h-6 min-w-6 items-center justify-center px-2 text-[9px] font-black">${chart.rank}</span>${chart.rankLine}`;
+                    chartsFeatureRankline.innerHTML = `<span class="chart-rank-badge inline-flex h-6 min-w-6 items-center justify-center px-2 text-[9px] font-black">${chart.rank || '#1'}</span>${view.rankline(chart)}`;
                 }
-                if (chartsFeatureStatus) chartsFeatureStatus.textContent = chart.status;
-                if (chartsFeatureTagline) chartsFeatureTagline.textContent = chart.tagline;
-                if (chartsFeatureTitle) chartsFeatureTitle.textContent = chart.title;
-                if (chartsFeatureDescription) chartsFeatureDescription.textContent = chart.description;
+                if (chartsFeatureStatus) chartsFeatureStatus.textContent = view.featureStatus(chart);
+                if (chartsFeatureTagline) chartsFeatureTagline.textContent = view.featureTagline(chart);
+                if (chartsFeatureTitle) chartsFeatureTitle.textContent = view.featureTitle(chart);
+                if (chartsFeatureDescription) chartsFeatureDescription.textContent = view.featureDescription(chart);
                 if (chartsFeatureChips) {
-                    chartsFeatureChips.innerHTML = chart.chips
+                    chartsFeatureChips.innerHTML = ensureArray(view.featureChips(chart))
                         .map((chip) => `<span class="chart-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">${chip}</span>`)
                         .join('');
                 }
                 if (chartsFeaturePrimaryCta) {
-                    chartsFeaturePrimaryCta.href = chart.primaryHref;
-                    chartsFeaturePrimaryCta.innerHTML = `${chart.primaryLabel}<span class="material-symbols-outlined text-base">${chart.primaryIcon}</span>`;
+                    chartsFeaturePrimaryCta.href = view.primaryHref(chart);
+                    chartsFeaturePrimaryCta.innerHTML = `${view.primaryLabel(chart)}<span class="material-symbols-outlined text-base">${view.primaryIcon(chart)}</span>`;
                 }
                 if (chartsFeatureSecondaryCta) {
-                    chartsFeatureSecondaryCta.href = chart.secondaryHref;
-                    chartsFeatureSecondaryCta.innerHTML = `${chart.secondaryLabel}<span class="material-symbols-outlined text-base">${chart.secondaryIcon}</span>`;
+                    chartsFeatureSecondaryCta.href = view.secondaryHref(chart);
+                    chartsFeatureSecondaryCta.innerHTML = `${view.secondaryLabel(chart)}<span class="material-symbols-outlined text-base">${view.secondaryIcon(chart)}</span>`;
                 }
-                if (chartsFeatureMomentumValue) chartsFeatureMomentumValue.textContent = chart.momentumValue;
-                if (chartsFeatureMomentumTitle) chartsFeatureMomentumTitle.textContent = chart.momentumTitle;
-                if (chartsFeatureMomentumCopy) chartsFeatureMomentumCopy.textContent = chart.momentumCopy;
+                if (chartsFeatureMomentumValue) chartsFeatureMomentumValue.textContent = view.momentumValue(chart);
+                if (chartsFeatureMomentumTitle) chartsFeatureMomentumTitle.textContent = view.momentumTitle(chart);
+                if (chartsFeatureMomentumCopy) chartsFeatureMomentumCopy.textContent = view.momentumCopy(chart);
                 if (chartsFeatureFastRead) {
-                    chartsFeatureFastRead.innerHTML = chart.fastRead
+                    chartsFeatureFastRead.innerHTML = view.fastRead(chart)
                         .map((item) => `<span class="chart-mini-pill px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]">${item}</span>`)
                         .join('');
                 }
-                if (chartsFeatureFastCopy) chartsFeatureFastCopy.textContent = chart.fastCopy;
+                if (chartsFeatureFastCopy) chartsFeatureFastCopy.textContent = view.fastCopy(chart);
                 highlightActiveChart();
             };
 
@@ -1860,12 +2099,12 @@
             };
 
             renderList();
-            refreshChartViewTabs();
+            renderChartViewFrame();
             renderChartsMoversList();
-            const initialCharts = getChartMoversForView(activeChartView);
-            if (initialCharts.length) activeChartId = initialCharts[0].id;
+            const initialChartId = getDefaultChartIdForView(activeChartView, false);
+            if (initialChartId) activeChartId = initialChartId;
             setActiveStream(activeStreamId);
-            setActiveChart(activeChartId);
+            if (activeChartId) setActiveChart(activeChartId);
             setActiveIdolRoute(activeIdolRouteId);
 
             const previewStream = (event) => {
@@ -1899,12 +2138,10 @@
                     const nextView = tab.getAttribute('data-chart-view');
                     if (!nextView || nextView === activeChartView) return;
                     activeChartView = nextView;
-                    refreshChartViewTabs();
+                    renderChartViewFrame();
                     renderChartsMoversList();
-                    const movers = getChartMoversForView(activeChartView);
-                    if (movers.length) {
-                        setActiveChart(movers[0].id);
-                    }
+                    const nextChartId = getDefaultChartIdForView(activeChartView, true);
+                    if (nextChartId) setActiveChart(nextChartId);
                 });
             });
             document.querySelectorAll('[data-idol-route]').forEach((row) => {
@@ -1988,7 +2225,13 @@
                 charts: {
                     trigger: chartsTrigger,
                     panel: chartsPanel,
-                    onShow: () => {}
+                    onShow: () => {
+                        activeChartView = 'climbing';
+                        renderChartViewFrame();
+                        renderChartsMoversList();
+                        const defaultChartId = getDefaultChartIdForView(activeChartView, false);
+                        if (defaultChartId) setActiveChart(defaultChartId);
+                    }
                 },
                 news: {
                     trigger: newsTrigger,
