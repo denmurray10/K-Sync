@@ -349,10 +349,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             Tonight's Schedule
                             <span class="material-symbols-outlined text-lg">event_upcoming</span>
                         </a>
-                        <a href="{% url 'live_player_popout' %}" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-white hover:text-white transition-colors sm:col-span-2 xl:col-span-1">
-                            Popout Player
-                            <span class="material-symbols-outlined text-lg">open_in_new</span>
-                        </a>
                     </div>
 
                     <div class="mt-8 grid gap-5 md:grid-cols-[minmax(0,1fr)_320px] items-end">
@@ -611,8 +607,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="live-full-bleed-band relative py-10 sm:py-12">
         <div class="container mx-auto px-4 sm:px-6">
             <article class="glass-panel solid-black-panel border border-white/10 p-4 sm:p-6 reveal-up" style="transition-delay: 240ms;">
-                <div class="grid gap-6 xl:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)]">
-                    <div>
+                <div>
                         <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Shape The Room</p>
                         <h3 class="mt-3 font-display text-3xl uppercase leading-none sm:text-4xl">{{ live_poll.heading|default:"Artist Of The Week" }}</h3>
                         <p class="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300">
@@ -670,49 +665,64 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                         </div>
                         {% endif %}
+                </div>
 
-                        {% if live_poll %}
-                        <div id="live-poll-panel" class="mt-6" data-poll-id="{{ live_poll.id }}">
-                            <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Weekly Takeover Vote</p>
-                            <p id="live-poll-question" class="mt-3 font-display text-2xl uppercase leading-tight text-white">{{ live_poll.question }}</p>
-                            <p id="live-poll-total" class="mt-3 text-[10px] uppercase tracking-[0.22em] text-slate-400">{{ live_poll.total_votes }} votes cast</p>
-
-                            <div class="mt-4 space-y-3">
-                                {% for option in live_poll.options %}
-                                <button type="button" data-poll-option="{{ option.id }}" class="group relative w-full overflow-hidden border border-white/20 bg-white/5 p-4 md:p-6 text-left transition-all duration-300 hover:border-primary hover:bg-black disabled:cursor-not-allowed disabled:opacity-60" {% if live_poll.locked %}disabled{% endif %}>
-                                    <span data-poll-bar class="absolute inset-y-0 left-0 bg-primary/20 z-0 transition-all duration-1000" style="width: {% if live_poll.locked %}0{% else %}{{ option.percentage }}%{% endif %}"></span>
-                                    <span data-poll-selected-bar class="absolute left-0 top-0 bottom-0 w-2 bg-primary z-10 hidden"></span>
-
-                                    <span class="relative z-10 w-full md:hidden flex flex-col gap-2">
-                                        <span class="grid grid-cols-2 items-center gap-3">
-                                            <span data-poll-letter class="w-8 h-8 flex items-center justify-center border border-white/40 font-mono text-xs font-black text-white transition-colors group-hover:border-primary">{{ forloop.counter }}</span>
-                                            <span data-poll-percent class="text-right font-black text-xl text-primary">{% if live_poll.locked %}Locked{% else %}{{ option.percentage }}%{% endif %}</span>
-                                        </span>
-                                        <span class="font-bold text-sm tracking-tight uppercase text-white">{{ option.text }}</span>
-                                    </span>
-
-                                    <span class="relative z-10 hidden md:flex items-center justify-between gap-4">
-                                        <span class="flex items-center gap-4">
-                                            <span data-poll-letter class="w-8 h-8 flex items-center justify-center border border-white/40 font-mono text-xs font-black text-white transition-colors group-hover:border-primary">{{ forloop.counter }}</span>
-                                            <span class="font-bold text-lg tracking-tight uppercase text-white">{{ option.text }}</span>
-                                        </span>
-                                        <span data-poll-percent class="font-black text-xl text-primary">{% if live_poll.locked %}Locked{% else %}{{ option.percentage }}%{% endif %}</span>
-                                    </span>
-                                </button>
-                                {% endfor %}
+                {% if live_poll %}
+                <div id="live-poll-panel" class="mt-8 border-t border-white/10 pt-8" data-poll-id="{{ live_poll.id }}">
+                    <div class="inline-flex items-center gap-2 border border-primary bg-primary/10 px-3 py-1 text-primary">
+                        <span class="h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.2em]">Live Poll</span>
+                    </div>
+                    <p id="live-poll-question" class="mt-6 max-w-4xl text-4xl font-black uppercase tracking-tighter leading-none text-white md:text-5xl">{{ live_poll.question }}</p>
+                    <p class="mt-5 max-w-md font-mono text-sm uppercase tracking-widest text-white/70">Cast your vote now.</p>
+                            <div class="mt-7 flex items-center gap-4 border-t border-white/20 pt-6">
+                                <span class="material-symbols-outlined text-3xl text-primary">how_to_vote</span>
+                                <div>
+                                    <div id="live-poll-total" class="text-2xl font-black tracking-tighter text-white">{{ live_poll.total_votes }}</div>
+                                    <div class="font-mono text-[10px] uppercase tracking-widest text-white/50">Total Votes Cast</div>
+                                </div>
                             </div>
-
-                            <p id="live-poll-status" class="mt-4 text-[10px] font-black uppercase tracking-[0.22em] {% if live_poll.locked %}text-primary{% else %}text-slate-400{% endif %}">
-                                {% if live_poll.locked %}{{ live_poll.locked_message }}{% else %}{{ live_poll.status_prompt }}{% endif %}
+                            {% if live_poll.simulated_results %}
+                            <p class="mt-3 text-[10px] uppercase tracking-[0.22em] text-slate-500">
+                                Fan totals pulse upward by {{ live_poll.hourly_growth_min }}-{{ live_poll.hourly_growth_max }} votes an hour, with {{ live_poll.winning_option_text|default:"BTS" }} currently holding the lead.
                             </p>
-                            {% if live_poll.early_access_note %}
-                            <p class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ live_poll.early_access_note }}</p>
                             {% endif %}
-                        </div>
-                        {% endif %}
+
+                    <div class="mt-6 space-y-3">
+                        {% for option in live_poll.options %}
+                        <button type="button" data-poll-option="{{ option.id }}" class="group relative w-full overflow-hidden border border-white/20 bg-white/5 p-6 text-left transition-all duration-300 hover:border-primary hover:bg-black disabled:cursor-not-allowed disabled:opacity-60" {% if live_poll.locked %}disabled{% endif %}>
+                            <span data-poll-bar class="absolute inset-y-0 left-0 bg-primary/20 z-0 transition-all duration-1000" style="width: {% if live_poll.locked %}0{% else %}{{ option.percentage }}%{% endif %}"></span>
+                            <span data-poll-selected-bar class="absolute left-0 top-0 bottom-0 w-2 bg-primary z-10 hidden"></span>
+
+                            <span class="relative z-10 flex w-full flex-col gap-2 md:hidden">
+                                <span class="grid grid-cols-2 items-center gap-3">
+                                    <span data-poll-letter class="flex h-8 w-8 items-center justify-center border border-white/40 font-mono text-xs font-black text-white transition-colors group-hover:border-primary">{{ forloop.counter }}</span>
+                                    <span data-poll-percent class="text-right text-xl font-black text-primary">{% if live_poll.locked %}Locked{% else %}{{ option.percentage }}%{% endif %}</span>
+                                </span>
+                                <span class="text-sm font-bold uppercase tracking-tight text-white">{{ option.text }}</span>
+                            </span>
+
+                            <span class="relative z-10 hidden items-center justify-between gap-4 md:flex">
+                                <span class="flex items-center gap-4">
+                                    <span data-poll-letter class="flex h-8 w-8 items-center justify-center border border-white/40 font-mono text-xs font-black text-white transition-colors group-hover:border-primary">{{ forloop.counter }}</span>
+                                    <span class="text-lg font-bold uppercase tracking-tight text-white">{{ option.text }}</span>
+                                </span>
+                                <span data-poll-percent class="text-xl font-black text-primary">{% if live_poll.locked %}Locked{% else %}{{ option.percentage }}%{% endif %}</span>
+                            </span>
+                        </button>
+                        {% endfor %}
                     </div>
 
-                    <aside class="space-y-4">
+                    <p id="live-poll-status" class="mt-4 text-[10px] font-black uppercase tracking-[0.22em] {% if live_poll.locked %}text-primary{% else %}text-slate-400{% endif %}">
+                        {% if live_poll.locked %}{{ live_poll.locked_message }}{% else %}{{ live_poll.status_prompt }}{% endif %}
+                    </p>
+                    {% if live_poll.early_access_note %}
+                    <p class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ live_poll.early_access_note }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <aside class="mt-8 grid gap-4 md:grid-cols-2">
                         <div class="border border-white/10 bg-white/[0.03] p-4 sm:p-5">
                             <div class="flex items-end justify-between gap-4">
                                 <div>
@@ -752,7 +762,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             {% endif %}
                         </div>
                     </aside>
-                </div>
             </article>
         </div>
     </section>
@@ -1108,7 +1117,88 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 .replace(/'/g, '&#39;');
 
             const getRequestedTrackMeta = (title) => requestedTrackLookup[normalizeTitleKey(title)] || null;
+            window.__liveEscapeHtml = escapeHtml;
+            window.__liveGetRequestedTrackMeta = getRequestedTrackMeta;
             const getPollLeaderMessage = (leaderText) => `${leaderText} is leading this week's station takeover right now.`;
+            const getLondonHourStamp = () => {
+                const formatter = new Intl.DateTimeFormat('en-GB', {
+                    timeZone: 'Europe/London',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    hour12: false,
+                });
+                const parts = Object.fromEntries(formatter.formatToParts(new Date()).map((part) => [part.type, part.value]));
+                return `${parts.year}-${parts.month}-${parts.day}-${parts.hour}`;
+            };
+            const getPollSimulationStorageKey = (suffix) => livePollData ? `live_poll_sim_${livePollData.id}_${livePollData.simulated_results_version || 'v1'}_${suffix}` : '';
+            const getPollTargetPercentages = () => Array.isArray(livePollData?.target_percentages) ? livePollData.target_percentages.map((value) => Number(value || 0)) : [];
+            const recalculateSimulatedPollPercentages = () => {
+                if (!livePollData || !Array.isArray(livePollData.options) || !livePollData.options.length) return;
+                const targetPercentages = getPollTargetPercentages();
+                if (targetPercentages.length === livePollData.options.length) {
+                    livePollData.options.forEach((option, idx) => {
+                        option.percentage = Math.max(0, Number(targetPercentages[idx] || 0));
+                    });
+                    return;
+                }
+                const total = Math.max(1, Number(livePollData.total_votes || 0));
+                livePollData.options.forEach((option) => {
+                    option.percentage = Math.max(0, Math.round((Number(option.votes || 0) / total) * 100));
+                });
+            };
+            const applySimulatedPollStorage = () => {
+                if (!livePollData?.simulated_results) return;
+                const hourKey = getLondonHourStamp();
+                const stateKey = getPollSimulationStorageKey('state');
+                const hourStorageKey = getPollSimulationStorageKey('hour');
+                if (!stateKey || !hourStorageKey) return;
+
+                const savedHour = localStorage.getItem(hourStorageKey);
+                const savedStateRaw = localStorage.getItem(stateKey);
+
+                if (savedStateRaw) {
+                    try {
+                        const savedState = JSON.parse(savedStateRaw);
+                        if (savedState && Array.isArray(savedState.options)) {
+                            livePollData.total_votes = Number(savedState.total_votes || livePollData.total_votes || 0);
+                            livePollData.options = livePollData.options.map((option, idx) => ({
+                                ...option,
+                                votes: Number(savedState.options[idx]?.votes || option.votes || 0),
+                            }));
+                            recalculateSimulatedPollPercentages();
+                        }
+                    } catch (error) {
+                        console.warn('Failed to restore simulated poll state', error);
+                    }
+                }
+
+                if (savedHour !== hourKey && Array.isArray(livePollData.options) && livePollData.options.length) {
+                    const growthMin = Number(livePollData.hourly_growth_min || 9);
+                    const growthMax = Number(livePollData.hourly_growth_max || 22);
+                    const totalGain = Math.floor(Math.random() * ((growthMax - growthMin) + 1)) + growthMin;
+                    const targetPercentages = getPollTargetPercentages();
+                    const voteGains = livePollData.options.map((_, idx) => {
+                        const ratio = targetPercentages[idx] ? Number(targetPercentages[idx]) / 100 : (1 / livePollData.options.length);
+                        return Math.max(1, Math.round(totalGain * ratio));
+                    });
+                    voteGains[0] += totalGain - voteGains.reduce((sum, count) => sum + count, 0);
+
+                    livePollData.options = livePollData.options.map((option, idx) => ({
+                        ...option,
+                        votes: Number(option.votes || 0) + Number(voteGains[idx] || 0),
+                    }));
+                    livePollData.total_votes = Number(livePollData.total_votes || 0) + totalGain;
+                    recalculateSimulatedPollPercentages();
+                }
+
+                localStorage.setItem(hourStorageKey, hourKey);
+                localStorage.setItem(stateKey, JSON.stringify({
+                    total_votes: livePollData.total_votes,
+                    options: livePollData.options.map((option) => ({ votes: Number(option.votes || 0) })),
+                }));
+            };
 
             const getPollLeader = () => {
                 if (!livePollData || !Array.isArray(livePollData.options) || !livePollData.options.length) return null;
@@ -1630,7 +1720,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (!livePollData) return;
                 if (livePollTotalEl) {
                     const totalVotes = Number(livePollData.total_votes || 0);
-                    livePollTotalEl.textContent = `${totalVotes.toLocaleString()} votes cast`;
+                    livePollTotalEl.textContent = totalVotes.toLocaleString();
                 }
 
                 livePollButtons.forEach((button) => {
@@ -1740,13 +1830,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         }
                         return;
                     }
-                    livePollData.total_votes = Number(data.total_votes || livePollData.total_votes || 0);
-                    if (Array.isArray(livePollData.options)) {
-                        livePollData.options.forEach((item) => {
-                            if (data.results && data.results[item.id] !== undefined) {
-                                item.percentage = Number(data.results[item.id] || 0);
-                            }
-                        });
+                    if (!livePollData.simulated_results) {
+                        livePollData.total_votes = Number(data.total_votes || livePollData.total_votes || 0);
+                        if (Array.isArray(livePollData.options)) {
+                            livePollData.options.forEach((item) => {
+                                if (data.results && data.results[item.id] !== undefined) {
+                                    item.percentage = Number(data.results[item.id] || 0);
+                                }
+                            });
+                        }
                     }
                     updateLivePollUI();
                 } catch (error) {
@@ -1764,10 +1856,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             };
 
             if (livePollData && livePollButtons.length) {
+                applySimulatedPollStorage();
                 livePollButtons.forEach((button) => {
                     button.addEventListener('click', () => submitLivePollVote(Number(button.dataset.pollOption || 0)));
                 });
                 updateLivePollUI();
+                if (livePollData.simulated_results) {
+                    window.setInterval(() => {
+                        applySimulatedPollStorage();
+                        updateLivePollUI();
+                    }, 300000);
+                }
             }
             updateRoomHypeUI();
 
@@ -2344,9 +2443,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             container.innerHTML = tracks.map((track, idx) => {
                 const title = sanitizePlaylistTitle(track.title);
                 const upNextEta = 'In --:--';
-                const requestMeta = containerId === 'up-next-container' ? getRequestedTrackMeta(track.title) : null;
+                const requestMeta = containerId === 'up-next-container' && typeof window.__liveGetRequestedTrackMeta === 'function'
+                    ? window.__liveGetRequestedTrackMeta(track.title)
+                    : null;
                 const requestChip = requestMeta
-                    ? `<span class="request-chip request-chip--light"><span>Fan Pick</span><span>${escapeHtml(requestMeta.listener_name)}</span></span>`
+                    ? `<span class="request-chip request-chip--light"><span>Fan Pick</span><span>${typeof window.__liveEscapeHtml === 'function' ? window.__liveEscapeHtml(requestMeta.listener_name) : requestMeta.listener_name}</span></span>`
                     : '';
                 const requestRowClass = requestMeta ? 'border-l-2 border-l-primary' : '';
                 return `

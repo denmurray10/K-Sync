@@ -1,4 +1,5 @@
 ﻿import json
+import hashlib
 import logging
 import os
 import uuid
@@ -3622,7 +3623,6 @@ def games(request):
 @csrf_exempt
 @require_POST
 def prelaunch_signup(request):
-    import json
     from .models import PreLaunchSignup
     from django.db import IntegrityError
     try:
@@ -5975,6 +5975,47 @@ def _build_live_poll_context(request):
         "BABYMONSTER",
         "STRAY KIDS",
     ]
+    display_results_version = "bts-38-blackpink-24-v1"
+
+    def _seeded_int(seed_key, minimum, maximum):
+        lower = int(minimum)
+        upper = int(maximum)
+        if upper <= lower:
+            return lower
+        digest = hashlib.sha256(seed_key.encode('utf-8')).hexdigest()
+        return lower + (int(digest[:8], 16) % ((upper - lower) + 1))
+
+    def _build_display_vote_profile(option_labels):
+        now_local = timezone.localtime(timezone.now(), ZoneInfo('Europe/London'))
+        day_key = now_local.strftime('%Y-%m-%d')
+        base_total = 1578
+        incremental_total = sum(
+            _seeded_int(f'live-poll-hourly:{day_key}:{hour}', 9, 22)
+            for hour in range(int(now_local.hour) + 1)
+        )
+        total = min(2162, base_total + incremental_total)
+        target_percentages = [38, 24, 16, 12, 10]
+        votes = [max(1, round((percentage / 100) * total)) for percentage in target_percentages[:len(option_labels)]]
+        if votes:
+            votes[0] += total - sum(votes)
+
+        options = []
+        for idx, label in enumerate(option_labels):
+            count = max(1, votes[idx])
+            options.append({
+                'text': label,
+                'votes': count,
+                'percentage': target_percentages[idx] if idx < len(target_percentages) else round((count / total) * 100),
+            })
+
+        return {
+            'total_votes': total,
+            'options': options,
+            'hourly_growth_min': 9,
+            'hourly_growth_max': 22,
+            'winning_option_text': option_labels[0] if option_labels else '',
+            'target_percentages': target_percentages[:len(option_labels)],
+        }
 
     poll = (
         LivePoll.objects
@@ -5988,7 +6029,8 @@ def _build_live_poll_context(request):
         return None
 
     locked = _is_poll_early_access_locked(request, poll)
-    total_votes = sum(option.votes for option in poll.options.all())
+    display_vote_profile = _build_display_vote_profile(display_option_labels)
+    total_votes = int(display_vote_profile['total_votes'])
     early_access_note = ''
     if poll.early_access_starts_at and poll.early_access_group:
         unlocks_at = timezone.localtime(poll.early_access_starts_at)
@@ -5997,14 +6039,16 @@ def _build_live_poll_context(request):
             f'until {unlocks_at:%a %H:%M}.'
         )
 
+    poll_options = list(poll.options.all())[:len(display_option_labels)]
     options_payload = []
-    for idx, option in enumerate(poll.options.all()):
+    for idx, option in enumerate(poll_options):
         display_text = display_option_labels[idx] if idx < len(display_option_labels) else option.text
+        display_option = display_vote_profile['options'][idx] if idx < len(display_vote_profile['options']) else None
         options_payload.append({
             'id': option.id,
             'text': display_text,
-            'votes': option.votes,
-            'percentage': option.percentage(),
+            'votes': int(display_option['votes']) if display_option else option.votes,
+            'percentage': int(display_option['percentage']) if display_option else option.percentage(),
         })
 
     leading_option = None
@@ -6028,6 +6072,12 @@ def _build_live_poll_context(request):
         'total_votes': total_votes,
         'leading_option': leading_option,
         'options': options_payload,
+        'simulated_results': True,
+        'hourly_growth_min': display_vote_profile['hourly_growth_min'],
+        'hourly_growth_max': display_vote_profile['hourly_growth_max'],
+        'winning_option_text': display_vote_profile['winning_option_text'],
+        'simulated_results_version': display_results_version,
+        'target_percentages': display_vote_profile['target_percentages'],
     }
 
 
