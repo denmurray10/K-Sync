@@ -224,6 +224,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <p class="mt-6 max-w-2xl text-sm md:text-lg text-slate-300 leading-relaxed">
                                 The station now feels less like a plain stream and more like a destination: live status, social energy, next-show momentum, and reasons for fans to check back in later.
                             </p>
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <span id="fan-requested-pill" class="inline-flex items-center gap-2 border border-primary/35 bg-primary/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-primary {% if not live_request_momentum.current_track_requested %}hidden{% endif %}">
+                                    Fan Requested On Air
+                                    <span class="material-symbols-outlined text-sm">bolt</span>
+                                </span>
+                                {% if live_show_snapshot.next %}
+                                <span class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-300">
+                                    Next Handoff {{ live_show_snapshot.next.relative_day_label }} {{ live_show_snapshot.next.time_label }}
+                                    <span class="material-symbols-outlined text-sm text-secondary">schedule</span>
+                                </span>
+                                {% endif %}
+                                <span class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-300">
+                                    {{ live_request_momentum.requests_last_24h }} requests in the last 24h
+                                    <span class="material-symbols-outlined text-sm text-primary">queue_music</span>
+                                </span>
+                            </div>
                         </div>
 
                         <div class="hidden md:flex items-end gap-2 h-20">
@@ -316,15 +332,83 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p id="share-now-playing-status" class="mt-3 min-h-[1rem] text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500" aria-live="polite"></p>
                     </div>
 
-                    <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                        <div class="border border-white/10 bg-white/[0.03] p-4">
-                            <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Why This Feels Better</p>
-                            <p class="mt-3 text-sm text-slate-300 leading-relaxed">The player is now surrounded by context, so every visit tells fans what is happening now and what is worth returning for later.</p>
-                        </div>
-                        <div class="border border-white/10 bg-white/[0.03] p-4">
-                            <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Built To Keep Momentum</p>
-                            <p class="mt-3 text-sm text-slate-300 leading-relaxed">Queue visibility, AI commentary, chat, and show countdowns all support the same goal: make live listening feel active, social, and collectible.</p>
-                        </div>
+                    <div class="mt-5 grid gap-3">
+                        <article class="border border-white/10 bg-white/[0.03] p-4">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Appointment Layer</p>
+                                    <p id="spotlight-current-show-name" class="mt-3 font-display text-2xl uppercase leading-none">
+                                        {% if live_show_snapshot.current %}{{ live_show_snapshot.current.show_name }}{% else %}Live schedule syncing{% endif %}
+                                    </p>
+                                </div>
+                                <span class="material-symbols-outlined text-secondary">event_upcoming</span>
+                            </div>
+                            <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                                <div class="border border-white/10 bg-black/25 p-3">
+                                    <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">On Air Host</p>
+                                    <p id="spotlight-current-show-host" class="mt-2 text-sm font-bold uppercase tracking-[0.18em] text-white">
+                                        {% if live_show_snapshot.current %}{{ live_show_snapshot.current.host_name }}{% else %}Auto DJ{% endif %}
+                                    </p>
+                                    <p id="spotlight-current-show-window" class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-400">
+                                        {% if live_show_snapshot.current %}{{ live_show_snapshot.current.time_range_label }}{% else %}Now on air{% endif %}
+                                    </p>
+                                </div>
+                                <div class="border border-primary/20 bg-primary/10 p-3">
+                                    <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Next Return Window</p>
+                                    <p id="spotlight-next-show-name" class="mt-2 text-sm font-bold uppercase tracking-[0.18em] text-white">
+                                        {% if live_show_snapshot.next %}{{ live_show_snapshot.next.show_name }}{% else %}Schedule loading{% endif %}
+                                    </p>
+                                    <p id="spotlight-next-show-time" class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-300">
+                                        {% if live_show_snapshot.next %}{{ live_show_snapshot.next.relative_day_label }} {{ live_show_snapshot.next.time_label }}{% else %}We are pulling the next handoff{% endif %}
+                                    </p>
+                                    <p id="spotlight-next-show-countdown" class="mt-3 text-[10px] font-black uppercase tracking-[0.24em] text-primary">
+                                        {% if live_show_snapshot.next %}{{ live_show_snapshot.next.countdown_prefix }} {{ live_show_snapshot.next.time_label }}{% else %}Watch this space{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <p id="spotlight-show-description" class="mt-4 text-sm text-slate-300 leading-relaxed">
+                                {% if live_show_snapshot.current %}
+                                {{ live_show_snapshot.current.description }}
+                                {% elif live_show_snapshot.next %}
+                                {{ live_show_snapshot.next.description }}
+                                {% else %}
+                                The page now keeps the next show visible so listeners always have a reason to come back at a specific time.
+                                {% endif %}
+                            </p>
+                        </article>
+
+                        <article class="border border-white/10 bg-white/[0.03] p-4">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Moment Archive</p>
+                                    <p id="saved-moment-count" class="mt-3 font-display text-4xl uppercase leading-none">{{ live_return_profile.saved_moments_count }}</p>
+                                    <p class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-400">Saved live moments</p>
+                                </div>
+                                {% if live_return_profile.is_authenticated %}
+                                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 border border-white/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                                    Open Archive
+                                    <span class="material-symbols-outlined text-sm">north_east</span>
+                                </a>
+                                {% else %}
+                                <a href="{% url 'login' %}" class="inline-flex items-center gap-2 border border-white/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                                    Log In
+                                    <span class="material-symbols-outlined text-sm">login</span>
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div id="saved-moment-archive-list" class="mt-4 space-y-2">
+                                {% for item in live_return_profile.saved_moments %}
+                                <div class="border border-white/10 bg-black/25 p-3" data-saved-title="{{ item.title }}" data-saved-artist="{{ item.artist }}">
+                                    <p class="text-sm font-bold uppercase tracking-tight text-white">{{ item.title }}</p>
+                                    <p class="mt-1 text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ item.artist }}</p>
+                                </div>
+                                {% empty %}
+                                <p id="saved-moment-empty" class="border border-dashed border-white/10 bg-black/25 p-4 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                                    {% if live_return_profile.is_authenticated %}Save a song to start your personal live archive{% else %}Log in to turn live songs into a personal archive{% endif %}
+                                </p>
+                                {% endfor %}
+                            </div>
+                        </article>
                     </div>
                 </aside>
             </div>
@@ -450,13 +534,68 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </article>
 
                     <article class="glass-panel border border-white/10 p-6">
-                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Return Signal</p>
-                        <h3 class="mt-3 font-display text-3xl uppercase leading-none">Why fans come back</h3>
-                        <ul class="mt-5 space-y-3 text-sm text-slate-300 leading-relaxed">
-                            <li class="border border-white/10 bg-white/[0.03] p-4">Clear show countdowns make it easier to build appointment listening habits.</li>
-                            <li class="border border-white/10 bg-white/[0.03] p-4">The player now surfaces more community energy, not just audio controls.</li>
-                            <li class="border border-white/10 bg-white/[0.03] p-4">Saved moments, live requests, and chat give the page memory and agency.</li>
-                        </ul>
+                        <div class="flex items-end justify-between gap-4">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Fan Influence</p>
+                                <h3 class="mt-3 font-display text-3xl uppercase leading-none">Requests And Room Vote</h3>
+                            </div>
+                            <span class="material-symbols-outlined text-3xl text-slate-500">how_to_vote</span>
+                        </div>
+
+                        <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Requests Last 24h</p>
+                                <p class="mt-2 font-display text-3xl text-white">{{ live_request_momentum.requests_last_24h }}</p>
+                            </div>
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Queued From Fans</p>
+                                <p class="mt-2 font-display text-3xl text-white">{{ live_request_momentum.queued_requested_count }}</p>
+                            </div>
+                        </div>
+
+                        {% if live_request_momentum.current_track_requested %}
+                        <p class="mt-4 border border-primary/20 bg-primary/10 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-primary">
+                            The current track is riding direct fan demand right now.
+                        </p>
+                        {% endif %}
+
+                        {% if live_poll %}
+                        <div id="live-poll-panel" class="mt-5" data-poll-id="{{ live_poll.id }}">
+                            <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Live Poll</p>
+                            <p id="live-poll-question" class="mt-3 font-display text-2xl uppercase leading-tight text-white">{{ live_poll.question }}</p>
+                            <p id="live-poll-total" class="mt-3 text-[10px] uppercase tracking-[0.22em] text-slate-400">{{ live_poll.total_votes }} votes cast</p>
+
+                            <div class="mt-4 space-y-3">
+                                {% for option in live_poll.options %}
+                                <button type="button" data-poll-option="{{ option.id }}" class="group relative w-full overflow-hidden border border-white/10 bg-white/[0.03] p-4 text-left transition-colors hover:border-primary/45 disabled:cursor-not-allowed disabled:opacity-60" {% if live_poll.locked %}disabled{% endif %}>
+                                    <span data-poll-bar class="absolute inset-y-0 left-0 bg-primary/15 transition-[width] duration-500" style="width: {% if live_poll.locked %}0{% else %}{{ option.percentage }}%{% endif %}"></span>
+                                    <span class="relative z-10 flex items-center justify-between gap-3">
+                                        <span class="text-sm font-bold uppercase tracking-tight text-white">{{ option.text }}</span>
+                                        <span data-poll-percent class="text-[11px] font-black uppercase tracking-[0.22em] text-primary">{% if live_poll.locked %}Locked{% else %}{{ option.percentage }}%{% endif %}</span>
+                                    </span>
+                                </button>
+                                {% endfor %}
+                            </div>
+
+                            <p id="live-poll-status" class="mt-4 text-[10px] font-black uppercase tracking-[0.22em] {% if live_poll.locked %}text-primary{% else %}text-slate-400{% endif %}">
+                                {% if live_poll.locked %}{{ live_poll.locked_message }}{% else %}Vote to push the room's momentum and make listener preference visible on air.{% endif %}
+                            </p>
+                            {% if live_poll.early_access_note %}
+                            <p class="mt-2 text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ live_poll.early_access_note }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <div class="mt-5 space-y-2">
+                            {% for item in live_request_momentum.latest_requests %}
+                            <div class="border border-white/10 bg-black/25 p-3">
+                                <p class="text-sm font-bold uppercase tracking-tight text-white">{{ item.song_title }}</p>
+                                <p class="mt-1 text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ item.artist }} - {{ item.listener_name }}</p>
+                            </div>
+                            {% empty %}
+                            <p class="border border-dashed border-white/10 bg-black/25 p-4 text-[11px] uppercase tracking-[0.22em] text-slate-500">No new requests yet. The request rail will light up once listeners start submitting tracks.</p>
+                            {% endfor %}
+                        </div>
                     </article>
                 </aside>
             </div>
@@ -593,15 +732,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </article>
 
                     <article class="glass-panel border border-white/10 p-6">
-                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Suggested Next Improvements</p>
-                        <div class="mt-5 space-y-3">
-                            {% for item in live_experience_suggestions|slice:":3" %}
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Return Loop</p>
+                        <h3 class="mt-3 font-display text-3xl uppercase leading-none">Keep The Habit Alive</h3>
+
+                        <div class="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
                             <div class="border border-white/10 bg-white/[0.03] p-4">
-                                <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">{{ item.eyebrow }}</p>
-                                <p class="mt-2 font-display text-2xl uppercase leading-tight">{{ item.title }}</p>
-                                <p class="mt-3 text-sm text-slate-300 leading-relaxed">{{ item.summary }}</p>
+                                <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Current Streak</p>
+                                <p class="mt-2 font-display text-3xl text-white">{{ live_return_profile.current_streak }}</p>
                             </div>
-                            {% endfor %}
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">This Week</p>
+                                <p class="mt-2 font-display text-3xl text-white">{{ live_return_profile.weekly_stream_total }}</p>
+                            </div>
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Tier</p>
+                                <p class="mt-2 font-display text-3xl text-white">{{ live_return_profile.tier }}</p>
+                            </div>
+                        </div>
+
+                        <p class="mt-5 text-sm leading-relaxed text-slate-300">{{ live_return_profile.streak_message }}</p>
+                        <p class="mt-3 text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ live_return_profile.digest_summary }}</p>
+
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            {% if live_return_profile.is_authenticated %}
+                            <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors">
+                                Open Dashboard
+                                <span class="material-symbols-outlined text-base">dashboard</span>
+                            </a>
+                            <a href="{% url 'profile_personalization_settings' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                                Reminder Settings
+                                <span class="material-symbols-outlined text-base">notifications</span>
+                            </a>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="inline-flex items-center gap-2 bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black hover:bg-white transition-colors">
+                                Log In To Track
+                                <span class="material-symbols-outlined text-base">login</span>
+                            </a>
+                            <a href="{% url 'beat_streak_v2' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-secondary hover:text-secondary transition-colors">
+                                Open Beat Streak
+                                <span class="material-symbols-outlined text-base">sports_esports</span>
+                            </a>
+                            {% endif %}
                         </div>
                     </article>
                 </aside>
@@ -613,8 +784,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="container mx-auto max-w-[1320px] px-6">
             <div class="flex flex-wrap items-end justify-between gap-4 reveal-up">
                 <div>
-                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Suggested Improvements</p>
-                    <h2 class="mt-3 font-display text-4xl uppercase leading-none">What I'd test next to deepen return visits</h2>
+                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Now Built Into Live</p>
+                    <h2 class="mt-3 font-display text-4xl uppercase leading-none">What now makes this worth returning to</h2>
                 </div>
                 <a href="{% url 'test_page' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                     Open The Test Page
@@ -675,7 +846,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const shareNowPlayingStatus = document.getElementById('share-now-playing-status');
             const saveMomentBtn = document.getElementById('save-moment-btn');
             const saveMomentDefaultLabel = 'Save This Moment';
+            const initialTrackSaved = {% if current_track_saved %}true{% else %}false{% endif %};
+            const requestedTitleLookup = new Set(({{ requested_titles_json|default:"[]"|safe }} || []).map((item) => String(item || '').trim().toLowerCase()));
             const upcomingShowsColumnListEl = document.getElementById('upcoming-shows-column-list');
+            const savedMomentCountEl = document.getElementById('saved-moment-count');
+            const savedMomentArchiveListEl = document.getElementById('saved-moment-archive-list');
+            const livePollData = {{ live_poll_json|default:"null"|safe }};
+            const livePollStatusEl = document.getElementById('live-poll-status');
+            const livePollTotalEl = document.getElementById('live-poll-total');
+            const livePollButtons = Array.from(document.querySelectorAll('[data-poll-option]'));
+            const livePollVoteKey = livePollData ? `poll_voted_${livePollData.id}` : '';
+            const livePollSelectedKey = livePollData ? `poll_selected_${livePollData.id}` : '';
+            let livePollVoted = livePollData ? localStorage.getItem(livePollVoteKey) === 'true' : false;
+            let livePollSelected = livePollData ? Number(localStorage.getItem(livePollSelectedKey) || 0) : 0;
             let currentUpNextTracks = {{ up_next_tracks_json|default:"[]"|safe }};
             let scheduleSlotsCache = [];
 
@@ -737,6 +920,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (artistEl && track.artist) artistEl.textContent = track.artist;
             };
 
+            const updateRequestedPill = (title) => {
+                const pill = document.getElementById('fan-requested-pill');
+                if (!pill) return;
+                const isRequested = requestedTitleLookup.has(String(title || '').trim().toLowerCase());
+                pill.classList.toggle('hidden', !isRequested);
+            };
+
+            const renderSaveMomentLabel = (isSelected) => {
+                if (!saveMomentBtn) return;
+                const icon = isSelected ? 'check' : 'bookmark';
+                const label = isSelected ? 'Saved' : saveMomentDefaultLabel;
+                saveMomentBtn.innerHTML = `${label}<span class="material-symbols-outlined text-base">${icon}</span>`;
+            };
+
             const setSaveMomentSelected = (isSelected) => {
                 if (!saveMomentBtn) return;
                 saveMomentBtn.classList.toggle('bg-emerald-400', !!isSelected);
@@ -745,10 +942,52 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 saveMomentBtn.classList.toggle('bg-black', !isSelected);
                 saveMomentBtn.classList.toggle('text-white', !isSelected);
                 saveMomentBtn.classList.toggle('border-white/15', !isSelected);
-                saveMomentBtn.textContent = isSelected ? 'Saved' : saveMomentDefaultLabel;
+                renderSaveMomentLabel(!!isSelected);
             };
 
-            setSaveMomentSelected(false);
+            const prependSavedMomentArchiveItem = (title, artist, shouldIncrementCount = false) => {
+                if (!savedMomentArchiveListEl) return;
+                const safeTitle = String(title || '').trim();
+                const safeArtist = String(artist || '').trim();
+                if (!safeTitle || !safeArtist) return;
+
+                const existingItems = Array.from(savedMomentArchiveListEl.querySelectorAll('[data-saved-title]'));
+                const existingMatch = existingItems.find((node) => (
+                    String(node.dataset.savedTitle || '').trim() === safeTitle
+                    && String(node.dataset.savedArtist || '').trim() === safeArtist
+                ));
+                const emptyState = document.getElementById('saved-moment-empty');
+                if (emptyState) emptyState.remove();
+
+                if (existingMatch) {
+                    savedMomentArchiveListEl.prepend(existingMatch);
+                } else {
+                    const item = document.createElement('div');
+                    item.className = 'border border-white/10 bg-black/25 p-3';
+                    item.dataset.savedTitle = safeTitle;
+                    item.dataset.savedArtist = safeArtist;
+                    const titleEl = document.createElement('p');
+                    titleEl.className = 'text-sm font-bold uppercase tracking-tight text-white';
+                    titleEl.textContent = safeTitle;
+                    const artistEl = document.createElement('p');
+                    artistEl.className = 'mt-1 text-[10px] uppercase tracking-[0.22em] text-slate-500';
+                    artistEl.textContent = safeArtist;
+                    item.appendChild(titleEl);
+                    item.appendChild(artistEl);
+                    savedMomentArchiveListEl.prepend(item);
+                }
+
+                const items = Array.from(savedMomentArchiveListEl.querySelectorAll('[data-saved-title]'));
+                items.slice(3).forEach((node) => node.remove());
+
+                if (shouldIncrementCount && savedMomentCountEl) {
+                    const currentCount = parseInt(savedMomentCountEl.textContent || '0', 10);
+                    savedMomentCountEl.textContent = String(Number.isNaN(currentCount) ? 1 : currentCount + 1);
+                }
+            };
+
+            setSaveMomentSelected(initialTrackSaved);
+            updateRequestedPill(document.getElementById('hero-title')?.textContent || '');
 
             const saveCurrentMoment = async () => {
                 if (!saveMomentBtn) return;
@@ -784,6 +1023,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     }
                     setShareStatus(data.already_saved ? 'Already saved' : 'Saved');
                     setSaveMomentSelected(true);
+                    prependSavedMomentArchiveItem(title, artist, !data.already_saved);
                 } catch (err) {
                     setShareStatus('Save failed');
                 } finally {
@@ -886,6 +1126,64 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 return candidate;
             };
 
+            const formatRelativeShowDay = (startAt, fallbackDay) => {
+                if (!(startAt instanceof Date) || Number.isNaN(startAt.getTime())) {
+                    return String(fallbackDay || '').trim();
+                }
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const target = new Date(startAt.getFullYear(), startAt.getMonth(), startAt.getDate());
+                const diffDays = Math.round((target.getTime() - today.getTime()) / 86400000);
+                if (diffDays === 0) return 'Today';
+                if (diffDays === 1) return 'Tomorrow';
+                return startAt.toLocaleDateString(undefined, { weekday: 'short' });
+            };
+
+            const extractUntilClock = (value) => {
+                const match = String(value || '').match(/(\d{1,2}:\d{2})$/);
+                return match ? match[1] : '';
+            };
+
+            const updateShowSpotlight = (currentShow, nextShow) => {
+                const currentNameEl = document.getElementById('spotlight-current-show-name');
+                const currentHostEl = document.getElementById('spotlight-current-show-host');
+                const currentWindowEl = document.getElementById('spotlight-current-show-window');
+                const nextNameEl = document.getElementById('spotlight-next-show-name');
+                const nextTimeEl = document.getElementById('spotlight-next-show-time');
+                const nextCountdownEl = document.getElementById('spotlight-next-show-countdown');
+                const descriptionEl = document.getElementById('spotlight-show-description');
+
+                if (currentNameEl) {
+                    currentNameEl.textContent = currentShow?.label || 'Live schedule syncing';
+                }
+                if (currentHostEl) {
+                    currentHostEl.textContent = currentShow?.host || 'Auto DJ';
+                }
+                if (currentWindowEl) {
+                    currentWindowEl.textContent = currentShow
+                        ? `${formatRelativeShowDay(currentShow.startAt, currentShow.day)} ${currentShow.time} ${currentShow.until || ''}`.trim()
+                        : 'Now on air';
+                }
+                if (nextNameEl) {
+                    nextNameEl.textContent = nextShow?.label || 'Schedule loading';
+                }
+                if (nextTimeEl) {
+                    nextTimeEl.textContent = nextShow
+                        ? `${formatRelativeShowDay(nextShow.startAt, nextShow.day)} ${nextShow.time}`
+                        : 'We are pulling the next handoff';
+                }
+                if (nextCountdownEl) {
+                    nextCountdownEl.textContent = nextShow
+                        ? `Starts in ${formatCountdownClock(nextShow.diff)}`
+                        : 'Watch this space';
+                }
+                if (descriptionEl) {
+                    descriptionEl.textContent = currentShow?.description
+                        || nextShow?.description
+                        || 'The next show handoff appears here so listeners always have a clear return window.';
+                }
+            };
+
             const renderUpcomingShowsColumn = () => {
                 if (!upcomingShowsColumnListEl) return;
                 if (!Array.isArray(scheduleSlotsCache) || !scheduleSlotsCache.length) {
@@ -903,6 +1201,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             label: String(slot.show_name || slot.name || 'Show').trim(),
                             day: String(slot.day || ''),
                             time: String(slot.time || ''),
+                            until: String(slot.until || ''),
+                            host: String(slot.host || 'Auto DJ').trim(),
+                            description: String(slot.description || '').trim(),
                             startAt,
                             diff,
                         };
@@ -916,21 +1217,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     .map((slot) => {
                         const thisWeek = parseShowDateThisWeek(slot.day, slot.time);
                         if (!thisWeek) return null;
+                        const untilClock = extractUntilClock(slot.until);
+                        const thisWeekEnd = untilClock ? parseShowDateThisWeek(slot.day, untilClock) : null;
+                        if (!thisWeekEnd) return null;
                         const thisWeekTime = thisWeek.getTime();
                         const nowTime = now.getTime();
-                        const startAt = thisWeekTime <= nowTime ? thisWeek : new Date(thisWeekTime - (7 * 24 * 60 * 60 * 1000));
+                        const usePreviousWeek = thisWeekTime > nowTime;
+                        const startAt = usePreviousWeek ? new Date(thisWeekTime - (7 * 24 * 60 * 60 * 1000)) : thisWeek;
+                        const endAtBase = usePreviousWeek
+                            ? new Date(thisWeekEnd.getTime() - (7 * 24 * 60 * 60 * 1000))
+                            : thisWeekEnd;
+                        const endAt = endAtBase <= startAt
+                            ? new Date(endAtBase.getTime() + (24 * 60 * 60 * 1000))
+                            : endAtBase;
                         return {
                             label: String(slot.show_name || slot.name || 'Show').trim(),
                             day: String(slot.day || ''),
                             time: String(slot.time || ''),
+                            until: String(slot.until || ''),
+                            host: String(slot.host || 'Auto DJ').trim(),
+                            description: String(slot.description || '').trim(),
                             startAt,
+                            endAt,
                         };
                     })
                     .filter(Boolean)
-                    .filter((item) => item.startAt <= now)
+                    .filter((item) => item.startAt <= now && item.endAt > now)
                     .sort((a, b) => b.startAt - a.startAt);
 
                 const currentShow = currentCandidates.length ? currentCandidates[0] : null;
+                updateShowSpotlight(currentShow, items[0] || null);
 
                 if (!items.length && !currentShow) {
                     upcomingShowsColumnListEl.innerHTML = '<p class="py-5 text-center text-[11px] uppercase tracking-[0.24em] text-slate-500">No upcoming shows right now</p>';
@@ -1000,8 +1316,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             slots.push({
                                 day,
                                 time: slot.time,
+                                until: slot.duration,
                                 name: slot.name,
                                 show_name: slot.show_name,
+                                host: slot.host,
+                                description: slot.description,
                             });
                         });
                     });
@@ -1011,6 +1330,124 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
                 renderUpcomingShowsColumn();
             };
+
+            const updateLivePollUI = () => {
+                if (!livePollData) return;
+                if (livePollTotalEl) {
+                    const totalVotes = Number(livePollData.total_votes || 0);
+                    livePollTotalEl.textContent = `${totalVotes.toLocaleString()} votes cast`;
+                }
+
+                livePollButtons.forEach((button) => {
+                    const optionId = Number(button.dataset.pollOption || 0);
+                    const option = Array.isArray(livePollData.options)
+                        ? livePollData.options.find((item) => Number(item.id) === optionId)
+                        : null;
+                    if (!option) return;
+
+                    const isSelected = livePollSelected === optionId;
+                    button.classList.toggle('border-primary', isSelected);
+                    button.classList.toggle('border-white/10', !isSelected);
+                    button.disabled = !!livePollData.locked || !!livePollVoted;
+
+                    const percentEl = button.querySelector('[data-poll-percent]');
+                    const barEl = button.querySelector('[data-poll-bar]');
+                    if (percentEl) {
+                        percentEl.textContent = livePollData.locked ? 'Locked' : `${option.percentage}%`;
+                    }
+                    if (barEl) {
+                        barEl.style.width = livePollData.locked ? '0%' : `${option.percentage}%`;
+                    }
+                });
+
+                if (!livePollStatusEl) return;
+                if (livePollData.locked) {
+                    livePollStatusEl.textContent = livePollData.locked_message || 'Voting is locked right now.';
+                } else if (livePollVoted) {
+                    livePollStatusEl.textContent = 'Vote registered. The room momentum just updated.';
+                } else {
+                    livePollStatusEl.textContent = 'Vote to push the room\'s momentum and make listener preference visible on air.';
+                }
+            };
+
+            const submitLivePollVote = async (optionId) => {
+                if (!livePollData || livePollData.locked || livePollVoted) return;
+                const previousState = {
+                    voted: livePollVoted,
+                    selected: livePollSelected,
+                    totalVotes: Number(livePollData.total_votes || 0),
+                    options: Array.isArray(livePollData.options)
+                        ? livePollData.options.map((item) => ({ ...item }))
+                        : [],
+                };
+                livePollSelected = optionId;
+                livePollVoted = true;
+                localStorage.setItem(livePollVoteKey, 'true');
+                localStorage.setItem(livePollSelectedKey, String(optionId));
+
+                if (Array.isArray(livePollData.options)) {
+                    const selectedOption = livePollData.options.find((item) => Number(item.id) === Number(optionId));
+                    if (selectedOption) selectedOption.votes = Number(selectedOption.votes || 0) + 1;
+                    livePollData.total_votes = livePollData.options.reduce((sum, item) => sum + Number(item.votes || 0), 0);
+                    const safeTotal = Math.max(1, Number(livePollData.total_votes || 0));
+                    livePollData.options.forEach((item) => {
+                        item.percentage = Math.round((Number(item.votes || 0) / safeTotal) * 100);
+                    });
+                }
+                updateLivePollUI();
+
+                try {
+                    const response = await fetch('/vote-poll/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({ option_id: optionId }),
+                    });
+                    const data = await response.json();
+                    if (!data?.success) {
+                        livePollVoted = previousState.voted;
+                        livePollSelected = previousState.selected;
+                        livePollData.total_votes = previousState.totalVotes;
+                        livePollData.options = previousState.options;
+                        localStorage.removeItem(livePollVoteKey);
+                        localStorage.removeItem(livePollSelectedKey);
+                        updateLivePollUI();
+                        if (livePollStatusEl) {
+                            livePollStatusEl.textContent = data?.error || 'Vote did not sync. Refresh to try again.';
+                        }
+                        return;
+                    }
+                    livePollData.total_votes = Number(data.total_votes || livePollData.total_votes || 0);
+                    if (Array.isArray(livePollData.options)) {
+                        livePollData.options.forEach((item) => {
+                            if (data.results && data.results[item.id] !== undefined) {
+                                item.percentage = Number(data.results[item.id] || 0);
+                            }
+                        });
+                    }
+                    updateLivePollUI();
+                } catch (error) {
+                    livePollVoted = previousState.voted;
+                    livePollSelected = previousState.selected;
+                    livePollData.total_votes = previousState.totalVotes;
+                    livePollData.options = previousState.options;
+                    localStorage.removeItem(livePollVoteKey);
+                    localStorage.removeItem(livePollSelectedKey);
+                    updateLivePollUI();
+                    if (livePollStatusEl) {
+                        livePollStatusEl.textContent = 'Vote could not sync right now. Please try again.';
+                    }
+                }
+            };
+
+            if (livePollData && livePollButtons.length) {
+                livePollButtons.forEach((button) => {
+                    button.addEventListener('click', () => submitLivePollVote(Number(button.dataset.pollOption || 0)));
+                });
+                updateLivePollUI();
+            }
 
             const updateProgressUI = (explicitCurrent = null) => {
                 const duration = getEffectiveDurationSeconds();
@@ -1341,7 +1778,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         const bgImg = document.getElementById('album-bg-img');
                         if (bgImg) bgImg.src = track.album_art;
                         updateShareCard(track);
-                        setSaveMomentSelected(false);
+                        setSaveMomentSelected(!!data.current_track_saved);
+                        updateRequestedPill(track.title);
 
                         currentLiveAiPayload = data.live_ai_payload || {};
                         applyLiveAiPayload(currentLiveAiPayload);

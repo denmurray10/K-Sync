@@ -5779,6 +5779,276 @@ def _get_or_generate_live_ai_payload(track):
         pass
     return generated
 
+
+LIVE_DAY_SEQUENCE = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+
+
+def _day_label_for_code(day_code):
+    return dict(RadioSchedule.DAY_CHOICES).get(str(day_code or '').upper(), str(day_code or '').upper())
+
+
+def _combine_local_date_and_time(target_date, target_time):
+    naive = datetime.combine(target_date, target_time)
+    return timezone.make_aware(naive, timezone.get_current_timezone())
+
+
+def _relative_day_label(target_date, current_date):
+    if target_date == current_date:
+        return 'Today'
+    if target_date == current_date + timedelta(days=1):
+        return 'Tomorrow'
+    return target_date.strftime('%A')
+
+
+def _build_live_show_snapshot(now_local):
+    schedules = list(
+        RadioSchedule.objects
+        .select_related('playlist')
+        .order_by('day', 'start_time', 'id')
+    )
+    if not schedules:
+        return {'current': None, 'next': None}
+
+    playlist_by_id = {slot.playlist.id: slot.playlist for slot in schedules}
+    playlist_preview_by_id = _build_playlist_preview_by_id(playlist_by_id)
+    assigned_host_by_playlist, assigned_host_by_day, global_assigned_host = _build_assigned_host_maps()
+    schedules_by_day = {day: [] for day in LIVE_DAY_SEQUENCE}
+    for slot in schedules:
+        schedules_by_day.setdefault(slot.day, []).append(slot)
+
+    def serialize_slot(slot, target_date, start_at, end_at, *, is_live=False):
+        common = _serialize_schedule_slot_common(
+            slot,
+            playlist_preview_by_id,
+            assigned_host_by_playlist,
+            assigned_host_by_day,
+            global_assigned_host,
+        )
+        countdown_target = end_at if is_live else start_at
+        countdown_seconds = max(0, int((countdown_target - now_local).total_seconds()))
+        show_name = common['show_name'] or common['playlist_name']
+        description = _shorten_text(
+            common['playlist_preview']
+            or common['show_name']
+            or slot.description
+            or slot.playlist.description,
+            180,
+        )
+        return {
+            'show_name': show_name,
+            'playlist_name': common['playlist_name'],
+            'host_name': common['host_name'],
+            'genre': common['genre'],
+            'description': description,
+            'day_code': slot.day,
+            'day_label': _day_label_for_code(slot.day),
+            'relative_day_label': _relative_day_label(target_date, now_local.date()),
+            'date_label': target_date.strftime('%a %d %b'),
+            'time_label': start_at.strftime('%H:%M'),
+            'time_range_label': f'{start_at:%H:%M} - {end_at:%H:%M}',
+            'countdown_seconds': countdown_seconds,
+            'countdown_prefix': 'Ends in' if is_live else 'Starts in',
+            'starts_at_iso': start_at.isoformat(),
+            'ends_at_iso': end_at.isoformat(),
+            'is_live': bool(is_live),
+        }
+
+    current_slot, _start_seconds, _end_seconds = _get_active_schedule_slot(now_local)
+    current_payload = None
+    if current_slot:
+        current_date = now_local.date()
+        current_start = _combine_local_date_and_time(current_date, current_slot.start_time)
+        current_end = _combine_local_date_and_time(current_date, current_slot.end_time)
+        if current_end <= current_start:
+            current_end += timedelta(days=1)
+        current_payload = serialize_slot(
+            current_slot,
+            current_date,
+            current_start,
+            current_end,
+            is_live=True,
+        )
+
+    next_payload = None
+    base_date = now_local.date()
+    for day_offset in range(0, 8):
+        target_date = base_date + timedelta(days=day_offset)
+        target_day = LIVE_DAY_SEQUENCE[target_date.weekday()]
+        for slot in schedules_by_day.get(target_day, []):
+            start_at = _combine_local_date_and_time(target_date, slot.start_time)
+            if start_at <= now_local:
+                continue
+            end_at = _combine_local_date_and_time(target_date, slot.end_time)
+            if end_at <= start_at:
+                end_at += timedelta(days=1)
+            next_payload = serialize_slot(slot, target_date, start_at, end_at, is_live=False)
+            break
+        if next_payload:
+            break
+
+    return {
+        'current': current_payload,
+        'next': next_payload,
+    }
+
+
+def _build_live_request_momentum(current_track, up_next_tracks, requested_titles):
+    requested_lookup = {
+        str(title or '').strip().lower()
+        for title in (requested_titles or [])
+        if str(title or '').strip()
+    }
+    recent_request_qs = SongRequest.objects.filter(
+        created_at__gte=timezone.now() - timedelta(hours=24)
+    ).order_by('-created_at')
+    recent_requests = list(recent_request_qs[:4])
+    queued_requested_count = sum(
+        1
+        for track in (up_next_tracks or [])
+        if str(getattr(track, 'title', '') or '').strip().lower() in requested_lookup
+    )
+    current_track_requested = bool(
+        current_track
+        and str(getattr(current_track, 'title', '') or '').strip().lower() in requested_lookup
+    )
+    return {
+        'requests_last_24h': recent_request_qs.count(),
+        'queued_requested_count': queued_requested_count,
+        'current_track_requested': current_track_requested,
+        'latest_requests': [
+            {
+                'song_title': req.song_title,
+                'artist': req.artist,
+                'listener_name': req.listener_name or 'Listener',
+            }
+            for req in recent_requests
+        ],
+    }
+
+
+def _build_live_poll_context(request):
+    poll = (
+        LivePoll.objects
+        .select_related('early_access_group')
+        .prefetch_related('options')
+        .filter(is_active=True)
+        .order_by('-created_at')
+        .first()
+    )
+    if not poll:
+        return None
+
+    locked = _is_poll_early_access_locked(request, poll)
+    total_votes = sum(option.votes for option in poll.options.all())
+    early_access_note = ''
+    if poll.early_access_starts_at and poll.early_access_group:
+        unlocks_at = timezone.localtime(poll.early_access_starts_at)
+        early_access_note = (
+            f'{poll.early_access_group.name} {poll.early_access_min_tier} members can vote early '
+            f'until {unlocks_at:%a %H:%M}.'
+        )
+
+    return {
+        'id': poll.id,
+        'question': poll.question,
+        'locked': locked,
+        'locked_message': (
+            'Early access is reserved for eligible fan-club members right now.'
+            if locked else ''
+        ),
+        'early_access_note': early_access_note,
+        'total_votes': total_votes,
+        'options': [
+            {
+                'id': option.id,
+                'text': option.text,
+                'votes': option.votes,
+                'percentage': option.percentage(),
+            }
+            for option in poll.options.all()
+        ],
+    }
+
+
+def _build_live_return_profile(user, profile, current_track):
+    base = {
+        'is_authenticated': False,
+        'tier': 'FREE',
+        'saved_moments_count': 0,
+        'current_track_saved': False,
+        'saved_moments': [],
+        'current_streak': 0,
+        'longest_streak': 0,
+        'weekly_stream_total': 0,
+        'today_stream_total': 0,
+        'digest_enabled': False,
+        'digest_summary': 'Log in to save live moments, build a streak, and unlock reminder nudges.',
+        'streak_message': 'Log in so every live session can build toward a return streak.',
+    }
+    if not user or not user.is_authenticated:
+        return base
+
+    saved_qs = FavouriteSong.objects.filter(user=user).order_by('-added_at')
+    saved_moments = list(saved_qs[:3])
+    saved_moments_count = saved_qs.count()
+    activity_days = _activity_day_set_for_user(user)
+    today = timezone.localdate()
+    streaks = _calculate_activity_streaks(activity_days, today)
+    week_cutoff = timezone.now() - timedelta(days=7)
+    weekly_stream_total = RadioTrackPlay.objects.filter(
+        user=user,
+        listened_at__gte=week_cutoff,
+    ).count()
+    today_stream_total = RadioTrackPlay.objects.filter(
+        user=user,
+        listened_at__date=today,
+    ).count()
+    tier = _user_highest_tier(user)
+    digest_timezone = (profile.digest_timezone if profile else 'Europe/London') or 'Europe/London'
+    digest_hour = int(profile.digest_hour if profile else 8)
+    digest_enabled = bool(profile.digest_enabled) if profile else False
+    if digest_enabled:
+        digest_summary = f'Daily digest set for {digest_hour:02d}:00 {digest_timezone}.'
+    else:
+        digest_summary = 'Reminder digest is off. Turn it on in personalisation settings.'
+
+    if streaks['current'] >= 7:
+        streak_message = 'Seven-day momentum is live. Drop back in tomorrow to keep the run going.'
+    elif streaks['current'] >= 3:
+        streak_message = 'Your Daily Pulse streak is active. Tomorrow keeps the streak alive.'
+    elif streaks['current'] >= 1:
+        streak_message = 'Momentum is building. Come back tomorrow to extend your listening streak.'
+    else:
+        streak_message = 'Start a fresh streak by dropping back in tomorrow or saving tonight\'s set.'
+
+    current_track_saved = False
+    if current_track:
+        current_track_saved = saved_qs.filter(
+            title=str(getattr(current_track, 'title', '') or '').strip(),
+            artist=str(getattr(current_track, 'artist', '') or '').strip(),
+        ).exists()
+
+    return {
+        'is_authenticated': True,
+        'tier': tier,
+        'saved_moments_count': saved_moments_count,
+        'current_track_saved': current_track_saved,
+        'saved_moments': [
+            {
+                'title': item.title,
+                'artist': item.artist,
+            }
+            for item in saved_moments
+        ],
+        'current_streak': streaks['current'],
+        'longest_streak': streaks['longest'],
+        'weekly_stream_total': weekly_stream_total,
+        'today_stream_total': today_stream_total,
+        'digest_enabled': digest_enabled,
+        'digest_summary': digest_summary,
+        'streak_message': streak_message,
+    }
+
 def _build_live_page_context(request):
     from datetime import timedelta
 
@@ -5852,6 +6122,14 @@ def _build_live_page_context(request):
     _record_live_track_play(request, current_track)
 
     live_ai_payload = _get_or_generate_live_ai_payload(current_track)
+    live_show_snapshot = _build_live_show_snapshot(timezone.localtime())
+    live_request_momentum = _build_live_request_momentum(
+        current_track,
+        up_next_tracks,
+        requested_titles,
+    )
+    live_poll = _build_live_poll_context(request)
+    live_return_profile = _build_live_return_profile(request.user, profile, current_track)
 
     # Calculate offset for synchronization
     current_offset = 0
@@ -5874,14 +6152,21 @@ def _build_live_page_context(request):
 
     return {
         'requested_titles': requested_titles,
+        'requested_titles_json': json.dumps(requested_titles),
         'state': state,
         'current_track': current_track,
+        'current_track_saved': live_return_profile['current_track_saved'],
         'current_track_json': json.dumps(current_track_payload),
         'current_track_id': (current_track.id if current_track else None),
         'current_track_duration_seconds': (current_track.duration_seconds if current_track else 0),
         'current_voice_overlay_json': json.dumps(current_voice_overlay),
         'up_next_tracks': up_next_tracks,
         'recently_played_tracks': recently_played_tracks,
+        'live_show_snapshot': live_show_snapshot,
+        'live_request_momentum': live_request_momentum,
+        'live_poll': live_poll,
+        'live_poll_json': json.dumps(live_poll),
+        'live_return_profile': live_return_profile,
         'up_next_tracks_json': json.dumps([
             {
                 'title': t.title,
@@ -5900,34 +6185,34 @@ def _build_live_page_context(request):
 def _get_live_experience_suggestions():
     return [
         {
-            'eyebrow': 'Return Hook 01',
-            'title': 'Make live listening feel like an appointment',
-            'summary': 'Promote the next show, give each slot a stronger personality, and turn countdowns into a reason to come back at a specific time.',
-            'impact': 'Listeners build habits when the schedule feels eventful instead of anonymous.',
+            'eyebrow': 'Now Live 01',
+            'title': 'Appointment listening is built into the page',
+            'summary': 'The live experience now surfaces the current show, the next handoff, and clear countdowns so fans always know when to return.',
+            'impact': 'The schedule now creates concrete return times instead of feeling anonymous.',
         },
         {
-            'eyebrow': 'Return Hook 02',
-            'title': 'Turn the page into a shared room, not just a player',
-            'summary': 'Lean on live chat, fan reactions, and visible listener energy so the page feels active even before a user presses play.',
-            'impact': 'Community presence increases session length and repeat visits.',
+            'eyebrow': 'Now Live 02',
+            'title': 'The stream feels like a room, not just a player',
+            'summary': 'Listener chat, fan voting, and visible room energy make the page feel inhabited before and after someone presses play.',
+            'impact': 'Community signals strengthen session depth and repeat visits.',
         },
         {
-            'eyebrow': 'Return Hook 03',
-            'title': 'Reward people for saving moments',
-            'summary': 'Package "Save This Moment" as a collectible memory feature tied to favourite songs, peak broadcasts, and shareable snapshots.',
-            'impact': 'Collecting creates emotional ownership and a reason to return to a personal archive.',
+            'eyebrow': 'Now Live 03',
+            'title': 'Saved moments now behave like a memory archive',
+            'summary': 'The save flow now connects to a visible archive layer so favourite songs and on-air highs feel collectible instead of disposable.',
+            'impact': 'Collecting adds ownership and gives listeners a reason to come back to their archive.',
         },
         {
-            'eyebrow': 'Return Hook 04',
-            'title': 'Surface fan influence more clearly',
-            'summary': 'Highlight request-driven songs, member-only perks, and polls so listeners can see where their actions shape the station.',
-            'impact': 'When people feel agency, they are more likely to come back and participate again.',
+            'eyebrow': 'Now Live 04',
+            'title': 'Fan influence is visible in the listening flow',
+            'summary': 'Requests, poll activity, and queue momentum now make it clearer where listeners shape what happens on air.',
+            'impact': 'Visible agency makes people more likely to return and participate again.',
         },
         {
-            'eyebrow': 'Return Hook 05',
-            'title': 'Build lightweight loyalty loops',
-            'summary': 'Add streaks, reminder nudges, and "come back tonight" prompts tied to artist eras, themed shows, or premium drops.',
-            'impact': 'Small recurring rituals help transform casual visitors into regulars.',
+            'eyebrow': 'Now Live 05',
+            'title': 'Loyalty loops are now part of the page rhythm',
+            'summary': 'Streak status, reminder state, and repeat-listen cues now give regulars a lightweight ritual instead of a one-off visit.',
+            'impact': 'Small recurring loops help turn casual visitors into regulars.',
         },
     ]
 
@@ -6174,6 +6459,13 @@ def api_live_rotate_track(request):
         current = schedule_context['current_track']
         _record_live_track_play(request, current)
         live_ai_payload = _get_or_generate_live_ai_payload(current)
+        current_track_saved = False
+        if request.user.is_authenticated and current:
+            current_track_saved = FavouriteSong.objects.filter(
+                user=request.user,
+                title=str(current.title or '').strip(),
+                artist=str(current.artist or '').strip(),
+            ).exists()
         up_next_list = schedule_context['up_next_tracks'][:6]
         recently_played_list = schedule_context['recently_played_tracks'][:6]
 
@@ -6181,6 +6473,7 @@ def api_live_rotate_track(request):
             'ok': True,
             'current_offset': schedule_context['current_offset'],
             'voice_overlay': schedule_context.get('current_voice_overlay'),
+            'current_track_saved': current_track_saved,
             'current_track': {
                 'id': current.id,
                 'title': current.title,
@@ -6250,6 +6543,13 @@ def api_live_rotate_track(request):
     current = state.current_track
     _record_live_track_play(request, current)
     live_ai_payload = _get_or_generate_live_ai_payload(current)
+    current_track_saved = False
+    if request.user.is_authenticated and current:
+        current_track_saved = FavouriteSong.objects.filter(
+            user=request.user,
+            title=str(current.title or '').strip(),
+            artist=str(current.artist or '').strip(),
+        ).exists()
     up_next_ids = state.up_next
     up_next_tracks = RadioTrack.objects.filter(id__in=up_next_ids)
     up_next_list = sorted(list(up_next_tracks), key=lambda t: up_next_ids.index(t.id))
@@ -6264,6 +6564,7 @@ def api_live_rotate_track(request):
         'ok': True,
         'current_offset': 0,
         'voice_overlay': None,
+        'current_track_saved': current_track_saved,
         'current_track': {
             'id': current.id,
             'title': current.title,
