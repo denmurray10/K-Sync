@@ -39,10 +39,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     html, body { overflow-x: hidden; }
     body {
         font-family: "Montserrat", sans-serif;
-        background:
-            radial-gradient(circle at top left, rgba(244, 37, 192, 0.2), transparent 30%),
-            radial-gradient(circle at top right, rgba(0, 240, 255, 0.16), transparent 28%),
-            linear-gradient(180deg, #090914 0%, #05050a 42%, #080910 100%);
+        background: #000000;
     }
     h1, h2, h3, h4, .brand-wordmark { font-family: "Cinzel", serif; }
     .glass-card {
@@ -106,31 +103,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
 </style>
 </head>
-<body class="bg-ink text-white font-body">
+<body class="bg-black text-white font-body">
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
 <div class="relative isolate min-h-screen">
-    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/55 backdrop-blur-xl">
-        <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-            <a href="{% url 'home' %}" class="flex items-center gap-3">
-                <span class="brand-wordmark text-lg font-extrabold uppercase tracking-[0.28em] text-white sm:text-xl">K-BEATS</span>
-                <span class="hidden text-[11px] uppercase tracking-[0.28em] text-slate-400 sm:inline">UK K-pop radio</span>
-            </a>
-            <div class="flex items-center gap-2 sm:gap-3">
-                <a href="{{ vip_trial_url }}" class="hidden rounded-none border border-white/15 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary sm:inline-flex">Start VIP Trial</a>
-                <a href="{{ listen_live_url }}" class="inline-flex items-center gap-2 rounded-none border border-primary bg-primary px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-white sm:px-5">
-                    <span class="material-symbols-outlined text-sm">play_arrow</span>
-                    Listen Free
-                </a>
-            </div>
-        </div>
-    </header>
+    {% include 'core/header.html' %}
 
     <main>
-        <section class="relative overflow-hidden px-4 pb-14 pt-28 sm:px-6 sm:pb-20 sm:pt-32">
+        <section class="relative overflow-hidden px-4 pb-14 pt-32 sm:px-6 sm:pb-20 sm:pt-36">
             <div class="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
                 <div class="reveal-left">
                     <div class="inline-flex items-center gap-2 rounded-none border border-primary/30 bg-primary/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-primary">
@@ -467,6 +450,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </section>
     </main>
+
+    {% include 'core/footer.html' %}
 
     <div class="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/80 px-4 py-3 backdrop-blur-xl sm:hidden">
         <div class="flex items-center gap-3">
