@@ -1,123 +1,227 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+
+<meta charset="utf-8"/>
 {% include 'core/seo_meta.html' %}
-<title>Privacy Policy | K-POP Pulse</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #000;
-            color: #e2e8f0;
-            line-height: 1.6;
-        }
-        .wrap {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 36px 20px 72px;
-        }
-        .hero {
-            border: 1px solid rgba(255,255,255,.2);
-            background: rgba(0,0,0,.92);
-            box-shadow: 0 0 0 1px rgba(244,37,192,.35);
-            padding: 18px 18px 16px;
-            margin-bottom: 18px;
-        }
-        h1 {
-            margin: 0 0 8px;
-            font-size: clamp(1.8rem, 4vw, 2.4rem);
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            font-weight: 900;
-            color: #f8fafc;
-        }
-        h2 {
-            margin-top: 28px;
-            margin-bottom: 8px;
-            color: #f8fafc;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            font-weight: 800;
-        }
-        p, li { color: #cbd5e1; font-size: .98rem; }
-        .meta {
-            color: #00f0ff;
-            font-size: 0.78rem;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: .18em;
-            font-weight: 700;
-        }
-        .card {
-            background: #050505;
-            border: 1px solid rgba(255,255,255,.16);
-            padding: 18px;
-            margin-top: 16px;
-        }
-        ul { padding-left: 18px; }
-        li { margin-bottom: 8px; }
-        a { color: #f425c0; }
-        .back {
-            display: inline-block;
-            margin-top: 24px;
-            color: #000;
-            text-decoration: none;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: .14em;
-            font-size: .7rem;
-            border: 1px solid #f425c0;
-            background: #f425c0;
-            padding: 12px 14px;
-            box-shadow: 3px 3px 0 rgba(255,255,255,1);
-        }
-        .back:hover { background: #fff; color: #000; border-color: #fff; }
-    </style>
+<title>Privacy Policy | K-Beats Radio UK</title>
+<meta name="description" content="Read the K-Beats Radio privacy policy to understand what listener data we collect, how we use it, and the choices you have over your information."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f425c0",
+                    "secondary": "#00f0ff",
+                    "background-dark": "#000000",
+                },
+                fontFamily: {
+                    "display": ["Montserrat", "sans-serif"],
+                    "cinzel": ["Cinzel", "serif"],
+                },
+                borderRadius: {
+                    "DEFAULT": "0px",
+                    "sm": "0px",
+                    "md": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "2xl": "0px",
+                    "3xl": "0px",
+                    "full": "9999px"
+                },
+            },
+        },
+    }
+</script>
+<style>
+    .nav-cinzel { font-family: 'Cinzel', serif; }
+    .legal-grid {
+        background-image:
+            linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        background-position: center;
+    }
+    .legal-panel {
+        background: linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.14);
+    }
+    .legal-copy p,
+    .legal-copy li {
+        color: rgb(203 213 225);
+        font-size: 0.98rem;
+        line-height: 1.8;
+    }
+    .legal-copy ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+    .legal-copy li {
+        position: relative;
+        padding-left: 1.25rem;
+    }
+    .legal-copy li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.8rem;
+        width: 0.45rem;
+        height: 1px;
+        background: #f425c0;
+        box-shadow: 0 0 14px rgba(244, 37, 192, 0.65);
+    }
+    .legal-copy a {
+        color: #00f0ff;
+        text-decoration: none;
+    }
+    .legal-copy a:hover {
+        color: #ffffff;
+    }
+</style>
 </head>
-<body>
-    {% include "core/header.html" %}
-    <main class="wrap">
-        <section class="hero">
-            <p class="meta">K-Beats Legal</p>
-            <h1>Privacy Policy</h1>
-            <p style="margin:0;color:#94a3b8;font-size:.92rem;">Last updated: March 17, 2026</p>
-        </section>
+<body class="bg-black text-white font-display antialiased min-h-screen overflow-x-hidden">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
-        <div class="card">
-            <p>This Privacy Policy explains how K-POP Pulse collects, uses, and shares information when you use this website and related services.</p>
+{% include "core/header.html" %}
+
+<main class="relative overflow-hidden">
+    <div class="absolute inset-0 legal-grid opacity-20"></div>
+    <div class="absolute -top-20 left-[-12rem] h-72 w-72 rounded-full bg-primary/20 blur-3xl"></div>
+    <div class="absolute top-40 right-[-8rem] h-80 w-80 rounded-full bg-secondary/15 blur-3xl"></div>
+
+    <section class="relative border-b border-white/10 px-6 pb-16 pt-32 sm:px-8 md:pb-24 md:pt-40">
+        <div class="mx-auto max-w-6xl">
+            <div class="mb-8 flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                <a href="{% url 'privacy_policy' %}" class="border border-primary bg-primary px-4 py-2 text-black">Privacy Policy</a>
+                <a href="{% url 'cookie_policy' %}" class="border border-white/15 px-4 py-2 transition hover:border-secondary hover:text-secondary">Cookie Policy</a>
+                <a href="{% url 'terms_of_service' %}" class="border border-white/15 px-4 py-2 transition hover:border-secondary hover:text-secondary">Terms of Service</a>
+            </div>
+
+            <div class="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_20rem] lg:items-end">
+                <div>
+                    <p class="nav-cinzel text-sm uppercase tracking-[0.35em] text-primary">K-Beats Legal</p>
+                    <h1 class="mt-4 max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-white md:text-7xl">
+                        Your privacy,
+                        <span class="text-transparent [-webkit-text-stroke:1px_theme(colors.secondary)]">handled like a broadcast standard.</span>
+                    </h1>
+                    <p class="mt-6 max-w-2xl text-base leading-8 text-slate-300 md:text-lg">
+                        This page explains what information K-Beats Radio collects, why we collect it, and how you stay in control while listening, browsing, or creating an account.
+                    </p>
+                </div>
+
+                <aside class="legal-panel p-6">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">Snapshot</p>
+                    <dl class="mt-5 space-y-5">
+                        <div>
+                            <dt class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Last updated</dt>
+                            <dd class="mt-1 text-lg font-bold text-white">March 17, 2026</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Applies to</dt>
+                            <dd class="mt-1 text-sm leading-7 text-slate-300">Website visits, listener accounts, newsletter signups, and consent choices across K-Beats services.</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Related pages</dt>
+                            <dd class="mt-1 flex flex-col gap-2 text-sm">
+                                <a href="{% url 'cookie_policy' %}" class="text-secondary transition hover:text-white">Cookie Policy</a>
+                                <a href="{% url 'terms_of_service' %}" class="text-secondary transition hover:text-white">Terms of Service</a>
+                            </dd>
+                        </div>
+                    </dl>
+                </aside>
+            </div>
         </div>
+    </section>
 
-        <h2>Information We Collect</h2>
-        <ul>
-            <li>Account and profile details you provide (such as username and preferences).</li>
-            <li>Usage information (pages viewed, interactions, and session activity).</li>
-            <li>Device and browser details used for performance and security.</li>
-        </ul>
+    <section class="relative px-6 py-16 sm:px-8 md:py-20">
+        <div class="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
+            <aside class="legal-panel h-fit p-6">
+                <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">On this page</p>
+                <nav class="mt-5 space-y-3 text-sm text-slate-300">
+                    <a href="#information-we-collect" class="block transition hover:text-white">Information we collect</a>
+                    <a href="#how-we-use-information" class="block transition hover:text-white">How we use information</a>
+                    <a href="#legal-basis-and-consent" class="block transition hover:text-white">Legal basis and consent</a>
+                    <a href="#sharing-and-processors" class="block transition hover:text-white">Sharing and processors</a>
+                    <a href="#your-controls" class="block transition hover:text-white">Your controls</a>
+                </nav>
+            </aside>
 
-        <h2>How We Use Information</h2>
-        <ul>
-            <li>Provide and improve site features and user experience.</li>
-            <li>Measure traffic and engagement through analytics tools.</li>
-            <li>Protect the website, users, and systems from abuse or fraud.</li>
-        </ul>
+            <div class="space-y-6 legal-copy">
+                <section id="information-we-collect" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">01</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Information We Collect</h2>
+                    <ul class="mt-6 space-y-4">
+                        <li>Account details you provide, such as your email address, display name, saved favourites, and optional profile preferences.</li>
+                        <li>Usage signals including pages viewed, stream interactions, sign-up activity, and general session behaviour.</li>
+                        <li>Technical information such as browser type, device data, IP-derived location region, and security logs used to protect the platform.</li>
+                    </ul>
+                </section>
 
-        <h2>Legal Basis and Consent</h2>
-        <p>Where required, analytics and advertising-related storage are enabled only after your consent selection in the cookie banner. You can change your preferences any time using the Cookie settings control.</p>
+                <section id="how-we-use-information" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">02</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">How We Use Information</h2>
+                    <ul class="mt-6 space-y-4">
+                        <li>Operate the station, maintain accounts, personalise key features, and improve the listener experience across the site.</li>
+                        <li>Measure audience behaviour so we can understand which programming, pages, and tools are genuinely useful.</li>
+                        <li>Detect abuse, prevent fraud, troubleshoot performance issues, and keep the service safe and stable.</li>
+                    </ul>
+                </section>
 
-        <h2>Sharing</h2>
-        <p>We may use trusted service providers for hosting, analytics, and content delivery. These providers process data on our behalf under applicable terms.</p>
+                <section id="legal-basis-and-consent" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">03</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Legal Basis And Consent</h2>
+                    <p class="mt-6">Where required, K-Beats relies on consent before enabling analytics or advertising-related storage. Essential processing for security, site delivery, and account operation may still run where it is necessary to provide the service.</p>
+                    <p class="mt-4">You can review or change your consent settings at any time through the controls described in our <a href="{% url 'cookie_policy' %}">Cookie Policy</a>.</p>
+                </section>
 
-        <h2>Your Choices</h2>
-        <p>You can review the <a href="{% url 'cookie_policy' %}">Cookie Policy</a> for details on cookies and controls. You may also contact us to request access, correction, or deletion where applicable.</p>
+                <section id="sharing-and-processors" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">04</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Sharing And Processors</h2>
+                    <p class="mt-6">We may work with trusted providers for hosting, analytics, infrastructure, media delivery, and operational support. They process data on our behalf under appropriate terms and only for the purposes described in this policy.</p>
+                </section>
 
-        <a class="back" href="{% url 'home' %}">← Back to Home</a>
-    </main>
+                <section id="your-controls" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">05</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Your Controls</h2>
+                    <p class="mt-6">You can contact us to request access, correction, or deletion where applicable. You can also revisit your consent settings and read our related legal pages for more detail:</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-[11px] font-black uppercase tracking-[0.2em]">
+                        <a href="{% url 'cookie_policy' %}" class="border border-secondary bg-secondary px-4 py-3 text-black transition hover:bg-white">Cookie Policy</a>
+                        <a href="{% url 'terms_of_service' %}" class="border border-white/20 px-4 py-3 text-white transition hover:border-primary hover:text-primary">Terms of Service</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative border-t border-white/10 px-6 py-16 sm:px-8">
+        <div class="mx-auto grid max-w-6xl gap-6 legal-panel p-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:p-10">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">Need the quick version?</p>
+                <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white">Your choices stay visible.</h2>
+                <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300">K-Beats keeps essential site operation on, while consent-based analytics and ad storage remain under your control. We link the related legal pages together so you can review the full picture without hunting for it.</p>
+            </div>
+            <div class="flex flex-wrap gap-3 text-[11px] font-black uppercase tracking-[0.2em]">
+                <a href="{% url 'home' %}" class="border border-primary bg-primary px-5 py-3 text-black transition hover:bg-white">Back to Home</a>
+                <a href="{% url 'live' %}" class="border border-white/20 px-5 py-3 text-white transition hover:border-secondary hover:text-secondary">Listen Live</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% include "core/footer.html" %}
 </body>
 </html>
-

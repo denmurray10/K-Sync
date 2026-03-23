@@ -1,148 +1,235 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+
+<meta charset="utf-8"/>
 {% include 'core/seo_meta.html' %}
-<title>Cookie Policy | K-POP Pulse</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #000;
-            color: #e2e8f0;
-            line-height: 1.6;
-        }
-        .wrap {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 36px 20px 72px;
-        }
-        .hero {
-            border: 1px solid rgba(255,255,255,.2);
-            background: rgba(0,0,0,.92);
-            box-shadow: 0 0 0 1px rgba(0,240,255,.35);
-            padding: 18px 18px 16px;
-            margin-bottom: 18px;
-        }
-        h1 {
-            margin: 0 0 8px;
-            font-size: clamp(1.8rem, 4vw, 2.4rem);
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            font-weight: 900;
-            color: #f8fafc;
-        }
-        h2 {
-            margin-top: 28px;
-            margin-bottom: 8px;
-            color: #f8fafc;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            font-weight: 800;
-        }
-        p, li { color: #cbd5e1; font-size: .98rem; }
-        .meta {
-            color: #00f0ff;
-            font-size: 0.78rem;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: .18em;
-            font-weight: 700;
-        }
-        .card {
-            background: #050505;
-            border: 1px solid rgba(255,255,255,.16);
-            padding: 18px;
-            margin-top: 16px;
-        }
-        ul { padding-left: 18px; }
-        li { margin-bottom: 8px; }
-        a { color: #f425c0; }
-        .back {
-            display: inline-block;
-            margin-top: 24px;
-            color: #000;
-            text-decoration: none;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: .14em;
-            font-size: .7rem;
-            border: 1px solid #00f0ff;
-            background: #00f0ff;
-            padding: 12px 14px;
-            box-shadow: 3px 3px 0 rgba(255,255,255,1);
-        }
-        .back:hover { background: #fff; color: #000; border-color: #fff; }
-        .open-cookie-settings {
-            display: inline-block;
-            margin-top: 14px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: .14em;
-            font-size: .7rem;
-            border: 1px solid #f425c0;
-            background: transparent;
-            padding: 12px 14px;
-            cursor: pointer;
-        }
-        .open-cookie-settings:hover { background: #f425c0; color: #000; }
-    </style>
+<title>Cookie Policy | K-Beats Radio UK</title>
+<meta name="description" content="See how K-Beats Radio uses cookies, consent controls, analytics storage, and advertising preferences across the site."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f425c0",
+                    "secondary": "#00f0ff",
+                    "background-dark": "#000000",
+                },
+                fontFamily: {
+                    "display": ["Montserrat", "sans-serif"],
+                    "cinzel": ["Cinzel", "serif"],
+                },
+                borderRadius: {
+                    "DEFAULT": "0px",
+                    "sm": "0px",
+                    "md": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "2xl": "0px",
+                    "3xl": "0px",
+                    "full": "9999px"
+                },
+            },
+        },
+    }
+</script>
+<style>
+    .nav-cinzel { font-family: 'Cinzel', serif; }
+    .legal-grid {
+        background-image:
+            linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        background-position: center;
+    }
+    .legal-panel {
+        background: linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.14);
+    }
+    .legal-copy p,
+    .legal-copy li {
+        color: rgb(203 213 225);
+        font-size: 0.98rem;
+        line-height: 1.8;
+    }
+    .legal-copy ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+    .legal-copy li {
+        position: relative;
+        padding-left: 1.25rem;
+    }
+    .legal-copy li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.8rem;
+        width: 0.45rem;
+        height: 1px;
+        background: #00f0ff;
+        box-shadow: 0 0 14px rgba(0, 240, 255, 0.7);
+    }
+    .legal-copy a {
+        color: #00f0ff;
+        text-decoration: none;
+    }
+    .legal-copy a:hover {
+        color: #ffffff;
+    }
+</style>
 </head>
-<body>
-    {% include "core/header.html" %}
-    <main class="wrap">
-        <section class="hero">
-            <p class="meta">K-Beats Legal</p>
-            <h1>Cookie Policy</h1>
-            <p style="margin:0;color:#94a3b8;font-size:.92rem;">Last updated: March 17, 2026</p>
-        </section>
+<body class="bg-black text-white font-display antialiased min-h-screen overflow-x-hidden">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
-        <div class="card">
-            <p>This Cookie Policy explains what cookies and similar technologies we use and how you can control them.</p>
+{% include "core/header.html" %}
+
+<main class="relative overflow-hidden">
+    <div class="absolute inset-0 legal-grid opacity-20"></div>
+    <div class="absolute -top-20 right-[-12rem] h-72 w-72 rounded-full bg-secondary/20 blur-3xl"></div>
+    <div class="absolute top-48 left-[-8rem] h-80 w-80 rounded-full bg-primary/15 blur-3xl"></div>
+
+    <section class="relative border-b border-white/10 px-6 pb-16 pt-32 sm:px-8 md:pb-24 md:pt-40">
+        <div class="mx-auto max-w-6xl">
+            <div class="mb-8 flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                <a href="{% url 'privacy_policy' %}" class="border border-white/15 px-4 py-2 transition hover:border-secondary hover:text-secondary">Privacy Policy</a>
+                <a href="{% url 'cookie_policy' %}" class="border border-secondary bg-secondary px-4 py-2 text-black">Cookie Policy</a>
+                <a href="{% url 'terms_of_service' %}" class="border border-white/15 px-4 py-2 transition hover:border-secondary hover:text-secondary">Terms of Service</a>
+            </div>
+
+            <div class="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_20rem] lg:items-end">
+                <div>
+                    <p class="nav-cinzel text-sm uppercase tracking-[0.35em] text-secondary">K-Beats Legal</p>
+                    <h1 class="mt-4 max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-white md:text-7xl">
+                        Cookies,
+                        <span class="text-transparent [-webkit-text-stroke:1px_theme(colors.primary)]">measurement, and listener control.</span>
+                    </h1>
+                    <p class="mt-6 max-w-2xl text-base leading-8 text-slate-300 md:text-lg">
+                        This policy explains which cookie categories K-Beats uses, what each category does, and how your consent settings shape analytics and advertising behaviour.
+                    </p>
+                </div>
+
+                <aside class="legal-panel p-6">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">Snapshot</p>
+                    <dl class="mt-5 space-y-5">
+                        <div>
+                            <dt class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Last updated</dt>
+                            <dd class="mt-1 text-lg font-bold text-white">March 17, 2026</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Consent model</dt>
+                            <dd class="mt-1 text-sm leading-7 text-slate-300">Necessary cookies stay active. Analytics and advertising-related storage remain denied until you explicitly allow them.</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Related pages</dt>
+                            <dd class="mt-1 flex flex-col gap-2 text-sm">
+                                <a href="{% url 'privacy_policy' %}" class="text-secondary transition hover:text-white">Privacy Policy</a>
+                                <a href="{% url 'terms_of_service' %}" class="text-secondary transition hover:text-white">Terms of Service</a>
+                            </dd>
+                        </div>
+                    </dl>
+                </aside>
+            </div>
         </div>
+    </section>
 
-        <h2>Categories of Cookies</h2>
-        <ul>
-            <li><strong>Strictly necessary:</strong> Required for core functionality and security. Always active.</li>
-            <li><strong>Analytics:</strong> Help us understand traffic and feature usage.</li>
-            <li><strong>Advertising:</strong> Used for ad storage and personalization where enabled.</li>
-        </ul>
+    <section class="relative px-6 py-16 sm:px-8 md:py-20">
+        <div class="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
+            <aside class="legal-panel h-fit p-6">
+                <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">On this page</p>
+                <nav class="mt-5 space-y-3 text-sm text-slate-300">
+                    <a href="#cookie-categories" class="block transition hover:text-white">Cookie categories</a>
+                    <a href="#consent-choices" class="block transition hover:text-white">Consent choices</a>
+                    <a href="#google-consent-mode" class="block transition hover:text-white">Google Consent Mode</a>
+                    <a href="#managing-cookies" class="block transition hover:text-white">Managing cookies</a>
+                    <a href="#more-information" class="block transition hover:text-white">More information</a>
+                </nav>
+            </aside>
 
-        <h2>Consent Choices</h2>
-        <p>You can choose Accept all, Reject all, or manage preferences in the consent banner. Your choice is stored and reused on future visits unless you change it.</p>
+            <div class="space-y-6 legal-copy">
+                <section id="cookie-categories" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">01</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Cookie Categories</h2>
+                    <ul class="mt-6 space-y-4">
+                        <li><strong class="text-white">Strictly necessary:</strong> required for security, core site features, and keeping the service operational.</li>
+                        <li><strong class="text-white">Analytics:</strong> helps us understand traffic, listener journeys, and which features earn repeat use.</li>
+                        <li><strong class="text-white">Advertising:</strong> supports ad storage and personalisation where you have agreed to those preferences.</li>
+                    </ul>
+                </section>
 
-        <h2>Google Consent Mode</h2>
-        <p>By default, analytics and advertising storage are denied until consent is granted. Consent signals are sent to Google tags through Consent Mode.</p>
+                <section id="consent-choices" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">02</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Consent Choices</h2>
+                    <p class="mt-6">The K-Beats consent banner lets you accept all, reject all, or save a more specific set of preferences. Your decision is stored so we can respect it on future visits until you change it again.</p>
+                </section>
 
-        <h2>Managing Cookies</h2>
-        <p>You can reopen preferences from this page whenever needed. You can also adjust browser settings to block or delete cookies, though some features may be affected.</p>
-        <button id="open-cookie-settings" class="open-cookie-settings" type="button">Open Cookie Preferences</button>
+                <section id="google-consent-mode" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">03</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Google Consent Mode</h2>
+                    <p class="mt-6">K-Beats sends consent signals to Google tags so analytics and advertising storage stay denied by default until you grant permission. This helps our measurement stack respond to the choices you make instead of assuming consent.</p>
+                </section>
 
-        <h2>More Information</h2>
-        <p>For broader data handling details, see our <a href="{% url 'privacy_policy' %}">Privacy Policy</a>.</p>
+                <section id="managing-cookies" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">04</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Managing Cookies</h2>
+                    <p class="mt-6">You can reopen your preferences from the site controls at any time. Browser settings can also be used to block or remove cookies, although some parts of the experience may stop working properly if strictly necessary cookies are disabled.</p>
+                    <button id="open-cookie-settings" type="button" class="mt-6 border border-secondary bg-secondary px-5 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-black transition hover:bg-white">
+                        Open Cookie Preferences
+                    </button>
+                </section>
 
-        <a class="back" href="{% url 'home' %}">← Back to Home</a>
-    </main>
-    <script>
-        (function () {
-            const trigger = document.getElementById('open-cookie-settings');
-            if (!trigger) return;
-            trigger.addEventListener('click', function () {
-                if (typeof window.ksyncOpenConsentSettings === 'function') {
-                    window.ksyncOpenConsentSettings();
-                    return;
-                }
-                window.dispatchEvent(new CustomEvent('ksync:open-consent-settings'));
-            });
-        })();
-    </script>
+                <section id="more-information" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">05</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">More Information</h2>
+                    <p class="mt-6">For a broader explanation of how listener and account data is handled across K-Beats, read the <a href="{% url 'privacy_policy' %}">Privacy Policy</a>. For rules covering use of the service itself, see the <a href="{% url 'terms_of_service' %}">Terms of Service</a>.</p>
+                </section>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative border-t border-white/10 px-6 py-16 sm:px-8">
+        <div class="mx-auto grid max-w-6xl gap-6 legal-panel p-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:p-10">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">Quick access</p>
+                <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white">Change your preferences whenever you need.</h2>
+                <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300">K-Beats keeps the cookie controls visible so you can revisit your consent choices without digging through the site.</p>
+            </div>
+            <div class="flex flex-wrap gap-3 text-[11px] font-black uppercase tracking-[0.2em]">
+                <a href="{% url 'home' %}" class="border border-primary bg-primary px-5 py-3 text-black transition hover:bg-white">Back to Home</a>
+                <a href="{% url 'privacy_policy' %}" class="border border-white/20 px-5 py-3 text-white transition hover:border-secondary hover:text-secondary">Privacy Policy</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% include "core/footer.html" %}
+
+<script>
+    (function () {
+        const trigger = document.getElementById('open-cookie-settings');
+        if (!trigger) return;
+        trigger.addEventListener('click', function () {
+            if (typeof window.ksyncOpenConsentSettings === 'function') {
+                window.ksyncOpenConsentSettings();
+                return;
+            }
+            window.dispatchEvent(new CustomEvent('ksync:open-consent-settings'));
+        });
+    })();
+</script>
 </body>
 </html>
-

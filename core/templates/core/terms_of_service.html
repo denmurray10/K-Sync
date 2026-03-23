@@ -1,122 +1,218 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+
+<meta charset="utf-8"/>
 {% include 'core/seo_meta.html' %}
-<title>Terms of Service | K-POP Pulse</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #000;
-            color: #e2e8f0;
-            line-height: 1.6;
-        }
-        .wrap {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 36px 20px 72px;
-        }
-        .hero {
-            border: 1px solid rgba(255,255,255,.2);
-            background: rgba(0,0,0,.92);
-            box-shadow: 0 0 0 1px rgba(123,44,191,.35);
-            padding: 18px 18px 16px;
-            margin-bottom: 18px;
-        }
-        h1 {
-            margin: 0 0 8px;
-            font-size: clamp(1.8rem, 4vw, 2.4rem);
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            font-weight: 900;
-            color: #f8fafc;
-        }
-        h2 {
-            margin-top: 28px;
-            margin-bottom: 8px;
-            color: #f8fafc;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            font-weight: 800;
-        }
-        p, li { color: #cbd5e1; font-size: .98rem; }
-        .meta {
-            color: #7b2cbf;
-            font-size: 0.78rem;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: .18em;
-            font-weight: 700;
-        }
-        .card {
-            background: #050505;
-            border: 1px solid rgba(255,255,255,.16);
-            padding: 18px;
-            margin-top: 16px;
-        }
-        ul { padding-left: 18px; }
-        li { margin-bottom: 8px; }
-        a { color: #f425c0; }
-        .back {
-            display: inline-block;
-            margin-top: 24px;
-            color: #000;
-            text-decoration: none;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: .14em;
-            font-size: .7rem;
-            border: 1px solid #7b2cbf;
-            background: #7b2cbf;
-            padding: 12px 14px;
-            box-shadow: 3px 3px 0 rgba(255,255,255,1);
-        }
-        .back:hover { background: #fff; color: #000; border-color: #fff; }
-    </style>
+<title>Terms of Service | K-Beats Radio UK</title>
+<meta name="description" content="Read the K-Beats Radio terms of service covering acceptable use, accounts, user content, and service availability."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f425c0",
+                    "secondary": "#00f0ff",
+                    "background-dark": "#000000",
+                },
+                fontFamily: {
+                    "display": ["Montserrat", "sans-serif"],
+                    "cinzel": ["Cinzel", "serif"],
+                },
+                borderRadius: {
+                    "DEFAULT": "0px",
+                    "sm": "0px",
+                    "md": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "2xl": "0px",
+                    "3xl": "0px",
+                    "full": "9999px"
+                },
+            },
+        },
+    }
+</script>
+<style>
+    .nav-cinzel { font-family: 'Cinzel', serif; }
+    .legal-grid {
+        background-image:
+            linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        background-position: center;
+    }
+    .legal-panel {
+        background: linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.14);
+    }
+    .legal-copy p,
+    .legal-copy li {
+        color: rgb(203 213 225);
+        font-size: 0.98rem;
+        line-height: 1.8;
+    }
+    .legal-copy ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+    .legal-copy li {
+        position: relative;
+        padding-left: 1.25rem;
+    }
+    .legal-copy li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.8rem;
+        width: 0.45rem;
+        height: 1px;
+        background: #f425c0;
+        box-shadow: 0 0 14px rgba(244, 37, 192, 0.65);
+    }
+    .legal-copy a {
+        color: #00f0ff;
+        text-decoration: none;
+    }
+    .legal-copy a:hover {
+        color: #ffffff;
+    }
+</style>
 </head>
-<body>
-    {% include "core/header.html" %}
-    <main class="wrap">
-        <section class="hero">
-            <p class="meta">K-Beats Legal</p>
-            <h1>Terms of Service</h1>
-            <p style="margin:0;color:#94a3b8;font-size:.92rem;">Last updated: March 17, 2026</p>
-        </section>
+<body class="bg-black text-white font-display antialiased min-h-screen overflow-x-hidden">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
-        <div class="card">
-            <p>These Terms of Service govern your access to and use of K-POP Pulse. By using this site, you agree to these terms.</p>
+{% include "core/header.html" %}
+
+<main class="relative overflow-hidden">
+    <div class="absolute inset-0 legal-grid opacity-20"></div>
+    <div class="absolute -top-20 left-[-12rem] h-72 w-72 rounded-full bg-primary/20 blur-3xl"></div>
+    <div class="absolute top-44 right-[-8rem] h-80 w-80 rounded-full bg-secondary/15 blur-3xl"></div>
+
+    <section class="relative border-b border-white/10 px-6 pb-16 pt-32 sm:px-8 md:pb-24 md:pt-40">
+        <div class="mx-auto max-w-6xl">
+            <div class="mb-8 flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                <a href="{% url 'privacy_policy' %}" class="border border-white/15 px-4 py-2 transition hover:border-secondary hover:text-secondary">Privacy Policy</a>
+                <a href="{% url 'cookie_policy' %}" class="border border-white/15 px-4 py-2 transition hover:border-secondary hover:text-secondary">Cookie Policy</a>
+                <a href="{% url 'terms_of_service' %}" class="border border-primary bg-primary px-4 py-2 text-black">Terms of Service</a>
+            </div>
+
+            <div class="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_20rem] lg:items-end">
+                <div>
+                    <p class="nav-cinzel text-sm uppercase tracking-[0.35em] text-primary">K-Beats Legal</p>
+                    <h1 class="mt-4 max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-white md:text-7xl">
+                        Terms for using
+                        <span class="text-transparent [-webkit-text-stroke:1px_theme(colors.secondary)]">the station, site, and fan features.</span>
+                    </h1>
+                    <p class="mt-6 max-w-2xl text-base leading-8 text-slate-300 md:text-lg">
+                        These terms explain the rules for using K-Beats Radio, including acceptable conduct, account responsibilities, and how service changes may be handled.
+                    </p>
+                </div>
+
+                <aside class="legal-panel p-6">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">Snapshot</p>
+                    <dl class="mt-5 space-y-5">
+                        <div>
+                            <dt class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Last updated</dt>
+                            <dd class="mt-1 text-lg font-bold text-white">March 17, 2026</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Covers</dt>
+                            <dd class="mt-1 text-sm leading-7 text-slate-300">Browsing, accounts, listener submissions, community tools, and service availability across K-Beats.</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Related pages</dt>
+                            <dd class="mt-1 flex flex-col gap-2 text-sm">
+                                <a href="{% url 'privacy_policy' %}" class="text-secondary transition hover:text-white">Privacy Policy</a>
+                                <a href="{% url 'cookie_policy' %}" class="text-secondary transition hover:text-white">Cookie Policy</a>
+                            </dd>
+                        </div>
+                    </dl>
+                </aside>
+            </div>
         </div>
+    </section>
 
-        <h2>Use of the Service</h2>
-        <ul>
-            <li>You agree to use the site lawfully and not abuse or disrupt services.</li>
-            <li>You are responsible for content you submit and actions taken through your account.</li>
-            <li>We may update or discontinue features at any time.</li>
-        </ul>
+    <section class="relative px-6 py-16 sm:px-8 md:py-20">
+        <div class="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
+            <aside class="legal-panel h-fit p-6">
+                <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">On this page</p>
+                <nav class="mt-5 space-y-3 text-sm text-slate-300">
+                    <a href="#use-of-service" class="block transition hover:text-white">Use of the service</a>
+                    <a href="#user-content-and-conduct" class="block transition hover:text-white">User content and conduct</a>
+                    <a href="#accounts" class="block transition hover:text-white">Accounts</a>
+                    <a href="#disclaimers-and-liability" class="block transition hover:text-white">Disclaimers and liability</a>
+                    <a href="#changes-to-terms" class="block transition hover:text-white">Changes to terms</a>
+                </nav>
+            </aside>
 
-        <h2>User Content and Conduct</h2>
-        <p>You must not upload or post unlawful, harmful, or infringing content. We may remove content or restrict access where necessary to protect users and platform integrity.</p>
+            <div class="space-y-6 legal-copy">
+                <section id="use-of-service" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">01</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Use Of The Service</h2>
+                    <ul class="mt-6 space-y-4">
+                        <li>You agree to use K-Beats lawfully and not interfere with the operation, security, or availability of the service.</li>
+                        <li>You must not misuse community tools, automate abuse, or submit content intended to harass, mislead, or damage the platform.</li>
+                        <li>We may improve, pause, replace, or discontinue features as the station evolves.</li>
+                    </ul>
+                </section>
 
-        <h2>Accounts</h2>
-        <p>If you create an account, keep your credentials secure. You are responsible for activity under your account unless unauthorized use is reported promptly.</p>
+                <section id="user-content-and-conduct" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">02</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">User Content And Conduct</h2>
+                    <p class="mt-6">You must not post or submit unlawful, harmful, abusive, deceptive, or infringing material. K-Beats may remove content or restrict access where necessary to protect listeners, creators, and the integrity of the service.</p>
+                </section>
 
-        <h2>Disclaimers and Liability</h2>
-        <p>The service is provided on an "as is" and "as available" basis. To the fullest extent permitted by law, we disclaim warranties and limit liability for indirect or consequential damages.</p>
+                <section id="accounts" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">03</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Accounts</h2>
+                    <p class="mt-6">If you create an account, you are responsible for keeping your credentials secure and for activity carried out under that account unless you notify us promptly about unauthorised use.</p>
+                </section>
 
-        <h2>Changes to Terms</h2>
-        <p>We may modify these terms from time to time. Continued use after updates means you accept the revised terms.</p>
+                <section id="disclaimers-and-liability" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">04</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Disclaimers And Liability</h2>
+                    <p class="mt-6">K-Beats is provided on an &quot;as is&quot; and &quot;as available&quot; basis. To the fullest extent allowed by law, we disclaim warranties and limit liability for indirect, incidental, or consequential losses arising from use of the service.</p>
+                </section>
 
-        <h2>Related Policies</h2>
-        <p>See our <a href="{% url 'privacy_policy' %}">Privacy Policy</a> and <a href="{% url 'cookie_policy' %}">Cookie Policy</a> for data and cookie details.</p>
+                <section id="changes-to-terms" class="legal-panel p-7 md:p-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">05</p>
+                    <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white md:text-4xl">Changes To Terms</h2>
+                    <p class="mt-6">We may update these terms from time to time. Continued use of K-Beats after an update means you accept the revised version. For related data and cookie controls, review the <a href="{% url 'privacy_policy' %}">Privacy Policy</a> and <a href="{% url 'cookie_policy' %}">Cookie Policy</a>.</p>
+                </section>
+            </div>
+        </div>
+    </section>
 
-        <a class="back" href="{% url 'home' %}">← Back to Home</a>
-    </main>
+    <section class="relative border-t border-white/10 px-6 py-16 sm:px-8">
+        <div class="mx-auto grid max-w-6xl gap-6 legal-panel p-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:p-10">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">Need the essentials?</p>
+                <h2 class="mt-3 font-cinzel text-3xl font-black uppercase tracking-[0.08em] text-white">Use the site fairly, keep your account secure.</h2>
+                <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300">These terms are meant to keep the station reliable for listeners and safe for the wider K-Beats community while the platform grows.</p>
+            </div>
+            <div class="flex flex-wrap gap-3 text-[11px] font-black uppercase tracking-[0.2em]">
+                <a href="{% url 'home' %}" class="border border-primary bg-primary px-5 py-3 text-black transition hover:bg-white">Back to Home</a>
+                <a href="{% url 'live' %}" class="border border-white/20 px-5 py-3 text-white transition hover:border-secondary hover:text-secondary">Listen Live</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% include "core/footer.html" %}
 </body>
 </html>
-

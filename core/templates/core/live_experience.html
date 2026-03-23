@@ -245,6 +245,27 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .hero-title-balance {
             max-width: none;
         }
+        #sticky-info-bar {
+            display: none;
+        }
+        #live-ai-card-1-value,
+        #live-ai-card-2-value,
+        #live-ai-card-3-value {
+            font-size: 2rem;
+            line-height: 0.95;
+        }
+        #live-rich-lyric-title,
+        #live-rich-comeback-title,
+        #live-rich-artist-title,
+        #room-hype-label,
+        #live-poll-question {
+            font-size: 1.75rem;
+            line-height: 0.95;
+        }
+        #live-poll-total {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
     }
 </style>
 </head>
@@ -273,8 +294,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="absolute right-0 top-28 h-64 w-64 rounded-full bg-primary/10 blur-3xl floating-orb alt"></div>
         </div>
 
-        <div class="relative container mx-auto px-4 sm:px-6">
-            <div class="mb-7 flex flex-wrap items-center justify-between gap-3">
+        <div class="relative container mx-auto px-6 sm:px-6">
+            <div class="mb-7 hidden flex-wrap items-center justify-between gap-3 md:flex">
                 <div class="inline-flex items-center gap-3 border border-white/10 bg-white/[0.03] px-4 py-2">
                     <span class="relative flex h-2.5 w-2.5">
                         <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
@@ -509,7 +530,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <div id="sticky-info-bar" class="sticky top-[96px] z-40 min-h-[96px] border-y border-white/20 bg-primary transition-[top] duration-300">
         <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
-        <div class="container mx-auto px-4 py-4 sm:px-6 relative z-10">
+          <div class="container mx-auto px-6 py-4 sm:px-6 relative z-10">
             <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                 <div class="flex items-center gap-4 xl:min-w-[240px] xl:shrink-0">
                     <div class="hidden h-12 w-12 shrink-0 items-center justify-center border border-black bg-black text-white shadow-[4px_4px_0px_#ffffff] md:flex">
@@ -548,7 +569,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <section class="relative bg-white py-16">
-        <div class="container mx-auto px-4 sm:px-6">
+          <div class="container mx-auto px-6 sm:px-6">
             <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_380px]">
                 <article class="reverse-live-panel min-w-0 border p-4 sm:p-6 reveal-up">
                     <div>
@@ -625,7 +646,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </section>
 
     <section class="live-full-bleed-band relative pt-10 pb-0 sm:pt-12 sm:pb-0">
-        <div class="container mx-auto px-4 sm:px-6">
+          <div class="container mx-auto px-6 sm:px-6">
             <article class="glass-panel solid-black-panel border border-white/10 p-4 sm:p-6 reveal-up" style="transition-delay: 240ms;">
                 <div>
                         <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Shape The Room</p>
@@ -704,7 +725,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                             {% if live_poll.simulated_results %}
                             <p class="mt-3 text-[10px] uppercase tracking-[0.22em] text-slate-500">
-                                Fan totals pulse upward by {{ live_poll.hourly_growth_min }}-{{ live_poll.hourly_growth_max }} votes an hour, with {{ live_poll.winning_option_text|default:"BTS" }} currently holding the lead.
+                                BTS leads with 38% of the vote. BLACKPINK holds second at 24%, with ATEEZ in third at 16%, BABYMONSTER at 12%, and STRAY KIDS at 10% from 2,096 total votes cast.
                             </p>
                             {% endif %}
 
@@ -787,7 +808,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </section>
 
     <section class="relative -mt-px bg-black pt-8 pb-16 sm:pt-10">
-        <div class="container mx-auto px-4 sm:px-6">
+          <div class="container mx-auto px-6 sm:px-6">
             <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.15fr)_340px]">
                 <div class="glass-panel min-w-0 border border-secondary/20 p-4 sm:p-6 md:p-8 reveal-up">
                     <div class="flex items-start justify-between gap-5">
@@ -861,7 +882,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </section>
 
     <section id="community" class="relative py-16">
-        <div class="container mx-auto px-4 sm:px-6">
+          <div class="container mx-auto px-6 sm:px-6">
             <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.08fr)_420px]">
                 <article class="glass-panel min-w-0 border border-white/10 p-4 sm:p-6 reveal-up">
                     <div class="flex items-start justify-between gap-4">
@@ -968,8 +989,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </section>
 
-    <section class="relative bg-black py-16">
-        <div class="container mx-auto px-4 sm:px-6">
+    <section class="relative bg-black pb-16 pt-6 sm:pt-10">
+        <div class="container mx-auto px-6 sm:px-6">
             <div class="flex flex-wrap items-end justify-between gap-4 reveal-up">
                 <div>
                     <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Stay Locked In</p>
