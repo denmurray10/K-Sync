@@ -5,7 +5,7 @@ import os
 import uuid
 from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
-from django.db import models, transaction
+from django.db import DatabaseError, models, transaction
 from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
@@ -3781,6 +3781,121 @@ def logout_view(request):
 
 def promo(request):
     return render(request, 'core/promo.html')
+
+
+def listen_free_landing(request):
+    try:
+        state, _ = RadioStationState.objects.get_or_create(id=1)
+        current_track = state.current_track
+        listener_count = int(state.listeners_count or 3847)
+    except DatabaseError:
+        state = None
+        current_track = None
+        listener_count = 3847
+
+    preview_track = {
+        'title': current_track.title if current_track else 'K-Beats Live',
+        'artist': current_track.artist if current_track else 'Always on for K-pop fans',
+        'album_art': (
+            current_track.album_art
+            if current_track and current_track.album_art
+            else 'https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner'
+        ),
+        'audio_url': (
+            _build_stream_audio_url(current_track.audio_url)
+            if current_track and current_track.audio_url
+            else ''
+        ),
+    }
+
+    feature_sections = [
+        {
+            'eyebrow': 'Always on',
+            'title': 'Live Radio, 24/7',
+            'body': 'Go from a Facebook ad straight into the stream. No app download required, no long setup, just a fast path into the station.',
+            'bullets': [
+                'One tap from ad click to live playback',
+                'Current-track preview with real station energy',
+                'Mobile-friendly listening built for headphones and commute time',
+            ],
+            'visual': 'live',
+        },
+        {
+            'eyebrow': 'Never miss the drop',
+            'title': 'Charts And New Releases',
+            'body': 'Keep pace with the songs, rankings, and comeback moments fans are talking about right now.',
+            'bullets': [
+                'Weekly chart movement at a glance',
+                'Fresh release discovery without endless scrolling',
+                'Built to turn casual listeners into regular return visits',
+            ],
+            'visual': 'charts',
+        },
+        {
+            'eyebrow': 'More than a stream',
+            'title': 'Community And Fan Clubs',
+            'body': 'Move beyond passive listening with fan-club spaces, shared moments, and reasons to come back for your bias.',
+            'bullets': [
+                'Fan-club spaces for deeper fandom energy',
+                'Profiles, alerts, and member-first community hooks',
+                'A station that feels social instead of one-way',
+            ],
+            'visual': 'community',
+        },
+        {
+            'eyebrow': 'Upgrade when you want more',
+            'title': 'Start A Free VIP Trial',
+            'body': 'Free listening stays open for everyone. VIP adds ad-free sessions, priority requests, and earlier alerts when you want the fuller version.',
+            'bullets': [
+                '7-day free trial messaging already supported on pricing',
+                'Ad-free listening and priority song requests',
+                'A cleaner upgrade path for your most engaged listeners',
+            ],
+            'visual': 'vip',
+        },
+    ]
+
+    comparison_rows = [
+        {'label': '24/7 live K-pop radio', 'free': True, 'vip': True},
+        {'label': 'Charts and rankings', 'free': True, 'vip': True},
+        {'label': 'Fan clubs and community', 'free': True, 'vip': True},
+        {'label': 'Ad-free listening', 'free': False, 'vip': True},
+        {'label': 'Priority song requests', 'free': False, 'vip': True},
+        {'label': 'Early comeback alerts', 'free': False, 'vip': True},
+    ]
+
+    fan_quotes = [
+        {
+            'name': 'Mia, London',
+            'initials': 'ML',
+            'quote': 'I clicked to sample one song and stayed on the stream for two hours. It feels built for actual fans, not casual tourists.',
+        },
+        {
+            'name': 'Jordan, Manchester',
+            'initials': 'JM',
+            'quote': 'The mix of live radio, charts, and fan-club energy makes it way easier to keep up with releases without juggling five different apps.',
+        },
+        {
+            'name': 'Ari, Birmingham',
+            'initials': 'AB',
+            'quote': 'VIP is the upgrade I wanted once I knew I would keep coming back. Free gets you in fast, and the premium extras make sense later.',
+        },
+    ]
+
+    context = {
+        'seo_title': 'Listen Free | K-Beats Radio - Live K-Pop 24/7',
+        'seo_description': 'Start listening to K-Beats Radio in seconds. Stream live K-pop, track charts, explore fan clubs, and see how the 7-day VIP trial fits your fandom.',
+        'listener_count': listener_count,
+        'preview_track': preview_track,
+        'vip_trial_url': f"{reverse('pricing')}#compare-plans",
+        'listen_live_url': reverse('live'),
+        'artist_marquee': ['BTS', 'Stray Kids', 'ATEEZ', 'ENHYPEN', 'TWICE', 'LE SSERAFIM', 'SEVENTEEN', 'aespa'],
+        'feature_sections': feature_sections,
+        'comparison_rows': comparison_rows,
+        'fan_quotes': fan_quotes,
+    }
+    return render(request, 'core/listen_free_landing.html', context)
+
 
 def chart_clash_promo(request):
     daily_rank = Ranking.objects.filter(timeframe='daily').first()

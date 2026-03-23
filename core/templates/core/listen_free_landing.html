@@ -1,0 +1,582 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+<meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+<title>{{ seo_title }}</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#f425c0",
+                    secondary: "#00f0ff",
+                    accent: "#8b5cf6",
+                    ink: "#05050a",
+                },
+                fontFamily: {
+                    display: ["Cinzel", "serif"],
+                    body: ["Montserrat", "sans-serif"],
+                },
+            },
+        },
+    };
+</script>
+<style>
+    :root { color-scheme: dark; }
+    html, body { overflow-x: hidden; }
+    body {
+        font-family: "Montserrat", sans-serif;
+        background:
+            radial-gradient(circle at top left, rgba(244, 37, 192, 0.2), transparent 30%),
+            radial-gradient(circle at top right, rgba(0, 240, 255, 0.16), transparent 28%),
+            linear-gradient(180deg, #090914 0%, #05050a 42%, #080910 100%);
+    }
+    h1, h2, h3, h4, .brand-wordmark { font-family: "Cinzel", serif; }
+    .glass-card {
+        background: linear-gradient(180deg, rgba(14, 15, 24, 0.92), rgba(7, 8, 14, 0.88));
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .gradient-outline { position: relative; }
+    .gradient-outline::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(244, 37, 192, 0.7), rgba(139, 92, 246, 0.45), rgba(0, 240, 255, 0.7));
+        -webkit-mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+    .mesh-grid {
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        background-size: 38px 38px;
+        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent);
+        opacity: 0.35;
+    }
+    .reveal-up, .reveal-left {
+        opacity: 0;
+        transform: translateY(32px);
+        transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-left { transform: translateX(-34px); }
+    .reveal-up.is-visible, .reveal-left.is-visible {
+        opacity: 1;
+        transform: translate(0);
+    }
+    .equalizer-bar {
+        transform-origin: bottom;
+        animation: equalize 1.1s ease-in-out infinite;
+    }
+    .equalizer-bar:nth-child(2) { animation-delay: 0.15s; }
+    .equalizer-bar:nth-child(3) { animation-delay: 0.3s; }
+    .equalizer-bar:nth-child(4) { animation-delay: 0.45s; }
+    .marquee-track {
+        width: max-content;
+        animation: marquee 28s linear infinite;
+    }
+    .cta-shadow { box-shadow: 0 14px 36px rgba(244, 37, 192, 0.28); }
+    @keyframes equalize {
+        0%, 100% { transform: scaleY(0.35); }
+        50% { transform: scaleY(1); }
+    }
+    @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .reveal-up, .reveal-left {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+        .equalizer-bar, .marquee-track { animation: none !important; }
+    }
+</style>
+</head>
+<body class="bg-ink text-white font-body">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<div class="relative isolate min-h-screen">
+    <div class="mesh-grid absolute inset-0"></div>
+
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/55 backdrop-blur-xl">
+        <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+            <a href="{% url 'home' %}" class="flex items-center gap-3">
+                <span class="brand-wordmark text-lg font-extrabold uppercase tracking-[0.28em] text-white sm:text-xl">K-BEATS</span>
+                <span class="hidden text-[11px] uppercase tracking-[0.28em] text-slate-400 sm:inline">UK K-pop radio</span>
+            </a>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <a href="{{ vip_trial_url }}" class="hidden rounded-full border border-white/15 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary sm:inline-flex">Start VIP Trial</a>
+                <a href="{{ listen_live_url }}" class="inline-flex items-center gap-2 rounded-full border border-primary bg-primary px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-white sm:px-5">
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+                    Listen Free
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="relative overflow-hidden px-4 pb-14 pt-28 sm:px-6 sm:pb-20 sm:pt-32">
+            <div class="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+                <div class="reveal-left">
+                    <div class="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-primary">
+                        <span class="material-symbols-outlined text-sm">campaign</span>
+                        Built for paid traffic
+                    </div>
+                    <h1 class="mt-6 text-5xl font-black uppercase leading-[0.86] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                        Your K-pop world,
+                        <span class="block text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)]">always on.</span>
+                    </h1>
+                    <p class="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
+                        Stream K-Beats Radio live, catch the newest chart movement, and step into a fan-first station that feels alive the second you land.
+                    </p>
+                    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                        <a href="{{ listen_live_url }}" class="cta-shadow inline-flex min-h-[56px] items-center justify-center gap-3 rounded-full border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
+                            <span class="material-symbols-outlined text-base">play_circle</span>
+                            Listen Free Now
+                        </a>
+                        <a href="{{ vip_trial_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 rounded-full border border-white/15 bg-white/[0.03] px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary">
+                            <span class="material-symbols-outlined text-base">workspace_premium</span>
+                            Start Free VIP Trial
+                        </a>
+                    </div>
+                    <div class="mt-5 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2">
+                            <span class="material-symbols-outlined text-sm text-primary">headphones</span>
+                            <span id="hero-listener-count">{{ listener_count }}</span> listening
+                        </span>
+                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2">
+                            <span class="material-symbols-outlined text-sm text-secondary">verified</span>
+                            No card required for free listening
+                        </span>
+                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2">
+                            <span class="material-symbols-outlined text-sm text-primary">smartphone</span>
+                            Mobile-first design
+                        </span>
+                    </div>
+                </div>
+
+                <div class="reveal-up">
+                    <div class="gradient-outline glass-card relative overflow-hidden rounded-[2rem] p-4 sm:p-6">
+                        <div class="grid gap-4">
+                            <div class="flex items-center justify-between rounded-[1.4rem] border border-white/10 bg-black/40 px-4 py-3">
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Live now</p>
+                                    <p id="hero-track-title" class="mt-1 text-lg font-bold text-white">{{ preview_track.title }}</p>
+                                    <p id="hero-track-artist" class="text-sm text-slate-300">{{ preview_track.artist }}</p>
+                                </div>
+                                <div class="flex items-end gap-1" aria-hidden="true">
+                                    <span class="equalizer-bar h-5 w-1 rounded-full bg-primary"></span>
+                                    <span class="equalizer-bar h-7 w-1 rounded-full bg-secondary"></span>
+                                    <span class="equalizer-bar h-4 w-1 rounded-full bg-primary"></span>
+                                    <span class="equalizer-bar h-8 w-1 rounded-full bg-secondary"></span>
+                                </div>
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
+                                <div class="rounded-[1.6rem] border border-white/10 bg-black/45 p-4">
+                                    <img id="hero-track-art" src="{{ preview_track.album_art }}" alt="Current track artwork" class="aspect-square w-full rounded-[1.2rem] border border-white/10 object-cover"/>
+                                    <div class="mt-4 flex items-center justify-between gap-3">
+                                        <div>
+                                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Preview player</p>
+                                            <p class="mt-1 text-sm text-slate-300">Tap to sample the live stream.</p>
+                                        </div>
+                                        <button id="hero-preview-toggle" type="button" class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary bg-primary text-black transition hover:bg-white" aria-label="Play or pause live preview" {% if not preview_track.audio_url %}disabled{% endif %}>
+                                            <span id="hero-preview-icon" class="material-symbols-outlined text-xl">play_arrow</span>
+                                        </button>
+                                    </div>
+                                    <audio id="hero-preview-audio" preload="none" {% if preview_track.audio_url %}src="{{ preview_track.audio_url }}"{% endif %}></audio>
+                                </div>
+                                <div class="grid gap-4">
+                                    <div class="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-5">
+                                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Why it works</p>
+                                        <div class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+                                            <p>One clear job above the fold: start listening or check the VIP trial.</p>
+                                            <p>Social proof and live context make the station feel active instantly.</p>
+                                            <p>Free vs VIP framing removes friction before the click.</p>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Free</p>
+                                            <p class="mt-2 text-2xl font-black uppercase tracking-tight text-white">24/7 radio</p>
+                                            <p class="mt-2 text-sm leading-6 text-slate-300">Live stream, charts, and community.</p>
+                                        </div>
+                                        <div class="rounded-[1.4rem] border border-primary/30 bg-primary/10 p-4">
+                                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">VIP trial</p>
+                                            <p class="mt-2 text-2xl font-black uppercase tracking-tight text-white">7 days free</p>
+                                            <p class="mt-2 text-sm leading-6 text-slate-300">Ad-free sessions and priority perks.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-y border-white/10 bg-black/35">
+            <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+                    <span class="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">Social proof</span>
+                    <p class="text-sm text-slate-200">Join <span id="proof-listener-count">{{ listener_count }}</span> K-pop fans tuned in live.</p>
+                </div>
+                <div class="overflow-hidden">
+                    <div class="marquee-track flex items-center gap-3 pr-3">
+                        {% for item in artist_marquee %}
+                        <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-300">{{ item }}</span>
+                        {% endfor %}
+                        {% for item in artist_marquee %}
+                        <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-300">{{ item }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="px-4 py-16 sm:px-6 sm:py-20">
+            <div class="mx-auto max-w-6xl">
+                <div class="reveal-left max-w-3xl">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">What you get</p>
+                    <h2 class="mt-4 text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl">A landing page built to move from curiosity to listening.</h2>
+                    <p class="mt-4 text-base leading-7 text-slate-300">The page keeps the ad promise tight: hear the station fast, understand the value quickly, and see why upgrading later still makes sense.</p>
+                </div>
+                <div class="mt-12 space-y-8">
+                    {% for section in feature_sections %}
+                    <article class="reveal-up grid gap-6 rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-7 lg:grid-cols-2 lg:items-center lg:gap-10">
+                        {% if forloop.counter|divisibleby:2 %}
+                        <div class="order-2 lg:order-1">
+                        {% else %}
+                        <div>
+                        {% endif %}
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">{{ section.eyebrow }}</p>
+                            <h3 class="mt-4 text-3xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-4xl">{{ section.title }}</h3>
+                            <p class="mt-4 text-base leading-7 text-slate-300">{{ section.body }}</p>
+                            <div class="mt-6 space-y-3">
+                                {% for bullet in section.bullets %}
+                                <div class="flex items-start gap-3">
+                                    <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
+                                        <span class="material-symbols-outlined text-sm text-primary">done</span>
+                                    </span>
+                                    <p class="text-sm leading-6 text-slate-300">{{ bullet }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if forloop.counter|divisibleby:2 %}
+                        <div class="order-1 lg:order-2">
+                        {% else %}
+                        <div>
+                        {% endif %}
+                            <div class="rounded-[1.8rem] border border-white/10 bg-black/45 p-5 sm:p-6">
+                                {% if section.visual == 'live' %}
+                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Live preview</p>
+                                <div class="mt-5 grid gap-4 sm:grid-cols-[auto_1fr]">
+                                    <img src="{{ preview_track.album_art }}" alt="K-Beats live preview artwork" class="h-24 w-24 rounded-2xl border border-white/10 object-cover"/>
+                                    <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                                        <p class="text-lg font-black uppercase tracking-tight text-white">{{ preview_track.title }}</p>
+                                        <p class="mt-1 text-sm text-slate-300">{{ preview_track.artist }}</p>
+                                        <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+                                            <div class="h-full w-1/2 rounded-full bg-gradient-to-r from-primary via-accent to-secondary"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% elif section.visual == 'charts' %}
+                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Chart pulse</p>
+                                <div class="mt-5 grid gap-3">
+                                    <div class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
+                                        <div>
+                                            <p class="text-sm font-bold text-white">Weekly movement</p>
+                                            <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Top 50 snapshot</p>
+                                        </div>
+                                        <span class="text-lg font-black text-secondary">+12</span>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <div class="rounded-2xl border border-white/10 bg-black/30 p-4"><p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">#1</p><p class="mt-2 text-sm font-bold text-white">Stay Loud</p></div>
+                                        <div class="rounded-2xl border border-white/10 bg-black/30 p-4"><p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">#2</p><p class="mt-2 text-sm font-bold text-white">Neon Heart</p></div>
+                                        <div class="rounded-2xl border border-white/10 bg-black/30 p-4"><p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">#3</p><p class="mt-2 text-sm font-bold text-white">Midnight Stage</p></div>
+                                    </div>
+                                </div>
+                                {% elif section.visual == 'community' %}
+                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Fan signal</p>
+                                <div class="mt-5 grid gap-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex -space-x-3">
+                                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black bg-primary text-xs font-black text-black">ST</span>
+                                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black bg-secondary text-xs font-black text-black">AT</span>
+                                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black bg-white text-xs font-black text-black">EN</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-white">Bias-led fan spaces</p>
+                                            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Clubs, alerts, return reasons</p>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="rounded-2xl border border-white/10 bg-black/30 p-4"><p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Top club</p><p class="mt-2 text-sm font-bold text-white">Stay Central</p></div>
+                                        <div class="rounded-2xl border border-white/10 bg-black/30 p-4"><p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Updates</p><p class="mt-2 text-sm font-bold text-white">Charts + comebacks</p></div>
+                                    </div>
+                                </div>
+                                {% elif section.visual == 'vip' %}
+                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Upgrade surface</p>
+                                <div class="mt-5 rounded-[1.6rem] border border-primary/20 bg-primary/10 p-5">
+                                    <p class="text-[10px] uppercase tracking-[0.24em] text-primary">7-day free trial</p>
+                                    <p class="mt-2 text-3xl font-black uppercase tracking-tight text-white">Ad-free listening</p>
+                                    <div class="mt-5 space-y-3 text-sm text-slate-300">
+                                        <div class="flex items-center gap-3"><span class="material-symbols-outlined text-base text-primary">check_circle</span>Priority song requests</div>
+                                        <div class="flex items-center gap-3"><span class="material-symbols-outlined text-base text-primary">check_circle</span>Early comeback alerts</div>
+                                        <div class="flex items-center gap-3"><span class="material-symbols-outlined text-base text-primary">check_circle</span>Fan-first premium extras</div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="px-4 py-16 sm:px-6">
+            <div class="mx-auto max-w-6xl">
+                <div class="reveal-up overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03]">
+                    <div class="border-b border-white/10 px-5 py-6 sm:px-8">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Free vs VIP</p>
+                        <div class="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                            <div class="max-w-2xl">
+                                <h2 class="text-3xl font-black uppercase leading-[0.94] tracking-tight text-white sm:text-4xl">A simple plan comparison that answers the upgrade question fast.</h2>
+                                <p class="mt-4 text-base leading-7 text-slate-300">Free listening gets people into the station immediately. VIP gives heavier listeners a cleaner, higher-value version once they are ready.</p>
+                            </div>
+                            <a href="{{ vip_trial_url }}" class="inline-flex items-center justify-center gap-2 rounded-full border border-primary bg-primary px-6 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-white">
+                                <span class="material-symbols-outlined text-base">workspace_premium</span>
+                                Try VIP Free
+                            </a>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border-separate border-spacing-0">
+                            <thead>
+                                <tr>
+                                    <th class="border-b border-white/10 px-5 py-4 text-left text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">Feature</th>
+                                    <th class="border-b border-white/10 px-5 py-4 text-center text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Free</th>
+                                    <th class="border-b border-white/10 px-5 py-4 text-center text-[10px] font-bold uppercase tracking-[0.28em] text-primary">VIP trial</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in comparison_rows %}
+                                <tr>
+                                    <td class="border-b border-white/10 px-5 py-4 text-sm text-slate-200">{{ row.label }}</td>
+                                    <td class="border-b border-white/10 px-5 py-4 text-center">
+                                        {% if row.free %}<span class="material-symbols-outlined text-lg text-green-400">check_circle</span>{% else %}<span class="material-symbols-outlined text-lg text-slate-600">close</span>{% endif %}
+                                    </td>
+                                    <td class="border-b border-white/10 px-5 py-4 text-center">
+                                        {% if row.vip %}<span class="material-symbols-outlined text-lg text-primary">check_circle</span>{% else %}<span class="material-symbols-outlined text-lg text-slate-600">close</span>{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="px-4 pb-14 sm:px-6 sm:pb-16">
+            <div class="mx-auto max-w-6xl">
+                <div class="reveal-up rounded-[2rem] border border-primary/20 bg-[linear-gradient(135deg,rgba(244,37,192,0.18),rgba(15,17,26,0.94),rgba(0,240,255,0.16))] p-6 sm:p-8">
+                    <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                        <div class="max-w-3xl">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Momentum strip</p>
+                            <h2 class="mt-4 text-3xl font-black uppercase leading-[0.94] tracking-tight text-white sm:text-4xl">Free radio is live right now, and new VIP listeners get a 7-day trial.</h2>
+                            <p class="mt-4 text-base leading-7 text-slate-200">No fake scarcity. Just a clean nudge: start free instantly, and upgrade when you want ad-free sessions plus priority fan perks.</p>
+                        </div>
+                        <div class="flex flex-col gap-3 sm:min-w-[18rem]">
+                            <a href="{{ listen_live_url }}" class="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white px-6 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-primary">
+                                <span class="material-symbols-outlined text-base">play_circle</span>
+                                Start Listening
+                            </a>
+                            <a href="{{ vip_trial_url }}" class="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-black/30 px-6 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-white transition hover:border-secondary hover:text-secondary">
+                                <span class="material-symbols-outlined text-base">workspace_premium</span>
+                                See VIP Trial
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="px-4 py-16 sm:px-6">
+            <div class="mx-auto max-w-6xl">
+                <div class="reveal-left max-w-3xl">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Fan quotes</p>
+                    <h2 class="mt-4 text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl">Social proof that feels closer to fandom than generic lifestyle copy.</h2>
+                </div>
+                <div class="mt-10 grid gap-5 md:grid-cols-3">
+                    {% for quote in fan_quotes %}
+                    <article class="reveal-up rounded-[1.8rem] border border-white/10 bg-white/[0.03] p-6">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-primary/10 text-sm font-black uppercase text-primary">{{ quote.initials }}</span>
+                            <div>
+                                <p class="text-sm font-bold uppercase tracking-[0.12em] text-white">{{ quote.name }}</p>
+                                <p class="mt-1 text-[11px] uppercase tracking-[0.2em] text-slate-500">5-star listener review</p>
+                            </div>
+                        </div>
+                        <p class="mt-5 text-base leading-7 text-slate-300">"{{ quote.quote }}"</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="px-4 pb-28 pt-6 sm:px-6 sm:pb-24">
+            <div class="mx-auto max-w-5xl">
+                <div class="reveal-up gradient-outline rounded-[2.2rem] bg-[linear-gradient(180deg,rgba(10,11,18,0.95),rgba(8,9,15,0.92))] px-6 py-12 text-center sm:px-10 sm:py-14">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Final call</p>
+                    <h2 class="mt-5 text-4xl font-black uppercase leading-[0.9] tracking-tight text-white sm:text-5xl">Ready to tune in?</h2>
+                    <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-300">Start with the free live stream now, or explore the VIP trial when you want ad-free listening and the fuller K-Beats experience.</p>
+                    <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                        <a href="{{ listen_live_url }}" class="cta-shadow inline-flex min-h-[56px] items-center justify-center gap-3 rounded-full border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
+                            <span class="material-symbols-outlined text-base">play_circle</span>
+                            Start Listening Now
+                        </a>
+                        <a href="{{ vip_trial_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 rounded-full border border-white/15 bg-white/[0.03] px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary">
+                            <span class="material-symbols-outlined text-base">workspace_premium</span>
+                            Explore VIP Trial
+                        </a>
+                    </div>
+                    <div class="mt-6 flex flex-wrap items-center justify-center gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2"><span class="material-symbols-outlined text-sm text-primary">lock</span>Secure signup</span>
+                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2"><span class="material-symbols-outlined text-sm text-secondary">headphones</span>Instant stream access</span>
+                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2"><span class="material-symbols-outlined text-sm text-primary">credit_card_off</span>No card for free listening</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/80 px-4 py-3 backdrop-blur-xl sm:hidden">
+        <div class="flex items-center gap-3">
+            <a href="{{ listen_live_url }}" class="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-primary bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black"><span class="material-symbols-outlined text-sm">play_arrow</span>Listen Free</a>
+            <a href="{{ vip_trial_url }}" class="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white"><span class="material-symbols-outlined text-sm">workspace_premium</span>VIP Trial</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+
+        document.querySelectorAll('.reveal-up, .reveal-left').forEach((element) => revealObserver.observe(element));
+
+        const baseListeners = Number({{ listener_count|default:3847 }}) || 3847;
+        const listenerTargets = ['hero-listener-count', 'proof-listener-count'];
+        const updateListenerCount = () => {
+            const nextCount = Math.max(3000, baseListeners + (Math.floor(Math.random() * 46) - 23)).toLocaleString();
+            listenerTargets.forEach((id) => {
+                const node = document.getElementById(id);
+                if (node) node.textContent = nextCount;
+            });
+        };
+        updateListenerCount();
+        window.setInterval(updateListenerCount, 7000);
+
+        const audio = document.getElementById('hero-preview-audio');
+        const playButton = document.getElementById('hero-preview-toggle');
+        const playIcon = document.getElementById('hero-preview-icon');
+        const artEl = document.getElementById('hero-track-art');
+        const titleEl = document.getElementById('hero-track-title');
+        const artistEl = document.getElementById('hero-track-artist');
+
+        const syncAudioUi = () => {
+            if (!audio || !playIcon || !playButton) return;
+            playIcon.textContent = audio.paused ? 'play_arrow' : 'pause';
+        };
+
+        if (audio && playButton) {
+            playButton.addEventListener('click', async () => {
+                if (!audio.src) return;
+                try {
+                    if (audio.paused) {
+                        await audio.play();
+                    } else {
+                        audio.pause();
+                    }
+                } catch (error) {
+                    audio.pause();
+                }
+                syncAudioUi();
+            });
+
+            audio.addEventListener('play', syncAudioUi);
+            audio.addEventListener('pause', syncAudioUi);
+            audio.addEventListener('ended', syncAudioUi);
+            syncAudioUi();
+        }
+
+        const refreshLivePreview = async () => {
+            try {
+                const response = await fetch(`/api/live/status/?_ts=${Date.now()}`, { cache: 'no-store' });
+                const data = await response.json();
+                if (!data || !data.ok || !data.current_track) return;
+
+                if (titleEl) titleEl.textContent = String(data.current_track.title || 'K-Beats Live');
+                if (artistEl) artistEl.textContent = String(data.current_track.artist || 'Always on for K-pop fans');
+                if (artEl && data.current_track.album_art) artEl.src = String(data.current_track.album_art);
+
+                if (audio && data.current_track.audio_url) {
+                    const nextSrc = String(data.current_track.audio_url);
+                    const previousSrc = String(audio.currentSrc || audio.src || '');
+                    if (previousSrc !== nextSrc) {
+                        const wasPlaying = !audio.paused;
+                        audio.src = nextSrc;
+                        if (wasPlaying) {
+                            try {
+                                await audio.play();
+                            } catch (error) {
+                                audio.pause();
+                            }
+                        }
+                    }
+                }
+                syncAudioUi();
+            } catch (error) {
+                // Keep existing preview state on transient failures.
+            }
+        };
+
+        refreshLivePreview();
+        window.setInterval(refreshLivePreview, 30000);
+    });
+</script>
+</body>
+</html>
