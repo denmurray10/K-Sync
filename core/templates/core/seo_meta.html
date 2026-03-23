@@ -8,6 +8,11 @@
 <meta property="og:title" content="{% firstof seo_title article.title contest.title group.name 'K-Beats Radio | Live K-Pop Music, Charts, News & Community' %}"/>
 <meta property="og:description" content="{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}"/>
 <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
+{% if article.image %}
+<meta property="og:image" content="{{ article.image }}"/>
+<meta property="og:image:secure_url" content="{{ article.image }}"/>
+<meta name="twitter:image" content="{{ article.image }}"/>
+{% endif %}
 
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="{% firstof seo_title article.title contest.title group.name 'K-Beats Radio | Live K-Pop Music, Charts, News & Community' %}"/>

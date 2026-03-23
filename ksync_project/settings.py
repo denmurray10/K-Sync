@@ -175,7 +175,7 @@ ENABLE_THIRD_PARTY_TRACKING = os.environ.get(
 # ── Facebook ─────────────────────────────────────────────────────────────────
 # Required permissions: pages_manage_posts, pages_read_engagement
 FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '966171646586881')
-FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUVcMgjdSoBQ0nyoLLbQTB7i3mrOIleDSuUZCcfL3Y2eEZAHzSnjKnLOeUreOxBtsDv8Wh52T4fgIfpZAn5vKEfVb7bvZC3xmBxTSjZCLXBv79sd0qibQxcNwBVyah8c08UKeyhpDbAClAbB3D0Xy2aNBqmyvUg80Ew811zlHXoYZCVvLlrCSZBfRI9DMbvOUnS2uV6QZDZD')
+FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUVcMgjdSoBRK2vapSeQa3jZCLAmp2NOwLaC7JxI3AQg6ZB4zZCitCdFdhzzV9FU27tLTy1jFZA9cHXhtbZCBJuWWC4elKQ4TBZBEvZAobmT4JjsFsZApxZAoZB1ZBEHJSMJrGvIAmCxPwNbiBNZBqYUu9Rv75YiYcErhzfmIx7wuyZCd4FWkKbo8rYST6wTI1HO6ZCrPszYPrr2VPeTDdcT6ZCDvoc11WpiZBZB2SxZC9umD')
 FACEBOOK_PIXEL_ID = os.environ.get('FACEBOOK_PIXEL_ID', '1694492738408843').strip()
 
 # ── Instagram ─────────────────────────────────────────────────────────────────

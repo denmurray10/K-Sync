@@ -3784,10 +3784,37 @@ def promo(request):
 
 
 def listen_free_landing(request):
+    up_next_tracks = []
     try:
         state, _ = RadioStationState.objects.get_or_create(id=1)
-        current_track = state.current_track
         listener_count = int(state.listeners_count or 3847)
+        schedule_context = _compute_schedule_live_context(timezone.localtime(), force_advance=False)
+
+        if schedule_context:
+            current_track = schedule_context.get('current_track') or state.current_track
+            raw_up_next = [
+                track for track in list(schedule_context.get('up_next_tracks') or [])
+                if track and not _is_generated_voice_track(track)
+            ][:3]
+        else:
+            current_track = state.current_track
+            up_next_ids = list(state.up_next or [])[:3]
+            raw_up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
+            raw_up_next_tracks = [
+                track for track in raw_up_next_tracks
+                if track and not _is_generated_voice_track(track)
+            ]
+            raw_up_next_tracks.sort(key=lambda track: up_next_ids.index(track.id) if track.id in up_next_ids else 999)
+            raw_up_next = raw_up_next_tracks[:3]
+
+        up_next_tracks = [
+            {
+                'title': track.title,
+                'artist': track.artist,
+                'album_art': track.album_art,
+            }
+            for track in raw_up_next
+        ]
     except DatabaseError:
         state = None
         current_track = None
@@ -3887,6 +3914,7 @@ def listen_free_landing(request):
         'seo_description': 'Start listening to K-Beats Radio in seconds. Stream live K-pop, track charts, explore fan clubs, and see how the 7-day VIP trial fits your fandom.',
         'listener_count': listener_count,
         'preview_track': preview_track,
+        'up_next_tracks': up_next_tracks,
         'vip_trial_url': f"{reverse('pricing')}#compare-plans",
         'listen_live_url': reverse('live'),
         'artist_marquee': ['BTS', 'Stray Kids', 'ATEEZ', 'ENHYPEN', 'TWICE', 'LE SSERAFIM', 'SEVENTEEN', 'aespa'],
@@ -7569,32 +7597,30 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
     if scheduled_unix_ts is None:
         scheduled_unix_ts = int(_time.time()) + 3600
 
+    article_url = _social_article_url(article, source='facebook')
     hook = _social_hook(article)
     plain_excerpt = _article_opening_excerpt(article, max_chars=400)
     hashtags = ' '.join(_social_hashtags('facebook', article))
 
-    # Construct a more substantial message with hook and title first
+    # Construct a link-first message so Facebook creates a proper article preview.
     message = (
         f"{hook} {article.title}\n\n"
         f"{plain_excerpt}\n\n"
-        "Link to the article in the comments\n\n"
+        f"Read more: {article_url}\n\n"
         f"{hashtags}"
     )
 
-    # Use the Page Photos endpoint to create a Photo Post.
-    # This avoids the "link preview" box at the bottom (which would show cloudinary.com)
-    # and makes the image the focus of the post.
     payload = {
-        'caption': message,
-        'url': article.image,
+        'message': message,
+        'link': article_url,
         'published': False,
         'scheduled_publish_time': scheduled_unix_ts,
     }
 
     try:
         resp = requests.post(
-            f'https://graph.facebook.com/v22.0/{page_id}/photos',
-            json=payload,
+            f'https://graph.facebook.com/v22.0/{page_id}/feed',
+            data=payload,
             params={'access_token': token},
             timeout=20,
         )
@@ -7612,8 +7638,8 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
             )
         else:
             logger.warning(
-                "[facebook] Scheduled post failed for %r - %s",
-                article.title, result,
+                "[facebook] Scheduled post failed for %r - status=%s response=%s",
+                article.title, resp.status_code, result,
             )
     except Exception as e:
         logger.warning("[facebook] Request error for %r: %s", article.title, e)

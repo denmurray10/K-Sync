@@ -41,6 +41,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         font-family: "Montserrat", sans-serif;
         background: #000000;
     }
+    .nav-cinzel { font-family: "Cinzel", serif; }
     h1, h2, h3, h4, .brand-wordmark { font-family: "Cinzel", serif; }
     .glass-card {
         background: linear-gradient(180deg, rgba(14, 15, 24, 0.92), rgba(7, 8, 14, 0.88));
@@ -85,6 +86,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         animation: marquee 28s linear infinite;
     }
     .cta-shadow { box-shadow: 0 14px 36px rgba(244, 37, 192, 0.28); }
+    .live-dock {
+        transform: translateY(110%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+    .live-dock.is-visible {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
     @keyframes equalize {
         0%, 100% { transform: scaleY(0.35); }
         50% { transform: scaleY(1); }
@@ -99,6 +111,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             transform: none !important;
             transition: none !important;
         }
+        .live-dock {
+            transition: none !important;
+        }
         .equalizer-bar, .marquee-track { animation: none !important; }
     }
 </style>
@@ -110,101 +125,121 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
 <div class="relative isolate min-h-screen">
-    {% include 'core/header.html' %}
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
+        <div class="container mx-auto flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+            <a class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
+                <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
+                <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
+                <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="{{ vip_trial_url }}" class="hidden border border-white/15 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary sm:inline-flex">VIP trial</a>
+                <button id="header-play-toggle" type="button" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-white">
+                    <span id="header-play-icon" class="material-symbols-outlined text-sm">play_arrow</span>
+                    <span id="header-play-label">Play live</span>
+                </button>
+            </div>
+        </div>
+    </header>
 
     <main>
         <section class="relative overflow-hidden pb-14 pt-32 sm:pb-20 sm:pt-36">
             <div class="container mx-auto grid items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
-                <div class="reveal-left">
-                    <div class="inline-flex items-center gap-2 rounded-none border border-primary/30 bg-primary/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-primary">
-                        <span class="material-symbols-outlined text-sm">campaign</span>
-                        Built for paid traffic
+                <div class="reveal-left max-w-3xl">
+                    <div class="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-primary">
+                        <span class="material-symbols-outlined text-sm">radio</span>
+                        24/7 live K-pop radio
                     </div>
-                    <h1 class="mt-6 text-5xl font-black uppercase leading-[0.86] tracking-tight text-white sm:text-6xl lg:text-7xl">
-                        Your K-pop world,
-                        <span class="block text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)]">always on.</span>
+                    <h1 class="mt-6 text-5xl font-black uppercase leading-[0.88] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                        Play live K-pop
+                        <span class="block text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)]">in one tap.</span>
                     </h1>
                     <p class="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
-                        Stream K-Beats Radio live, catch the newest chart movement, and step into a fan-first station that feels alive the second you land.
+                        K-Beats Radio takes visitors straight from the ad into a real live stream, with current-track context and fan-first discovery that keeps people listening instead of bouncing.
                     </p>
                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                        <a href="{{ listen_live_url }}" class="cta-shadow inline-flex min-h-[56px] items-center justify-center gap-3 rounded-none border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
-                            <span class="material-symbols-outlined text-base">play_circle</span>
-                            Listen Free Now
-                        </a>
-                        <a href="{{ vip_trial_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 rounded-none border border-white/15 bg-white/[0.03] px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary">
+                        <button id="hero-primary-toggle" type="button" class="cta-shadow inline-flex min-h-[56px] items-center justify-center gap-3 border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
+                            <span id="hero-primary-icon" class="material-symbols-outlined text-base">play_circle</span>
+                            <span id="hero-primary-label">Play live free</span>
+                        </button>
+                        <a href="{{ vip_trial_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-white/15 bg-white/[0.03] px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary">
                             <span class="material-symbols-outlined text-base">workspace_premium</span>
-                            Start Free VIP Trial
+                            See VIP trial
                         </a>
                     </div>
-                    <div class="mt-5 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                        <span class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white/[0.03] px-4 py-2">
-                            <span class="material-symbols-outlined text-sm text-primary">headphones</span>
-                            <span id="hero-listener-count">{{ listener_count }}</span> listening
-                        </span>
-                        <span class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white/[0.03] px-4 py-2">
-                            <span class="material-symbols-outlined text-sm text-secondary">verified</span>
-                            No card required for free listening
-                        </span>
-                        <span class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white/[0.03] px-4 py-2">
-                            <span class="material-symbols-outlined text-sm text-primary">smartphone</span>
-                            Mobile-first design
-                        </span>
+                    <div class="mt-6 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">Free live stream</span>
+                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">No app download needed</span>
+                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">No card for free listening</span>
                     </div>
                 </div>
 
                 <div class="reveal-up">
                     <div class="gradient-outline glass-card relative overflow-hidden rounded-none p-4 sm:p-6">
-                        <div class="grid gap-4">
-                            <div class="flex items-center justify-between rounded-none border border-white/10 bg-black/40 px-4 py-3">
-                                <div>
-                                    <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Live now</p>
-                                    <p id="hero-track-title" class="mt-1 text-lg font-bold text-white">{{ preview_track.title }}</p>
-                                    <p id="hero-track-artist" class="text-sm text-slate-300">{{ preview_track.artist }}</p>
-                                </div>
-                                <div class="flex items-end gap-1" aria-hidden="true">
-                                    <span class="equalizer-bar h-5 w-1 rounded-none bg-primary"></span>
-                                    <span class="equalizer-bar h-7 w-1 rounded-none bg-secondary"></span>
-                                    <span class="equalizer-bar h-4 w-1 rounded-none bg-primary"></span>
-                                    <span class="equalizer-bar h-8 w-1 rounded-none bg-secondary"></span>
+                        <div class="flex items-center justify-between border border-white/10 bg-black/40 px-4 py-3">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Now live on K-Beats</p>
+                                <p id="hero-track-title" class="mt-1 text-xl font-bold text-white">{{ preview_track.title }}</p>
+                                <p id="hero-track-artist" class="text-sm uppercase tracking-[0.18em] text-slate-300">{{ preview_track.artist }}</p>
+                            </div>
+                            <div class="flex items-end gap-1" aria-hidden="true">
+                                <span class="equalizer-bar h-5 w-1 rounded-none bg-primary"></span>
+                                <span class="equalizer-bar h-7 w-1 rounded-none bg-secondary"></span>
+                                <span class="equalizer-bar h-4 w-1 rounded-none bg-primary"></span>
+                                <span class="equalizer-bar h-8 w-1 rounded-none bg-secondary"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 border border-white/10 bg-black/45 p-4 sm:p-5">
+                            <div class="grid gap-4 sm:grid-cols-[140px_minmax(0,1fr)] sm:items-center">
+                                <img id="hero-track-art" src="{{ preview_track.album_art }}" alt="Current track artwork" class="aspect-square w-full border border-white/10 object-cover"/>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">On-page live player</p>
+                                    <p id="landing-player-status" class="mt-2 text-sm leading-6 text-slate-300">Press play to start the stream here, then keep browsing while the station keeps running.</p>
+                                    <div class="mt-4 flex flex-col gap-3 sm:flex-row">
+                                        <button id="hero-preview-toggle" type="button" class="inline-flex min-h-[52px] items-center justify-center gap-3 border border-primary bg-primary px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-black transition hover:bg-white">
+                                            <span id="hero-preview-icon" class="material-symbols-outlined text-xl">play_arrow</span>
+                                            <span id="hero-preview-label">Play live now</span>
+                                        </button>
+                                        <a href="{{ listen_live_url }}" class="inline-flex min-h-[52px] items-center justify-center gap-3 border border-white/15 bg-white/[0.03] px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-white transition hover:border-secondary hover:text-secondary">
+                                            <span class="material-symbols-outlined text-base">open_in_new</span>
+                                            Open full live page
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
+                            <audio id="hero-preview-audio" preload="none" playsinline {% if preview_track.audio_url %}src="{{ preview_track.audio_url }}"{% endif %}></audio>
+                        </div>
 
-                            <div class="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
-                                <div class="rounded-none border border-white/10 bg-black/45 p-4">
-                                    <img id="hero-track-art" src="{{ preview_track.album_art }}" alt="Current track artwork" class="aspect-square w-full rounded-none border border-white/10 object-cover"/>
-                                    <div class="mt-4 flex items-center justify-between gap-3">
-                                        <div>
-                                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Preview player</p>
-                                            <p class="mt-1 text-sm text-slate-300">Tap to sample the live stream.</p>
-                                        </div>
-                                        <button id="hero-preview-toggle" type="button" class="inline-flex h-12 w-12 items-center justify-center rounded-none border border-primary bg-primary text-black transition hover:bg-white" aria-label="Play or pause live preview" {% if not preview_track.audio_url %}disabled{% endif %}>
-                                            <span id="hero-preview-icon" class="material-symbols-outlined text-xl">play_arrow</span>
-                                        </button>
+                        <div class="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+                            <div class="border border-white/10 bg-white/[0.04] p-4">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div>
+                                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Up next</p>
+                                        <p class="mt-1 text-sm text-slate-300">A reason to keep the stream on.</p>
                                     </div>
-                                    <audio id="hero-preview-audio" preload="none" {% if preview_track.audio_url %}src="{{ preview_track.audio_url }}"{% endif %}></audio>
+                                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Queue</span>
                                 </div>
-                                <div class="grid gap-4">
-                                    <div class="rounded-none border border-white/10 bg-white/[0.04] p-5">
-                                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Why it works</p>
-                                        <div class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
-                                            <p>One clear job above the fold: start listening or check the VIP trial.</p>
-                                            <p>Social proof and live context make the station feel active instantly.</p>
-                                            <p>Free vs VIP framing removes friction before the click.</p>
+                                <div id="landing-up-next" class="mt-4 space-y-3">
+                                    {% for track in up_next_tracks %}
+                                    <div class="flex items-center gap-3 border border-white/10 bg-black/35 p-3">
+                                        <img src="{{ track.album_art }}" alt="" class="h-12 w-12 border border-white/10 object-cover"/>
+                                        <div class="min-w-0">
+                                            <p class="truncate text-sm font-black uppercase tracking-tight text-white">{{ track.title }}</p>
+                                            <p class="truncate text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ track.artist }}</p>
                                         </div>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <div class="rounded-none border border-white/10 bg-white/[0.03] p-4">
-                                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Free</p>
-                                            <p class="mt-2 text-2xl font-black uppercase tracking-tight text-white">24/7 radio</p>
-                                            <p class="mt-2 text-sm leading-6 text-slate-300">Live stream, charts, and community.</p>
-                                        </div>
-                                        <div class="rounded-none border border-primary/30 bg-primary/10 p-4">
-                                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">VIP trial</p>
-                                            <p class="mt-2 text-2xl font-black uppercase tracking-tight text-white">7 days free</p>
-                                            <p class="mt-2 text-sm leading-6 text-slate-300">Ad-free sessions and priority perks.</p>
-                                        </div>
-                                    </div>
+                                    {% empty %}
+                                    <p class="text-sm leading-6 text-slate-400">Queue details will load as soon as the station responds.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="border border-white/10 bg-white/[0.04] p-4">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Why listeners stay</p>
+                                <div class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+                                    <p>Live radio creates momentum that playlists usually lose after the first song.</p>
+                                    <p>The page keeps charts, fan energy, and upgrade options nearby without interrupting the stream.</p>
+                                    <p>VIP stays available, but listening is the first win.</p>
                                 </div>
                             </div>
                         </div>
@@ -214,20 +249,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <section class="border-y border-white/10 bg-black/35">
-            <div class="container mx-auto flex flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-                <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                    <span class="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">Social proof</span>
-                    <p class="text-sm text-slate-200">Join <span id="proof-listener-count">{{ listener_count }}</span> K-pop fans tuned in live.</p>
+            <div class="container mx-auto grid gap-4 px-4 py-5 sm:px-6 md:grid-cols-3">
+                <div class="border border-white/10 bg-white/[0.03] p-4">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Listening now</p>
+                    <p id="proof-listener-count" class="mt-3 text-2xl font-black uppercase tracking-tight text-white">{{ listener_count }}</p>
+                    <p class="mt-2 text-sm text-slate-300">Fans already tuned in to the live K-Beats stream.</p>
                 </div>
-                <div class="overflow-hidden">
-                    <div class="marquee-track flex items-center gap-3 pr-3">
-                        {% for item in artist_marquee %}
-                        <span class="rounded-none border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-300">{{ item }}</span>
-                        {% endfor %}
-                        {% for item in artist_marquee %}
-                        <span class="rounded-none border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-300">{{ item }}</span>
-                        {% endfor %}
-                    </div>
+                <div class="border border-white/10 bg-white/[0.03] p-4">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Current track</p>
+                    <p id="proof-track-title" class="mt-3 text-lg font-black uppercase tracking-tight text-white">{{ preview_track.title }}</p>
+                    <p id="proof-track-artist" class="mt-2 text-sm uppercase tracking-[0.18em] text-slate-300">{{ preview_track.artist }}</p>
+                </div>
+                <div class="border border-white/10 bg-white/[0.03] p-4">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Built for repeat listening</p>
+                    <p class="mt-3 text-sm leading-6 text-slate-300">Live radio, chart movement, and fan-club energy all live in one place once the stream starts.</p>
                 </div>
             </div>
         </section>
@@ -388,10 +423,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <p class="mt-4 text-base leading-7 text-slate-200">No fake scarcity. Just a clean nudge: start free instantly, and upgrade when you want ad-free sessions plus priority fan perks.</p>
                         </div>
                         <div class="flex flex-col gap-3 sm:min-w-[18rem]">
-                            <a href="{{ listen_live_url }}" class="inline-flex items-center justify-center gap-2 rounded-none border border-white/15 bg-white px-6 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-primary">
-                                <span class="material-symbols-outlined text-base">play_circle</span>
-                                Start Listening
-                            </a>
+                            <button id="momentum-play-toggle" type="button" class="inline-flex items-center justify-center gap-2 rounded-none border border-white/15 bg-white px-6 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-primary">
+                                <span id="momentum-play-icon" class="material-symbols-outlined text-base">play_circle</span>
+                                <span id="momentum-play-label">Start listening</span>
+                            </button>
                             <a href="{{ vip_trial_url }}" class="inline-flex items-center justify-center gap-2 rounded-none border border-white/15 bg-black/30 px-6 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-white transition hover:border-secondary hover:text-secondary">
                                 <span class="material-symbols-outlined text-base">workspace_premium</span>
                                 See VIP Trial
@@ -432,10 +467,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <h2 class="mt-5 text-4xl font-black uppercase leading-[0.9] tracking-tight text-white sm:text-5xl">Ready to tune in?</h2>
                     <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-300">Start with the free live stream now, or explore the VIP trial when you want ad-free listening and the fuller K-Beats experience.</p>
                     <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                        <a href="{{ listen_live_url }}" class="cta-shadow inline-flex min-h-[56px] items-center justify-center gap-3 rounded-none border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
-                            <span class="material-symbols-outlined text-base">play_circle</span>
-                            Start Listening Now
-                        </a>
+                        <button id="final-play-toggle" type="button" class="cta-shadow inline-flex min-h-[56px] items-center justify-center gap-3 rounded-none border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
+                            <span id="final-play-icon" class="material-symbols-outlined text-base">play_circle</span>
+                            <span id="final-play-label">Start listening now</span>
+                        </button>
                         <a href="{{ vip_trial_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 rounded-none border border-white/15 bg-white/[0.03] px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary">
                             <span class="material-symbols-outlined text-base">workspace_premium</span>
                             Explore VIP Trial
@@ -451,12 +486,38 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
     </main>
 
-    {% include 'core/footer.html' %}
+    <footer class="border-t border-white/10 bg-black">
+        <div class="container mx-auto flex flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between">
+            <div class="max-w-2xl">
+                <p class="nav-cinzel text-xl font-black uppercase tracking-[0.24em] text-white">K-Beats Radio</p>
+                <p class="mt-3 text-sm leading-6 text-slate-400">24/7 live K-pop radio from Cornwall, UK. Built to turn a quick click into a real listening session.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-[0.22em]">
+                <a href="{{ listen_live_url }}" class="border border-primary bg-primary px-4 py-2 text-black transition hover:bg-white">Open live page</a>
+                <a href="{{ vip_trial_url }}" class="border border-white/15 px-4 py-2 text-white transition hover:border-secondary hover:text-secondary">VIP trial</a>
+                <a href="{% url 'privacy_policy' %}" class="text-slate-500 transition hover:text-white">Privacy</a>
+                <a href="{% url 'cookie_policy' %}" class="text-slate-500 transition hover:text-white">Cookies</a>
+                <a href="{% url 'terms_of_service' %}" class="text-slate-500 transition hover:text-white">Terms</a>
+            </div>
+        </div>
+    </footer>
 
-    <div class="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/80 px-4 py-3 backdrop-blur-xl sm:hidden">
-        <div class="flex items-center gap-3">
-            <a href="{{ listen_live_url }}" class="inline-flex flex-1 items-center justify-center gap-2 rounded-none border border-primary bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black"><span class="material-symbols-outlined text-sm">play_arrow</span>Listen Free</a>
-            <a href="{{ vip_trial_url }}" class="inline-flex flex-1 items-center justify-center gap-2 rounded-none border border-white/15 bg-white/[0.04] px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white"><span class="material-symbols-outlined text-sm">workspace_premium</span>VIP Trial</a>
+    <div id="listen-dock" class="live-dock fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/92 backdrop-blur-xl">
+        <div class="container mx-auto flex items-center gap-3 px-4 py-3 sm:px-6">
+            <img id="dock-track-art" src="{{ preview_track.album_art }}" alt="" class="hidden h-12 w-12 border border-white/10 object-cover sm:block"/>
+            <div class="min-w-0 flex-1">
+                <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">K-Beats live now</p>
+                <p id="dock-track-title" class="truncate text-sm font-black uppercase tracking-tight text-white">{{ preview_track.title }}</p>
+                <p id="dock-track-artist" class="truncate text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ preview_track.artist }}</p>
+            </div>
+            <button id="dock-play-toggle" type="button" class="inline-flex min-h-[48px] items-center justify-center gap-2 border border-primary bg-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
+                <span id="dock-play-icon" class="material-symbols-outlined text-sm">play_arrow</span>
+                <span id="dock-play-label" class="hidden sm:inline">Play live</span>
+            </button>
+            <a href="{{ listen_live_url }}" class="hidden min-h-[48px] items-center justify-center gap-2 border border-white/15 bg-white/[0.03] px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary md:inline-flex">
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                Full player
+            </a>
         </div>
     </div>
 </div>
@@ -473,49 +534,147 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         document.querySelectorAll('.reveal-up, .reveal-left').forEach((element) => revealObserver.observe(element));
 
-        const baseListeners = Number({{ listener_count|default:3847 }}) || 3847;
-        const listenerTargets = ['hero-listener-count', 'proof-listener-count'];
-        const updateListenerCount = () => {
-            const nextCount = Math.max(3000, baseListeners + (Math.floor(Math.random() * 46) - 23)).toLocaleString();
-            listenerTargets.forEach((id) => {
-                const node = document.getElementById(id);
-                if (node) node.textContent = nextCount;
-            });
-        };
-        updateListenerCount();
-        window.setInterval(updateListenerCount, 7000);
-
         const audio = document.getElementById('hero-preview-audio');
-        const playButton = document.getElementById('hero-preview-toggle');
-        const playIcon = document.getElementById('hero-preview-icon');
+        const dock = document.getElementById('listen-dock');
+        const statusCopy = document.getElementById('landing-player-status');
         const artEl = document.getElementById('hero-track-art');
+        const dockArtEl = document.getElementById('dock-track-art');
         const titleEl = document.getElementById('hero-track-title');
         const artistEl = document.getElementById('hero-track-artist');
+        const proofTitleEl = document.getElementById('proof-track-title');
+        const proofArtistEl = document.getElementById('proof-track-artist');
+        const dockTitleEl = document.getElementById('dock-track-title');
+        const dockArtistEl = document.getElementById('dock-track-artist');
+        const upNextContainer = document.getElementById('landing-up-next');
 
-        const syncAudioUi = () => {
-            if (!audio || !playIcon || !playButton) return;
-            playIcon.textContent = audio.paused ? 'play_arrow' : 'pause';
+        const controls = [
+            { button: document.getElementById('header-play-toggle'), icon: document.getElementById('header-play-icon'), label: document.getElementById('header-play-label'), pausedText: 'Play live', playingText: 'Pause live' },
+            { button: document.getElementById('hero-primary-toggle'), icon: document.getElementById('hero-primary-icon'), label: document.getElementById('hero-primary-label'), pausedText: 'Play live free', playingText: 'Pause live' },
+            { button: document.getElementById('hero-preview-toggle'), icon: document.getElementById('hero-preview-icon'), label: document.getElementById('hero-preview-label'), pausedText: 'Play live now', playingText: 'Pause live' },
+            { button: document.getElementById('momentum-play-toggle'), icon: document.getElementById('momentum-play-icon'), label: document.getElementById('momentum-play-label'), pausedText: 'Start listening', playingText: 'Pause live' },
+            { button: document.getElementById('final-play-toggle'), icon: document.getElementById('final-play-icon'), label: document.getElementById('final-play-label'), pausedText: 'Start listening now', playingText: 'Pause live' },
+            { button: document.getElementById('dock-play-toggle'), icon: document.getElementById('dock-play-icon'), label: document.getElementById('dock-play-label'), pausedText: 'Play live', playingText: 'Pause live' },
+        ];
+
+        let dockActivated = false;
+
+        const setDockVisible = (visible) => {
+            if (!dock) return;
+            dock.classList.toggle('is-visible', visible);
         };
 
-        if (audio && playButton) {
-            playButton.addEventListener('click', async () => {
-                if (!audio.src) return;
-                try {
-                    if (audio.paused) {
-                        await audio.play();
-                    } else {
-                        audio.pause();
-                    }
-                } catch (error) {
-                    audio.pause();
-                }
-                syncAudioUi();
+        const syncTrackUi = (track) => {
+            if (!track) return;
+
+            const nextTitle = String(track.title || 'K-Beats Live');
+            const nextArtist = String(track.artist || 'Always on for K-pop fans');
+            const nextArt = String(track.album_art || '');
+
+            if (titleEl) titleEl.textContent = nextTitle;
+            if (artistEl) artistEl.textContent = nextArtist;
+            if (proofTitleEl) proofTitleEl.textContent = nextTitle;
+            if (proofArtistEl) proofArtistEl.textContent = nextArtist;
+            if (dockTitleEl) dockTitleEl.textContent = nextTitle;
+            if (dockArtistEl) dockArtistEl.textContent = nextArtist;
+
+            if (artEl && nextArt) artEl.src = nextArt;
+            if (dockArtEl && nextArt) dockArtEl.src = nextArt;
+        };
+
+        const renderUpNext = (tracks) => {
+            if (!upNextContainer) return;
+
+            const upcoming = Array.isArray(tracks) ? tracks.filter(Boolean).slice(0, 3) : [];
+            upNextContainer.innerHTML = '';
+
+            if (!upcoming.length) {
+                const placeholder = document.createElement('p');
+                placeholder.className = 'text-sm leading-6 text-slate-400';
+                placeholder.textContent = 'Queue details will load as soon as the station responds.';
+                upNextContainer.appendChild(placeholder);
+                return;
+            }
+
+            upcoming.forEach((track) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-3 border border-white/10 bg-black/35 p-3';
+
+                const art = document.createElement('img');
+                art.className = 'h-12 w-12 border border-white/10 object-cover';
+                art.alt = '';
+                art.src = String(track.album_art || '{{ preview_track.album_art|escapejs }}');
+
+                const textWrap = document.createElement('div');
+                textWrap.className = 'min-w-0';
+
+                const title = document.createElement('p');
+                title.className = 'truncate text-sm font-black uppercase tracking-tight text-white';
+                title.textContent = String(track.title || 'K-Beats Live');
+
+                const artist = document.createElement('p');
+                artist.className = 'truncate text-[11px] uppercase tracking-[0.18em] text-slate-400';
+                artist.textContent = String(track.artist || 'On Air');
+
+                textWrap.appendChild(title);
+                textWrap.appendChild(artist);
+                row.appendChild(art);
+                row.appendChild(textWrap);
+                upNextContainer.appendChild(row);
+            });
+        };
+
+        const syncAudioUi = () => {
+            const isPlaying = !!(audio && !audio.paused);
+
+            controls.forEach((control) => {
+                if (control.icon) control.icon.textContent = isPlaying ? 'pause' : 'play_arrow';
+                if (control.label) control.label.textContent = isPlaying ? control.playingText : control.pausedText;
             });
 
+            if (statusCopy) {
+                statusCopy.textContent = isPlaying
+                    ? 'Live radio is playing on this page. Keep scrolling and the stream will continue.'
+                    : 'Press play to start the stream here, then keep browsing while the station keeps running.';
+            }
+
+            setDockVisible(dockActivated || isPlaying);
+        };
+
+        const togglePlayback = async () => {
+            if (!audio) {
+                window.location.href = '{{ listen_live_url }}';
+                return;
+            }
+
+            if (!audio.currentSrc && !audio.src) {
+                window.location.href = '{{ listen_live_url }}';
+                return;
+            }
+
+            dockActivated = true;
+
+            try {
+                if (audio.paused) {
+                    await audio.play();
+                } else {
+                    audio.pause();
+                }
+            } catch (error) {
+                window.location.href = '{{ listen_live_url }}';
+                return;
+            }
+
+            syncAudioUi();
+        };
+
+        controls.forEach((control) => {
+            if (control.button) control.button.addEventListener('click', togglePlayback);
+        });
+
+        if (audio) {
             audio.addEventListener('play', syncAudioUi);
             audio.addEventListener('pause', syncAudioUi);
             audio.addEventListener('ended', syncAudioUi);
-            syncAudioUi();
         }
 
         const refreshLivePreview = async () => {
@@ -524,9 +683,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 const data = await response.json();
                 if (!data || !data.ok || !data.current_track) return;
 
-                if (titleEl) titleEl.textContent = String(data.current_track.title || 'K-Beats Live');
-                if (artistEl) artistEl.textContent = String(data.current_track.artist || 'Always on for K-pop fans');
-                if (artEl && data.current_track.album_art) artEl.src = String(data.current_track.album_art);
+                syncTrackUi(data.current_track);
+                renderUpNext(data.up_next);
 
                 if (audio && data.current_track.audio_url) {
                     const nextSrc = String(data.current_track.audio_url);
@@ -549,6 +707,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
         };
 
+        syncTrackUi({
+            title: '{{ preview_track.title|escapejs }}',
+            artist: '{{ preview_track.artist|escapejs }}',
+            album_art: '{{ preview_track.album_art|escapejs }}',
+        });
+        renderUpNext([
+            {% for track in up_next_tracks %}
+            {
+                title: '{{ track.title|escapejs }}',
+                artist: '{{ track.artist|escapejs }}',
+                album_art: '{{ track.album_art|escapejs }}',
+            },
+            {% endfor %}
+        ]);
+        syncAudioUi();
         refreshLivePreview();
         window.setInterval(refreshLivePreview, 30000);
     });
