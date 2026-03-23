@@ -3785,27 +3785,20 @@ def promo(request):
 
 def listen_free_landing(request):
     up_next_tracks = []
+    artist_marquee = ['BTS', 'Stray Kids', 'ATEEZ', 'ENHYPEN', 'TWICE', 'LE SSERAFIM', 'SEVENTEEN', 'aespa']
     try:
         state, _ = RadioStationState.objects.get_or_create(id=1)
+        state = _auto_rotate_station(state)
         listener_count = int(state.listeners_count or 3847)
-        schedule_context = _compute_schedule_live_context(timezone.localtime(), force_advance=False)
-
-        if schedule_context:
-            current_track = schedule_context.get('current_track') or state.current_track
-            raw_up_next = [
-                track for track in list(schedule_context.get('up_next_tracks') or [])
-                if track and not _is_generated_voice_track(track)
-            ][:3]
-        else:
-            current_track = state.current_track
-            up_next_ids = list(state.up_next or [])[:3]
-            raw_up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
-            raw_up_next_tracks = [
-                track for track in raw_up_next_tracks
-                if track and not _is_generated_voice_track(track)
-            ]
-            raw_up_next_tracks.sort(key=lambda track: up_next_ids.index(track.id) if track.id in up_next_ids else 999)
-            raw_up_next = raw_up_next_tracks[:3]
+        current_track = state.current_track
+        up_next_ids = list(state.up_next or [])[:3]
+        raw_up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
+        raw_up_next_tracks = [
+            track for track in raw_up_next_tracks
+            if track and not _is_generated_voice_track(track)
+        ]
+        raw_up_next_tracks.sort(key=lambda track: up_next_ids.index(track.id) if track.id in up_next_ids else 999)
+        raw_up_next = raw_up_next_tracks[:3]
 
         up_next_tracks = [
             {
@@ -3837,46 +3830,46 @@ def listen_free_landing(request):
 
     feature_sections = [
         {
-            'eyebrow': 'Always on',
-            'title': 'Live Radio, 24/7',
-            'body': 'Go from a Facebook ad straight into the stream. No app download required, no long setup, just a fast path into the station.',
+            'eyebrow': 'Always live',
+            'title': 'The Beat Never Stops.',
+            'body': 'Go from your feed to full K-pop in seconds. No app to install, no account needed -- just tap play and you are live.',
             'bullets': [
-                'One tap from ad click to live playback',
-                'Current-track preview with real station energy',
-                'Mobile-friendly listening built for headphones and commute time',
+                'One tap and you are streaming',
+                'See what is playing and what is coming up next',
+                'Built for headphones, commutes, and late-night K-pop sessions',
             ],
             'visual': 'live',
         },
         {
-            'eyebrow': 'Never miss the drop',
-            'title': 'Charts And New Releases',
-            'body': 'Keep pace with the songs, rankings, and comeback moments fans are talking about right now.',
+            'eyebrow': 'Always fresh',
+            'title': 'Stay Ahead of Every Comeback.',
+            'body': 'K-pop moves fast. Our weekly charts and new release tracker keep you in the loop before it blows up on your timeline.',
             'bullets': [
-                'Weekly chart movement at a glance',
-                'Fresh release discovery without endless scrolling',
-                'Built to turn casual listeners into regular return visits',
+                'Weekly chart updates so you never miss a rise',
+                'Discover new drops without the doom-scroll',
+                'Stay connected to the fandom, not just the music',
             ],
             'visual': 'charts',
         },
         {
-            'eyebrow': 'More than a stream',
-            'title': 'Community And Fan Clubs',
-            'body': 'Move beyond passive listening with fan-club spaces, shared moments, and reasons to come back for your bias.',
+            'eyebrow': 'Fan-first',
+            'title': 'Your Fandom Has A Home.',
+            'body': 'Join fan club spaces built around your favourites. Follow your bias group, get alerts for comebacks, and connect with fans who get it.',
             'bullets': [
-                'Fan-club spaces for deeper fandom energy',
-                'Profiles, alerts, and member-first community hooks',
-                'A station that feels social instead of one-way',
+                'Dedicated spaces for your favourite groups',
+                'Comeback alerts so you are never the last to know',
+                'A station that feels like a fan community, not just a music player',
             ],
             'visual': 'community',
         },
         {
-            'eyebrow': 'Upgrade when you want more',
-            'title': 'Start A Free VIP Trial',
-            'body': 'Free listening stays open for everyone. VIP adds ad-free sessions, priority requests, and earlier alerts when you want the fuller version.',
+            'eyebrow': 'Level up',
+            'title': 'Go Ad-Free. Get More. It Is Free To Try.',
+            'body': 'Free gets you in the door. VIP takes the experience further -- no ads, priority song requests, and early access to comeback drops. Try it free for 3 days, no card needed.',
             'bullets': [
-                '7-day free trial messaging already supported on pricing',
-                'Ad-free listening and priority song requests',
-                'A cleaner upgrade path for your most engaged listeners',
+                '3 days free -- cancel anytime, no strings',
+                'Stream without interruption, request your favourite tracks',
+                'Fan-first extras that actually make a difference',
             ],
             'visual': 'vip',
         },
@@ -3895,29 +3888,70 @@ def listen_free_landing(request):
         {
             'name': 'Mia, London',
             'initials': 'ML',
-            'quote': 'I clicked to sample one song and stayed on the stream for two hours. It feels built for actual fans, not casual tourists.',
+            'quote': 'I came for one song and stayed for two hours. K-Beats actually gets what K-pop fans want -- it is addictive.',
         },
         {
             'name': 'Jordan, Manchester',
             'initials': 'JM',
-            'quote': 'The mix of live radio, charts, and fan-club energy makes it way easier to keep up with releases without juggling five different apps.',
+            'quote': 'Charts, comebacks, live radio -- all in one place. I have ditched three other apps since I found K-Beats.',
         },
         {
             'name': 'Ari, Birmingham',
             'initials': 'AB',
-            'quote': 'VIP is the upgrade I wanted once I knew I would keep coming back. Free gets you in fast, and the premium extras make sense later.',
+            'quote': 'I started on the free stream and upgraded to VIP within a week. The ad-free listening alone is worth it for a K-pop obsessive like me.',
         },
     ]
 
+    idol_images = []
+    try:
+        for artist_name in artist_marquee:
+            group = (
+                KPopGroup.objects.filter(name__iexact=artist_name).first()
+                or KPopGroup.objects.filter(name__icontains=artist_name).order_by('rank', 'name').first()
+            )
+            if not group:
+                continue
+            _apply_stream_image_to_field(group, 'image_url')
+            image_url = str(group.image_url or '').strip()
+            if not image_url:
+                continue
+            idol_images.append({
+                'name': group.name,
+                'image_url': image_url,
+            })
+            if len(idol_images) >= 3:
+                break
+    except DatabaseError:
+        idol_images = []
+
     context = {
-        'seo_title': 'Listen Free | K-Beats Radio - Live K-Pop 24/7',
-        'seo_description': 'Start listening to K-Beats Radio in seconds. Stream live K-pop, track charts, explore fan clubs, and see how the 7-day VIP trial fits your fandom.',
+        'seo_title': 'Listen Free to Live K-Pop 24/7 | K-Beats Radio',
+        'seo_description': 'Stream live K-pop in seconds on K-Beats Radio. No app, no card, just 24/7 hits, charts, fan clubs, and a free 3-day VIP trial when you want more.',
+        'seo_type': 'website',
+        'seo_image': preview_track['album_art'],
+        'seo_image_alt': f"Listen free to K-Beats Radio live K-pop stream featuring {preview_track['title']}",
+        'extra_schema_json': json.dumps({
+            '@context': 'https://schema.org',
+            '@type': 'RadioStation',
+            'name': 'K-Beats Radio',
+            'url': request.build_absolute_uri(reverse('listen_free_landing')),
+            'description': 'Stream live K-pop 24/7 on K-Beats Radio, a UK-based station for fans across the country and around the world.',
+            'genre': ['K-pop', 'Pop Music', 'Internet Radio'],
+            'areaServed': 'Worldwide',
+            'inLanguage': 'en',
+            'sameAs': [
+                request.build_absolute_uri(reverse('live')),
+                request.build_absolute_uri(reverse('charts')),
+                request.build_absolute_uri(reverse('fan_clubs')),
+            ],
+        }),
         'listener_count': listener_count,
         'preview_track': preview_track,
         'up_next_tracks': up_next_tracks,
+        'idol_images': idol_images,
         'vip_trial_url': f"{reverse('pricing')}#compare-plans",
         'listen_live_url': reverse('live'),
-        'artist_marquee': ['BTS', 'Stray Kids', 'ATEEZ', 'ENHYPEN', 'TWICE', 'LE SSERAFIM', 'SEVENTEEN', 'aespa'],
+        'artist_marquee': artist_marquee,
         'feature_sections': feature_sections,
         'comparison_rows': comparison_rows,
         'fan_quotes': fan_quotes,
@@ -5597,12 +5631,41 @@ def _find_group_for_artist_name(artist_name):
 
 
 def _shorten_text(value, max_len=210):
-    text = re.sub(r'\s+', ' ', str(value or '')).strip()
+    text = _normalize_social_text(value)
     if not text:
         return ''
     if len(text) <= max_len:
         return text
-    return text[: max_len - 1].rstrip() + 'â€¦'
+    return text[: max_len - 3].rstrip('.,;:! ') + '...'
+
+
+def _normalize_social_text(value):
+    """Normalize common mojibake and whitespace for social copy."""
+    text = re.sub(r'\s+', ' ', str(value or '')).strip()
+    if not text:
+        return ''
+
+    replacements = {
+        'â€¦': '...',
+        '…': '...',
+        'â€™': "'",
+        '’': "'",
+        'â€˜': "'",
+        '‘': "'",
+        'â€œ': '"',
+        '“': '"',
+        'â€�': '"',
+        '”': '"',
+        'â€“': '-',
+        '–': '-',
+        'â€”': '-',
+        '—': '-',
+        'Â': '',
+    }
+    for bad, good in replacements.items():
+        text = text.replace(bad, good)
+
+    return re.sub(r'\s+', ' ', text).strip()
 
 
 def _lyrics_snippet_api_config():
@@ -6891,30 +6954,21 @@ def api_live_rotate_track(request):
 
 def api_live_status(request):
     state, _ = RadioStationState.objects.get_or_create(id=1)
-    schedule_context = _compute_schedule_live_context(timezone.localtime(), force_advance=False)
+    state = _auto_rotate_station(state)
+    current = state.current_track
+    current_offset = 0
 
-    if schedule_context:
-        _sync_state_with_schedule_context(state, schedule_context)
-        current = schedule_context['current_track']
-        up_next_list = schedule_context['up_next_tracks'][:6]
-        recently_played_list = schedule_context['recently_played_tracks'][:6]
-        current_offset = int(schedule_context.get('current_offset') or 0)
-    else:
-        state = _auto_rotate_station(state)
-        current = state.current_track
-        current_offset = 0
+    up_next_ids = list(state.up_next or [])[:6]
+    up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
+    up_next_tracks = [track for track in up_next_tracks if not _is_generated_voice_track(track)]
+    up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
+    up_next_list = up_next_tracks
 
-        up_next_ids = list(state.up_next or [])[:6]
-        up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
-        up_next_tracks = [track for track in up_next_tracks if not _is_generated_voice_track(track)]
-        up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
-        up_next_list = up_next_tracks
-
-        recent_ids = list(state.recently_played or [])[:6]
-        recent_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
-        recent_tracks = [track for track in recent_tracks if not _is_generated_voice_track(track)]
-        recent_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
-        recently_played_list = recent_tracks
+    recent_ids = list(state.recently_played or [])[:6]
+    recent_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
+    recent_tracks = [track for track in recent_tracks if not _is_generated_voice_track(track)]
+    recent_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
+    recently_played_list = recent_tracks
 
     if not current:
         return JsonResponse({'ok': False, 'error': 'No active track'}, status=404)
@@ -7645,6 +7699,103 @@ def _post_to_facebook_draft(article, scheduled_unix_ts=None):
         logger.warning("[facebook] Request error for %r: %s", article.title, e)
 
 
+def _comment_on_live_facebook_posts():
+    """
+    Add a single homepage comment to Facebook posts after they go live.
+    Returns the number of new comments created.
+    """
+    if not getattr(settings, 'FACEBOOK_HOMEPAGE_COMMENT_ENABLED', False):
+        return 0
+
+    token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
+    homepage_comment = _normalize_social_text(
+        getattr(settings, 'FACEBOOK_HOMEPAGE_COMMENT_TEXT', '')
+    ).strip()
+    if not token or not homepage_comment:
+        return 0
+
+    candidates = list(BlogArticle.objects.filter(
+        facebook_post_id__gt='',
+        facebook_homepage_comment_id='',
+    ).order_by('created_at')[:100])
+    if not candidates:
+        return 0
+
+    page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
+    if not page_id:
+        return 0
+
+    try:
+        published_resp = requests.get(
+            f'https://graph.facebook.com/v22.0/{page_id}/published_posts',
+            params={
+                'access_token': token,
+                'fields': 'id',
+                'limit': 100,
+            },
+            timeout=20,
+        )
+        published_data = published_resp.json()
+        if published_resp.status_code != 200:
+            logger.warning(
+                "[facebook] Could not load published posts - status=%s response=%s",
+                published_resp.status_code, published_data,
+            )
+            return 0
+        published_ids = {
+            str(item.get('id') or '').strip()
+            for item in published_data.get('data', [])
+            if str(item.get('id') or '').strip()
+        }
+    except Exception as exc:
+        logger.warning("[facebook] Could not load published posts: %s", exc)
+        return 0
+
+    created_comments = 0
+    for article in candidates:
+        raw_post_id = str(article.facebook_post_id or '').strip()
+        post_id = raw_post_id
+        if post_id and '_' not in post_id and page_id:
+            post_id = f"{page_id}_{post_id}"
+        if not post_id:
+            continue
+
+        if post_id not in published_ids:
+            continue
+
+        try:
+            comment_resp = requests.post(
+                f'https://graph.facebook.com/v22.0/{post_id}/comments',
+                data={'message': homepage_comment},
+                params={'access_token': token},
+                timeout=15,
+            )
+            comment_data = comment_resp.json()
+            if comment_resp.status_code == 200 and comment_data.get('id'):
+                BlogArticle.objects.filter(pk=article.pk).update(
+                    facebook_posted_at=timezone.now(),
+                    facebook_homepage_comment_id=comment_data['id'],
+                    facebook_homepage_commented_at=timezone.now(),
+                )
+                created_comments += 1
+                logger.info(
+                    "[facebook] Added homepage comment for %r - comment id: %s",
+                    article.title, comment_data['id'],
+                )
+            else:
+                logger.warning(
+                    "[facebook] Homepage comment failed for %r - status=%s response=%s",
+                    article.title, comment_resp.status_code, comment_data,
+                )
+        except Exception as exc:
+            logger.warning(
+                "[facebook] Homepage comment request error for %r: %s",
+                article.title, exc,
+            )
+
+    return created_comments
+
+
 def _post_to_instagram(article):
     """
     Publishes the article as an Instagram post via the Facebook Graph API.
@@ -7725,7 +7876,7 @@ def _article_opening_excerpt(article, max_chars=180):
     else:
         raw = _re.sub(r'<[^>]+>', '', body_html)
 
-    text = _html.unescape(' '.join((raw or '').split())).strip()
+    text = _normalize_social_text(_html.unescape(' '.join((raw or '').split())))
     if not text:
         return ''
     if len(text) <= max_chars:
@@ -7734,7 +7885,7 @@ def _article_opening_excerpt(article, max_chars=180):
     cut = text[:max_chars]
     if ' ' in cut:
         cut = cut.rsplit(' ', 1)[0]
-    return cut.rstrip('.,;:!') + 'â€¦'
+    return cut.rstrip('.,;:! ') + '...'
 
 
 def _social_article_url(article, source):
@@ -7784,10 +7935,10 @@ def _social_hook(article):
     """Generate a short hook line for social posts."""
     cat = (article.category or 'news').strip()
     if cat.lower() == 'review':
-        return "ðŸŽ§ New review dropped"
+        return "New Review:"
     if cat.lower() == 'comeback':
-        return "ðŸš¨ Comeback alert"
-    return "ðŸ”¥ New K-Pop update"
+        return "Comeback Alert:"
+    return "New K-Pop Update:"
 
 
 def _x_teaser_line(article, max_chars=120):
@@ -7830,7 +7981,7 @@ def _x_compose_text(title_text, teaser, article_url, hashtags):
     while trimmed and _x_text_length(
         f"{title_text}\n\n{trimmed}\n\n{article_url}\n\n{hashtags}"
     ) > 280:
-        trimmed = trimmed[:-2].rstrip() + 'â€¦' if len(trimmed) > 2 else ''
+        trimmed = trimmed[:-2].rstrip('.,;:! ') + '...' if len(trimmed) > 2 else ''
 
     if trimmed:
         return f"{title_text}\n\n{trimmed}\n\n{article_url}\n\n{hashtags}"

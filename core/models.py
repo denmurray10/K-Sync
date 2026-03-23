@@ -130,6 +130,8 @@ class BlogArticle(models.Model):
     reading_time = models.IntegerField(default=3)
     facebook_post_id = models.CharField(max_length=100, blank=True)
     facebook_posted_at = models.DateTimeField(null=True, blank=True)
+    facebook_homepage_comment_id = models.CharField(max_length=100, blank=True)
+    facebook_homepage_commented_at = models.DateTimeField(null=True, blank=True)
     x_post_id = models.CharField(max_length=100, blank=True)
     x_posted_at = models.DateTimeField(null=True, blank=True)
     pinterest_post_id = models.CharField(max_length=100, blank=True)

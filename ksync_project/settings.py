@@ -175,8 +175,10 @@ ENABLE_THIRD_PARTY_TRACKING = os.environ.get(
 # ── Facebook ─────────────────────────────────────────────────────────────────
 # Required permissions: pages_manage_posts, pages_read_engagement
 FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '966171646586881')
-FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUVcMgjdSoBRK2vapSeQa3jZCLAmp2NOwLaC7JxI3AQg6ZB4zZCitCdFdhzzV9FU27tLTy1jFZA9cHXhtbZCBJuWWC4elKQ4TBZBEvZAobmT4JjsFsZApxZAoZB1ZBEHJSMJrGvIAmCxPwNbiBNZBqYUu9Rv75YiYcErhzfmIx7wuyZCd4FWkKbo8rYST6wTI1HO6ZCrPszYPrr2VPeTDdcT6ZCDvoc11WpiZBZB2SxZC9umD')
+FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUVcMgjdSoBRLNnSM6y3lyzmuQoO1bMRMFrJ1ZAm0PZA7SpbnF9sURoQLVXXZA6CErrNX4xU9pSWtobwIGE08BeIdp06ZA1Ishh8aM6bD2BQ0HHZCp8MeZBN1oSiPcRJ5anJCFqPCglE0sPgK6SUsEA27i9usOnPZCezZB6LpyFnLOBPVqec8BNTnURreBtZAmr2h7KW9YUHlYQJkPq9PxmUysq4WC6c79N3rQv3WErlC0dtwZB2IurcoT7gmjs1vSTinBZBsNkNKjBeaD')
 FACEBOOK_PIXEL_ID = os.environ.get('FACEBOOK_PIXEL_ID', '1694492738408843').strip()
+FACEBOOK_HOMEPAGE_COMMENT_ENABLED = os.environ.get('FACEBOOK_HOMEPAGE_COMMENT_ENABLED', 'true').lower() == 'true'
+FACEBOOK_HOMEPAGE_COMMENT_TEXT = os.environ.get('FACEBOOK_HOMEPAGE_COMMENT_TEXT', SITE_URL.rstrip('/') + '/')
 
 # ── Instagram ─────────────────────────────────────────────────────────────────
 # Instagram Business account must be linked to your Facebook Page.

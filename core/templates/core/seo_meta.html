@@ -8,10 +8,12 @@
 <meta property="og:title" content="{% firstof seo_title article.title contest.title group.name 'K-Beats Radio | Live K-Pop Music, Charts, News & Community' %}"/>
 <meta property="og:description" content="{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}"/>
 <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
-{% if article.image %}
-<meta property="og:image" content="{{ article.image }}"/>
-<meta property="og:image:secure_url" content="{{ article.image }}"/>
-<meta name="twitter:image" content="{{ article.image }}"/>
+{% firstof seo_image article.image as social_image %}
+{% if social_image %}
+<meta property="og:image" content="{{ social_image }}"/>
+<meta property="og:image:secure_url" content="{{ social_image }}"/>
+<meta property="og:image:alt" content="{% firstof seo_image_alt seo_title 'K-Beats Radio' %}"/>
+<meta name="twitter:image" content="{{ social_image }}"/>
 {% endif %}
 
 <meta name="twitter:card" content="summary_large_image"/>
@@ -28,3 +30,6 @@
     "inLanguage": "en-GB"
 }
 </script>
+{% if extra_schema_json %}
+<script type="application/ld+json">{{ extra_schema_json|safe }}</script>
+{% endif %}

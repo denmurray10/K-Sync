@@ -86,6 +86,40 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         animation: marquee 28s linear infinite;
     }
     .cta-shadow { box-shadow: 0 14px 36px rgba(244, 37, 192, 0.28); }
+    .signal-panel {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+    .signal-panel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.08) 42%, rgba(255, 255, 255, 0.16) 50%, transparent 64%);
+        transform: translateX(-140%);
+        pointer-events: none;
+        opacity: 0;
+    }
+    .panel-hover {
+        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, background-color 0.35s ease, box-shadow 0.35s ease;
+    }
+    .panel-hover:hover {
+        transform: translateY(-6px);
+        border-color: rgba(255, 255, 255, 0.22);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+    }
+    .white-stage {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(242, 243, 248, 0.96));
+        color: #05050a;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+    }
+    .white-stage-muted {
+        background: rgba(255, 255, 255, 0.96);
+        color: #05050a;
+    }
+    .floating-pulse {
+        animation: floatingPulse 4.8s ease-in-out infinite;
+    }
     .live-dock {
         transform: translateY(110%);
         opacity: 0;
@@ -105,6 +139,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         from { transform: translateX(0); }
         to { transform: translateX(-50%); }
     }
+    @keyframes floatingPulse {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
     @media (prefers-reduced-motion: reduce) {
         .reveal-up, .reveal-left {
             opacity: 1 !important;
@@ -114,7 +152,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .live-dock {
             transition: none !important;
         }
-        .equalizer-bar, .marquee-track { animation: none !important; }
+        .equalizer-bar, .marquee-track, .floating-pulse { animation: none !important; }
+        .signal-panel::after { display: none !important; }
+        .panel-hover { transition: none !important; }
+        .panel-hover:hover { transform: none !important; box-shadow: none !important; }
     }
 </style>
 </head>
@@ -126,17 +167,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <div class="relative isolate min-h-screen">
     <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
-        <div class="container mx-auto flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div class="container mx-auto flex items-center justify-between gap-4 px-6 py-3 sm:px-6">
             <a class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
                 <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
                 <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
                 <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
             </a>
             <div class="flex items-center gap-3">
-                <a href="{{ vip_trial_url }}" class="hidden border border-white/15 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary sm:inline-flex">VIP trial</a>
+                <a href="{{ vip_trial_url }}" class="hidden border border-white/15 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary sm:inline-flex">Free VIP Trial</a>
                 <button id="header-play-toggle" type="button" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-white">
                     <span id="header-play-icon" class="material-symbols-outlined text-sm">play_arrow</span>
-                    <span id="header-play-label">Play live</span>
+                    <span id="header-play-label">Listen Free</span>
                 </button>
             </div>
         </div>
@@ -144,39 +185,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <main>
         <section class="relative overflow-hidden pb-14 pt-32 sm:pb-20 sm:pt-36">
-            <div class="container mx-auto grid items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div class="container mx-auto grid items-center gap-10 px-6 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
                 <div class="reveal-left max-w-3xl">
-                    <div class="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-primary">
+                    <div class="inline-flex items-center gap-2 border border-white/15 bg-white text-[10px] font-bold uppercase tracking-[0.28em] text-black px-4 py-2 floating-pulse">
                         <span class="material-symbols-outlined text-sm">radio</span>
-                        24/7 live K-pop radio
+                        Live now - K-Pop never stops
                     </div>
                     <h1 class="mt-6 text-5xl font-black uppercase leading-[0.88] tracking-tight text-white sm:text-6xl lg:text-7xl">
-                        Play live K-pop
-                        <span class="block text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)]">in one tap.</span>
+                        Your K-Pop,
+                        <span class="block text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)]">Live 24/7.</span>
                     </h1>
+                    <p class="mt-4 text-sm font-bold uppercase tracking-[0.24em] text-slate-300 sm:text-base">No app. No card. Just hit play.</p>
                     <p class="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
-                        K-Beats Radio takes visitors straight from the ad into a real live stream, with current-track context and fan-first discovery that keeps people listening instead of bouncing.
+                        K-Beats Radio streams the biggest K-pop hits, comebacks, and fan favourites around the clock - completely free. Tap play and you're in. No downloads, no sign-up required.
                     </p>
                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                         <button id="hero-primary-toggle" type="button" class="cta-shadow inline-flex min-h-[56px] items-center justify-center gap-3 border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
                             <span id="hero-primary-icon" class="material-symbols-outlined text-base">play_circle</span>
-                            <span id="hero-primary-label">Play live free</span>
+                            <span id="hero-primary-label">Play Live Free</span>
                         </button>
                         <a href="{{ vip_trial_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-white/15 bg-white/[0.03] px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary">
                             <span class="material-symbols-outlined text-base">workspace_premium</span>
-                            See VIP trial
+                            Start Free VIP Trial
                         </a>
                     </div>
                     <div class="mt-6 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">Free live stream</span>
-                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">No app download needed</span>
-                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">No card for free listening</span>
+                        <span class="border border-white/10 bg-white px-4 py-2 text-black">Free to stream instantly</span>
+                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">No app download</span>
+                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">No card needed</span>
                     </div>
                 </div>
 
                 <div class="reveal-up">
-                    <div class="gradient-outline glass-card relative overflow-hidden rounded-none p-4 sm:p-6">
-                        <div class="flex items-center justify-between border border-white/10 bg-black/40 px-4 py-3">
+                    <div class="gradient-outline glass-card signal-panel relative overflow-hidden rounded-none p-6 sm:p-6">
+                        <div class="flex items-center justify-between border border-white/10 bg-black/40 px-6 py-3">
                             <div>
                                 <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Now live on K-Beats</p>
                                 <p id="hero-track-title" class="mt-1 text-xl font-bold text-white">{{ preview_track.title }}</p>
@@ -190,20 +232,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                         </div>
 
-                        <div class="mt-4 border border-white/10 bg-black/45 p-4 sm:p-5">
+                        <div class="mt-4 border border-white/10 bg-black/45 p-6 sm:p-6">
                             <div class="grid gap-4 sm:grid-cols-[140px_minmax(0,1fr)] sm:items-center">
                                 <img id="hero-track-art" src="{{ preview_track.album_art }}" alt="Current track artwork" class="aspect-square w-full border border-white/10 object-cover"/>
                                 <div class="min-w-0">
-                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">On-page live player</p>
-                                    <p id="landing-player-status" class="mt-2 text-sm leading-6 text-slate-300">Press play to start the stream here, then keep browsing while the station keeps running.</p>
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Tune in right here</p>
+                                    <p id="landing-player-status" class="mt-2 text-sm leading-6 text-slate-300">Hit play and the stream follows you - keep browsing the site while K-Beats keeps the music going.</p>
                                     <div class="mt-4 flex flex-col gap-3 sm:flex-row">
                                         <button id="hero-preview-toggle" type="button" class="inline-flex min-h-[52px] items-center justify-center gap-3 border border-primary bg-primary px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-black transition hover:bg-white">
                                             <span id="hero-preview-icon" class="material-symbols-outlined text-xl">play_arrow</span>
-                                            <span id="hero-preview-label">Play live now</span>
+                                            <span id="hero-preview-label">Play Now</span>
                                         </button>
                                         <a href="{{ listen_live_url }}" class="inline-flex min-h-[52px] items-center justify-center gap-3 border border-white/15 bg-white/[0.03] px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-white transition hover:border-secondary hover:text-secondary">
                                             <span class="material-symbols-outlined text-base">open_in_new</span>
-                                            Open full live page
+                                            Open Full Player
                                         </a>
                                     </div>
                                 </div>
@@ -212,11 +254,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
 
                         <div class="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-                            <div class="border border-white/10 bg-white/[0.04] p-4">
+                            <div class="border border-white/10 bg-white/[0.04] p-6">
                                 <div class="flex items-center justify-between gap-3">
                                     <div>
                                         <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Up next</p>
-                                        <p class="mt-1 text-sm text-slate-300">A reason to keep the stream on.</p>
+                                        <p class="mt-1 text-sm text-slate-300">Stay for what's coming.</p>
                                     </div>
                                     <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Queue</span>
                                 </div>
@@ -234,12 +276,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     {% endfor %}
                                 </div>
                             </div>
-                            <div class="border border-white/10 bg-white/[0.04] p-4">
+                            <div class="border border-white/10 bg-white/[0.04] p-6">
                                 <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Why listeners stay</p>
                                 <div class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
-                                    <p>Live radio creates momentum that playlists usually lose after the first song.</p>
-                                    <p>The page keeps charts, fan energy, and upgrade options nearby without interrupting the stream.</p>
-                                    <p>VIP stays available, but listening is the first win.</p>
+                                    <p>Unlike a playlist that runs dry, K-Beats keeps building - every track flows into the next with real radio energy.</p>
+                                    <p>Charts, fan clubs, and new releases are all one scroll away - without ever pausing the music.</p>
+                                    <p>Start free, stay as long as you want. Upgrade to VIP when you're ready for more.</p>
                                 </div>
                             </div>
                         </div>
@@ -249,34 +291,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <section class="border-y border-white/10 bg-black/35">
-            <div class="container mx-auto grid gap-4 px-4 py-5 sm:px-6 md:grid-cols-3">
-                <div class="border border-white/10 bg-white/[0.03] p-4">
-                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Listening now</p>
-                    <p id="proof-listener-count" class="mt-3 text-2xl font-black uppercase tracking-tight text-white">{{ listener_count }}</p>
-                    <p class="mt-2 text-sm text-slate-300">Fans already tuned in to the live K-Beats stream.</p>
+            <div class="container mx-auto grid gap-4 px-6 py-5 sm:px-6 md:grid-cols-3">
+                <div class="border border-white/10 white-stage p-6 panel-hover">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Listening</p>
+                    <p id="proof-listener-count" class="mt-3 text-2xl font-black uppercase tracking-tight text-black">{{ listener_count }}</p>
+                    <p class="mt-2 text-sm text-slate-700">K-pop fans are listening live right now. Jump in.</p>
                 </div>
-                <div class="border border-white/10 bg-white/[0.03] p-4">
-                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Current track</p>
+                <div class="border border-white/10 bg-white/[0.03] p-6 panel-hover signal-panel">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">On air now</p>
                     <p id="proof-track-title" class="mt-3 text-lg font-black uppercase tracking-tight text-white">{{ preview_track.title }}</p>
                     <p id="proof-track-artist" class="mt-2 text-sm uppercase tracking-[0.18em] text-slate-300">{{ preview_track.artist }}</p>
                 </div>
-                <div class="border border-white/10 bg-white/[0.03] p-4">
+                <div class="border border-white/10 bg-white/[0.03] p-6 panel-hover signal-panel">
                     <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Built for repeat listening</p>
-                    <p class="mt-3 text-sm leading-6 text-slate-300">Live radio, chart movement, and fan-club energy all live in one place once the stream starts.</p>
+                    <p class="mt-3 text-sm leading-6 text-slate-300">Everything a K-pop fan needs - live radio, charts, and fan spaces - all in one place, all free.</p>
                 </div>
             </div>
         </section>
 
         <section class="py-16 sm:py-20">
-            <div class="container mx-auto px-4 sm:px-6">
+            <div class="container mx-auto px-6 sm:px-6">
                 <div class="reveal-left max-w-3xl">
                     <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">What you get</p>
-                    <h2 class="mt-4 text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl">A landing page built to move from curiosity to listening.</h2>
-                    <p class="mt-4 text-base leading-7 text-slate-300">The page keeps the ad promise tight: hear the station fast, understand the value quickly, and see why upgrading later still makes sense.</p>
+                    <h2 class="mt-4 text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl">Everything You Need to Live in K-Pop</h2>
+                    <p class="mt-4 text-base leading-7 text-slate-300">Stream live, explore the charts, connect with fans - and when you want more, VIP is waiting.</p>
                 </div>
                 <div class="mt-12 space-y-8">
                     {% for section in feature_sections %}
-                    <article class="reveal-up grid gap-6 rounded-none border border-white/10 bg-white/[0.03] p-5 sm:p-7 lg:grid-cols-2 lg:items-center lg:gap-10">
+                    <article class="reveal-up panel-hover signal-panel grid gap-6 rounded-none border border-white/10 bg-white/[0.03] p-6 sm:p-7 lg:grid-cols-2 lg:items-center lg:gap-10">
                         {% if forloop.counter|divisibleby:2 %}
                         <div class="order-2 lg:order-1">
                         {% else %}
@@ -301,7 +343,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         {% else %}
                         <div>
                         {% endif %}
-                            <div class="rounded-none border border-white/10 bg-black/45 p-5 sm:p-6">
+                            {% if section.visual == 'vip' %}
+                            <div class="rounded-none border border-primary/20 bg-primary/10 p-6 sm:p-6">
+                            {% else %}
+                            <div class="rounded-none border border-white/10 bg-black/45 p-6 sm:p-6">
+                            {% endif %}
                                 {% if section.visual == 'live' %}
                                 <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Live preview</p>
                                 <div class="mt-5 grid gap-4 sm:grid-cols-[auto_1fr]">
@@ -335,9 +381,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <div class="mt-5 grid gap-4">
                                     <div class="flex items-center gap-3">
                                         <div class="flex -space-x-3">
-                                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-none border border-black bg-primary text-xs font-black text-black">ST</span>
-                                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-none border border-black bg-secondary text-xs font-black text-black">AT</span>
-                                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-none border border-black bg-white text-xs font-black text-black">EN</span>
+                                            <img
+                                                src="{% if idol_images.0 %}{{ idol_images.0.image_url }}{% else %}{{ preview_track.album_art }}{% endif %}"
+                                                alt="{% if idol_images.0 %}{{ idol_images.0.name }} idol image{% else %}K-pop artist image{% endif %}"
+                                                class="h-11 w-11 border border-black object-cover"
+                                            />
+                                            <img
+                                                src="{% if idol_images.1 %}{{ idol_images.1.image_url }}{% else %}{{ preview_track.album_art }}{% endif %}"
+                                                alt="{% if idol_images.1 %}{{ idol_images.1.name }} idol image{% else %}K-pop artist image{% endif %}"
+                                                class="h-11 w-11 border border-black object-cover"
+                                            />
+                                            <img
+                                                src="{% if idol_images.2 %}{{ idol_images.2.image_url }}{% else %}{{ preview_track.album_art }}{% endif %}"
+                                                alt="{% if idol_images.2 %}{{ idol_images.2.name }} idol image{% else %}K-pop artist image{% endif %}"
+                                                class="h-11 w-11 border border-black object-cover"
+                                            />
                                         </div>
                                         <div>
                                             <p class="text-sm font-bold text-white">Bias-led fan spaces</p>
@@ -350,15 +408,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     </div>
                                 </div>
                                 {% elif section.visual == 'vip' %}
-                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Upgrade surface</p>
-                                <div class="mt-5 rounded-none border border-primary/20 bg-primary/10 p-5">
-                                    <p class="text-[10px] uppercase tracking-[0.24em] text-primary">7-day free trial</p>
-                                    <p class="mt-2 text-3xl font-black uppercase tracking-tight text-white">Ad-free listening</p>
-                                    <div class="mt-5 space-y-3 text-sm text-slate-300">
-                                        <div class="flex items-center gap-3"><span class="material-symbols-outlined text-base text-primary">check_circle</span>Priority song requests</div>
-                                        <div class="flex items-center gap-3"><span class="material-symbols-outlined text-base text-primary">check_circle</span>Early comeback alerts</div>
-                                        <div class="flex items-center gap-3"><span class="material-symbols-outlined text-base text-primary">check_circle</span>Fan-first premium extras</div>
-                                    </div>
+                                <p class="text-[10px] uppercase tracking-[0.24em] text-primary">3-day free trial</p>
+                                <p class="mt-2 text-3xl font-black uppercase tracking-tight text-white">Ad-free listening</p>
+                                <div class="mt-5 space-y-3 text-sm text-slate-300">
+                                    <div class="flex items-center gap-3"><span class="material-symbols-outlined text-base text-primary">check_circle</span>Priority song requests</div>
+                                    <div class="flex items-center gap-3"><span class="material-symbols-outlined text-base text-primary">check_circle</span>Early comeback alerts</div>
+                                    <div class="flex items-center gap-3"><span class="material-symbols-outlined text-base text-primary">check_circle</span>Fan-first premium extras</div>
                                 </div>
                                 {% endif %}
                             </div>
@@ -370,18 +425,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <section class="py-16">
-            <div class="container mx-auto px-4 sm:px-6">
-                <div class="reveal-up overflow-hidden rounded-none border border-white/10 bg-white/[0.03]">
-                    <div class="border-b border-white/10 px-5 py-6 sm:px-8">
+            <div class="container mx-auto px-6 sm:px-6">
+                <div class="reveal-up signal-panel panel-hover overflow-hidden rounded-none border border-white/10 bg-white/[0.03]">
+                    <div class="border-b border-white/10 px-6 py-6 sm:px-6">
                         <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Free vs VIP</p>
                         <div class="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                             <div class="max-w-2xl">
-                                <h2 class="text-3xl font-black uppercase leading-[0.94] tracking-tight text-white sm:text-4xl">A simple plan comparison that answers the upgrade question fast.</h2>
-                                <p class="mt-4 text-base leading-7 text-slate-300">Free listening gets people into the station immediately. VIP gives heavier listeners a cleaner, higher-value version once they are ready.</p>
+                                <h2 class="text-3xl font-black uppercase leading-[0.94] tracking-tight text-white sm:text-4xl">Free or VIP? Here's the Difference.</h2>
+                                <p class="mt-4 text-base leading-7 text-slate-300">Both are great. Free gets you streaming in seconds. VIP is for the fans who want to go deeper - and it's free to try.</p>
                             </div>
                             <a href="{{ vip_trial_url }}" class="inline-flex items-center justify-center gap-2 rounded-none border border-primary bg-primary px-6 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-white">
                                 <span class="material-symbols-outlined text-base">workspace_premium</span>
-                                Try VIP Free
+                                Try VIP Free - No Card Needed
                             </a>
                         </div>
                     </div>
@@ -389,19 +444,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <table class="min-w-full border-separate border-spacing-0">
                             <thead>
                                 <tr>
-                                    <th class="border-b border-white/10 px-5 py-4 text-left text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">Feature</th>
-                                    <th class="border-b border-white/10 px-5 py-4 text-center text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Free</th>
-                                    <th class="border-b border-white/10 px-5 py-4 text-center text-[10px] font-bold uppercase tracking-[0.28em] text-primary">VIP trial</th>
+                                    <th class="border-b border-white/10 px-4 py-4 text-left text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500 sm:px-5">Feature</th>
+                                    <th class="border-b border-white/10 px-4 py-4 text-center text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400 sm:px-5">Free</th>
+                                    <th class="border-b border-white/10 px-4 py-4 text-center text-[10px] font-bold uppercase tracking-[0.28em] text-primary sm:px-5">VIP trial</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for row in comparison_rows %}
                                 <tr>
-                                    <td class="border-b border-white/10 px-5 py-4 text-sm text-slate-200">{{ row.label }}</td>
-                                    <td class="border-b border-white/10 px-5 py-4 text-center">
+                                    <td class="border-b border-white/10 px-4 py-4 text-sm text-slate-200 sm:px-5">{{ row.label }}</td>
+                                    <td class="border-b border-white/10 px-4 py-4 text-center sm:px-5">
                                         {% if row.free %}<span class="material-symbols-outlined text-lg text-green-400">check_circle</span>{% else %}<span class="material-symbols-outlined text-lg text-slate-600">close</span>{% endif %}
                                     </td>
-                                    <td class="border-b border-white/10 px-5 py-4 text-center">
+                                    <td class="border-b border-white/10 px-4 py-4 text-center sm:px-5">
                                         {% if row.vip %}<span class="material-symbols-outlined text-lg text-primary">check_circle</span>{% else %}<span class="material-symbols-outlined text-lg text-slate-600">close</span>{% endif %}
                                     </td>
                                 </tr>
@@ -414,22 +469,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <section class="pb-14 sm:pb-16">
-            <div class="container mx-auto px-4 sm:px-6">
-                <div class="reveal-up rounded-none border border-primary/20 bg-[linear-gradient(135deg,rgba(244,37,192,0.18),rgba(15,17,26,0.94),rgba(0,240,255,0.16))] p-6 sm:p-8">
+            <div class="container mx-auto px-6 sm:px-6">
+                <div class="reveal-up signal-panel panel-hover rounded-none border border-primary/20 bg-[linear-gradient(135deg,rgba(244,37,192,0.18),rgba(15,17,26,0.94),rgba(0,240,255,0.16))] p-6 sm:p-8">
                     <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                         <div class="max-w-3xl">
                             <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Momentum strip</p>
-                            <h2 class="mt-4 text-3xl font-black uppercase leading-[0.94] tracking-tight text-white sm:text-4xl">Free radio is live right now, and new VIP listeners get a 7-day trial.</h2>
-                            <p class="mt-4 text-base leading-7 text-slate-200">No fake scarcity. Just a clean nudge: start free instantly, and upgrade when you want ad-free sessions plus priority fan perks.</p>
+                            <h2 class="mt-4 text-3xl font-black uppercase leading-[0.94] tracking-tight text-white sm:text-4xl">Live Right Now. Free to Stream. VIP Free for 3 Days.</h2>
+                            <p class="mt-4 text-base leading-7 text-slate-200">There's no catch. Hit play and you're streaming K-pop in seconds - completely free. When you're ready for the full experience, your 3-day VIP trial is waiting.</p>
                         </div>
                         <div class="flex flex-col gap-3 sm:min-w-[18rem]">
                             <button id="momentum-play-toggle" type="button" class="inline-flex items-center justify-center gap-2 rounded-none border border-white/15 bg-white px-6 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-primary">
                                 <span id="momentum-play-icon" class="material-symbols-outlined text-base">play_circle</span>
-                                <span id="momentum-play-label">Start listening</span>
+                                <span id="momentum-play-label">Start Listening Free</span>
                             </button>
                             <a href="{{ vip_trial_url }}" class="inline-flex items-center justify-center gap-2 rounded-none border border-white/15 bg-black/30 px-6 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-white transition hover:border-secondary hover:text-secondary">
                                 <span class="material-symbols-outlined text-base">workspace_premium</span>
-                                See VIP Trial
+                                Explore VIP Trial
                             </a>
                         </div>
                     </div>
@@ -438,14 +493,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <section class="py-16">
-            <div class="container mx-auto px-4 sm:px-6">
+            <div class="container mx-auto px-6 sm:px-6">
                 <div class="reveal-left max-w-3xl">
                     <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Fan quotes</p>
-                    <h2 class="mt-4 text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl">Social proof that feels closer to fandom than generic lifestyle copy.</h2>
+                    <h2 class="mt-4 text-4xl font-black uppercase leading-[0.92] tracking-tight text-white sm:text-5xl">What K-Beats Listeners Are Saying</h2>
                 </div>
                 <div class="mt-10 grid gap-5 md:grid-cols-3">
                     {% for quote in fan_quotes %}
-                    <article class="reveal-up rounded-none border border-white/10 bg-white/[0.03] p-6">
+                    <article class="reveal-up panel-hover rounded-none border border-white/10 bg-white/[0.03] p-6">
                         <div class="flex items-center gap-3">
                             <span class="inline-flex h-12 w-12 items-center justify-center rounded-none border border-white/10 bg-primary/10 text-sm font-black uppercase text-primary">{{ quote.initials }}</span>
                             <div>
@@ -461,24 +516,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <section class="pb-28 pt-6 sm:pb-24">
-            <div class="container mx-auto px-4 sm:px-6">
-                <div class="reveal-up gradient-outline rounded-none bg-[linear-gradient(180deg,rgba(10,11,18,0.95),rgba(8,9,15,0.92))] px-6 py-12 text-center sm:px-10 sm:py-14">
-                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Final call</p>
-                    <h2 class="mt-5 text-4xl font-black uppercase leading-[0.9] tracking-tight text-white sm:text-5xl">Ready to tune in?</h2>
-                    <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-300">Start with the free live stream now, or explore the VIP trial when you want ad-free listening and the fuller K-Beats experience.</p>
+            <div class="container mx-auto px-6 sm:px-6">
+                <div class="reveal-up gradient-outline signal-panel rounded-none bg-[linear-gradient(180deg,rgba(10,11,18,0.95),rgba(8,9,15,0.92))] px-6 py-12 text-center sm:px-6 sm:py-14">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Don't Miss a Beat</p>
+                    <h2 class="mt-5 text-4xl font-black uppercase leading-[0.9] tracking-tight text-white sm:text-5xl">Your K-Pop Playlist is Live Right Now.</h2>
+                    <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-300">Stream free instantly, no sign-up needed. Or unlock the full experience with a free 3-day VIP trial. Either way - the music starts now.</p>
                     <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                        <button id="final-play-toggle" type="button" class="cta-shadow inline-flex min-h-[56px] items-center justify-center gap-3 rounded-none border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
-                            <span id="final-play-icon" class="material-symbols-outlined text-base">play_circle</span>
-                            <span id="final-play-label">Start listening now</span>
-                        </button>
+                        <a href="{{ listen_live_url }}" class="cta-shadow inline-flex min-h-[56px] items-center justify-center gap-3 rounded-none border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
+                            <span class="material-symbols-outlined text-base">play_circle</span>
+                            <span>Start Listening Now - It's Free</span>
+                        </a>
                         <a href="{{ vip_trial_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 rounded-none border border-white/15 bg-white/[0.03] px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary">
                             <span class="material-symbols-outlined text-base">workspace_premium</span>
-                            Explore VIP Trial
+                            Try VIP Free for 3 Days
                         </a>
                     </div>
                     <div class="mt-6 flex flex-wrap items-center justify-center gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                        <span class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white/[0.03] px-4 py-2"><span class="material-symbols-outlined text-sm text-primary">lock</span>Secure signup</span>
-                        <span class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white/[0.03] px-4 py-2"><span class="material-symbols-outlined text-sm text-secondary">headphones</span>Instant stream access</span>
+                        <span class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white px-4 py-2 text-black"><span class="material-symbols-outlined text-sm text-primary">lock</span>Secure and safe</span>
+                        <span class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white/[0.03] px-4 py-2"><span class="material-symbols-outlined text-sm text-secondary">flash_on</span>Stream instantly</span>
                         <span class="inline-flex items-center gap-2 rounded-none border border-white/10 bg-white/[0.03] px-4 py-2"><span class="material-symbols-outlined text-sm text-primary">credit_card_off</span>No card for free listening</span>
                     </div>
                 </div>
@@ -487,14 +542,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </main>
 
     <footer class="border-t border-white/10 bg-black">
-        <div class="container mx-auto flex flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between">
+        <div class="container mx-auto flex flex-col gap-6 px-6 py-10 sm:px-6 md:flex-row md:items-center md:justify-between">
             <div class="max-w-2xl">
                 <p class="nav-cinzel text-xl font-black uppercase tracking-[0.24em] text-white">K-Beats Radio</p>
-                <p class="mt-3 text-sm leading-6 text-slate-400">24/7 live K-pop radio from Cornwall, UK. Built to turn a quick click into a real listening session.</p>
+                <p class="mt-3 text-sm leading-6 text-slate-400">A UK-based 24/7 live K-pop station built by fans, for fans - streaming for listeners across the country and beyond.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-[0.22em]">
                 <a href="{{ listen_live_url }}" class="border border-primary bg-primary px-4 py-2 text-black transition hover:bg-white">Open live page</a>
-                <a href="{{ vip_trial_url }}" class="border border-white/15 px-4 py-2 text-white transition hover:border-secondary hover:text-secondary">VIP trial</a>
+                <a href="{{ vip_trial_url }}" class="border border-white/15 px-4 py-2 text-white transition hover:border-secondary hover:text-secondary">Free VIP Trial</a>
                 <a href="{% url 'privacy_policy' %}" class="text-slate-500 transition hover:text-white">Privacy</a>
                 <a href="{% url 'cookie_policy' %}" class="text-slate-500 transition hover:text-white">Cookies</a>
                 <a href="{% url 'terms_of_service' %}" class="text-slate-500 transition hover:text-white">Terms</a>
@@ -503,7 +558,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </footer>
 
     <div id="listen-dock" class="live-dock fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/92 backdrop-blur-xl">
-        <div class="container mx-auto flex items-center gap-3 px-4 py-3 sm:px-6">
+        <div class="container mx-auto flex items-center gap-3 px-6 py-3 sm:px-6">
             <img id="dock-track-art" src="{{ preview_track.album_art }}" alt="" class="hidden h-12 w-12 border border-white/10 object-cover sm:block"/>
             <div class="min-w-0 flex-1">
                 <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">K-Beats live now</p>
@@ -548,11 +603,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const upNextContainer = document.getElementById('landing-up-next');
 
         const controls = [
-            { button: document.getElementById('header-play-toggle'), icon: document.getElementById('header-play-icon'), label: document.getElementById('header-play-label'), pausedText: 'Play live', playingText: 'Pause live' },
-            { button: document.getElementById('hero-primary-toggle'), icon: document.getElementById('hero-primary-icon'), label: document.getElementById('hero-primary-label'), pausedText: 'Play live free', playingText: 'Pause live' },
-            { button: document.getElementById('hero-preview-toggle'), icon: document.getElementById('hero-preview-icon'), label: document.getElementById('hero-preview-label'), pausedText: 'Play live now', playingText: 'Pause live' },
-            { button: document.getElementById('momentum-play-toggle'), icon: document.getElementById('momentum-play-icon'), label: document.getElementById('momentum-play-label'), pausedText: 'Start listening', playingText: 'Pause live' },
-            { button: document.getElementById('final-play-toggle'), icon: document.getElementById('final-play-icon'), label: document.getElementById('final-play-label'), pausedText: 'Start listening now', playingText: 'Pause live' },
+            { button: document.getElementById('header-play-toggle'), icon: document.getElementById('header-play-icon'), label: document.getElementById('header-play-label'), pausedText: 'Listen Free', playingText: 'Pause live' },
+            { button: document.getElementById('hero-primary-toggle'), icon: document.getElementById('hero-primary-icon'), label: document.getElementById('hero-primary-label'), pausedText: 'Play Live Free', playingText: 'Pause live' },
+            { button: document.getElementById('hero-preview-toggle'), icon: document.getElementById('hero-preview-icon'), label: document.getElementById('hero-preview-label'), pausedText: 'Play Now', playingText: 'Pause live' },
+            { button: document.getElementById('momentum-play-toggle'), icon: document.getElementById('momentum-play-icon'), label: document.getElementById('momentum-play-label'), pausedText: 'Start Listening Free', playingText: 'Pause live' },
             { button: document.getElementById('dock-play-toggle'), icon: document.getElementById('dock-play-icon'), label: document.getElementById('dock-play-label'), pausedText: 'Play live', playingText: 'Pause live' },
         ];
 
@@ -634,7 +688,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             if (statusCopy) {
                 statusCopy.textContent = isPlaying
                     ? 'Live radio is playing on this page. Keep scrolling and the stream will continue.'
-                    : 'Press play to start the stream here, then keep browsing while the station keeps running.';
+                    : 'Hit play and the stream follows you - keep browsing the site while K-Beats keeps the music going.';
             }
 
             setDockVisible(dockActivated || isPlaying);

@@ -6,7 +6,7 @@ import logging
 import re
 import random
 from core.models import Ranking
-from core.views import _chat, _do_blog_generate
+from core.views import _chat, _do_blog_generate, _comment_on_live_facebook_posts
 from core.digests import send_due_user_digests
 import urllib.request
 import urllib.parse
@@ -230,6 +230,16 @@ def send_user_digests_job():
         logger.error("[scheduler] User digest dispatch failed: %s", e)
 
 
+def facebook_homepage_comment_job():
+    """Background job: comment on live Facebook posts with the homepage link."""
+    logger.info("[scheduler] Starting Facebook homepage comment pass...")
+    try:
+        created = _comment_on_live_facebook_posts()
+        logger.info("[scheduler] Facebook homepage comment pass complete - %d comment(s) added.", created)
+    except Exception as e:
+        logger.error("[scheduler] Facebook homepage comment pass failed: %s", e)
+
+
 def _is_generated_voice_track_url_or_title(audio_url, title):
     title_text = str(title or '').strip()
     url_text = str(audio_url or '').lower()
@@ -353,6 +363,17 @@ def start_scheduler():
 
     # Schedule User Digests: Run every hour (timezone-aware per user)
     scheduler.add_job(send_user_digests_job, 'interval', hours=1, id='send_user_digests', replace_existing=True)
+
+    # Schedule Facebook homepage comments: run frequently so newly published posts get a follow-up quickly.
+    scheduler.add_job(
+        facebook_homepage_comment_job,
+        'interval',
+        minutes=10,
+        id='facebook_homepage_comment_job',
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+    )
 
     if getattr(settings, 'PLAYLIST_WEEKLY_RANDOMIZE_ENABLED', True):
         scheduler.add_job(
