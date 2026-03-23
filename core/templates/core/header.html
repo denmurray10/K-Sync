@@ -26,13 +26,13 @@
 {% if request.resolver_match.url_name == '__legacy_live_header_disabled__' %}
 <!-- ───── LIVE PAGE HEADER ───── -->
 <header id="main-header" class="fixed top-0 left-0 right-0 z-50 px-6 py-8 bg-transparent border-none">
-    <div class="container mx-auto grid items-center gap-8 md:grid-cols-[auto_1fr_auto]">
+    <div class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 md:grid-cols-[auto_1fr_auto]">
         <a href="{% url 'home' %}" class="flex items-center gap-0 group shrink-0 py-2">
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
             <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
         </a>
-        <div class="flex justify-center min-w-0">
+        <div class="hidden min-w-0 justify-center md:flex">
             <nav id="desktop-primary-nav" class="hidden md:flex items-center justify-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'live' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
                 <a class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
@@ -45,7 +45,7 @@
         </div>
 
         <!-- Status + Actions -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center justify-self-end gap-2 sm:gap-4">
             <!-- Live On Air -->
             <button
                 class="group relative flex items-center gap-2 border border-primary px-6 py-3 font-black text-white hover:bg-primary hover:text-black transition-all"
@@ -80,13 +80,13 @@
 {% else %}
 <!-- ───── STANDARD HEADER ───── -->
 <header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-5 sm:py-8 border-none">
-    <div class="container mx-auto grid items-center gap-4 md:gap-8 min-w-0 md:grid-cols-[auto_1fr_auto]">
+    <div class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 min-w-0 md:grid-cols-[auto_1fr_auto]">
         <a class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
             <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
         </a>
-        <div class="flex justify-center min-w-0">
+        <div class="hidden min-w-0 justify-center md:flex">
             <nav id="desktop-primary-nav" class="hidden md:flex items-center justify-center gap-6">
                 <a class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
                 <a class="{% if request.resolver_match.url_name == 'charts' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
@@ -96,7 +96,7 @@
                 <a class="{% if request.resolver_match.url_name == 'shop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'coming_soon' %}">Shop</a>
             </nav>
         </div>
-        <div class="flex items-center gap-2 sm:gap-4 md:gap-6 shrink-0">
+        <div class="flex items-center justify-self-end gap-2 sm:gap-4 md:gap-6 shrink-0">
             <form action="{% url 'results' %}" method="GET" class="hidden lg:flex items-center relative group">
                 <span class="material-symbols-outlined absolute left-3 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
                 <input name="q" class="bg-black/30 border border-primary/30 py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-64 placeholder:text-slate-500" placeholder="Search artist, song..." type="text"/>
