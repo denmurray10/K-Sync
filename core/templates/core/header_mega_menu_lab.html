@@ -122,6 +122,18 @@
         .mega-panel-column-scroll::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.24);
         }
+        #live-schedule-column.mega-panel-column-scroll,
+        #live-requests-column.mega-panel-column-scroll {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (min-width: 640px) {
+            #live-schedule-column.mega-panel-column-scroll,
+            #live-requests-column.mega-panel-column-scroll {
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+            }
+        }
         .live-panel-shell {
             background:
                 radial-gradient(circle at 14% 0%, rgba(var(--live-accent), 0.18), transparent 32%),
@@ -2405,7 +2417,7 @@
             };
             const syncLiveColumnHeights = () => {
                 if (!liveFeatureColumn || !liveScheduleColumn || !liveRequestsColumn) return;
-                [liveFeatureColumn, liveScheduleColumn].forEach((column) => {
+                [liveFeatureColumn, liveScheduleColumn, liveRequestsColumn].forEach((column) => {
                     column.style.height = '';
                     column.style.minHeight = '';
                     column.style.maxHeight = '';
@@ -2413,7 +2425,7 @@
                 if (window.innerWidth < 1024) return;
                 const targetHeight = Math.ceil(liveRequestsColumn.getBoundingClientRect().height) + 40;
                 if (!targetHeight) return;
-                [liveFeatureColumn, liveScheduleColumn].forEach((column) => {
+                [liveFeatureColumn, liveScheduleColumn, liveRequestsColumn].forEach((column) => {
                     column.style.height = `${targetHeight}px`;
                     column.style.minHeight = `${targetHeight}px`;
                     column.style.maxHeight = `${targetHeight}px`;
