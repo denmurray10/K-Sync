@@ -805,17 +805,12 @@
 
     <div id="mega-live-lab-panel" class="mega-panel-shell live-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
         <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-5 sm:py-6">
-            <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-                <div class="max-w-3xl">
-                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+            <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                <div class="max-w-5xl flex-1">
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-start lg:gap-6">
                         <h1 id="live-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Drop Into The Broadcast</h1>
-                        <p id="live-panel-copy" class="max-w-xl text-[13px] leading-relaxed text-slate-300">A live-first mega menu should feel like a studio window: what is on now, what is next, and how fast you can join.</p>
+                        <p id="live-panel-copy" class="max-w-2xl text-[13px] leading-relaxed text-slate-300">A live-first mega menu should feel like a studio window: what is on now, what is next, and how fast you can join.</p>
                     </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
-                    <button type="button" data-live-view="now" class="panel-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Now</button>
-                    <button type="button" data-live-view="next" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Up Next</button>
-                    <button type="button" data-live-view="studio" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Studio</button>
                 </div>
                 <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
                     <span class="relative flex h-2.5 w-2.5">
@@ -2003,7 +1998,6 @@
             const liveFeatureColumn = document.getElementById('live-feature-column');
             const liveScheduleColumn = document.getElementById('live-schedule-column');
             const liveRequestsColumn = document.getElementById('live-requests-column');
-            const liveRequestsContent = document.getElementById('live-requests-content');
             const newsPanelTitle = document.getElementById('news-panel-title');
             const newsPanelCopy = document.getElementById('news-panel-copy');
             const newsViewTabs = Array.from(document.querySelectorAll('[data-news-view]'));
@@ -2407,17 +2401,17 @@
                     `).join('') : '<div class="border border-white/10 bg-black/25 p-3 text-xs text-slate-400">Schedule data is not available yet.</div>';
                 }
                 if (liveRequestCount) liveRequestCount.textContent = `${requestCountData || 0} Picks`;
-                syncLiveColumnHeights();
+                window.requestAnimationFrame(syncLiveColumnHeights);
             };
             const syncLiveColumnHeights = () => {
-                if (!liveFeatureColumn || !liveScheduleColumn || !liveRequestsColumn || !liveRequestsContent) return;
+                if (!liveFeatureColumn || !liveScheduleColumn || !liveRequestsColumn) return;
                 [liveFeatureColumn, liveScheduleColumn].forEach((column) => {
                     column.style.height = '';
                     column.style.minHeight = '';
                     column.style.maxHeight = '';
                 });
                 if (window.innerWidth < 1024) return;
-                const targetHeight = liveRequestsContent.offsetHeight;
+                const targetHeight = Math.ceil(liveRequestsColumn.getBoundingClientRect().height) + 40;
                 if (!targetHeight) return;
                 [liveFeatureColumn, liveScheduleColumn].forEach((column) => {
                     column.style.height = `${targetHeight}px`;
