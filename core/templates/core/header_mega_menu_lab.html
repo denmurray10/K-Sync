@@ -96,6 +96,22 @@
             pointer-events: auto;
             visibility: visible;
         }
+        .mega-menu-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 46;
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            background: linear-gradient(180deg, rgba(2, 4, 8, 0.12) 0%, rgba(2, 4, 8, 0.58) 38%, rgba(1, 2, 5, 0.72) 100%);
+            transition: opacity var(--panel-open-duration) ease, visibility var(--panel-open-duration) ease;
+        }
+        .mega-menu-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
         .mega-panel-stage {
             display: flex;
             height: 100%;
@@ -138,8 +154,19 @@
             background:
                 radial-gradient(circle at 14% 0%, rgba(var(--live-accent), 0.18), transparent 32%),
                 radial-gradient(circle at 82% 10%, rgba(var(--live-secondary), 0.18), transparent 28%),
-                linear-gradient(135deg, rgb(4 9 14), rgb(3 10 17) 56%, rgb(7 5 18));
+                linear-gradient(180deg, rgba(4, 10, 15, 0.96) 0%, rgba(3, 8, 14, 0.98) 38%, rgba(2, 4, 9, 0.99) 68%, rgb(1 2 5) 100%);
             box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
+        }
+        .live-panel-shell {
+            height: auto;
+            max-height: none;
+            min-height: 0;
+        }
+        .live-panel-stage {
+            height: auto;
+            min-height: 0;
+            padding-top: calc(var(--live-panel-header-offset, 0px) + 26px);
+            padding-bottom: 60px;
         }
         .charts-panel-shell {
             background:
@@ -815,8 +842,10 @@
     {% include 'core/header.html' %}
 {% endif %}
 
+    <div id="mega-menu-backdrop" class="mega-menu-backdrop" aria-hidden="true"></div>
+
     <div id="mega-live-lab-panel" class="mega-panel-shell live-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
-        <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-5 sm:py-6">
+        <div class="live-panel-stage mega-panel-stage container mx-auto px-4 sm:px-6">
             <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                 <div class="max-w-5xl flex-1">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-start lg:gap-6">
@@ -1905,6 +1934,7 @@
             const idolsPanel = document.getElementById('mega-idols-lab-panel');
             const gamesPanel = document.getElementById('mega-games-lab-panel');
             const shopPanel = document.getElementById('mega-shop-lab-panel');
+            const megaMenuBackdrop = document.getElementById('mega-menu-backdrop');
             if (!header || !streamPanel || !livePanel || !chartsPanel || !newsPanel || !comebacksPanel || !idolsPanel || !gamesPanel || !shopPanel) return;
             header.dataset.desktopMegaMenuInit = 'true';
 
@@ -2417,15 +2447,18 @@
             };
             const syncLiveColumnHeights = () => {
                 if (!liveFeatureColumn || !liveScheduleColumn || !liveRequestsColumn) return;
-                [liveFeatureColumn, liveScheduleColumn, liveRequestsColumn].forEach((column) => {
+                const liveColumns = [liveFeatureColumn, liveScheduleColumn, liveRequestsColumn];
+                liveColumns.forEach((column) => {
                     column.style.height = '';
                     column.style.minHeight = '';
                     column.style.maxHeight = '';
                 });
                 if (window.innerWidth < 1024) return;
-                const targetHeight = Math.ceil(liveRequestsColumn.getBoundingClientRect().height) + 40;
+                const targetHeight = Math.max(
+                    ...liveColumns.map((column) => Math.ceil(column.getBoundingClientRect().height))
+                );
                 if (!targetHeight) return;
-                [liveFeatureColumn, liveScheduleColumn, liveRequestsColumn].forEach((column) => {
+                liveColumns.forEach((column) => {
                     column.style.height = `${targetHeight}px`;
                     column.style.minHeight = `${targetHeight}px`;
                     column.style.maxHeight = `${targetHeight}px`;
@@ -3764,6 +3797,11 @@
 
             const positionPanel = (targetPanel) => {
                 const rect = header.getBoundingClientRect();
+                if (targetPanel === livePanel) {
+                    targetPanel.style.top = '0px';
+                    targetPanel.style.setProperty('--live-panel-header-offset', `${Math.max(0, Math.round(rect.bottom))}px`);
+                    return;
+                }
                 targetPanel.style.top = `${Math.max(0, Math.round(rect.bottom))}px`;
             };
 
@@ -3771,13 +3809,25 @@
                 const panels = [livePanel, chartsPanel, newsPanel, comebacksPanel, streamPanel, idolsPanel, gamesPanel, shopPanel].filter(Boolean);
                 if (!panels.length) return;
                 if (window.innerWidth < desktopBreakpoint) {
-                    panels.forEach((panel) => panel.style.removeProperty('--mega-panel-height'));
+                    panels.forEach((panel) => {
+                        panel.style.removeProperty('--mega-panel-height');
+                        if (panel === livePanel) {
+                            panel.style.removeProperty('--live-panel-header-offset');
+                        }
+                    });
                     return;
                 }
                 const rect = header.getBoundingClientRect();
                 const availableHeight = Math.floor(window.innerHeight - Math.max(0, rect.bottom) - 20);
                 const stageHeight = Math.max(320, Math.min(760, availableHeight));
                 panels.forEach((panel) => {
+                    if (panel === livePanel) {
+                        panel.style.removeProperty('--mega-panel-height');
+                        panel.style.setProperty('--live-panel-header-offset', `${Math.max(0, Math.round(rect.bottom))}px`);
+                        panel.style.overflow = 'hidden';
+                        panel.style.overflowX = 'hidden';
+                        return;
+                    }
                     panel.style.setProperty('--mega-panel-height', `${stageHeight}px`);
                     panel.style.overflow = 'hidden';
                     panel.style.overflowX = 'hidden';
@@ -3955,6 +4005,7 @@
                     config.panel.classList.remove('mega-panel-open');
                     setTriggerState(key, false);
                 });
+                if (megaMenuBackdrop) megaMenuBackdrop.classList.remove('active');
                 activePanelKey = null;
                 pinnedPanelKey = null;
             };
@@ -3979,6 +4030,7 @@
                 positionPanel(config.panel);
                 config.panel.classList.remove('mega-panel-hidden');
                 config.panel.classList.add('mega-panel-open');
+                if (megaMenuBackdrop) megaMenuBackdrop.classList.add('active');
                 setTriggerState(key, true);
                 activePanelKey = key;
                 pinnedPanelKey = pinned ? key : null;
