@@ -1,0 +1,245 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>404 | K-Beats Radio</title>
+<meta name="description" content="The page you asked for is off-air. Use the K-Beats return paths to jump back into live radio, charts, idols, news, games, and more."/>
+<meta name="robots" content="noindex, follow"/>
+<link rel="icon" href="{% static 'core/img/favicon.ico' %}" sizes="any"/>
+<link rel="icon" type="image/svg+xml" href="{% static 'core/img/favicon-kb.svg' %}"/>
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'core/img/favicon-32x32.png' %}"/>
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/img/favicon-16x16.png' %}"/>
+<link rel="shortcut icon" href="{% static 'core/img/favicon.ico' %}"/>
+<link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/img/apple-touch-icon.png' %}"/>
+
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="K-Beats Radio"/>
+<meta property="og:title" content="404 | K-Beats Radio"/>
+<meta property="og:description" content="The page you asked for is off-air. Get back to the station, charts, idols, games, news, or the app from here."/>
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="404 | K-Beats Radio"/>
+<meta name="twitter:description" content="The page you asked for is off-air. Jump back into K-Beats from the live player, charts, idols, games, or news."/>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0,0&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#f425c0",
+                    secondary: "#00f0ff",
+                    ink: "#05050a",
+                },
+                fontFamily: {
+                    display: ["Cinzel", "serif"],
+                    body: ["Montserrat", "sans-serif"],
+                },
+            },
+        },
+    };
+</script>
+<style>
+    :root { color-scheme: dark; }
+    html, body { overflow-x: hidden; }
+    body {
+        font-family: "Montserrat", sans-serif;
+        background: #000000;
+    }
+    h1, h2, h3, .nav-cinzel { font-family: "Cinzel", serif; }
+    .signal-grid {
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-size: 72px 72px;
+        mask-image: radial-gradient(circle at center, black 38%, transparent 86%);
+        opacity: 0.14;
+    }
+    .signal-panel {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    .route-card {
+        transition: border-color 0.35s ease, background-color 0.35s ease, color 0.35s ease;
+    }
+    .route-card:hover,
+    .route-card:focus-visible {
+        border-color: rgba(244, 37, 192, 0.45);
+        background-color: rgba(255, 255, 255, 0.07);
+    }
+    .equalizer-bar {
+        transform-origin: bottom;
+        animation: equalize 1s ease-in-out infinite;
+    }
+    .equalizer-bar:nth-child(2) { animation-delay: 0.15s; }
+    .equalizer-bar:nth-child(3) { animation-delay: 0.3s; }
+    .equalizer-bar:nth-child(4) { animation-delay: 0.45s; }
+    @keyframes equalize {
+        0%, 100% { transform: scaleY(0.35); }
+        50% { transform: scaleY(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .route-card,
+        .equalizer-bar {
+            animation: none !important;
+            transition: none !important;
+            transform: none !important;
+        }
+    }
+</style>
+</head>
+<body class="min-h-screen bg-black text-white font-body">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+{% include 'core/header.html' %}
+
+<main class="relative isolate">
+    <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div class="signal-grid absolute inset-0"></div>
+        <div class="absolute inset-x-0 top-20 flex justify-center">
+            <span class="text-[30vw] font-black uppercase leading-none tracking-[-0.12em] text-white/[0.03] sm:text-[18rem]">404</span>
+        </div>
+    </div>
+
+    <section class="relative border-b border-white/10 pb-14 pt-32 sm:pb-20 sm:pt-36 lg:pt-40">
+        <div class="container mx-auto px-6 sm:px-6">
+            <div class="grid gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+                <div class="max-w-4xl">
+                    <div class="inline-flex items-center gap-3 border border-primary/35 bg-primary/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.28em] text-primary">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary"></span>
+                        </span>
+                        Signal lost
+                    </div>
+
+                    <p class="mt-8 text-[11px] font-bold uppercase tracking-[0.38em] text-slate-400">404 / Route offline</p>
+                    <h1 class="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                        This page
+                        <span class="block text-transparent [-webkit-text-stroke:1.5px_#f425c0]">missed the broadcast.</span>
+                    </h1>
+                    <p class="mt-6 max-w-3xl text-base leading-7 text-slate-300 sm:text-lg">
+                        We could not find
+                        <span class="border border-white/10 bg-white/[0.04] px-3 py-1 text-white">{{ requested_path }}</span>.
+                        The station is still live though, so use one of the return paths below to get back inside K-Beats.
+                    </p>
+
+                    <div class="mt-8 flex flex-wrap gap-4">
+                        {% if previous_path %}
+                        <a href="{{ previous_path }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-white/15 bg-white/[0.03] px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">
+                            <span class="material-symbols-outlined text-base">arrow_back</span>
+                            Previous page
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'home' %}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+                            <span class="material-symbols-outlined text-base">home</span>
+                            Home base
+                        </a>
+                        <a href="{% url 'live' %}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-secondary/35 bg-secondary/10 px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-secondary transition hover:border-secondary hover:bg-secondary hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">
+                            <span class="material-symbols-outlined text-base">radio</span>
+                            Listen live
+                        </a>
+                    </div>
+
+                    <form action="{% url 'results' %}" method="GET" class="signal-panel mt-10 max-w-2xl border border-white/10 p-5">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
+                            <div class="min-w-0 flex-1">
+                                <label for="error-page-search" class="mb-2 block text-[11px] font-bold uppercase tracking-[0.26em] text-slate-400">Search the station</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">search</span>
+                                    <input id="error-page-search" name="q" type="text" class="min-h-[56px] w-full border border-white/10 bg-black/50 pl-12 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Search artist, song, article, or page"/>
+                                </div>
+                            </div>
+                            <button type="submit" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-primary bg-primary px-6 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+                                <span class="material-symbols-outlined text-base">travel_explore</span>
+                                Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <aside class="signal-panel border border-white/10 p-6">
+                    <div class="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">Fast return paths</p>
+                            <p class="mt-2 text-lg font-semibold text-white">Three strong ways back in.</p>
+                        </div>
+                        <div class="flex items-end gap-1" aria-hidden="true">
+                            <span class="equalizer-bar h-4 w-1 bg-primary"></span>
+                            <span class="equalizer-bar h-6 w-1 bg-secondary"></span>
+                            <span class="equalizer-bar h-5 w-1 bg-primary"></span>
+                            <span class="equalizer-bar h-7 w-1 bg-secondary"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-4">
+                        {% for link in featured_links %}
+                        <a href="{{ link.url }}" class="route-card block border border-white/12 bg-white/[0.03] p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="min-w-0">
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">{{ link.eyebrow }}</p>
+                                    <h2 class="mt-2 text-2xl font-semibold uppercase tracking-[0.06em] text-white">{{ link.title }}</h2>
+                                    <p class="mt-3 text-sm leading-6 text-slate-300">{{ link.description }}</p>
+                                </div>
+                                <span class="material-symbols-outlined mt-1 text-3xl text-white/70">{{ link.icon }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+
+                    <p class="mt-6 text-sm leading-6 text-slate-400">
+                        Every route above keeps the user inside the K-Beats website, whether they want to listen, browse, catch up, or explore something new.
+                    </p>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative py-12 sm:py-16">
+        <div class="container mx-auto px-6 sm:px-6">
+            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-500">More places to return to</p>
+                    <h2 class="mt-2 text-3xl font-semibold uppercase tracking-[0.06em] text-white sm:text-4xl">Choose your next stop.</h2>
+                </div>
+                <p class="max-w-xl text-sm leading-6 text-slate-400">
+                    Not sure where to go? These shortcuts cover the main parts of the station so the dead end does not stop the session.
+                </p>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {% for link in secondary_links %}
+                <a href="{{ link.url }}" class="route-card block border border-white/12 bg-white/[0.03] p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <h3 class="text-2xl font-semibold uppercase tracking-[0.06em] text-white">{{ link.title }}</h3>
+                            <p class="mt-3 text-sm leading-6 text-slate-300">{{ link.description }}</p>
+                        </div>
+                        <span class="material-symbols-outlined text-3xl text-white/70">{{ link.icon }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</main>
+
+{% include 'core/footer.html' %}
+</body>
+</html>

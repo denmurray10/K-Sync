@@ -28,6 +28,8 @@ sitemaps = {
     'blog': BlogArticleSitemap,
 }
 
+handler404 = 'core.views.custom_404'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),

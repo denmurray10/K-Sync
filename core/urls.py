@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('404-preview/', views.preview_404, name='preview_404'),
+    path('home-redesign-lab/', views.home_redesign_lab, name='home_redesign_lab'),
     path('charts/', views.charts, name='charts'),
     path('idols/', views.idols, name='idols'),
     path('idols/universe/', views.idol_universe, name='idol_universe'),
@@ -41,6 +43,8 @@ urlpatterns = [
     path('game/lyric-drop/', views.lyric_drop, name='lyric_drop'),
     path('game/chart-clash/', views.chart_clash, name='chart_clash'),
     path('game/chart-clash/promo/', views.chart_clash_promo, name='chart_clash_promo'),
+    path('game/bias-selector/', views.bias_selector_game, name='bias_selector_game'),
+    path('game/bias-selector/promo/', views.bias_selector_promo, name='bias_selector_promo'),
     path('game/fandom-trivia/', views.fandom_trivia, name='fandom_trivia'),
     path('game/mv-matcher/', views.mv_matcher, name='mv_matcher'),
     path('game/draft-day/', views.draft_day, name='draft_day'),
@@ -54,7 +58,7 @@ urlpatterns = [
     path('api/contests/<int:contest_id>/delete/', views.api_contest_delete, name='api_contest_delete'),
     path('results/', views.results, name='results'),
     path('api/search/', views.search_api, name='search_api'),
-    path('bias-selector/', views.bias_selector, name='bias_selector'),
+    path('bias-selector/', views.bias_selector_promo, name='bias_selector'),
     path('api/bias-quiz-result/', views.bias_quiz_result, name='bias_quiz_result'),
     path('live/', views.live, name='live'),
     path('live/player-popout/', views.live_player_popout, name='live_player_popout'),

@@ -473,8 +473,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         }
 
         return {
-            state: 'intro',
-            questions: [],
+            state: 'playing',
+            questions: buildQuestions(),
             currentStep: 0,
             totalSteps: 10,
             answers: {},
@@ -496,6 +496,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 this.totalSteps = this.questions.length;
                 this.currentStep = 0;
                 this.answers = {};
+                this.selectedAudio = null;
+                this.selectedImage = null;
+                this.spectrumValue = 50;
                 this.state = 'playing';
             },
 
@@ -648,10 +651,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             },
 
             resetQuiz() {
-                this.state = 'intro';
                 this.stopAudio();
                 this.biasSet = false;
                 this.result = {};
+                this.startQuiz();
             },
         };
     }

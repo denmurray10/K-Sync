@@ -1,0 +1,708 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    {% include 'core/seo_meta.html' %}
+    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>K-Beats Homepage Redesign Lab</title>
+    <meta name="description" content="A non-destructive K-Beats homepage redesign variant focused on a stronger broadcast hero, cleaner hierarchy, and a more editorial front page rhythm."/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f425c0",
+                        secondary: "#00f0ff",
+                        "background-dark": "#000000",
+                    },
+                    fontFamily: {
+                        display: ["Cinzel", "serif"],
+                        body: ["Montserrat", "sans-serif"],
+                    },
+                    boxShadow: {
+                        signal: "0 0 28px rgba(244, 37, 192, 0.18)",
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: "Montserrat", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(244, 37, 192, 0.16), transparent 32%),
+                radial-gradient(circle at 82% 18%, rgba(0, 240, 255, 0.12), transparent 26%),
+                #000;
+        }
+        .font-display {
+            font-family: "Cinzel", serif;
+        }
+        .signal-panel {
+            background: linear-gradient(180deg, rgba(5, 5, 8, 0.88) 0%, rgba(0, 0, 0, 0.94) 100%);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .signal-grid {
+            background-image:
+                linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 36px 36px;
+            mask-image: linear-gradient(180deg, rgba(0,0,0,0.75), transparent);
+        }
+        .hero-glow {
+            text-shadow: 0 0 24px rgba(244, 37, 192, 0.35), 0 0 48px rgba(244, 37, 192, 0.22);
+        }
+        .section-kicker {
+            letter-spacing: 0.26em;
+        }
+        .signal-wave span {
+            animation: signalPulse 1.1s ease-in-out infinite;
+            transform-origin: bottom;
+        }
+        .signal-wave span:nth-child(2) { animation-delay: 0.14s; }
+        .signal-wave span:nth-child(3) { animation-delay: 0.28s; }
+        .signal-wave span:nth-child(4) { animation-delay: 0.42s; }
+        @keyframes signalPulse {
+            0%, 100% { transform: scaleY(0.45); opacity: 0.5; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-white min-h-screen overflow-x-hidden">
+    {% include 'core/header.html' %}
+
+    <main class="relative">
+        <section class="relative min-h-[100svh] overflow-hidden border-b border-white/10">
+            <div class="absolute inset-0 bg-black">
+                <video
+                    class="absolute inset-0 h-full w-full object-cover opacity-70"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    webkit-playsinline
+                    preload="auto"
+                >
+                    <source src="https://res.cloudinary.com/diuanqnce/video/upload/f_mp4,w_960,br_800k,vc_h264/v1773964952/ksync/hero/homevid720.mp4" type="video/mp4"/>
+                    <source src="https://f003.backblazeb2.com/file/StrayKids/hero/homevid720.mp4" type="video/mp4"/>
+                    <source src="https://f003.backblazeb2.com/file/StrayKids/hero/Hero_video.mp4" type="video/mp4"/>
+                </video>
+                <div class="absolute inset-0 bg-black/45"></div>
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(244,37,192,0.24),transparent_34%),radial-gradient(circle_at_82%_18%,rgba(0,240,255,0.16),transparent_24%)]"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-black/25 via-black/30 to-black"></div>
+                <div class="absolute inset-0 signal-grid opacity-35"></div>
+            </div>
+
+            <div class="relative z-10 container mx-auto px-4 sm:px-6 pt-28 pb-12 md:pt-32 md:pb-20 min-h-[100svh] flex items-center">
+                <div class="grid w-full items-end gap-10 lg:grid-cols-[minmax(0,1.1fr)_400px]">
+                    <div class="max-w-4xl">
+                        <p class="section-kicker text-[10px] font-semibold uppercase text-primary sm:text-xs">UK-based live K-pop radio and fandom signal</p>
+                        <h1 class="mt-5 font-display text-5xl uppercase leading-[0.84] tracking-tight hero-glow sm:text-6xl md:text-8xl lg:text-[7.5rem]">
+                            <span class="block text-white">K-BEATS</span>
+                            <span class="block text-transparent [-webkit-text-stroke:1.7px_theme(colors.primary)]">LIVE SIGNAL</span>
+                        </h1>
+                        <p class="mt-6 max-w-2xl text-base leading-8 text-slate-200 md:text-xl md:leading-9">
+                            Stream nonstop K-pop, catch the next comeback before it lands, and move from live radio to charts, news, and fandom in one sharp broadcast front page.
+                        </p>
+
+                        <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                            <a href="{% url 'live' %}" class="inline-flex items-center justify-center gap-2 bg-primary px-7 py-4 text-[11px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-white">
+                                Listen Live
+                                <span class="material-symbols-outlined text-base">play_arrow</span>
+                            </a>
+                            <a href="{% url 'schedule' %}" class="inline-flex items-center justify-center gap-2 border border-white/20 bg-black/35 px-7 py-4 text-[11px] font-bold uppercase tracking-[0.22em] text-white transition-colors hover:border-secondary hover:text-secondary">
+                                View Schedule
+                                <span class="material-symbols-outlined text-base">schedule</span>
+                            </a>
+                        </div>
+
+                        <div class="mt-8 max-w-3xl border border-white/10 bg-black/35 p-4 sm:p-5">
+                            <p class="section-kicker text-[9px] font-semibold uppercase text-slate-400">Featured editorial</p>
+                            <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="min-w-0">
+                                    <p class="truncate text-lg font-semibold text-white sm:text-xl">{% if featured_article %}{{ featured_article.title }}{% else %}Latest K-Beats editorial update{% endif %}</p>
+                                    <p class="mt-1 text-sm text-slate-400">{% if featured_article and featured_article.subtitle %}{{ featured_article.subtitle|truncatechars:110 }}{% else %}Fresh reporting, comeback context, and the stories shaping the week in K-pop.{% endif %}</p>
+                                </div>
+                                <a href="{% if featured_article %}{% url 'blog_article_read' featured_article.slug %}{% else %}{% url 'news' %}{% endif %}" class="inline-flex shrink-0 items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary transition-colors hover:text-white">
+                                    Read Story
+                                    <span class="material-symbols-outlined text-sm">north_east</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <aside class="signal-panel border border-white/15 shadow-signal">
+                        <div class="border-b border-white/10 px-6 py-5">
+                            <div class="flex items-center justify-between gap-4">
+                                <div>
+                                    <p class="section-kicker text-[9px] font-semibold uppercase text-primary">Broadcast signal</p>
+                                    <p class="mt-2 font-display text-2xl uppercase">On Air And Up Next</p>
+                                </div>
+                                <div class="signal-wave flex h-8 items-end gap-1 text-secondary">
+                                    <span class="block h-3 w-1 bg-current"></span>
+                                    <span class="block h-5 w-1 bg-current"></span>
+                                    <span class="block h-7 w-1 bg-current"></span>
+                                    <span class="block h-4 w-1 bg-current"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-5 px-6 py-6">
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p class="section-kicker text-[9px] font-semibold uppercase text-slate-400">Live now</p>
+                                        <p class="mt-2 text-xl font-semibold uppercase tracking-tight text-white">{{ home_live_track.title|default:"Live Mix" }}</p>
+                                        <p class="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ home_live_track.artist|default:"K-Beats Radio" }}</p>
+                                    </div>
+                                    <span class="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                                        <span class="h-2 w-2 rounded-full bg-primary"></span>
+                                        Live
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="border border-white/10 bg-black/50 p-4">
+                                <div class="flex items-start gap-4">
+                                    {% if hero_primary_event and hero_primary_event.image %}
+                                    <img src="{{ hero_primary_event.image }}" alt="{{ hero_primary_event.artist }} {{ hero_primary_event.title }}" class="h-28 w-24 shrink-0 border border-white/10 object-cover"/>
+                                    {% else %}
+                                    <div class="flex h-28 w-24 shrink-0 items-center justify-center border border-white/10 bg-[radial-gradient(circle_at_20%_20%,rgba(244,37,192,0.35),transparent_60%),radial-gradient(circle_at_82%_78%,rgba(0,240,255,0.22),transparent_52%),#050505]">
+                                        <span class="text-[10px] font-bold uppercase tracking-[0.24em] text-white/70">Signal</span>
+                                    </div>
+                                    {% endif %}
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <span class="inline-flex items-center border border-primary/30 bg-primary/10 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-primary">
+                                                {{ hero_primary_event.type|default:"Next event" }}
+                                            </span>
+                                            {% if hero_primary_event %}
+                                            <span class="text-[10px] uppercase tracking-[0.18em] text-slate-400">{{ hero_primary_event.date_str }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <p class="mt-3 section-kicker text-[9px] font-semibold uppercase text-slate-400">Next comeback</p>
+                                        <h2 class="mt-2 font-display text-3xl uppercase leading-tight text-white">{% if hero_primary_event %}{{ hero_primary_event.title }}{% else %}Calendar updating{% endif %}</h2>
+                                        <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-300">{% if hero_primary_event %}{{ hero_primary_event.artist }}{% else %}Fresh release data is being refreshed.{% endif %}</p>
+                                        {% if hero_primary_event %}
+                                        <div class="mt-4 flex flex-wrap items-center gap-2">
+                                            <span class="border border-secondary/25 bg-secondary/10 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-secondary" data-countdown="{{ hero_primary_event.iso_date }}">--d --h --m</span>
+                                            <a href="{% url 'comeback_timeline' %}" class="text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:text-primary">Open calendar</a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if hero_support_events %}
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="section-kicker text-[9px] font-semibold uppercase text-slate-400">Also on deck</p>
+                                <div class="mt-4 space-y-3">
+                                    {% for release in hero_support_events %}
+                                    <a href="{% url 'comeback_timeline' %}" class="flex items-center justify-between gap-3 border-b border-white/10 pb-3 last:border-b-0 last:pb-0">
+                                        <div class="min-w-0">
+                                            <p class="truncate text-sm font-semibold uppercase tracking-tight text-white">{{ release.title }}</p>
+                                            <p class="mt-1 text-[10px] uppercase tracking-[0.16em] text-slate-400">{{ release.artist }}</p>
+                                        </div>
+                                        <span class="shrink-0 text-[10px] uppercase tracking-[0.16em] text-slate-500">{{ release.date_str|slice:"5:" }}</span>
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <a href="{% if featured_article %}{% url 'blog_article_read' featured_article.slug %}{% else %}{% url 'news' %}{% endif %}" class="flex items-center justify-between gap-3 border border-white/10 px-4 py-3 text-left transition-colors hover:border-primary/40 hover:bg-white/[0.03]">
+                                <div class="min-w-0">
+                                    <p class="section-kicker text-[9px] font-semibold uppercase text-slate-400">Editorial pick</p>
+                                    <p class="mt-2 truncate text-sm font-semibold text-white">{% if featured_article %}{{ featured_article.title }}{% else %}Fresh stories from the newsroom{% endif %}</p>
+                                </div>
+                                <span class="material-symbols-outlined text-base text-primary">east</span>
+                            </a>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-b border-white/10 bg-primary text-black">
+            <div class="container mx-auto px-4 py-5 sm:px-6 sm:py-6">
+                <div class="grid gap-4 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-12 w-12 items-center justify-center border border-black bg-black text-white">
+                            <span class="material-symbols-outlined text-2xl">radio</span>
+                        </div>
+                        <div>
+                            <p class="section-kicker text-[9px] font-bold uppercase text-black/65">Now spinning</p>
+                            <p class="mt-1 text-lg font-semibold uppercase tracking-tight">{{ home_live_track.title|default:"Live Mix" }}</p>
+                            <p class="text-[11px] uppercase tracking-[0.18em] text-black/70">{{ home_live_track.artist|default:"K-Beats Radio" }}</p>
+                        </div>
+                    </div>
+                    <div class="text-sm leading-6 text-black/75 md:text-center">
+                        Go from the live stream straight into the schedule, the latest comeback calendar, and the stories driving the culture.
+                    </div>
+                    <div class="flex items-center gap-3 md:justify-end">
+                        <a href="{% url 'live' %}" class="inline-flex items-center gap-2 border border-black bg-black px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-white hover:text-black">
+                            Open Studio
+                            <span class="material-symbols-outlined text-sm">play_arrow</span>
+                        </a>
+                        <a href="{% url 'stream_hub' %}" class="inline-flex items-center gap-2 border border-black px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-black transition-colors hover:bg-black hover:text-white">
+                            Streams
+                            <span class="material-symbols-outlined text-sm">graphic_eq</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-b border-white/10 bg-white py-16 text-black md:py-24">
+            <div class="container mx-auto px-4 sm:px-6">
+                <div class="grid gap-12 lg:grid-cols-[320px_minmax(0,1fr)]">
+                    <div class="lg:pr-6">
+                        <p class="section-kicker text-[10px] font-semibold uppercase text-black/45">Programming</p>
+                        <h2 class="mt-4 font-display text-4xl uppercase leading-none sm:text-5xl">Today’s Broadcast</h2>
+                        <p class="mt-5 text-sm leading-7 text-black/70">A tighter look at what is on air, what is coming next, and where the station mood is heading through the day.</p>
+                        <a href="{% url 'schedule' %}" class="mt-8 inline-flex items-center gap-2 border border-black bg-black px-5 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-primary hover:text-black">
+                            Full Schedule
+                            <span class="material-symbols-outlined text-sm">east</span>
+                        </a>
+                    </div>
+
+                    <div class="space-y-4">
+                        {% for item in homepage_programming %}
+                        <article class="grid gap-4 border border-black/10 p-5 sm:grid-cols-[120px_minmax(0,1fr)_auto] sm:items-center sm:p-6">
+                            <div>
+                                {% if item.status %}
+                                <p class="section-kicker text-[9px] font-bold uppercase {% if item.status == 'On Air' %}text-primary{% else %}text-black/45{% endif %}">{{ item.status }}</p>
+                                {% endif %}
+                                <p class="mt-2 text-3xl font-semibold tracking-tight">{{ item.time_label }}</p>
+                                <p class="mt-1 text-[10px] uppercase tracking-[0.18em] text-black/45">{{ item.duration_label }}</p>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-2xl font-semibold uppercase tracking-tight">{{ item.title }}</h3>
+                                <p class="mt-2 text-sm leading-7 text-black/65">{{ item.description|truncatechars:148 }}</p>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 sm:block sm:text-right">
+                                <span class="inline-flex items-center gap-2 border border-black/10 bg-black/5 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] {% if item.status == 'On Air' %}text-primary{% else %}text-black/60{% endif %}">
+                                    <span class="material-symbols-outlined text-sm">graphic_eq</span>
+                                    Signal
+                                </span>
+                            </div>
+                        </article>
+                        {% empty %}
+                        <div class="border border-black/10 p-6 text-sm text-black/55">No schedule data is available right now.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-b border-white/10 bg-black py-16 md:py-24">
+            <div class="container mx-auto px-4 sm:px-6">
+                <div class="flex flex-col gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <p class="section-kicker text-[10px] font-semibold uppercase text-slate-500">Charts and momentum</p>
+                        <h2 class="mt-4 font-display text-4xl uppercase leading-none text-white sm:text-5xl">Trending Now</h2>
+                        <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-400">A more editorial read on the tracks climbing through the K-pop conversation right now.</p>
+                    </div>
+                    <a href="{% url 'charts' %}" class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary transition-colors hover:text-white">
+                        View full chart
+                        <span class="material-symbols-outlined text-sm">north_east</span>
+                    </a>
+                </div>
+
+                {% if trending_tracks %}
+                <div class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
+                    {% with lead_track=trending_tracks.0 %}
+                    <article class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+                        <div class="grid gap-5 md:grid-cols-[220px_minmax(0,1fr)]">
+                            <div class="overflow-hidden border border-white/10 bg-white/[0.04]">
+                                {% if lead_track.image %}
+                                <img src="{{ lead_track.image }}" alt="{{ lead_track.title }} by {{ lead_track.artist }}" class="h-full w-full object-cover"/>
+                                {% else %}
+                                <div class="flex h-full min-h-[220px] items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(244,37,192,0.35),transparent_56%),radial-gradient(circle_at_80%_80%,rgba(0,240,255,0.28),transparent_52%),#050505]">
+                                    <span class="text-sm font-bold uppercase tracking-[0.24em] text-white/70">Top signal</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="section-kicker text-[10px] font-semibold uppercase text-slate-500">Lead track</p>
+                                <div class="mt-4 flex items-end gap-4">
+                                    <span class="font-display text-7xl leading-none text-primary">{{ lead_track.rank }}</span>
+                                    <div class="pb-2">
+                                        <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Current momentum</p>
+                                        <p class="mt-1 text-sm font-semibold uppercase tracking-[0.14em] {{ lead_track.trend_class }}">{{ lead_track.trend_icon }} {{ lead_track.trend_value|default:"steady" }}</p>
+                                    </div>
+                                </div>
+                                <h3 class="mt-5 text-3xl font-semibold uppercase tracking-tight text-white sm:text-4xl">{{ lead_track.title }}</h3>
+                                <p class="mt-3 text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ lead_track.artist }}</p>
+                                <p class="mt-5 max-w-xl text-sm leading-7 text-slate-300">The front-runner of the moment, anchoring the chart view before the supporting rise around it.</p>
+                            </div>
+                        </div>
+                    </article>
+                    {% endwith %}
+
+                    <div class="space-y-3">
+                        {% for track in trending_tracks|slice:"1:6" %}
+                        <a href="{% url 'charts' %}" class="grid gap-4 border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-primary/40 hover:bg-white/[0.05] sm:grid-cols-[70px_72px_minmax(0,1fr)_auto] sm:items-center">
+                            <div class="flex items-end gap-2">
+                                <span class="font-display text-4xl leading-none text-white">{{ track.rank }}</span>
+                                <span class="pb-1 text-[10px] font-bold uppercase tracking-[0.16em] {{ track.trend_class }}">{{ track.trend_icon }} {{ track.trend_value|default:"steady" }}</span>
+                            </div>
+                            <div class="overflow-hidden border border-white/10 bg-white/[0.05]">
+                                {% if track.image %}
+                                <img src="{{ track.image }}" alt="{{ track.title }} by {{ track.artist }}" class="h-[72px] w-[72px] object-cover"/>
+                                {% else %}
+                                <div class="flex h-[72px] w-[72px] items-center justify-center bg-black/60 text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">Track</div>
+                                {% endif %}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="truncate text-lg font-semibold uppercase tracking-tight text-white">{{ track.title }}</p>
+                                <p class="mt-1 truncate text-[10px] uppercase tracking-[0.18em] text-slate-400">{{ track.artist }}</p>
+                            </div>
+                            <span class="section-kicker text-[9px] font-semibold uppercase text-slate-500">Global</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if trending_ticker_tracks %}
+                <div class="mt-6 flex gap-3 overflow-x-auto border border-white/10 bg-white/[0.02] p-3">
+                    {% for track in trending_ticker_tracks %}
+                    <a href="{% url 'charts' %}" class="shrink-0 border border-white/10 px-3 py-2">
+                        <p class="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500">{{ track.rank }}</p>
+                        <p class="mt-2 text-sm font-semibold uppercase tracking-tight text-white">{{ track.title }}</p>
+                        <p class="mt-1 text-[10px] uppercase tracking-[0.16em] text-slate-400">{{ track.artist }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="border-b border-white/10 bg-black py-16 md:py-20">
+            <div class="container mx-auto px-4 sm:px-6">
+                <div class="grid gap-8 border border-white/10 bg-white/[0.03] p-6 md:grid-cols-[minmax(0,1fr)_280px] md:p-8">
+                    <div>
+                        <p class="section-kicker text-[10px] font-semibold uppercase text-primary">Artist spotlight</p>
+                        <h2 class="mt-4 font-display text-4xl uppercase leading-none text-white sm:text-5xl">Stray Kids</h2>
+                        <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
+                            A tighter artist feature block that keeps the music-channel atmosphere without interrupting the homepage flow like a second hero.
+                        </p>
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            <a href="{% url 'idol_page' slug='stray-kids' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-5 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-black transition-colors hover:bg-white">
+                                Explore profile
+                                <span class="material-symbols-outlined text-sm">north_east</span>
+                            </a>
+                            <a href="{% url 'news' %}" class="inline-flex items-center gap-2 border border-white/20 px-5 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-secondary hover:text-secondary">
+                                Read stories
+                                <span class="material-symbols-outlined text-sm">article</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="border border-white/10 bg-black/45 p-4">
+                            <p class="section-kicker text-[9px] font-semibold uppercase text-slate-500">Essential tracks</p>
+                            <div class="mt-4 space-y-3 text-sm uppercase tracking-[0.16em] text-slate-300">
+                                <div class="flex items-center justify-between gap-4 border-b border-white/10 pb-3"><span>S-Class</span><span class="text-slate-500">01</span></div>
+                                <div class="flex items-center justify-between gap-4 border-b border-white/10 pb-3"><span>MANIAC</span><span class="text-slate-500">02</span></div>
+                                <div class="flex items-center justify-between gap-4"><span>God's Menu</span><span class="text-slate-500">03</span></div>
+                            </div>
+                        </div>
+                        <div class="overflow-hidden border border-white/10">
+                            <img src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/skz_ai/stray_kids_performance" alt="Stray Kids featured artist" class="h-48 w-full object-cover opacity-75"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-b border-white/10 bg-white py-16 text-black md:py-24">
+            <div class="container mx-auto px-4 sm:px-6">
+                <div class="flex flex-col gap-5 border-b border-black/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <p class="section-kicker text-[10px] font-semibold uppercase text-black/45">Release calendar</p>
+                        <h2 class="mt-4 font-display text-4xl uppercase leading-none sm:text-5xl">Upcoming Comebacks</h2>
+                        <p class="mt-4 max-w-2xl text-sm leading-7 text-black/70">A more deliberate calendar view that keeps urgency without repeating the top-fold card stack.</p>
+                    </div>
+                    <a href="{% url 'comeback_timeline' %}" class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-black transition-colors hover:text-primary">
+                        Open full calendar
+                        <span class="material-symbols-outlined text-sm">north_east</span>
+                    </a>
+                </div>
+
+                <div class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                    <div class="border border-black/10 bg-black text-white">
+                        <div class="grid gap-5 p-5 sm:grid-cols-[120px_minmax(0,1fr)] sm:p-6">
+                            <div class="border border-white/10 bg-white/[0.03] p-4 text-center">
+                                <p class="section-kicker text-[9px] font-semibold uppercase text-slate-500">Next drop</p>
+                                <p class="mt-4 font-display text-6xl leading-none text-primary">{% if hero_primary_event %}{{ hero_primary_event.date_str|slice:"8:10" }}{% else %}--{% endif %}</p>
+                                <p class="mt-2 text-[10px] uppercase tracking-[0.18em] text-slate-400">{% if hero_primary_event %}{{ hero_primary_event.date_str|slice:"5:7" }}{% else %}Updating{% endif %}</p>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="border border-primary/40 bg-primary/10 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-primary">{% if hero_primary_event %}{{ hero_primary_event.type|default:"Release" }}{% else %}Release{% endif %}</span>
+                                    {% if hero_primary_event %}
+                                    <span class="border border-secondary/30 bg-secondary/10 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-secondary" data-countdown="{{ hero_primary_event.iso_date }}">--d --h --m</span>
+                                    {% endif %}
+                                </div>
+                                <h3 class="mt-4 text-3xl font-semibold uppercase tracking-tight">{% if hero_primary_event %}{{ hero_primary_event.title }}{% else %}Upcoming calendar refresh{% endif %}</h3>
+                                <p class="mt-3 text-[11px] uppercase tracking-[0.18em] text-slate-400">{% if hero_primary_event %}{{ hero_primary_event.artist }}{% else %}More releases are loading in.{% endif %}</p>
+                                <p class="mt-5 max-w-xl text-sm leading-7 text-slate-300">Use the homepage as a quick-release monitor, then move into the full timeline when you want the complete month view.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        {% for release in upcoming_comebacks %}
+                        <a href="{% url 'comeback_timeline' %}" class="grid gap-4 border border-black/10 bg-black px-4 py-4 text-white transition-colors hover:border-primary/40 sm:grid-cols-[88px_minmax(0,1fr)_88px] sm:items-center sm:px-5">
+                            <div class="border border-white/10 bg-white/[0.03] px-3 py-4 text-center">
+                                <p class="text-[9px] uppercase tracking-[0.18em] text-slate-500">{{ release.date_str|slice:"5:7" }}</p>
+                                <p class="mt-1 text-3xl font-semibold leading-none">{{ release.date_str|slice:"8:10" }}</p>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xl font-semibold uppercase tracking-tight">{{ release.title }}</p>
+                                <p class="mt-2 text-[10px] uppercase tracking-[0.18em] text-slate-400">{{ release.artist }}</p>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <span class="border border-primary/35 bg-primary/10 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-primary">{{ release.type|default:"Release" }}</span>
+                                    <span class="border border-white/15 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-slate-300" data-countdown="{{ release.iso_date }}">--d --h --m</span>
+                                </div>
+                            </div>
+                            <div class="overflow-hidden border border-white/10 bg-white/[0.04] sm:justify-self-end">
+                                {% if release.image %}
+                                <img src="{{ release.image }}" alt="{{ release.artist }} {{ release.title }}" class="h-[88px] w-[88px] object-cover"/>
+                                {% else %}
+                                <div class="flex h-[88px] w-[88px] items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(244,37,192,0.35),transparent_56%),radial-gradient(circle_at_80%_80%,rgba(0,240,255,0.28),transparent_52%),#050505] text-[9px] font-bold uppercase tracking-[0.18em] text-white/70">Signal</div>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% empty %}
+                        <div class="border border-black/10 bg-black p-6 text-sm text-slate-400">Upcoming comeback data is loading.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if upcoming_ticker %}
+                <div class="mt-6 flex gap-3 overflow-x-auto">
+                    {% for release in upcoming_ticker %}
+                    <a href="{% url 'comeback_timeline' %}" class="shrink-0 border border-black/10 bg-black px-3 py-3 text-white">
+                        <p class="text-[9px] font-bold uppercase tracking-[0.18em] text-primary">{{ release.date_str|slice:"5:" }}</p>
+                        <p class="mt-2 text-sm font-semibold uppercase tracking-tight">{{ release.title }}</p>
+                        <p class="mt-1 text-[10px] uppercase tracking-[0.16em] text-slate-400">{{ release.artist }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="border-b border-white/10 bg-black py-16 md:py-24">
+            <div class="container mx-auto px-4 sm:px-6">
+                <div class="flex flex-col gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <p class="section-kicker text-[10px] font-semibold uppercase text-slate-500">Newsroom</p>
+                        <h2 class="mt-4 font-display text-4xl uppercase leading-none text-white sm:text-5xl">Latest News</h2>
+                        <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-400">Lead with the biggest story, then use the supporting slots to keep the front page editorial instead of card-grid generic.</p>
+                    </div>
+                    <a href="{% url 'news' %}" class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary transition-colors hover:text-white">
+                        More stories
+                        <span class="material-symbols-outlined text-sm">north_east</span>
+                    </a>
+                </div>
+
+                {% if news_articles %}
+                <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
+                    {% with lead_story=news_articles.0 %}
+                    <a href="{% url 'blog_article_read' slug=lead_story.slug %}" class="group border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+                        <div class="overflow-hidden border border-white/10">
+                            {% if lead_story.image %}
+                            <img src="{{ lead_story.image }}" alt="{{ lead_story.title }}" class="h-[320px] w-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+                            {% else %}
+                            <div class="flex h-[320px] items-center justify-center bg-white/[0.04] text-sm font-bold uppercase tracking-[0.2em] text-slate-500">Lead story</div>
+                            {% endif %}
+                        </div>
+                        <div class="mt-5">
+                            <p class="section-kicker text-[9px] font-semibold uppercase text-primary">{{ lead_story.category }}</p>
+                            <h3 class="mt-3 text-3xl font-semibold uppercase tracking-tight text-white sm:text-4xl">{{ lead_story.title }}</h3>
+                            {% if lead_story.subtitle %}
+                            <p class="mt-4 text-sm leading-7 text-slate-300">{{ lead_story.subtitle|truncatechars:180 }}</p>
+                            {% endif %}
+                            <p class="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors group-hover:text-primary">Read feature</p>
+                        </div>
+                    </a>
+                    {% endwith %}
+
+                    <div class="space-y-4">
+                        {% for article in news_articles|slice:"1:3" %}
+                        <a href="{% url 'blog_article_read' slug=article.slug %}" class="group grid gap-4 border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-[120px_minmax(0,1fr)] sm:items-center">
+                            <div class="overflow-hidden border border-white/10">
+                                {% if article.image %}
+                                <img src="{{ article.image }}" alt="{{ article.title }}" class="h-[120px] w-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+                                {% else %}
+                                <div class="flex h-[120px] items-center justify-center bg-white/[0.04] text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Story</div>
+                                {% endif %}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="section-kicker text-[9px] font-semibold uppercase text-primary">{{ article.category }}</p>
+                                <p class="mt-2 text-xl font-semibold uppercase tracking-tight text-white">{{ article.title }}</p>
+                                {% if article.subtitle %}
+                                <p class="mt-3 text-sm leading-7 text-slate-300">{{ article.subtitle|truncatechars:120 }}</p>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        {% if active_poll %}
+        <section
+            class="border-b border-white/10 bg-black py-16 md:py-20"
+            x-data="{
+                pollId: {{ active_poll.id }},
+                voted: localStorage.getItem('poll_voted_{{ active_poll.id }}') === 'true',
+                selected: parseInt(localStorage.getItem('poll_selected_{{ active_poll.id }}')) || null,
+                options: [
+                    {% for option in active_poll.options.all %}
+                    { id: {{ option.id }}, text: '{{ option.text|escapejs }}', votes: {{ option.votes }}, percentage: {{ option.percentage }} },
+                    {% endfor %}
+                ],
+                get total() {
+                    return this.options.reduce((sum, opt) => sum + opt.votes, 0);
+                },
+                recalculatePercentages() {
+                    const total = this.total;
+                    if (!total) return;
+                    this.options.forEach((opt) => {
+                        opt.percentage = Math.round((opt.votes / total) * 100);
+                    });
+                },
+                async submitVote(optionId) {
+                    if (this.voted) return;
+                    this.selected = optionId;
+                    this.voted = true;
+                    localStorage.setItem('poll_voted_' + this.pollId, 'true');
+                    localStorage.setItem('poll_selected_' + this.pollId, optionId.toString());
+                    const option = this.options.find((entry) => entry.id === optionId);
+                    if (option) option.votes++;
+                    this.recalculatePercentages();
+                    try {
+                        const response = await fetch('{% url "vote_poll" %}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}',
+                            },
+                            body: JSON.stringify({ option_id: optionId }),
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            this.options.forEach((opt) => {
+                                if (data.results[opt.id] !== undefined) {
+                                    opt.percentage = data.results[opt.id];
+                                }
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Vote failed:', error);
+                    }
+                }
+            }"
+        >
+            <div class="container mx-auto px-4 sm:px-6">
+                <div class="grid gap-8 lg:grid-cols-[340px_minmax(0,1fr)]">
+                    <div>
+                        <p class="section-kicker text-[10px] font-semibold uppercase text-primary">Live fan vote</p>
+                        <h2 class="mt-4 font-display text-4xl uppercase leading-none text-white sm:text-5xl">{{ active_poll.question|safe }}</h2>
+                        <p class="mt-5 text-sm leading-7 text-slate-400">Still keeping the poll on the homepage, but pushed lower and compressed so it supports the page instead of stopping the upper flow.</p>
+                        <div class="mt-6 border border-white/10 bg-white/[0.03] p-4">
+                            <p class="section-kicker text-[9px] font-semibold uppercase text-slate-500">Total votes</p>
+                            <p class="mt-3 text-4xl font-semibold text-white" x-text="total.toLocaleString()">0</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <template x-for="(option, index) in options" :key="option.id">
+                            <button
+                                @click="submitVote(option.id)"
+                                :class="{'border-primary': selected === option.id, 'border-white/10': selected !== option.id, 'cursor-default': voted}"
+                                class="relative w-full overflow-hidden border bg-white/[0.03] px-4 py-4 text-left transition-colors hover:border-primary/40"
+                            >
+                                <div x-show="voted" class="absolute inset-y-0 left-0 bg-primary/15" :style="`width:${option.percentage}%;`"></div>
+                                <div class="relative z-10 flex items-start justify-between gap-4">
+                                    <div class="flex min-w-0 items-start gap-3">
+                                        <span class="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center border border-white/15 text-[10px] font-bold uppercase tracking-[0.18em] text-white" x-text="String.fromCharCode(65 + index)">A</span>
+                                        <span class="text-sm font-semibold leading-6 text-white" x-text="option.text">Option</span>
+                                    </div>
+                                    <span class="shrink-0 text-sm font-semibold text-primary" x-text="voted ? `${option.percentage}%` : ''"></span>
+                                </div>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="bg-primary py-16 text-black md:py-20">
+            <div class="container mx-auto px-4 sm:px-6">
+                <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
+                    <div>
+                        <p class="section-kicker text-[10px] font-semibold uppercase text-black/55">Community signup</p>
+                        <h2 class="mt-4 font-display text-5xl uppercase leading-none sm:text-6xl">Never Miss A Beat</h2>
+                        <p class="mt-5 max-w-2xl text-sm leading-7 text-black/75">Join the list for artist alerts, weekly chart updates, fan-sign opportunities, and the moments people will be talking about the next morning.</p>
+                    </div>
+                    <div class="border border-black bg-white p-5 sm:p-6">
+                        <form id="homepage-email-promo-form" class="space-y-4" novalidate>
+                            <div>
+                                <label for="homepage-email-promo-input" class="section-kicker text-[9px] font-semibold uppercase text-black/45">Email address</label>
+                                <input id="homepage-email-promo-input" type="email" required placeholder="Enter your email address" class="mt-2 w-full border border-black bg-white px-5 py-4 text-sm text-black placeholder:text-black/35 focus:border-primary focus:outline-none focus:ring-0"/>
+                            </div>
+                            <p id="homepage-email-promo-feedback" class="hidden text-[10px] font-semibold uppercase tracking-[0.18em]"></p>
+                            <button id="homepage-email-promo-submit" type="submit" class="inline-flex w-full items-center justify-center gap-2 border border-black bg-black px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-white hover:text-black">
+                                Subscribe now
+                                <span class="material-symbols-outlined text-sm">mail</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'core/footer.html' %}
+
+    <script>
+        function updateCountdowns() {
+            document.querySelectorAll('[data-countdown]').forEach((element) => {
+                const target = new Date(element.dataset.countdown).getTime();
+                if (!target) {
+                    element.textContent = '--d --h --m';
+                    return;
+                }
+                const diff = target - Date.now();
+                if (diff <= 0) {
+                    element.textContent = 'Released';
+                    return;
+                }
+                const days = Math.floor(diff / 86400000);
+                const hours = Math.floor((diff % 86400000) / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                element.textContent = `${days}d ${hours}h ${minutes}m`;
+            });
+        }
+
+        updateCountdowns();
+        window.setInterval(updateCountdowns, 60000);
+    </script>
+</body>
+</html>

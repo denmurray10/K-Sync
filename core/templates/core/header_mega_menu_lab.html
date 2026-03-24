@@ -44,6 +44,10 @@
             --charts-secondary: 244, 114, 182;
             --comeback-accent: 236, 72, 153;
             --comeback-secondary: 59, 130, 246;
+            --games-accent: 0, 240, 255;
+            --games-secondary: 244, 37, 192;
+            --shop-accent: 244, 37, 192;
+            --shop-secondary: 0, 240, 255;
         }
         .mega-menu-lab-page {
             background:
@@ -59,6 +63,8 @@
         .mega-panel-shell,
         .streams-panel-shell {
             transition: opacity var(--panel-open-duration) ease, transform var(--panel-open-duration) ease;
+            height: var(--mega-panel-height, auto);
+            max-height: var(--mega-panel-height, none);
             background:
                 radial-gradient(circle at 12% 0%, rgba(var(--stream-accent), 0.18), transparent 34%),
                 radial-gradient(circle at 88% 8%, rgba(var(--stream-secondary), 0.16), transparent 28%),
@@ -90,6 +96,32 @@
             pointer-events: auto;
             visibility: visible;
         }
+        .mega-panel-stage {
+            display: flex;
+            height: 100%;
+            min-height: 0;
+            flex-direction: column;
+        }
+        .mega-panel-body {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        .mega-panel-column-scroll {
+            min-height: 0;
+            overflow-y: auto;
+            padding-right: 0.25rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+        }
+        .mega-panel-column-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .mega-panel-column-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .mega-panel-column-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.24);
+        }
         .live-panel-shell {
             background:
                 radial-gradient(circle at 14% 0%, rgba(var(--live-accent), 0.18), transparent 32%),
@@ -116,6 +148,20 @@
                 radial-gradient(circle at 14% 0%, rgba(var(--comeback-accent), 0.22), transparent 30%),
                 radial-gradient(circle at 84% 10%, rgba(var(--comeback-secondary), 0.2), transparent 30%),
                 linear-gradient(135deg, rgb(14 6 12), rgb(8 8 18) 52%, rgb(4 6 13));
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
+        }
+        .games-panel-shell {
+            background:
+                radial-gradient(circle at 14% 0%, rgba(var(--games-accent), 0.2), transparent 30%),
+                radial-gradient(circle at 84% 10%, rgba(var(--games-secondary), 0.18), transparent 30%),
+                linear-gradient(135deg, rgb(3 9 13), rgb(9 6 16) 54%, rgb(4 6 12));
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
+        }
+        .shop-panel-shell {
+            background:
+                radial-gradient(circle at 14% 0%, rgba(var(--shop-accent), 0.2), transparent 30%),
+                radial-gradient(circle at 84% 10%, rgba(var(--shop-secondary), 0.16), transparent 30%),
+                linear-gradient(135deg, rgb(12 6 10), rgb(9 7 16) 52%, rgb(4 6 12));
             box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62);
         }
         .charts-panel-shell::after {
@@ -204,18 +250,20 @@
         .live-schedule-card {
             position: relative;
             overflow: hidden;
-            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
+            border-color: rgba(255, 255, 255, 0.06) !important;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.008)) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease;
         }
         .live-schedule-card:hover,
         .live-schedule-card:focus-visible {
-            transform: translateX(8px);
-            border-color: rgba(var(--live-accent), 0.42) !important;
-            background: linear-gradient(135deg, rgba(var(--live-accent), 0.14), rgba(255, 255, 255, 0.03) 52%, rgba(var(--live-secondary), 0.08));
-            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+            transform: translateX(4px);
+            border-color: rgba(var(--live-accent), 0.22) !important;
+            background: linear-gradient(135deg, rgba(var(--live-accent), 0.08), rgba(255, 255, 255, 0.018) 52%, rgba(var(--live-secondary), 0.04));
         }
         .live-stat-card {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.01));
         }
         .request-feature-shell {
             position: relative;
@@ -252,12 +300,12 @@
             color: rgba(255, 255, 255, 0.88);
         }
         .request-queue-box {
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(3, 8, 12, 0.4);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(3, 8, 12, 0.24);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
         }
         .live-next-card {
-            min-height: 86px;
+            min-height: 74px;
         }
         .live-signal-box {
             display: flex;
@@ -282,15 +330,15 @@
             color: rgb(187 247 208);
         }
         .idols-route-card {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.01));
             transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
         }
         .idols-route-card:hover,
         .idols-route-card:focus-visible {
-            border-color: rgba(74, 222, 128, 0.45);
-            background: linear-gradient(180deg, rgba(74, 222, 128, 0.12), rgba(255, 255, 255, 0.03));
-            box-shadow: inset 0 0 0 1px rgba(74, 222, 128, 0.12);
+            border-color: rgba(74, 222, 128, 0.24);
+            background: linear-gradient(180deg, rgba(74, 222, 128, 0.06), rgba(255, 255, 255, 0.018));
+            box-shadow: inset 3px 0 0 rgba(74, 222, 128, 0.36);
             transform: translateY(-1px);
         }
         .idols-mini-stat {
@@ -300,10 +348,10 @@
         .stream-shell-card {
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.24);
-            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.012));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(14px);
         }
         .stream-feature-shell::after {
             content: "";
@@ -379,8 +427,8 @@
         }
         .stream-stat-card,
         .lab-note-card {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.01));
         }
         .stream-energy-track {
             height: 10px;
@@ -456,15 +504,15 @@
         .chart-snapshot-card {
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.01));
         }
         .chart-rank-card {
             transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
         }
         .charts-stat-card {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.01));
         }
         .chart-rank-badge {
             border: 1px solid rgba(var(--charts-accent), 0.42);
@@ -484,10 +532,10 @@
         .chart-rank-card:hover,
         .chart-rank-card:focus-visible,
         .chart-rank-card.active {
-            transform: translateX(8px);
-            border-color: rgba(var(--charts-accent), 0.5);
-            background: linear-gradient(135deg, rgba(var(--charts-accent), 0.14), rgba(255, 255, 255, 0.03) 52%, rgba(var(--charts-secondary), 0.08));
-            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+            transform: translateX(4px);
+            border-color: rgba(var(--charts-accent), 0.24);
+            background: linear-gradient(135deg, rgba(var(--charts-accent), 0.08), rgba(255, 255, 255, 0.018) 52%, rgba(var(--charts-secondary), 0.04));
+            box-shadow: inset 3px 0 0 rgba(var(--charts-accent), 0.34);
         }
         .chart-mini-pill {
             border: 1px solid rgba(var(--charts-accent), 0.28);
@@ -544,15 +592,15 @@
             color: rgba(255, 255, 255, 0.92);
         }
         .news-card {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018));
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0.01));
             transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease;
         }
         .news-card:hover,
         .news-card:focus-visible {
-            transform: translateX(8px);
-            border-color: rgba(var(--news-accent), 0.46);
-            background: linear-gradient(135deg, rgba(var(--news-accent), 0.14), rgba(255, 255, 255, 0.03) 52%, rgba(var(--news-secondary), 0.08));
+            transform: translateX(4px);
+            border-color: rgba(var(--news-accent), 0.24);
+            background: linear-gradient(135deg, rgba(var(--news-accent), 0.08), rgba(255, 255, 255, 0.018) 52%, rgba(var(--news-secondary), 0.04));
         }
         .news-meta-pill {
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -629,6 +677,100 @@
             border-color: rgba(var(--comeback-accent), 0.42);
             background: linear-gradient(135deg, rgba(var(--comeback-accent), 0.12), rgba(255, 255, 255, 0.03) 52%, rgba(var(--comeback-secondary), 0.08));
         }
+        .game-feature-stage,
+        .shop-feature-stage {
+            position: relative;
+            overflow: hidden;
+            min-height: 320px;
+        }
+        .game-feature-stage {
+            background:
+                radial-gradient(circle at 18% 18%, rgba(var(--games-accent), 0.24), transparent 34%),
+                radial-gradient(circle at 82% 18%, rgba(var(--games-secondary), 0.18), transparent 32%),
+                linear-gradient(145deg, rgba(4, 11, 16, 0.96), rgba(7, 8, 16, 0.95) 58%, rgba(4, 6, 12, 0.98));
+        }
+        .shop-feature-stage {
+            background:
+                radial-gradient(circle at 18% 18%, rgba(var(--shop-accent), 0.22), transparent 34%),
+                radial-gradient(circle at 82% 18%, rgba(var(--shop-secondary), 0.16), transparent 32%),
+                linear-gradient(145deg, rgba(13, 7, 12, 0.96), rgba(7, 8, 16, 0.95) 58%, rgba(4, 6, 12, 0.98));
+        }
+        .game-feature-stage::before,
+        .shop-feature-stage::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 36px 36px;
+            mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.58), transparent 82%);
+            opacity: 0.42;
+        }
+        .game-feature-stage::after,
+        .shop-feature-stage::after {
+            content: "";
+            position: absolute;
+            inset: auto -8% -20% auto;
+            width: 280px;
+            height: 280px;
+            border-radius: 999px;
+            pointer-events: none;
+            opacity: 0.92;
+        }
+        .game-feature-stage::after {
+            background: radial-gradient(circle, rgba(var(--games-accent), 0.22) 0%, transparent 72%);
+        }
+        .shop-feature-stage::after {
+            background: radial-gradient(circle, rgba(var(--shop-accent), 0.22) 0%, transparent 72%);
+        }
+        .game-chip {
+            border: 1px solid rgba(var(--games-accent), 0.24);
+            background: rgba(var(--games-accent), 0.1);
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .shop-chip {
+            border: 1px solid rgba(var(--shop-accent), 0.24);
+            background: rgba(var(--shop-accent), 0.1);
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .game-list-card,
+        .shop-list-card,
+        .shop-benefit-card,
+        .shop-route-card {
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0.01));
+            transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
+        }
+        .game-list-card:hover,
+        .game-list-card:focus-visible,
+        .game-list-card.active {
+            transform: translateX(4px);
+            border-color: rgba(var(--games-accent), 0.26);
+            background: linear-gradient(135deg, rgba(var(--games-accent), 0.08), rgba(255, 255, 255, 0.018) 52%, rgba(var(--games-secondary), 0.04));
+            box-shadow: inset 3px 0 0 rgba(var(--games-accent), 0.34);
+        }
+        .shop-list-card:hover,
+        .shop-list-card:focus-visible,
+        .shop-list-card.active,
+        .shop-route-card:hover,
+        .shop-route-card:focus-visible {
+            transform: translateX(4px);
+            border-color: rgba(var(--shop-accent), 0.26);
+            background: linear-gradient(135deg, rgba(var(--shop-accent), 0.08), rgba(255, 255, 255, 0.018) 52%, rgba(var(--shop-secondary), 0.04));
+            box-shadow: inset 3px 0 0 rgba(var(--shop-accent), 0.34);
+        }
+        .shop-benefit-card {
+            border-color: rgba(var(--shop-accent), 0.12);
+            background: linear-gradient(180deg, rgba(var(--shop-accent), 0.045), rgba(255, 255, 255, 0.012));
+        }
+        .game-icon-badge,
+        .shop-icon-badge {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.24);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
         @keyframes equalizer {
             0%, 100% {
                 transform: scaleY(0.45);
@@ -662,7 +804,7 @@
 {% endif %}
 
     <div id="mega-live-lab-panel" class="mega-panel-shell live-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
-        <div class="container mx-auto px-4 sm:px-6 py-5 sm:py-6">
+        <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-5 sm:py-6">
             <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
@@ -684,11 +826,11 @@
                 </div>
             </div>
 
-            <div class="grid gap-5 lg:grid-cols-12">
-                <section class="stream-shell-card lg:col-span-6 min-h-[320px]">
-                    <div class="relative h-full overflow-hidden">
+            <div class="mega-panel-body grid gap-5 lg:grid-cols-12">
+                <section id="live-feature-column" class="stream-shell-card lg:col-span-5 lg:self-start min-h-[320px] min-h-0">
+                    <div class="relative h-full min-h-[320px] overflow-hidden">
                         <div id="live-feature-image" class="live-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_live.image|default:'' }}');"></div>
-                        <div class="absolute inset-0 p-5 sm:p-6">
+                        <div class="absolute inset-0 z-10 flex flex-col justify-between p-5 sm:p-6">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <p id="live-feature-eyebrow" class="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200">{{ mega_menu_live.eyebrow|default:"Live Right Now" }}</p>
@@ -702,7 +844,7 @@
                                 </div>
                                 <span id="live-feature-status" class="border border-cyan-300/40 bg-cyan-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">{{ mega_menu_live.status|default:"On Air" }}</span>
                             </div>
-                            <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                            <div class="pt-2">
                                 <p id="live-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_live.tagline|default:"Join the live player and see what is on now." }}</p>
                                 <h2 id="live-feature-title" class="mt-2 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_live.title|default:"K-Beats Live" }}</h2>
                                 <p id="live-feature-description" class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_live.description|default:"Open the live player for the current track and next-up schedule." }}</p>
@@ -726,7 +868,7 @@
                     </div>
                 </section>
 
-                <section class="stream-shell-card lg:col-span-6 p-4 sm:p-5">
+                <section id="live-schedule-column" class="stream-shell-card lg:col-span-4 lg:self-start p-4 sm:p-5 min-h-0 mega-panel-column-scroll">
                     <div class="flex items-end justify-between gap-4 border-b border-white/10 pb-3">
                         <div>
                             <p id="live-deck-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">On Deck</p>
@@ -752,30 +894,34 @@
                         <div class="border border-white/10 bg-black/25 p-3 text-xs text-slate-400">Schedule data is not available yet.</div>
                         {% endfor %}
                     </div>
-                    <a href="{% url 'schedule' %}" class="mt-3 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-secondary transition-colors hover:text-white">
-                        Open Full Schedule
-                        <span class="material-symbols-outlined text-base">arrow_forward</span>
-                    </a>
-                    <div class="request-feature-shell mt-4 border border-white/10 p-3 sm:p-4">
-                        <div class="relative z-10 grid gap-3 md:grid-cols-[minmax(0,1fr)_150px] md:items-center">
+                </section>
+
+                <section id="live-requests-column" class="stream-shell-card lg:col-span-3 lg:self-start p-4 sm:p-5 min-h-0 mega-panel-column-scroll">
+                    <div id="live-requests-content">
+                        <div class="flex items-end justify-between gap-4 border-b border-white/10 pb-3">
                             <div>
-                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-300">Requests</p>
-                                <h3 class="mt-1 text-xl font-black uppercase tracking-tight text-white">Push A Track Into Tonight's Feed</h3>
-                                <p class="mt-2 text-sm leading-relaxed text-slate-200/90">A fast route for listeners to get picks in front of the presenter while the show is still moving.</p>
+                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Listener Lane</p>
+                                <h3 class="mt-2 text-xl font-black uppercase tracking-tight text-white">Requests</h3>
                             </div>
-                            <div class="request-queue-box p-3">
-                                <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Queue Pulse</p>
-                                <p id="live-request-count" class="mt-2 text-2xl font-impact uppercase leading-none tracking-[0.04em] text-white">{{ mega_menu_request_count }} Picks</p>
-                                <p class="mt-1 text-xs leading-relaxed text-slate-300">Current request entries.</p>
-                            </div>
+                            <p class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Live queue</p>
                         </div>
-                        <div class="relative z-10 mt-3 flex flex-wrap items-center gap-3">
-                            <a href="{% url 'request_track' %}" class="inline-flex items-center gap-2 border border-white bg-white px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.45)] hover:bg-primary hover:border-primary hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
-                                Request A Track
-                                <span class="material-symbols-outlined text-base">queue_music</span>
-                            </a>
-                            <span class="request-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Open Requests</span>
-                            <span class="request-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Live Review</span>
+                        <div class="request-feature-shell mt-4 border border-white/10 p-3 sm:p-4">
+                            <div class="request-queue-box relative z-10 flex items-end justify-between gap-4 p-3">
+                                <div>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Queue Pulse</p>
+                                    <p class="mt-1 text-xs leading-relaxed text-slate-300">Current request entries.</p>
+                                </div>
+                                <p id="live-request-count" class="text-2xl font-impact uppercase leading-none tracking-[0.04em] text-white">{{ mega_menu_request_count }} Picks</p>
+                            </div>
+                            <p class="relative z-10 mt-3 text-sm leading-relaxed text-slate-200/90">A fast route for listeners to get picks in front of the presenter while the show is still moving.</p>
+                            <div class="relative z-10 mt-3 flex flex-wrap items-center gap-3">
+                                <a href="{% url 'request_track' %}" class="inline-flex items-center gap-2 border border-white bg-white px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.45)] hover:bg-primary hover:border-primary hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                    Request Track
+                                    <span class="material-symbols-outlined text-base">queue_music</span>
+                                </a>
+                                <span class="request-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Open Requests</span>
+                                <span class="request-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">Live Review</span>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -784,7 +930,7 @@
     </div>
 
     <div id="mega-menu-lab-panel" class="mega-panel-shell streams-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
-        <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
+        <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
@@ -799,8 +945,8 @@
                 </div>
             </div>
 
-            <div class="grid gap-5 lg:grid-cols-12">
-                <section class="stream-shell-card stream-feature-shell lg:col-span-6">
+            <div class="mega-panel-body grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card stream-feature-shell lg:col-span-6 min-h-0">
                     <div class="grid h-full xl:grid-cols-[minmax(0,1.45fr)_minmax(250px,0.85fr)]">
                         <div class="relative min-h-[280px] overflow-hidden">
                             <div id="stream-feature-image" class="stream-card-image absolute inset-0" {% if mega_menu_streams.0.image %}style="background-image: linear-gradient(115deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.54) 100%), url('{{ mega_menu_streams.0.image }}');"{% endif %}></div>
@@ -864,7 +1010,7 @@
                     </div>
                 </section>
 
-                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5" aria-label="Launch streams list">
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5 min-h-0 mega-panel-column-scroll" aria-label="Launch streams list">
                     <div class="mb-4 flex items-end justify-between gap-4">
                         <div>
                             <p id="stream-list-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Launch Presets</p>
@@ -875,7 +1021,7 @@
                     <div id="stream-list" class="space-y-3"></div>
                 </section>
 
-                <section class="lg:col-span-3 space-y-4">
+                <section class="lg:col-span-3 min-h-0 mega-panel-column-scroll space-y-4">
                     <div class="stream-shell-card p-5 sm:p-6">
                         <div class="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
                             <div>
@@ -920,7 +1066,7 @@
     </div>
 
     <div id="mega-charts-lab-panel" class="mega-panel-shell charts-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
-        <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
+        <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
@@ -939,8 +1085,8 @@
                 </div>
             </div>
 
-            <div class="grid gap-5 lg:grid-cols-12">
-                <section class="stream-shell-card charts-feature-shell lg:col-span-6">
+            <div class="mega-panel-body grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card charts-feature-shell lg:col-span-6 min-h-0">
                     <div class="grid h-full xl:grid-cols-[minmax(0,1.5fr)_minmax(250px,0.8fr)]">
                         <div class="relative min-h-[300px] overflow-hidden">
                             <div id="charts-feature-image" class="charts-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_charts.0.image|default:'' }}');"></div>
@@ -1000,7 +1146,7 @@
                     </div>
                 </section>
 
-                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5">
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5 min-h-0 mega-panel-column-scroll">
                     <div class="mb-4 flex items-end justify-between gap-4">
                         <div>
                             <p id="charts-movers-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Top Movers</p>
@@ -1026,7 +1172,7 @@
                     </div>
                 </section>
 
-                <section class="lg:col-span-3">
+                <section class="lg:col-span-3 min-h-0 mega-panel-column-scroll">
                     <div class="chart-snapshot-card p-5 sm:p-6">
                         <div class="flex items-center justify-between gap-4">
                             <div>
@@ -1066,7 +1212,7 @@
     </div>
 
     <div id="mega-news-lab-panel" class="mega-panel-shell news-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
-        <div class="container mx-auto px-4 sm:px-6 py-5 sm:py-6">
+        <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-5 sm:py-6">
             <div class="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
@@ -1085,8 +1231,8 @@
                 </div>
             </div>
 
-            <div class="grid gap-5 lg:grid-cols-12">
-                <section class="stream-shell-card lg:col-span-7 min-h-[300px]">
+            <div class="mega-panel-body grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card lg:col-span-7 min-h-[300px] min-h-0">
                     <div class="relative h-full overflow-hidden">
                         <div id="news-feature-image" class="news-hero-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_news.featured.image|default:'' }}');"></div>
                         <div class="absolute inset-0 p-5 sm:p-6">
@@ -1125,7 +1271,7 @@
                     </div>
                 </section>
 
-                <section class="lg:col-span-5 grid gap-4 content-start">
+                <section class="lg:col-span-5 grid gap-4 content-start min-h-0 mega-panel-column-scroll">
                     <div class="stream-shell-card p-4 sm:p-5">
                         <div class="flex items-end justify-between gap-4 border-b border-white/10 pb-3">
                             <div>
@@ -1179,7 +1325,7 @@
     </div>
 
     <div id="mega-comebacks-lab-panel" class="mega-panel-shell comebacks-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
-        <div id="mega-comebacks-lab-panel-inner" class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
+        <div id="mega-comebacks-lab-panel-inner" class="mega-panel-stage container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
@@ -1198,8 +1344,8 @@
                 </div>
             </div>
 
-            <div class="grid gap-5 lg:grid-cols-12">
-                <section class="stream-shell-card lg:col-span-6 min-h-[320px]">
+            <div class="mega-panel-body grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card lg:col-span-6 min-h-[320px] min-h-0">
                     <div class="relative h-full overflow-hidden">
                         <div id="comebacks-feature-image" class="comeback-image absolute inset-0 bg-cover bg-center" style="background-image: url('{{ mega_menu_comebacks_primary.image|default:'' }}');"></div>
                         <div class="absolute inset-0 p-5 sm:p-6">
@@ -1237,7 +1383,7 @@
                     </div>
                 </section>
 
-                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5">
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5 min-h-0 mega-panel-column-scroll">
                     <div class="mb-4 flex items-end justify-between gap-4">
                         <div>
                             <p id="comebacks-board-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Countdown Board</p>
@@ -1271,7 +1417,7 @@
                     </div>
                 </section>
 
-                <section class="lg:col-span-3 space-y-4">
+                <section class="lg:col-span-3 min-h-0 mega-panel-column-scroll space-y-4">
                     <div class="stream-shell-card p-5 sm:p-6">
                         <div class="flex items-center justify-between gap-4">
                             <div>
@@ -1321,7 +1467,7 @@
     </div>
 
     <div id="mega-idols-lab-panel" class="mega-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
-        <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-7">
+        <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-6 sm:py-7">
             <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div class="max-w-3xl">
                     <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
@@ -1340,8 +1486,8 @@
                 </div>
             </div>
 
-            <div class="grid gap-5 lg:grid-cols-12">
-                <section class="stream-shell-card stream-feature-shell lg:col-span-6">
+            <div class="mega-panel-body grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card stream-feature-shell lg:col-span-6 min-h-0">
                     <div class="grid h-full xl:grid-cols-[minmax(0,1.5fr)_minmax(250px,0.8fr)]">
                         <div class="relative min-h-[340px] overflow-hidden">
                             <div id="idols-feature-image" class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(120deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.6) 100%), url('{{ mega_menu_idols.0.image|default:'' }}');"></div>
@@ -1403,7 +1549,7 @@
                     </div>
                 </section>
 
-                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5">
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5 min-h-0 mega-panel-column-scroll">
                     <div class="mb-4 flex items-end justify-between gap-4">
                         <div>
                             <p id="idols-routes-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Jump By Intent</p>
@@ -1426,7 +1572,7 @@
                     </div>
                 </section>
 
-                <section class="lg:col-span-3 space-y-4">
+                <section class="lg:col-span-3 min-h-0 mega-panel-column-scroll space-y-4">
                     <div class="chart-snapshot-card p-5 sm:p-6">
                         <div class="flex items-center justify-between gap-4">
                             <div>
@@ -1475,6 +1621,196 @@
                                 <span class="material-symbols-outlined text-base text-slate-400">arrow_outward</span>
                             </a>
                         </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="mega-games-lab-panel" class="mega-panel-shell games-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
+        <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-6 sm:py-7">
+            <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="max-w-3xl">
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+                        <h1 id="games-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Enter The Arcade</h1>
+                        <p id="games-panel-copy" class="max-w-xl text-[13px] leading-relaxed text-slate-300">Move fast, learn faster, and make the Games menu feel like a destination instead of a utility list.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
+                    <button type="button" data-games-view="arcade" class="panel-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Arcade</button>
+                    <button type="button" data-games-view="knowledge" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Knowledge</button>
+                    <button type="button" data-games-view="challenge" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Challenge</button>
+                </div>
+                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
+                    <span class="h-2.5 w-2.5 rounded-full bg-secondary shadow-[0_0_14px_rgba(0,240,255,0.8)]"></span>
+                    Arcade Deck Live
+                </div>
+            </div>
+
+            <div class="mega-panel-body grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card lg:col-span-6 min-h-0">
+                    <div id="games-feature-stage" class="game-feature-stage relative h-full">
+                        <div class="absolute inset-0 p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p id="games-feature-eyebrow" class="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200">Arcade Spotlight</p>
+                                    <div id="games-feature-badge" class="game-icon-badge mt-2 inline-flex items-center gap-2 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                        <span class="h-2 w-2 rounded-full bg-secondary"></span>
+                                        Fast replay loop
+                                    </div>
+                                </div>
+                                <span id="games-feature-status" class="border border-secondary/40 bg-secondary/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-100">Featured</span>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                                <div class="mb-4 flex items-center gap-4">
+                                    <div class="game-icon-badge flex h-16 w-16 items-center justify-center">
+                                        <span id="games-feature-icon" class="material-symbols-outlined text-4xl text-secondary">speed</span>
+                                    </div>
+                                    <p id="games-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Start with the game that gets a player moving immediately.</p>
+                                </div>
+                                <h2 id="games-feature-title" class="font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">Beat Streak</h2>
+                                <p id="games-feature-description" class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">A rhythm-first sprint with escalating pace, cleaner timing windows, and immediate replay pull.</p>
+                                <div id="games-feature-chips" class="mt-4 flex flex-wrap gap-2"></div>
+                                <div class="mt-5 flex flex-wrap items-center gap-3">
+                                    <a id="games-feature-primary-cta" href="{% url 'games' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                        Play Now
+                                        <span class="material-symbols-outlined text-base">play_arrow</span>
+                                    </a>
+                                    <a id="games-feature-secondary-cta" href="{% url 'games' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
+                                        Open Games Hub
+                                        <span class="material-symbols-outlined text-base">north_east</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5 min-h-0 mega-panel-column-scroll">
+                    <div class="mb-4 flex items-end justify-between gap-4">
+                        <div>
+                            <p id="games-list-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Arcade Queue</p>
+                            <h3 id="games-list-title" class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Press Start</h3>
+                        </div>
+                        <p id="games-list-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">quick rounds</p>
+                    </div>
+                    <div id="games-list" class="space-y-3"></div>
+                </section>
+
+                <section class="lg:col-span-3 min-h-0 mega-panel-column-scroll space-y-4">
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p id="games-side-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Session Read</p>
+                                <h3 id="games-side-title" class="mt-2 text-xl font-black uppercase tracking-tight text-white">What This Mode Feels Like</h3>
+                            </div>
+                            <span class="game-chip px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Live</span>
+                        </div>
+                        <p id="games-side-note" class="mt-4 text-sm leading-relaxed text-slate-300">High-replay, low-friction games with enough speed and feedback to keep the panel lively.</p>
+                        <div id="games-side-pills" class="mt-4 flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Quick Routes</p>
+                        <div id="games-routes-list" class="mt-4 space-y-3"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="mega-shop-lab-panel" class="mega-panel-shell shop-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
+        <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-6 sm:py-7">
+            <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="max-w-3xl">
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+                        <h1 id="shop-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">Open The Merch Floor</h1>
+                        <p id="shop-panel-copy" class="max-w-xl text-[13px] leading-relaxed text-slate-300">The Shop menu should feel useful and desirable at the same time: what is worth opening first, what is limited, and what fits a fan fast.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
+                    <button type="button" data-shop-view="drops" class="panel-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Drops</button>
+                    <button type="button" data-shop-view="essentials" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Essentials</button>
+                    <button type="button" data-shop-view="collectors" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Collectors</button>
+                </div>
+                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
+                    <span class="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_14px_rgba(244,37,192,0.8)]"></span>
+                    Store Floor Active
+                </div>
+            </div>
+
+            <div class="mega-panel-body grid gap-5 lg:grid-cols-12">
+                <section class="stream-shell-card lg:col-span-6 min-h-0">
+                    <div id="shop-feature-stage" class="shop-feature-stage relative h-full">
+                        <div class="absolute inset-0 p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p id="shop-feature-eyebrow" class="font-mono text-[10px] uppercase tracking-[0.22em] text-pink-200">Featured Drop</p>
+                                    <div id="shop-feature-badge" class="shop-icon-badge mt-2 inline-flex items-center gap-2 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                        <span class="h-2 w-2 rounded-full bg-primary"></span>
+                                        Numbered collection
+                                    </div>
+                                </div>
+                                <span id="shop-feature-status" class="border border-primary/40 bg-primary/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-pink-100">Limited Edition</span>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                                <div class="mb-4 flex items-center gap-4">
+                                    <div class="shop-icon-badge flex h-16 w-16 items-center justify-center">
+                                        <span id="shop-feature-icon" class="material-symbols-outlined text-4xl text-primary">diamond</span>
+                                    </div>
+                                    <div>
+                                        <p id="shop-feature-tagline" class="text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">Lead with the drop that feels event-level, not just another product card.</p>
+                                        <div class="mt-3 flex items-center gap-3">
+                                            <span id="shop-feature-price" class="text-3xl font-black uppercase tracking-tight text-white">£89.00</span>
+                                            <span id="shop-feature-compare-price" class="text-base font-mono uppercase tracking-[0.16em] text-slate-500 line-through">£120.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h2 id="shop-feature-title" class="font-impact text-5xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-6xl">Spectrum Collection</h2>
+                                <p id="shop-feature-description" class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-200/90">A flagship collection that gives the Shop menu a real event feel instead of a flat merch tray.</p>
+                                <div id="shop-feature-chips" class="mt-4 flex flex-wrap gap-2"></div>
+                                <div class="mt-5 flex flex-wrap items-center gap-3">
+                                    <a id="shop-feature-primary-cta" href="{% url 'shop' %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                        Shop The Drop
+                                        <span class="material-symbols-outlined text-base">shopping_bag</span>
+                                    </a>
+                                    <a id="shop-feature-secondary-cta" href="{% url 'shop' %}" class="inline-flex items-center gap-2 border border-white/20 bg-black/50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary">
+                                        Browse Everything
+                                        <span class="material-symbols-outlined text-base">north_east</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5 min-h-0 mega-panel-column-scroll">
+                    <div class="mb-4 flex items-end justify-between gap-4">
+                        <div>
+                            <p id="shop-list-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Drop Queue</p>
+                            <h3 id="shop-list-title" class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Open First</h3>
+                        </div>
+                        <p id="shop-list-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">limited now</p>
+                    </div>
+                    <div id="shop-list" class="space-y-3"></div>
+                </section>
+
+                <section class="lg:col-span-3 min-h-0 mega-panel-column-scroll space-y-4">
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p id="shop-side-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Floor Read</p>
+                                <h3 id="shop-side-title" class="mt-2 text-xl font-black uppercase tracking-tight text-white">Why This View Works</h3>
+                            </div>
+                            <span class="shop-chip px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Store</span>
+                        </div>
+                        <p id="shop-side-note" class="mt-4 text-sm leading-relaxed text-slate-300">Each tab should help fans find the right kind of product faster instead of making them scan one long merch wall.</p>
+                        <div id="shop-benefits-list" class="mt-4 space-y-3"></div>
+                    </div>
+
+                    <div class="stream-shell-card p-5 sm:p-6">
+                        <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Quick Routes</p>
+                        <div id="shop-routes-list" class="mt-4 space-y-3"></div>
                     </div>
                 </section>
             </div>
@@ -1541,6 +1877,8 @@
     {{ mega_menu_live_json|json_script:"mega-menu-live-data" }}
     {{ mega_menu_schedule_json|json_script:"mega-menu-schedule-data" }}
     {{ mega_menu_news_json|json_script:"mega-menu-news-data" }}
+    {{ mega_menu_games_json|json_script:"mega-menu-games-data" }}
+    {{ mega_menu_shop_json|json_script:"mega-menu-shop-data" }}
     {{ mega_menu_comebacks_primary_json|json_script:"mega-menu-comeback-primary-data" }}
     {{ mega_menu_comebacks_json|json_script:"mega-menu-comebacks-data" }}
     {{ mega_menu_idol_stats_json|json_script:"mega-menu-idol-stats-data" }}
@@ -1558,7 +1896,9 @@
             const comebacksPanel = document.getElementById('mega-comebacks-lab-panel');
             const comebacksPanelInner = document.getElementById('mega-comebacks-lab-panel-inner');
             const idolsPanel = document.getElementById('mega-idols-lab-panel');
-            if (!header || !streamPanel || !livePanel || !chartsPanel || !newsPanel || !comebacksPanel || !idolsPanel) return;
+            const gamesPanel = document.getElementById('mega-games-lab-panel');
+            const shopPanel = document.getElementById('mega-shop-lab-panel');
+            if (!header || !streamPanel || !livePanel || !chartsPanel || !newsPanel || !comebacksPanel || !idolsPanel || !gamesPanel || !shopPanel) return;
             header.dataset.desktopMegaMenuInit = 'true';
 
             const desktopNav = Array.from(header.querySelectorAll('nav')).find((nav) => nav.classList.contains('md:flex'));
@@ -1573,6 +1913,8 @@
                 pricing: "{% url 'pricing' %}",
                 news: "{% url 'news' %}",
                 schedule: "{% url 'schedule' %}",
+                games: "{% url 'games' %}",
+                shop: "{% url 'shop' %}",
                 megaMenuData: "{% url 'api_header_mega_menu_data' %}"
             };
 
@@ -1601,6 +1943,8 @@
             let livePanelData = readMegaMenuJson('mega-menu-live-data', {});
             let liveScheduleData = readMegaMenuJson('mega-menu-schedule-data', []);
             let newsPanelData = readMegaMenuJson('mega-menu-news-data', {});
+            let gamesPanelData = readMegaMenuJson('mega-menu-games-data', {});
+            let shopPanelData = readMegaMenuJson('mega-menu-shop-data', {});
             let comebackPrimaryData = readMegaMenuJson('mega-menu-comeback-primary-data', {});
             let comebackCardsData = readMegaMenuJson('mega-menu-comebacks-data', []);
             let requestCountData = readMegaMenuJson('mega-menu-request-count-data', 0);
@@ -1656,6 +2000,10 @@
             const liveFeatureSecondaryCta = document.getElementById('live-feature-secondary-cta');
             const liveScheduleList = document.getElementById('live-schedule-list');
             const liveRequestCount = document.getElementById('live-request-count');
+            const liveFeatureColumn = document.getElementById('live-feature-column');
+            const liveScheduleColumn = document.getElementById('live-schedule-column');
+            const liveRequestsColumn = document.getElementById('live-requests-column');
+            const liveRequestsContent = document.getElementById('live-requests-content');
             const newsPanelTitle = document.getElementById('news-panel-title');
             const newsPanelCopy = document.getElementById('news-panel-copy');
             const newsViewTabs = Array.from(document.querySelectorAll('[data-news-view]'));
@@ -1749,6 +2097,54 @@
             const chartsLane1Title = document.getElementById('charts-lane-1-title');
             const chartsLane2Title = document.getElementById('charts-lane-2-title');
             const chartsLane3Title = document.getElementById('charts-lane-3-title');
+            const gamesPanelTitle = document.getElementById('games-panel-title');
+            const gamesPanelCopy = document.getElementById('games-panel-copy');
+            const gamesViewTabs = Array.from(document.querySelectorAll('[data-games-view]'));
+            const gamesFeatureStage = document.getElementById('games-feature-stage');
+            const gamesFeatureEyebrow = document.getElementById('games-feature-eyebrow');
+            const gamesFeatureBadge = document.getElementById('games-feature-badge');
+            const gamesFeatureStatus = document.getElementById('games-feature-status');
+            const gamesFeatureIcon = document.getElementById('games-feature-icon');
+            const gamesFeatureTagline = document.getElementById('games-feature-tagline');
+            const gamesFeatureTitle = document.getElementById('games-feature-title');
+            const gamesFeatureDescription = document.getElementById('games-feature-description');
+            const gamesFeatureChips = document.getElementById('games-feature-chips');
+            const gamesFeaturePrimaryCta = document.getElementById('games-feature-primary-cta');
+            const gamesFeatureSecondaryCta = document.getElementById('games-feature-secondary-cta');
+            const gamesListKicker = document.getElementById('games-list-kicker');
+            const gamesListTitle = document.getElementById('games-list-title');
+            const gamesListMeta = document.getElementById('games-list-meta');
+            const gamesList = document.getElementById('games-list');
+            const gamesSideKicker = document.getElementById('games-side-kicker');
+            const gamesSideTitle = document.getElementById('games-side-title');
+            const gamesSideNote = document.getElementById('games-side-note');
+            const gamesSidePills = document.getElementById('games-side-pills');
+            const gamesRoutesList = document.getElementById('games-routes-list');
+            const shopPanelTitle = document.getElementById('shop-panel-title');
+            const shopPanelCopy = document.getElementById('shop-panel-copy');
+            const shopViewTabs = Array.from(document.querySelectorAll('[data-shop-view]'));
+            const shopFeatureStage = document.getElementById('shop-feature-stage');
+            const shopFeatureEyebrow = document.getElementById('shop-feature-eyebrow');
+            const shopFeatureBadge = document.getElementById('shop-feature-badge');
+            const shopFeatureStatus = document.getElementById('shop-feature-status');
+            const shopFeatureIcon = document.getElementById('shop-feature-icon');
+            const shopFeatureTagline = document.getElementById('shop-feature-tagline');
+            const shopFeaturePrice = document.getElementById('shop-feature-price');
+            const shopFeatureComparePrice = document.getElementById('shop-feature-compare-price');
+            const shopFeatureTitle = document.getElementById('shop-feature-title');
+            const shopFeatureDescription = document.getElementById('shop-feature-description');
+            const shopFeatureChips = document.getElementById('shop-feature-chips');
+            const shopFeaturePrimaryCta = document.getElementById('shop-feature-primary-cta');
+            const shopFeatureSecondaryCta = document.getElementById('shop-feature-secondary-cta');
+            const shopListKicker = document.getElementById('shop-list-kicker');
+            const shopListTitle = document.getElementById('shop-list-title');
+            const shopListMeta = document.getElementById('shop-list-meta');
+            const shopList = document.getElementById('shop-list');
+            const shopSideKicker = document.getElementById('shop-side-kicker');
+            const shopSideTitle = document.getElementById('shop-side-title');
+            const shopSideNote = document.getElementById('shop-side-note');
+            const shopBenefitsList = document.getElementById('shop-benefits-list');
+            const shopRoutesList = document.getElementById('shop-routes-list');
 
             if (
                 !panelTagline ||
@@ -1791,8 +2187,12 @@
             let activeNewsView = 'headlines';
             let activeComebackView = 'priority';
             let activeIdolView = 'discover';
+            let activeGamesView = 'arcade';
+            let activeShopView = 'drops';
             const streamViewRotationOffset = { discover: 0, moods: 1, premium: 2 };
             const activeStreamByView = { discover: null, moods: null, premium: null };
+            const activeGameByView = { arcade: null, knowledge: null, challenge: null };
+            const activeShopByView = { drops: null, essentials: null, collectors: null };
 
             const liveViewConfig = {
                 now: {
@@ -2007,6 +2407,23 @@
                     `).join('') : '<div class="border border-white/10 bg-black/25 p-3 text-xs text-slate-400">Schedule data is not available yet.</div>';
                 }
                 if (liveRequestCount) liveRequestCount.textContent = `${requestCountData || 0} Picks`;
+                syncLiveColumnHeights();
+            };
+            const syncLiveColumnHeights = () => {
+                if (!liveFeatureColumn || !liveScheduleColumn || !liveRequestsColumn || !liveRequestsContent) return;
+                [liveFeatureColumn, liveScheduleColumn].forEach((column) => {
+                    column.style.height = '';
+                    column.style.minHeight = '';
+                    column.style.maxHeight = '';
+                });
+                if (window.innerWidth < 1024) return;
+                const targetHeight = liveRequestsContent.offsetHeight;
+                if (!targetHeight) return;
+                [liveFeatureColumn, liveScheduleColumn].forEach((column) => {
+                    column.style.height = `${targetHeight}px`;
+                    column.style.minHeight = `${targetHeight}px`;
+                    column.style.maxHeight = `${targetHeight}px`;
+                });
             };
             const getNewsFeatureForView = () => {
                 const featured = newsPanelData.featured || null;
@@ -2148,6 +2565,8 @@
                 livePanelData = payload.live || {};
                 liveScheduleData = ensureArray(payload.schedule);
                 newsPanelData = payload.news || {};
+                gamesPanelData = payload.games || {};
+                shopPanelData = payload.shop || {};
                 comebackPrimaryData = payload.comebacks_primary || {};
                 comebackCardsData = ensureArray(payload.comebacks);
                 requestCountData = payload.request_count || 0;
@@ -2163,6 +2582,10 @@
                 renderIdolViewFrame();
                 renderIdolStats();
                 renderIdolRoutesList();
+                renderGamesViewFrame();
+                renderGamesList();
+                renderShopViewFrame();
+                renderShopList();
                 renderChartViewFrame();
                 renderChartsMoversList();
                 const nextStreamId = launchStreams.some((item) => item.id === activeStreamId) ? activeStreamId : getDefaultStreamIdForView(activeStreamsView, false);
@@ -2171,6 +2594,10 @@
                 if (nextChartId) setActiveChart(nextChartId);
                 const nextIdolRouteId = idolRoutes.some((item) => item.id === activeIdolRouteId) ? activeIdolRouteId : getDefaultIdolRouteIdForView();
                 if (nextIdolRouteId) setActiveIdolRoute(nextIdolRouteId);
+                const nextGameId = getGamesForView(activeGamesView).some((item) => item.id === activeGameId) ? activeGameId : getDefaultGameIdForView(activeGamesView, true);
+                if (nextGameId) setActiveGame(nextGameId);
+                const nextShopId = getShopItemsForView(activeShopView).some((item) => item.id === activeShopId) ? activeShopId : getDefaultShopIdForView(activeShopView, true);
+                if (nextShopId) setActiveShop(nextShopId);
             };
 
             const buildTierBadge = (stream) => stream.tier === 'free'
@@ -2272,6 +2699,8 @@
 
             let activeChartId = allChartMovers.length ? allChartMovers[0].id : null;
             let activeIdolRouteId = idolRoutes.length ? idolRoutes[0].id : null;
+            let activeGameId = Array.isArray(gamesPanelData.items) && gamesPanelData.items[0] ? gamesPanelData.items[0].id : null;
+            let activeShopId = Array.isArray(shopPanelData.items) && shopPanelData.items[0] ? shopPanelData.items[0].id : null;
             let activeChartView = 'climbing';
             const chartViewRotationOffset = {
                 climbing: 0,
@@ -2307,6 +2736,449 @@
                 const words = clean.split(' ');
                 if (words.length <= maxWords) return clean;
                 return `${words.slice(0, maxWords).join(' ')}...`;
+            };
+            const buildPanelBackground = (accentRgb, secondaryRgb, stops) => {
+                const accent = accentRgb || '244, 37, 192';
+                const secondary = secondaryRgb || '0, 240, 255';
+                return `radial-gradient(circle at 18% 18%, rgba(${accent}, ${stops[0]}) 0%, transparent 34%), radial-gradient(circle at 82% 18%, rgba(${secondary}, ${stops[1]}) 0%, transparent 32%), ${stops[2]}`;
+            };
+            const buildFeatureShellBackground = (accentRgb, secondaryRgb, palette) =>
+                buildPanelBackground(accentRgb, secondaryRgb, [
+                    palette.glowAlpha,
+                    palette.secondaryAlpha,
+                    palette.baseGradient
+                ]);
+            const buildOrderedItems = (items, preferredIds) => {
+                const source = ensureArray(items);
+                const order = new Map(preferredIds.map((id, index) => [id, index]));
+                return [...source].sort((a, b) => {
+                    const aIndex = order.has(a.id) ? order.get(a.id) : preferredIds.length + source.findIndex((item) => item.id === a.id);
+                    const bIndex = order.has(b.id) ? order.get(b.id) : preferredIds.length + source.findIndex((item) => item.id === b.id);
+                    return aIndex - bIndex;
+                });
+            };
+            const uniqueNonEmpty = (values) => [...new Set(ensureArray(values).map((value) => String(value || '').trim()).filter(Boolean))];
+            const gamesViewConfig = {
+                arcade: {
+                    panelTitle: 'Enter The Arcade',
+                    panelCopy: 'Arcade mode pushes the fastest-start, highest-replay picks so the whole menu feels instantly playable.',
+                    listKicker: 'Arcade Queue',
+                    listTitle: 'Press Start',
+                    listMeta: 'quick rounds',
+                    sideKicker: 'Session Read',
+                    sideTitle: 'What This Mode Feels Like',
+                    sideNote: 'High-replay, low-friction games lead first so the menu feels alive before a user even clicks through.',
+                    primaryLabel: 'Play Now',
+                    primaryIcon: 'play_arrow',
+                    secondaryLabel: 'Open Games Hub',
+                    routeLead: 'Fast route',
+                    order: ['beat-streak', 'song-game', 'mv-matcher', 'chart-clash', 'draft-day', 'lyric-drop', 'bias-selector', 'idol-scramble', 'fandom-trivia']
+                },
+                knowledge: {
+                    panelTitle: 'Test Fan Knowledge',
+                    panelCopy: 'Knowledge mode shifts the entire panel toward lore, lyrics, clues, and memory-driven play.',
+                    listKicker: 'Knowledge Queue',
+                    listTitle: 'Know It Cold',
+                    listMeta: 'fan memory',
+                    sideKicker: 'Fan Skill Read',
+                    sideTitle: 'How This View Plays',
+                    sideNote: 'This tab turns the menu into a brainier route with stronger quiz energy and cleaner clue-led discovery.',
+                    primaryLabel: 'Test Your Knowledge',
+                    primaryIcon: 'quiz',
+                    secondaryLabel: 'See Every Challenge',
+                    routeLead: 'Deep cut',
+                    order: ['fandom-trivia', 'idol-scramble', 'lyric-drop', 'chart-clash', 'bias-selector', 'beat-streak', 'song-game', 'mv-matcher', 'draft-day']
+                },
+                challenge: {
+                    panelTitle: 'Turn Up The Pressure',
+                    panelCopy: 'Challenge mode reorders the panel around score-chasing, head-to-head tension, and tougher repeat runs.',
+                    listKicker: 'Challenge Queue',
+                    listTitle: 'Raise The Stakes',
+                    listMeta: 'high pressure',
+                    sideKicker: 'Pressure Read',
+                    sideTitle: 'Why This View Hits Harder',
+                    sideNote: 'This pass puts sharper competition cues and streak pressure at the front so the whole panel reads more intense.',
+                    primaryLabel: 'Take The Challenge',
+                    primaryIcon: 'emoji_events',
+                    secondaryLabel: 'Open All Games',
+                    routeLead: 'Pressure lane',
+                    order: ['chart-clash', 'beat-streak', 'draft-day', 'fandom-trivia', 'idol-scramble', 'song-game', 'mv-matcher', 'lyric-drop', 'bias-selector']
+                }
+            };
+            const shopViewConfig = {
+                drops: {
+                    panelTitle: 'Open The Merch Floor',
+                    panelCopy: 'Drops mode treats the menu like a live release board: what feels hottest, newest, and worth opening first.',
+                    listKicker: 'Drop Queue',
+                    listTitle: 'Open First',
+                    listMeta: 'limited now',
+                    sideKicker: 'Floor Read',
+                    sideTitle: 'Why This View Converts',
+                    sideNote: 'Lead with urgency, limited stock energy, and products that feel event-level instead of interchangeable.',
+                    primaryLabel: 'Shop The Drop',
+                    primaryIcon: 'shopping_bag',
+                    secondaryLabel: 'Browse Everything',
+                    routeLead: 'Drop route',
+                    featuredBenefit: {
+                        title: 'Drop Energy',
+                        copy: 'This view pushes urgency, fresh releases, and the merch most likely to pull a click fast.',
+                        icon: 'rocket_launch'
+                    },
+                    order: ['spectrum-collection', 'spectrum-oversized-tee', 'blink-lightstick', 'newjeans-poster', 'army-bomb', 'neon-logo-hoodie', 'photocard-binder', 'rock-star-album']
+                },
+                essentials: {
+                    panelTitle: 'Shop Everyday Essentials',
+                    panelCopy: 'Essentials mode shifts the whole panel toward practical fan staples, clean entry products, and useful merch.',
+                    listKicker: 'Core Picks',
+                    listTitle: 'Start Here',
+                    listMeta: 'easy wins',
+                    sideKicker: 'Utility Read',
+                    sideTitle: 'Why This View Feels Useful',
+                    sideNote: 'This mix helps fans get to wearable, giftable, and practical products without scanning the whole store.',
+                    primaryLabel: 'Shop Essentials',
+                    primaryIcon: 'checkroom',
+                    secondaryLabel: 'Browse Everything',
+                    routeLead: 'Core route',
+                    featuredBenefit: {
+                        title: 'Everyday Fit',
+                        copy: 'Prioritise dependable apparel, albums, and accessories that lower choice friction for first-time buyers.',
+                        icon: 'inventory_2'
+                    },
+                    order: ['neon-logo-hoodie', 'photocard-binder', 'rock-star-album', 'spectrum-oversized-tee', 'army-bomb', 'newjeans-poster', 'blink-lightstick', 'spectrum-collection']
+                },
+                collectors: {
+                    panelTitle: 'Focus Collector Picks',
+                    panelCopy: 'Collectors mode reframes the entire panel around display value, premium fandom items, and rarer-feeling pieces.',
+                    listKicker: 'Collector Queue',
+                    listTitle: 'Display Worthy',
+                    listMeta: 'premium shelf',
+                    sideKicker: 'Collector Read',
+                    sideTitle: 'What Makes This View Strong',
+                    sideNote: 'This tab foregrounds higher-signal products so the menu feels more curated, premium, and fandom-specific.',
+                    primaryLabel: 'View Collector Picks',
+                    primaryIcon: 'diamond',
+                    secondaryLabel: 'Browse Everything',
+                    routeLead: 'Collector route',
+                    featuredBenefit: {
+                        title: 'Shelf Appeal',
+                        copy: 'Lead with display-driven, premium-feeling items so the menu reads like a collector destination.',
+                        icon: 'workspace_premium'
+                    },
+                    order: ['spectrum-collection', 'army-bomb', 'blink-lightstick', 'rock-star-album', 'newjeans-poster', 'photocard-binder', 'neon-logo-hoodie', 'spectrum-oversized-tee']
+                }
+            };
+            const getGamesForView = (view) => {
+                const config = gamesViewConfig[view] || gamesViewConfig.arcade;
+                const items = ensureArray(gamesPanelData.items).filter((item) => ensureArray(item.views).includes(view));
+                return buildOrderedItems(items, config.order);
+            };
+            const getShopItemsForView = (view) => {
+                const config = shopViewConfig[view] || shopViewConfig.drops;
+                const items = ensureArray(shopPanelData.items).filter((item) => ensureArray(item.views).includes(view));
+                return buildOrderedItems(items, config.order);
+            };
+            const getDefaultGameIdForView = (view, preferStored = true) => {
+                const items = getGamesForView(view);
+                if (!items.length) return null;
+                const stored = activeGameByView[view];
+                if (preferStored && stored && items.some((item) => item.id === stored)) return stored;
+                return items[0].id;
+            };
+            const getDefaultShopIdForView = (view, preferStored = true) => {
+                const items = getShopItemsForView(view);
+                if (!items.length) return null;
+                const stored = activeShopByView[view];
+                if (preferStored && stored && items.some((item) => item.id === stored)) return stored;
+                return items[0].id;
+            };
+            const buildGameRow = (item) => `
+                <a href="${escapeHtml(item.href || urls.games)}" data-game-id="${escapeHtml(item.id)}" class="game-list-card block p-4 focus-visible:outline-none focus-visible:ring-0">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">${escapeHtml(firstNonEmpty(item.family, item.eyebrow, 'Game'))}</p>
+                            <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">${escapeHtml(item.title)}</p>
+                            <p class="mt-2 text-xs leading-relaxed text-slate-300">${escapeHtml(firstNonEmpty(item.summary, item.description, 'Open this route inside the Games hub.'))}</p>
+                        </div>
+                        <span class="game-chip px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">${escapeHtml(firstNonEmpty(item.status, 'Live'))}</span>
+                    </div>
+                </a>
+            `;
+            const buildShopRow = (item) => `
+                <a href="${escapeHtml(item.href || urls.shop)}" data-shop-item-id="${escapeHtml(item.id)}" class="shop-list-card block p-4 focus-visible:outline-none focus-visible:ring-0">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">${escapeHtml(firstNonEmpty(item.family, item.eyebrow, 'Shop'))}</p>
+                            <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">${escapeHtml(item.title)}</p>
+                            <p class="mt-2 text-xs leading-relaxed text-slate-300">${escapeHtml(firstNonEmpty(item.summary, item.description, 'Open this route inside the Shop.'))}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="shop-chip inline-flex px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">${escapeHtml(firstNonEmpty(item.status, 'Featured'))}</span>
+                            <p class="mt-3 text-xs font-black uppercase tracking-[0.08em] text-white">${escapeHtml(firstNonEmpty(item.price, 'Shop'))}</p>
+                        </div>
+                    </div>
+                </a>
+            `;
+            const buildGameRouteCard = (route) => `
+                <a href="${escapeHtml(route.href || urls.games)}" class="game-list-card stream-route-link p-4 focus-visible:outline-none focus-visible:ring-0">
+                    <div>
+                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">${escapeHtml(route.kicker)}</p>
+                        <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">${escapeHtml(route.title)}</p>
+                    </div>
+                    <span class="material-symbols-outlined text-base text-slate-400">${escapeHtml(route.icon || 'arrow_outward')}</span>
+                </a>
+            `;
+            const buildShopBenefitCard = (benefit) => `
+                <div class="shop-benefit-card p-4">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-lg text-white/85">${escapeHtml(benefit.icon || 'star')}</span>
+                        <div>
+                            <p class="text-sm font-black uppercase tracking-[0.08em] text-white">${escapeHtml(benefit.title)}</p>
+                            <p class="mt-2 text-xs leading-relaxed text-slate-300">${escapeHtml(benefit.copy)}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            const buildShopRouteCard = (route) => `
+                <a href="${escapeHtml(route.href || urls.shop)}" class="shop-route-card stream-route-link p-4 focus-visible:outline-none focus-visible:ring-0">
+                    <div>
+                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">${escapeHtml(route.kicker)}</p>
+                        <p class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">${escapeHtml(route.title)}</p>
+                    </div>
+                    <span class="material-symbols-outlined text-base text-slate-400">${escapeHtml(route.icon || 'arrow_outward')}</span>
+                </a>
+            `;
+            const renderGamesViewFrame = () => {
+                const view = gamesViewConfig[activeGamesView] || gamesViewConfig.arcade;
+                gamesViewTabs.forEach((button) => {
+                    const isActive = button.getAttribute('data-games-view') === activeGamesView;
+                    button.classList.toggle('active', isActive);
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+                if (gamesPanelTitle) gamesPanelTitle.textContent = view.panelTitle;
+                if (gamesPanelCopy) gamesPanelCopy.textContent = view.panelCopy;
+                if (gamesListKicker) gamesListKicker.textContent = view.listKicker;
+                if (gamesListTitle) gamesListTitle.textContent = view.listTitle;
+                if (gamesListMeta) gamesListMeta.textContent = view.listMeta;
+                if (gamesSideKicker) gamesSideKicker.textContent = view.sideKicker;
+                if (gamesSideTitle) gamesSideTitle.textContent = view.sideTitle;
+            };
+            const renderGamesList = () => {
+                if (!gamesList) return;
+                const items = getGamesForView(activeGamesView);
+                if (!items.length) {
+                    gamesList.innerHTML = '<div class="game-list-card block p-4 text-xs text-slate-400">Game routes are syncing right now.</div>';
+                    if (gamesRoutesList) gamesRoutesList.innerHTML = '<div class="game-list-card block p-4 text-xs text-slate-400">Open the Games hub for the full catalogue.</div>';
+                    return;
+                }
+                gamesList.innerHTML = items.map(buildGameRow).join('');
+                highlightActiveGame();
+            };
+            const renderGamesRoutes = () => {
+                if (!gamesRoutesList) return;
+                const items = getGamesForView(activeGamesView);
+                if (!items.length) {
+                    gamesRoutesList.innerHTML = '<div class="game-list-card block p-4 text-xs text-slate-400">Open the Games hub for the full catalogue.</div>';
+                    return;
+                }
+                const currentView = gamesViewConfig[activeGamesView] || gamesViewConfig.arcade;
+                const sideRoutes = [
+                    { href: urls.games, kicker: currentView.routeLead, title: `Open ${currentView.listTitle}`, icon: 'arrow_outward' },
+                    ...items.filter((item) => item.id !== activeGameId).slice(0, 2).map((item) => ({
+                        href: item.href || urls.games,
+                        kicker: item.family || item.status || 'Game route',
+                        title: item.title,
+                        icon: item.icon || 'stadia_controller'
+                    }))
+                ];
+                gamesRoutesList.innerHTML = sideRoutes.map(buildGameRouteCard).join('');
+            };
+            const highlightActiveGame = () => {
+                if (!gamesList) return;
+                gamesList.querySelectorAll('[data-game-id]').forEach((row) => {
+                    row.classList.toggle('active', row.getAttribute('data-game-id') === activeGameId);
+                });
+            };
+            const setActiveGame = (gameId) => {
+                const items = getGamesForView(activeGamesView);
+                const game = items.find((item) => item.id === gameId);
+                if (!game) return;
+                const view = gamesViewConfig[activeGamesView] || gamesViewConfig.arcade;
+                activeGameId = game.id;
+                if (Object.prototype.hasOwnProperty.call(activeGameByView, activeGamesView)) {
+                    activeGameByView[activeGamesView] = game.id;
+                }
+                gamesPanel.style.setProperty('--games-accent', game.accentRgb || '0, 240, 255');
+                gamesPanel.style.setProperty('--games-secondary', game.secondaryRgb || '244, 37, 192');
+                if (gamesFeatureStage) {
+                    gamesFeatureStage.style.background = buildFeatureShellBackground(
+                        game.accentRgb,
+                        game.secondaryRgb,
+                        {
+                            glowAlpha: '0.28',
+                            secondaryAlpha: '0.18',
+                            baseGradient: 'linear-gradient(145deg, rgba(4, 11, 16, 0.96), rgba(7, 8, 16, 0.95) 58%, rgba(4, 6, 12, 0.98))'
+                        }
+                    );
+                }
+                if (gamesFeatureEyebrow) gamesFeatureEyebrow.textContent = firstNonEmpty(game.eyebrow, game.family, 'Arcade Spotlight');
+                if (gamesFeatureBadge) {
+                    gamesFeatureBadge.innerHTML = `<span class="h-2 w-2 rounded-full bg-secondary"></span>${escapeHtml(firstNonEmpty(game.metric_note, `${game.family} mode`, 'Fast replay loop'))}`;
+                }
+                if (gamesFeatureStatus) gamesFeatureStatus.textContent = firstNonEmpty(game.status, 'Featured');
+                if (gamesFeatureIcon) gamesFeatureIcon.textContent = firstNonEmpty(game.icon, 'stadia_controller');
+                if (gamesFeatureTagline) gamesFeatureTagline.textContent = firstNonEmpty(game.summary, game.metric_note, 'Pick the route that gets the player moving fast.');
+                if (gamesFeatureTitle) gamesFeatureTitle.textContent = firstNonEmpty(game.title, 'Game Highlight');
+                if (gamesFeatureDescription) gamesFeatureDescription.textContent = firstNonEmpty(game.description, game.summary, 'Game detail is updating.');
+                if (gamesFeatureChips) {
+                    gamesFeatureChips.innerHTML = buildChipMarkup(
+                        uniqueNonEmpty([game.family, ...ensureArray(game.tags), game.metric]),
+                        'game-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]'
+                    );
+                }
+                if (gamesFeaturePrimaryCta) {
+                    gamesFeaturePrimaryCta.href = game.href || urls.games;
+                    gamesFeaturePrimaryCta.innerHTML = `${escapeHtml(view.primaryLabel)}<span class="material-symbols-outlined text-base">${escapeHtml(view.primaryIcon)}</span>`;
+                }
+                if (gamesFeatureSecondaryCta) {
+                    gamesFeatureSecondaryCta.href = urls.games;
+                    gamesFeatureSecondaryCta.innerHTML = `${escapeHtml(view.secondaryLabel)}<span class="material-symbols-outlined text-base">north_east</span>`;
+                }
+                if (gamesSideNote) {
+                    gamesSideNote.textContent = `${view.sideNote} ${firstNonEmpty(game.summary, game.metric_note, 'Open the Games hub for more routes.')}`;
+                }
+                if (gamesSidePills) {
+                    gamesSidePills.innerHTML = buildChipMarkup(
+                        uniqueNonEmpty([game.family, game.metric, game.metric_note, ...ensureArray(game.tags).slice(0, 2)]),
+                        'game-chip px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]'
+                    );
+                }
+                renderGamesRoutes();
+                highlightActiveGame();
+            };
+            const getShopBenefitsForView = (view, item) => {
+                const config = shopViewConfig[view] || shopViewConfig.drops;
+                const base = ensureArray(shopPanelData.benefits);
+                const baseOrder = view === 'essentials' ? [0, 2, 1] : (view === 'collectors' ? [1, 0, 2] : [1, 2, 0]);
+                const orderedBase = baseOrder
+                    .map((index) => base[index])
+                    .filter(Boolean);
+                const dynamicCard = {
+                    title: config.featuredBenefit.title,
+                    copy: `${config.featuredBenefit.copy} ${firstNonEmpty(item.summary, '')}`.trim(),
+                    icon: config.featuredBenefit.icon
+                };
+                return [dynamicCard, ...orderedBase.slice(0, 2)];
+            };
+            const renderShopViewFrame = () => {
+                const view = shopViewConfig[activeShopView] || shopViewConfig.drops;
+                shopViewTabs.forEach((button) => {
+                    const isActive = button.getAttribute('data-shop-view') === activeShopView;
+                    button.classList.toggle('active', isActive);
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+                if (shopPanelTitle) shopPanelTitle.textContent = view.panelTitle;
+                if (shopPanelCopy) shopPanelCopy.textContent = view.panelCopy;
+                if (shopListKicker) shopListKicker.textContent = view.listKicker;
+                if (shopListTitle) shopListTitle.textContent = view.listTitle;
+                if (shopListMeta) shopListMeta.textContent = view.listMeta;
+                if (shopSideKicker) shopSideKicker.textContent = view.sideKicker;
+                if (shopSideTitle) shopSideTitle.textContent = view.sideTitle;
+            };
+            const renderShopList = () => {
+                if (!shopList) return;
+                const items = getShopItemsForView(activeShopView);
+                if (!items.length) {
+                    shopList.innerHTML = '<div class="shop-list-card block p-4 text-xs text-slate-400">Shop picks are syncing right now.</div>';
+                    if (shopRoutesList) shopRoutesList.innerHTML = '<div class="shop-route-card block p-4 text-xs text-slate-400">Open the Shop for the full collection.</div>';
+                    return;
+                }
+                shopList.innerHTML = items.map(buildShopRow).join('');
+                highlightActiveShop();
+            };
+            const renderShopRoutes = () => {
+                if (!shopRoutesList) return;
+                const items = getShopItemsForView(activeShopView);
+                if (!items.length) {
+                    shopRoutesList.innerHTML = '<div class="shop-route-card block p-4 text-xs text-slate-400">Open the Shop for the full collection.</div>';
+                    return;
+                }
+                const view = shopViewConfig[activeShopView] || shopViewConfig.drops;
+                const routes = [
+                    { href: urls.shop, kicker: view.routeLead, title: `Open ${view.listTitle}`, icon: 'arrow_outward' },
+                    ...items.filter((item) => item.id !== activeShopId).slice(0, 2).map((item) => ({
+                        href: item.href || urls.shop,
+                        kicker: item.family || item.status || 'Shop route',
+                        title: `${item.title}${item.price ? ` - ${item.price}` : ''}`,
+                        icon: item.icon || 'shopping_bag'
+                    }))
+                ];
+                shopRoutesList.innerHTML = routes.map(buildShopRouteCard).join('');
+            };
+            const highlightActiveShop = () => {
+                if (!shopList) return;
+                shopList.querySelectorAll('[data-shop-item-id]').forEach((row) => {
+                    row.classList.toggle('active', row.getAttribute('data-shop-item-id') === activeShopId);
+                });
+            };
+            const setActiveShop = (itemId) => {
+                const items = getShopItemsForView(activeShopView);
+                const item = items.find((entry) => entry.id === itemId);
+                if (!item) return;
+                const view = shopViewConfig[activeShopView] || shopViewConfig.drops;
+                activeShopId = item.id;
+                if (Object.prototype.hasOwnProperty.call(activeShopByView, activeShopView)) {
+                    activeShopByView[activeShopView] = item.id;
+                }
+                shopPanel.style.setProperty('--shop-accent', item.accentRgb || '244, 37, 192');
+                shopPanel.style.setProperty('--shop-secondary', item.secondaryRgb || '0, 240, 255');
+                if (shopFeatureStage) {
+                    shopFeatureStage.style.background = buildFeatureShellBackground(
+                        item.accentRgb,
+                        item.secondaryRgb,
+                        {
+                            glowAlpha: '0.24',
+                            secondaryAlpha: '0.16',
+                            baseGradient: 'linear-gradient(145deg, rgba(13, 7, 12, 0.96), rgba(7, 8, 16, 0.95) 58%, rgba(4, 6, 12, 0.98))'
+                        }
+                    );
+                }
+                if (shopFeatureEyebrow) shopFeatureEyebrow.textContent = firstNonEmpty(item.eyebrow, item.family, 'Featured Drop');
+                if (shopFeatureBadge) {
+                    shopFeatureBadge.innerHTML = `<span class="h-2 w-2 rounded-full bg-primary"></span>${escapeHtml(firstNonEmpty(item.family, item.status, 'Store Spotlight'))}`;
+                }
+                if (shopFeatureStatus) shopFeatureStatus.textContent = firstNonEmpty(item.status, 'Featured');
+                if (shopFeatureIcon) shopFeatureIcon.textContent = firstNonEmpty(item.icon, 'shopping_bag');
+                if (shopFeatureTagline) shopFeatureTagline.textContent = firstNonEmpty(item.summary, 'Lead with the product that gives the Shop panel an unmistakable reason to click.');
+                if (shopFeaturePrice) shopFeaturePrice.textContent = firstNonEmpty(item.price, 'Shop');
+                if (shopFeatureComparePrice) {
+                    const comparePrice = firstNonEmpty(item.comparePrice, '');
+                    shopFeatureComparePrice.textContent = comparePrice;
+                    shopFeatureComparePrice.classList.toggle('hidden', !comparePrice);
+                }
+                if (shopFeatureTitle) shopFeatureTitle.textContent = firstNonEmpty(item.title, 'Featured Product');
+                if (shopFeatureDescription) shopFeatureDescription.textContent = firstNonEmpty(item.description, item.summary, 'Product detail is updating.');
+                if (shopFeatureChips) {
+                    shopFeatureChips.innerHTML = buildChipMarkup(
+                        uniqueNonEmpty([item.family, ...ensureArray(item.tags)]),
+                        'shop-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]'
+                    );
+                }
+                if (shopFeaturePrimaryCta) {
+                    shopFeaturePrimaryCta.href = item.href || urls.shop;
+                    shopFeaturePrimaryCta.innerHTML = `${escapeHtml(view.primaryLabel)}<span class="material-symbols-outlined text-base">${escapeHtml(view.primaryIcon)}</span>`;
+                }
+                if (shopFeatureSecondaryCta) {
+                    shopFeatureSecondaryCta.href = urls.shop;
+                    shopFeatureSecondaryCta.innerHTML = `${escapeHtml(view.secondaryLabel)}<span class="material-symbols-outlined text-base">north_east</span>`;
+                }
+                if (shopSideNote) {
+                    shopSideNote.textContent = `${view.sideNote} ${firstNonEmpty(item.summary, item.description, 'Browse the Shop for more products.')}`;
+                }
+                if (shopBenefitsList) {
+                    shopBenefitsList.innerHTML = getShopBenefitsForView(activeShopView, item).map(buildShopBenefitCard).join('');
+                }
+                renderShopRoutes();
+                highlightActiveShop();
             };
             const chartCardLead = {
                 climbing: ['Fast climb', 'Steady rise', 'Breakout push'],
@@ -2665,6 +3537,10 @@
             renderNewsViewFrame();
             renderComebackViewFrame();
             renderIdolViewFrame();
+            renderGamesViewFrame();
+            renderGamesList();
+            renderShopViewFrame();
+            renderShopList();
             renderChartViewFrame();
             renderChartsMoversList();
             renderLiveContent();
@@ -2678,9 +3554,15 @@
             if (initialChartId) activeChartId = initialChartId;
             const initialIdolRouteId = getDefaultIdolRouteIdForView();
             if (initialIdolRouteId) activeIdolRouteId = initialIdolRouteId;
+            const initialGameId = getDefaultGameIdForView(activeGamesView, false);
+            if (initialGameId) activeGameId = initialGameId;
+            const initialShopId = getDefaultShopIdForView(activeShopView, false);
+            if (initialShopId) activeShopId = initialShopId;
             setActiveStream(activeStreamId);
             if (activeChartId) setActiveChart(activeChartId);
             setActiveIdolRoute(activeIdolRouteId);
+            if (activeGameId) setActiveGame(activeGameId);
+            if (activeShopId) setActiveShop(activeShopId);
 
             const previewStream = (event) => {
                 const row = event.target.closest('[data-stream-id]');
@@ -2698,6 +3580,16 @@
                 const row = event.target.closest('[data-idol-route]');
                 if (!row) return;
                 setActiveIdolRoute(row.getAttribute('data-idol-route'));
+            };
+            const previewGame = (event) => {
+                const row = event.target.closest('[data-game-id]');
+                if (!row) return;
+                setActiveGame(row.getAttribute('data-game-id'));
+            };
+            const previewShop = (event) => {
+                const row = event.target.closest('[data-shop-item-id]');
+                if (!row) return;
+                setActiveShop(row.getAttribute('data-shop-item-id'));
             };
 
             streamList.addEventListener('mouseover', previewStream);
@@ -2728,6 +3620,7 @@
                     renderLiveContent();
                 });
             });
+            window.addEventListener('resize', syncLiveColumnHeights);
             streamViewTabs.forEach((tab) => {
                 tab.addEventListener('click', () => {
                     const nextView = tab.getAttribute('data-stream-view');
@@ -2772,6 +3665,38 @@
                 idolsRoutesList.addEventListener('focusin', previewIdolRoute);
                 idolsRoutesList.addEventListener('click', previewIdolRoute);
             }
+            if (gamesList) {
+                gamesList.addEventListener('mouseover', previewGame);
+                gamesList.addEventListener('focusin', previewGame);
+                gamesList.addEventListener('click', previewGame);
+            }
+            gamesViewTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const nextView = tab.getAttribute('data-games-view');
+                    if (!nextView || nextView === activeGamesView) return;
+                    activeGamesView = nextView;
+                    renderGamesViewFrame();
+                    renderGamesList();
+                    const nextGameId = getDefaultGameIdForView(activeGamesView, true);
+                    if (nextGameId) setActiveGame(nextGameId);
+                });
+            });
+            if (shopList) {
+                shopList.addEventListener('mouseover', previewShop);
+                shopList.addEventListener('focusin', previewShop);
+                shopList.addEventListener('click', previewShop);
+            }
+            shopViewTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const nextView = tab.getAttribute('data-shop-view');
+                    if (!nextView || nextView === activeShopView) return;
+                    activeShopView = nextView;
+                    renderShopViewFrame();
+                    renderShopList();
+                    const nextShopId = getDefaultShopIdForView(activeShopView, true);
+                    if (nextShopId) setActiveShop(nextShopId);
+                });
+            });
 
             let premiumTitleIndex = 0;
 
@@ -2792,6 +3717,8 @@
             const newsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.news);
             const comebacksTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.timeline);
             const idolsTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.idols);
+            const gamesTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.games);
+            const shopTrigger = Array.from(desktopNav.querySelectorAll('a')).find((link) => link.getAttribute('href') === urls.shop);
 
             if (liveTrigger) {
                 liveTrigger.id = 'mega-live-trigger';
@@ -2818,6 +3745,16 @@
                 idolsTrigger.setAttribute('aria-expanded', 'false');
                 idolsTrigger.setAttribute('aria-controls', 'mega-idols-lab-panel');
             }
+            if (gamesTrigger) {
+                gamesTrigger.id = 'mega-games-trigger';
+                gamesTrigger.setAttribute('aria-expanded', 'false');
+                gamesTrigger.setAttribute('aria-controls', 'mega-games-lab-panel');
+            }
+            if (shopTrigger) {
+                shopTrigger.id = 'mega-shop-trigger';
+                shopTrigger.setAttribute('aria-expanded', 'false');
+                shopTrigger.setAttribute('aria-controls', 'mega-shop-lab-panel');
+            }
 
             const positionPanel = (targetPanel) => {
                 const rect = header.getBoundingClientRect();
@@ -2825,18 +3762,20 @@
             };
 
             const syncAllPanelHeightsNoScroll = () => {
-                const panels = [livePanel, chartsPanel, newsPanel, comebacksPanel, streamPanel, idolsPanel];
-                const tallestPanel = Math.max(...panels.map((panel) => panel.scrollHeight || 0));
-                if (!tallestPanel) return;
+                const panels = [livePanel, chartsPanel, newsPanel, comebacksPanel, streamPanel, idolsPanel, gamesPanel, shopPanel].filter(Boolean);
+                if (!panels.length) return;
+                if (window.innerWidth < desktopBreakpoint) {
+                    panels.forEach((panel) => panel.style.removeProperty('--mega-panel-height'));
+                    return;
+                }
+                const rect = header.getBoundingClientRect();
+                const availableHeight = Math.floor(window.innerHeight - Math.max(0, rect.bottom) - 20);
+                const stageHeight = Math.max(320, Math.min(760, availableHeight));
                 panels.forEach((panel) => {
-                    panel.style.maxHeight = `${tallestPanel}px`;
-                    panel.style.overflowY = 'hidden';
+                    panel.style.setProperty('--mega-panel-height', `${stageHeight}px`);
+                    panel.style.overflow = 'hidden';
                     panel.style.overflowX = 'hidden';
                 });
-                if (comebacksPanelInner) {
-                    comebacksPanelInner.style.maxHeight = 'none';
-                    comebacksPanelInner.style.overflowY = 'visible';
-                }
             };
 
             const desktopBreakpoint = 768;
@@ -2954,6 +3893,32 @@
                     }
                 };
             }
+            if (gamesTrigger && gamesPanel) {
+                panelConfigs.games = {
+                    trigger: gamesTrigger,
+                    panel: gamesPanel,
+                    onShow: () => {
+                        activeGamesView = 'arcade';
+                        renderGamesViewFrame();
+                        renderGamesList();
+                        const defaultGameId = getDefaultGameIdForView(activeGamesView, false);
+                        if (defaultGameId) setActiveGame(defaultGameId);
+                    }
+                };
+            }
+            if (shopTrigger && shopPanel) {
+                panelConfigs.shop = {
+                    trigger: shopTrigger,
+                    panel: shopPanel,
+                    onShow: () => {
+                        activeShopView = 'drops';
+                        renderShopViewFrame();
+                        renderShopList();
+                        const defaultShopId = getDefaultShopIdForView(activeShopView, false);
+                        if (defaultShopId) setActiveShop(defaultShopId);
+                    }
+                };
+            }
             if (streamsTrigger && streamPanel) {
                 panelConfigs.streams = {
                     trigger: streamsTrigger,
@@ -3004,6 +3969,7 @@
                 const config = panelConfigs[key];
                 if (!config) return;
                 config.onShow();
+                syncAllPanelHeightsNoScroll();
                 positionPanel(config.panel);
                 config.panel.classList.remove('mega-panel-hidden');
                 config.panel.classList.add('mega-panel-open');
@@ -3019,7 +3985,7 @@
             };
 
             const getTriggerKeyFromElement = (element) => {
-                const trigger = element?.closest?.('#mega-live-trigger, #mega-streams-trigger, #mega-charts-trigger, #mega-news-trigger, #mega-comebacks-trigger, #mega-idols-trigger');
+                const trigger = element?.closest?.('#mega-live-trigger, #mega-streams-trigger, #mega-charts-trigger, #mega-news-trigger, #mega-comebacks-trigger, #mega-idols-trigger, #mega-games-trigger, #mega-shop-trigger');
                 if (!trigger) return null;
                 if (trigger.id === 'mega-live-trigger') return 'live';
                 if (trigger.id === 'mega-streams-trigger') return 'streams';
@@ -3027,6 +3993,8 @@
                 if (trigger.id === 'mega-news-trigger') return 'news';
                 if (trigger.id === 'mega-comebacks-trigger') return 'comebacks';
                 if (trigger.id === 'mega-idols-trigger') return 'idols';
+                if (trigger.id === 'mega-games-trigger') return 'games';
+                if (trigger.id === 'mega-shop-trigger') return 'shop';
                 return null;
             };
 
@@ -3059,6 +4027,16 @@
                 idolsTrigger.addEventListener('focus', () => openPanel('idols', { pinned: true }));
                 idolsTrigger.addEventListener('mouseleave', queueClose);
             }
+            if (gamesTrigger) {
+                gamesTrigger.addEventListener('mouseenter', () => openPanel('games', { pinned: true }));
+                gamesTrigger.addEventListener('focus', () => openPanel('games', { pinned: true }));
+                gamesTrigger.addEventListener('mouseleave', queueClose);
+            }
+            if (shopTrigger) {
+                shopTrigger.addEventListener('mouseenter', () => openPanel('shop', { pinned: true }));
+                shopTrigger.addEventListener('focus', () => openPanel('shop', { pinned: true }));
+                shopTrigger.addEventListener('mouseleave', queueClose);
+            }
 
             if (streamsTrigger) {
                 streamsTrigger.addEventListener('mouseenter', () => openPanel('streams', { pinned: true }));
@@ -3076,7 +4054,7 @@
                 if (!key) return;
                 openPanel(key, { pinned: true });
             });
-            [livePanel, chartsPanel, newsPanel, comebacksPanel, idolsPanel, streamPanel].filter(Boolean).forEach((targetPanel) => {
+            [livePanel, chartsPanel, newsPanel, comebacksPanel, idolsPanel, gamesPanel, shopPanel, streamPanel].filter(Boolean).forEach((targetPanel) => {
                 targetPanel.addEventListener('mouseenter', () => clearTimeout(hideTimer));
                 targetPanel.addEventListener('mouseleave', queueClose);
                 targetPanel.addEventListener('focusin', () => clearTimeout(hideTimer));
@@ -3090,12 +4068,16 @@
                     event.target.closest('#mega-news-lab-panel') ||
                     event.target.closest('#mega-comebacks-lab-panel') ||
                     event.target.closest('#mega-idols-lab-panel') ||
+                    event.target.closest('#mega-games-lab-panel') ||
+                    event.target.closest('#mega-shop-lab-panel') ||
                     event.target.closest('#mega-streams-trigger') ||
                     event.target.closest('#mega-live-trigger') ||
                     event.target.closest('#mega-charts-trigger') ||
                     event.target.closest('#mega-news-trigger') ||
                     event.target.closest('#mega-comebacks-trigger') ||
-                    event.target.closest('#mega-idols-trigger')
+                    event.target.closest('#mega-idols-trigger') ||
+                    event.target.closest('#mega-games-trigger') ||
+                    event.target.closest('#mega-shop-trigger')
                 ) return;
                 hideAllPanels();
             });

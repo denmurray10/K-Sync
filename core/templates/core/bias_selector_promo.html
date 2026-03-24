@@ -1,0 +1,416 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="utf-8"/>
+    {% include 'core/seo_meta.html' %}
+    <title>Bias Selector - K-Beats Games</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: {
+                    sans: ['Montserrat', 'sans-serif'],
+                    display: ['Cinzel', 'serif']
+                },
+                borderRadius: {
+                    DEFAULT: '0px', sm: '0px', md: '0px', lg: '0px', xl: '0px', '2xl': '0px', '3xl': '0px', full: '9999px'
+                }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; background: #000; overflow-x: hidden; }
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(244,37,192,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,240,255,0.05) 1px, transparent 1px);
+            background-size: 42px 42px;
+        }
+        .reveal, .reveal-left, .reveal-right {
+            opacity: 0;
+            transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16,1,0.3,1);
+        }
+        .reveal { transform: translateY(30px); }
+        .reveal-left { transform: translateX(-30px); }
+        .reveal-right { transform: translateX(30px); }
+        .reveal.visible, .reveal-left.visible, .reveal-right.visible {
+            opacity: 1;
+            transform: none;
+        }
+        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes floatCard { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .animate-ticker { animation: ticker 24s linear infinite; }
+        .animate-float-card { animation: floatCard 5s ease-in-out infinite; }
+        .hero-stroke { -webkit-text-stroke: 1.5px #f425c0; color: transparent; }
+        .hero-stroke-cyan { -webkit-text-stroke: 1.4px #00f0ff; color: transparent; }
+        .panel-glow { box-shadow: 0 0 40px rgba(244,37,192,0.12); }
+        .panel-glow-cyan { box-shadow: 0 0 40px rgba(0,240,255,0.12); }
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-left, .reveal-right, .animate-ticker, .animate-float-card {
+                animation: none !important;
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans text-white">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/88 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+            <a href="{% url 'games' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-lg">arrow_back</span>
+                <span class="font-mono text-[10px] uppercase tracking-[0.28em]">K-Beats Games</span>
+            </a>
+            <div class="hidden md:flex items-center gap-2 text-white">
+                <span class="material-symbols-outlined text-primary text-sm">favorite</span>
+                <span class="font-black uppercase tracking-[0.18em] text-xs">Bias Selector</span>
+            </div>
+            <a href="{% url 'bias_selector_game' %}" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-5 py-2 border border-primary hover:bg-black hover:text-primary transition-colors">
+                Start Quiz
+            </a>
+        </div>
+    </nav>
+
+    <section class="relative min-h-screen overflow-hidden grid-bg" style="padding-top: 110px;">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,37,192,0.18),transparent_38%),radial-gradient(circle_at_bottom_right,rgba(0,240,255,0.16),transparent_38%)]"></div>
+        <div class="relative z-10 max-w-6xl mx-auto px-6 pb-20">
+            <div class="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+                <div class="reveal">
+                    <div class="inline-flex items-center gap-2 border border-primary/30 bg-primary/5 px-4 py-2 mb-8">
+                        <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                        <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-primary">K-Beats Match Lab</span>
+                    </div>
+                    <h1 class="font-display text-[clamp(3.7rem,11vw,8.8rem)] leading-[0.9] uppercase tracking-tight mb-5">
+                        <span class="block">BIAS</span>
+                        <span class="block hero-stroke">SELECTOR</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-slate-300 max-w-xl leading-relaxed mb-4">
+                        The K-Pop match quiz built for fan instinct, not personality-test fluff.
+                    </p>
+                    <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-slate-500 mb-10">
+                        audio picks . visual pulls . stage-energy prompts
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                        <a href="{% url 'bias_selector_game' %}" class="inline-flex items-center justify-center gap-3 bg-primary text-black font-black uppercase tracking-[0.22em] text-sm px-10 py-5 border-2 border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                            <span class="material-symbols-outlined">play_arrow</span>
+                            Start Bias Selector
+                        </a>
+                        <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 border border-white/15 text-white font-black uppercase tracking-[0.18em] text-[11px] px-8 py-5 hover:border-secondary hover:text-secondary transition-colors">
+                            <span class="material-symbols-outlined text-base">south</span>
+                            See How It Works
+                        </a>
+                    </div>
+                    <div class="grid sm:grid-cols-3 gap-0 border border-white/10 max-w-2xl">
+                        <div class="p-5 border-b sm:border-b-0 sm:border-r border-white/10">
+                            <span class="block font-black text-3xl text-white">10</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">question flow</span>
+                        </div>
+                        <div class="p-5 border-b sm:border-b-0 sm:border-r border-white/10">
+                            <span class="block font-black text-3xl text-primary">mix</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">audio + image + vibe</span>
+                        </div>
+                        <div class="p-5">
+                            <span class="block font-black text-3xl text-secondary">1</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">bias reveal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reveal-right">
+                    <div class="border border-white/10 bg-black/75 panel-glow animate-float-card">
+                        <div class="grid grid-cols-2 border-b border-white/10">
+                            <div class="p-4 border-r border-white/10">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-slate-500 mb-2">Audio Pick</p>
+                                {% if hero_artist_primary %}
+                                <div class="aspect-[4/5] overflow-hidden border border-white/10 mb-3">
+                                    <img src="{{ hero_artist_primary.image_url }}" alt="{{ hero_artist_primary.name }}" class="w-full h-full object-cover"/>
+                                </div>
+                                <p class="font-black uppercase tracking-tight text-lg">{{ hero_artist_primary.name }}</p>
+                                <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-primary mt-1">{{ hero_artist_primary.group_type }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="p-4">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-slate-500 mb-2">Visual Pull</p>
+                                {% if hero_artist_secondary %}
+                                <div class="aspect-[4/5] overflow-hidden border border-secondary/20 mb-3">
+                                    <img src="{{ hero_artist_secondary.image_url }}" alt="{{ hero_artist_secondary.name }}" class="w-full h-full object-cover"/>
+                                </div>
+                                <p class="font-black uppercase tracking-tight text-lg">{{ hero_artist_secondary.name }}</p>
+                                <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-secondary mt-1">{{ hero_artist_secondary.label }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="p-5 border-b border-white/10">
+                            <p class="font-mono text-[9px] uppercase tracking-[0.28em] text-primary mb-2">Live Outcome</p>
+                            {% if hero_artist_tertiary %}
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 overflow-hidden border border-white/10 shrink-0">
+                                    <img src="{{ hero_artist_tertiary.image_url }}" alt="{{ hero_artist_tertiary.name }}" class="w-full h-full object-cover"/>
+                                </div>
+                                <div>
+                                    <p class="font-black text-xl uppercase tracking-tight">{{ hero_artist_tertiary.name }}</p>
+                                    <p class="text-slate-400 text-sm">Matched for high-drama stage energy, visual confidence, and fan-first replay pull.</p>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p class="text-slate-400 text-sm">Answer the quiz and Bias Selector builds a match from your picks in real time.</p>
+                            {% endif %}
+                        </div>
+                        <div class="grid grid-cols-3 gap-0">
+                            <div class="p-4 border-r border-white/10">
+                                <p class="font-black text-white text-xl">A/B</p>
+                                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">blind listens</p>
+                            </div>
+                            <div class="p-4 border-r border-white/10">
+                                <p class="font-black text-primary text-xl">VIBE</p>
+                                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">spectrum sliders</p>
+                            </div>
+                            <div class="p-4">
+                                <p class="font-black text-secondary text-xl">SET</p>
+                                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">save your bias</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="bg-primary/10 border-y border-primary/20 py-3 overflow-hidden">
+        <div class="animate-ticker whitespace-nowrap flex gap-16 text-[10px] font-black uppercase tracking-[0.3em] text-primary/65">
+            <span>Bias Selector</span><span class="text-primary/30">.</span>
+            <span>Share-Ready Result</span><span class="text-primary/30">.</span>
+            <span>Blind Audio Picks</span><span class="text-primary/30">.</span>
+            <span>Visual Taste Checks</span><span class="text-primary/30">.</span>
+            <span>Replay With Friends</span><span class="text-primary/30">.</span>
+            <span>Bias Selector</span><span class="text-primary/30">.</span>
+            <span>Share-Ready Result</span><span class="text-primary/30">.</span>
+            <span>Blind Audio Picks</span><span class="text-primary/30">.</span>
+            <span>Visual Taste Checks</span><span class="text-primary/30">.</span>
+            <span>Replay With Friends</span><span class="text-primary/30">.</span>
+        </div>
+    </div>
+
+    <section id="how-it-works" class="py-24 md:py-32 px-6 max-w-6xl mx-auto">
+        <div class="reveal text-center mb-16">
+            <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary mb-3">How It Works</p>
+            <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none">
+                A Match Flow<br/><span class="hero-stroke-cyan">Built Like A Game</span>
+            </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10">
+            <div class="reveal p-10 md:p-12 border-b md:border-b-0 md:border-r border-white/10 hover:bg-white/[0.02] transition-colors">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6">01</div>
+                <div class="w-12 h-12 border border-primary/30 bg-primary/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-primary">headphones</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Pick By Instinct</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">The quiz mixes blind audio rounds, aesthetic face-offs, and quick choice prompts so your answers feel reactive, not overthought.</p>
+            </div>
+            <div class="reveal p-10 md:p-12 border-b md:border-b-0 md:border-r border-white/10 hover:bg-white/[0.02] transition-colors" style="transition-delay:0.08s">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6">02</div>
+                <div class="w-12 h-12 border border-secondary/30 bg-secondary/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-secondary">tune</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Build a Fan Profile</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Each answer shapes a signal map around energy, concept preference, group type, and the performance style you come back to most.</p>
+            </div>
+            <div class="reveal p-10 md:p-12 hover:bg-white/[0.02] transition-colors" style="transition-delay:0.16s">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6">03</div>
+                <div class="w-12 h-12 border border-white/20 bg-white/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-white">favorite</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Lock In the Match</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Land on a bias result with a short explanation, then save it to your profile or rerun the quiz to compare outcomes with friends.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 px-6 bg-white/[0.02] border-y border-white/5">
+        <div class="max-w-6xl mx-auto">
+            <div class="reveal text-center mb-16">
+                <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">What Makes It Different</p>
+                <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none">
+                    Less Quiz Filler.<br/><span class="hero-stroke">More Fan Signal.</span>
+                </h2>
+            </div>
+            <div class="grid md:grid-cols-[0.95fr_1.05fr] gap-8 items-start">
+                <div class="reveal-left border border-white/10 bg-black/70 panel-glow p-8">
+                    <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500 mb-6">Question Mix</p>
+                    <div class="space-y-5">
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-primary mt-0.5">graphic_eq</span>
+                            <div>
+                                <p class="font-black uppercase tracking-tight text-lg">Blind audio rounds</p>
+                                <p class="text-slate-500 text-sm">Choose between two sonic moods before names or fandom loyalty can interfere.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-secondary mt-0.5">imagesmode</span>
+                            <div>
+                                <p class="font-black uppercase tracking-tight text-lg">Visual vibe checks</p>
+                                <p class="text-slate-500 text-sm">Aesthetic pairings help the quiz capture what pulls you in on stage, in teasers, and in performance eras.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-white mt-0.5">equalizer</span>
+                            <div>
+                                <p class="font-black uppercase tracking-tight text-lg">Spectrum sliders</p>
+                                <p class="text-slate-500 text-sm">Energy and vibe sliders give the match engine more room to read nuance than a standard multiple-choice personality test.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal-right grid sm:grid-cols-2 gap-0 border border-white/10">
+                    <div class="p-8 border-b sm:border-b-0 sm:border-r border-white/10">
+                        <p class="font-mono text-[9px] uppercase tracking-[0.24em] text-primary mb-3">Prompt Style</p>
+                        <h3 class="font-black uppercase tracking-tight text-xl mb-3">Built For Replay</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">Short enough to run back immediately, then compare results with friends who answer from a different fandom angle.</p>
+                    </div>
+                    <div class="p-8 border-b sm:border-b-0 border-white/10">
+                        <p class="font-mono text-[9px] uppercase tracking-[0.24em] text-secondary mb-3">Result Mode</p>
+                        <h3 class="font-black uppercase tracking-tight text-xl mb-3">Share-Ready Ending</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">The result screen is clean and visual, with an explanation that feels like a reveal instead of a data dump.</p>
+                    </div>
+                    <div class="p-8 border-r border-white/10">
+                        <p class="font-mono text-[9px] uppercase tracking-[0.24em] text-white mb-3">Profile Tie-In</p>
+                        <h3 class="font-black uppercase tracking-tight text-xl mb-3">Save Your Bias</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">Signed-in fans can lock the result into their profile, turning the quiz into a proper K-Beats entry point.</p>
+                    </div>
+                    <div class="p-8">
+                        <p class="font-mono text-[9px] uppercase tracking-[0.24em] text-primary mb-3">Fan Tone</p>
+                        <h3 class="font-black uppercase tracking-tight text-xl mb-3">Social, Not Clinical</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">The flow stays playful and fandom-first. It feels closer to passing a phone around than filling out a serious assessment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 md:py-32 px-6 max-w-6xl mx-auto">
+        <div class="reveal text-center mb-16">
+            <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">Live Match Preview</p>
+            <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none">
+                Some Of The Energy<br/><span class="hero-stroke">Already In The Pool</span>
+            </h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+            {% for artist in hero_artists %}
+            <div class="reveal border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                <div class="aspect-[4/5] overflow-hidden border-b border-white/10">
+                    <img src="{{ artist.image_url }}" alt="{{ artist.name }}" class="w-full h-full object-cover"/>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between gap-4 mb-3">
+                        <p class="font-black uppercase tracking-tight text-2xl">{{ artist.name }}</p>
+                        <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">Rank {{ artist.rank }}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="font-mono text-[9px] uppercase tracking-[0.24em] border border-primary/30 text-primary px-3 py-1">{{ artist.group_type }}</span>
+                        <span class="font-mono text-[9px] uppercase tracking-[0.24em] border border-white/10 text-slate-400 px-3 py-1">{{ artist.label }}</span>
+                        <span class="font-mono text-[9px] uppercase tracking-[0.24em] border border-secondary/30 text-secondary px-3 py-1">{{ artist.member_count }} members</span>
+                    </div>
+                    <p class="text-slate-500 text-sm leading-relaxed">A strong candidate for a fan who keeps choosing intensity, clarity of concept, and a result worth screenshotting.</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="md:col-span-3 border border-white/10 bg-white/[0.02] p-10 text-center">
+                <p class="font-black uppercase tracking-tight text-2xl mb-2">The pool updates with your game data.</p>
+                <p class="text-slate-500 text-sm">Even without a hero sample loaded, the Bias Selector quiz is ready to run through the full match flow.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="relative py-24 md:py-32 px-6 overflow-hidden border-y border-primary/20">
+        <div class="absolute inset-0 grid-bg opacity-50"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
+        <div class="relative z-10 max-w-3xl mx-auto text-center">
+            <p class="font-mono text-[10px] uppercase tracking-[0.4em] text-primary mb-6">Ready To Find Out?</p>
+            <h2 class="font-display text-5xl md:text-8xl uppercase tracking-tight leading-none mb-8">
+                WHO'S YOUR<br/><span class="hero-stroke">BIAS MATCH?</span>
+            </h2>
+            <p class="text-slate-400 mb-12 max-w-lg mx-auto">
+                Run the full quiz, get the reveal, and save the result to your profile if it feels right. Then run it again and see who else your answers attract.
+            </p>
+            <a href="{% url 'bias_selector_game' %}" class="inline-flex items-center gap-3 bg-primary text-black font-black uppercase tracking-[0.2em] text-sm px-14 py-6 border-2 border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                <span class="material-symbols-outlined">favorite</span>
+                Play Bias Selector
+            </a>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 max-w-6xl mx-auto">
+        <div class="reveal flex items-center justify-between mb-10 gap-6">
+            <h2 class="font-black uppercase tracking-tighter text-2xl">More Games</h2>
+            <a href="{% url 'games' %}" class="font-mono text-[10px] uppercase tracking-widest text-slate-500 hover:text-primary transition-colors flex items-center gap-1">
+                View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="{% url 'chart_clash_promo' %}" class="reveal group border border-white/10 bg-white/[0.02] p-6 hover:border-primary/40 transition-all hover:bg-white/[0.04]">
+                <div class="w-10 h-10 border border-primary/20 bg-primary/5 flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary text-lg">trending_up</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight mb-1">Chart Clash</h3>
+                <p class="text-slate-500 text-xs">Fast head-to-head chart instinct with streak pressure.</p>
+            </a>
+            <a href="{% url 'fandom_trivia' %}" class="reveal group border border-white/10 bg-white/[0.02] p-6 hover:border-secondary/40 transition-all hover:bg-white/[0.04]" style="transition-delay:0.1s">
+                <div class="w-10 h-10 border border-secondary/20 bg-secondary/5 flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-secondary text-lg">quiz</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight mb-1">Fandom Trivia</h3>
+                <p class="text-slate-500 text-xs">Deep-cut fan knowledge for labels, debuts, and group lore.</p>
+            </a>
+            <a href="{% url 'draft_day' %}" class="reveal group border border-white/10 bg-white/[0.02] p-6 hover:border-primary/40 transition-all hover:bg-white/[0.04]" style="transition-delay:0.2s">
+                <div class="w-10 h-10 border border-primary/20 bg-primary/5 flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary text-lg">groups</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight mb-1">Draft Day</h3>
+                <p class="text-slate-500 text-xs">Build your lineup, balance the budget, and chase the perfect roster.</p>
+            </a>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/5 py-8 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="font-mono text-[9px] uppercase tracking-widest text-slate-700">Copyright 2026 K-Beats . Bias Selector</p>
+            <div class="flex items-center gap-6">
+                <a href="{% url 'games' %}" class="font-mono text-[9px] uppercase tracking-widest text-slate-700 hover:text-primary transition-colors">All Games</a>
+                <a href="{% url 'coming_soon' %}" class="font-mono text-[9px] uppercase tracking-widest text-slate-700 hover:text-primary transition-colors">K-Beats Home</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach((element) => observer.observe(element));
+    </script>
+</body>
+</html>

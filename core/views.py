@@ -2393,7 +2393,13 @@ def _inworld_chat(prompt, system="You are an expert K-Pop radio assistant."):
 # â”€â”€ Page views â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
-def home(request):
+def _render_frameable_page(request, template_name, context):
+    response = render(request, template_name, context)
+    response['X-Frame-Options'] = 'SAMEORIGIN'
+    return response
+
+
+def _build_homepage_context(request):
     profile = None
     station_group_names = []
     if request.user.is_authenticated:
@@ -2678,9 +2684,14 @@ def home(request):
     except Exception:
         home_live_track = None
     
-    return render(request, 'core/index.html', {
+    hero_primary_event = hero_day_events[0] if hero_day_events else (upcoming[0] if upcoming else None)
+    hero_support_events = hero_day_events[1:4] if len(hero_day_events) > 1 else upcoming[1:4]
+
+    return {
         'upcoming_comebacks': upcoming,
         'hero_day_events': hero_day_events,
+        'hero_primary_event': hero_primary_event,
+        'hero_support_events': hero_support_events,
         'upcoming_ticker': upcoming_ticker,
         'trending_tracks': trending,
         'trending_ticker_tracks': trending_ticker,
@@ -2693,7 +2704,36 @@ def home(request):
         'homepage_programming': homepage_programming,
         'my_station_profile': profile,
         'my_station_groups': station_group_names,
-    })
+    }
+
+
+def home(request):
+    context = _build_homepage_context(request)
+    if not isinstance(context, dict):
+        return context
+    return _render_frameable_page(request, 'core/index.html', context)
+
+
+def home_redesign_lab(request):
+    context = _build_homepage_context(request)
+    if not isinstance(context, dict):
+        return context
+
+    context['redesign_summary'] = [
+        {
+            'title': 'Signal-panel hero',
+            'summary': 'The stacked comeback cards are replaced with a broadcast control panel that surfaces live status, the next event, and stronger top-fold actions.',
+        },
+        {
+            'title': 'Sharper section hierarchy',
+            'summary': 'Programming, trending, upcoming releases, and news now each have one dominant focal point instead of multiple equal-weight blocks.',
+        },
+        {
+            'title': 'Cleaner comparison build',
+            'summary': 'The redesign drops the client-side artwork fetch pattern and avoids the null-target particle logic that currently adds console noise.',
+        },
+    ]
+    return _render_frameable_page(request, 'core/home_redesign_lab.html', context)
 
 
 def upcoming_comebacks_design_lab(request):
@@ -3036,6 +3076,312 @@ def _build_header_mega_menu_context(request):
         'items': news_articles[1:3] if len(news_articles) > 1 else [],
         'total_count': len(news_articles),
     }
+
+    games_panel = {
+        'promo_line': '9 games. Infinite replays.',
+        'items': [
+            {
+                'id': 'beat-streak',
+                'title': 'Beat Streak',
+                'family': 'Rhythm',
+                'views': ['arcade', 'challenge'],
+                'status': 'Featured',
+                'summary': 'Tap through tempo spikes and chase a perfect streak.',
+                'description': 'A rhythm-first sprint with escalating pace, cleaner timing windows, and immediate replay pull.',
+                'href': reverse('beat_streak'),
+                'icon': 'speed',
+                'accentRgb': '0, 240, 255',
+                'secondaryRgb': '244, 37, 192',
+                'eyebrow': 'Rhythm Run',
+                'metric': '5x streak',
+                'metric_note': 'Precision wins',
+                'tags': ['Rhythm', 'Streak', 'Solo'],
+            },
+            {
+                'id': 'chart-clash',
+                'title': 'Chart Clash',
+                'family': 'Duel',
+                'views': ['challenge', 'knowledge'],
+                'status': 'Head To Head',
+                'summary': 'Pick the track that charted higher and keep the run alive.',
+                'description': 'A fast comparison game built around chart instinct, bragging rights, and tight round-to-round momentum.',
+                'href': reverse('chart_clash_promo'),
+                'icon': 'trending_up',
+                'accentRgb': '244, 37, 192',
+                'secondaryRgb': '0, 240, 255',
+                'eyebrow': 'Chart Duel',
+                'metric': '10 rounds',
+                'metric_note': 'Multiplier pressure',
+                'tags': ['Charts', 'Versus', 'Quick'],
+            },
+            {
+                'id': 'draft-day',
+                'title': 'Draft Day',
+                'family': 'Strategy',
+                'views': ['party', 'challenge'],
+                'status': 'Build Your Lineup',
+                'summary': 'Assemble your dream roster without blowing the budget.',
+                'description': 'A strategy-led draft where fan instinct meets trade-offs, caps, and lineup flex.',
+                'href': reverse('draft_day'),
+                'icon': 'stars',
+                'accentRgb': '0, 240, 255',
+                'secondaryRgb': '255, 255, 255',
+                'eyebrow': 'Lineup Builder',
+                'metric': 'Budget cap',
+                'metric_note': 'Every pick matters',
+                'tags': ['Strategy', 'Roster', 'Replayable'],
+            },
+            {
+                'id': 'song-game',
+                'title': 'Song Game',
+                'family': 'Party',
+                'views': ['party', 'arcade'],
+                'status': 'Fast Start',
+                'summary': 'Jump into a simple track-first challenge built for quick sessions.',
+                'description': 'The easiest way to start playing fast without setup friction or deep rules.',
+                'href': reverse('song_game'),
+                'icon': 'videogame_asset',
+                'accentRgb': '255, 255, 255',
+                'secondaryRgb': '0, 240, 255',
+                'eyebrow': 'Instant Play',
+                'metric': 'Quick rounds',
+                'metric_note': 'Low friction',
+                'tags': ['Party', 'Quick', 'Accessible'],
+            },
+            {
+                'id': 'idol-scramble',
+                'title': 'Idol Scramble',
+                'family': 'Puzzle',
+                'views': ['knowledge', 'challenge'],
+                'status': 'Brain Teaser',
+                'summary': 'Unscramble idols and groups before the clock wins.',
+                'description': 'A puzzle-style challenge that rewards fan memory, speed, and clean recognition.',
+                'href': reverse('idol_scramble'),
+                'icon': 'extension',
+                'accentRgb': '244, 37, 192',
+                'secondaryRgb': '255, 255, 255',
+                'eyebrow': 'Puzzle Board',
+                'metric': 'Timed solve',
+                'metric_note': 'Memory + pace',
+                'tags': ['Puzzle', 'Idols', 'Timed'],
+            },
+            {
+                'id': 'lyric-drop',
+                'title': 'Lyric Drop',
+                'family': 'Lyrics',
+                'views': ['knowledge', 'party'],
+                'status': 'Sing It Back',
+                'summary': 'Finish the lyric before the next clue lands.',
+                'description': 'A lyric-led challenge designed for fans who know hooks, verses, and instant callbacks.',
+                'href': reverse('lyric_drop'),
+                'icon': 'lyrics',
+                'accentRgb': '0, 240, 255',
+                'secondaryRgb': '244, 37, 192',
+                'eyebrow': 'Lyric Test',
+                'metric': 'Hook recall',
+                'metric_note': 'Fan memory flex',
+                'tags': ['Lyrics', 'Party', 'Recognition'],
+            },
+            {
+                'id': 'bias-selector',
+                'title': 'Bias Selector',
+                'family': 'Discovery',
+                'views': ['party', 'knowledge'],
+                'status': 'Fan Favourite',
+                'summary': 'Follow the prompts and see where your bias lands.',
+                'description': 'A lighter discovery route that feels social, shareable, and easy to replay with friends.',
+                'href': reverse('bias_selector'),
+                'icon': 'favorite',
+                'accentRgb': '244, 37, 192',
+                'secondaryRgb': '0, 240, 255',
+                'eyebrow': 'Bias Match',
+                'metric': 'Share ready',
+                'metric_note': 'Low-pressure fun',
+                'tags': ['Discovery', 'Social', 'Fan'],
+            },
+            {
+                'id': 'fandom-trivia',
+                'title': 'Fandom Trivia',
+                'family': 'Quiz',
+                'views': ['knowledge', 'challenge'],
+                'status': 'Deep Cut',
+                'summary': 'Test what you know about fandoms, labels, and group history.',
+                'description': 'The strongest pure-knowledge lane for fans who want bragging rights, not just quick reflexes.',
+                'href': reverse('fandom_trivia'),
+                'icon': 'quiz',
+                'accentRgb': '255, 255, 255',
+                'secondaryRgb': '244, 37, 192',
+                'eyebrow': 'Knowledge Check',
+                'metric': 'Lore heavy',
+                'metric_note': 'True fan mode',
+                'tags': ['Quiz', 'Lore', 'Knowledge'],
+            },
+            {
+                'id': 'mv-matcher',
+                'title': 'MV Matcher',
+                'family': 'Visual',
+                'views': ['arcade', 'party'],
+                'status': 'Frame Hunt',
+                'summary': 'Identify the act from a single video frame.',
+                'description': 'A fast visual challenge built around iconic shots, styling cues, and instant pattern recognition.',
+                'href': reverse('mv_matcher'),
+                'icon': 'movie',
+                'accentRgb': '0, 240, 255',
+                'secondaryRgb': '255, 255, 255',
+                'eyebrow': 'Visual Match',
+                'metric': 'One frame',
+                'metric_note': 'Spot it fast',
+                'tags': ['Visual', 'MV', 'Quick'],
+            },
+        ],
+    }
+
+    shop_panel = {
+        'promo_line': 'Limited drops, collector picks, and merch built for the fandom.',
+        'benefits': [
+            {'title': 'Free Shipping', 'copy': 'On orders over £75 worldwide.', 'icon': 'local_shipping'},
+            {'title': 'Limited Drops', 'copy': 'Small-run pieces that feel collectible, not generic.', 'icon': 'diamond'},
+            {'title': 'Fast Dispatch', 'copy': 'Quick ship windows for in-stock fan essentials.', 'icon': 'bolt'},
+        ],
+        'items': [
+            {
+                'id': 'spectrum-collection',
+                'title': 'Spectrum Collection',
+                'family': 'Featured Drop',
+                'views': ['drops', 'collectors'],
+                'status': 'Limited Edition',
+                'summary': 'The official numbered drop with premium streetwear energy.',
+                'description': 'A flagship collection that gives the Shop menu a real event feel instead of a flat merch tray.',
+                'href': reverse('shop'),
+                'icon': 'diamond',
+                'accentRgb': '244, 37, 192',
+                'secondaryRgb': '0, 240, 255',
+                'eyebrow': 'Featured Drop',
+                'price': '£89.00',
+                'comparePrice': '£120.00',
+                'tags': ['Limited', 'Numbered', 'Streetwear'],
+            },
+            {
+                'id': 'neon-logo-hoodie',
+                'title': 'Neon Logo Hoodie',
+                'family': 'Apparel',
+                'views': ['essentials', 'collectors'],
+                'status': 'Best Seller',
+                'summary': 'Heavyweight layer with the core K-Beats wordmark front and centre.',
+                'description': 'A dependable flagship piece for fans who want the cleanest branded look first.',
+                'href': reverse('shop'),
+                'icon': 'checkroom',
+                'accentRgb': '255, 255, 255',
+                'secondaryRgb': '244, 37, 192',
+                'eyebrow': 'Wardrobe Core',
+                'price': '£79.00',
+                'comparePrice': '',
+                'tags': ['Apparel', 'Core', 'In Stock'],
+            },
+            {
+                'id': 'spectrum-oversized-tee',
+                'title': 'Spectrum Oversized Tee',
+                'family': 'Apparel',
+                'views': ['drops', 'essentials'],
+                'status': 'Sale',
+                'summary': 'Oversized fit with drop energy and brighter colour contrast.',
+                'description': 'The easiest entry point into the current collection without losing the limited-drop mood.',
+                'href': reverse('shop'),
+                'icon': 'styler',
+                'accentRgb': '244, 37, 192',
+                'secondaryRgb': '255, 255, 255',
+                'eyebrow': 'Drop Layer',
+                'price': '£39.00',
+                'comparePrice': '£55.00',
+                'tags': ['Drop', 'Apparel', 'Sale'],
+            },
+            {
+                'id': 'rock-star-album',
+                'title': 'Stray Kids - ROCK-STAR',
+                'family': 'Albums',
+                'views': ['collectors', 'essentials'],
+                'status': 'Collector Pick',
+                'summary': 'A strong album lane for fans who want music-first shelf pieces.',
+                'description': 'Collectors mode should spotlight display-worthy picks, not only apparel.',
+                'href': reverse('shop'),
+                'icon': 'album',
+                'accentRgb': '0, 240, 255',
+                'secondaryRgb': '255, 255, 255',
+                'eyebrow': 'Shelf Ready',
+                'price': '£34.99',
+                'comparePrice': '',
+                'tags': ['Album', 'Collector', 'Display'],
+            },
+            {
+                'id': 'army-bomb',
+                'title': 'Official ARMY Bomb Ver.4',
+                'family': 'Lightsticks',
+                'views': ['collectors', 'essentials'],
+                'status': 'High Demand',
+                'summary': 'One of the clearest collector-led hero products in the current range.',
+                'description': 'A premium fandom item that gives the panel an unmistakable merch destination feel.',
+                'href': reverse('shop'),
+                'icon': 'flare',
+                'accentRgb': '0, 240, 255',
+                'secondaryRgb': '244, 37, 192',
+                'eyebrow': 'Fandom Gear',
+                'price': '£59.99',
+                'comparePrice': '',
+                'tags': ['Lightstick', 'Collector', 'Premium'],
+            },
+            {
+                'id': 'newjeans-poster',
+                'title': 'NewJeans - Get Up Poster',
+                'family': 'Posters',
+                'views': ['drops', 'collectors'],
+                'status': 'Wall Ready',
+                'summary': 'A lower-price collector entry that still feels display-driven.',
+                'description': 'Posters give the Shop menu a quick-pick lane for fans not ready to commit to bigger pieces.',
+                'href': reverse('shop'),
+                'icon': 'photo',
+                'accentRgb': '255, 255, 255',
+                'secondaryRgb': '0, 240, 255',
+                'eyebrow': 'Print Drop',
+                'price': '£24.99',
+                'comparePrice': '',
+                'tags': ['Poster', 'Display', 'Accessible'],
+            },
+            {
+                'id': 'photocard-binder',
+                'title': 'Photocard Binder Set',
+                'family': 'Accessories',
+                'views': ['essentials', 'collectors'],
+                'status': 'Utility Pick',
+                'summary': 'Storage-first merch for fans who care about collecting without clutter.',
+                'description': 'A practical accessory lane that makes the Shop feel more resourceful than pure apparel.',
+                'href': reverse('shop'),
+                'icon': 'folder_copy',
+                'accentRgb': '244, 37, 192',
+                'secondaryRgb': '0, 240, 255',
+                'eyebrow': 'Collector Utility',
+                'price': '£19.99',
+                'comparePrice': '',
+                'tags': ['Accessories', 'Organise', 'Everyday'],
+            },
+            {
+                'id': 'blink-lightstick',
+                'title': 'BLINK Official Lightstick',
+                'family': 'Lightsticks',
+                'views': ['collectors', 'drops'],
+                'status': 'Fan Signal',
+                'summary': 'An instantly recognisable fandom piece with high display value.',
+                'description': 'Another strong collector route that keeps the panel feeling broad, not single-brand.',
+                'href': reverse('shop'),
+                'icon': 'celebration',
+                'accentRgb': '244, 37, 192',
+                'secondaryRgb': '255, 255, 255',
+                'eyebrow': 'Signal Piece',
+                'price': '£54.99',
+                'comparePrice': '',
+                'tags': ['Lightstick', 'Display', 'Fan Gear'],
+            },
+        ],
+    }
     recent_request_count = SongRequest.objects.count()
 
     return {
@@ -3048,6 +3394,8 @@ def _build_header_mega_menu_context(request):
         'mega_menu_comebacks_primary': comeback_primary,
         'mega_menu_comebacks': comeback_cards,
         'mega_menu_news': news_panel,
+        'mega_menu_games': games_panel,
+        'mega_menu_shop': shop_panel,
         'mega_menu_last_chart_sync': ranking_obj.created_at if ranking_obj else None,
         'mega_menu_request_count': recent_request_count,
     }
@@ -3105,6 +3453,8 @@ def _serialize_header_mega_menu_payload(context):
             'items': items,
             'total_count': news_panel.get('total_count') or len(items) + (1 if featured_article else 0),
         },
+        'games': context.get('mega_menu_games') or {},
+        'shop': context.get('mega_menu_shop') or {},
         'last_chart_sync': context.get('mega_menu_last_chart_sync').isoformat() if context.get('mega_menu_last_chart_sync') else None,
         'request_count': context.get('mega_menu_request_count') or 0,
         'generated_at': now_local.isoformat(),
@@ -3121,6 +3471,8 @@ def header_mega_menu_lab(request):
         'mega_menu_live_json': payload['live'],
         'mega_menu_schedule_json': payload['schedule'],
         'mega_menu_news_json': payload['news'],
+        'mega_menu_games_json': payload['games'],
+        'mega_menu_shop_json': payload['shop'],
         'mega_menu_comebacks_primary_json': payload['comebacks_primary'],
         'mega_menu_comebacks_json': payload['comebacks'],
         'mega_menu_idol_stats_json': payload['idol_stats'],
@@ -3645,6 +3997,89 @@ def coming_soon(request):
 def games(request):
     return render(request, 'core/games.html')
 
+
+def _build_404_context(request):
+    requested_path = urllib.parse.unquote(request.get_full_path() or '/')
+    if len(requested_path) > 72:
+        requested_path = f"{requested_path[:69]}..."
+
+    previous_path = ''
+    referrer = str(request.META.get('HTTP_REFERER') or '').strip()
+    if referrer:
+        parsed_referrer = urllib.parse.urlparse(referrer)
+        if parsed_referrer.netloc == request.get_host():
+            previous_path = parsed_referrer.path or reverse('home')
+            if parsed_referrer.query:
+                previous_path = f"{previous_path}?{parsed_referrer.query}"
+            if previous_path == request.get_full_path():
+                previous_path = reverse('home')
+
+    featured_links = [
+        {
+            'eyebrow': 'On air now',
+            'title': 'Live Radio',
+            'description': 'Jump back into the station and keep the music going.',
+            'url': reverse('live'),
+            'icon': 'radio',
+        },
+        {
+            'eyebrow': 'Keep listening',
+            'title': 'Stream Hub',
+            'description': 'Open the player and pick up where the broadcast left off.',
+            'url': reverse('stream_hub'),
+            'icon': 'play_circle',
+        },
+        {
+            'eyebrow': 'Fan pulse',
+            'title': 'Charts',
+            'description': 'See what is rising, holding, and making noise right now.',
+            'url': reverse('charts'),
+            'icon': 'leaderboard',
+        },
+    ]
+    secondary_links = [
+        {
+            'title': 'Idols',
+            'description': 'Browse artists, groups, and fandom favourites.',
+            'url': reverse('idols'),
+            'icon': 'groups_2',
+        },
+        {
+            'title': 'Games',
+            'description': 'Switch lanes and play one of the K-Beats fan games.',
+            'url': reverse('games'),
+            'icon': 'sports_esports',
+        },
+        {
+            'title': 'News',
+            'description': 'Catch up on comebacks, stories, and fresh headlines.',
+            'url': reverse('news'),
+            'icon': 'article',
+        },
+        {
+            'title': 'Get the App',
+            'description': 'Head to the app page for the full K-Beats experience.',
+            'url': reverse('promo'),
+            'icon': 'phone_iphone',
+        },
+    ]
+
+    return {
+        'requested_path': requested_path,
+        'previous_path': previous_path,
+        'featured_links': featured_links,
+        'secondary_links': secondary_links,
+    }
+
+
+def preview_404(request):
+    return render(request, 'core/404.html', _build_404_context(request))
+
+
+def custom_404(request, exception):
+    context = _build_404_context(request)
+    return render(request, 'core/404.html', context, status=404)
+
 @csrf_exempt
 @require_POST
 def prelaunch_signup(request):
@@ -4000,6 +4435,63 @@ def chart_clash_promo(request):
     return render(request, 'core/chart_clash_promo.html', {
         'track_a': tracks[0] if len(tracks) > 0 else None,
         'track_b': tracks[1] if len(tracks) > 1 else None,
+    })
+
+
+def bias_selector_promo(request):
+    featured_artists = list(
+        KPopGroup.objects.filter(
+            rank__isnull=False
+        ).exclude(
+            image_url=''
+        ).order_by('rank')[:3]
+    )
+    hero_artists = []
+    for artist in featured_artists:
+        hero_artists.append({
+            'id': artist.id,
+            'name': artist.name,
+            'slug': artist.slug,
+            'image_url': artist.image_url,
+            'rank': artist.rank,
+            'label': artist.label or 'K-Pop',
+            'group_type': artist.get_group_type_display(),
+            'member_count': artist.members.count(),
+        })
+
+    social_image = hero_artists[0]['image_url'] if hero_artists else ''
+    extra_schema_json = json.dumps({
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Bias Selector",
+        "url": request.build_absolute_uri(reverse('bias_selector')),
+        "description": (
+            "Take the Bias Selector quiz on K-Beats to discover your K-Pop bias "
+            "through audio picks, visual choices, and fan-personality prompts."
+        ),
+        "genre": ["Music", "Quiz", "Personality"],
+        "playMode": "SinglePlayer",
+        "applicationCategory": "Game",
+        "publisher": {
+            "@type": "Organization",
+            "name": "K-Beats",
+        },
+    })
+
+    return render(request, 'core/bias_selector_promo.html', {
+        'hero_artists': hero_artists,
+        'hero_artist_primary': hero_artists[0] if len(hero_artists) > 0 else None,
+        'hero_artist_secondary': hero_artists[1] if len(hero_artists) > 1 else None,
+        'hero_artist_tertiary': hero_artists[2] if len(hero_artists) > 2 else None,
+        'seo_title': 'Bias Selector - Find Your K-Pop Bias Match | K-Beats Games',
+        'seo_description': (
+            'Bias Selector is K-Beats\' interactive K-Pop personality quiz. '
+            'Compare vibes, answer fan prompts, and discover the idol or group '
+            'that matches your energy.'
+        ),
+        'seo_image': social_image,
+        'seo_image_alt': 'Bias Selector promo artwork on K-Beats',
+        'extra_schema_json': extra_schema_json,
     })
 
 
@@ -5211,7 +5703,7 @@ def search_api(request):
         })
     return JsonResponse({'results': results})
 
-def bias_selector(request):
+def bias_selector_game(request):
     import random
     import urllib.request
     import urllib.parse
@@ -6771,10 +7263,27 @@ def live(request):
 
 
 def test_page(request):
-    context = _resolve_live_page_context(request)
-    if not isinstance(context, dict):
-        return context
-    return render(request, 'core/test_page.html', context)
+    return render(request, 'core/test_page.html', {
+        'current_home_url': reverse('home'),
+        'redesign_home_url': reverse('home_redesign_lab'),
+        'comparison_cards': [
+            {
+                'eyebrow': 'Hero',
+                'title': 'Broadcast signal panel',
+                'summary': 'The redesign trades the comeback card stack for a cleaner signal panel with live status, the next release, and stronger listening CTAs.',
+            },
+            {
+                'eyebrow': 'Flow',
+                'title': 'Faster editorial scan',
+                'summary': 'Upper-page hierarchy is tightened so the hero, live rail, programming, trending, and news each do one clear job.',
+            },
+            {
+                'eyebrow': 'Polish',
+                'title': 'Quieter front-end',
+                'summary': 'The variant avoids the client-side artwork fetches and null-target particle script so review stays focused on the redesign itself.',
+            },
+        ],
+    })
 
 
 def stream_hub(request):
