@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">K-Beats KB favicon</title>
+  <desc id="desc">A black square favicon with a white outlined K and neon pink outlined B in the K-Beats logo style.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050505" />
+      <stop offset="100%" stop-color="#141414" />
+    </linearGradient>
+    <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#f425c0" flood-opacity="0.75" />
+    </filter>
+    <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#00f0ff" flood-opacity="0.45" />
+    </filter>
+    <filter id="whiteGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#ffffff" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <rect width="256" height="256" rx="28" fill="url(#bg)" />
+  <rect x="10" y="10" width="236" height="236" rx="22" fill="none" stroke="#ffffff" stroke-opacity="0.08" />
+  <path d="M30 58 L64 58" stroke="#00f0ff" stroke-width="10" stroke-linecap="square" opacity="0.85" />
+  <path d="M192 198 L226 198" stroke="#f425c0" stroke-width="10" stroke-linecap="square" opacity="0.95" />
+
+  <g filter="url(#whiteGlow)">
+    <text
+      x="88"
+      y="174"
+      text-anchor="middle"
+      font-size="144"
+      font-weight="900"
+      font-family="Montserrat, Arial, sans-serif"
+      fill="transparent"
+      stroke="#ffffff"
+      stroke-width="8"
+      letter-spacing="-8"
+    >K</text>
+  </g>
+
+  <g filter="url(#pinkGlow)">
+    <text
+      x="166"
+      y="174"
+      text-anchor="middle"
+      font-size="144"
+      font-weight="900"
+      font-family="Montserrat, Arial, sans-serif"
+      fill="transparent"
+      stroke="#f425c0"
+      stroke-width="8"
+      letter-spacing="-8"
+    >B</text>
+  </g>
+
+  <g filter="url(#cyanGlow)" opacity="0.9">
+    <text
+      x="166"
+      y="174"
+      text-anchor="middle"
+      font-size="144"
+      font-weight="900"
+      font-family="Montserrat, Arial, sans-serif"
+      fill="transparent"
+      stroke="#00f0ff"
+      stroke-width="2"
+      letter-spacing="-8"
+    >B</text>
+  </g>
+</svg>
