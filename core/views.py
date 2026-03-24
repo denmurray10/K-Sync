@@ -266,6 +266,31 @@ def _build_stream_image_url(source_url):
     return f"https://res.cloudinary.com/{cloud_name}/image/fetch/{encoded}"
 
 
+DEFAULT_STREAM_IMAGE_URL = "https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner"
+KNOWN_BROKEN_IMAGE_FRAGMENTS = (
+    "v1710546648/ksync/skz_group_default.jpg",
+)
+
+
+def _is_known_broken_image_url(source_url):
+    raw = str(source_url or '').strip()
+    if not raw:
+        return True
+    lowered = raw.lower()
+    return any(fragment in lowered for fragment in KNOWN_BROKEN_IMAGE_FRAGMENTS)
+
+
+def _coalesce_stream_image_url(*candidates, fallback=DEFAULT_STREAM_IMAGE_URL):
+    for candidate in candidates:
+        raw = str(candidate or '').strip()
+        if not raw or _is_known_broken_image_url(raw):
+            continue
+        cooked = _build_stream_image_url(raw)
+        if cooked and not _is_known_broken_image_url(cooked):
+            return cooked
+    return fallback
+
+
 def _apply_stream_image_to_field(obj, field_name):
     if not obj or not field_name:
         return
@@ -3804,7 +3829,7 @@ def listen_free_landing(request):
             {
                 'title': track.title,
                 'artist': track.artist,
-                'album_art': track.album_art,
+                'album_art': _coalesce_stream_image_url(track.album_art),
             }
             for track in raw_up_next
         ]
@@ -3816,10 +3841,8 @@ def listen_free_landing(request):
     preview_track = {
         'title': current_track.title if current_track else 'K-Beats Live',
         'artist': current_track.artist if current_track else 'Always on for K-pop fans',
-        'album_art': (
-            current_track.album_art
-            if current_track and current_track.album_art
-            else 'https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner'
+        'album_art': _coalesce_stream_image_url(
+            current_track.album_art if current_track else '',
         ),
         'audio_url': (
             _build_stream_audio_url(current_track.audio_url)
@@ -3912,7 +3935,7 @@ def listen_free_landing(request):
             if not group:
                 continue
             _apply_stream_image_to_field(group, 'image_url')
-            image_url = str(group.image_url or '').strip()
+            image_url = _coalesce_stream_image_url(group.image_url, fallback='')
             if not image_url:
                 continue
             idol_images.append({
@@ -3947,6 +3970,7 @@ def listen_free_landing(request):
         }),
         'listener_count': listener_count,
         'preview_track': preview_track,
+        'image_fallback_url': DEFAULT_STREAM_IMAGE_URL,
         'up_next_tracks': up_next_tracks,
         'idol_images': idol_images,
         'vip_trial_url': f"{reverse('pricing')}#compare-plans",

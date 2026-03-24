@@ -265,7 +265,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <div id="landing-up-next" class="mt-4 space-y-3">
                                     {% for track in up_next_tracks %}
                                     <div class="flex items-center gap-3 border border-white/10 bg-black/35 p-3">
-                                        <img src="{{ track.album_art }}" alt="" class="h-12 w-12 border border-white/10 object-cover"/>
+                                        <img src="{{ track.album_art }}" alt="{{ track.title }} by {{ track.artist }} album artwork" onerror="this.onerror=null;this.src='{{ image_fallback_url|escapejs }}';" class="h-12 w-12 border border-white/10 object-cover"/>
                                         <div class="min-w-0">
                                             <p class="truncate text-sm font-black uppercase tracking-tight text-white">{{ track.title }}</p>
                                             <p class="truncate text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ track.artist }}</p>
@@ -351,7 +351,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 {% if section.visual == 'live' %}
                                 <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Live preview</p>
                                 <div class="mt-5 grid gap-4 sm:grid-cols-[auto_1fr]">
-                                    <img src="{{ preview_track.album_art }}" alt="K-Beats live preview artwork" class="h-24 w-24 rounded-none border border-white/10 object-cover"/>
+                                    <img src="{{ preview_track.album_art }}" alt="{{ preview_track.title }} by {{ preview_track.artist }} artwork" onerror="this.onerror=null;this.src='{{ image_fallback_url|escapejs }}';" class="h-24 w-24 rounded-none border border-white/10 object-cover"/>
                                     <div class="rounded-none border border-white/10 bg-white/[0.04] p-4">
                                         <p class="text-lg font-black uppercase tracking-tight text-white">{{ preview_track.title }}</p>
                                         <p class="mt-1 text-sm text-slate-300">{{ preview_track.artist }}</p>
@@ -384,16 +384,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                             <img
                                                 src="{% if idol_images.0 %}{{ idol_images.0.image_url }}{% else %}{{ preview_track.album_art }}{% endif %}"
                                                 alt="{% if idol_images.0 %}{{ idol_images.0.name }} idol image{% else %}K-pop artist image{% endif %}"
+                                                onerror="this.onerror=null;this.src='{{ image_fallback_url|escapejs }}';"
                                                 class="h-11 w-11 border border-black object-cover"
                                             />
                                             <img
                                                 src="{% if idol_images.1 %}{{ idol_images.1.image_url }}{% else %}{{ preview_track.album_art }}{% endif %}"
                                                 alt="{% if idol_images.1 %}{{ idol_images.1.name }} idol image{% else %}K-pop artist image{% endif %}"
+                                                onerror="this.onerror=null;this.src='{{ image_fallback_url|escapejs }}';"
                                                 class="h-11 w-11 border border-black object-cover"
                                             />
                                             <img
                                                 src="{% if idol_images.2 %}{{ idol_images.2.image_url }}{% else %}{{ preview_track.album_art }}{% endif %}"
                                                 alt="{% if idol_images.2 %}{{ idol_images.2.name }} idol image{% else %}K-pop artist image{% endif %}"
+                                                onerror="this.onerror=null;this.src='{{ image_fallback_url|escapejs }}';"
                                                 class="h-11 w-11 border border-black object-cover"
                                             />
                                         </div>
@@ -559,7 +562,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <div id="listen-dock" class="live-dock fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/92 backdrop-blur-xl">
         <div class="container mx-auto flex items-center gap-3 px-6 py-3 sm:px-6">
-            <img id="dock-track-art" src="{{ preview_track.album_art }}" alt="" class="hidden h-12 w-12 border border-white/10 object-cover sm:block"/>
+            <img id="dock-track-art" src="{{ preview_track.album_art }}" alt="{{ preview_track.title }} by {{ preview_track.artist }} artwork" onerror="this.onerror=null;this.src='{{ image_fallback_url|escapejs }}';" class="hidden h-12 w-12 border border-white/10 object-cover sm:block"/>
             <div class="min-w-0 flex-1">
                 <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">K-Beats live now</p>
                 <p id="dock-track-title" class="truncate text-sm font-black uppercase tracking-tight text-white">{{ preview_track.title }}</p>

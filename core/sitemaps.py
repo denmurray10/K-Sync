@@ -11,6 +11,7 @@ class StaticViewSitemap(Sitemap):
     def items(self):
         return [
             "home",
+            "listen_free_landing",
             "live",
             "schedule",
             "charts",
