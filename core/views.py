@@ -3732,6 +3732,7 @@ def idols(request):
     for group in groups:
         _apply_stream_image_to_field(group, 'image_url')
         _apply_logo_path(group)
+        group.image_url = _optimize_home_image_url(group.image_url, width=720, height=720)
     
     return render(request, 'core/idols.html', {
         'today_events': today_events, 
@@ -9314,6 +9315,7 @@ def idol_page(request, slug):
     group = get_object_or_404(KPopGroup, slug=slug)
     _apply_stream_image_to_field(group, 'image_url')
     _apply_logo_path(group)
+    group.image_url = _optimize_home_image_url(group.image_url, width=1600, height=1600)
 
     # Default accent colors per group type
     accent_map = {
@@ -9332,6 +9334,7 @@ def idol_page(request, slug):
     for related_group in related:
         _apply_stream_image_to_field(related_group, 'image_url')
         _apply_logo_path(related_group)
+        related_group.image_url = _optimize_home_image_url(related_group.image_url, width=960, height=720)
 
     # Pull real releases, birthdays, and anniversaries from ComebackData
     now = timezone.now()
@@ -9353,7 +9356,7 @@ def idol_page(request, slug):
                 if name_lower in r.get('artist', '').lower():
                     comeback_albums.append({
                         'title': r.get('title', ''),
-                        'image': _build_stream_image_url(r.get('image', '')),
+                        'image': _optimize_home_image_url(_build_stream_image_url(r.get('image', '')), width=720, height=720),
                         'type': r.get('type', 'Release'),
                         'date_str': date_key,
                     })
@@ -9392,7 +9395,7 @@ def idol_page(request, slug):
             if name_lower in item.get('artist', '').lower():
                 chart_tracks.append({
                     'title': item.get('track', ''),
-                    'image': _build_stream_image_url(item.get('artwork_url', '')),
+                    'image': _optimize_home_image_url(_build_stream_image_url(item.get('artwork_url', '')), width=480, height=480),
                     'album': item.get('album', ''),
                 })
 
@@ -9425,7 +9428,7 @@ def idol_page(request, slug):
         art = item.get('artworkUrl100', '').replace('100x100bb', '600x600bb')
         itunes_albums.append({
             'title': item.get('collectionName', ''),
-            'image': art,
+            'image': _optimize_home_image_url(art, width=720, height=720),
             'type': item.get('collectionType', 'Album'),
             'date_str': (item.get('releaseDate', '') or '')[:10],
             'track_count': item.get('trackCount', 0),
@@ -9442,7 +9445,7 @@ def idol_page(request, slug):
         itunes_tracks.append({
             'title': item.get('trackName', ''),
             'album': item.get('collectionName', ''),
-            'image': art,
+            'image': _optimize_home_image_url(art, width=480, height=480),
             'preview_url': item.get('previewUrl', ''),
             'duration': f"{mins}:{secs:02d}",
             'itunes_url': item.get('trackViewUrl', ''),
@@ -9463,7 +9466,7 @@ def idol_page(request, slug):
                 'name': m.stage_name or m.name,
                 'full_name': m.name,
                 'position': m.position,
-                'image': m.image_url or '',
+                'image': _optimize_home_image_url(m.image_url or '', width=720, height=720),
             }
             for m in group.members.all()
         ],

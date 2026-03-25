@@ -14,7 +14,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         
 {% include 'core/seo_meta.html' %}
 <title>K-Beats — {{ group.name }}</title>
-        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link rel="stylesheet" href="{% static 'core/css/idols-tailwind.css' %}" />
         <script
             defer
             src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
@@ -27,35 +27,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
             rel="stylesheet"
         />
-        <script id="tailwind-config">
-            tailwind.config = {
-                darkMode: "class",
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: "#f425c0",
-                            "background-light": "#f8f5f8",
-                            "background-dark": "#000000",
-                            secondary: "#00f0ff",
-                            accent: "{{ accent_color }}",
-                        },
-                        fontFamily: {
-                            display: ["Montserrat", "sans-serif"],
-                        },
-                        borderRadius: {
-                            DEFAULT: "0px",
-                            sm: "0px",
-                            md: "0px",
-                            lg: "0px",
-                            xl: "0px",
-                            "2xl": "0px",
-                            "3xl": "0px",
-                            full: "9999px",
-                        },
-                    },
-                },
-            };
-        </script>
         <style>
             .glass-panel {
                 background: rgba(0, 0, 0, 0.7);
@@ -244,6 +215,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <img
                                 src="{{ group.image_url }}"
                                 alt="{{ group.name }}"
+                                loading="eager"
+                                fetchpriority="high"
+                                decoding="async"
                                 onerror="this.onerror=null;{% if group.logo_path %}this.src='{{ group.logo_path }}';{% else %}this.src='https://api.dicebear.com/7.x/initials/svg?seed={{ group.name|urlencode }}&backgroundColor=111111&textColor=ffffff';this.className='w-full h-full object-cover opacity-40';{% endif %}"
                                 class="w-full h-full object-cover opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-500"
                             />
@@ -467,6 +441,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <img
                                     src="{{ member.image }}"
                                     alt="{{ member.name }}"
+                                    loading="lazy"
+                                    decoding="async"
                                     onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/initials/svg?seed={{ member.name|urlencode }}&backgroundColor=111111&textColor=ffffff';this.className='w-20 h-20 opacity-40 group-hover:opacity-70 transition-opacity duration-300';"
                                     class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                                 />
@@ -556,6 +532,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <img
                                     src="{{ album.image }}"
                                     alt="{{ album.title }}"
+                                    loading="lazy"
+                                    decoding="async"
                                     class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 opacity-80 group-hover:opacity-100"
                                 />
                                 {% else %}
@@ -709,6 +687,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <img
                                         src="{{ track.image }}"
                                         alt="{{ track.title }}"
+                                        loading="lazy"
+                                        decoding="async"
                                         class="w-full h-full object-cover transition-all duration-500"
                                         :class="playing === {{ forloop.counter }} ? 'scale-110' : 'grayscale opacity-80'"
                                     />
@@ -941,6 +921,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <img
                                     src="{{ rg.image_url }}"
                                     alt="{{ rg.name }}"
+                                    loading="lazy"
+                                    decoding="async"
                                     onerror="this.onerror=null;{% if rg.logo_path %}this.src='{{ rg.logo_path }}';{% else %}this.src='https://api.dicebear.com/7.x/initials/svg?seed={{ rg.name|urlencode }}&backgroundColor=111111&textColor=ffffff';this.className='w-24 h-24 opacity-40 group-hover:opacity-70 transition-opacity duration-300';{% endif %}"
                                     class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                                 />

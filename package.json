@@ -2,7 +2,8 @@
   "name": "k-sync",
   "private": true,
   "scripts": {
-    "build:tailwind-home": "tailwindcss -c tailwind.home.config.js -i ./core/static_src/home-tailwind.css -o ./core/static/core/css/home-tailwind.css --minify"
+    "build:tailwind-home": "tailwindcss -c tailwind.home.config.js -i ./core/static_src/home-tailwind.css -o ./core/static/core/css/home-tailwind.css --minify",
+    "build:tailwind-idols": "tailwindcss -c tailwind.idols.config.js -i ./core/static_src/idols-tailwind.css -o ./core/static/core/css/idols-tailwind.css --minify"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",

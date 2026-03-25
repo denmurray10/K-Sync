@@ -14,7 +14,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         
 {% include 'core/seo_meta.html' %}
 <title>K-Beats — Idol Universe</title>
-        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link rel="stylesheet" href="{% static 'core/css/idols-tailwind.css' %}" />
         <script
             defer
             src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"
@@ -27,34 +27,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
             rel="stylesheet"
         />
-        <script id="tailwind-config">
-            tailwind.config = {
-                darkMode: "class",
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: "#f425c0",
-                            "background-light": "#f8f5f8",
-                            "background-dark": "#000000",
-                            secondary: "#00f0ff",
-                        },
-                        fontFamily: {
-                            display: ["Montserrat", "sans-serif"],
-                        },
-                        borderRadius: {
-                            DEFAULT: "0px",
-                            sm: "0px",
-                            md: "0px",
-                            lg: "0px",
-                            xl: "0px",
-                            "2xl": "0px",
-                            "3xl": "0px",
-                            full: "9999px",
-                        },
-                    },
-                },
-            };
-        </script>
         <style>
             .glass-panel {
                 background: rgba(0, 0, 0, 0.7);
@@ -369,6 +341,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <img
                                     src="{{ group.image_url }}"
                                     alt="{{ group.name }}"
+                                    loading="{% if forloop.counter <= 4 %}eager{% else %}lazy{% endif %}"
+                                    fetchpriority="{% if forloop.counter <= 4 %}high{% else %}auto{% endif %}"
+                                    decoding="async"
                                     onerror="this.onerror=null;{% if group.logo_path %}this.src='{{ group.logo_path }}';{% else %}this.src='https://api.dicebear.com/7.x/initials/svg?seed={{ group.name|urlencode }}&backgroundColor=111111&textColor=ffffff';this.className='w-24 h-24 opacity-40 group-hover:opacity-70 transition-opacity duration-300';{% endif %}"
                                     class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                                 />
@@ -376,6 +351,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <img
                                     src="{{ group.logo_path }}"
                                     alt="{{ group.name }}"
+                                    loading="lazy"
+                                    decoding="async"
                                     class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                                 />
                                 {% else %}
