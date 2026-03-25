@@ -311,7 +311,7 @@ def sync_tracks_from_b2(prune_missing=False, new_only=False, include_versions=Fa
             
             # Default fallback if extraction fails
             if not album_art:
-                 album_art = "https://res.cloudinary.com/diuanqnce/image/upload/v1710546648/ksync/skz_group_default.jpg"
+                 album_art = "https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner"
             
             defaults = {
                 'artist': artist,

@@ -1,0 +1,12 @@
+{
+  "name": "k-sync",
+  "private": true,
+  "scripts": {
+    "build:tailwind-home": "tailwindcss -c tailwind.home.config.js -i ./core/static_src/home-tailwind.css -o ./core/static/core/css/home-tailwind.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "tailwindcss": "^3.4.17"
+  }
+}

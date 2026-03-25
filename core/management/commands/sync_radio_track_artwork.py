@@ -11,7 +11,7 @@ from core.models import RadioTrack
 ITUNES_SEARCH_URL = "https://itunes.apple.com/search"
 DEEZER_SEARCH_URL = "https://api.deezer.com/search"
 USER_AGENT = "KSyncArtworkSync/1.0"
-KNOWN_DEFAULT_ART_FRAGMENT = "v1710546648/ksync/skz_group_default.jpg"
+KNOWN_DEFAULT_ART_FRAGMENT = "ksync/about_banner"
 
 
 def _clean_text(value):

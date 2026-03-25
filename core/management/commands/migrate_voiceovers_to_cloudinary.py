@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from core.models import RadioTrack
 
 
-DEFAULT_ALBUM_ART_URL = "https://res.cloudinary.com/diuanqnce/image/upload/v1710546648/ksync/skz_group_default.jpg"
+DEFAULT_ALBUM_ART_URL = "https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner"
 
 
 def _is_vo_track(track: RadioTrack) -> bool:

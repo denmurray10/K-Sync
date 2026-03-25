@@ -860,7 +860,7 @@ def api_b2_tracks(request):
     key_id = settings.B2_KEY_ID
     app_key = settings.B2_APPLICATION_KEY
     bucket_name = settings.B2_BUCKET_NAME
-    default_album_art = "https://res.cloudinary.com/diuanqnce/image/upload/v1710546648/ksync/skz_group_default.jpg"
+    default_album_art = DEFAULT_STREAM_IMAGE_URL
     search_query = (request.GET.get('q') or '').strip().lower()
     group_query = (request.GET.get('group') or request.GET.get('group_name') or '').strip().lower()
     

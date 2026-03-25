@@ -4,6 +4,7 @@ db.sqlite3
 staticfiles/
 .env
 .venv/
+node_modules/
 .gemini/
 brain/
 tmp/

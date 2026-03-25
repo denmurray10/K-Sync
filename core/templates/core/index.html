@@ -44,33 +44,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
 }
 </script>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    document.documentElement.classList.add('site-loading');
+</script>
+<link rel="stylesheet" href="{% static 'core/css/home-tailwind.css' %}"/>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f425c0",
-                        "background-light": "#f8f5f8",
-                        "background-dark": "#000000",
-                        "secondary": "#00f0ff", // Cyan accent for neon theme
-                    },
-                    fontFamily: {
-                        "display": ["Montserrat", "sans-serif"]
-                    },
-                    borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
-                    backgroundImage: {
-                        'neon-gradient': 'linear-gradient(to right, #f425c0, #7b2cbf, #00f0ff)',
-                    }
-                },
-            },
-        }
-    </script>
 <style>
+        html.site-loading body {
+            opacity: 0;
+        }
+        body {
+            transition: opacity 220ms ease;
+        }
         .glass-panel {
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(12px);
@@ -81,6 +68,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         .outline-outer-glow {
             filter: drop-shadow(0 0 6px rgba(244, 37, 192, 0.9)) drop-shadow(0 0 14px rgba(244, 37, 192, 0.75));
+        }
+        #hero-bg-video {
+            opacity: 0;
+            transition: opacity 320ms ease;
+        }
+        #hero-bg-video.is-ready {
+            opacity: 0.9;
         }
         .neon-border {
              box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
@@ -303,7 +297,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="hero-bg-media" class="absolute inset-0 z-0 bg-black">
 <video
     id="hero-bg-video"
-    class="absolute inset-0 w-full h-full object-cover opacity-90"
+    class="absolute inset-0 w-full h-full object-cover"
     autoplay
     muted
     loop
@@ -312,9 +306,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     preload="auto"
     poster="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2FComing%2520soon.png"
 >
-<source src="https://res.cloudinary.com/diuanqnce/video/fetch/f_mp4,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FVideos%2F720%2520%25281%2529.mp4" type="video/mp4" />
 <source src="https://f003.backblazeb2.com/file/StrayKids/Videos/720%20%281%29.mp4" type="video/mp4" />
 <source src="https://f003.backblazeb2.com/file/StrayKids/hero/Hero_video.mp4" type="video/mp4" />
+<source src="https://res.cloudinary.com/diuanqnce/video/fetch/f_mp4,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FVideos%2F720%2520%25281%2529.mp4" type="video/mp4" />
 </video>
 <div class="absolute inset-0 bg-black/5"></div>
 <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"></div>
@@ -1005,47 +999,17 @@ Experience the explosive energy of this generation's most dynamic self-producing
 {% include 'core/footer.html' %}
 <script>
 // ── iTunes Album Art Fetcher ────────────────────────────────────
-async function fetchLiveArtwork() {
-    const images = document.querySelectorAll('img[data-itunes-artist][data-itunes-track]');
-    const requests = {};
-    const normalizeArtworkUrl = (url) => {
-        const raw = String(url || '').trim();
-        if (!raw) return raw;
-        return raw
-            .replace('/600x600bb', '/200x200bb')
-            .replace('/100x100bb', '/200x200bb');
-    };
+function normalizeArtworkImage(img) {
+    if (!img?.src) return;
+    img.src = String(img.src)
+        .replace('/600x600bb', '/200x200bb')
+        .replace('/100x100bb', '/200x200bb');
+}
 
-    images.forEach(img => {
-        const key = `${img.dataset.itunesArtist}%%%${img.dataset.itunesTrack}`;
-        if (img.src) {
-            img.src = normalizeArtworkUrl(img.src);
-        }
-        if (!requests[key]) requests[key] = [];
-        requests[key].push(img);
+function prepareHomepageArtwork() {
+    document.querySelectorAll('img[data-itunes-artist][data-itunes-track]').forEach((img) => {
+        normalizeArtworkImage(img);
     });
-    for (const [key, targets] of Object.entries(requests)) {
-        const [artist, track] = key.split('%%%');
-        const query = encodeURIComponent(`${artist} ${track}`);
-        try {
-            const resp = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`);
-            const data = await resp.json();
-            if (data.results && data.results.length > 0) {
-                const optimizedUrl = normalizeArtworkUrl(data.results[0].artworkUrl100);
-                targets.forEach(img => {
-                    img.src = optimizedUrl;
-                    img.classList.remove('hidden');
-
-                    const coverSlot = img.closest('.cover-slot');
-                    const coverFallback = coverSlot ? coverSlot.querySelector('.cover-fallback') : null;
-                    if (coverFallback) coverFallback.classList.add('hidden');
-
-                    const siblingFallback = img.nextElementSibling;
-                    if (siblingFallback) siblingFallback.classList.add('hidden');
-                });
-            }
-        } catch (e) { console.error(`Artwork fetch failed: ${artist} - ${track}`, e); }
-    }
 }
 // ── Countdown Timers ───────────────────────────────────────────
 function updateCountdowns() {
@@ -1086,7 +1050,7 @@ function syncHomepageTickerSpeeds() {
 }
 
 window.addEventListener('load', () => {
-    fetchLiveArtwork();
+    prepareHomepageArtwork();
     syncHomepageTickerSpeeds();
 });
 window.addEventListener('resize', () => {
@@ -1353,6 +1317,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Ensure Hero Background Video Plays ──────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    const revealPage = () => {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                document.documentElement.classList.remove('site-loading');
+            });
+        });
+    };
+
+    revealPage();
+    window.setTimeout(revealPage, 1200);
+
     const heroVideo = document.getElementById('hero-bg-video');
     const heroMedia = document.getElementById('hero-bg-media');
     if (!heroVideo) return;
@@ -1366,6 +1341,10 @@ document.addEventListener('DOMContentLoaded', () => {
         heroVideo.style.display = 'none';
     };
 
+    const showVideo = () => {
+        heroVideo.classList.add('is-ready');
+    };
+
     const tryPlay = () => {
         const playPromise = heroVideo.play();
         if (playPromise && typeof playPromise.catch === 'function') {
@@ -1376,6 +1355,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    heroVideo.addEventListener('loadeddata', showVideo, { once: true });
+    heroVideo.addEventListener('canplay', showVideo, { once: true });
     heroVideo.addEventListener('error', showFallbackImage);
 
     tryPlay();
@@ -1395,8 +1376,9 @@ const colors = ['#f425c0', '#00f0ff', '#ffffff', '#9B00FF'];
 
 function resizeCanvas() {
     if (!canvas) return;
+    const heroSection = document.getElementById('hero-section');
     canvas.width = window.innerWidth;
-    canvas.height = document.getElementById('hero-section').offsetHeight || window.innerHeight;
+    canvas.height = (heroSection ? heroSection.offsetHeight : 0) || window.innerHeight;
 }
 window.addEventListener('resize', resizeCanvas);
 
@@ -1432,6 +1414,7 @@ class Particle {
 }
 
 function initParticles() {
+    if (!canvas || !ctx) return;
     resizeCanvas();
     particles = [];
     for (let i = 0; i < particleCount; i++) {
