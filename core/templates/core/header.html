@@ -135,6 +135,21 @@
 </header>
 {% endif %}
 
+<div class="fixed top-[88px] left-0 right-0 z-[49] px-4 sm:px-6 md:hidden">
+    <nav aria-label="Primary" class="overflow-x-auto border border-white/10 bg-black/75 backdrop-blur-md">
+        <div class="flex min-w-max items-center gap-2 px-3 py-2">
+            <a class="{% if request.resolver_match.url_name == 'live' %}bg-primary text-black border-primary{% else %}border-white/15 text-slate-200 hover:border-primary hover:text-primary{% endif %} nav-cinzel border px-3 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors" href="{% url 'live' %}">Live</a>
+            <a class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}bg-primary text-black border-primary{% else %}border-white/15 text-slate-200 hover:border-primary hover:text-primary{% endif %} nav-cinzel border px-3 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors" href="{% url 'stream_hub' %}">Stream</a>
+            <a class="{% if request.resolver_match.url_name == 'charts' %}bg-primary text-black border-primary{% else %}border-white/15 text-slate-200 hover:border-primary hover:text-primary{% endif %} nav-cinzel border px-3 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors" href="{% url 'charts' %}">Charts</a>
+            <a class="{% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}bg-primary text-black border-primary{% else %}border-white/15 text-slate-200 hover:border-primary hover:text-primary{% endif %} nav-cinzel border px-3 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors" href="{% url 'idols' %}">Idols</a>
+            <a class="{% if request.resolver_match.url_name == 'games' or request.resolver_match.url_name == 'song_game' or request.resolver_match.url_name == 'chart_clash' or request.resolver_match.url_name == 'fandom_trivia' or request.resolver_match.url_name == 'idol_scramble' or request.resolver_match.url_name == 'mv_matcher' or request.resolver_match.url_name == 'lyric_drop' %}bg-primary text-black border-primary{% else %}border-white/15 text-slate-200 hover:border-primary hover:text-primary{% endif %} nav-cinzel border px-3 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors" href="{% url 'games' %}">Games</a>
+            <a class="{% if request.resolver_match.url_name == 'comeback_timeline' %}bg-primary text-black border-primary{% else %}border-white/15 text-slate-200 hover:border-primary hover:text-primary{% endif %} nav-cinzel border px-3 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors" href="{% url 'comeback_timeline' %}">Comebacks</a>
+            <a class="{% if request.resolver_match.url_name == 'news' %}bg-primary text-black border-primary{% else %}border-white/15 text-slate-200 hover:border-primary hover:text-primary{% endif %} nav-cinzel border px-3 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors" href="{% url 'news' %}">News</a>
+            <a class="{% if request.resolver_match.url_name == 'shop' %}bg-primary text-black border-primary{% else %}border-white/15 text-slate-200 hover:border-primary hover:text-primary{% endif %} nav-cinzel border px-3 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors" href="{% url 'shop' %}">Shop</a>
+        </div>
+    </nav>
+</div>
+
 
 <!-- ───── MOBILE SITE MENU ───── -->
 <button
