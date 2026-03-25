@@ -15,12 +15,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="description" content="Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists."/>
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/>
 <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
-<link rel="icon" href="{% static 'core/img/favicon.ico' %}" sizes="any"/>
-<link rel="icon" type="image/svg+xml" href="{% static 'core/img/favicon-kb.svg' %}"/>
-<link rel="icon" type="image/png" sizes="32x32" href="{% static 'core/img/favicon-32x32.png' %}"/>
-<link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/img/favicon-16x16.png' %}"/>
-<link rel="shortcut icon" href="{% static 'core/img/favicon.ico' %}"/>
-<link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/img/apple-touch-icon.png' %}"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="preconnect" href="https://is1-ssl.mzstatic.com" crossorigin/>
@@ -316,9 +310,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     playsinline
     webkit-playsinline
     preload="auto"
+    poster="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2FComing%2520soon.png"
 >
-<source src="https://res.cloudinary.com/diuanqnce/video/upload/f_mp4,w_960,br_800k,vc_h264/v1773964952/ksync/hero/homevid720.mp4" type="video/mp4" />
-<source src="https://f003.backblazeb2.com/file/StrayKids/hero/homevid720.mp4" type="video/mp4" />
+<source src="https://res.cloudinary.com/diuanqnce/video/fetch/f_mp4,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FVideos%2F720%2520%25281%2529.mp4" type="video/mp4" />
+<source src="https://f003.backblazeb2.com/file/StrayKids/Videos/720%20%281%29.mp4" type="video/mp4" />
 <source src="https://f003.backblazeb2.com/file/StrayKids/hero/Hero_video.mp4" type="video/mp4" />
 </video>
 <div class="absolute inset-0 bg-black/5"></div>
@@ -1382,8 +1377,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     heroVideo.addEventListener('error', showFallbackImage);
-    heroVideo.addEventListener('stalled', showFallbackImage);
-    heroVideo.addEventListener('abort', showFallbackImage);
 
     tryPlay();
     document.addEventListener('visibilitychange', () => {

@@ -1,14 +1,21 @@
 {% load static %}
+{% with
+favicon_ico="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2Ffavicon.ico"
+favicon_svg="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2Ffavicon-kb.svg"
+favicon_32="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2Ffavicon-32x32.png"
+favicon_16="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2Ffavicon-16x16.png"
+apple_touch_icon="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2Fapple-touch-icon.png"
+%}
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}"/>
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/>
 <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
-<link rel="icon" href="{% static 'core/img/favicon.ico' %}" sizes="any"/>
-<link rel="icon" type="image/svg+xml" href="{% static 'core/img/favicon-kb.svg' %}"/>
-<link rel="icon" type="image/png" sizes="32x32" href="{% static 'core/img/favicon-32x32.png' %}"/>
-<link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/img/favicon-16x16.png' %}"/>
-<link rel="shortcut icon" href="{% static 'core/img/favicon.ico' %}"/>
-<link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/img/apple-touch-icon.png' %}"/>
+<link rel="icon" href="{{ favicon_ico }}" sizes="any"/>
+<link rel="icon" type="image/svg+xml" href="{{ favicon_svg }}"/>
+<link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}"/>
+<link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16 }}"/>
+<link rel="shortcut icon" href="{{ favicon_ico }}"/>
+<link rel="apple-touch-icon" sizes="180x180" href="{{ apple_touch_icon }}"/>
 
 <meta property="og:type" content="{% firstof seo_type 'website' %}"/>
 <meta property="og:site_name" content="K-Beats Radio"/>
@@ -40,3 +47,4 @@
 {% if extra_schema_json %}
 <script type="application/ld+json">{{ extra_schema_json|safe }}</script>
 {% endif %}
+{% endwith %}
