@@ -271,8 +271,6 @@ def _build_stream_image_url(source_url):
 DEFAULT_STREAM_IMAGE_URL = "https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner"
 KNOWN_BROKEN_IMAGE_FRAGMENTS = (
     "v1710546648/ksync/skz_group_default.jpg",
-    "/file/straykids/media/images/",
-    "/file/straykids/media/member_images/",
 )
 
 
@@ -391,6 +389,12 @@ def _optimize_home_image_url(source_url, *, width=None, height=None):
     if 'res.cloudinary.com' in host and '/image/upload/' in raw:
         base, tail = raw.split('/image/upload/', 1)
         return f'{base}/image/upload/{transform}/{tail}'
+
+    # Only route external image hosts through fetch when that feature is explicitly enabled.
+    # Our Backblaze originals are already valid, and forced fetch rewrites can fail open into
+    # placeholder fallbacks on pages like /idols/.
+    if not getattr(settings, 'IMAGE_STREAM_USE_CLOUDINARY_FETCH', False):
+        return raw
 
     if 'cdn.kpopping.com' in host or 'backblazeb2.com' in host:
         encoded = urllib.parse.quote(raw, safe='')
