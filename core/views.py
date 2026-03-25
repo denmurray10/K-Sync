@@ -4619,6 +4619,76 @@ def bias_selector_promo(request):
     })
 
 
+def song_game_promo(request):
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    featured_tracks = []
+    featured_artists = []
+    if daily_rank and daily_rank.ranking_data:
+        seen_artists = set()
+        for item in daily_rank.ranking_data[:20]:
+            artist = item.get('artist', '').strip()
+            title = item.get('track', '').strip()
+            artwork_url = item.get('artwork_url', '').strip()
+            if not artist or not title:
+                continue
+
+            featured_tracks.append({
+                'artist': artist,
+                'title': title,
+                'artwork_url': artwork_url,
+            })
+
+            if artist.lower() not in seen_artists and artwork_url:
+                seen_artists.add(artist.lower())
+                featured_artists.append({
+                    'artist': artist,
+                    'title': title,
+                    'artwork_url': artwork_url,
+                })
+
+            if len(featured_tracks) >= 4 and len(featured_artists) >= 3:
+                break
+
+    social_image = ''
+    if featured_artists:
+        social_image = featured_artists[0]['artwork_url']
+    elif featured_tracks:
+        social_image = featured_tracks[0]['artwork_url']
+
+    extra_schema_json = json.dumps({
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Song Game",
+        "url": request.build_absolute_uri(reverse('song_game')),
+        "description": (
+            "Play Song Game on K-Beats and guess the artist from fast K-Pop audio "
+            "clips, score streak bonuses, and race through ten rounds."
+        ),
+        "genre": ["Music", "Trivia", "Audio"],
+        "playMode": "SinglePlayer",
+        "applicationCategory": "Game",
+        "publisher": {
+            "@type": "Organization",
+            "name": "K-Beats",
+        },
+    })
+
+    return render(request, 'core/song_game_promo.html', {
+        'featured_tracks': featured_tracks,
+        'hero_track_primary': featured_artists[0] if len(featured_artists) > 0 else None,
+        'hero_track_secondary': featured_artists[1] if len(featured_artists) > 1 else None,
+        'hero_track_tertiary': featured_artists[2] if len(featured_artists) > 2 else None,
+        'seo_title': 'Song Game - Guess The K-Pop Artist | K-Beats Games',
+        'seo_description': (
+            'Song Game is K-Beats\' fast audio challenge. Hear the clip, pick the '
+            'right artist, and build streak bonuses across ten rounds.'
+        ),
+        'seo_image': social_image,
+        'seo_image_alt': 'Song Game promo artwork on K-Beats',
+        'extra_schema_json': extra_schema_json,
+    })
+
+
 def signup(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -5256,6 +5326,61 @@ def idol_scramble(request):
 
 def lyric_drop(request):
     return render(request, 'core/lyric_drop.html')
+
+
+def lyric_drop_promo(request):
+    sample_rounds = [
+        {
+            'song': 'BTS - Dynamite',
+            'lyric_before': "Cause I-I-I'm in the stars tonight so watch me bring the",
+            'word': 'fire',
+            'lyric_after': 'the heat',
+        },
+        {
+            'song': 'BLACKPINK - How You Like That',
+            'lyric_before': "Look up in the sky it's a bird it's a",
+            'word': 'plane',
+            'lyric_after': '',
+        },
+        {
+            'song': 'IVE - LOVE DIVE',
+            'lyric_before': 'Narcissistic my god I',
+            'word': 'love',
+            'lyric_after': 'it',
+        },
+    ]
+
+    extra_schema_json = json.dumps({
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Lyric Drop",
+        "url": request.build_absolute_uri(reverse('lyric_drop')),
+        "description": (
+            "Play Lyric Drop on K-Beats and fill in the missing lyric from "
+            "famous K-Pop songs before the countdown runs out."
+        ),
+        "genre": ["Music", "Trivia", "Lyrics"],
+        "playMode": "SinglePlayer",
+        "applicationCategory": "Game",
+        "publisher": {
+            "@type": "Organization",
+            "name": "K-Beats",
+        },
+    })
+
+    return render(request, 'core/lyric_drop_promo.html', {
+        'sample_rounds': sample_rounds,
+        'hero_round_primary': sample_rounds[0],
+        'hero_round_secondary': sample_rounds[1],
+        'hero_round_tertiary': sample_rounds[2],
+        'seo_title': 'Lyric Drop - Finish The K-Pop Lyric | K-Beats Games',
+        'seo_description': (
+            'Lyric Drop is K-Beats\' quick-fire lyric challenge. Fill in the '
+            'missing word, beat the timer, and stack your score across ten rounds.'
+        ),
+        'seo_image_alt': 'Lyric Drop promo artwork on K-Beats',
+        'extra_schema_json': extra_schema_json,
+    })
 
 def fandom_trivia(request):
     import random

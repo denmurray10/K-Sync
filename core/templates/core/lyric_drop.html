@@ -30,6 +30,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </script>
     <style>
         body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        [x-cloak] { display: none !important; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @keyframes score-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
         @keyframes slide-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
@@ -44,7 +45,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .option-btn:hover:not(:disabled) { border-color: #f425c0; background: rgba(244, 37, 192, 0.05); transform: translateY(-2px); }
     </style>
 </head>
-<body class="font-sans text-white" x-data="lyricDrop()">
+<body class="font-sans text-white" x-data="lyricDrop()" x-init="boot()">
 {% include "core/header.html" %}
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
@@ -84,21 +85,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- Game Area -->
         <div class="flex-1 flex items-center justify-center p-6 overflow-auto">
 
-            <!-- Start Screen -->
-            <div x-show="state === 'start'" x-transition class="text-center max-w-lg mx-auto animate-slide-up">
-                <div class="w-20 h-20 bg-secondary/10 border border-secondary/30 flex items-center justify-center mx-auto mb-8">
+            <div x-show="state === 'loading'" x-transition x-cloak class="text-center max-w-lg mx-auto animate-slide-up">
+                <div class="w-20 h-20 bg-secondary/10 border border-secondary/30 flex items-center justify-center mx-auto mb-8 animate-pulse">
                     <span class="material-symbols-outlined text-secondary text-4xl">lyrics</span>
                 </div>
-                <h2 class="text-4xl font-black uppercase tracking-tighter mb-4">LYRIC DROP</h2>
-                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase mb-2">Complete the missing lyric</p>
-                <p class="text-slate-500 text-sm mb-10 max-w-md mx-auto">We'll show you a line from a famous K-Pop song with a missing word. Pick the correct word from four options. Quick answers earn bonus points!</p>
-                <button @click="startGame()" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-10 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
-                    Start Game
-                </button>
+                <h2 class="text-4xl font-black uppercase tracking-tighter mb-4">LOADING ROUND</h2>
+                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase mb-2">Preparing your lyric drops</p>
             </div>
 
             <!-- Playing Screen -->
-            <div x-show="state === 'playing'" x-transition class="text-center max-w-2xl w-full mx-auto">
+            <div x-show="state === 'playing'" x-transition x-cloak class="text-center max-w-2xl w-full mx-auto">
                 <!-- Song & Artist -->
                 <div class="mb-4">
                     <span class="inline-flex items-center gap-2 px-3 py-1 border border-primary/30 text-primary bg-primary/10 font-mono text-[10px] tracking-widest uppercase">
@@ -142,7 +138,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
 
             <!-- Results Screen -->
-            <div x-show="state === 'results'" x-transition class="text-center max-w-lg mx-auto animate-slide-up">
+            <div x-show="state === 'results'" x-transition x-cloak class="text-center max-w-lg mx-auto animate-slide-up">
                 <div class="w-20 h-20 bg-secondary/10 border border-secondary/30 flex items-center justify-center mx-auto mb-6">
                     <span class="material-symbols-outlined text-secondary text-4xl">emoji_events</span>
                 </div>
@@ -202,7 +198,7 @@ const LYRIC_DATA = [
 
 function lyricDrop() {
     return {
-        state: 'start',
+        state: 'loading',
         questions: [],
         currentRound: 0,
         totalRounds: 10,
@@ -221,6 +217,10 @@ function lyricDrop() {
         correctIndex: -1,
         selectedIndex: -1,
         answered: false,
+
+        boot() {
+            this.startGame();
+        },
 
         startGame() {
             let pool = [...LYRIC_DATA];

@@ -1,0 +1,336 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="utf-8"/>
+    {% include 'core/seo_meta.html' %}
+    <title>Lyric Drop - K-Beats Games</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: {
+                    sans: ['Montserrat', 'sans-serif'],
+                    display: ['Cinzel', 'serif']
+                },
+                borderRadius: {
+                    DEFAULT: '0px', sm: '0px', md: '0px', lg: '0px', xl: '0px', '2xl': '0px', '3xl': '0px', full: '9999px'
+                }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; background: #000; overflow-x: hidden; }
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(244,37,192,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,240,255,0.05) 1px, transparent 1px);
+            background-size: 42px 42px;
+        }
+        .reveal, .reveal-left, .reveal-right {
+            opacity: 0;
+            transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16,1,0.3,1);
+        }
+        .reveal { transform: translateY(30px); }
+        .reveal-left { transform: translateX(-30px); }
+        .reveal-right { transform: translateX(30px); }
+        .reveal.visible, .reveal-left.visible, .reveal-right.visible {
+            opacity: 1;
+            transform: none;
+        }
+        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes floatCard { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .animate-ticker { animation: ticker 24s linear infinite; }
+        .animate-float-card { animation: floatCard 5s ease-in-out infinite; }
+        .hero-stroke { -webkit-text-stroke: 1.5px #f425c0; color: transparent; }
+        .hero-stroke-cyan { -webkit-text-stroke: 1.4px #00f0ff; color: transparent; }
+        .panel-glow { box-shadow: 0 0 40px rgba(244,37,192,0.12); }
+        .panel-glow-cyan { box-shadow: 0 0 40px rgba(0,240,255,0.12); }
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-left, .reveal-right, .animate-ticker, .animate-float-card {
+                animation: none !important;
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans text-white">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/88 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+            <a href="{% url 'games' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-lg">arrow_back</span>
+                <span class="font-mono text-[10px] uppercase tracking-[0.28em]">K-Beats Games</span>
+            </a>
+            <div class="hidden md:flex items-center gap-2 text-white">
+                <span class="material-symbols-outlined text-secondary text-sm">lyrics</span>
+                <span class="font-black uppercase tracking-[0.18em] text-xs">Lyric Drop</span>
+            </div>
+            <a href="{% url 'lyric_drop_play' %}" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-5 py-2 border border-primary hover:bg-black hover:text-primary transition-colors">
+                Play Game
+            </a>
+        </div>
+    </nav>
+
+    <section class="relative min-h-screen overflow-hidden grid-bg" style="padding-top: 110px;">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,37,192,0.18),transparent_38%),radial-gradient(circle_at_bottom_right,rgba(0,240,255,0.16),transparent_38%)]"></div>
+        <div class="relative z-10 max-w-6xl mx-auto px-6 pb-20">
+            <div class="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+                <div class="reveal">
+                    <div class="inline-flex items-center gap-2 border border-secondary/30 bg-secondary/5 px-4 py-2 mb-8">
+                        <span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+                        <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary">K-Beats Word Check</span>
+                    </div>
+                    <h1 class="font-display text-[clamp(3.6rem,11vw,8.6rem)] leading-[0.9] uppercase tracking-tight mb-5">
+                        <span class="block">LYRIC</span>
+                        <span class="block hero-stroke">DROP</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-slate-300 max-w-xl leading-relaxed mb-4">
+                        A fast fill-in-the-blank challenge for fans who know the hook before the chorus even lands.
+                    </p>
+                    <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-slate-500 mb-10">
+                        missing word rounds . 12 second timer . instant score push
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                        <a href="{% url 'lyric_drop_play' %}" class="inline-flex items-center justify-center gap-3 bg-primary text-black font-black uppercase tracking-[0.22em] text-sm px-10 py-5 border-2 border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                            <span class="material-symbols-outlined">play_arrow</span>
+                            Start Lyric Drop
+                        </a>
+                        <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 border border-white/15 text-white font-black uppercase tracking-[0.18em] text-[11px] px-8 py-5 hover:border-secondary hover:text-secondary transition-colors">
+                            <span class="material-symbols-outlined text-base">south</span>
+                            See How It Works
+                        </a>
+                    </div>
+                    <div class="grid sm:grid-cols-3 gap-0 border border-white/10 max-w-2xl">
+                        <div class="p-5 border-b sm:border-b-0 sm:border-r border-white/10">
+                            <span class="block font-black text-3xl text-white">10</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">lyric rounds</span>
+                        </div>
+                        <div class="p-5 border-b sm:border-b-0 sm:border-r border-white/10">
+                            <span class="block font-black text-3xl text-primary">12s</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">per answer</span>
+                        </div>
+                        <div class="p-5">
+                            <span class="block font-black text-3xl text-secondary">4</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">word choices</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reveal-right">
+                    <div class="border border-white/10 bg-black/75 panel-glow animate-float-card">
+                        <div class="grid grid-cols-2 border-b border-white/10">
+                            <div class="p-4 border-r border-white/10">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-slate-500 mb-3">Preview Line</p>
+                                {% if hero_round_primary %}
+                                <p class="font-black uppercase tracking-tight text-lg text-white mb-2">{{ hero_round_primary.song }}</p>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    {{ hero_round_primary.lyric_before }}
+                                    <span class="inline-block border-b-2 border-primary px-2 text-primary font-black">______</span>
+                                    {{ hero_round_primary.lyric_after }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            <div class="p-4">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-slate-500 mb-3">Correct Drop</p>
+                                {% if hero_round_secondary %}
+                                <p class="font-black uppercase tracking-tight text-lg text-white mb-2">{{ hero_round_secondary.song }}</p>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    {{ hero_round_secondary.lyric_before }}
+                                    <span class="inline-block border-b-2 border-secondary px-2 text-secondary font-black">{{ hero_round_secondary.word }}</span>
+                                    {{ hero_round_secondary.lyric_after }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="p-5 border-b border-white/10">
+                            <p class="font-mono text-[9px] uppercase tracking-[0.28em] text-primary mb-3">Round Pressure</p>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 border border-secondary/30 bg-secondary/5 flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-secondary text-3xl">timer</span>
+                                </div>
+                                <div>
+                                    <p class="font-black text-xl uppercase tracking-tight">Spot The Missing Word</p>
+                                    <p class="text-slate-400 text-sm">You get one lyric gap, four choices, and just enough time to trust your memory before the clock wipes the round.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-0">
+                            <div class="p-4 border-r border-white/10">
+                                <p class="font-black text-white text-xl">READ</p>
+                                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">lyric line</p>
+                            </div>
+                            <div class="p-4 border-r border-white/10">
+                                <p class="font-black text-primary text-xl">DROP</p>
+                                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">the word in</p>
+                            </div>
+                            <div class="p-4">
+                                <p class="font-black text-secondary text-xl">RUSH</p>
+                                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">beat the timer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="bg-primary/10 border-y border-primary/20 py-3 overflow-hidden">
+        <div class="animate-ticker whitespace-nowrap flex gap-16 text-[10px] font-black uppercase tracking-[0.3em] text-primary/65">
+            <span>Lyric Drop</span><span class="text-primary/30">.</span>
+            <span>Fill The Blank</span><span class="text-primary/30">.</span>
+            <span>Beat The Clock</span><span class="text-primary/30">.</span>
+            <span>Trust Your Memory</span><span class="text-primary/30">.</span>
+            <span>Lyric Drop</span><span class="text-primary/30">.</span>
+            <span>Fill The Blank</span><span class="text-primary/30">.</span>
+            <span>Beat The Clock</span><span class="text-primary/30">.</span>
+            <span>Trust Your Memory</span><span class="text-primary/30">.</span>
+        </div>
+    </div>
+
+    <section id="how-it-works" class="py-24 md:py-32 px-6 max-w-6xl mx-auto">
+        <div class="reveal text-center mb-16">
+            <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary mb-3">How It Works</p>
+            <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none">
+                One Missing Word.<br/><span class="hero-stroke-cyan">Zero Setup Friction.</span>
+            </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10">
+            <div class="reveal p-10 md:p-12 border-b md:border-b-0 md:border-r border-white/10 hover:bg-white/[0.02] transition-colors">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6">01</div>
+                <div class="w-12 h-12 border border-primary/30 bg-primary/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-primary">short_text</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Read the Line</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Each round gives you a recognisable lyric with one missing word, so the puzzle is immediate and easy to scan.</p>
+            </div>
+            <div class="reveal p-10 md:p-12 border-b md:border-b-0 md:border-r border-white/10 hover:bg-white/[0.02] transition-colors" style="transition-delay:0.08s">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6">02</div>
+                <div class="w-12 h-12 border border-secondary/30 bg-secondary/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-secondary">quiz</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Choose the Word</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">You get four plausible answers, which keeps the game sharp enough to reward fans who actually know the line.</p>
+            </div>
+            <div class="reveal p-10 md:p-12 hover:bg-white/[0.02] transition-colors" style="transition-delay:0.16s">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6">03</div>
+                <div class="w-12 h-12 border border-white/20 bg-white/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-white">bolt</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Keep the Pace</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Fast answers push your score up, while hesitation burns the timer and resets the rhythm of your run.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 px-6 bg-white/[0.02] border-y border-white/5">
+        <div class="max-w-6xl mx-auto">
+            <div class="reveal text-center mb-16">
+                <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">Sample Drops</p>
+                <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none">
+                    Built For Hooks You Know.<br/><span class="hero-stroke">Fast Enough To Miss.</span>
+                </h2>
+            </div>
+            <div class="grid md:grid-cols-[0.95fr_1.05fr] gap-8 items-start">
+                <div class="reveal-left border border-white/10 bg-black/70 panel-glow p-8">
+                    <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500 mb-6">Game Rhythm</p>
+                    <div class="space-y-5">
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-primary mt-0.5">edit_note</span>
+                            <div>
+                                <p class="font-black uppercase tracking-tight text-white">One gap per round</p>
+                                <p class="text-slate-500 text-sm">The format stays clear and repeatable, so the challenge comes from your memory rather than puzzle overload.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-secondary mt-0.5">timer</span>
+                            <div>
+                                <p class="font-black uppercase tracking-tight text-white">Fast score pressure</p>
+                                <p class="text-slate-500 text-sm">Correct answers reward speed, making the mode feel competitive even in a solo run.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-white mt-0.5">play_circle</span>
+                            <div>
+                                <p class="font-black uppercase tracking-tight text-white">Direct-to-play flow</p>
+                                <p class="text-slate-500 text-sm">The promo page sells the mode, then the CTA drops you straight into the live playable rounds.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal-right border border-white/10 divide-y divide-white/10 bg-black/60 panel-glow-cyan">
+                    {% for round in sample_rounds %}
+                    <div class="p-5 md:p-6 hover:bg-white/[0.02] transition-colors">
+                        <p class="font-black uppercase tracking-tight text-lg text-white mb-2">{{ round.song }}</p>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            {{ round.lyric_before }}
+                            <span class="inline-block border-b-2 border-primary px-2 text-primary font-black">______</span>
+                            {{ round.lyric_after }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 md:py-32 px-6 max-w-5xl mx-auto text-center">
+        <div class="reveal">
+            <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500 mb-4">Ready To Play</p>
+            <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none mb-6">
+                Go Straight Into<br/><span class="hero-stroke">Lyric Drop</span>
+            </h2>
+            <p class="text-slate-400 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+                No extra holding page. Hit play and go directly into the first missing-word round.
+            </p>
+            <a href="{% url 'lyric_drop_play' %}" class="inline-flex items-center gap-3 bg-primary text-black font-black uppercase tracking-[0.2em] text-sm px-14 py-6 border-2 border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                <span class="material-symbols-outlined">play_arrow</span>
+                Play Lyric Drop
+            </a>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/10 py-8 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="font-mono text-[9px] uppercase tracking-widest text-slate-700">Copyright 2026 K-Beats . Lyric Drop</p>
+            <div class="flex items-center gap-6 text-[10px] uppercase tracking-[0.24em] font-black text-slate-500">
+                <a href="{% url 'games' %}" class="hover:text-primary transition-colors">Games</a>
+                <a href="{% url 'lyric_drop_play' %}" class="hover:text-primary transition-colors">Play Now</a>
+                <a href="{% url 'live' %}" class="hover:text-primary transition-colors">Live</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

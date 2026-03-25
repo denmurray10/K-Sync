@@ -1,0 +1,354 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="utf-8"/>
+    {% include 'core/seo_meta.html' %}
+    <title>Song Game - K-Beats Games</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: {
+                    sans: ['Montserrat', 'sans-serif'],
+                    display: ['Cinzel', 'serif']
+                },
+                borderRadius: {
+                    DEFAULT: '0px', sm: '0px', md: '0px', lg: '0px', xl: '0px', '2xl': '0px', '3xl': '0px', full: '9999px'
+                }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; background: #000; overflow-x: hidden; }
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(244,37,192,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,240,255,0.05) 1px, transparent 1px);
+            background-size: 42px 42px;
+        }
+        .reveal, .reveal-left, .reveal-right {
+            opacity: 0;
+            transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16,1,0.3,1);
+        }
+        .reveal { transform: translateY(30px); }
+        .reveal-left { transform: translateX(-30px); }
+        .reveal-right { transform: translateX(30px); }
+        .reveal.visible, .reveal-left.visible, .reveal-right.visible {
+            opacity: 1;
+            transform: none;
+        }
+        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes floatCard { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes pulseRing {
+            0% { box-shadow: 0 0 0 0 rgba(244,37,192,0.28); }
+            100% { box-shadow: 0 0 0 18px rgba(244,37,192,0); }
+        }
+        .animate-ticker { animation: ticker 24s linear infinite; }
+        .animate-float-card { animation: floatCard 5s ease-in-out infinite; }
+        .animate-pulse-ring { animation: pulseRing 1.8s ease-out infinite; }
+        .hero-stroke { -webkit-text-stroke: 1.5px #f425c0; color: transparent; }
+        .hero-stroke-cyan { -webkit-text-stroke: 1.4px #00f0ff; color: transparent; }
+        .panel-glow { box-shadow: 0 0 40px rgba(244,37,192,0.12); }
+        .panel-glow-cyan { box-shadow: 0 0 40px rgba(0,240,255,0.12); }
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-left, .reveal-right, .animate-ticker, .animate-float-card, .animate-pulse-ring {
+                animation: none !important;
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans text-white">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/88 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+            <a href="{% url 'games' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-lg">arrow_back</span>
+                <span class="font-mono text-[10px] uppercase tracking-[0.28em]">K-Beats Games</span>
+            </a>
+            <div class="hidden md:flex items-center gap-2 text-white">
+                <span class="material-symbols-outlined text-primary text-sm">headphones</span>
+                <span class="font-black uppercase tracking-[0.18em] text-xs">Song Game</span>
+            </div>
+            <a href="{% url 'song_game_play' %}" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-[10px] px-5 py-2 border border-primary hover:bg-black hover:text-primary transition-colors">
+                Play Game
+            </a>
+        </div>
+    </nav>
+
+    <section class="relative min-h-screen overflow-hidden grid-bg" style="padding-top: 110px;">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,37,192,0.18),transparent_38%),radial-gradient(circle_at_bottom_right,rgba(0,240,255,0.16),transparent_38%)]"></div>
+        <div class="relative z-10 max-w-6xl mx-auto px-6 pb-20">
+            <div class="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+                <div class="reveal">
+                    <div class="inline-flex items-center gap-2 border border-primary/30 bg-primary/5 px-4 py-2 mb-8">
+                        <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                        <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-primary">K-Beats Audio Arena</span>
+                    </div>
+                    <h1 class="font-display text-[clamp(3.6rem,11vw,8.6rem)] leading-[0.9] uppercase tracking-tight mb-5">
+                        <span class="block">SONG</span>
+                        <span class="block hero-stroke">GAME</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-slate-300 max-w-xl leading-relaxed mb-4">
+                        The fast K-Pop audio challenge. Hear the clip, trust your instincts, and lock in the right artist before the timer burns out.
+                    </p>
+                    <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-slate-500 mb-10">
+                        10 rounds . streak bonuses . artist guess showdown
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                        <a href="{% url 'song_game_play' %}" class="inline-flex items-center justify-center gap-3 bg-primary text-black font-black uppercase tracking-[0.22em] text-sm px-10 py-5 border-2 border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                            <span class="material-symbols-outlined">play_arrow</span>
+                            Start Song Game
+                        </a>
+                        <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 border border-white/15 text-white font-black uppercase tracking-[0.18em] text-[11px] px-8 py-5 hover:border-secondary hover:text-secondary transition-colors">
+                            <span class="material-symbols-outlined text-base">south</span>
+                            See How It Works
+                        </a>
+                    </div>
+                    <div class="grid sm:grid-cols-3 gap-0 border border-white/10 max-w-2xl">
+                        <div class="p-5 border-b sm:border-b-0 sm:border-r border-white/10">
+                            <span class="block font-black text-3xl text-white">10</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">rapid rounds</span>
+                        </div>
+                        <div class="p-5 border-b sm:border-b-0 sm:border-r border-white/10">
+                            <span class="block font-black text-3xl text-primary">15s</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">per clip timer</span>
+                        </div>
+                        <div class="p-5">
+                            <span class="block font-black text-3xl text-secondary">4</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">artist choices</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reveal-right">
+                    <div class="border border-white/10 bg-black/75 panel-glow animate-float-card">
+                        <div class="grid grid-cols-2 border-b border-white/10">
+                            <div class="p-4 border-r border-white/10">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-slate-500 mb-2">Round Preview</p>
+                                {% if hero_track_primary %}
+                                <div class="aspect-[4/5] overflow-hidden border border-white/10 mb-3">
+                                    <img src="{{ hero_track_primary.artwork_url }}" alt="{{ hero_track_primary.artist }}" class="w-full h-full object-cover"/>
+                                </div>
+                                <p class="font-black uppercase tracking-tight text-lg">{{ hero_track_primary.artist }}</p>
+                                <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-primary mt-1">{{ hero_track_primary.title }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="p-4">
+                                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-slate-500 mb-2">Decoy Pick</p>
+                                {% if hero_track_secondary %}
+                                <div class="aspect-[4/5] overflow-hidden border border-secondary/20 mb-3">
+                                    <img src="{{ hero_track_secondary.artwork_url }}" alt="{{ hero_track_secondary.artist }}" class="w-full h-full object-cover"/>
+                                </div>
+                                <p class="font-black uppercase tracking-tight text-lg">{{ hero_track_secondary.artist }}</p>
+                                <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-secondary mt-1">{{ hero_track_secondary.title }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="p-5 border-b border-white/10">
+                            <p class="font-mono text-[9px] uppercase tracking-[0.28em] text-primary mb-3">Live Round Feel</p>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 border border-primary/30 bg-primary/5 flex items-center justify-center shrink-0 animate-pulse-ring">
+                                    <span class="material-symbols-outlined text-primary text-3xl">headphones</span>
+                                </div>
+                                <div>
+                                    <p class="font-black text-xl uppercase tracking-tight">Clip. Decide. Lock It In.</p>
+                                    <p class="text-slate-400 text-sm">Every correct answer stacks time and streak points, so the pressure rises with every round.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-0">
+                            <div class="p-4 border-r border-white/10">
+                                <p class="font-black text-white text-xl">PLAY</p>
+                                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">preview clip</p>
+                            </div>
+                            <div class="p-4 border-r border-white/10">
+                                <p class="font-black text-primary text-xl">PICK</p>
+                                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">1 of 4 artists</p>
+                            </div>
+                            <div class="p-4">
+                                <p class="font-black text-secondary text-xl">STACK</p>
+                                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">streak points</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="bg-primary/10 border-y border-primary/20 py-3 overflow-hidden">
+        <div class="animate-ticker whitespace-nowrap flex gap-16 text-[10px] font-black uppercase tracking-[0.3em] text-primary/65">
+            <span>Song Game</span><span class="text-primary/30">.</span>
+            <span>Guess The Artist</span><span class="text-primary/30">.</span>
+            <span>Hear The Clip</span><span class="text-primary/30">.</span>
+            <span>Beat The Timer</span><span class="text-primary/30">.</span>
+            <span>Build A Streak</span><span class="text-primary/30">.</span>
+            <span>Song Game</span><span class="text-primary/30">.</span>
+            <span>Guess The Artist</span><span class="text-primary/30">.</span>
+            <span>Hear The Clip</span><span class="text-primary/30">.</span>
+            <span>Beat The Timer</span><span class="text-primary/30">.</span>
+            <span>Build A Streak</span><span class="text-primary/30">.</span>
+        </div>
+    </div>
+
+    <section id="how-it-works" class="py-24 md:py-32 px-6 max-w-6xl mx-auto">
+        <div class="reveal text-center mb-16">
+            <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary mb-3">How It Works</p>
+            <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none">
+                Fast Audio Rounds.<br/><span class="hero-stroke-cyan">No Filler Setup.</span>
+            </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10">
+            <div class="reveal p-10 md:p-12 border-b md:border-b-0 md:border-r border-white/10 hover:bg-white/[0.02] transition-colors">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6">01</div>
+                <div class="w-12 h-12 border border-primary/30 bg-primary/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-primary">graphic_eq</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Hear the Clip</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Each round pulls in a short music preview so the challenge starts immediately instead of making you read through setup screens.</p>
+            </div>
+            <div class="reveal p-10 md:p-12 border-b md:border-b-0 md:border-r border-white/10 hover:bg-white/[0.02] transition-colors" style="transition-delay:0.08s">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6">02</div>
+                <div class="w-12 h-12 border border-secondary/30 bg-secondary/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-secondary">timer</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Pick Under Pressure</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">You get four artist choices and a 15 second countdown, so the game feels more like a live radio challenge than a trivia form.</p>
+            </div>
+            <div class="reveal p-10 md:p-12 hover:bg-white/[0.02] transition-colors" style="transition-delay:0.16s">
+                <div class="text-[5rem] font-black text-white/5 leading-none mb-6">03</div>
+                <div class="w-12 h-12 border border-white/20 bg-white/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-white">local_fire_department</span>
+                </div>
+                <h3 class="font-black uppercase tracking-tight text-xl mb-3">Stack the Streak</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Correct runs build bonus points, so the tension climbs as your score gets hotter and every next answer matters more.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 px-6 bg-white/[0.02] border-y border-white/5">
+        <div class="max-w-6xl mx-auto">
+            <div class="reveal text-center mb-16">
+                <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">Featured In The Mix</p>
+                <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none">
+                    The Artists You Know.<br/><span class="hero-stroke">The Clips You Need To Catch.</span>
+                </h2>
+            </div>
+            <div class="grid md:grid-cols-[0.95fr_1.05fr] gap-8 items-start">
+                <div class="reveal-left border border-white/10 bg-black/70 panel-glow p-8">
+                    <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500 mb-6">Game Rhythm</p>
+                    <div class="space-y-5">
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-primary mt-0.5">radio</span>
+                            <div>
+                                <p class="font-black uppercase tracking-tight text-white">Built for instant play</p>
+                                <p class="text-slate-500 text-sm">The promo page sells the challenge, then your click lands directly inside the playable game screen.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-secondary mt-0.5">music_note</span>
+                            <div>
+                                <p class="font-black uppercase tracking-tight text-white">Pulled from chart energy</p>
+                                <p class="text-slate-500 text-sm">The round pool is seeded from the live ranking data so the artists feel current and recognisable.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-white mt-0.5">leaderboard</span>
+                            <div>
+                                <p class="font-black uppercase tracking-tight text-white">Arcade-style pressure</p>
+                                <p class="text-slate-500 text-sm">Quick timers, visible scores, and streak bonuses keep the session moving like a music-channel challenge.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal-right border border-white/10 divide-y divide-white/10 bg-black/60 panel-glow-cyan">
+                    {% for track in featured_tracks|slice:":4" %}
+                    <div class="flex items-center gap-4 p-5 md:p-6 hover:bg-white/[0.02] transition-colors">
+                        <div class="w-20 h-20 overflow-hidden border border-white/10 shrink-0">
+                            {% if track.artwork_url %}
+                            <img src="{{ track.artwork_url }}" alt="{{ track.artist }}" class="w-full h-full object-cover"/>
+                            {% else %}
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white/15">album</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-black uppercase tracking-tight text-lg text-white truncate">{{ track.artist }}</p>
+                            <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500 truncate">{{ track.title }}</p>
+                        </div>
+                        <span class="material-symbols-outlined text-primary text-xl">headphones</span>
+                    </div>
+                    {% empty %}
+                    <div class="p-8">
+                        <p class="font-black uppercase tracking-tight text-white mb-2">Fresh tracks load in live</p>
+                        <p class="text-slate-500 text-sm">Even if featured artwork is missing here, the playable Song Game still launches with the current clip set.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 md:py-32 px-6 max-w-5xl mx-auto text-center">
+        <div class="reveal">
+            <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500 mb-4">Ready To Play</p>
+            <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none mb-6">
+                Go Straight Into<br/><span class="hero-stroke">The Real Game</span>
+            </h2>
+            <p class="text-slate-400 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+                No holding page, no extra click loop. Hit play and jump directly into the live Song Game round flow.
+            </p>
+            <a href="{% url 'song_game_play' %}" class="inline-flex items-center gap-3 bg-primary text-black font-black uppercase tracking-[0.2em] text-sm px-14 py-6 border-2 border-primary hover:bg-black hover:text-primary transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]">
+                <span class="material-symbols-outlined">play_arrow</span>
+                Play Song Game
+            </a>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/10 py-8 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="font-mono text-[9px] uppercase tracking-widest text-slate-700">Copyright 2026 K-Beats . Song Game</p>
+            <div class="flex items-center gap-6 text-[10px] uppercase tracking-[0.24em] font-black text-slate-500">
+                <a href="{% url 'games' %}" class="hover:text-primary transition-colors">Games</a>
+                <a href="{% url 'song_game_play' %}" class="hover:text-primary transition-colors">Play Now</a>
+                <a href="{% url 'live' %}" class="hover:text-primary transition-colors">Live</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

@@ -46,7 +46,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .option-btn:hover:not(:disabled) { border-color: #f425c0; background: rgba(244, 37, 192, 0.05); transform: translateY(-2px); }
     </style>
 </head>
-<body class="font-sans text-white" x-data="songGame()">
+<body class="font-sans text-white" x-data="songGame()" x-init="boot()">
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -96,26 +96,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- Game Area -->
         <div class="flex-1 flex items-center justify-center overflow-hidden">
 
-            <!-- Intro Screen -->
-            <div x-show="state === 'intro'" x-transition class="text-center px-6 max-w-lg">
-                <span class="material-symbols-outlined text-7xl text-primary mb-6 block">headphones</span>
-                <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-4">
-                    GUESS THE<br/><span class="text-transparent [-webkit-text-stroke:1.5px_#f425c0]">ARTIST</span>
-                </h2>
-                <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-3">
-                    <span x-text="totalRounds"></span> Rounds &bull; 4 Choices per Round &bull; 15s Timer
-                </p>
-                <p class="text-slate-400 text-sm mb-10 max-w-sm mx-auto">
-                    Listen to the audio clip and pick the correct artist. Score bonus points for streaks!
-                </p>
-                <button @click="startGame()"
-                        class="inline-flex items-center gap-3 bg-primary text-black px-10 py-4 font-black uppercase tracking-[0.2em] text-xs border border-primary hover:bg-white hover:border-white transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
-                    <span class="material-symbols-outlined text-lg">play_arrow</span> Start Game
-                </button>
-            </div>
-
             <!-- Playing Screen -->
-            <div x-show="state === 'playing'" x-transition class="w-full max-w-3xl px-6 animate-slide-up" :key="currentRound">
+            <div class="w-full max-w-3xl px-6 animate-slide-up" :key="currentRound">
 
                 <!-- Timer Bar -->
                 <div class="flex items-center justify-center gap-3 mb-8">
@@ -203,7 +185,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div x-show="answered" x-transition class="mt-6 text-center">
                     <p class="font-mono text-[10px] tracking-widest uppercase mb-4"
                        :class="wasCorrect ? 'text-green-400' : 'text-red-400'"
-                       x-text="wasCorrect ? (streak >= 3 ? '🔥 ' + streak + 'x STREAK! +' + lastPoints + ' PTS' : '✓ CORRECT! +' + lastPoints + ' PTS') : '✗ WRONG — IT WAS ' + currentQuestion.options[currentQuestion.correctIndex].artist.toUpperCase()">
+                       x-text="feedbackMessage">
                     </p>
                     <button @click="nextRound()"
                             class="inline-flex items-center gap-2 border border-white/20 text-white px-6 py-3 font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors">
@@ -283,7 +265,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         }
 
         return {
-            state: 'intro',
+            state: 'playing',
             questions: [],
             currentRound: 0,
             totalRounds: allTracks.length,
@@ -304,6 +286,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             get currentQuestion() {
                 return this.questions[this.currentRound] || { title: '', options: [], correctIndex: 0 };
+            },
+
+            get feedbackMessage() {
+                const correctOption = this.currentQuestion.options?.[this.currentQuestion.correctIndex];
+                if (this.wasCorrect) {
+                    return this.streak >= 3
+                        ? 'Correct streak! +' + this.lastPoints + ' pts'
+                        : 'Correct! +' + this.lastPoints + ' pts';
+                }
+                if (!correctOption || !correctOption.artist) {
+                    return '';
+                }
+                return 'Wrong - it was ' + String(correctOption.artist).toUpperCase();
+            },
+
+            boot() {
+                this.startGame();
             },
 
             startGame() {
@@ -447,7 +446,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
         };
     }
-        {% include 'core/footer.html' %}
+    </script>
+    {% include 'core/footer.html' %}
 </body>
 </html>
 
