@@ -11,6 +11,7 @@ from core.models import RadioTrack
 ITUNES_SEARCH_URL = "https://itunes.apple.com/search"
 DEEZER_SEARCH_URL = "https://api.deezer.com/search"
 USER_AGENT = "KSyncArtworkSync/1.0"
+KNOWN_DEFAULT_ART_FRAGMENT = "v1710546648/ksync/skz_group_default.jpg"
 
 
 def _clean_text(value):
@@ -181,6 +182,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--only-missing", action="store_true", help="Only process tracks with blank album_art.")
+        parser.add_argument(
+            "--replace-defaults",
+            action="store_true",
+            help="Treat the legacy default Cloudinary artwork as missing and replace it.",
+        )
         parser.add_argument("--limit", type=int, default=0, help="Maximum number of tracks to process.")
         parser.add_argument("--min-score", type=float, default=0.72, help="Minimum match score required to save artwork.")
         parser.add_argument("--timeout", type=float, default=4.0, help="Per-provider request timeout in seconds.")
@@ -190,16 +196,23 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
         only_missing = options["only_missing"]
+        replace_defaults = options["replace_defaults"]
         force_refresh = options["force_refresh"]
         timeout = float(options["timeout"])
         min_score = float(options["min_score"])
         limit = int(options["limit"] or 0)
 
         queryset = RadioTrack.objects.all().order_by("artist", "title")
-        if only_missing and not force_refresh:
-            queryset = queryset.filter(Q(album_art__isnull=True) | Q(album_art=""))
-        elif not force_refresh:
-            queryset = queryset.filter(Q(album_art__isnull=True) | Q(album_art=""))
+        if not force_refresh:
+            artwork_filter = Q()
+            if only_missing:
+                artwork_filter |= Q(album_art__isnull=True) | Q(album_art="")
+            if replace_defaults:
+                artwork_filter |= Q(album_art__icontains=KNOWN_DEFAULT_ART_FRAGMENT)
+            if artwork_filter:
+                queryset = queryset.filter(artwork_filter)
+            else:
+                queryset = queryset.filter(Q(album_art__isnull=True) | Q(album_art=""))
 
         if limit > 0:
             queryset = queryset[:limit]
