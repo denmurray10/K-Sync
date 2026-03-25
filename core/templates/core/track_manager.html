@@ -39,8 +39,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-{% include "core/header.html" %}
-
     <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 px-6 py-3 flex items-center justify-between">
         <div class="flex items-center gap-4">
             <span class="material-symbols-outlined text-primary text-xl">library_music</span>
@@ -50,6 +48,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
         <div class="flex items-center gap-4">
+            <a href="{% url 'signups_dashboard' %}" class="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors font-black text-[9px] uppercase tracking-[0.15em]">
+                <span class="material-symbols-outlined text-sm">dashboard</span> Dashboard
+            </a>
             <a href="{% url 'playlist_manager' %}" class="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors font-black text-[9px] uppercase tracking-[0.15em]">
                 <span class="material-symbols-outlined text-sm">queue_music</span> Playlist Manager
             </a>
