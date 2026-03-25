@@ -3819,7 +3819,7 @@
                 }
                 const rect = header.getBoundingClientRect();
                 const availableHeight = Math.floor(window.innerHeight - Math.max(0, rect.bottom) - 20);
-                const stageHeight = Math.max(320, Math.min(760, availableHeight));
+                const stageHeight = Math.max(360, Math.min(820, availableHeight + 40));
                 panels.forEach((panel) => {
                     if (panel === livePanel) {
                         panel.style.removeProperty('--mega-panel-height');

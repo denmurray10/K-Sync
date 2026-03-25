@@ -838,6 +838,37 @@ def playlist_manager(request):
         playlist.name = _sanitize_playlist_name(playlist.name)
     return render(request, 'core/playlist_manager.html', {'playlists': playlists})
 
+
+@login_required(login_url='/staff/login/')
+def track_manager(request):
+    if not request.user.is_superuser:
+        return redirect('signups_login')
+
+    tracks = (
+        RadioTrack.objects
+        .prefetch_related('playlists')
+        .annotate(playlist_count=models.Count('playlists', distinct=True))
+        .order_by('artist', 'title')
+    )
+
+    for track in tracks:
+        parsed_audio_url = urllib.parse.urlparse(track.audio_url or '')
+        format_name = os.path.splitext(parsed_audio_url.path or '')[1].lower().lstrip('.')
+        track.file_format = format_name.upper() if format_name else 'UNKNOWN'
+        assigned_playlists = sorted(
+            {playlist.name for playlist in track.playlists.all()},
+            key=str.lower,
+        )
+        track.assigned_playlists = assigned_playlists
+        track.assigned_playlist_label = ', '.join(assigned_playlists) if assigned_playlists else 'Not assigned'
+
+    return render(request, 'core/track_manager.html', {
+        'tracks': tracks,
+        'total_tracks': len(tracks),
+        'assigned_tracks': sum(1 for track in tracks if track.assigned_playlists),
+        'unassigned_tracks': sum(1 for track in tracks if not track.assigned_playlists),
+    })
+
 def api_b2_tracks(request):
     """Lists files from Backblaze B2 bucket."""
     staff_check = _admin_only_json(request)

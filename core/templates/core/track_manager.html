@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+    <title>K-Beats - Track Manager</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#f425c0",
+                    secondary: "#00f0ff",
+                    accent: "#fbbf24",
+                    "background-dark": "#000000"
+                },
+                fontFamily: { display: ["Montserrat", "sans-serif"] },
+                borderRadius: { DEFAULT:"0px", sm:"0px", md:"0px", lg:"0px", xl:"0px", "2xl":"0px", "3xl":"0px", full:"9999px" },
+            }
+        }
+    };
+    </script>
+</head>
+<body class="bg-black text-white font-display min-h-screen" x-data="trackManagerApp()">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+{% include "core/header.html" %}
+
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-primary text-xl">library_music</span>
+            <div>
+                <h1 class="text-[11px] font-black uppercase tracking-[0.2em] text-white">Track Manager</h1>
+                <p class="font-mono text-[8px] tracking-widest uppercase text-white/20">Admin Only Track Library</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="{% url 'playlist_manager' %}" class="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors font-black text-[9px] uppercase tracking-[0.15em]">
+                <span class="material-symbols-outlined text-sm">queue_music</span> Playlist Manager
+            </a>
+            <a href="{% url 'signups_logout' %}" class="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors font-black text-[9px] uppercase tracking-[0.15em]">
+                <span class="material-symbols-outlined text-sm">logout</span> Sign Out
+            </a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 pt-24 pb-16">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="border border-white/10 bg-white/[0.02] p-6">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Total Tracks</span>
+                <span class="text-4xl font-black text-primary">{{ total_tracks }}</span>
+            </div>
+            <div class="border border-white/10 bg-white/[0.02] p-6">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Assigned To Playlists</span>
+                <span class="text-4xl font-black text-secondary">{{ assigned_tracks }}</span>
+            </div>
+            <div class="border border-white/10 bg-white/[0.02] p-6">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Unassigned</span>
+                <span class="text-4xl font-black text-accent">{{ unassigned_tracks }}</span>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+            <div class="relative flex-1 max-w-xl">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg pointer-events-none">search</span>
+                <input x-model="search" type="text" placeholder="Search by title, artist, format or playlist..."
+                       class="w-full bg-white/5 border border-white/10 text-white pl-11 pr-4 py-3 font-display text-sm placeholder-slate-600 focus:border-primary focus:ring-0 focus:outline-none transition-colors" />
+            </div>
+        </div>
+
+        <div class="border border-white/10 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-white/10 bg-white/[0.03]">
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">Track</th>
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">Artist</th>
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">Format</th>
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">Duration</th>
+                            <th class="px-6 py-4 font-mono text-[9px] uppercase tracking-widest text-white/40">Playlists</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for track in tracks %}
+                        <tr class="track-row border-b border-white/5 hover:bg-white/[0.02] transition-colors"
+                            data-title="{{ track.title|lower }}"
+                            data-artist="{{ track.artist|lower }}"
+                            data-format="{{ track.file_format|lower }}"
+                            data-playlists="{{ track.assigned_playlist_label|lower }}">
+                            <td class="px-6 py-4 font-black text-sm uppercase tracking-tight">{{ track.title }}</td>
+                            <td class="px-6 py-4 text-sm text-slate-300">{{ track.artist }}</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center border border-secondary/40 bg-secondary/10 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-secondary">
+                                    {{ track.file_format }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 font-mono text-[10px] text-white/50 uppercase tracking-wide">{{ track.duration }}</td>
+                            <td class="px-6 py-4">
+                                {% if track.assigned_playlists %}
+                                <div class="flex flex-wrap gap-2">
+                                    {% for playlist_name in track.assigned_playlists %}
+                                    <span class="inline-flex items-center border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white/75">
+                                        {{ playlist_name }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <span class="text-[10px] font-mono uppercase tracking-widest text-white/30">Not assigned</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-20 text-center">
+                                <span class="material-symbols-outlined text-4xl text-white/10 block mb-3">library_music</span>
+                                <p class="font-mono text-[10px] uppercase tracking-widest text-white/20">No tracks found</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    function trackManagerApp() {
+        return {
+            search: '',
+            init() {
+                this.$watch('search', (q) => {
+                    const term = q.toLowerCase().trim();
+                    document.querySelectorAll('.track-row').forEach((row) => {
+                        const haystack = [
+                            row.dataset.title || '',
+                            row.dataset.artist || '',
+                            row.dataset.format || '',
+                            row.dataset.playlists || '',
+                        ].join(' ');
+                        row.style.display = (!term || haystack.includes(term)) ? '' : 'none';
+                    });
+                });
+            }
+        };
+    }
+    </script>
+</body>
+</html>
