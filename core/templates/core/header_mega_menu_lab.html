@@ -469,6 +469,30 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.01));
         }
+        .streams-compact-banner {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background:
+                linear-gradient(135deg, rgba(var(--stream-accent), 0.12), rgba(255, 255, 255, 0.018) 44%, rgba(var(--stream-secondary), 0.08));
+        }
+        .streams-compact-feature {
+            min-height: 0;
+        }
+        .streams-compact-feature #stream-feature-image {
+            min-height: 160px;
+        }
+        .streams-mini-stat {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        #stream-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+        @media (min-width: 1024px) {
+            #stream-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
         .stream-energy-track {
             height: 10px;
             overflow: hidden;
@@ -489,6 +513,16 @@
             overflow: hidden;
             border-radius: 0;
             transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
+        }
+        #stream-list .stream-row {
+            min-height: 118px;
+            padding: 0.95rem;
+        }
+        #stream-list .stream-row p.text-xs.leading-relaxed {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         .stream-row::after {
             content: "";
@@ -967,106 +1001,23 @@
 
     <div id="mega-menu-lab-panel" class="mega-panel-shell streams-panel-shell mega-panel-hidden fixed left-0 right-0 z-[47] overflow-hidden border-y border-white/10">
         <div class="mega-panel-stage container mx-auto px-4 sm:px-6 py-6 sm:py-7">
-            <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-                <div class="max-w-3xl">
-                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+            <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                <div class="max-w-5xl flex-1">
+                    <div class="mt-2 flex flex-col gap-2 lg:flex-row lg:items-start lg:gap-6">
                         <h1 id="streams-panel-title" class="font-impact whitespace-nowrap text-3xl leading-[0.9] uppercase tracking-[0.04em] text-white sm:text-4xl">PICK YOUR FREQUENCY</h1>
-                        <p id="stream-panel-tagline" class="max-w-xl text-[13px] leading-relaxed text-slate-300">{{ mega_menu_streams.0.panelLine|default:"Stream presets built from the current K-Beats live player experience." }}</p>
+                        <p id="stream-panel-tagline" class="max-w-2xl text-[13px] leading-relaxed text-slate-300">{{ mega_menu_streams.0.panelLine|default:"Stream presets built from the current K-Beats live player experience." }}</p>
                     </div>
                 </div>
-                <div class="grid grid-cols-3 gap-2 self-start xl:self-center">
-                    <button type="button" data-stream-view="discover" class="panel-filter-tab active px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="true">Discover</button>
-                    <button type="button" data-stream-view="moods" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Moods</button>
-                    <button type="button" data-stream-view="premium" class="panel-filter-tab px-2.5 py-2 text-[9px] font-black uppercase tracking-[0.16em]" aria-pressed="false">Premium</button>
+                <div class="inline-flex items-center gap-2 self-start border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-300">
+                    <span class="h-2.5 w-2.5 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(0,240,255,0.75)]"></span>
+                    Stream Presets Live
                 </div>
             </div>
 
             <div class="mega-panel-body grid gap-5 lg:grid-cols-12">
-                <section class="stream-shell-card stream-feature-shell lg:col-span-6 min-h-0">
-                    <div class="grid h-full xl:grid-cols-[minmax(0,1.45fr)_minmax(250px,0.85fr)]">
-                        <div class="relative min-h-[280px] overflow-hidden">
-                            <div id="stream-feature-image" class="stream-card-image absolute inset-0" {% if mega_menu_streams.0.image %}style="background-image: linear-gradient(115deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.54) 100%), url('{{ mega_menu_streams.0.image }}');"{% endif %}></div>
-                            <div class="absolute inset-x-0 top-0 flex items-start justify-between gap-4 p-5 sm:p-6">
-                                <div class="space-y-2">
-                                    <p id="stream-feature-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase">Stream Preset</p>
-                                    <div id="stream-feature-frequency" class="inline-flex items-center gap-2 border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
-                                        <span class="h-2 w-2 rounded-full bg-white/80"></span>
-                                        {{ mega_menu_streams.0.preset|default:"Live Now" }}
-                                    </div>
-                                </div>
-                                <span id="stream-feature-tier" class="border border-emerald-300/50 bg-emerald-400/15 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-200">{{ mega_menu_streams.0.tier|default:"free"|title }}</span>
-                            </div>
-                            <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                                <p id="stream-feature-tagline" class="max-w-md text-[11px] font-mono uppercase tracking-[0.22em] text-slate-200/90">{{ mega_menu_streams.0.tagline|default:"Preset-led listening modes built around the live K-Beats player." }}</p>
-                                <h2 id="stream-feature-title" class="mt-3 font-impact text-4xl leading-[0.88] uppercase tracking-[0.04em] text-white sm:text-5xl">{{ mega_menu_streams.0.name|default:"K-Beats Live" }}</h2>
-                                <p id="stream-feature-description" class="mt-3 max-w-xl text-sm leading-relaxed text-slate-200/90">{{ mega_menu_streams.0.description }}</p>
-                                <div id="stream-feature-genres" class="mt-4 flex flex-wrap gap-2">{% for genre in mega_menu_streams.0.genres %}<span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ genre }}</span>{% endfor %}</div>
-                                <div class="mt-5 flex flex-wrap items-center gap-3">
-                                    <a id="stream-feature-cta" href="{{ mega_menu_streams.0.href|default:'' }}{% if not mega_menu_streams.0.href %}{% url 'live' %}{% endif %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
-                                        Listen Now
-                                        <span class="material-symbols-outlined text-base">play_arrow</span>
-                                    </a>
-                                    <a href="{% url 'pricing' %}" class="inline-flex items-center gap-2 bg-black px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
-                                        Unlock More
-                                        <span class="material-symbols-outlined text-base">bolt</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-white/10 bg-black/35 p-5 sm:p-6 xl:border-l xl:border-t-0">
-                            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                                <div class="stream-stat-card p-4">
-                                    <div class="flex items-center justify-between gap-3">
-                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Energy</p>
-                                        <p id="stream-feature-energy-value" class="text-xs font-black uppercase tracking-[0.18em] text-white">{{ mega_menu_streams.0.energy|default:0 }}%</p>
-                                    </div>
-                                    <div class="stream-energy-track mt-3">
-                                        <span id="stream-feature-energy-fill" class="stream-energy-fill"></span>
-                                    </div>
-                                    <p id="stream-feature-energy-label" class="mt-3 text-xs text-slate-300">{{ mega_menu_streams.0.energyLabel }}</p>
-                                </div>
-
-                                <div class="stream-stat-card p-4">
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Access</p>
-                                    <p id="stream-feature-peak" class="mt-3 text-xl font-black uppercase tracking-tight text-white">{{ mega_menu_streams.0.peak }}</p>
-                                    <p id="stream-feature-peak-note" class="mt-2 text-xs leading-relaxed text-slate-400">{{ mega_menu_streams.0.peakNote }}</p>
-                                </div>
-
-                                <div class="stream-stat-card p-4 sm:col-span-2 xl:col-span-1">
-                                    <div class="flex items-center justify-between gap-3">
-                                        <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">Best For</p>
-                                        <p id="stream-feature-audience" class="font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500">{{ mega_menu_streams.0.audience }}</p>
-                                    </div>
-                                    <p id="stream-feature-best-for" class="mt-3 text-sm font-semibold text-white">{{ mega_menu_streams.0.bestFor }}</p>
-                                    <p id="stream-feature-note" class="mt-2 text-xs leading-relaxed text-slate-400">{{ mega_menu_streams.0.note }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="stream-shell-card lg:col-span-3 p-4 sm:p-5 min-h-0 mega-panel-column-scroll" aria-label="Launch streams list">
-                    <div class="mb-4 flex items-end justify-between gap-4">
-                        <div>
-                            <p id="stream-list-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Launch Presets</p>
-                            <h3 id="stream-list-title" class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Dial In</h3>
-                        </div>
-                        <p id="stream-list-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">Hover or focus</p>
-                    </div>
-                    <div id="stream-list" class="space-y-3"></div>
-                </section>
-
-                <section class="lg:col-span-3 min-h-0 mega-panel-column-scroll space-y-4">
-                    <div class="stream-shell-card p-5 sm:p-6">
-                        <div class="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
-                            <div>
-                                <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Live Signal</p>
-                                <p id="stream-now-vibe" class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ mega_menu_streams.0.mood|default:"Live" }}</p>
-                            </div>
-                            <span id="stream-now-live-pill" class="border px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Live</span>
-                        </div>
-                        <div class="mt-4 flex items-center gap-4">
+                <section class="lg:col-span-7 min-h-0 space-y-4">
+                    <div class="streams-compact-banner flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                        <div class="flex min-w-0 items-center gap-4">
                             <div class="flex h-14 w-14 items-end gap-1 border border-white/10 bg-black/35 p-2">
                                 <span class="signal-bar h-5 w-1.5"></span>
                                 <span class="signal-bar h-9 w-1.5"></span>
@@ -1075,14 +1026,82 @@
                                 <span class="signal-bar h-6 w-1.5"></span>
                             </div>
                             <div class="min-w-0">
-                                <p id="stream-now-track" class="text-sm font-black uppercase tracking-[0.08em] text-white">{{ mega_menu_live.track_title|default:"K-Beats Live" }}</p>
+                                <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-400">Now Playing</p>
+                                <p id="stream-now-track" class="mt-2 text-sm font-black uppercase tracking-[0.08em] text-white">{{ mega_menu_live.track_title|default:"K-Beats Live" }}</p>
                                 <p id="stream-now-artist" class="mt-1 text-xs text-slate-400">{{ mega_menu_live.track_artist|default:"On Air" }}</p>
-                                <p id="stream-now-audience" class="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">{{ mega_menu_live.audience|default:"Live now" }}</p>
+                                <p id="stream-now-audience" class="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">{{ mega_menu_live.audience|default:"Live now" }}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span id="stream-now-live-pill" class="border px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em]">Live</span>
+                            <a id="stream-feature-cta" href="{{ mega_menu_streams.0.href|default:'' }}{% if not mega_menu_streams.0.href %}{% url 'live' %}{% endif %}" class="inline-flex items-center gap-2 border border-primary bg-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-black transition-all shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:border-white hover:bg-white hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                                Listen Now
+                                <span class="material-symbols-outlined text-base">play_arrow</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="stream-shell-card p-4 sm:p-5 min-h-0">
+                        <div class="mb-4 flex items-end justify-between gap-4">
+                            <div>
+                                <p id="stream-list-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Launch Presets</p>
+                                <h3 id="stream-list-title" class="mt-2 text-2xl font-black uppercase tracking-tight text-white">Dial In</h3>
+                            </div>
+                            <p id="stream-list-meta" class="font-mono text-[9px] tracking-[0.18em] uppercase text-slate-500">pick a lane</p>
+                        </div>
+                        <div id="stream-list"></div>
+                    </div>
+                </section>
+
+                <section class="lg:col-span-5 min-h-0 space-y-4">
+                    <div class="stream-shell-card streams-compact-feature overflow-hidden">
+                        <div class="grid lg:grid-cols-[170px_minmax(0,1fr)]">
+                            <div class="relative min-h-[160px] overflow-hidden">
+                                <div id="stream-feature-image" class="stream-card-image absolute inset-0" {% if mega_menu_streams.0.image %}style="background-image: linear-gradient(115deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.54) 100%), url('{{ mega_menu_streams.0.image }}');"{% endif %}></div>
+                            </div>
+                            <div class="p-4 sm:p-5">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p id="stream-feature-kicker" class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-400">Featured Preset</p>
+                                        <div id="stream-feature-frequency" class="mt-2 inline-flex items-center gap-2 border border-white/15 bg-black/35 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-100">
+                                            <span class="h-2 w-2 rounded-full bg-white/80"></span>
+                                            {{ mega_menu_streams.0.preset|default:"Live Now" }}
+                                        </div>
+                                    </div>
+                                    <span id="stream-feature-tier" class="border border-emerald-300/50 bg-emerald-400/15 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-200">{{ mega_menu_streams.0.tier|default:"free"|title }}</span>
+                                </div>
+                                <h2 id="stream-feature-title" class="mt-4 text-2xl font-black uppercase tracking-tight text-white">{{ mega_menu_streams.0.name|default:"K-Beats Live" }}</h2>
+                                <p id="stream-feature-tagline" class="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-400">{{ mega_menu_streams.0.tagline|default:"Preset-led listening modes built around the live K-Beats player." }}</p>
+                                <p id="stream-feature-description" class="mt-3 text-sm leading-relaxed text-slate-300">{{ mega_menu_streams.0.description }}</p>
+                                <div id="stream-feature-genres" class="mt-4 flex flex-wrap gap-2">{% for genre in mega_menu_streams.0.genres %}<span class="stream-detail-chip px-3 py-1 text-[10px] uppercase tracking-[0.16em]">{{ genre }}</span>{% endfor %}</div>
+                                <div class="mt-4 grid gap-2 sm:grid-cols-3">
+                                    <div class="streams-mini-stat px-3 py-2">
+                                        <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Energy</p>
+                                        <p id="stream-feature-energy-value" class="mt-1 text-sm font-black uppercase tracking-[0.08em] text-white">{{ mega_menu_streams.0.energy|default:0 }}%</p>
+                                        <div class="stream-energy-track mt-2">
+                                            <span id="stream-feature-energy-fill" class="stream-energy-fill"></span>
+                                        </div>
+                                        <p id="stream-feature-energy-label" class="mt-2 text-[11px] text-slate-400">{{ mega_menu_streams.0.energyLabel }}</p>
+                                    </div>
+                                    <div class="streams-mini-stat px-3 py-2">
+                                        <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Access</p>
+                                        <p id="stream-feature-peak" class="mt-1 text-sm font-black uppercase tracking-[0.08em] text-white">{{ mega_menu_streams.0.peak }}</p>
+                                        <p id="stream-feature-peak-note" class="mt-2 text-[11px] leading-relaxed text-slate-400">{{ mega_menu_streams.0.peakNote }}</p>
+                                    </div>
+                                    <div class="streams-mini-stat px-3 py-2">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">Best For</p>
+                                            <p id="stream-feature-audience" class="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">{{ mega_menu_streams.0.audience }}</p>
+                                        </div>
+                                        <p id="stream-feature-best-for" class="mt-1 text-sm font-black uppercase tracking-[0.08em] text-white">{{ mega_menu_streams.0.bestFor }}</p>
+                                        <p id="stream-feature-note" class="mt-2 text-[11px] leading-relaxed text-slate-400">{{ mega_menu_streams.0.note }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stream-shell-card p-5 sm:p-6">
+                    <div class="stream-shell-card p-4 sm:p-5">
                         <div class="flex items-center justify-between gap-4">
                             <div>
                                 <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500">Premium Hooks</p>
