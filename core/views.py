@@ -836,37 +836,20 @@ def playlist_manager(request):
     playlists = list(RadioPlaylist.objects.all())
     for playlist in playlists:
         playlist.name = _sanitize_playlist_name(playlist.name)
-    return render(request, 'core/playlist_manager.html', {'playlists': playlists})
-
-
-@login_required(login_url='/staff/login/')
-def track_manager(request):
-    if not request.user.is_superuser:
-        return redirect('signups_login')
-
-    tracks = (
+    track_stats = (
         RadioTrack.objects
-        .prefetch_related('playlists')
         .annotate(playlist_count=models.Count('playlists', distinct=True))
-        .order_by('artist', 'title')
-    )
-
-    for track in tracks:
-        parsed_audio_url = urllib.parse.urlparse(track.audio_url or '')
-        format_name = os.path.splitext(parsed_audio_url.path or '')[1].lower().lstrip('.')
-        track.file_format = format_name.upper() if format_name else 'UNKNOWN'
-        assigned_playlists = sorted(
-            {playlist.name for playlist in track.playlists.all()},
-            key=str.lower,
+        .aggregate(
+            total_tracks=models.Count('id'),
+            assigned_tracks=models.Count('id', filter=models.Q(playlist_count__gt=0)),
+            unassigned_tracks=models.Count('id', filter=models.Q(playlist_count=0)),
         )
-        track.assigned_playlists = assigned_playlists
-        track.assigned_playlist_label = ', '.join(assigned_playlists) if assigned_playlists else 'Not assigned'
-
-    return render(request, 'core/track_manager.html', {
-        'tracks': tracks,
-        'total_tracks': len(tracks),
-        'assigned_tracks': sum(1 for track in tracks if track.assigned_playlists),
-        'unassigned_tracks': sum(1 for track in tracks if not track.assigned_playlists),
+    )
+    return render(request, 'core/playlist_manager.html', {
+        'playlists': playlists,
+        'total_tracks': track_stats.get('total_tracks', 0),
+        'assigned_tracks': track_stats.get('assigned_tracks', 0),
+        'unassigned_tracks': track_stats.get('unassigned_tracks', 0),
     })
 
 def api_b2_tracks(request):
@@ -939,7 +922,13 @@ def api_b2_tracks(request):
 
         metadata_by_title = {}
         metadata_by_filename = {}
-        for radio_track in _radio_track_base_queryset().only('title', 'artist', 'album_art', 'audio_url', 'duration', 'duration_seconds'):
+        radio_tracks = (
+            _radio_track_base_queryset()
+            .prefetch_related('playlists')
+            .annotate(playlist_count=models.Count('playlists', distinct=True))
+            .only('title', 'artist', 'album_art', 'audio_url', 'duration', 'duration_seconds')
+        )
+        for radio_track in radio_tracks:
             title_key = normalize(radio_track.title)
             if title_key and title_key not in metadata_by_title:
                 metadata_by_title[title_key] = radio_track
@@ -980,6 +969,23 @@ def api_b2_tracks(request):
             if metadata_artist.lower() == 'unknown artist':
                 metadata_artist = ''
 
+            assigned_playlists = []
+            assigned_playlist_label = 'Not assigned'
+            playlist_count = 0
+            file_format = 'UNKNOWN'
+            if metadata:
+                parsed_audio_url = urllib.parse.urlparse(metadata.audio_url or '')
+                format_name = os.path.splitext(parsed_audio_url.path or '')[1].lower().lstrip('.')
+                file_format = format_name.upper() if format_name else 'UNKNOWN'
+                assigned_playlists = sorted(
+                    {_sanitize_playlist_name(playlist.name) for playlist in metadata.playlists.all()},
+                    key=str.lower,
+                )
+                assigned_playlist_label = ', '.join(assigned_playlists) if assigned_playlists else 'Not assigned'
+                playlist_count = len(assigned_playlists)
+            else:
+                file_format = os.path.splitext(file_leaf)[1].lower().lstrip('.').upper() or 'UNKNOWN'
+
             artist = (
                 metadata_artist
                 or artist_from_audio_url(metadata.audio_url if metadata else '')
@@ -1011,7 +1017,11 @@ def api_b2_tracks(request):
                 'duration': duration,
                 'duration_seconds': duration_seconds,
                 'url': stream_url,
-                'fileId': f['fileId']
+                'fileId': f['fileId'],
+                'file_format': file_format,
+                'assigned_playlists': assigned_playlists,
+                'assigned_playlist_label': assigned_playlist_label,
+                'playlist_count': playlist_count,
             })
         
         return JsonResponse({'ok': True, 'tracks': tracks})

@@ -93,6 +93,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- TAB 1: BUILDER -->
     <div x-show="activeTab === 'builder'" class="flex-1 flex flex-col overflow-hidden min-h-0">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 px-4 sm:px-6 pt-4 pb-3 bg-black/30 border-b border-white/10">
+            <div class="border border-white/10 bg-white/[0.02] p-4">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Total Tracks</span>
+                <span class="text-3xl font-black text-primary">{{ total_tracks }}</span>
+            </div>
+            <div class="border border-white/10 bg-white/[0.02] p-4">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Assigned To Playlists</span>
+                <span class="text-3xl font-black text-secondary">{{ assigned_tracks }}</span>
+            </div>
+            <div class="border border-white/10 bg-white/[0.02] p-4">
+                <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Unassigned</span>
+                <span class="text-3xl font-black text-white">{{ unassigned_tracks }}</span>
+            </div>
+        </div>
         <div class="flex-1 flex overflow-hidden min-h-0">
         <!-- LEFT PANEL: Playlist -->
         <div class="w-96 border-r border-white/10 flex flex-col bg-surface/50 min-h-0">
@@ -181,7 +195,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <input type="number" min="1" x-model.number="slotTargetMinutes" class="h-6 w-16 bg-black border border-white/10 px-2 text-[10px] font-mono text-white focus:border-secondary outline-none">
                             <span :class="playlistRemainingSeconds >= 0 ? 'text-green-300' : 'text-red-400'" class="text-[10px] font-bold uppercase tracking-widest" x-text="playlistRemainingLabel"></span>
                         </div>
-                        <input type="text" x-model="searchQuery" placeholder="Search tracks..."
+                        <input type="text" x-model="searchQuery" placeholder="Search title, artist, format, playlist..."
                                class="h-9 w-full bg-black/50 border border-white/10 px-3 text-[10px] font-mono placeholder-slate-600 focus:border-secondary outline-none uppercase">
                     </div>
                     <div class="space-y-1">
@@ -189,34 +203,80 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <span class="text-[9px] font-mono uppercase tracking-widest text-slate-500">Save Status</span>
                             <span :class="saveState === 'saving' ? 'text-secondary' : (saveState === 'saved' ? 'text-green-300' : (saveState === 'failed' ? 'text-red-400' : 'text-slate-500'))" class="text-[10px] font-bold uppercase tracking-widest" x-text="saveStateLabel"></span>
                         </div>
-                        <input type="text" x-model="groupQuery" placeholder="Group names..."
+                        <input type="text" x-model="groupQuery" placeholder="Artist or group..."
                                class="h-9 w-full bg-black/50 border border-white/10 px-3 text-[10px] font-mono placeholder-primary focus:border-primary outline-none uppercase">
                     </div>
+                </div>
+                <div class="mt-3 inline-flex items-center border border-white/10 bg-black/40 p-1">
+                    <button
+                        type="button"
+                        @click="catalogueViewMode = 'list'"
+                        :class="catalogueViewMode === 'list' ? 'bg-secondary text-black' : 'text-slate-400 hover:text-white'"
+                        class="inline-flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] transition-colors"
+                    >
+                        <span class="material-symbols-outlined text-sm">view_list</span>
+                        List
+                    </button>
+                    <button
+                        type="button"
+                        @click="catalogueViewMode = 'details'"
+                        :class="catalogueViewMode === 'details' ? 'bg-secondary text-black' : 'text-slate-400 hover:text-white'"
+                        class="inline-flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] transition-colors"
+                    >
+                        <span class="material-symbols-outlined text-sm">list_alt</span>
+                        Details
+                    </button>
                 </div>
             </div>
 
             <div class="relative flex-1 min-h-0">
-                <div id="library-list" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 bg-black/20 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 content-start auto-rows-max">
+                <div
+                    id="library-list"
+                    :class="catalogueViewMode === 'details'
+                        ? 'grid grid-cols-1 gap-3 content-start auto-rows-max'
+                        : 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 content-start auto-rows-max'"
+                    class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 bg-black/20"
+                >
                     <template x-for="track in filteredTracks" :key="`${track.fileId}-${catalogueRenderKey}`">
                         <div :data-url="track.url" :data-name="track.name" :data-title="track.title" :data-artist="track.artist" :data-album-art="track.album_art" :data-duration="track.duration"
-                             :class="isTrackInPlaylist(track) ? 'border-green-500/90 shadow-[0_0_0_1px_rgba(34,197,94,0.35)]' : 'border-white/10 hover:border-secondary'"
-                             class="library-item group p-2 bg-white/5 border cursor-grab transition-all flex flex-col gap-2 relative overflow-hidden">
+                             :class="[
+                                isTrackInPlaylist(track) ? 'border-green-500/90 shadow-[0_0_0_1px_rgba(34,197,94,0.35)]' : 'border-white/10 hover:border-secondary',
+                                catalogueViewMode === 'details' ? 'p-3 md:grid md:grid-cols-[72px_1.4fr_auto] md:items-center' : 'p-2 flex flex-col gap-2'
+                             ]"
+                             class="library-item group bg-white/5 border cursor-grab transition-all relative overflow-hidden">
                             <div x-show="isTrackInPlaylist(track)" class="pointer-events-none absolute inset-0 bg-green-400/10"></div>
-                            <div class="w-full aspect-square bg-black border border-white/10 overflow-hidden">
+                            <div x-show="track.assigned_playlists && track.assigned_playlists.length" class="absolute right-2 top-2 z-[2] max-w-[calc(100%-1rem)]">
+                                <span class="inline-flex max-w-full items-center gap-1 border border-green-400/60 bg-green-400/15 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-green-300">
+                                    <span class="material-symbols-outlined text-[12px]">playlist_add_check</span>
+                                    <span class="truncate" x-text="track.assigned_playlists[0]"></span>
+                                </span>
+                            </div>
+                            <div :class="catalogueViewMode === 'details' ? 'w-[72px] h-[72px]' : 'w-full aspect-square'" class="bg-black border border-white/10 overflow-hidden">
                                 <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
                                 <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
                                     <span class="material-symbols-outlined text-sm text-slate-500">music_note</span>
                                 </div>
                             </div>
-                            <div class="min-w-0">
-                                <p class="text-[10px] font-bold truncate uppercase" x-text="track.title || track.name"></p>
+                            <div :class="catalogueViewMode === 'details' ? 'min-w-0 md:px-3' : 'min-w-0'">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <p class="text-[10px] font-bold truncate uppercase" x-text="track.title || track.name"></p>
+                                    <span x-show="track.file_format" class="inline-flex items-center border border-secondary/40 bg-secondary/10 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-secondary" x-text="track.file_format"></span>
+                                </div>
                                 <p class="text-[9px] font-mono text-slate-500 truncate uppercase" x-text="track.artist || 'Unknown Artist'"></p>
-                                <p class="text-[9px] font-mono text-slate-400 uppercase" x-text="track.duration || '3:00'"></p>
+                                <div :class="catalogueViewMode === 'details' ? 'mt-2 flex flex-wrap gap-3' : ''">
+                                    <p class="text-[9px] font-mono text-slate-400 uppercase" x-text="track.duration || '3:00'"></p>
+                                    <p x-show="catalogueViewMode === 'details'" class="text-[9px] font-mono text-slate-500 uppercase" x-text="track.playlist_count ? `${track.playlist_count} playlist${track.playlist_count === 1 ? '' : 's'}` : 'Not assigned'"></p>
+                                </div>
+                                <div x-show="catalogueViewMode === 'details' && track.assigned_playlists && track.assigned_playlists.length" class="mt-2 flex flex-wrap gap-1.5">
+                                    <template x-for="playlistName in track.assigned_playlists" :key="`${track.fileId}-${playlistName}`">
+                                        <span class="inline-flex items-center border border-white/10 bg-white/[0.04] px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-white/70" x-text="playlistName"></span>
+                                    </template>
+                                </div>
                             </div>
                             <button @click="addTrack(track)" :disabled="isTrackInPlaylist(track)"
                                     :class="isTrackInPlaylist(track) ? 'bg-green-500/20 text-green-300 cursor-not-allowed' : 'bg-secondary/20 hover:bg-secondary text-secondary hover:text-black'"
-                                    class="mt-auto p-1 transition-all self-start">
-                                <span class="material-symbols-outlined text-xs">add</span>
+                                    class="p-1 transition-all self-start md:self-center md:justify-self-end">
+                                <span class="material-symbols-outlined text-xs" x-text="isTrackInPlaylist(track) ? 'playlist_add_check' : 'add'"></span>
                             </button>
                         </div>
                     </template>
@@ -777,6 +837,7 @@ function playlistApp() {
         activeTab: 'builder',
         showPageHeader: false,
         tracks: [],
+        catalogueViewMode: localStorage.getItem('ksync-playlist-catalogue-view') || 'list',
         catalogueRenderKey: 0,
         playlistRenderKey: 0,
         searchQuery: '',
@@ -861,6 +922,10 @@ function playlistApp() {
         },
 
         async init() {
+            this.$watch('catalogueViewMode', (mode) => {
+                localStorage.setItem('ksync-playlist-catalogue-view', mode);
+                this.$nextTick(() => this.syncScrollPanelHeights());
+            });
             await this.fetchB2Tracks();
             await this.fetchSchedules();
             await this.fetchInworldVoices();
