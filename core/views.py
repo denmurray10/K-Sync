@@ -19,6 +19,8 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.urls import reverse
+from django.templatetags.static import static
+from django.contrib.staticfiles import finders
 import requests
 import urllib.parse
 import re
@@ -269,6 +271,8 @@ def _build_stream_image_url(source_url):
 DEFAULT_STREAM_IMAGE_URL = "https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/about_banner"
 KNOWN_BROKEN_IMAGE_FRAGMENTS = (
     "v1710546648/ksync/skz_group_default.jpg",
+    "/file/straykids/media/images/",
+    "/file/straykids/media/member_images/",
 )
 
 
@@ -298,8 +302,54 @@ def _apply_stream_image_to_field(obj, field_name):
         current = getattr(obj, field_name, '')
     except Exception:
         return
+    if _is_known_broken_image_url(current):
+        try:
+            setattr(obj, field_name, '')
+        except Exception:
+            pass
+        return
     try:
         setattr(obj, field_name, _build_stream_image_url(current))
+    except Exception:
+        pass
+
+
+def _resolve_logo_path(logo_path):
+    raw = str(logo_path or '').strip()
+    if not raw:
+        return ''
+    if raw.startswith(('http://', 'https://', '/static/')):
+        return raw
+
+    candidates = [raw]
+    if raw.startswith('core/'):
+        candidates.append(raw.removeprefix('core/'))
+    else:
+        candidates.append(f'core/{raw}')
+
+    seen = set()
+    for candidate in candidates:
+        candidate = str(candidate or '').strip().replace('\\', '/').lstrip('/')
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        try:
+            if finders.find(candidate):
+                return static(candidate)
+        except Exception:
+            continue
+    return ''
+
+
+def _apply_logo_path(obj):
+    if not obj:
+        return
+    try:
+        current = getattr(obj, 'logo_path', '')
+    except Exception:
+        return
+    try:
+        setattr(obj, 'logo_path', _resolve_logo_path(current))
     except Exception:
         pass
 
@@ -3681,6 +3731,7 @@ def idols(request):
     groups = list(groups.filter(rank__isnull=False).order_by('rank', 'name'))
     for group in groups:
         _apply_stream_image_to_field(group, 'image_url')
+        _apply_logo_path(group)
     
     return render(request, 'core/idols.html', {
         'today_events': today_events, 
@@ -9262,6 +9313,7 @@ def idol_page(request, slug):
 
     group = get_object_or_404(KPopGroup, slug=slug)
     _apply_stream_image_to_field(group, 'image_url')
+    _apply_logo_path(group)
 
     # Default accent colors per group type
     accent_map = {
@@ -9279,6 +9331,7 @@ def idol_page(request, slug):
     related = list(KPopGroup.objects.filter(group_type=group.group_type).exclude(pk=group.pk).order_by('rank')[:3])
     for related_group in related:
         _apply_stream_image_to_field(related_group, 'image_url')
+        _apply_logo_path(related_group)
 
     # Pull real releases, birthdays, and anniversaries from ComebackData
     now = timezone.now()

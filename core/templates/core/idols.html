@@ -341,7 +341,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         {% for group in groups %}
                         <a
                             href="{% url 'idol_page' slug=group.slug %}"
-                            x-show="(filter === 'ALL' || filter === '{{ group.group_type }}') && (!query || '{{ group.name|lower }}'.includes(query.toLowerCase()) || '{{ group.label|lower }}'.includes(query.toLowerCase()))"
+                            x-show="(filter === 'ALL' || filter === '{{ group.group_type }}') && (!query || '{{ group.name|lower|escapejs }}'.includes(query.toLowerCase()) || '{{ group.label|default:''|lower|escapejs }}'.includes(query.toLowerCase()))"
                             x-transition:enter="transition ease-out duration-300"
                             x-transition:enter-start="opacity-0 scale-95"
                             x-transition:enter-end="opacity-100 scale-100"
@@ -369,6 +369,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <img
                                     src="{{ group.image_url }}"
                                     alt="{{ group.name }}"
+                                    onerror="this.onerror=null;{% if group.logo_path %}this.src='{{ group.logo_path }}';{% else %}this.src='https://api.dicebear.com/7.x/initials/svg?seed={{ group.name|urlencode }}&backgroundColor=111111&textColor=ffffff';this.className='w-24 h-24 opacity-40 group-hover:opacity-70 transition-opacity duration-300';{% endif %}"
                                     class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                                 />
                                 {% elif group.logo_path %}
