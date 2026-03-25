@@ -46,7 +46,32 @@ tailwind.config = {
     .animate-ticker { width: max-content; animation: ticker-scroll 40s linear infinite; }
     .cal-day { transition: all 0.2s ease; }
     .cal-day:hover:not(.cal-empty) { background: rgba(244,37,192,0.06); border-color: rgba(244,37,192,0.3); }
-    .cal-dot { width: 6px; height: 6px; border-radius: 9999px; }
+    .cal-dot { width: 6px; height: 6px; border-radius: 9999px; flex-shrink: 0; transition: opacity 0.3s; }
+    /* Type-coded dot colours */
+    .dot-single      { background: #f425c0; box-shadow: 0 0 4px #f425c0aa; }  /* pink  */
+    .dot-mini        { background: #a855f7; box-shadow: 0 0 4px #a855f7aa; }  /* purple */
+    .dot-album       { background: #3b82f6; box-shadow: 0 0 4px #3b82f6aa; }  /* blue  */
+    .dot-ep          { background: #22c55e; box-shadow: 0 0 4px #22c55eaa; }  /* green */
+    .dot-other       { background: #f425c0; box-shadow: 0 0 4px #f425c0aa; }  /* pink (fallback) */
+    .dot-birthday    { background: #facc15; box-shadow: 0 0 4px #facc15aa; }  /* gold  */
+    /* Today cell — stronger glow ring */
+    .cal-today {
+        outline: 2px solid #f425c0;
+        outline-offset: -2px;
+        box-shadow: inset 0 0 24px rgba(244,37,192,0.18), 0 0 12px rgba(244,37,192,0.25);
+        background: rgba(244,37,192,0.07) !important;
+    }
+    /* Sticky pill */
+    #jump-today { transition: opacity 0.3s, transform 0.3s; }
+    #jump-today.hidden-pill { opacity: 0; pointer-events: none; transform: translateY(12px); }
+    /* Release detail drawer */
+    #release-drawer { transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); }
+    #release-drawer.drawer-closed { transform: translateX(100%); }
+    #drawer-backdrop { transition: opacity 0.3s; }
+    #drawer-backdrop.backdrop-hidden { opacity: 0; pointer-events: none; }
+    /* Filter pill active state */
+    .filter-pill-active { background: #f425c0; color: #000; border-color: #f425c0; }
+    .sort-btn-active { background: #f425c0; color: #000; }
 </style>
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
@@ -84,16 +109,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </p>
             </div>
 
-            <!-- Stats strip -->
-            <div class="flex gap-0 border border-white/20 reveal-up" style="transition-delay:200ms;">
-                <div class="px-6 py-5 border-r border-white/20 text-center">
+            <!-- Stats strip — clickable to filter upcoming list (item 7) -->
+            <div class="flex gap-0 border border-white/20 reveal-up" style="transition-delay:200ms;"
+                 x-data x-init
+                 @keydown.escape.window="$store.releases.activeFilter = ''">
+                <div class="px-6 py-5 border-r border-white/20 text-center cursor-pointer"
+                     @click="$store.releases.activeFilter = ''"
+                     :class="{ 'bg-primary/10 border-primary/40': !$store.releases.activeFilter }">
                     <span class="font-black text-3xl text-primary block">{{ total_upcoming }}</span>
                     <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">Upcoming</span>
                 </div>
                 {% for type, count in types_count.items %}
                 {% if type != 'Anniversary' %}
-                <div class="px-6 py-5 {% if not forloop.last %}border-r border-white/20{% endif %} text-center">
-                    <span class="font-black text-3xl text-white block">{{ count }}</span>
+                <div class="px-6 py-5 {% if not forloop.last %}border-r border-white/20{% endif %} text-center cursor-pointer transition-colors hover:bg-primary/10"
+                     @click="$store.releases.activeFilter = $store.releases.activeFilter === '{{ type }}' ? '' : '{{ type }}'"
+                     :class="{ 'bg-primary/10 ring-2 ring-inset ring-primary/60': $store.releases.activeFilter === '{{ type }}' }">
+                    <span class="font-black text-3xl block" :class="$store.releases.activeFilter === '{{ type }}' ? 'text-primary' : 'text-white'">{{ count }}</span>
                     <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">{{ type }}</span>
                 </div>
                 {% endif %}
@@ -108,6 +139,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="relative w-full overflow-hidden bg-black border-b border-white/10 h-12 flex items-center">
     <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
     <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
+    {# Dual loop is intentional — the second copy makes the infinite scroll seamless at the halfway point #}
     <div class="whitespace-nowrap flex items-center gap-8 animate-ticker hover:[animation-play-state:paused]">
         {% for r in upcoming %}
         <span class="inline-flex items-center gap-2 shrink-0">
@@ -117,6 +149,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span class="text-white/20 mx-4">/</span>
         </span>
         {% endfor %}
+        {# Second pass — mirrors first so the loop never shows a gap #}
         {% for r in upcoming %}
         <span class="inline-flex items-center gap-2 shrink-0">
             <span class="font-black text-primary">{{ r.date_str|slice:"5:" }}</span>
@@ -173,8 +206,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="grid grid-cols-7 border-l border-white/10 reveal-up" style="transition-delay:100ms;"
          x-data="{ activeDay: null }">
         {% for day in days %}
-        <div class="cal-day {% if day.empty %}cal-empty{% endif %} relative border-r border-b border-white/10 min-h-[100px] md:min-h-[130px] p-2 md:p-3
-                    {% if day.is_today %}bg-primary/5 border-primary/30{% endif %}
+        <div class="cal-day {% if day.empty %}cal-empty{% endif %} {% if day.is_today %}cal-today{% endif %} relative border-r border-b border-white/10 min-h-[100px] md:min-h-[130px] p-2 md:p-3
                     {% if day.is_past %}opacity-50{% endif %}"
              {% if not day.empty %}
              @mouseenter="activeDay = {{ day.num }}"
@@ -184,44 +216,82 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             {% if not day.empty %}
             <!-- Day number -->
             <div class="flex items-center justify-between mb-2">
-                <span class="font-black text-sm md:text-lg {% if day.is_today %}text-primary{% else %}text-white/70{% endif %}">
+                <span class="font-black text-sm md:text-lg {% if day.is_today %}text-primary neon-text{% else %}text-white/70{% endif %}">
                     {{ day.num }}
                 </span>
                 {% if day.is_today %}
-                <span class="font-mono text-[7px] tracking-widest uppercase text-primary bg-primary/10 px-1.5 py-0.5">Today</span>
+                <span class="font-mono text-[7px] tracking-widest uppercase text-black bg-primary px-1.5 py-0.5 animate-pulse">TODAY</span>
                 {% endif %}
             </div>
 
-            <!-- Event dots (compact on mobile) -->
-            <div class="flex flex-col gap-1">
+            <!-- Event dots — type-coded colours, collapse at 3 with Alpine expand -->
+            {% with num_releases=day.releases|length %}
+            <div x-data="{ expanded: false }" class="flex flex-col gap-1">
                 {% for release in day.releases %}
-                <div class="group/ev flex items-center gap-1.5 cursor-default">
-                    <span class="cal-dot bg-primary shrink-0"></span>
+                {# Determine dot colour from release type #}
+                {% with rtype=release.type|lower %}
+                <div class="group/ev flex items-center gap-1.5 cursor-default"
+                     x-show="expanded || {{ forloop.counter }} <= 3"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0">
+                    <span class="cal-dot shrink-0
+                        {% if 'single' in rtype %}dot-single
+                        {% elif 'mini' in rtype %}dot-mini
+                        {% elif 'ep' == rtype or 'ep ' in rtype %}dot-ep
+                        {% elif 'album' in rtype %}dot-album
+                        {% else %}dot-other{% endif %}"></span>
                     <span class="hidden md:block text-[9px] font-bold text-white/80 uppercase tracking-tight truncate group-hover/ev:text-primary transition-colors">{{ release.artist }}</span>
                 </div>
+                {% endwith %}
                 {% endfor %}
+
+                {# Birthday items — item 10: 🎂 emoji + gold dot #}
                 {% for bday in day.birthdays %}
-                <div class="group/ev flex items-center gap-1.5 cursor-default">
-                    <span class="cal-dot bg-secondary shrink-0"></span>
-                    <span class="hidden md:block text-[9px] font-bold text-white/60 uppercase tracking-tight truncate group-hover/ev:text-secondary transition-colors">{{ bday.name }}{% if bday.group %} ({{ bday.group }}){% endif %}</span>
+                {% with global_idx=forloop.counter|add:num_releases %}
+                <div class="group/ev flex items-center gap-1.5 cursor-default"
+                     x-show="expanded || {{ global_idx }} <= 3"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0">
+                    <span class="cal-dot dot-birthday shrink-0"></span>
+                    <span class="hidden md:block text-[9px] font-bold text-white/60 uppercase tracking-tight truncate group-hover/ev:text-yellow-400 transition-colors">🎂 {{ bday.name }}{% if bday.group %} ({{ bday.group }}){% endif %}</span>
                 </div>
+                {% endwith %}
                 {% endfor %}
+
+                {# "X more" expand toggle — only shown when total exceeds 3 #}
+                {% with total_events=num_releases|add:day.birthdays|length %}
+                {% if total_events > 3 %}
+                <button @click.stop="expanded = !expanded"
+                        class="mt-0.5 text-[8px] font-black uppercase tracking-widest text-primary/70 hover:text-primary transition-colors text-left">
+                    <span x-show="!expanded">+{{ total_events|add:"-3" }} more</span>
+                    <span x-show="expanded">Show less</span>
+                </button>
+                {% endif %}
+                {% endwith %}
             </div>
+            {% endwith %}
             {% endif %}
         </div>
         {% endfor %}
     </div>
 
-    <!-- Legend -->
-    <div class="flex items-center gap-6 mt-6 reveal-up" style="transition-delay:200ms;">
-        <div class="flex items-center gap-2"><span class="cal-dot bg-primary"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Release</span></div>
-        <div class="flex items-center gap-2"><span class="cal-dot bg-secondary"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Birthday</span></div>
+    <!-- Legend — type-coded dots -->
+    <div class="flex flex-wrap items-center gap-4 mt-6 reveal-up" style="transition-delay:200ms;">
+        <div class="flex items-center gap-2"><span class="cal-dot dot-single"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Single</span></div>
+        <div class="flex items-center gap-2"><span class="cal-dot dot-mini"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Mini Album</span></div>
+        <div class="flex items-center gap-2"><span class="cal-dot dot-album"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Album</span></div>
+        <div class="flex items-center gap-2"><span class="cal-dot dot-ep"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">EP</span></div>
+        <div class="flex items-center gap-2"><span class="cal-dot dot-other"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Other</span></div>
+        <div class="flex items-center gap-2"><span class="cal-dot dot-birthday"></span><span class="font-mono text-[9px] tracking-widest uppercase text-slate-500">🎂 Birthday</span></div>
     </div>
 </div>
 </section>
 
 <!-- ═══════════════ UPCOMING RELEASES (TIMELINE) ═══════════════ -->
-<section class="w-full bg-black py-32 border-b border-white/10">
+<section class="w-full bg-black py-32 border-b border-white/10"
+         x-data="upcomingList()">
 <div class="container mx-auto px-4 sm:px-6">
     <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-0">
         <div class="reveal-left">
@@ -232,49 +302,99 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 
-    <div class="flex flex-col border-t border-white/20 reveal-up">
-        {% for r in upcoming %}
-        <div class="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-6 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
-            <div class="flex items-center gap-6 w-full md:w-auto mb-4 md:mb-0">
-                <!-- Artwork -->
-                <div class="relative w-20 h-20 md:w-24 md:h-24 overflow-hidden bg-black shrink-0 border border-white/10">
-                    {% if r.image %}
-                    <img class="w-full h-full object-cover grayscale transition-transform duration-700 ease-out group-hover:scale-110 group-hover:grayscale-0"
-                         alt="{{ r.artist }} {{ r.title }}" src="{{ r.image }}"/>
-                    {% else %}
-                    <div class="w-full h-full bg-white/5 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-3xl text-white/10">album</span>
-                    </div>
-                    {% endif %}
-                    <div class="absolute inset-0 bg-primary/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <span class="material-symbols-outlined text-black text-3xl">play_arrow</span>
-                    </div>
-                </div>
+    <!-- Tier 2: Filter pills + Sort toggle + Search (items 8 & 9) -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 py-4 border-b border-white/10">
+        <!-- Filter pills -->
+        <div class="flex flex-wrap gap-2 flex-1">
+            <button @click="activeFilter = ''"
+                    :class="activeFilter === '' ? 'filter-pill-active' : 'border-white/20 text-slate-400 hover:border-primary hover:text-primary'"
+                    class="border px-3 py-1 font-black text-[9px] uppercase tracking-widest transition-colors">All</button>
+            <template x-for="pill in filterTypes" :key="pill">
+                <button @click="activeFilter = (activeFilter === pill) ? '' : pill"
+                        :class="activeFilter === pill ? 'filter-pill-active' : 'border-white/20 text-slate-400 hover:border-primary hover:text-primary'"
+                        class="border px-3 py-1 font-black text-[9px] uppercase tracking-widest transition-colors"
+                        x-text="pill"></button>
+            </template>
+        </div>
+        <!-- Sort toggle -->
+        <div class="flex items-center gap-2 shrink-0">
+            <button @click="sortAsc = true"
+                    :class="sortAsc ? 'sort-btn-active' : 'bg-white/10 text-slate-400 hover:bg-white/20'"
+                    class="px-3 py-1 font-black text-[9px] uppercase tracking-widest transition-colors">Date ↑</button>
+            <button @click="sortAsc = false"
+                    :class="!sortAsc ? 'sort-btn-active' : 'bg-white/10 text-slate-400 hover:bg-white/20'"
+                    class="px-3 py-1 font-black text-[9px] uppercase tracking-widest transition-colors">Date ↓</button>
+        </div>
+        <!-- Search -->
+        <div class="relative shrink-0">
+            <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-[14px] text-slate-500">search</span>
+            <input type="text" x-model="search" placeholder="Search artist or title…"
+                   class="bg-white/5 border border-white/10 text-white placeholder-slate-600 text-[10px] font-mono tracking-wide pl-7 pr-3 py-1.5 w-48 focus:border-primary focus:outline-none focus:bg-white/10 transition-colors" />
+        </div>
+    </div>
 
-                <!-- Info -->
-                <div class="flex flex-col">
-                    <span class="inline-block bg-primary text-black text-[10px] font-black px-2 py-0.5 mb-2 uppercase tracking-widest w-max">{{ r.type }}</span>
+    <div class="flex flex-col border-t border-white/10 reveal-up">
+        {# Rows rendered with data attributes; Alpine controls visibility & order #}
+        <template x-for="row in filteredRows()" :key="row.idx">
+            <div class="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-6 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
+                 @click="openDrawer(row)">
+                <div class="flex items-center gap-6 w-full md:w-auto mb-4 md:mb-0">
+                    <!-- Artwork -->
+                    <div class="relative w-20 h-20 md:w-24 md:h-24 overflow-hidden bg-black shrink-0 border border-white/10">
+                        <template x-if="row.image">
+                            <img class="w-full h-full object-cover grayscale transition-transform duration-700 ease-out group-hover:scale-110 group-hover:grayscale-0"
+                                 :alt="row.artist + ' ' + row.title" :src="row.image"/>
+                        </template>
+                        <template x-if="!row.image">
+                            <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-3xl text-white/10">album</span>
+                            </div>
+                        </template>
+                        <div class="absolute inset-0 bg-primary/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                            <span class="material-symbols-outlined text-black text-3xl">open_in_new</span>
+                        </div>
+                    </div>
+                    <!-- Info -->
                     <div class="flex flex-col">
-                        <span class="text-primary font-mono text-[10px] tracking-widest uppercase mb-1">{{ r.artist }}</span>
-                        <h4 class="text-white font-black text-xl leading-tight uppercase tracking-tight group-hover:text-primary transition-colors truncate max-w-[200px] sm:max-w-xs md:max-w-md">{{ r.title }}</h4>
+                        <span class="inline-block bg-primary text-black text-[10px] font-black px-2 py-0.5 mb-2 uppercase tracking-widest w-max" x-text="row.type"></span>
+                        <div class="flex flex-col">
+                            <span class="text-primary font-mono text-[10px] tracking-widest uppercase mb-1" x-text="row.artist"></span>
+                            <h4 class="text-white font-black text-xl leading-tight uppercase tracking-tight group-hover:text-primary transition-colors truncate max-w-[200px] sm:max-w-xs md:max-w-md" x-text="row.title"></h4>
+                        </div>
                     </div>
                 </div>
+                <!-- Date & Countdown -->
+                <div class="flex flex-col md:items-end w-full md:w-auto">
+                    <span class="text-slate-400 text-xs font-mono tracking-widest uppercase flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[14px]">schedule</span>
+                        <span x-text="row.date_str"></span>
+                    </span>
+                    <span class="text-white text-lg font-black font-mono tracking-wider mt-1" :data-countdown="row.iso_date" x-text="row.countdown"></span>
+                </div>
             </div>
+        </template>
 
-            <!-- Date & Countdown -->
-            <div class="flex flex-col md:items-end w-full md:w-auto">
-                <span class="text-slate-400 text-xs font-mono tracking-widest uppercase flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[14px]">schedule</span> {{ r.date_str }}
-                </span>
-                <span class="text-white text-lg font-black font-mono tracking-wider mt-1" data-countdown="{{ r.iso_date }}">--d --h --m</span>
-            </div>
+        <!-- Empty state -->
+        <div x-show="filteredRows().length === 0" class="py-16 text-center border-b border-white/10">
+            <span class="material-symbols-outlined text-6xl text-white/10 block mb-4">search_off</span>
+            <p class="text-slate-500 font-mono text-sm tracking-widest uppercase">No releases match your filter</p>
         </div>
-        {% empty %}
-        <div class="py-16 text-center border-b border-white/10">
-            <span class="material-symbols-outlined text-6xl text-white/10 block mb-4">event_busy</span>
-            <p class="text-slate-500 font-mono text-sm tracking-widest uppercase">No upcoming releases for this period</p>
-        </div>
+
+        {# Hidden data source — Django renders JSON for Alpine to consume #}
+        <script id="upcoming-data" type="application/json">
+        [
+        {% for r in upcoming %}
+            {"idx": {{ forloop.counter0 }},
+             "artist": "{{ r.artist|escapejs }}",
+             "title": "{{ r.title|escapejs }}",
+             "type": "{{ r.type }}",
+             "date_str": "{{ r.date_str }}",
+             "iso_date": "{{ r.iso_date }}",
+             "image": "{{ r.image|default:'' }}"
+            }{% if not forloop.last %},{% endif %}
         {% endfor %}
+        ]
+        </script>
     </div>
 </div>
 </section>
@@ -340,10 +460,186 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 </main>
 
+<!-- ═══════════════ STICKY JUMP-TO-TODAY PILL ═══════════════ -->
+<button id="jump-today" onclick="scrollToToday()"
+        class="hidden-pill fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-primary text-black font-black px-5 py-3 uppercase tracking-[0.15em] text-[11px] shadow-[4px_4px_0px_rgba(244,37,192,0.4)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200">
+    <span class="material-symbols-outlined text-[16px]">today</span> Jump to Today
+</button>
+
+<!-- ═══════════════ RELEASE DETAIL DRAWER (item 6) ═══════════════ -->
+<!-- Backdrop -->
+<div id="drawer-backdrop"
+     class="backdrop-hidden fixed inset-0 bg-black/70 z-40"
+     x-data x-init
+     :class="$store.drawer.open ? '' : 'backdrop-hidden'"
+     @click.self="closeDrawerDOM()"></div>
+<!-- Drawer panel -->
+<aside id="release-drawer"
+       class="drawer-closed fixed top-0 right-0 h-full w-full sm:w-[400px] bg-[#0a0a0a] border-l border-white/10 z-50 flex flex-col overflow-y-auto"
+       x-data x-init
+       @click.stop>
+    <!-- Close button -->
+    <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
+        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Release Details</span>
+        <button onclick="closeDrawerDOM()" class="w-8 h-8 flex items-center justify-center border border-white/20 text-white hover:border-primary hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+    </div>
+    <!-- Artwork -->
+    <div class="relative w-full aspect-square bg-black overflow-hidden">
+        <img id="drawer-img" src="" alt="" class="w-full h-full object-cover grayscale" />
+        <div id="drawer-img-placeholder" class="hidden w-full h-full bg-white/5 flex items-center justify-center">
+            <span class="material-symbols-outlined text-7xl text-white/10">album</span>
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent"></div>
+    </div>
+    <!-- Info -->
+    <div class="px-6 pt-4 pb-8 flex flex-col gap-4">
+        <span id="drawer-type" class="inline-block bg-primary text-black text-[10px] font-black px-2 py-0.5 uppercase tracking-widest w-max"></span>
+        <div>
+            <p id="drawer-artist" class="text-primary font-mono text-[10px] tracking-widest uppercase mb-1"></p>
+            <h3 id="drawer-title" class="text-white font-black text-2xl uppercase tracking-tight leading-tight"></h3>
+        </div>
+        <div class="border-t border-white/10 pt-4">
+            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500 block mb-1">Release Date</span>
+            <p id="drawer-date" class="text-white font-mono text-sm tracking-widest"></p>
+        </div>
+        <div>
+            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-500 block mb-1">Countdown</span>
+            <p id="drawer-countdown" class="text-primary font-black text-2xl font-mono tracking-wider" data-drawer-countdown="">--d --h --m</p>
+        </div>
+    </div>
+</aside>
+
 {% include 'core/footer.html' %}
 
 <script>
-// ── Countdown Timers ───────────────────────────────────────────
+// ── Alpine.js Stores & Components — initialise BEFORE Alpine starts ──
+document.addEventListener('alpine:init', () => {
+
+    // Global drawer store (item 6)
+    Alpine.store('drawer', { open: false, release: {} });
+
+    // Global release filter store (item 7)
+    Alpine.store('releases', { activeFilter: '' });
+
+    // Upcoming list component (items 7, 8, 9)
+    Alpine.data('upcomingList', () => ({
+        activeFilter: '',
+        search: '',
+        sortAsc: true,
+        filterTypes: ['Single', 'Mini Album', 'Album', 'EP'],
+        rows: [],
+
+        init() {
+            // Parse data from embedded JSON script tag
+            const raw = document.getElementById('upcoming-data');
+            if (raw) {
+                this.rows = JSON.parse(raw.textContent).map(r => ({
+                    ...r,
+                    countdown: this.calcCountdown(r.iso_date)
+                }));
+            }
+            // Keep in sync with the stat-card filter store
+            this.$watch('$store.releases.activeFilter', val => {
+                this.activeFilter = val;
+            });
+            this.$watch('activeFilter', val => {
+                this.$store.releases.activeFilter = val;
+            });
+            // Refresh countdowns every minute
+            setInterval(() => {
+                this.rows = this.rows.map(r => ({ ...r, countdown: this.calcCountdown(r.iso_date) }));
+            }, 60000);
+            // Also update drawer countdown
+            setInterval(updateDrawerCountdown, 60000);
+        },
+
+        calcCountdown(iso) {
+            const diff = new Date(iso).getTime() - Date.now();
+            if (diff <= 0) return '🎉 RELEASED!';
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            return `${d}d ${h}h ${m}m`;
+        },
+
+        filteredRows() {
+            let list = this.rows.slice();
+            // Type filter (from pills or stat cards)
+            if (this.activeFilter) {
+                list = list.filter(r => r.type === this.activeFilter);
+            }
+            // Text search
+            if (this.search.trim()) {
+                const q = this.search.trim().toLowerCase();
+                list = list.filter(r =>
+                    r.artist.toLowerCase().includes(q) ||
+                    r.title.toLowerCase().includes(q)
+                );
+            }
+            // Sort by iso_date
+            list.sort((a, b) => {
+                const diff = new Date(a.iso_date) - new Date(b.iso_date);
+                return this.sortAsc ? diff : -diff;
+            });
+            return list;
+        },
+
+        openDrawer(row) {
+            this.$store.drawer.open = true;
+            this.$store.drawer.release = row;
+            openDrawerDOM(row);
+        }
+    }));
+});
+
+// ── Drawer DOM helpers (item 6) ───────────────────────────────────
+function openDrawerDOM(row) {
+    const drawer = document.getElementById('release-drawer');
+    const backdrop = document.getElementById('drawer-backdrop');
+    const img = document.getElementById('drawer-img');
+    const imgPh = document.getElementById('drawer-img-placeholder');
+    document.getElementById('drawer-type').textContent = row.type;
+    document.getElementById('drawer-artist').textContent = row.artist;
+    document.getElementById('drawer-title').textContent = row.title;
+    document.getElementById('drawer-date').textContent = row.date_str;
+    updateDrawerCountdown(row.iso_date);
+    if (row.image) {
+        img.src = row.image; img.alt = row.artist + ' ' + row.title;
+        img.classList.remove('hidden'); imgPh && imgPh.classList.add('hidden');
+    } else {
+        img.src = ''; img.classList.add('hidden');
+        imgPh && imgPh.classList.remove('hidden');
+    }
+    drawer.classList.remove('drawer-closed');
+    backdrop.classList.remove('backdrop-hidden');
+    document.body.style.overflow = 'hidden';
+    window._drawerIso = row.iso_date;
+}
+
+function closeDrawerDOM() {
+    document.getElementById('release-drawer').classList.add('drawer-closed');
+    document.getElementById('drawer-backdrop').classList.add('backdrop-hidden');
+    document.body.style.overflow = '';
+    window._drawerIso = null;
+    if (window.Alpine) Alpine.store('drawer').open = false;
+}
+
+function updateDrawerCountdown(iso) {
+    const target = iso || window._drawerIso;
+    if (!target) return;
+    const el = document.getElementById('drawer-countdown');
+    if (!el) return;
+    const diff = new Date(target).getTime() - Date.now();
+    if (diff <= 0) { el.textContent = '🎉 RELEASED!'; return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    el.textContent = `${d}d ${h}h ${m}m`;
+}
+
+// ── Countdown Timers (static elements) ─────────────────────────────
 function updateCountdowns() {
     document.querySelectorAll('[data-countdown]').forEach(el => {
         const target = new Date(el.dataset.countdown).getTime();
@@ -376,6 +672,30 @@ const observer = new IntersectionObserver((entries, obs) => {
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => observer.observe(el));
 });
+
+// ── Sticky "Jump to Today" pill ──────────────────────────────────
+const todayPill = document.getElementById('jump-today');
+const calSection = document.querySelector('section:has(.cal-day)');
+
+function scrollToToday() {
+    const todayCell = document.querySelector('.cal-today');
+    if (todayCell) {
+        todayCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+        window.location.href = '?year=&month=';
+    }
+}
+
+if (todayPill && calSection) {
+    const pillObs = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+            todayPill.classList.add('hidden-pill');
+        } else {
+            todayPill.classList.remove('hidden-pill');
+        }
+    }, { threshold: 0.1 });
+    pillObs.observe(calSection);
+}
 </script>
 </body>
 </html>
