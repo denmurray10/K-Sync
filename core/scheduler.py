@@ -6,7 +6,12 @@ import logging
 import re
 import random
 from core.models import Ranking
-from core.views import _chat, _do_blog_generate, _comment_on_live_facebook_posts
+from core.views import (
+    _chat,
+    _do_blog_generate,
+    _comment_on_live_facebook_posts,
+    _post_next_article_to_x,
+)
 from core.digests import send_due_user_digests
 import urllib.request
 import urllib.parse
@@ -240,6 +245,19 @@ def facebook_homepage_comment_job():
         logger.error("[scheduler] Facebook homepage comment pass failed: %s", e)
 
 
+def x_post_job():
+    """Background job: publish one queued blog article to X."""
+    logger.info("[scheduler] Starting X post pass...")
+    try:
+        posted = _post_next_article_to_x()
+        if posted:
+            logger.info("[scheduler] X post pass complete - 1 article posted.")
+        else:
+            logger.info("[scheduler] X post pass complete - no queued article posted.")
+    except Exception as e:
+        logger.error("[scheduler] X post pass failed: %s", e)
+
+
 def _is_generated_voice_track_url_or_title(audio_url, title):
     title_text = str(title or '').strip()
     url_text = str(audio_url or '').lower()
@@ -374,6 +392,18 @@ def start_scheduler():
         max_instances=1,
         coalesce=True,
     )
+
+    if getattr(settings, 'X_POST_ENABLED', False):
+        x_interval_minutes = max(1, int(getattr(settings, 'X_POST_INTERVAL_MINUTES', 40) or 40))
+        scheduler.add_job(
+            x_post_job,
+            'interval',
+            minutes=x_interval_minutes,
+            id='x_post_job',
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
 
     if getattr(settings, 'PLAYLIST_WEEKLY_RANDOMIZE_ENABLED', True):
         scheduler.add_job(

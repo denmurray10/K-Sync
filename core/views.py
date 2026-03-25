@@ -8139,14 +8139,15 @@ def _do_blog_generate():
         except Exception as e:
             logger.warning("[instagram] Post failed for %r: %s", title, e)
 
-        # Post to X (Twitter) when enabled
-        if getattr(settings, 'X_POST_ENABLED', False):
+        # Optional immediate X posting. The scheduled X queue handles the
+        # normal publishing cadence, so this stays off unless explicitly enabled.
+        if getattr(settings, 'X_POST_ON_CREATE_ENABLED', False):
             try:
                 _post_to_x(article)
             except Exception as e:
                 logger.warning("[x] Post failed for %r: %s", title, e)
         else:
-            logger.info("[x] Posting disabled - skipping for %r", title)
+            logger.info("[x] Immediate posting disabled - article queued for scheduler for %r", title)
 
         # Post to Pinterest
         try:
@@ -8694,6 +8695,31 @@ def _post_to_x(article):
         logger.info("[x] Tweeted %r - id: %s", article.title, result['data']['id'])
     else:
         logger.warning("[x] Tweet failed: %s", result)
+
+
+def _post_next_article_to_x():
+    """Post the oldest unpublished article to X and return True when sent."""
+    if not getattr(settings, 'X_POST_ENABLED', False):
+        logger.debug("[x] Scheduler posting disabled via X_POST_ENABLED - skipping.")
+        return False
+
+    article = (
+        BlogArticle.objects
+        .filter(x_posted_at__isnull=True)
+        .order_by('created_at')
+        .first()
+    )
+    if not article:
+        logger.debug("[x] No queued articles found for scheduler.")
+        return False
+
+    if article.x_post_id:
+        logger.debug("[x] Article %r already has an X post id - skipping.", article.slug)
+        return False
+
+    _post_to_x(article)
+    article.refresh_from_db(fields=['x_posted_at'])
+    return bool(article.x_posted_at)
 
 
 def _post_to_pinterest(article):
