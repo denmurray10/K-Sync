@@ -1018,6 +1018,7 @@ def api_b2_tracks(request):
                 'duration_seconds': duration_seconds,
                 'url': stream_url,
                 'fileId': f['fileId'],
+                'radio_track_id': metadata.id if metadata else None,
                 'file_format': file_format,
                 'assigned_playlists': assigned_playlists,
                 'assigned_playlist_label': assigned_playlist_label,
@@ -1120,16 +1121,21 @@ def api_playlist_save(request):
             else:
                 voice_over_start_percent = 0
             
-            track, _ = RadioTrack.objects.get_or_create(
-                title=title,
-                artist=artist,
-                defaults={
-                    'audio_url': audio_url,
-                    'album_art': album_art,
-                    'duration': duration,
-                    'duration_seconds': duration_seconds,
-                }
+            track = (
+                RadioTrack.objects
+                .filter(title=title, artist=artist)
+                .order_by('id')
+                .first()
             )
+            if not track:
+                track = RadioTrack.objects.create(
+                    title=title,
+                    artist=artist,
+                    audio_url=audio_url,
+                    album_art=album_art,
+                    duration=duration,
+                    duration_seconds=duration_seconds,
+                )
             # If track exists but URL changed, update it
             changed = False
             if track.audio_url != audio_url:
@@ -1304,6 +1310,27 @@ def api_playlist_delete(request, playlist_id):
     try:
         playlist.delete()
         return JsonResponse({'ok': True})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@require_POST
+def api_track_delete(request, track_id):
+    """Deletes a RadioTrack from the DB and removes linked playlist memberships."""
+    staff_check = _admin_only_json(request)
+    if staff_check:
+        return staff_check
+
+    try:
+        track = RadioTrack.objects.get(id=track_id)
+    except RadioTrack.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'Track not found'}, status=404)
+
+    try:
+        track_label = f"{track.artist} - {track.title}".strip(" -")
+        track.delete()
+        return JsonResponse({'ok': True, 'label': track_label})
     except Exception as e:
         return JsonResponse({'ok': False, 'error': str(e)}, status=500)
 

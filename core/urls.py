@@ -142,6 +142,7 @@ urlpatterns = [
     path('api/playlist/ai-generate/', views.api_playlist_ai_generate, name='api_playlist_ai_generate'),
     path('api/playlist/<int:playlist_id>/data/', views.api_playlist_data, name='api_playlist_data'),
     path('api/playlist/<int:playlist_id>/delete/', views.api_playlist_delete, name='api_playlist_delete'),
+    path('api/track/<int:track_id>/delete/', views.api_track_delete, name='api_track_delete'),
     path('api/schedule/save/', views.api_schedule_save, name='api_schedule_save'),
     path('api/schedule/<int:schedule_id>/delete/', views.api_schedule_delete, name='api_schedule_delete'),
     path('api/schedule/ai-fill/', views.api_schedule_ai_fill, name='api_schedule_ai_fill'),
