@@ -73,6 +73,17 @@
         if (statusEl) statusEl.textContent = String(text || '').trim() || 'Ready';
       };
 
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({ title: 'K-BEATS LIVE', artist: 'On Air' });
+        navigator.mediaSession.setActionHandler('play', () => {});
+        navigator.mediaSession.setActionHandler('pause', () => {});
+        navigator.mediaSession.setActionHandler('seekbackward', () => {});
+        navigator.mediaSession.setActionHandler('seekforward', () => {});
+        navigator.mediaSession.setActionHandler('previoustrack', () => {});
+        navigator.mediaSession.setActionHandler('nexttrack', () => {});
+        navigator.mediaSession.setActionHandler('seekto', () => {});
+      }
+
       const audioMimeForUrl = (url) => {
         const val = String(url || '').toLowerCase();
         if (val.includes('.m4a')) return 'audio/mp4';

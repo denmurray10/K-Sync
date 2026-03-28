@@ -544,6 +544,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const progressTotalEl = document.getElementById('live-progress-total');
         
         if (playBtn && audio) {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({ title: 'K-BEATS LIVE', artist: 'On Air' });
+                navigator.mediaSession.setActionHandler('play', () => {});
+                navigator.mediaSession.setActionHandler('pause', () => {});
+                navigator.mediaSession.setActionHandler('seekbackward', () => {});
+                navigator.mediaSession.setActionHandler('seekforward', () => {});
+                navigator.mediaSession.setActionHandler('previoustrack', () => {});
+                navigator.mediaSession.setActionHandler('nexttrack', () => {});
+                navigator.mediaSession.setActionHandler('seekto', () => {});
+            }
             let currentLiveAiPayload = {{ live_ai_payload_json|default:"{}"|safe }};
             let currentTrackId = Number({{ current_track_id|default:0 }} || 0);
             const helpfulSelectedTrackIds = new Set();

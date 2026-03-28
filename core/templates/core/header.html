@@ -481,6 +481,17 @@
         const mobilePlayerIcon = document.getElementById('mobile-menu-player-icon');
         const mobileMenuAudio = document.getElementById('mobile-menu-live-audio');
 
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({ title: 'K-BEATS LIVE', artist: 'On Air' });
+            navigator.mediaSession.setActionHandler('play', () => {});
+            navigator.mediaSession.setActionHandler('pause', () => {});
+            navigator.mediaSession.setActionHandler('seekbackward', () => {});
+            navigator.mediaSession.setActionHandler('seekforward', () => {});
+            navigator.mediaSession.setActionHandler('previoustrack', () => {});
+            navigator.mediaSession.setActionHandler('nexttrack', () => {});
+            navigator.mediaSession.setActionHandler('seekto', () => {});
+        }
+
         const playerStateKey = 'ksync_station_widget_v1';
 
         const readPlayerState = () => {
