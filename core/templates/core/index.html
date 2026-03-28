@@ -1114,6 +1114,12 @@ function _startProgressTicker() {
         if (_liveDuration > 0 && _liveOffset < _liveDuration) {
             _liveOffset++;
             _updateProgressBars();
+        } else if (_liveDuration > 0 && _liveOffset >= _liveDuration) {
+            // Song finished — immediately fetch next track for seamless transition
+            _liveOffset = 0;
+            _liveDuration = 0;
+            _updateProgressBars();
+            refreshHomepageLiveBar();
         }
     }, 1000);
 }

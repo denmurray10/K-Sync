@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
@@ -2290,9 +2290,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         }
                         if (Number.isFinite(serverOffset) && serverOffset > 0) {
                             const seekTo = Math.max(0, Math.floor(serverOffset));
-                            if (Math.abs(audio.currentTime - seekTo) > 2) {
+                            if (Math.abs(audio.currentTime - seekTo) > 1) {
                                 audio.currentTime = seekTo;
                             }
+                        } else if (isSameTrack && audio.ended) {
+                            // Same track returned but audio has ended — seek to start
+                            audio.currentTime = 0;
+                        }
+                        // If the server says offset >= duration, the schedule hasn't advanced yet; retry soon
+                        if (isSameTrack && durationFromPayload > 0 && serverOffset >= durationFromPayload - 1) {
+                            setTimeout(() => triggerRotate('boundary-retry'), 1500);
+                            return;
                         }
                         scheduleVoiceOverlayForOffset(serverOffset);
                         scheduleRotateWatchdog();
@@ -2347,6 +2355,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             loadNextShowRail();
             setInterval(updateUpNextCountdownTimers, 1000);
             setInterval(renderUpcomingShowsColumn, 1000);
+
+            // Stall detector: if audio ended/paused while we should be playing, force rotation
+            setInterval(() => {
+                if (!isPlaying || rotateInFlight) return;
+                if (audio.ended || (audio.paused && !audio.muted)) {
+                    triggerRotate('stall-detector');
+                }
+            }, 2000);
             applyLiveAiPayload(currentLiveAiPayload);
             updateShareCard({
                 title: document.getElementById('hero-title')?.textContent || 'K-BEATS LIVE',
