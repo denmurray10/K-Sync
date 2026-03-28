@@ -1,4 +1,4 @@
-﻿import json
+import json
 import hashlib
 import logging
 import os
@@ -2799,9 +2799,17 @@ def _build_homepage_context(request):
             candidate_track = state.current_track if state else None
 
         if candidate_track and not _is_generated_voice_track(candidate_track):
+            offset = 0
+            if schedule_context:
+                offset = schedule_context.get('current_offset', 0)
+            elif state and state.started_at:
+                offset = max(0, int((timezone.now() - state.started_at).total_seconds()))
             home_live_track = {
                 'title': candidate_track.title,
                 'artist': candidate_track.artist,
+                'album_art': candidate_track.album_art or '',
+                'duration_seconds': int(candidate_track.duration_seconds or 0),
+                'current_offset': int(offset),
             }
     except Exception:
         home_live_track = None
@@ -7736,28 +7744,39 @@ def api_live_rotate_track(request):
 
 def api_live_status(request):
     state, _ = RadioStationState.objects.get_or_create(id=1)
-    state = _auto_rotate_station(state)
-    current = state.current_track
+    schedule_context = _compute_schedule_live_context(timezone.localtime())
     current_offset = 0
 
-    up_next_ids = list(state.up_next or [])[:6]
-    up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
-    up_next_tracks = [track for track in up_next_tracks if not _is_generated_voice_track(track)]
-    up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
-    up_next_list = up_next_tracks
+    if schedule_context:
+        state = _sync_state_with_schedule_context(state, schedule_context)
+        current = schedule_context['current_track']
+        current_offset = schedule_context.get('current_offset', 0)
+        up_next_list = schedule_context['up_next_tracks'][:6]
+        recently_played_list = schedule_context['recently_played_tracks'][:6]
+    else:
+        state = _auto_rotate_station(state)
+        current = state.current_track
+        if state and state.started_at:
+            current_offset = max(0, int((timezone.now() - state.started_at).total_seconds()))
 
-    recent_ids = list(state.recently_played or [])[:6]
-    recent_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
-    recent_tracks = [track for track in recent_tracks if not _is_generated_voice_track(track)]
-    recent_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
-    recently_played_list = recent_tracks
+        up_next_ids = list(state.up_next or [])[:6]
+        up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
+        up_next_tracks = [track for track in up_next_tracks if not _is_generated_voice_track(track)]
+        up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
+        up_next_list = up_next_tracks
+
+        recent_ids = list(state.recently_played or [])[:6]
+        recent_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
+        recent_tracks = [track for track in recent_tracks if not _is_generated_voice_track(track)]
+        recent_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
+        recently_played_list = recent_tracks
 
     if not current:
         return JsonResponse({'ok': False, 'error': 'No active track'}, status=404)
 
     return JsonResponse({
         'ok': True,
-        'current_offset': current_offset,
+        'current_offset': int(current_offset),
         'current_track': {
             'id': current.id,
             'title': current.title,
@@ -7765,7 +7784,7 @@ def api_live_status(request):
             'album_art': current.album_art,
             'audio_url': _build_stream_audio_url(current.audio_url),
             'duration': current.duration,
-            'duration_seconds': current.duration_seconds,
+            'duration_seconds': int(current.duration_seconds or 0),
         },
         'up_next': [
             {
