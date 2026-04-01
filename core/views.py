@@ -5160,6 +5160,169 @@ def bias_selector_promo(request):
     })
 
 
+def _game_intro_catalog():
+    return {
+        'idol_scramble': {
+            'title': 'Idol Scramble',
+            'eyebrow': 'K-Beats Arcade',
+            'kicker': 'Puzzle sprint',
+            'icon': 'extension',
+            'accent_hex': '#f425c0',
+            'secondary_hex': '#00f0ff',
+            'description': 'Unscramble idol and group names against the clock in a fast memory-led word game built for fans who know their rosters cold.',
+            'hook': 'The intro page sets the challenge, then one click drops straight into the playable scramble board.',
+            'play_url_name': 'idol_scramble',
+            'stats': [('60+', 'Names'), ('90', 'Seconds'), ('1', 'Continuous run')],
+            'how_it_works': [
+                'Letters are shuffled from real idol and group names already loaded into the app.',
+                'Each correct answer feeds the next round instantly, so the pace stays tight.',
+                'Hints help when you blank, but the timer keeps the pressure on.',
+            ],
+        },
+        'fandom_trivia': {
+            'title': 'Fandom Trivia',
+            'eyebrow': 'K-Beats Arcade',
+            'kicker': 'Knowledge check',
+            'icon': 'quiz',
+            'accent_hex': '#f425c0',
+            'secondary_hex': '#00f0ff',
+            'description': 'Take on fast K-Pop trivia rounds covering labels, lineups, and artist history, with enough variation to reward real fandom depth.',
+            'hook': 'The intro page frames the mode, then the CTA launches the first question immediately.',
+            'play_url_name': 'fandom_trivia',
+            'stats': [('10', 'Questions'), ('3', 'Topic types'), ('1', 'Score run')],
+            'how_it_works': [
+                'Each session mixes label, member-count, and artist-type questions.',
+                'Wrong answers cost momentum, so broad knowledge matters more than lucky guesses.',
+                'The question pool shifts between sessions to keep replay value high.',
+            ],
+        },
+        'mv_matcher': {
+            'title': 'MV Matcher',
+            'eyebrow': 'K-Beats Arcade',
+            'kicker': 'Visual recall',
+            'icon': 'movie',
+            'accent_hex': '#00f0ff',
+            'secondary_hex': '#f425c0',
+            'description': 'Read the frame, trust your instincts, and identify members or groups from a single still before the next round flips in.',
+            'hook': 'The intro page sells the visual challenge first, then the CTA opens the playable rounds directly.',
+            'play_url_name': 'mv_matcher',
+            'stats': [('10', 'Rounds'), ('4', 'Choices'), ('1', 'Frame at a time')],
+            'how_it_works': [
+                'Every round shows one image drawn from the idol and member library.',
+                'You answer from four options, balancing visual memory with fandom instinct.',
+                'The mode mixes groups, soloists, and members so repeat sessions stay unpredictable.',
+            ],
+        },
+        'draft_day': {
+            'title': 'Draft Day',
+            'eyebrow': 'K-Beats Arcade',
+            'kicker': 'Strategy board',
+            'icon': 'stars',
+            'accent_hex': '#f425c0',
+            'secondary_hex': '#00f0ff',
+            'description': 'Assemble a fantasy idol lineup by balancing cost, visuals, rap, dance, and vocal stats across a board built for replayable roster strategy.',
+            'hook': 'The intro page explains the fantasy draft first, then the CTA opens the board with no extra step afterward.',
+            'play_url_name': 'draft_day',
+            'stats': [('300+', 'Draft pool'), ('4', 'Core stats'), ('1', 'Fantasy lineup')],
+            'how_it_works': [
+                'Every idol card has seeded stats and cost values for a consistent drafting meta.',
+                'The challenge is building the strongest roster without blowing the budget too early.',
+                'Because the pool uses real artists, each run feels like building a fan-made supergroup.',
+            ],
+        },
+        'beat_streak': {
+            'title': 'Beat Streak',
+            'eyebrow': 'K-Beats Arcade',
+            'kicker': 'Rhythm lane',
+            'icon': 'speed',
+            'accent_hex': '#00f0ff',
+            'secondary_hex': '#f425c0',
+            'description': 'Hit the rhythm of current K-Pop tracks in a score-chasing mode built around fast retries, rising tempo, and leaderboard energy.',
+            'hook': 'The intro page gives the rhythm mode a proper setup, then the CTA jumps straight into gameplay.',
+            'play_url_name': 'beat_streak',
+            'stats': [('30', 'Track pool'), ('3', 'Difficulty vibes'), ('10', 'Leaderboard spots')],
+            'how_it_works': [
+                'Tracks come from current chart imports and are enriched with preview clips.',
+                'Every run reshuffles the pool so reaction speed still matters on replay.',
+                'Saved high scores give the mode a real arcade loop instead of a one-off demo.',
+            ],
+        },
+        'beat_streak_v2': {
+            'title': 'Beat Streak v2',
+            'eyebrow': 'K-Beats Arcade',
+            'kicker': 'Rhythm lane',
+            'icon': 'graphic_eq',
+            'accent_hex': '#00f0ff',
+            'secondary_hex': '#f425c0',
+            'description': 'A sharper second pass on Beat Streak, using the same music pipeline with a more polished presentation and the same instant replay loop.',
+            'hook': 'The intro page introduces the upgraded version, then the CTA lands right inside the playable board.',
+            'play_url_name': 'beat_streak_v2',
+            'stats': [('30', 'Track pool'), ('1', 'Upgraded UI'), ('10', 'Leaderboard spots')],
+            'how_it_works': [
+                'The core rhythm data comes from the same live chart pipeline as the original mode.',
+                'The v2 screen focuses on cleaner visual rhythm cues and tighter pacing.',
+                'It is built for players who want the same loop with a more refined surface.',
+            ],
+        },
+    }
+
+
+def _render_game_intro(request, key):
+    config = dict(_game_intro_catalog()[key])
+    related = []
+    for related_key, item in _game_intro_catalog().items():
+        if related_key == key:
+            continue
+        related.append({
+            'title': item['title'],
+            'href': reverse(f'{related_key}_promo'),
+            'kicker': item['kicker'],
+            'icon': item['icon'],
+        })
+
+    return render(request, 'core/game_intro.html', {
+        'promo_title': config['title'],
+        'promo_eyebrow': config['eyebrow'],
+        'promo_kicker': config['kicker'],
+        'promo_icon': config['icon'],
+        'promo_accent_hex': config['accent_hex'],
+        'promo_secondary_hex': config['secondary_hex'],
+        'promo_description': config['description'],
+        'promo_hook': config['hook'],
+        'promo_stats': config['stats'],
+        'promo_how_it_works': config['how_it_works'],
+        'promo_play_url': reverse(config['play_url_name']),
+        'promo_back_url': reverse('games'),
+        'promo_related': related[:3],
+        'seo_title': f"{config['title']} - K-Beats Games",
+        'seo_description': config['description'],
+    })
+
+
+def idol_scramble_promo(request):
+    return _render_game_intro(request, 'idol_scramble')
+
+
+def fandom_trivia_promo(request):
+    return _render_game_intro(request, 'fandom_trivia')
+
+
+def mv_matcher_promo(request):
+    return _render_game_intro(request, 'mv_matcher')
+
+
+def draft_day_promo(request):
+    return _render_game_intro(request, 'draft_day')
+
+
+def beat_streak_promo(request):
+    return _render_game_intro(request, 'beat_streak')
+
+
+def beat_streak_v2_promo(request):
+    return _render_game_intro(request, 'beat_streak_v2')
+
+
 def song_game_promo(request):
     daily_rank = Ranking.objects.filter(timeframe='daily').first()
     featured_tracks = []
