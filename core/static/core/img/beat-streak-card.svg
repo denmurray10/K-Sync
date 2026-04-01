@@ -1,0 +1,113 @@
+<svg width="1600" height="1200" viewBox="0 0 1600 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="220" y1="120" x2="1400" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#031318"/>
+      <stop offset="0.5" stop-color="#060008"/>
+      <stop offset="1" stop-color="#14000F"/>
+    </linearGradient>
+    <radialGradient id="pinkGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1180 220) rotate(124.824) scale(760 560)">
+      <stop stop-color="#F425C0" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#F425C0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cyanGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(360 260) rotate(59.421) scale(740 540)">
+      <stop stop-color="#00F0FF" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#00F0FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="laneGlow" x1="800" y1="240" x2="800" y2="940" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07141A"/>
+      <stop offset="1" stop-color="#020202"/>
+    </linearGradient>
+    <linearGradient id="pinkLine" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FF66DB"/>
+      <stop offset="1" stop-color="#F425C0"/>
+    </linearGradient>
+    <linearGradient id="cyanLine" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#8BFFFF"/>
+      <stop offset="1" stop-color="#00F0FF"/>
+    </linearGradient>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="noteGlowPink" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="noteGlowCyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="1200" fill="url(#bg)"/>
+  <rect width="1600" height="1200" fill="url(#pinkGlow)"/>
+  <rect width="1600" height="1200" fill="url(#cyanGlow)"/>
+
+  <g opacity="0.12">
+    <path d="M0 210H1600" stroke="#FFFFFF"/>
+    <path d="M0 370H1600" stroke="#FFFFFF"/>
+    <path d="M0 530H1600" stroke="#FFFFFF"/>
+    <path d="M0 690H1600" stroke="#FFFFFF"/>
+    <path d="M0 850H1600" stroke="#FFFFFF"/>
+    <path d="M250 0V1200" stroke="#FFFFFF"/>
+    <path d="M470 0V1200" stroke="#FFFFFF"/>
+    <path d="M690 0V1200" stroke="#FFFFFF"/>
+    <path d="M910 0V1200" stroke="#FFFFFF"/>
+    <path d="M1130 0V1200" stroke="#FFFFFF"/>
+    <path d="M1350 0V1200" stroke="#FFFFFF"/>
+  </g>
+
+  <g filter="url(#softGlow)">
+    <path d="M520 280L1080 280L1270 930H330L520 280Z" fill="url(#laneGlow)" stroke="#0F2930" stroke-width="3"/>
+    <path d="M660 280L550 930" stroke="url(#cyanLine)" stroke-opacity="0.25" stroke-width="4"/>
+    <path d="M800 280L800 930" stroke="url(#pinkLine)" stroke-opacity="0.2" stroke-width="4"/>
+    <path d="M940 280L1050 930" stroke="url(#cyanLine)" stroke-opacity="0.25" stroke-width="4"/>
+    <path d="M420 760L1180 760" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="3"/>
+    <path d="M390 840L1210 840" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="5"/>
+    <path d="M365 890L1235 890" stroke="url(#pinkLine)" stroke-opacity="0.7" stroke-width="6"/>
+  </g>
+
+  <g opacity="0.95">
+    <rect x="465" y="840" width="125" height="125" rx="10" fill="#071A13" stroke="#22C55E" stroke-width="5"/>
+    <rect x="645" y="840" width="125" height="125" rx="10" fill="#1A0716" stroke="#F425C0" stroke-width="5"/>
+    <rect x="825" y="840" width="125" height="125" rx="10" fill="#1D1604" stroke="#EAB308" stroke-width="5"/>
+    <rect x="1005" y="840" width="125" height="125" rx="10" fill="#03191B" stroke="#00F0FF" stroke-width="5"/>
+  </g>
+
+  <g filter="url(#noteGlowCyan)">
+    <rect x="650" y="510" width="116" height="54" rx="14" fill="#00F0FF"/>
+    <rect x="1008" y="615" width="118" height="54" rx="14" fill="#00F0FF"/>
+  </g>
+  <g filter="url(#noteGlowPink)">
+    <rect x="820" y="430" width="118" height="54" rx="14" fill="#F425C0"/>
+    <rect x="463" y="640" width="116" height="54" rx="14" fill="#22C55E"/>
+    <rect x="820" y="705" width="118" height="54" rx="14" fill="#EAB308"/>
+  </g>
+
+  <g opacity="0.65">
+    <path d="M708 564L666 840" stroke="#00F0FF" stroke-opacity="0.35" stroke-width="18" stroke-linecap="round"/>
+    <path d="M1068 669L1068 840" stroke="#00F0FF" stroke-opacity="0.35" stroke-width="18" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(180 160)">
+    <text x="0" y="0" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="12">K-BEATS ARCADE</text>
+    <text x="0" y="160" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="156" font-weight="900" letter-spacing="-8">BEAT</text>
+    <text x="0" y="285" fill="none" stroke="#F425C0" stroke-width="3" font-family="Montserrat, Arial, sans-serif" font-size="156" font-weight="900" letter-spacing="-8">STREAK</text>
+    <text x="0" y="360" fill="#9CA3AF" font-family="Montserrat, Arial, sans-serif" font-size="34" font-weight="600" letter-spacing="5">SYNC THE HITS. CHASE THE STREAK.</text>
+  </g>
+
+  <g transform="translate(1160 180)">
+    <rect width="250" height="88" fill="#030303" stroke="#00F0FF" stroke-opacity="0.3"/>
+    <text x="28" y="33" fill="#00F0FF" font-family="Montserrat, Arial, sans-serif" font-size="20" font-weight="800" letter-spacing="5">LIVE SCORE</text>
+    <text x="28" y="68" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="42" font-weight="900" letter-spacing="-2">12840</text>
+  </g>
+</svg>
