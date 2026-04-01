@@ -5,6 +5,7 @@ import os
 import uuid
 import io
 import mimetypes
+from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 from django.db import DatabaseError, models, transaction
@@ -5444,8 +5445,9 @@ def signup(request):
 
 @login_required
 def dashboard(request):
-    now = timezone.now()
-    today_str = now.strftime('%Y-%m-%d')
+    now = timezone.localtime()
+    today = now.date()
+    today_str = today.isoformat()
     user = request.user
 
     # Ensure profile exists
@@ -7122,6 +7124,93 @@ def _find_group_for_artist_name(artist_name):
     if starts:
         return starts
     return KPopGroup.objects.filter(name__icontains=artist_name).order_by('rank', 'name').first()
+
+
+def _comeback_relative_label(target_date, today):
+    days_until = (target_date - today).days
+    if days_until <= 0:
+        return 'Today'
+    if days_until == 1:
+        return 'Tomorrow'
+    if days_until < 7:
+        return f'In {days_until} days'
+    if days_until < 14:
+        return 'Next week'
+    return target_date.strftime('%d %b')
+
+
+def _comeback_release_type_group(type_label):
+    lowered = str(type_label or '').strip().lower()
+    if lowered == 'single':
+        return 'single'
+    if lowered in {'album', 'mini album', 'ep', 'repackage'}:
+        return 'album'
+    return 'other'
+
+
+def _build_comeback_release_item(raw_release, date_key, today):
+    date_obj = datetime.strptime(date_key, '%Y-%m-%d').date()
+    artist_display = str(raw_release.get('artist') or '').strip()
+    primary_artist = _extract_primary_artist_name(artist_display) or artist_display
+    group = _find_group_for_artist_name(primary_artist)
+    type_label = str(raw_release.get('type') or 'Release').strip() or 'Release'
+    title = str(raw_release.get('title') or 'Untitled release').strip() or 'Untitled release'
+    base_id = f"{date_key}:{artist_display}:{title}:{type_label}"
+    item_id = hashlib.md5(base_id.encode('utf-8')).hexdigest()[:12]
+    artist_mark = re.sub(r'[^A-Z0-9]', '', primary_artist.upper())[:3] or 'KB'
+
+    return {
+        'id': item_id,
+        'slug': str(raw_release.get('slug') or '').strip(),
+        'title': title,
+        'artist': artist_display or 'Unknown Artist',
+        'artist_primary': primary_artist or 'Unknown Artist',
+        'artist_mark': artist_mark,
+        'type': type_label,
+        'type_group': _comeback_release_type_group(type_label),
+        'image': _optimize_home_image_url(raw_release.get('image'), width=960, height=960),
+        'date_str': date_key,
+        'iso_date': f'{date_key}T09:00:00Z',
+        'date_label': date_obj.strftime('%d %b'),
+        'weekday_label': date_obj.strftime('%A'),
+        'short_weekday': date_obj.strftime('%a').upper(),
+        'days_until': (date_obj - today).days,
+        'relative_label': _comeback_relative_label(date_obj, today),
+        'artist_href': reverse('idol_page', args=[group.slug]) if group else '',
+    }
+
+
+def _build_comeback_event_item(raw_item, date_key, today, kind):
+    date_obj = datetime.strptime(date_key, '%Y-%m-%d').date()
+    if kind == 'birthday':
+        label = str(raw_item.get('name') or 'Birthday').strip()
+        group_name = str(raw_item.get('group') or '').strip()
+        age = raw_item.get('age')
+        if age:
+            detail = f"Turns {age}"
+            if group_name:
+                detail = f"{detail} • {group_name}"
+        else:
+            detail = group_name or 'Birthday spotlight'
+        lookup_name = group_name or label
+    else:
+        label = str(raw_item.get('group') or 'Anniversary').strip()
+        years = raw_item.get('years')
+        detail = f"{years} year anniversary" if years else 'Anniversary spotlight'
+        lookup_name = label
+
+    group = _find_group_for_artist_name(lookup_name)
+    return {
+        'kind': kind,
+        'label': label or ('Birthday' if kind == 'birthday' else 'Anniversary'),
+        'detail': detail,
+        'image': _optimize_home_image_url(raw_item.get('image'), width=320, height=320),
+        'date_str': date_key,
+        'date_label': date_obj.strftime('%d %b'),
+        'weekday_label': date_obj.strftime('%A'),
+        'relative_label': _comeback_relative_label(date_obj, today),
+        'href': reverse('idol_page', args=[group.slug]) if group else '',
+    }
 
 
 def _shorten_text(value, max_len=210):
@@ -10026,7 +10115,7 @@ def ai_generate_ranking(request):
 
 
 
-def comeback_timeline(request):
+def legacy_comeback_timeline(request):
     import calendar as py_calendar
 
     now = timezone.now()
@@ -10142,6 +10231,301 @@ def comeback_timeline(request):
         'recent': recent,
         'total_upcoming': total_upcoming,
         'types_count': types_count,
+    })
+
+
+def comeback_timeline(request):
+    import calendar as py_calendar
+
+    now = timezone.localtime()
+    today = now.date()
+    today_str = today.isoformat()
+
+    try:
+        nav_year = int(request.GET.get('year', now.year))
+        nav_month = int(request.GET.get('month', now.month))
+    except (ValueError, TypeError):
+        nav_year, nav_month = now.year, now.month
+
+    if nav_month < 1 or nav_month > 12:
+        nav_month = now.month
+    if nav_year < 2020 or nav_year > 2030:
+        nav_year = now.year
+
+    if nav_month == 1:
+        prev_year, prev_month = nav_year - 1, 12
+    else:
+        prev_year, prev_month = nav_year, nav_month - 1
+    if nav_month == 12:
+        next_year, next_month = nav_year + 1, 1
+    else:
+        next_year, next_month = nav_year, nav_month + 1
+
+    window_months = []
+    cursor_year = today.year
+    cursor_month = today.month - 1
+    if cursor_month == 0:
+        cursor_month = 12
+        cursor_year -= 1
+    for _ in range(5):
+        window_months.append((cursor_year, cursor_month))
+        cursor_month += 1
+        if cursor_month > 12:
+            cursor_month = 1
+            cursor_year += 1
+    if (nav_year, nav_month) not in window_months:
+        window_months.append((nav_year, nav_month))
+
+    month_records = {}
+    for year, month in sorted(set(window_months)):
+        month_records[(year, month)] = ComebackData.objects.filter(year=year, month=month).first()
+
+    all_releases = []
+    all_birthdays = []
+    all_anniversaries = []
+    for (_, _), data_obj in sorted(month_records.items()):
+        if not data_obj:
+            continue
+        for date_key, details in sorted((data_obj.data or {}).items()):
+            day_payload = details or {}
+            for raw_release in day_payload.get('releases', []) or []:
+                all_releases.append(_build_comeback_release_item(raw_release, date_key, today))
+            for raw_birthday in day_payload.get('birthdays', []) or []:
+                all_birthdays.append(_build_comeback_event_item(raw_birthday, date_key, today, 'birthday'))
+            for raw_anniversary in day_payload.get('anniversaries', []) or []:
+                all_anniversaries.append(_build_comeback_event_item(raw_anniversary, date_key, today, 'anniversary'))
+
+    all_releases.sort(key=lambda item: (item['date_str'], item['artist_primary'], item['title']))
+    all_birthdays.sort(key=lambda item: (item['date_str'], item['label']))
+    all_anniversaries.sort(key=lambda item: (item['date_str'], item['label']))
+
+    releases_by_date = defaultdict(list)
+    birthdays_by_date = defaultdict(list)
+    anniversaries_by_date = defaultdict(list)
+    for release in all_releases:
+        releases_by_date[release['date_str']].append(release)
+    for birthday in all_birthdays:
+        birthdays_by_date[birthday['date_str']].append(birthday)
+    for anniversary in all_anniversaries:
+        anniversaries_by_date[anniversary['date_str']].append(anniversary)
+
+    for release in all_releases:
+        release_date = datetime.strptime(release['date_str'], '%Y-%m-%d').date()
+        same_day_releases = releases_by_date.get(release['date_str'], [])
+        same_day_lineup = []
+        for candidate in same_day_releases:
+            same_day_lineup.append({
+                'title': candidate['title'],
+                'artist': candidate['artist'],
+                'type': candidate['type'],
+                'artist_href': candidate['artist_href'],
+                'is_current': candidate['id'] == release['id'],
+            })
+
+        nearby_releases = []
+        for candidate in all_releases:
+            if candidate['id'] == release['id']:
+                continue
+            candidate_date = datetime.strptime(candidate['date_str'], '%Y-%m-%d').date()
+            diff = (candidate_date - release_date).days
+            if 1 <= diff <= 7:
+                nearby_releases.append({
+                    'title': candidate['title'],
+                    'artist': candidate['artist'],
+                    'type': candidate['type'],
+                    'date_str': candidate['date_str'],
+                    'date_label': candidate['date_label'],
+                    'artist_href': candidate['artist_href'],
+                    'offset_label': f'+{diff}d',
+                })
+        nearby_releases.sort(key=lambda item: (item['date_str'], item['artist'], item['title']))
+
+        if len(same_day_releases) == 1:
+            signal_label = 'Only release that day'
+        elif len(same_day_releases) == 2:
+            signal_label = 'Part of a double-release day'
+        else:
+            signal_label = f"Same-day competition: {len(same_day_releases)} releases"
+
+        release['same_day_lineup'] = same_day_lineup
+        release['nearby_releases'] = nearby_releases[:6]
+        release['signal_label'] = signal_label
+        release['day_birthdays'] = birthdays_by_date.get(release['date_str'], [])
+        release['day_anniversaries'] = anniversaries_by_date.get(release['date_str'], [])
+
+    upcoming_releases = [item for item in all_releases if item['days_until'] >= 0]
+    recent_releases = sorted(
+        [item for item in all_releases if -14 <= item['days_until'] < 0],
+        key=lambda item: (item['date_str'], item['artist_primary'], item['title']),
+        reverse=True,
+    )[:8]
+
+    timeline_source = [item for item in upcoming_releases if item['days_until'] <= 60]
+    if not timeline_source:
+        timeline_source = upcoming_releases[:24]
+
+    grouped_upcoming = defaultdict(list)
+    for release in timeline_source:
+        grouped_upcoming[release['date_str']].append(release)
+
+    timeline_releases = []
+    for date_key in sorted(grouped_upcoming.keys()):
+        date_obj = datetime.strptime(date_key, '%Y-%m-%d').date()
+        grouped_items = grouped_upcoming[date_key]
+        timeline_releases.append({
+            'date_str': date_key,
+            'iso_date': f'{date_key}T09:00:00Z',
+            'date_label': date_obj.strftime('%d %b'),
+            'month_day_label': date_obj.strftime('%b %d'),
+            'weekday_label': date_obj.strftime('%A'),
+            'short_weekday': date_obj.strftime('%a').upper(),
+            'relative_label': _comeback_relative_label(date_obj, today),
+            'release_count': len(grouped_items),
+            'release_copy': f"{len(grouped_items)} release{'s' if len(grouped_items) != 1 else ''} scheduled",
+            'releases': grouped_items,
+        })
+
+    primary_release = upcoming_releases[0] if upcoming_releases else None
+    hero_queue = upcoming_releases[1:5] if len(upcoming_releases) > 1 else []
+
+    today_release_count = len(releases_by_date.get(today_str, []))
+    week_release_count = len([item for item in upcoming_releases if 0 <= item['days_until'] <= 6])
+    month_release_count = len([
+        item for item in upcoming_releases
+        if item['date_str'].startswith(f'{today.year}-{today.month:02d}-')
+    ])
+
+    today_in_kpop = []
+    for release in releases_by_date.get(today_str, []):
+        today_in_kpop.append({
+            'kind': 'release',
+            'label': release['title'],
+            'detail': release['artist'],
+            'image': release['image'],
+            'href': release['artist_href'],
+        })
+    for birthday in birthdays_by_date.get(today_str, []):
+        today_in_kpop.append(birthday)
+    for anniversary in anniversaries_by_date.get(today_str, []):
+        today_in_kpop.append(anniversary)
+
+    birthdays_this_week = [
+        item for item in all_birthdays
+        if 0 <= (datetime.strptime(item['date_str'], '%Y-%m-%d').date() - today).days <= 6
+    ][:8]
+    anniversaries_this_week = [
+        item for item in all_anniversaries
+        if 0 <= (datetime.strptime(item['date_str'], '%Y-%m-%d').date() - today).days <= 6
+    ][:8]
+
+    secondary_events = {
+        'today_in_kpop': today_in_kpop[:8],
+        'birthdays_this_week': birthdays_this_week,
+        'anniversaries_this_week': anniversaries_this_week,
+    }
+
+    first_weekday, num_days = py_calendar.monthrange(nav_year, nav_month)
+    empty_cells = (first_weekday + 1) % 7
+    calendar_days = [{'empty': True} for _ in range(empty_cells)]
+    day_summaries = {}
+    selected_month_release_count = 0
+    selected_month_birthday_count = 0
+    selected_month_anniversary_count = 0
+    busiest_planner_day = {'label': 'No releases', 'count': 0}
+
+    for d in range(1, num_days + 1):
+        day_key = f"{nav_year}-{nav_month:02d}-{d:02d}"
+        date_obj = datetime.strptime(day_key, '%Y-%m-%d').date()
+        day_releases = releases_by_date.get(day_key, [])
+        day_birthdays = birthdays_by_date.get(day_key, [])
+        day_anniversaries = anniversaries_by_date.get(day_key, [])
+
+        selected_month_release_count += len(day_releases)
+        selected_month_birthday_count += len(day_birthdays)
+        selected_month_anniversary_count += len(day_anniversaries)
+        if len(day_releases) > busiest_planner_day['count']:
+            busiest_planner_day = {
+                'label': date_obj.strftime('%d %b'),
+                'count': len(day_releases),
+            }
+
+        day_summaries[day_key] = {
+            'date_str': day_key,
+            'date_label': date_obj.strftime('%d %b %Y'),
+            'weekday_label': date_obj.strftime('%A'),
+            'release_count': len(day_releases),
+            'birthday_count': len(day_birthdays),
+            'anniversary_count': len(day_anniversaries),
+            'releases': [
+                {
+                    'title': item['title'],
+                    'artist': item['artist'],
+                    'type': item['type'],
+                    'artist_href': item['artist_href'],
+                }
+                for item in day_releases
+            ],
+            'birthdays': day_birthdays,
+            'anniversaries': day_anniversaries,
+        }
+
+        calendar_days.append({
+            'empty': False,
+            'num': d,
+            'date_str': day_key,
+            'is_today': day_key == today_str,
+            'is_past': date_obj < today,
+            'release_count': len(day_releases),
+            'birthday_count': len(day_birthdays),
+            'anniversary_count': len(day_anniversaries),
+            'primary_release': (
+                {
+                    'title': day_releases[0]['title'],
+                    'artist': day_releases[0]['artist'],
+                    'type': day_releases[0]['type'],
+                }
+                if day_releases else None
+            ),
+        })
+
+    month_label = py_calendar.month_name[nav_month]
+    month_stats = {
+        'today_count': today_release_count,
+        'week_count': week_release_count,
+        'month_count': month_release_count,
+        'selected_month_release_count': selected_month_release_count,
+        'selected_month_birthday_count': selected_month_birthday_count,
+        'selected_month_anniversary_count': selected_month_anniversary_count,
+        'busiest_planner_day': busiest_planner_day,
+        'current_month_label': today.strftime('%B %Y'),
+    }
+
+    drawer_releases = []
+    seen_release_ids = set()
+    for release in all_releases:
+        if release['id'] in seen_release_ids:
+            continue
+        if -14 <= release['days_until'] <= 60:
+            drawer_releases.append(release)
+            seen_release_ids.add(release['id'])
+
+    return render(request, 'core/comebacks.html', {
+        'primary_release': primary_release,
+        'hero_queue': hero_queue,
+        'timeline_releases': timeline_releases,
+        'secondary_events': secondary_events,
+        'calendar_days': calendar_days,
+        'day_summaries': day_summaries,
+        'recent_releases': recent_releases,
+        'month_stats': month_stats,
+        'drawer_releases': drawer_releases,
+        'month_label': month_label,
+        'nav_year': nav_year,
+        'nav_month': nav_month,
+        'prev_year': prev_year,
+        'prev_month': prev_month,
+        'next_year': next_year,
+        'next_month': next_month,
     })
 
 
