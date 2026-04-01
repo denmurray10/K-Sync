@@ -29,7 +29,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     };
     </script>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; zoom: 0.9; }
+        body { margin: 0; overflow-x: hidden; background: #000; zoom: 0.9; }
         @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(0,240,255,0.3); } 50% { box-shadow: 0 0 40px rgba(0,240,255,0.6); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @keyframes score-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
@@ -48,7 +48,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </style>
 </head>
 <body class="font-sans text-white" x-data="mvMatcher()">
-{% include "core/header.html" %}
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -56,13 +55,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
     <!-- Full-screen modal overlay -->
-    <div class="fixed inset-0 z-50 bg-black flex flex-col">
+    <div class="relative min-h-screen bg-black flex flex-col">
 
         <!-- Top Bar -->
-        <div class="flex items-center justify-between px-3 py-2 md:px-6 md:py-4 border-b border-white/10 shrink-0">
+        <div class="bg-black/80 backdrop-blur-md flex items-center justify-between px-4 py-4 md:px-6 border-b border-white/10 shrink-0">
             <div class="flex items-center gap-4">
-                <a href="{% url 'games' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-xl">close</span>
+                <a href="{% url 'games' %}" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-black uppercase tracking-[0.18em] text-[10px]">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span>
+                    Back to Games
                 </a>
                 <div>
                     <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">MV Matcher</h1>
