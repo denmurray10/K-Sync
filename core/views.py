@@ -3,6 +3,8 @@ import hashlib
 import logging
 import os
 import uuid
+import io
+import mimetypes
 from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 from django.db import DatabaseError, models, transaction
@@ -27,6 +29,8 @@ import re
 import random
 from openai import OpenAI
 import bleach
+import cloudinary
+import cloudinary.uploader
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 import base64
@@ -58,13 +62,70 @@ def _admin_only_json(request):
     return None
 
 
+LIVE_RADIO_ALLOWED_AUDIO_EXTENSIONS = ('.mp3', '.m4a', '.wav', '.flac')
+RADIO_BUCKET_PREFIX = '/file/StrayKids/Music/'
+
+
+def _normalize_live_audio_path(audio_url):
+    raw = str(audio_url or '').strip()
+    if not raw:
+        return ''
+
+    parsed = urllib.parse.urlparse(raw)
+    path = urllib.parse.unquote(parsed.path or '')
+    if '/video/fetch/' in path:
+        encoded_source = path.split('/video/fetch/', 1)[-1].split('/', 1)[-1]
+        if encoded_source:
+            decoded_source = urllib.parse.unquote(encoded_source)
+            parsed = urllib.parse.urlparse(decoded_source)
+            path = urllib.parse.unquote(parsed.path or '')
+    return path
+
+
+def _canonicalize_radio_bucket_audio_url(audio_url):
+    raw = str(audio_url or '').strip()
+    if not raw:
+        return ''
+
+    path = _normalize_live_audio_path(raw)
+    if not path:
+        return ''
+
+    filename = os.path.basename(path).strip()
+    if not filename:
+        return ''
+
+    lowered = filename.lower()
+    if not lowered.endswith(LIVE_RADIO_ALLOWED_AUDIO_EXTENSIONS):
+        return ''
+
+    download_url = str(getattr(settings, 'B2_DOWNLOAD_URL', '') or '').strip().rstrip('/')
+    bucket_name = str(getattr(settings, 'B2_BUCKET_NAME', '') or 'StrayKids').strip() or 'StrayKids'
+    if not download_url or not bucket_name:
+        return ''
+
+    return f"{download_url}/file/{bucket_name}/Music/{urllib.parse.quote(filename)}"
+
+
+def _is_supported_live_audio_url(audio_url):
+    path = _normalize_live_audio_path(audio_url)
+    if not path:
+        return False
+    lowered = path.lower()
+    if RADIO_BUCKET_PREFIX.lower() not in lowered:
+        return False
+    return lowered.endswith(LIVE_RADIO_ALLOWED_AUDIO_EXTENSIONS)
+
+
 def _radio_track_base_queryset():
     qs = (
         RadioTrack.objects
         .exclude(audio_url='')
         .exclude(audio_url__isnull=True)
+        .filter(audio_url__icontains='StrayKids/Music/')
     )
-    return qs.exclude(audio_url__icontains='versionId=')
+    qs = qs.exclude(audio_url__icontains='versionId=')
+    return qs
 
 
 def _record_live_track_play(request, track):
@@ -213,6 +274,10 @@ def _build_stream_audio_url(source_url):
     raw = str(source_url or '').strip()
     if not raw:
         return raw
+
+    canonical = _canonicalize_radio_bucket_audio_url(raw)
+    if canonical:
+        raw = canonical
 
     if not getattr(settings, 'AUDIO_STREAM_USE_CLOUDINARY_FETCH', False):
         return raw
@@ -471,7 +536,7 @@ def _sanitize_playlist_name(name):
     cleaned = re.sub(r'\b(AI|DATE|TIME)\b', ' ', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\b\d{4}-\d{2}-\d{2}(?:\s+\d{1,2}:\d{2})?\b', ' ', cleaned)
     cleaned = re.sub(r'\b\d{1,2}:\d{2}\b', ' ', cleaned)
-    cleaned = re.sub(r'[\---|]+', ' ', cleaned)
+    cleaned = re.sub(r'[-|]+', ' ', cleaned)
     cleaned = re.sub(r'\s{2,}', ' ', cleaned).strip()
 
     return cleaned or str(name or '').strip()
@@ -906,6 +971,430 @@ def playlist_manager(request):
         'unassigned_tracks': track_stats.get('unassigned_tracks', 0),
     })
 
+@login_required(login_url='/staff/login/')
+def track_manager(request):
+    """Renders the Track Manager UI."""
+    if not request.user.is_superuser:
+        return redirect('signups_login')
+
+    tracks = list(
+        RadioTrack.objects
+        .annotate(playlist_count=models.Count('playlists', distinct=True))
+        .prefetch_related('playlists')
+        .order_by('artist', 'title')
+    )
+
+    for track in tracks:
+        audio_url = str(track.audio_url or '').strip()
+        parsed_audio_url = urllib.parse.urlparse(audio_url)
+        file_leaf = urllib.parse.unquote(os.path.basename(parsed_audio_url.path or ''))
+        file_ext = os.path.splitext(file_leaf)[1].lower().lstrip('.').upper() or 'UNKNOWN'
+        assigned_playlists = [
+            _sanitize_playlist_name(playlist.name)
+            for playlist in track.playlists.all().order_by('name')
+        ]
+        track.file_format = file_ext
+        track.assigned_playlists = assigned_playlists
+        track.assigned_playlist_label = ', '.join(assigned_playlists)
+
+    track_stats = (
+        RadioTrack.objects
+        .annotate(playlist_count=models.Count('playlists', distinct=True))
+        .aggregate(
+            total_tracks=models.Count('id'),
+            assigned_tracks=models.Count('id', filter=models.Q(playlist_count__gt=0)),
+            unassigned_tracks=models.Count('id', filter=models.Q(playlist_count=0)),
+        )
+    )
+
+    return render(request, 'core/track_manager.html', {
+        'tracks': tracks,
+        'total_tracks': track_stats.get('total_tracks', 0),
+        'assigned_tracks': track_stats.get('assigned_tracks', 0),
+        'unassigned_tracks': track_stats.get('unassigned_tracks', 0),
+    })
+
+def _get_b2_upload_context():
+    key_id = str(getattr(settings, 'B2_KEY_ID', '') or '').strip()
+    app_key = str(getattr(settings, 'B2_APPLICATION_KEY', '') or '').strip()
+    bucket_name = str(getattr(settings, 'B2_BUCKET_NAME', '') or '').strip()
+    download_url = str(getattr(settings, 'B2_DOWNLOAD_URL', '') or '').strip()
+    if not key_id or not app_key or not bucket_name or not download_url:
+        raise ValueError('Missing B2 configuration.')
+
+    auth = base64.b64encode(f"{key_id}:{app_key}".encode('utf-8')).decode('ascii')
+    auth_resp = requests.get(
+        'https://api.backblazeb2.com/b2api/v2/b2_authorize_account',
+        headers={'Authorization': f'Basic {auth}'},
+        timeout=20,
+    )
+    if auth_resp.status_code != 200:
+        raise ValueError(f"B2 authorize failed: {auth_resp.status_code}")
+
+    auth_data = auth_resp.json()
+    token = auth_data['authorizationToken']
+    api_url = auth_data['apiUrl']
+    account_id = auth_data['accountId']
+
+    buckets_resp = requests.get(
+        f'{api_url}/b2api/v2/b2_list_buckets',
+        headers={'Authorization': token},
+        params={'accountId': account_id},
+        timeout=20,
+    )
+    if buckets_resp.status_code != 200:
+        raise ValueError(f"B2 list buckets failed: {buckets_resp.status_code}")
+
+    bucket = next((item for item in buckets_resp.json().get('buckets', []) if item.get('bucketName') == bucket_name), None)
+    if not bucket:
+        raise ValueError(f'B2 bucket not found: {bucket_name}')
+
+    upload_resp = requests.post(
+        f'{api_url}/b2api/v2/b2_get_upload_url',
+        headers={'Authorization': token},
+        json={'bucketId': bucket['bucketId']},
+        timeout=20,
+    )
+    if upload_resp.status_code != 200:
+        raise ValueError(f"B2 get upload URL failed: {upload_resp.status_code}")
+
+    upload_payload = upload_resp.json()
+    return {
+        'bucket_name': bucket_name,
+        'download_url': download_url.rstrip('/'),
+        'api_url': api_url,
+        'auth_token': token,
+        'bucket_id': bucket['bucketId'],
+        'upload_url': upload_payload['uploadUrl'],
+        'upload_auth_token': upload_payload['authorizationToken'],
+    }
+
+
+def _refresh_b2_upload_url(upload_context):
+    response = requests.post(
+        f"{upload_context['api_url']}/b2api/v2/b2_get_upload_url",
+        headers={'Authorization': upload_context['auth_token']},
+        json={'bucketId': upload_context['bucket_id']},
+        timeout=20,
+    )
+    if response.status_code != 200:
+        raise ValueError(f"B2 get upload URL failed: {response.status_code}")
+    payload = response.json()
+    upload_context['upload_url'] = payload['uploadUrl']
+    upload_context['upload_auth_token'] = payload['authorizationToken']
+
+
+def _upload_audio_bytes_to_b2(upload_context, target_name, content, content_type):
+    headers = {
+        'Authorization': upload_context['upload_auth_token'],
+        'X-Bz-File-Name': urllib.parse.quote(target_name, safe='/'),
+        'Content-Type': content_type,
+        'X-Bz-Content-Sha1': hashlib.sha1(content).hexdigest(),
+    }
+    response = requests.post(upload_context['upload_url'], headers=headers, data=content, timeout=180)
+    if response.status_code in (200, 201):
+        return response.json()
+    if response.status_code == 401 and 'expired_auth_token' in response.text.lower():
+        _refresh_b2_upload_url(upload_context)
+        return _upload_audio_bytes_to_b2(upload_context, target_name, content, content_type)
+    raise ValueError(f"B2 upload failed: {response.status_code} {response.text[:300]}")
+
+
+def _normalize_uploaded_audio_name(raw_name):
+    cleaned = str(raw_name or '').replace('\\', '/').strip().lstrip('/')
+    normalized = os.path.normpath(cleaned).replace('\\', '/').strip('/')
+    parts = [part.strip() for part in normalized.split('/') if part.strip() not in ('', '.', '..')]
+    if not parts:
+        raise ValueError('Invalid file name.')
+    return '/'.join(parts)
+
+
+def _build_uploaded_music_target_name(raw_name):
+    normalized_name = _normalize_uploaded_audio_name(raw_name)
+    return f"Music/{normalized_name}"
+
+
+def _extract_uploaded_track_metadata(relative_name, content):
+    normalized_name = _normalize_uploaded_audio_name(relative_name)
+    path_parts = normalized_name.split('/')
+    file_leaf = path_parts[-1]
+    base_name = file_leaf.rsplit('.', 1)[0]
+    parent_folder = path_parts[-2] if len(path_parts) > 1 else ''
+    if parent_folder.lower() == 'music':
+        parent_folder = ''
+
+    artist = parent_folder
+    title = base_name
+    if ' - ' in base_name:
+        left, right = base_name.split(' - ', 1)
+        if left.strip() and right.strip():
+            artist = artist or left.strip()
+            title = right.strip()
+
+    duration_seconds = 180
+    try:
+        from mutagen import File as MutagenFile
+        parsed = MutagenFile(io.BytesIO(content))
+        if parsed and getattr(parsed, 'info', None) and getattr(parsed.info, 'length', None):
+            duration_seconds = max(1, int(parsed.info.length))
+
+        tags = getattr(parsed, 'tags', {}) or {}
+        if isinstance(tags, dict):
+            for key in ('TPE1', 'TPE2', '\xa9ART', 'artist', 'ARTIST'):
+                value = tags.get(key)
+                if value:
+                    candidate = value[0] if isinstance(value, (list, tuple)) else value
+                    candidate = str(candidate).strip()
+                    if candidate:
+                        artist = candidate
+                        break
+            for key in ('TIT2', '\xa9nam', 'title', 'TITLE'):
+                value = tags.get(key)
+                if value:
+                    candidate = value[0] if isinstance(value, (list, tuple)) else value
+                    candidate = str(candidate).strip()
+                    if candidate:
+                        title = candidate
+                        break
+    except Exception:
+        pass
+
+    minutes, seconds = divmod(duration_seconds, 60)
+    duration_label = f'{minutes}:{seconds:02d}'
+    return {
+        'relative_name': normalized_name,
+        'artist': (artist or 'Unknown Artist').strip() or 'Unknown Artist',
+        'title': (title or base_name).strip() or base_name,
+        'duration_seconds': duration_seconds,
+        'duration': duration_label,
+    }
+
+
+def _write_song_upload_failure_report(failures):
+    tmp_dir = os.path.join(settings.BASE_DIR, 'tmp')
+    os.makedirs(tmp_dir, exist_ok=True)
+    stamp = timezone.localtime().strftime('%Y%m%d_%H%M%S')
+    timestamped_path = os.path.join(tmp_dir, f'song_upload_failures_{stamp}.json')
+    latest_path = os.path.join(tmp_dir, 'song_upload_failures_latest.json')
+
+    payload = {
+        'generated_at': timezone.now().isoformat(),
+        'failure_count': len(failures),
+        'failures': failures,
+    }
+    for target in (timestamped_path, latest_path):
+        with open(target, 'w', encoding='utf-8') as handle:
+            json.dump(payload, handle, indent=2)
+
+    return {
+        'timestamped_path': timestamped_path,
+        'latest_path': latest_path,
+    }
+
+
+def _configure_cloudinary_for_radio_art():
+    cloudinary.config(
+        cloud_name=str(getattr(settings, 'CLOUDINARY_CLOUD_NAME', '') or '').strip(),
+        api_key=str(getattr(settings, 'CLOUDINARY_API_KEY', '') or '').strip(),
+        api_secret=str(getattr(settings, 'CLOUDINARY_API_SECRET', '') or '').strip(),
+        secure=True,
+    )
+
+
+def _extract_and_upload_album_art(content, artist, title):
+    metadata = {
+        'album_art': '',
+        'artwork_error': '',
+    }
+
+    try:
+        from mutagen import File as MutagenFile
+        from mutagen.id3 import ID3, APIC
+    except Exception as exc:
+        metadata['artwork_error'] = f'Metadata parser unavailable: {exc}'
+        return metadata
+
+    artwork_blob = b''
+    try:
+        parsed = MutagenFile(io.BytesIO(content))
+        # Handle FLAC pictures specifically
+        if hasattr(parsed, 'pictures') and parsed.pictures:
+            artwork_blob = bytes(parsed.pictures[0].data)
+        
+        if not artwork_blob:
+            tags = getattr(parsed, 'tags', {}) or {}
+            if isinstance(tags, dict):
+                covr = tags.get('covr')
+                if covr:
+                    first = covr[0]
+                    artwork_blob = bytes(first.data if hasattr(first, 'data') else first)
+    except Exception:
+        artwork_blob = b''
+
+    if not artwork_blob:
+        try:
+            tags = ID3(io.BytesIO(content))
+            for tag in tags.values():
+                if isinstance(tag, APIC) and getattr(tag, 'data', None):
+                    artwork_blob = bytes(tag.data)
+                    break
+        except Exception:
+            artwork_blob = b''
+
+    if not artwork_blob:
+        return metadata
+
+    cloud_name = str(getattr(settings, 'CLOUDINARY_CLOUD_NAME', '') or '').strip()
+    api_key = str(getattr(settings, 'CLOUDINARY_API_KEY', '') or '').strip()
+    api_secret = str(getattr(settings, 'CLOUDINARY_API_SECRET', '') or '').strip()
+    if not cloud_name or not api_key or not api_secret:
+        metadata['artwork_error'] = 'Cloudinary credentials missing.'
+        return metadata
+
+    try:
+        _configure_cloudinary_for_radio_art()
+        public_key = hashlib.sha1(f"{artist}|{title}".encode('utf-8')).hexdigest()
+        result = cloudinary.uploader.upload(
+            artwork_blob,
+            folder='radio/album_art',
+            public_id=public_key,
+            overwrite=True,
+            resource_type='image',
+        )
+        metadata['album_art'] = str(result.get('secure_url') or '').strip()
+    except Exception as exc:
+        metadata['artwork_error'] = str(exc)
+
+    return metadata
+
+
+@login_required(login_url='/staff/login/')
+def song_upload_manager(request):
+    if not request.user.is_superuser:
+        return redirect('signups_login')
+    latest_report_path = os.path.join(settings.BASE_DIR, 'tmp', 'song_upload_failures_latest.json')
+    latest_failures = []
+    latest_failure_count = 0
+    if os.path.exists(latest_report_path):
+        try:
+            with open(latest_report_path, 'r', encoding='utf-8') as handle:
+                report = json.load(handle)
+            latest_failures = list(report.get('failures') or [])[:25]
+            latest_failure_count = int(report.get('failure_count') or len(report.get('failures') or []))
+        except Exception:
+            latest_failures = []
+            latest_failure_count = 0
+
+    return render(request, 'core/song_upload_manager.html', {
+        'latest_failure_count': latest_failure_count,
+        'latest_failures': latest_failures,
+    })
+
+
+@csrf_exempt
+@require_POST
+def api_song_upload(request):
+    staff_check = _admin_only_json(request)
+    if staff_check:
+        return staff_check
+
+    files = request.FILES.getlist('files')
+    if not files:
+        return JsonResponse({'ok': False, 'error': 'No files selected.'}, status=400)
+
+    allowed_exts = set(LIVE_RADIO_ALLOWED_AUDIO_EXTENSIONS)
+    uploaded = []
+    failures = []
+
+    try:
+        upload_context = _get_b2_upload_context()
+    except Exception as exc:
+        return JsonResponse({'ok': False, 'error': str(exc)}, status=500)
+
+    for uploaded_file in files:
+        relative_name = getattr(uploaded_file, 'name', '') or ''
+        try:
+            normalized_name = _normalize_uploaded_audio_name(relative_name)
+            target_name = _build_uploaded_music_target_name(relative_name)
+            ext = os.path.splitext(normalized_name)[1].lower()
+            if ext not in allowed_exts:
+                raise ValueError(f'Unsupported audio format: {ext or "unknown"}')
+
+            content = uploaded_file.read()
+            if not content:
+                raise ValueError('File is empty.')
+
+            metadata = _extract_uploaded_track_metadata(normalized_name, content)
+            art_metadata = _extract_and_upload_album_art(content, metadata['artist'], metadata['title'])
+            content_type = mimetypes.guess_type(normalized_name)[0] or 'application/octet-stream'
+            _upload_audio_bytes_to_b2(upload_context, target_name, content, content_type)
+
+            raw_download_url = (
+                f"{upload_context['download_url']}/file/{upload_context['bucket_name']}/"
+                f"{urllib.parse.quote(target_name, safe='/')}"
+            )
+            album_art_url = str(art_metadata.get('album_art') or '').strip() or DEFAULT_STREAM_IMAGE_URL
+
+            track = (
+                RadioTrack.objects
+                .filter(title=metadata['title'], artist=metadata['artist'])
+                .order_by('id')
+                .first()
+            )
+            if not track:
+                track = RadioTrack.objects.create(
+                    title=metadata['title'],
+                    artist=metadata['artist'],
+                    audio_url=raw_download_url,
+                    album_art=album_art_url,
+                    duration=metadata['duration'],
+                    duration_seconds=metadata['duration_seconds'],
+                )
+            else:
+                changed = False
+                if track.audio_url != raw_download_url:
+                    track.audio_url = raw_download_url
+                    changed = True
+                if metadata['duration'] and track.duration != metadata['duration']:
+                    track.duration = metadata['duration']
+                    changed = True
+                if metadata['duration_seconds'] and track.duration_seconds != metadata['duration_seconds']:
+                    track.duration_seconds = metadata['duration_seconds']
+                    changed = True
+                if track.album_art != album_art_url:
+                    track.album_art = album_art_url
+                    changed = True
+                if changed:
+                    track.save(update_fields=['audio_url', 'duration', 'duration_seconds', 'album_art'])
+
+            upload_entry = {
+                'track_id': track.id,
+                'title': track.title,
+                'artist': track.artist,
+                'bucket_path': target_name,
+                'audio_url': _build_stream_audio_url(raw_download_url),
+                'album_art': album_art_url,
+            }
+            if art_metadata.get('artwork_error'):
+                upload_entry['artwork_warning'] = art_metadata['artwork_error']
+            uploaded.append(upload_entry)
+        except Exception as exc:
+            failures.append({
+                'file_name': relative_name,
+                'reason': str(exc),
+            })
+
+    report_paths = _write_song_upload_failure_report(failures)
+    return JsonResponse({
+        'ok': True,
+        'uploaded_count': len(uploaded),
+        'failure_count': len(failures),
+        'uploaded': uploaded[:100],
+        'failures': failures,
+        'failure_report_path': report_paths['timestamped_path'],
+        'latest_failure_report_path': report_paths['latest_path'],
+    })
+
 def api_b2_tracks(request):
     """Lists files from Backblaze B2 bucket."""
     staff_check = _admin_only_json(request)
@@ -944,12 +1433,29 @@ def api_b2_tracks(request):
         if not bucket:
             return JsonResponse({'ok': False, 'error': f'Bucket "{bucket_name}" not found'}, status=404)
             
-        # List Files
-        files_resp = requests.post(f"{api_url}/b2api/v2/b2_list_file_names", json={'bucketId': bucket['bucketId']}, headers={'Authorization': token})
-        if files_resp.status_code != 200:
-            return JsonResponse({'ok': False, 'error': f'B2 List Files Failed: {files_resp.text}'}, status=files_resp.status_code)
-            
-        files = files_resp.json().get('files', [])
+        # List Files across every page so nested Music/ files are included even
+        # when the bucket has more than 1000 objects ahead of them alphabetically.
+        files = []
+        next_file_name = None
+        while True:
+            payload = {'bucketId': bucket['bucketId'], 'maxFileCount': 1000}
+            if next_file_name:
+                payload['startFileName'] = next_file_name
+            files_resp = requests.post(
+                f"{api_url}/b2api/v2/b2_list_file_names",
+                json=payload,
+                headers={'Authorization': token},
+            )
+            if files_resp.status_code != 200:
+                return JsonResponse({'ok': False, 'error': f'B2 List Files Failed: {files_resp.text}'}, status=files_resp.status_code)
+            response_payload = files_resp.json()
+            files.extend(
+                item for item in response_payload.get('files', [])
+                if str(item.get('fileName') or '').startswith('Music/')
+            )
+            next_file_name = response_payload.get('nextFileName')
+            if not next_file_name:
+                break
 
         def normalize(text):
             if not text:
@@ -997,20 +1503,22 @@ def api_b2_tracks(request):
         tracks = []
         for f in files:
             file_name = f['fileName']
-            if not file_name.lower().endswith(('.mp3', '.wav', '.m4a')):
+            if not file_name.lower().endswith(LIVE_RADIO_ALLOWED_AUDIO_EXTENSIONS):
                 continue
 
             path_parts = file_name.split('/')
             parent_folder = path_parts[-2] if len(path_parts) > 1 else ''
             file_leaf = path_parts[-1]
             base_name = file_leaf.rsplit('.', 1)[0]
+            if parent_folder.lower() == 'music':
+                parent_folder = ''
 
             parsed_artist = parent_folder or ''
             parsed_title = base_name
             if ' - ' in base_name:
                 left, right = base_name.split(' - ', 1)
                 if left and right:
-                    parsed_artist = left
+                    parsed_artist = parsed_artist or left
                     parsed_title = right
 
             metadata = (
@@ -6169,9 +6677,7 @@ def _is_generated_voice_track(track):
 
 def _get_non_vo_live_track_ids():
     return list(
-        RadioTrack.objects
-        .exclude(audio_url='')
-        .exclude(audio_url__isnull=True)
+        _radio_track_base_queryset()
         .exclude(title__startswith='VO:')
         .exclude(audio_url__icontains='/radio/voiceovers/')
         .values_list('id', flat=True)
@@ -6222,6 +6728,8 @@ def _build_live_playlist_timeline(playlist):
         if not track or not track.audio_url:
             continue
         if _is_generated_voice_track(track):
+            continue
+        if not _is_supported_live_audio_url(track.audio_url):
             continue
 
         duration_seconds = _safe_track_duration_seconds(track)
@@ -7222,7 +7730,7 @@ def _build_live_page_context(request):
         recently_played_tracks = schedule_context['recently_played_tracks'][:6]
     elif state:
         current_track = state.current_track
-        if _is_generated_voice_track(current_track):
+        if _is_generated_voice_track(current_track) or (current_track and not _is_supported_live_audio_url(current_track.audio_url)):
             current_track = None
         elif current_track:
             current_track.audio_url = _build_stream_audio_url(current_track.audio_url)
@@ -7230,14 +7738,20 @@ def _build_live_page_context(request):
         # Fetch up_next tracks in order, limit to 6
         up_next_ids = (state.up_next or [])[:6]
         up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
-        up_next_tracks = [track for track in up_next_tracks if not _is_generated_voice_track(track)]
+        up_next_tracks = [
+            track for track in up_next_tracks
+            if not _is_generated_voice_track(track) and _is_supported_live_audio_url(track.audio_url)
+        ]
         # Preserving order from list
         up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
 
         # Fetch recently_played tracks in order, limit to 6
         recent_ids = (state.recently_played or [])[:6]
         recently_played_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
-        recently_played_tracks = [track for track in recently_played_tracks if not _is_generated_voice_track(track)]
+        recently_played_tracks = [
+            track for track in recently_played_tracks
+            if not _is_generated_voice_track(track) and _is_supported_live_audio_url(track.audio_url)
+        ]
         recently_played_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
 
     if station_group_names:
@@ -7756,18 +8270,30 @@ def api_live_status(request):
     else:
         state = _auto_rotate_station(state)
         current = state.current_track
+        if current and not _is_supported_live_audio_url(current.audio_url):
+            state.current_track = None
+            state.started_at = None
+            state.save(update_fields=['current_track', 'started_at', 'updated_at'])
+            state = _auto_rotate_station(state)
+            current = state.current_track
         if state and state.started_at:
             current_offset = max(0, int((timezone.now() - state.started_at).total_seconds()))
 
         up_next_ids = list(state.up_next or [])[:6]
         up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
-        up_next_tracks = [track for track in up_next_tracks if not _is_generated_voice_track(track)]
+        up_next_tracks = [
+            track for track in up_next_tracks
+            if not _is_generated_voice_track(track) and _is_supported_live_audio_url(track.audio_url)
+        ]
         up_next_tracks.sort(key=lambda t: up_next_ids.index(t.id) if t.id in up_next_ids else 999)
         up_next_list = up_next_tracks
 
         recent_ids = list(state.recently_played or [])[:6]
         recent_tracks = list(RadioTrack.objects.filter(id__in=recent_ids))
-        recent_tracks = [track for track in recent_tracks if not _is_generated_voice_track(track)]
+        recent_tracks = [
+            track for track in recent_tracks
+            if not _is_generated_voice_track(track) and _is_supported_live_audio_url(track.audio_url)
+        ]
         recent_tracks.sort(key=lambda t: recent_ids.index(t.id) if t.id in recent_ids else 999)
         recently_played_list = recent_tracks
 
@@ -9614,7 +10140,15 @@ def idol_page(request, slug):
                 'name': m.stage_name or m.name,
                 'full_name': m.name,
                 'position': m.position,
-                'image': _optimize_home_image_url(m.image_url or '', width=720, height=720),
+                'image': _optimize_home_image_url(
+                    _coalesce_stream_image_url(
+                        getattr(m, 'image_url', ''),
+                        getattr(group, 'image_url', ''),
+                        fallback=getattr(group, 'logo_path', '') or DEFAULT_STREAM_IMAGE_URL,
+                    ),
+                    width=720,
+                    height=720,
+                ),
             }
             for m in group.members.all()
         ],
@@ -10360,4 +10894,3 @@ def cookie_policy(request):
 
 def terms_of_service(request):
     return render(request, 'core/terms_of_service.html')
-

@@ -82,6 +82,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
 
+        {% if user.is_superuser %}
+        <div class="flex flex-wrap items-center gap-3 mb-8">
+            <a href="{% url 'playlist_manager' %}"
+               class="inline-flex items-center gap-2 border border-secondary/40 bg-secondary/10 px-5 py-3 text-secondary font-black text-[9px] uppercase tracking-[0.15em] hover:bg-secondary hover:text-black transition-colors">
+                <span class="material-symbols-outlined text-sm">queue_music</span> Playlist Manager
+            </a>
+            <a href="{% url 'track_manager' %}"
+               class="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 px-5 py-3 text-primary font-black text-[9px] uppercase tracking-[0.15em] hover:bg-primary hover:text-black transition-colors">
+                <span class="material-symbols-outlined text-sm">library_music</span> Track Manager
+            </a>
+            <a href="{% url 'song_upload_manager' %}"
+               class="inline-flex items-center gap-2 border border-accent/40 bg-accent/10 px-5 py-3 text-accent font-black text-[9px] uppercase tracking-[0.15em] hover:bg-accent hover:text-black transition-colors">
+                <span class="material-symbols-outlined text-sm">cloud_upload</span> Song Upload Manager
+            </a>
+        </div>
+        {% endif %}
+
         <!-- Search & Export -->
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
             <div class="relative flex-1 max-w-md">

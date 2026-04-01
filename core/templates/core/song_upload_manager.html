@@ -1,0 +1,322 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+    <meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+    <title>K-Beats - Song Upload Manager</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#f425c0",
+                    secondary: "#00f0ff",
+                    accent: "#fbbf24",
+                    "background-dark": "#000000"
+                },
+                fontFamily: { display: ["Montserrat", "sans-serif"] },
+                borderRadius: { DEFAULT:"0px", sm:"0px", md:"0px", lg:"0px", xl:"0px", "2xl":"0px", "3xl":"0px", full:"9999px" },
+            }
+        }
+    };
+    </script>
+</head>
+<body class="bg-black text-white font-display min-h-screen" x-data="songUploadApp()">
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+{% include "core/header.html" %}
+
+    <main class="container mx-auto px-4 sm:px-6 pt-24 pb-16">
+        <div class="flex flex-wrap items-center gap-3 mb-8">
+            <a href="{% url 'signups_dashboard' %}" class="inline-flex items-center gap-2 border border-white/10 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-300 hover:border-white hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-sm">dashboard</span> Staff Dashboard
+            </a>
+            <a href="{% url 'playlist_manager' %}" class="inline-flex items-center gap-2 border border-secondary/40 bg-secondary/10 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-secondary hover:bg-secondary hover:text-black transition-colors">
+                <span class="material-symbols-outlined text-sm">queue_music</span> Playlist Manager
+            </a>
+            <a href="{% url 'track_manager' %}" class="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-primary hover:bg-primary hover:text-black transition-colors">
+                <span class="material-symbols-outlined text-sm">library_music</span> Track Manager
+            </a>
+        </div>
+
+        <section class="border border-white/10 bg-white/[0.02] p-6 md:p-8">
+            <div class="max-w-3xl">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-primary mb-3">StrayKids Bucket Uploader</p>
+                <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight">Upload A Folder Of Songs</h1>
+                <p class="mt-4 text-sm text-slate-300 leading-relaxed">
+                    Select a folder of `.mp3`, `.wav`, `.m4a`, or `.flac` files. Each successful upload goes into the configured Backblaze
+                    <span class="font-mono text-white">StrayKids/Music</span> path and is synced into the radio library so it can be used by the live player.
+                    Embedded cover art is extracted from each song, uploaded to the shared radio artwork store, and saved onto the track for reuse across the site.
+                    Any failures are logged to <span class="font-mono text-white">tmp/song_upload_failures_latest.json</span> for retry later.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-8 mt-8">
+                <form @submit.prevent="submitUpload" class="space-y-5 border border-white/10 bg-black/30 p-5">
+                    <div>
+                        <label class="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Folder Of Songs</label>
+                        <input x-ref="fileInput" @change="captureFiles" type="file" name="files" webkitdirectory directory multiple
+                               class="block w-full bg-white/5 border border-white/10 px-4 py-4 text-sm text-white file:mr-4 file:border-0 file:bg-primary file:px-4 file:py-2 file:font-black file:text-black file:uppercase file:tracking-[0.18em] focus:border-primary focus:outline-none"/>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="border border-white/10 bg-white/[0.03] p-4">
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Selected Files</span>
+                            <span class="text-3xl font-black text-primary" x-text="selectedCount"></span>
+                        </div>
+                        <div class="border border-white/10 bg-white/[0.03] p-4">
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Status</span>
+                            <span class="text-sm font-black uppercase tracking-[0.16em]" :class="isUploading ? 'text-secondary' : 'text-white'" x-text="statusLabel"></span>
+                        </div>
+                        <div class="border border-white/10 bg-white/[0.03] p-4">
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Latest Failure Log</span>
+                            <span class="text-xs font-mono text-accent break-all">tmp/song_upload_failures_latest.json</span>
+                        </div>
+                    </div>
+
+                    <div x-show="isUploading || uploadPercent > 0" class="border border-white/10 bg-black/30 p-4 space-y-3" style="display:none;">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <p class="font-mono text-[10px] uppercase tracking-widest text-secondary">
+                                <span x-text="uploadPercent"></span>% uploaded
+                            </p>
+                            <p class="font-mono text-[10px] uppercase tracking-widest text-white/40">
+                                <span x-text="selectedCount"></span> file<span x-text="selectedCount === 1 ? '' : 's'"></span>
+                                <span x-show="uploadSizeLabel" style="display:none;"> · <span x-text="uploadSizeLabel"></span></span>
+                            </p>
+                        </div>
+                        <div class="h-3 border border-white/10 bg-white/5 overflow-hidden">
+                            <div class="h-full bg-secondary transition-[width] duration-150" :style="`width:${uploadPercent}%`"></div>
+                        </div>
+                        <p class="font-mono text-[10px] uppercase tracking-widest" :class="awaitingServerResponse ? 'text-accent' : 'text-white/50'" x-text="awaitingServerResponse ? 'Files sent. Waiting for server to finish processing and syncing tracks...' : 'Uploading folder to server...'"></p>
+                    </div>
+
+                    <div x-show="selectedPreview.length" class="border border-white/10 bg-black/30 p-4" style="display:none;">
+                        <p class="font-mono text-[10px] uppercase tracking-widest text-white/35 mb-3">Preview</p>
+                        <div class="space-y-2 max-h-48 overflow-y-auto">
+                            <template x-for="item in selectedPreview" :key="item">
+                                <p class="font-mono text-[10px] text-slate-300 break-all" x-text="item"></p>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="submit" :disabled="isUploading || !selectedCount"
+                                :class="isUploading || !selectedCount ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:border-white hover:text-black'"
+                                class="inline-flex items-center gap-2 border border-primary bg-primary px-6 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-black transition-colors">
+                            <span class="material-symbols-outlined text-sm">cloud_upload</span>
+                            <span x-text="isUploading ? 'Uploading...' : 'Upload Songs'"></span>
+                        </button>
+                        <button type="button" @click="resetSelection" class="inline-flex items-center gap-2 border border-white/10 px-6 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-slate-300 hover:border-white hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-sm">restart_alt</span> Clear Selection
+                        </button>
+                    </div>
+                </form>
+
+                <aside class="space-y-4">
+                    <div class="border border-white/10 bg-black/30 p-5">
+                        <p class="font-mono text-[10px] uppercase tracking-widest text-secondary mb-3">What Happens</p>
+                        <ul class="space-y-2 text-sm text-slate-300">
+                            <li>Each audio file is uploaded into <span class="font-mono text-white">StrayKids/Music/...</span> in Backblaze.</li>
+                            <li>Live radio accepts files from <span class="font-mono text-white">StrayKids/Music</span>, including <span class="font-mono text-white">.flac</span> when the browser supports it.</li>
+                            <li>Artist and title are derived from folder and filename, then saved into <span class="font-mono text-white">RadioTrack</span>.</li>
+                            <li>Embedded artwork is extracted and stored in the shared radio artwork library for reuse across the site.</li>
+                            <li>Successful tracks become available to the live player through the normal radio library flow.</li>
+                            <li>Failed uploads are written to <span class="font-mono text-white">tmp/song_upload_failures_latest.json</span>.</li>
+                        </ul>
+                    </div>
+                    <div class="border border-white/10 bg-black/30 p-5">
+                        <p class="font-mono text-[10px] uppercase tracking-widest text-accent mb-3">Latest Failure Snapshot</p>
+                        <p class="text-sm text-slate-300 mb-3">{{ latest_failure_count }} recorded failure{{ latest_failure_count|pluralize }} in the latest log.</p>
+                        {% if latest_failures %}
+                        <div class="space-y-2 max-h-64 overflow-y-auto">
+                            {% for item in latest_failures %}
+                            <div class="border border-red-400/20 bg-red-400/5 p-3">
+                                <p class="font-mono text-[10px] text-white break-all">{{ item.file_name }}</p>
+                                <p class="font-mono text-[10px] text-red-300 mt-1">{{ item.reason }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="font-mono text-[10px] uppercase tracking-widest text-white/30">No failures logged yet.</p>
+                        {% endif %}
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section x-show="result" class="mt-8 border border-white/10 bg-white/[0.02] p-6" style="display:none;">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="border border-white/10 bg-white/[0.03] p-4">
+                    <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Uploaded</span>
+                    <span class="text-3xl font-black text-primary" x-text="result?.uploaded_count || 0"></span>
+                </div>
+                <div class="border border-white/10 bg-white/[0.03] p-4">
+                    <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Failed</span>
+                    <span class="text-3xl font-black text-red-300" x-text="result?.failure_count || 0"></span>
+                </div>
+                <div class="border border-white/10 bg-white/[0.03] p-4">
+                    <span class="font-mono text-[9px] uppercase tracking-widest text-white/30 block mb-2">Failure Report</span>
+                    <span class="text-xs font-mono text-accent break-all" x-text="result?.latest_failure_report_path || ''"></span>
+                </div>
+            </div>
+
+            <div x-show="result?.uploaded?.length" class="mb-6" style="display:none;">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-secondary mb-3">Uploaded Tracks</p>
+                <div class="space-y-2 max-h-64 overflow-y-auto">
+                    <template x-for="item in result.uploaded" :key="`${item.track_id}-${item.bucket_path}`">
+                        <div class="border border-green-400/20 bg-green-400/5 p-3">
+                            <p class="text-sm font-black uppercase tracking-tight text-white" x-text="item.title"></p>
+                            <p class="font-mono text-[10px] uppercase tracking-widest text-slate-400" x-text="item.artist"></p>
+                            <p class="font-mono text-[10px] text-green-300 break-all mt-1" x-text="item.bucket_path"></p>
+                            <p class="font-mono text-[10px] text-white/50 mt-1" x-text="item.artwork_warning ? 'Artwork fallback used' : 'Artwork stored and reusable'"></p>
+                            <p x-show="item.artwork_warning" class="font-mono text-[10px] text-amber-300 mt-1 break-all" x-text="item.artwork_warning"></p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <div x-show="result?.failures?.length" style="display:none;">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-red-300 mb-3">Failed Files</p>
+                <div class="space-y-2 max-h-80 overflow-y-auto">
+                    <template x-for="item in result.failures" :key="`${item.file_name}-${item.reason}`">
+                        <div class="border border-red-400/20 bg-red-400/5 p-3">
+                            <p class="font-mono text-[10px] text-white break-all" x-text="item.file_name"></p>
+                            <p class="font-mono text-[10px] text-red-300 mt-1" x-text="item.reason"></p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+    function songUploadApp() {
+        return {
+            files: [],
+            selectedCount: 0,
+            selectedPreview: [],
+            isUploading: false,
+            statusLabel: 'Idle',
+            uploadPercent: 0,
+            uploadBytesSent: 0,
+            uploadBytesTotal: 0,
+            awaitingServerResponse: false,
+            result: null,
+            get uploadSizeLabel() {
+                if (!this.uploadBytesTotal) return '';
+                return `${this.formatBytes(this.uploadBytesSent)} / ${this.formatBytes(this.uploadBytesTotal)}`;
+            },
+            captureFiles(event) {
+                this.files = Array.from(event.target.files || []);
+                this.selectedCount = this.files.length;
+                this.selectedPreview = this.files.slice(0, 12).map((file) => file.webkitRelativePath || file.name);
+                this.statusLabel = this.selectedCount ? 'Ready' : 'Idle';
+                this.uploadPercent = 0;
+                this.uploadBytesSent = 0;
+                this.uploadBytesTotal = this.files.reduce((sum, file) => sum + (Number(file.size || 0)), 0);
+                this.awaitingServerResponse = false;
+            },
+            resetSelection() {
+                this.files = [];
+                this.selectedCount = 0;
+                this.selectedPreview = [];
+                this.statusLabel = 'Idle';
+                this.uploadPercent = 0;
+                this.uploadBytesSent = 0;
+                this.uploadBytesTotal = 0;
+                this.awaitingServerResponse = false;
+                this.result = null;
+                if (this.$refs.fileInput) this.$refs.fileInput.value = '';
+            },
+            formatBytes(bytes) {
+                const safe = Number(bytes || 0);
+                if (!safe) return '0 B';
+                const units = ['B', 'KB', 'MB', 'GB'];
+                let value = safe;
+                let idx = 0;
+                while (value >= 1024 && idx < units.length - 1) {
+                    value /= 1024;
+                    idx += 1;
+                }
+                return `${value.toFixed(value >= 10 || idx === 0 ? 0 : 1)} ${units[idx]}`;
+            },
+            async submitUpload() {
+                if (!this.files.length || this.isUploading) return;
+                this.isUploading = true;
+                this.statusLabel = 'Uploading';
+                this.uploadPercent = 0;
+                this.uploadBytesSent = 0;
+                this.uploadBytesTotal = this.files.reduce((sum, file) => sum + (Number(file.size || 0)), 0);
+                this.awaitingServerResponse = false;
+                this.result = null;
+
+                const formData = new FormData();
+                this.files.forEach((file) => formData.append('files', file, file.webkitRelativePath || file.name));
+
+                try {
+                    const data = await new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('POST', '/api/song-upload/');
+                        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+
+                        xhr.upload.addEventListener('progress', (event) => {
+                            if (!event.lengthComputable) return;
+                            this.uploadBytesSent = Number(event.loaded || 0);
+                            this.uploadBytesTotal = Number(event.total || this.uploadBytesTotal || 0);
+                            this.uploadPercent = Math.min(100, Math.round((this.uploadBytesSent / Math.max(1, this.uploadBytesTotal)) * 100));
+                            this.awaitingServerResponse = this.uploadPercent >= 100;
+                        });
+
+                        xhr.addEventListener('load', () => {
+                            let payload = {};
+                            try {
+                                payload = JSON.parse(xhr.responseText || '{}');
+                            } catch (error) {
+                                reject(new Error('Upload finished but the server returned invalid JSON.'));
+                                return;
+                            }
+                            if (xhr.status < 200 || xhr.status >= 300 || !payload.ok) {
+                                reject(new Error(payload.error || 'Upload failed'));
+                                return;
+                            }
+                            resolve(payload);
+                        });
+
+                        xhr.addEventListener('error', () => reject(new Error('Network error during upload.')));
+                        xhr.addEventListener('abort', () => reject(new Error('Upload was cancelled.')));
+                        xhr.send(formData);
+                    });
+
+                    this.result = data;
+                    this.uploadBytesSent = this.uploadBytesTotal || this.uploadBytesSent;
+                    this.uploadPercent = 100;
+                    this.awaitingServerResponse = false;
+                    this.statusLabel = data.failure_count ? 'Completed With Failures' : 'Completed';
+                } catch (error) {
+                    this.result = {
+                        uploaded_count: 0,
+                        failure_count: this.files.length,
+                        failures: [{ file_name: 'Upload request', reason: error.message || 'Upload failed' }],
+                    };
+                    this.awaitingServerResponse = false;
+                    this.statusLabel = 'Failed';
+                } finally {
+                    this.isUploading = false;
+                }
+            }
+        };
+    }
+    </script>
+</body>
+</html>

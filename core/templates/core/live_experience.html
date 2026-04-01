@@ -277,9 +277,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 {% include 'core/header.html' %}
 
-<audio id="live-audio" preload="auto">
+<audio id="live-audio" preload="auto" {% if current_track and current_track.audio_url %}src="{{ current_track.audio_url }}"{% endif %}>
     {% if current_track and current_track.audio_url %}
-    <source src="{{ current_track.audio_url }}" {% with lower_audio_url=current_track.audio_url|lower %}type="{% if '.m4a' in lower_audio_url %}audio/mp4{% elif '.wav' in lower_audio_url %}audio/wav{% else %}audio/mpeg{% endif %}"{% endwith %}>
+    <source src="{{ current_track.audio_url }}" {% with lower_audio_url=current_track.audio_url|lower %}type="{% if '.m4a' in lower_audio_url %}audio/mp4{% elif '.wav' in lower_audio_url %}audio/wav{% elif '.flac' in lower_audio_url %}audio/flac{% else %}audio/mpeg{% endif %}"{% endwith %}>
     {% endif %}
 </audio>
 <audio id="live-vo-audio" preload="auto"></audio>
@@ -2155,6 +2155,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }, { once: true });
             }
 
+            audio.addEventListener('error', () => {
+                console.error('Audio element error:', audio.error);
+                if (isPlaying || currentTrackId) {
+                    // Start rotating to the next track to avoid UI freeze
+                    setTimeout(() => triggerRotate('audio-error'), 1000);
+                }
+            });
+
             playBtn.addEventListener('click', async () => {
                 if (isPlaying) {
                     const wasMuted = audio.muted;
@@ -2173,7 +2181,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             mobileMenuAudio.pause();
                         }
 
-                        if (!audio.src || audio.src === '') {
+                        if (!audio.currentSrc && audio.src) {
                             audio.load();
                         }
 
@@ -2189,6 +2197,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             playBtn.classList.add('pulse-glow');
                         } catch (e) {
                             console.error('Critical playback failure:', e);
+                            triggerRotate('playback-error-fallback');
                         }
                     }
                 }

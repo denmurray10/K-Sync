@@ -1,0 +1,14 @@
+================ DIAGNOSTICS ================
+Total RadioTracks without audio_url: 2 / 3124
+ - [ID 573] Jung Kook - Seven
+ - [ID 583] Unknown Artist - New Track
+
+RadioTracks with invalid URL format (not starting with http): 3
+ - [ID 3023] (G)I-DLE - ESCAPE -> URL: /media/audio-proxy/?src=https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2F%2528G%2529I-DLE%2520-%2520ESCAPE.mp3
+ - [ID 3039] (G)I-DLE - POLAROID -> URL: /media/audio-proxy/?src=https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2F%2528G%2529I-DLE%2520-%2520POLAROID.mp3
+ - [ID 3029] (G)I-DLE - I DO -> URL: /media/audio-proxy/?src=https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2F%2528G%2529I-DLE%2520-%2520I%2520DO.mp3
+
+Total KPopGroups without image_url: 0 / 81
+
+Total KPopMembers without image_url: 0 / 339
+================ DONE ================

@@ -214,10 +214,12 @@ B2_APPLICATION_KEY = os.environ.get('B2_APPLICATION_KEY', '003309a8127932d4a086f
 B2_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME', 'StrayKids')
 B2_DOWNLOAD_URL = os.environ.get('B2_DOWNLOAD_URL', 'https://f003.backblazeb2.com')
 
-# Auto-sync radio library from Backblaze without manual runs
-B2_AUTO_SYNC_ENABLED = str(config('B2_AUTO_SYNC_ENABLED', default='true')).lower() == 'true'
+# Auto-sync radio library from Backblaze without manual runs.
+# Keep this off by default in local DEBUG mode so `runserver` doesn't perform
+# network syncs and mutate the radio library during normal development.
+B2_AUTO_SYNC_ENABLED = str(config('B2_AUTO_SYNC_ENABLED', default='false' if DEBUG else 'true')).lower() == 'true'
 B2_AUTO_SYNC_INTERVAL_MINUTES = int(config('B2_AUTO_SYNC_INTERVAL_MINUTES', default='30'))
-B2_AUTO_SYNC_RUN_ON_STARTUP = str(config('B2_AUTO_SYNC_RUN_ON_STARTUP', default='true')).lower() == 'true'
+B2_AUTO_SYNC_RUN_ON_STARTUP = str(config('B2_AUTO_SYNC_RUN_ON_STARTUP', default='false' if DEBUG else 'true')).lower() == 'true'
 B2_AUTO_SYNC_NEW_ONLY = str(config('B2_AUTO_SYNC_NEW_ONLY', default='true')).lower() == 'true'
 B2_AUTO_SYNC_PRUNE_MISSING = str(config('B2_AUTO_SYNC_PRUNE_MISSING', default='false')).lower() == 'true'
 B2_AUTO_SYNC_INCLUDE_VERSIONS = str(config('B2_AUTO_SYNC_INCLUDE_VERSIONS', default='false')).lower() == 'true'

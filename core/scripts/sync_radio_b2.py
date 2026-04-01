@@ -23,20 +23,21 @@ if os.path.exists(env_path):
 django.setup()
 
 from core.models import RadioTrack, RadioStationState
+from django.conf import settings
 
 # --- B2 CONFIGURATION ---
-# Replace these with your actual B2 credentials or use environment variables
-B2_KEY_ID = os.getenv('B2_KEY_ID', 'your_key_id')
-B2_APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY', 'your_application_key')
-B2_BUCKET_NAME = os.getenv('B2_BUCKET_NAME', 'your_bucket_name')
-B2_ENDPOINT = os.getenv('B2_ENDPOINT', '') # e.g. f000.backblazeb2.com
+# Prefer Django settings so scheduler jobs don't emit placeholder warnings
+# when credentials are configured there instead of a local .env file.
+B2_KEY_ID = os.getenv('B2_KEY_ID') or getattr(settings, 'B2_KEY_ID', '') or 'your_key_id'
+B2_APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY') or getattr(settings, 'B2_APPLICATION_KEY', '') or 'your_application_key'
+B2_BUCKET_NAME = os.getenv('B2_BUCKET_NAME') or getattr(settings, 'B2_BUCKET_NAME', '') or 'your_bucket_name'
+B2_ENDPOINT = os.getenv('B2_ENDPOINT') or getattr(settings, 'B2_ENDPOINT', '') or ''  # e.g. f000.backblazeb2.com
 
 import io
 import cloudinary
 import cloudinary.uploader
 from mutagen import File as MutagenFile
 from mutagen.id3 import ID3, APIC
-from django.conf import settings
 
 # Configure Cloudinary
 cloudinary.config(
