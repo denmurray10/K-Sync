@@ -247,6 +247,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             45%  { transform:translate(-3px, 2px); }
             60%  { transform:translate(4px, -2px); }
             75%  { transform:translate(-2px, 1px); }
+            100% { transform:translate(0,0); }
+        }
         .screen-shake { animation:shake 0.35s ease-in-out; }
     </style>
 </head>
@@ -274,7 +276,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <!-- Game — hidden on mobile -->
-    <div class="hidden md:contents">
+    <div class="game-layout hidden md:grid">
 
         <!-- ══════════════════════════════════════════════════════════════
              LEFT SIDEBAR — Leaderboard (Glass Panel Style)
@@ -1121,6 +1123,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
         };
     }
+    </script>
     {% include 'core/footer.html' %}
 </body>
 </html>

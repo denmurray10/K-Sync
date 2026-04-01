@@ -6266,10 +6266,17 @@ def beat_streak(request):
     random.shuffle(game_tracks)
 
     high_scores = GameScore.objects.filter(game='beat_streak').order_by('-score')[:10]
+    best_score = (
+        GameScore.objects
+        .filter(game='beat_streak')
+        .order_by('-score')
+        .first()
+    )
 
     return render(request, 'core/beat_streak.html', {
         'game_tracks_json': json.dumps(game_tracks),
         'high_scores': high_scores,
+        'best_score': best_score,
     })
 
 
