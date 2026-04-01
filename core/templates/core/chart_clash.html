@@ -189,7 +189,7 @@ const CHART_TRACKS = {{ chart_tracks_json|safe }};
 
 function chartClash() {
     return {
-        state: 'start',
+        state: 'loading',
         pairs: [],
         currentRound: 0,
         totalRounds: 10,
@@ -203,6 +203,10 @@ function chartClash() {
         songACorrect: false,
         answered: false,
         pickedSide: '',
+
+        init() {
+            this.startGame();
+        },
 
         startGame() {
             // Generate pairs from chart data
