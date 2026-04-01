@@ -455,13 +455,18 @@ def _optimize_home_image_url(source_url, *, width=None, height=None):
         base, tail = raw.split('/image/upload/', 1)
         return f'{base}/image/upload/{transform}/{tail}'
 
-    # Only route external image hosts through fetch when that feature is explicitly enabled.
-    # Our Backblaze originals are already valid, and forced fetch rewrites can fail open into
-    # placeholder fallbacks on pages like /idols/.
+    # Keep Kpopping profile images direct. This Cloudinary account returns 401 for
+    # unsigned fetches against cdn.kpopping.com, which causes the idols grid and
+    # member cards to fall back to initials.
+    if 'cdn.kpopping.com' in host:
+        return raw
+
+    # Only route Backblaze and other external hosts through fetch when the broader
+    # feature is explicitly enabled.
     if not getattr(settings, 'IMAGE_STREAM_USE_CLOUDINARY_FETCH', False):
         return raw
 
-    if 'cdn.kpopping.com' in host or 'backblazeb2.com' in host:
+    if 'backblazeb2.com' in host:
         encoded = urllib.parse.quote(raw, safe='')
         return f'https://res.cloudinary.com/{cloud_name}/image/fetch/{transform}/{encoded}'
 
@@ -3019,6 +3024,26 @@ def _inworld_chat(prompt, system="You are an expert K-Pop radio assistant."):
         return ''
     message = choices[0].get('message') or {}
     return (message.get('content') or '').strip()
+
+
+def _split_story_paragraphs(text, *, fallback=''):
+    raw = str(text or fallback or '').strip()
+    if not raw:
+        return []
+
+    parts = [part.strip() for part in re.split(r'\n\s*\n+', raw) if part.strip()]
+    if len(parts) >= 2:
+        return parts
+
+    sentences = [segment.strip() for segment in re.split(r'(?<=[.!?])\s+', raw) if segment.strip()]
+    if len(sentences) >= 4:
+        midpoint = max(2, len(sentences) // 2)
+        return [
+            ' '.join(sentences[:midpoint]).strip(),
+            ' '.join(sentences[midpoint:]).strip(),
+        ]
+
+    return [raw]
 
 # â”€â”€ Page views â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -10129,12 +10154,18 @@ def idol_page(request, slug):
     albums = itunes_albums if itunes_albums else comeback_albums
     tracks = itunes_tracks if itunes_tracks else chart_tracks
 
+    story_text = group.description or f"Explore the world of {group.name} - members, discography, top tracks, and more."
+
     context = {
         'group': group,
         'accent_color': accent_map.get(group.group_type, '#FF8EAF'),
         'accent_rgb': accent_rgb_map.get(group.group_type, '255,142,175'),
         'related_groups': related,
-        'description': group.description or f"Explore the world of {group.name} - members, discography, top tracks, and more.",
+        'description': story_text,
+        'description_paragraphs': _split_story_paragraphs(
+            story_text,
+            fallback=f"Explore the world of {group.name} - members, discography, top tracks, and more.",
+        ),
         'members': [
             {
                 'name': m.stage_name or m.name,

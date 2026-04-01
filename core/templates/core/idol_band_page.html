@@ -344,11 +344,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             class="lg:w-2/3 reveal-up"
                             style="transition-delay: 200ms"
                         >
-                            <p
-                                class="text-slate-300 text-lg md:text-xl leading-relaxed font-light"
-                            >
-                                {{ description }}
-                            </p>
+                            <div class="space-y-0">
+                                {% for paragraph in description_paragraphs %}
+                                <p
+                                    class="{% if not forloop.first %}mt-8 md:mt-10{% endif %} text-slate-300 text-lg md:text-xl leading-relaxed font-light"
+                                >
+                                    {{ paragraph }}
+                                </p>
+                                {% endfor %}
+                            </div>
                             <div
                                 class="grid grid-cols-2 md:grid-cols-3 gap-6 mt-12 pt-8 border-t border-white/10"
                             >
