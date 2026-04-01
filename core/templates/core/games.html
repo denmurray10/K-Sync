@@ -233,61 +233,64 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <!-- Featured Row: 3 big cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10 mb-16 reveal-up">
                 <!-- Beat Streak -->
-                <a href="{% url 'beat_streak_promo' %}" class="group relative border border-white/10 bg-black hover:bg-white/[0.03] transition-all overflow-hidden">
+                <a href="{% url 'beat_streak_promo' %}" class="group relative border border-white/10 bg-black transition-all overflow-hidden">
                     <div class="aspect-[4/3] relative overflow-hidden bg-black">
                         <img src="{% static 'core/img/beat-streak-card.svg' %}" alt="Beat Streak neon rhythm artwork" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"/>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10"></div>
+                        <div class="absolute inset-0 bg-black/35 z-10"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-10"></div>
                         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(244,37,192,0.22),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(0,240,255,0.14),transparent_30%)] opacity-80 z-10"></div>
                     </div>
-                    <div class="p-8 border-t border-white/10">
+                    <div class="relative z-20 bg-black p-8 border-t border-white/10">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="bg-secondary text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Featured</span>
                             <span class="bg-white/5 text-white/40 text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Rhythm</span>
                         </div>
-                        <h3 class="text-2xl font-black text-white uppercase tracking-tighter group-hover:text-secondary transition-colors mb-2">Beat Streak</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed">Tap to the rhythm of the latest K-Pop hits. Choose your difficulty and chase the perfect score.</p>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-2">Beat Streak</h3>
+                        <p class="text-sm font-medium text-slate-400 leading-relaxed">Tap to the rhythm of the latest K-Pop hits. Choose your difficulty and chase the perfect score.</p>
                         <div class="mt-6 flex items-center gap-2 text-secondary font-black text-[10px] uppercase tracking-[0.2em]">
-                            Play Now <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            Play Now <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </div>
                     </div>
                 </a>
 
                 <!-- Chart Clash -->
-                <a href="{% url 'chart_clash_promo' %}" class="group relative border border-white/10 bg-black hover:bg-white/[0.03] transition-all overflow-hidden">
+                <a href="{% url 'chart_clash_promo' %}" class="group relative border border-white/10 bg-black transition-all overflow-hidden">
                     <div class="aspect-[4/3] relative overflow-hidden bg-black">
                         <img src="{% static 'core/img/chart-clash-card.svg' %}" alt="Chart Clash versus chart artwork" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"/>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10"></div>
+                        <div class="absolute inset-0 bg-black/35 z-10"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-10"></div>
                         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,37,192,0.22),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(0,240,255,0.14),transparent_30%)] opacity-80 z-10"></div>
                     </div>
-                    <div class="p-8 border-t border-white/10">
+                    <div class="relative z-20 bg-black p-8 border-t border-white/10">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="bg-primary text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Featured</span>
                             <span class="bg-white/5 text-white/40 text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Trivia</span>
                         </div>
-                        <h3 class="text-2xl font-black text-white uppercase tracking-tighter group-hover:text-primary transition-colors mb-2">Chart Clash</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed">Two songs face off — which one charted higher? Test your chart knowledge in rapid-fire rounds.</p>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-2">Chart Clash</h3>
+                        <p class="text-sm font-medium text-slate-400 leading-relaxed">Two songs face off — which one charted higher? Test your chart knowledge in rapid-fire rounds.</p>
                         <div class="mt-6 flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-[0.2em]">
-                            Play Now <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            Play Now <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </div>
                     </div>
                 </a>
 
                 <!-- Draft Day -->
-                <a href="{% url 'draft_day_promo' %}" class="group relative border border-white/10 bg-black hover:bg-white/[0.03] transition-all overflow-hidden">
+                <a href="{% url 'draft_day_promo' %}" class="group relative border border-white/10 bg-black transition-all overflow-hidden">
                     <div class="aspect-[4/3] relative overflow-hidden bg-black">
                         <img src="{% static 'core/img/draft-day-card.svg' %}" alt="Draft Day roster building artwork" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"/>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10"></div>
+                        <div class="absolute inset-0 bg-black/35 z-10"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-10"></div>
                         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,240,255,0.18),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(244,37,192,0.16),transparent_30%)] opacity-80 z-10"></div>
                     </div>
-                    <div class="p-8 border-t border-white/10">
+                    <div class="relative z-20 bg-black p-8 border-t border-white/10">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="bg-secondary text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Featured</span>
                             <span class="bg-white/5 text-white/40 text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">Strategy</span>
                         </div>
-                        <h3 class="text-2xl font-black text-white uppercase tracking-tighter group-hover:text-secondary transition-colors mb-2">Draft Day</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed">Build your ultimate fantasy idol group. Draft members from real groups and create your dream lineup.</p>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-2">Draft Day</h3>
+                        <p class="text-sm font-medium text-slate-400 leading-relaxed">Build your ultimate fantasy idol group. Draft members from real groups and create your dream lineup.</p>
                         <div class="mt-6 flex items-center gap-2 text-secondary font-black text-[10px] uppercase tracking-[0.2em]">
-                            Play Now <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            Play Now <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </div>
                     </div>
                 </a>
