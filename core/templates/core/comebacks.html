@@ -47,12 +47,6 @@ tailwind.config = {
             #000;
     }
     .font-cinzel { font-family: "Cinzel", serif; }
-    .signal-grid {
-        background-image:
-            linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-        background-size: 32px 32px;
-    }
     .panel-shell {
         background: linear-gradient(180deg, rgba(14,14,14,0.98), rgba(5,5,5,0.98));
         border: 1px solid rgba(255,255,255,0.1);
@@ -93,7 +87,7 @@ tailwind.config = {
 
 {% include 'core/header.html' %}
 
-<main class="flex-grow pt-0 signal-grid" x-data="comebackSignalHub()" x-init="init()" @keydown.escape.window="closeDrawer()">
+<main class="flex-grow pt-0" x-data="comebackSignalHub()" x-init="init()" @keydown.escape.window="closeDrawer()">
     <section class="relative overflow-hidden border-b border-white/10">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(244,37,192,0.18),transparent_32%),radial-gradient(circle_at_82%_12%,rgba(0,240,255,0.1),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_22%,rgba(0,0,0,0.95))]"></div>
         <div class="relative container mx-auto px-4 sm:px-6 pt-32 md:pt-40 pb-20 md:pb-24">
@@ -204,7 +198,7 @@ tailwind.config = {
                     {% endif %}
                 </div>
 
-                <aside class="panel-shell flex flex-col justify-between overflow-hidden">
+                <aside class="panel-shell overflow-hidden">
                     <div class="border-b border-white/10 px-6 py-5">
                         <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Release desk notes</p>
                         <h3 class="mt-3 font-cinzel text-3xl text-white">Scene pulse</h3>
