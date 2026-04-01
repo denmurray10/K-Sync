@@ -7,7 +7,7 @@
 <title>{{ seo_title }}</title>
 <meta name="description" content="{{ seo_description }}"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
 tailwind.config = {
@@ -15,97 +15,244 @@ tailwind.config = {
   theme: {
     extend: {
       colors: { primary: "#f425c0", secondary: "#00f0ff" },
-      fontFamily: { display: ["Montserrat", "sans-serif"] },
-      borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
+      fontFamily: {
+        sans: ["Montserrat", "sans-serif"],
+        display: ["Cinzel", "serif"]
+      },
+      borderRadius: {
+        "DEFAULT": "0px",
+        "sm": "0px",
+        "md": "0px",
+        "lg": "0px",
+        "xl": "0px",
+        "2xl": "0px",
+        "3xl": "0px",
+        "full": "9999px"
+      },
     }
   }
 }
 </script>
 <style>
-body {
-  background:
-    radial-gradient(circle at top left, {{ promo_accent_hex }}26, transparent 32%),
-    radial-gradient(circle at bottom right, {{ promo_secondary_hex }}26, transparent 32%),
-    linear-gradient(180deg, #050505 0%, #000 100%);
-}
+body { margin: 0; background: #000; overflow-x: hidden; }
 .grid-bg {
   background-image:
-    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
+    linear-gradient(rgba(244,37,192,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,240,255,0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+.reveal, .reveal-left, .reveal-right {
+  opacity: 0;
+  transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal { transform: translateY(30px); }
+.reveal-left { transform: translateX(-30px); }
+.reveal-right { transform: translateX(30px); }
+.reveal.visible, .reveal-left.visible, .reveal-right.visible {
+  opacity: 1;
+  transform: none;
+}
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes floatCard { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.animate-ticker { animation: ticker 24s linear infinite; }
+.animate-float-card { animation: floatCard 5s ease-in-out infinite; }
+.hero-stroke { color: transparent; -webkit-text-stroke: 1.5px {{ promo_accent_hex }}; }
+.hero-stroke-secondary { color: transparent; -webkit-text-stroke: 1.4px {{ promo_secondary_hex }}; }
+.panel-glow {
+  box-shadow: 0 0 40px color-mix(in srgb, {{ promo_accent_hex }} 12%, transparent);
+}
+.panel-glow-secondary {
+  box-shadow: 0 0 40px color-mix(in srgb, {{ promo_secondary_hex }} 12%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-left, .reveal-right, .animate-ticker, .animate-float-card {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 </style>
 </head>
-<body class="min-h-screen bg-black text-white font-display overflow-x-hidden">
+<body class="font-sans text-white">
 {% include 'core/header.html' %}
 <main class="relative">
-  <section class="grid-bg relative overflow-hidden border-b border-white/10 pt-28 pb-20 md:pt-36 md:pb-28">
-    <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
-    <div class="relative container mx-auto px-4 sm:px-6">
-      <div class="max-w-5xl">
-        <a href="{{ promo_back_url }}" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-[11px] font-black uppercase tracking-[0.18em]">
-          <span class="material-symbols-outlined text-base">arrow_back</span>
-          K-Beats Games
-        </a>
-        <div class="mt-10 inline-flex items-center gap-2 border px-4 py-2" style="border-color: {{ promo_accent_hex }}55; color: {{ promo_accent_hex }}; background: rgba(255,255,255,0.03);">
-          <span class="material-symbols-outlined text-sm">{{ promo_icon }}</span>
-          <span class="font-mono text-[10px] uppercase tracking-[0.3em]">{{ promo_eyebrow }}</span>
-        </div>
-        <p class="mt-8 font-mono text-[11px] uppercase tracking-[0.3em]" style="color: {{ promo_secondary_hex }};">{{ promo_kicker }}</p>
-        <h1 class="mt-4 text-[clamp(3.5rem,10vw,8rem)] font-black uppercase leading-[0.9] tracking-tight">{{ promo_title }}</h1>
-        <p class="mt-6 max-w-3xl text-lg md:text-xl leading-relaxed text-slate-300">{{ promo_description }}</p>
-        <p class="mt-4 max-w-2xl text-sm leading-relaxed text-slate-500">{{ promo_hook }}</p>
-        <div class="mt-10 flex flex-col sm:flex-row gap-4">
-          <a href="{{ promo_play_url }}" class="inline-flex items-center justify-center gap-3 px-10 py-5 border-2 font-black uppercase tracking-[0.22em] text-sm text-black transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]" style="background: {{ promo_accent_hex }}; border-color: {{ promo_accent_hex }};">
-            <span class="material-symbols-outlined">play_arrow</span>
-            Start Playing
+  <section class="relative min-h-screen overflow-hidden grid-bg" style="padding-top: 110px;">
+    <div class="absolute inset-0" style="background:
+      radial-gradient(circle at top left, color-mix(in srgb, {{ promo_accent_hex }} 18%, transparent), transparent 38%),
+      radial-gradient(circle at bottom right, color-mix(in srgb, {{ promo_secondary_hex }} 16%, transparent), transparent 38%);"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-6 pb-20">
+      <div class="grid lg:grid-cols-[1.08fr_0.92fr] gap-12 items-center">
+        <div class="reveal">
+          <a href="{{ promo_back_url }}" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-lg">arrow_back</span>
+            <span class="font-mono text-[10px] uppercase tracking-[0.28em]">K-Beats Games</span>
           </a>
-          <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 border border-white/15 px-8 py-5 text-[11px] font-black uppercase tracking-[0.18em] text-white hover:border-white/40 transition-colors">
-            <span class="material-symbols-outlined text-base">south</span>
-            See How It Works
-          </a>
-        </div>
-        <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 border border-white/10">
-          {% for stat, label in promo_stats %}
-          <div class="p-6 {% if not forloop.last %}border-b sm:border-b-0 sm:border-r border-white/10{% endif %}">
-            <div class="text-3xl md:text-4xl font-black" style="color: {% if forloop.first %}{{ promo_accent_hex }}{% else %}white{% endif %};">{{ stat }}</div>
-            <div class="mt-2 font-mono text-[9px] uppercase tracking-[0.24em] text-slate-500">{{ label }}</div>
+          <div class="inline-flex items-center gap-2 border px-4 py-2 mt-8" style="border-color: color-mix(in srgb, {{ promo_accent_hex }} 32%, transparent); background: color-mix(in srgb, {{ promo_accent_hex }} 8%, transparent); color: {{ promo_accent_hex }};">
+            <span class="w-2 h-2 rounded-full animate-pulse" style="background: {{ promo_accent_hex }};"></span>
+            <span class="font-mono text-[10px] uppercase tracking-[0.3em]">{{ promo_eyebrow }}</span>
           </div>
-          {% endfor %}
+          <p class="mt-8 font-mono text-[11px] tracking-[0.3em] uppercase" style="color: {{ promo_secondary_hex }};">{{ promo_kicker }}</p>
+          <h1 class="font-display text-[clamp(3.7rem,11vw,8.8rem)] leading-[0.9] uppercase tracking-tight mt-3 text-white">
+            {{ promo_title }}
+          </h1>
+          <h2 class="font-display text-[clamp(2.2rem,6vw,4.5rem)] leading-[0.92] uppercase tracking-[0.18em] -mt-1">
+            <span class="hero-stroke">{{ promo_kicker }}</span>
+          </h2>
+          <p class="text-lg md:text-xl text-slate-300 max-w-xl leading-relaxed mt-6 mb-4">
+            {{ promo_description }}
+          </p>
+          <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-slate-500 mb-10">
+            {{ promo_hook }}
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 mb-12">
+            <a href="{{ promo_play_url }}" class="inline-flex items-center justify-center gap-3 text-black font-black uppercase tracking-[0.22em] text-sm px-10 py-5 border-2 transition-all shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]" style="background: {{ promo_accent_hex }}; border-color: {{ promo_accent_hex }};">
+              <span class="material-symbols-outlined">play_arrow</span>
+              Start Playing
+            </a>
+            <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 border border-white/15 text-white font-black uppercase tracking-[0.18em] text-[11px] px-8 py-5 transition-colors" onmouseover="this.style.borderColor='{{ promo_secondary_hex }}';this.style.color='{{ promo_secondary_hex }}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='white'">
+              <span class="material-symbols-outlined text-base">south</span>
+              See How It Works
+            </a>
+          </div>
+          <div class="grid sm:grid-cols-3 gap-0 border border-white/10 max-w-2xl">
+            {% for stat, label in promo_stats %}
+            <div class="p-5 {% if not forloop.last %}border-b sm:border-b-0 sm:border-r border-white/10{% endif %}">
+              <span class="block font-black text-3xl {% if forloop.first %}text-white{% endif %}" {% if not forloop.first %}style="color: {% if forloop.counter == 2 %}{{ promo_accent_hex }}{% else %}{{ promo_secondary_hex }}{% endif %};"{% endif %}>{{ stat }}</span>
+              <span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">{{ label }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="reveal-right">
+          <div class="border border-white/10 bg-black/75 panel-glow animate-float-card">
+            <div class="grid grid-cols-2 border-b border-white/10">
+              <div class="p-4 border-r border-white/10">
+                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-slate-500 mb-3">Mode Signal</p>
+                <p class="font-black uppercase tracking-tight text-lg text-white mb-2">{{ promo_title }}</p>
+                <p class="text-slate-300 text-sm leading-relaxed">{{ promo_description }}</p>
+              </div>
+              <div class="p-4">
+                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-slate-500 mb-3">Launch Flow</p>
+                <p class="font-black uppercase tracking-tight text-lg mb-2" style="color: {{ promo_secondary_hex }};">One Click</p>
+                <p class="text-slate-300 text-sm leading-relaxed">{{ promo_hook }}</p>
+              </div>
+            </div>
+            <div class="p-5 border-b border-white/10">
+              <p class="font-mono text-[9px] uppercase tracking-[0.28em] mb-3" style="color: {{ promo_accent_hex }};">Game Pressure</p>
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 border flex items-center justify-center shrink-0" style="border-color: color-mix(in srgb, {{ promo_secondary_hex }} 30%, transparent); background: color-mix(in srgb, {{ promo_secondary_hex }} 8%, transparent);">
+                  <span class="material-symbols-outlined text-3xl" style="color: {{ promo_secondary_hex }};">{{ promo_icon }}</span>
+                </div>
+                <div>
+                  <p class="font-black text-xl uppercase tracking-tight">Built For Replay</p>
+                  <p class="text-slate-400 text-sm">Fast setup, sharp pacing, and a cleaner launch path so the page feels like part of the game instead of a detour before it.</p>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-0">
+              {% for stat, label in promo_stats %}
+              <div class="p-4 {% if not forloop.last %}border-r border-white/10{% endif %}">
+                <p class="font-black text-xl {% if forloop.counter == 1 %}text-white{% elif forloop.counter == 2 %}text-primary{% else %}text-secondary{% endif %}">{{ stat }}</p>
+                <p class="font-mono text-[9px] uppercase tracking-widest text-slate-500">{{ label }}</p>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
-  <section id="how-it-works" class="border-b border-white/10 py-20 md:py-24">
-    <div class="container mx-auto px-4 sm:px-6">
-      <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-        <div>
-          <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">How It Works</p>
-          <h2 class="mt-3 text-4xl md:text-5xl font-black uppercase tracking-tight">Play In One Click</h2>
-          <p class="mt-5 text-base leading-relaxed text-slate-400">Each game now has a dedicated intro page. The start button on this page goes straight to the playable screen.</p>
+
+  <div class="border-y py-3 overflow-hidden" style="border-color: color-mix(in srgb, {{ promo_accent_hex }} 22%, transparent); background: color-mix(in srgb, {{ promo_accent_hex }} 10%, transparent);">
+    <div class="animate-ticker whitespace-nowrap flex gap-16 text-[10px] font-black uppercase tracking-[0.3em]" style="color: color-mix(in srgb, {{ promo_accent_hex }} 65%, white 10%);">
+      {% for item in promo_ticker_items %}
+      <span>{{ item }}</span><span class="opacity-30">.</span>
+      {% endfor %}
+      {% for item in promo_ticker_items %}
+      <span>{{ item }}</span><span class="opacity-30">.</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <section id="how-it-works" class="py-24 md:py-32 px-6 max-w-6xl mx-auto">
+    <div class="reveal text-center mb-16">
+      <p class="font-mono text-[10px] uppercase tracking-[0.3em] mb-3" style="color: {{ promo_secondary_hex }};">How It Works</p>
+      <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none">
+        One Start Button.<br/><span class="hero-stroke-secondary">No Momentum Lost.</span>
+      </h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10">
+      {% for item in promo_numbered_steps %}
+      <div class="reveal p-10 md:p-12 {% if not forloop.last %}border-b md:border-b-0 md:border-r border-white/10{% endif %} hover:bg-white/[0.02] transition-colors" {% if not forloop.first %}style="transition-delay:0.0{{ forloop.counter }}s"{% endif %}>
+        <div class="text-[5rem] font-black text-white/5 leading-none mb-6">{{ item.index }}</div>
+        <div class="w-12 h-12 border flex items-center justify-center mb-6" style="border-color: {% if forloop.counter == 2 %}color-mix(in srgb, {{ promo_secondary_hex }} 30%, transparent); background: color-mix(in srgb, {{ promo_secondary_hex }} 8%, transparent);{% else %}color-mix(in srgb, {{ promo_accent_hex }} 30%, transparent); background: color-mix(in srgb, {{ promo_accent_hex }} 8%, transparent);{% endif %}">
+          <span class="material-symbols-outlined" style="color: {% if forloop.counter == 2 %}{{ promo_secondary_hex }}{% else %}{{ promo_accent_hex }}{% endif %};">{% if forloop.counter == 1 %}flash_on{% elif forloop.counter == 2 %}sports_esports{% else %}bolt{% endif %}</span>
         </div>
-        <div class="grid gap-4">
+        <h3 class="font-black uppercase tracking-tight text-xl mb-3">
+          {% if forloop.counter == 1 %}Read The Mode{% elif forloop.counter == 2 %}Hit Start Fast{% else %}Stay In Flow{% endif %}
+        </h3>
+        <p class="text-slate-500 text-sm leading-relaxed">{{ item.copy }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="py-16 px-6 bg-white/[0.02] border-y border-white/5">
+    <div class="max-w-6xl mx-auto">
+      <div class="reveal text-center mb-16">
+        <p class="font-mono text-[10px] uppercase tracking-[0.3em] mb-3" style="color: {{ promo_accent_hex }};">Why This Mode Works</p>
+        <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tight leading-none">
+          Built To Feel Immediate.<br/><span class="hero-stroke">Styled To Sell The Game.</span>
+        </h2>
+      </div>
+      <div class="grid md:grid-cols-[0.95fr_1.05fr] gap-8 items-start">
+        <div class="reveal-left border border-white/10 bg-black/70 panel-glow p-8">
+          <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500 mb-6">Mode Rhythm</p>
+          <div class="space-y-5">
+            {% for stat, label in promo_stats %}
+            <div class="flex items-start gap-4">
+              <span class="material-symbols-outlined mt-0.5" style="color: {% if forloop.counter == 2 %}{{ promo_secondary_hex }}{% else %}{{ promo_accent_hex }}{% endif %};">{% if forloop.counter == 1 %}bar_chart{% elif forloop.counter == 2 %}timer{% else %}rocket_launch{% endif %}</span>
+              <div>
+                <p class="font-black uppercase tracking-tight text-white">{{ stat }} {{ label }}</p>
+                <p class="text-slate-500 text-sm">{% if forloop.counter == 1 %}A clear rule set gives the mode identity before the player even presses start.{% elif forloop.counter == 2 %}The pressure point is visible up front, so the game promise feels concrete rather than vague.{% else %}The payoff is immediate, which keeps the intro page feeling like a runway into play instead of a dead-end explainer.{% endif %}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="reveal-right grid gap-4">
           {% for item in promo_how_it_works %}
-          <article class="border border-white/10 bg-white/[0.03] p-5">
-            <p class="text-sm leading-relaxed text-slate-300">{{ item }}</p>
+          <article class="border border-white/10 bg-white/[0.03] p-6 hover:bg-white/[0.05] transition-colors">
+            <div class="flex items-start gap-4">
+              <div class="w-11 h-11 border flex items-center justify-center shrink-0" style="border-color: color-mix(in srgb, {% if forloop.counter == 2 %}{{ promo_secondary_hex }}{% else %}{{ promo_accent_hex }}{% endif %} 30%, transparent); background: color-mix(in srgb, {% if forloop.counter == 2 %}{{ promo_secondary_hex }}{% else %}{{ promo_accent_hex }}{% endif %} 8%, transparent);">
+                <span class="material-symbols-outlined" style="color: {% if forloop.counter == 2 %}{{ promo_secondary_hex }}{% else %}{{ promo_accent_hex }}{% endif %};">{% if forloop.counter == 1 %}grid_view{% elif forloop.counter == 2 %}joystick{% else %}whatshot{% endif %}</span>
+              </div>
+              <div>
+                <p class="font-black uppercase tracking-tight text-white mb-2">{% if forloop.counter == 1 %}Core Setup{% elif forloop.counter == 2 %}Mid-Round Feel{% else %}Replay Hook{% endif %}</p>
+                <p class="text-sm leading-relaxed text-slate-300">{{ item }}</p>
+              </div>
+            </div>
           </article>
           {% endfor %}
         </div>
       </div>
     </div>
   </section>
-  <section class="py-20 md:py-24">
-    <div class="container mx-auto px-4 sm:px-6">
+
+  <section class="py-20 md:py-24 px-6">
+    <div class="max-w-6xl mx-auto">
       <div class="flex items-end justify-between gap-4">
         <div>
           <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">More Games</p>
-          <h2 class="mt-3 text-3xl md:text-4xl font-black uppercase tracking-tight">Keep Exploring</h2>
+          <h2 class="mt-3 font-display text-3xl md:text-5xl uppercase tracking-tight">Keep Exploring</h2>
         </div>
         <a href="{% url 'games' %}" class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-300 hover:text-white transition-colors">All Games</a>
       </div>
       <div class="mt-8 grid gap-4 md:grid-cols-3">
         {% for item in promo_related %}
-        <a href="{{ item.href }}" class="border border-white/10 bg-white/[0.03] p-5 hover:bg-white/[0.05] transition-colors">
+        <a href="{{ item.href }}" class="border border-white/10 bg-white/[0.03] p-6 hover:bg-white/[0.05] transition-colors">
           <div class="flex items-center gap-3">
             <span class="material-symbols-outlined" style="color: {{ promo_accent_hex }};">{{ item.icon }}</span>
             <div>
@@ -120,5 +267,20 @@ body {
   </section>
 </main>
 {% include 'core/footer.html' %}
+<script>
+const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+if ('IntersectionObserver' in window) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+  revealElements.forEach((element) => observer.observe(element));
+} else {
+  revealElements.forEach((element) => element.classList.add('visible'));
+}
+</script>
 </body>
 </html>

@@ -5280,6 +5280,22 @@ def _render_game_intro(request, key):
             'icon': item['icon'],
         })
 
+    numbered_steps = [
+        {
+            'index': f"{step_index:02d}",
+            'copy': step_copy,
+        }
+        for step_index, step_copy in enumerate(config['how_it_works'], start=1)
+    ]
+    ticker_items = [
+        config['title'],
+        config['kicker'],
+        config['stats'][0][1],
+        config['stats'][1][1],
+        'One Click Start',
+        config['stats'][2][1],
+    ]
+
     return render(request, 'core/game_intro.html', {
         'promo_title': config['title'],
         'promo_eyebrow': config['eyebrow'],
@@ -5291,6 +5307,8 @@ def _render_game_intro(request, key):
         'promo_hook': config['hook'],
         'promo_stats': config['stats'],
         'promo_how_it_works': config['how_it_works'],
+        'promo_numbered_steps': numbered_steps,
+        'promo_ticker_items': ticker_items,
         'promo_play_url': reverse(config['play_url_name']),
         'promo_back_url': reverse('games'),
         'promo_related': related[:3],
