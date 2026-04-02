@@ -588,8 +588,6 @@ tailwind.config = {
     {% endif %}
 
     {{ timeline_releases|json_script:"comeback-timeline-data" }}
-    {{ day_summaries|json_script:"comeback-day-data" }}
-    {{ drawer_releases|json_script:"comeback-drawer-data" }}
     {{ secondary_events.birthdays_this_week|json_script:"comeback-birthday-data" }}
 
     <div x-cloak
@@ -792,8 +790,9 @@ function comebackSignalHub() {
         filter: 'all',
         search: '',
         timelineGroups: [],
-        dayMap: {},
-        releaseLibrary: [],
+        releaseIndex: {},
+        dayCache: {},
+        releaseCache: {},
         birthdaySlides: [],
         birthdayIndex: 0,
         birthdayTimer: null,
@@ -801,21 +800,44 @@ function comebackSignalHub() {
         drawerMode: 'release',
         activeRelease: null,
         activeDay: null,
+        releaseApiBase: '{{ comeback_release_api_base|escapejs }}',
+        dayApiBase: '{{ comeback_day_api_base|escapejs }}',
+        navYear: {{ nav_year }},
+        navMonth: {{ nav_month }},
 
         init() {
             const timelineEl = document.getElementById('comeback-timeline-data');
-            const dayEl = document.getElementById('comeback-day-data');
-            const drawerEl = document.getElementById('comeback-drawer-data');
             const birthdayEl = document.getElementById('comeback-birthday-data');
             this.timelineGroups = timelineEl ? JSON.parse(timelineEl.textContent) : [];
-            this.dayMap = dayEl ? JSON.parse(dayEl.textContent) : {};
-            this.releaseLibrary = drawerEl ? JSON.parse(drawerEl.textContent) : [];
+            this.releaseIndex = Object.fromEntries(
+                this.timelineGroups.flatMap((group) => (group.releases || []).map((release) => [release.id, release]))
+            );
             this.birthdaySlides = birthdayEl ? JSON.parse(birthdayEl.textContent).filter((item) => item.image || item.label) : [];
             if (this.birthdaySlides.length > 1) {
                 this.birthdayTimer = window.setInterval(() => {
                     this.birthdayIndex = (this.birthdayIndex + 1) % this.birthdaySlides.length;
                 }, 4200);
             }
+        },
+
+        buildApiUrl(base, value) {
+            const params = new URLSearchParams({
+                year: String(this.navYear),
+                month: String(this.navMonth),
+            });
+            return `${base}${encodeURIComponent(value)}/?${params.toString()}`;
+        },
+
+        async fetchJson(url) {
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+            if (!response.ok) {
+                throw new Error(`Request failed with ${response.status}`);
+            }
+            return response.json();
         },
 
         matchesFilter(release) {
@@ -846,30 +868,78 @@ function comebackSignalHub() {
                 .filter((group) => group.releases.length);
         },
 
-        openRelease(release) {
+        async openRelease(release) {
             if (!release) return;
-            this.activeRelease = release;
+            const baseRelease = {
+                same_day_lineup: [],
+                nearby_releases: [],
+                day_birthdays: [],
+                day_anniversaries: [],
+                ...release,
+            };
+            this.activeRelease = baseRelease;
             this.activeDay = null;
             this.drawerMode = 'release';
             this.drawerOpen = true;
             document.body.style.overflow = 'hidden';
+            await this.ensureReleaseLoaded(baseRelease.id);
         },
 
-        openReleaseById(releaseId) {
-            const match = this.releaseLibrary.find((release) => release.id === releaseId);
+        async openReleaseById(releaseId) {
+            const match = this.releaseIndex[releaseId];
             if (match) {
-                this.openRelease(match);
+                await this.openRelease(match);
                 return;
             }
+            await this.ensureReleaseLoaded(releaseId, true);
         },
 
-        openDay(dateKey) {
-            if (!this.dayMap[dateKey]) return;
-            this.activeDay = this.dayMap[dateKey];
+        async openDay(dateKey) {
+            this.activeDay = {
+                date_str: dateKey,
+                date_label: dateKey,
+                weekday_label: '',
+                release_count: 0,
+                birthday_count: 0,
+                anniversary_count: 0,
+                releases: [],
+                birthdays: [],
+                anniversaries: [],
+            };
             this.activeRelease = null;
             this.drawerMode = 'day';
             this.drawerOpen = true;
             document.body.style.overflow = 'hidden';
+            await this.ensureDayLoaded(dateKey);
+        },
+
+        async ensureReleaseLoaded(releaseId, openAfterLoad = false) {
+            if (!releaseId) return;
+            if (this.releaseCache[releaseId]) {
+                this.activeRelease = this.releaseCache[releaseId];
+                this.releaseIndex[releaseId] = this.releaseCache[releaseId];
+                if (openAfterLoad) {
+                    this.drawerMode = 'release';
+                    this.drawerOpen = true;
+                    document.body.style.overflow = 'hidden';
+                }
+                return;
+            }
+            const payload = await this.fetchJson(this.buildApiUrl(this.releaseApiBase, releaseId));
+            this.releaseCache[releaseId] = payload;
+            this.releaseIndex[releaseId] = payload;
+            this.activeRelease = payload;
+        },
+
+        async ensureDayLoaded(dateKey) {
+            if (!dateKey) return;
+            if (this.dayCache[dateKey]) {
+                this.activeDay = this.dayCache[dateKey];
+                return;
+            }
+            const payload = await this.fetchJson(this.buildApiUrl(this.dayApiBase, dateKey));
+            this.dayCache[dateKey] = payload;
+            this.activeDay = payload;
         },
 
         closeDrawer() {

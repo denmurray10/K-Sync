@@ -1,11 +1,17 @@
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth.models import User
+from django.db import connection
+from django.core.cache import cache
+
+from core import views as core_views
 
 from .models import (
     BlogArticle,
+    ComebackData,
     KPopGroup,
     LivePoll,
     LivePollOption,
@@ -153,3 +159,121 @@ class FanClubTierAndEventTests(TestCase):
         self.assertEqual(claimed.status_code, 200)
         self.assertTrue(claimed.json().get('claimed'))
         self.assertTrue(UserBadge.objects.filter(user=self.user, name='Spotlight Collector').exists())
+
+
+class ComebackPerformanceTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.group = KPopGroup.objects.create(
+            name='Alpha Group',
+            slug='alpha-group',
+            label='Alpha Label',
+            group_type='GIRL',
+            rank=1,
+        )
+        today = timezone.localdate()
+        self.nav_year = today.year
+        self.nav_month = today.month
+        date_key = today.isoformat()
+        ComebackData.objects.create(
+            year=self.nav_year,
+            month=self.nav_month,
+            data={
+                date_key: {
+                    'releases': [
+                        {
+                            'artist': 'Alpha Group',
+                            'title': 'Signal Rush',
+                            'type': 'Single',
+                            'image': 'https://example.com/a.jpg',
+                        },
+                        {
+                            'artist': 'Beta Unit',
+                            'title': 'Night Shift',
+                            'type': 'EP',
+                            'image': 'https://example.com/b.jpg',
+                        },
+                    ],
+                    'birthdays': [
+                        {
+                            'name': 'Rin',
+                            'group': 'Alpha Group',
+                            'age': 23,
+                            'image': 'https://example.com/rin.jpg',
+                        }
+                    ],
+                    'anniversaries': [
+                        {
+                            'group': 'Alpha Group',
+                            'years': 5,
+                            'image': 'https://example.com/anniversary.jpg',
+                        }
+                    ],
+                }
+            },
+        )
+
+    def test_comeback_timeline_renders_with_low_query_count(self):
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(reverse('comeback_timeline'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertLess(len(queries), 20)
+        self.assertContains(response, 'COMEBACK')
+
+    def test_release_drawer_endpoint_returns_expected_payload(self):
+        timeline_response = self.client.get(reverse('comeback_timeline'))
+        self.assertEqual(timeline_response.status_code, 200)
+
+        today = timezone.localdate()
+        window_data = core_views._load_comeback_window_content(today, today.year, today.month)
+        release_id = window_data['all_releases'][0]['id']
+
+        response = self.client.get(
+            reverse('comeback_release_drawer_api', args=[release_id]),
+            {'year': today.year, 'month': today.month},
+        )
+        payload = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload['id'], release_id)
+        self.assertIn('same_day_lineup', payload)
+        self.assertIn('nearby_releases', payload)
+        self.assertIn('day_birthdays', payload)
+        self.assertIn('day_anniversaries', payload)
+
+    def test_day_drawer_endpoint_returns_expected_payload(self):
+        today = timezone.localdate()
+        response = self.client.get(
+            reverse('comeback_day_drawer_api', args=[today.isoformat()]),
+            {'year': today.year, 'month': today.month},
+        )
+        payload = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload['date_str'], today.isoformat())
+        self.assertEqual(payload['release_count'], 2)
+        self.assertEqual(payload['birthday_count'], 1)
+        self.assertEqual(payload['anniversary_count'], 1)
+
+    def test_comeback_window_cache_invalidates_on_data_update(self):
+        today = timezone.localdate()
+        first = core_views._load_comeback_window_content(today, today.year, today.month)
+        self.assertEqual(first['all_releases'][0]['title'], 'Signal Rush')
+
+        record = ComebackData.objects.get(year=today.year, month=today.month)
+        updated = dict(record.data)
+        updated[today.isoformat()] = dict(updated[today.isoformat()])
+        updated[today.isoformat()]['releases'] = [
+            {
+                'artist': 'Alpha Group',
+                'title': 'Updated Signal',
+                'type': 'Single',
+                'image': 'https://example.com/a.jpg',
+            }
+        ]
+        record.data = updated
+        record.save()
+
+        second = core_views._load_comeback_window_content(today, today.year, today.month)
+        self.assertEqual(second['all_releases'][0]['title'], 'Updated Signal')

@@ -20,6 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.core.cache import cache
 from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
@@ -7115,16 +7116,44 @@ def _extract_primary_artist_name(raw_artist):
     return re.sub(r'\s{2,}', ' ', primary).strip()
 
 
-def _find_group_for_artist_name(artist_name):
-    if not artist_name:
+def _normalize_group_lookup_name(value):
+    normalized = re.sub(r'\s+', ' ', str(value or '').strip().lower())
+    return normalized.strip(' -_|')
+
+
+def _build_group_lookup_resolver():
+    groups = list(KPopGroup.objects.only('slug', 'name', 'rank').order_by('rank', 'name'))
+    normalized_groups = []
+    exact_map = {}
+
+    for group in groups:
+        normalized_name = _normalize_group_lookup_name(group.name)
+        if not normalized_name:
+            continue
+        normalized_groups.append((normalized_name, group))
+        exact_map.setdefault(normalized_name, group)
+
+    def resolve(artist_name):
+        normalized_name = _normalize_group_lookup_name(artist_name)
+        if not normalized_name:
+            return None
+        if normalized_name in exact_map:
+            return exact_map[normalized_name]
+        for candidate_name, candidate_group in normalized_groups:
+            if candidate_name.startswith(normalized_name):
+                return candidate_group
+        for candidate_name, candidate_group in normalized_groups:
+            if normalized_name in candidate_name:
+                return candidate_group
         return None
-    exact = KPopGroup.objects.filter(name__iexact=artist_name).first()
-    if exact:
-        return exact
-    starts = KPopGroup.objects.filter(name__istartswith=artist_name).order_by('rank', 'name').first()
-    if starts:
-        return starts
-    return KPopGroup.objects.filter(name__icontains=artist_name).order_by('rank', 'name').first()
+
+    return resolve
+
+
+def _find_group_for_artist_name(artist_name, resolver=None):
+    if resolver:
+        return resolver(artist_name)
+    return _build_group_lookup_resolver()(artist_name)
 
 
 def _comeback_relative_label(target_date, today):
@@ -7154,11 +7183,11 @@ def _comeback_release_article_slug(date_key, artist_name, title):
     return base or hashlib.md5(f'{date_key}:{artist_name}:{title}'.encode('utf-8')).hexdigest()[:18]
 
 
-def _build_comeback_release_item(raw_release, date_key, today):
+def _build_comeback_release_item(raw_release, date_key, today, resolver=None):
     date_obj = datetime.strptime(date_key, '%Y-%m-%d').date()
     artist_display = str(raw_release.get('artist') or '').strip()
     primary_artist = _extract_primary_artist_name(artist_display) or artist_display
-    group = _find_group_for_artist_name(primary_artist)
+    group = _find_group_for_artist_name(primary_artist, resolver=resolver)
     type_label = str(raw_release.get('type') or 'Release').strip() or 'Release'
     title = str(raw_release.get('title') or 'Untitled release').strip() or 'Untitled release'
     base_id = f"{date_key}:{artist_display}:{title}:{type_label}"
@@ -7189,7 +7218,7 @@ def _build_comeback_release_item(raw_release, date_key, today):
     }
 
 
-def _build_comeback_event_item(raw_item, date_key, today, kind):
+def _build_comeback_event_item(raw_item, date_key, today, kind, resolver=None):
     date_obj = datetime.strptime(date_key, '%Y-%m-%d').date()
     if kind == 'birthday':
         label = str(raw_item.get('name') or 'Birthday').strip()
@@ -7208,7 +7237,7 @@ def _build_comeback_event_item(raw_item, date_key, today, kind):
         detail = f"{years} year anniversary" if years else 'Anniversary spotlight'
         lookup_name = label
 
-    group = _find_group_for_artist_name(lookup_name)
+    group = _find_group_for_artist_name(lookup_name, resolver=resolver)
     return {
         'kind': kind,
         'label': label or ('Birthday' if kind == 'birthday' else 'Anniversary'),
@@ -7219,6 +7248,93 @@ def _build_comeback_event_item(raw_item, date_key, today, kind):
         'weekday_label': date_obj.strftime('%A'),
         'relative_label': _comeback_relative_label(date_obj, today),
         'href': reverse('idol_page', args=[group.slug]) if group else '',
+    }
+
+
+def _serialize_comeback_release_summary(release, releases_by_date):
+    same_day_count = len(releases_by_date.get(release['date_str'], []))
+    if same_day_count <= 1:
+        signal_label = 'Only release that day'
+    elif same_day_count == 2:
+        signal_label = 'Part of a double-release day'
+    else:
+        signal_label = f"Same-day competition: {same_day_count} releases"
+
+    summary = dict(release)
+    summary['signal_label'] = signal_label
+    return summary
+
+
+def _build_comeback_release_drawer_payload(release_id, window_data):
+    release = window_data['releases_by_id'].get(release_id)
+    if not release:
+        return None
+
+    release_date = datetime.strptime(release['date_str'], '%Y-%m-%d').date()
+    same_day_releases = window_data['releases_by_date'].get(release['date_str'], [])
+    same_day_lineup = [
+        {
+            'title': candidate['title'],
+            'artist': candidate['artist'],
+            'type': candidate['type'],
+            'artist_href': candidate['artist_href'],
+            'is_current': candidate['id'] == release['id'],
+        }
+        for candidate in same_day_releases
+    ]
+
+    nearby_releases = []
+    for candidate in window_data['all_releases']:
+        if candidate['id'] == release['id']:
+            continue
+        candidate_date = datetime.strptime(candidate['date_str'], '%Y-%m-%d').date()
+        diff = (candidate_date - release_date).days
+        if 1 <= diff <= 7:
+            nearby_releases.append({
+                'title': candidate['title'],
+                'artist': candidate['artist'],
+                'type': candidate['type'],
+                'date_str': candidate['date_str'],
+                'date_label': candidate['date_label'],
+                'artist_href': candidate['artist_href'],
+                'offset_label': f'+{diff}d',
+            })
+    nearby_releases.sort(key=lambda item: (item['date_str'], item['artist'], item['title']))
+
+    payload = _serialize_comeback_release_summary(release, window_data['releases_by_date'])
+    payload['same_day_lineup'] = same_day_lineup
+    payload['nearby_releases'] = nearby_releases[:6]
+    payload['day_birthdays'] = window_data['birthdays_by_date'].get(release['date_str'], [])
+    payload['day_anniversaries'] = window_data['anniversaries_by_date'].get(release['date_str'], [])
+    return payload
+
+
+def _build_comeback_day_payload(date_key, window_data):
+    date_obj = datetime.strptime(date_key, '%Y-%m-%d').date()
+    day_releases = window_data['releases_by_date'].get(date_key, [])
+    day_birthdays = window_data['birthdays_by_date'].get(date_key, [])
+    day_anniversaries = window_data['anniversaries_by_date'].get(date_key, [])
+
+    return {
+        'date_str': date_key,
+        'date_label': date_obj.strftime('%d %b %Y'),
+        'weekday_label': date_obj.strftime('%A'),
+        'release_count': len(day_releases),
+        'birthday_count': len(day_birthdays),
+        'anniversary_count': len(day_anniversaries),
+        'releases': [
+            {
+                'id': item['id'],
+                'title': item['title'],
+                'artist': item['artist'],
+                'type': item['type'],
+                'artist_href': item['artist_href'],
+                'article_href': item['article_href'],
+            }
+            for item in day_releases
+        ],
+        'birthdays': day_birthdays,
+        'anniversaries': day_anniversaries,
     }
 
 
@@ -7244,10 +7360,28 @@ def _comeback_window_months(today, nav_year=None, nav_month=None):
 
 
 def _load_comeback_window_content(today, nav_year=None, nav_month=None):
+    window_months = _comeback_window_months(today, nav_year, nav_month)
     month_records = {}
-    for year, month in _comeback_window_months(today, nav_year, nav_month):
-        month_records[(year, month)] = ComebackData.objects.filter(year=year, month=month).first()
+    month_fingerprint = []
+    for year, month in window_months:
+        data_obj = ComebackData.objects.filter(year=year, month=month).first()
+        month_records[(year, month)] = data_obj
+        month_fingerprint.append(
+            f"{year:04d}-{month:02d}:{data_obj.last_updated.isoformat() if data_obj else 'none'}"
+        )
 
+    cache_source = '|'.join([
+        today.isoformat(),
+        str(nav_year or ''),
+        str(nav_month or ''),
+        *month_fingerprint,
+    ])
+    cache_key = f"comeback-window:{hashlib.md5(cache_source.encode('utf-8')).hexdigest()}"
+    cached_payload = cache.get(cache_key)
+    if cached_payload:
+        return cached_payload
+
+    resolver = _build_group_lookup_resolver()
     all_releases = []
     all_birthdays = []
     all_anniversaries = []
@@ -7257,31 +7391,32 @@ def _load_comeback_window_content(today, nav_year=None, nav_month=None):
         for date_key, details in sorted((data_obj.data or {}).items()):
             day_payload = details or {}
             for raw_release in day_payload.get('releases', []) or []:
-                all_releases.append(_build_comeback_release_item(raw_release, date_key, today))
+                all_releases.append(_build_comeback_release_item(raw_release, date_key, today, resolver=resolver))
             for raw_birthday in day_payload.get('birthdays', []) or []:
-                all_birthdays.append(_build_comeback_event_item(raw_birthday, date_key, today, 'birthday'))
+                all_birthdays.append(_build_comeback_event_item(raw_birthday, date_key, today, 'birthday', resolver=resolver))
             for raw_anniversary in day_payload.get('anniversaries', []) or []:
-                all_anniversaries.append(_build_comeback_event_item(raw_anniversary, date_key, today, 'anniversary'))
+                all_anniversaries.append(_build_comeback_event_item(raw_anniversary, date_key, today, 'anniversary', resolver=resolver))
 
     all_releases.sort(key=lambda item: (item['date_str'], item['artist_primary'], item['title']))
     all_birthdays.sort(key=lambda item: (item['date_str'], item['label']))
     all_anniversaries.sort(key=lambda item: (item['date_str'], item['label']))
 
-    releases_by_date = defaultdict(list)
-    birthdays_by_date = defaultdict(list)
-    anniversaries_by_date = defaultdict(list)
+    releases_by_date = {}
+    birthdays_by_date = {}
+    anniversaries_by_date = {}
     releases_by_article_slug = {}
+    releases_by_id = {}
 
     for release in all_releases:
-        releases_by_date[release['date_str']].append(release)
+        releases_by_date.setdefault(release['date_str'], []).append(release)
         releases_by_article_slug[release['article_slug']] = release
+        releases_by_id[release['id']] = release
     for birthday in all_birthdays:
-        birthdays_by_date[birthday['date_str']].append(birthday)
+        birthdays_by_date.setdefault(birthday['date_str'], []).append(birthday)
     for anniversary in all_anniversaries:
-        anniversaries_by_date[anniversary['date_str']].append(anniversary)
+        anniversaries_by_date.setdefault(anniversary['date_str'], []).append(anniversary)
 
-    return {
-        'month_records': month_records,
+    payload = {
         'all_releases': all_releases,
         'all_birthdays': all_birthdays,
         'all_anniversaries': all_anniversaries,
@@ -7289,7 +7424,10 @@ def _load_comeback_window_content(today, nav_year=None, nav_month=None):
         'birthdays_by_date': birthdays_by_date,
         'anniversaries_by_date': anniversaries_by_date,
         'releases_by_article_slug': releases_by_article_slug,
+        'releases_by_id': releases_by_id,
     }
+    cache.set(cache_key, payload, 900)
+    return payload
 
 
 def _comeback_type_reader_copy(type_label):
@@ -10482,54 +10620,13 @@ def comeback_timeline(request):
     releases_by_date = window_data['releases_by_date']
     birthdays_by_date = window_data['birthdays_by_date']
     anniversaries_by_date = window_data['anniversaries_by_date']
-
-    for release in all_releases:
-        release_date = datetime.strptime(release['date_str'], '%Y-%m-%d').date()
-        same_day_releases = releases_by_date.get(release['date_str'], [])
-        same_day_lineup = []
-        for candidate in same_day_releases:
-            same_day_lineup.append({
-                'title': candidate['title'],
-                'artist': candidate['artist'],
-                'type': candidate['type'],
-                'artist_href': candidate['artist_href'],
-                'is_current': candidate['id'] == release['id'],
-            })
-
-        nearby_releases = []
-        for candidate in all_releases:
-            if candidate['id'] == release['id']:
-                continue
-            candidate_date = datetime.strptime(candidate['date_str'], '%Y-%m-%d').date()
-            diff = (candidate_date - release_date).days
-            if 1 <= diff <= 7:
-                nearby_releases.append({
-                    'title': candidate['title'],
-                    'artist': candidate['artist'],
-                    'type': candidate['type'],
-                    'date_str': candidate['date_str'],
-                    'date_label': candidate['date_label'],
-                    'artist_href': candidate['artist_href'],
-                    'offset_label': f'+{diff}d',
-                })
-        nearby_releases.sort(key=lambda item: (item['date_str'], item['artist'], item['title']))
-
-        if len(same_day_releases) == 1:
-            signal_label = 'Only release that day'
-        elif len(same_day_releases) == 2:
-            signal_label = 'Part of a double-release day'
-        else:
-            signal_label = f"Same-day competition: {len(same_day_releases)} releases"
-
-        release['same_day_lineup'] = same_day_lineup
-        release['nearby_releases'] = nearby_releases[:6]
-        release['signal_label'] = signal_label
-        release['day_birthdays'] = birthdays_by_date.get(release['date_str'], [])
-        release['day_anniversaries'] = anniversaries_by_date.get(release['date_str'], [])
-
-    upcoming_releases = [item for item in all_releases if item['days_until'] >= 0]
+    release_summaries = [
+        _serialize_comeback_release_summary(release, releases_by_date)
+        for release in all_releases
+    ]
+    upcoming_releases = [item for item in release_summaries if item['days_until'] >= 0]
     recent_releases = sorted(
-        [item for item in all_releases if -14 <= item['days_until'] < 0],
+        [item for item in release_summaries if -14 <= item['days_until'] < 0],
         key=lambda item: (item['date_str'], item['artist_primary'], item['title']),
         reverse=True,
     )[:8]
@@ -10601,7 +10698,6 @@ def comeback_timeline(request):
     first_weekday, num_days = py_calendar.monthrange(nav_year, nav_month)
     empty_cells = (first_weekday + 1) % 7
     calendar_days = [{'empty': True} for _ in range(empty_cells)]
-    day_summaries = {}
     selected_month_release_count = 0
     selected_month_birthday_count = 0
     selected_month_anniversary_count = 0
@@ -10622,26 +10718,6 @@ def comeback_timeline(request):
                 'label': date_obj.strftime('%d %b'),
                 'count': len(day_releases),
             }
-
-        day_summaries[day_key] = {
-            'date_str': day_key,
-            'date_label': date_obj.strftime('%d %b %Y'),
-            'weekday_label': date_obj.strftime('%A'),
-            'release_count': len(day_releases),
-            'birthday_count': len(day_birthdays),
-            'anniversary_count': len(day_anniversaries),
-            'releases': [
-                {
-                    'title': item['title'],
-                    'artist': item['artist'],
-                    'type': item['type'],
-                    'artist_href': item['artist_href'],
-                }
-                for item in day_releases
-            ],
-            'birthdays': day_birthdays,
-            'anniversaries': day_anniversaries,
-        }
 
         calendar_days.append({
             'empty': False,
@@ -10674,25 +10750,14 @@ def comeback_timeline(request):
         'current_month_label': today.strftime('%B %Y'),
     }
 
-    drawer_releases = []
-    seen_release_ids = set()
-    for release in all_releases:
-        if release['id'] in seen_release_ids:
-            continue
-        if -14 <= release['days_until'] <= 60:
-            drawer_releases.append(release)
-            seen_release_ids.add(release['id'])
-
     return render(request, 'core/comebacks.html', {
         'primary_release': primary_release,
         'hero_queue': hero_queue,
         'timeline_releases': timeline_releases,
         'secondary_events': secondary_events,
         'calendar_days': calendar_days,
-        'day_summaries': day_summaries,
         'recent_releases': recent_releases,
         'month_stats': month_stats,
-        'drawer_releases': drawer_releases,
         'month_label': month_label,
         'nav_year': nav_year,
         'nav_month': nav_month,
@@ -10700,7 +10765,39 @@ def comeback_timeline(request):
         'prev_month': prev_month,
         'next_year': next_year,
         'next_month': next_month,
+        'comeback_release_api_base': reverse('comeback_release_drawer_api', kwargs={'release_id': 'release-id-placeholder'}).replace('release-id-placeholder', ''),
+        'comeback_day_api_base': reverse('comeback_day_drawer_api', kwargs={'date_str': 'date-placeholder'}).replace('date-placeholder', ''),
     })
+
+
+def comeback_release_drawer_api(request, release_id):
+    now = timezone.localtime()
+    today = now.date()
+    try:
+        nav_year = int(request.GET.get('year', now.year))
+        nav_month = int(request.GET.get('month', now.month))
+    except (ValueError, TypeError):
+        nav_year, nav_month = now.year, now.month
+
+    window_data = _load_comeback_window_content(today, nav_year, nav_month)
+    payload = _build_comeback_release_drawer_payload(release_id, window_data)
+    if not payload:
+        raise Http404("Release not found.")
+    return JsonResponse(payload)
+
+
+def comeback_day_drawer_api(request, date_str):
+    now = timezone.localtime()
+    today = now.date()
+    try:
+        nav_year = int(request.GET.get('year', now.year))
+        nav_month = int(request.GET.get('month', now.month))
+    except (ValueError, TypeError):
+        nav_year, nav_month = now.year, now.month
+
+    window_data = _load_comeback_window_content(today, nav_year, nav_month)
+    payload = _build_comeback_day_payload(date_str, window_data)
+    return JsonResponse(payload)
 
 
 def comeback_release_article(request, article_slug):
