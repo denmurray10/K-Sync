@@ -209,6 +209,99 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .hero-title-balance {
         max-width: 10ch;
     }
+    .sync-wave-shell {
+        --wave-progress: 0%;
+        position: relative;
+        height: 64px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.08);
+        background:
+            radial-gradient(circle at 18% 50%, rgba(255,255,255,0.05), transparent 24%),
+            linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    }
+    .sync-wave-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%),
+            linear-gradient(90deg, rgba(255,255,255,0.06), transparent 12%, transparent 88%, rgba(255,255,255,0.06));
+        pointer-events: none;
+    }
+    .sync-wave-shell.is-live .sync-wave-scan {
+        opacity: 1;
+        animation: sync-wave-scan 2.8s linear infinite;
+    }
+    .sync-wave-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.16;
+    }
+    .sync-wave-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        opacity: 0.96;
+    }
+    .sync-wave-track {
+        fill: none;
+        stroke: rgba(255,255,255,0.16);
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
+    .sync-wave-progress-group {
+        clip-path: inset(0 calc(100% - var(--wave-progress)) 0 0);
+        transition: clip-path 0.25s ease;
+    }
+    .sync-wave-progress {
+        fill: none;
+        stroke: url(#sync-wave-gradient-main);
+        stroke-width: 3.6;
+        stroke-linecap: round;
+        filter: drop-shadow(0 0 14px rgba(244, 37, 192, 0.32)) drop-shadow(0 0 24px rgba(0, 240, 255, 0.22));
+    }
+    .sync-wave-glow {
+        fill: none;
+        stroke: url(#sync-wave-gradient-glow);
+        stroke-width: 10;
+        opacity: 0.28;
+        filter: blur(10px);
+        stroke-linecap: round;
+    }
+    .sync-wave-scan {
+        position: absolute;
+        top: 10px;
+        bottom: 10px;
+        left: -14%;
+        width: 18%;
+        opacity: 0;
+        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 18%, rgba(244,37,192,0.24) 42%, rgba(0,240,255,0.24) 76%, transparent 100%);
+        filter: blur(10px);
+        pointer-events: none;
+    }
+    .sync-wave-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .sync-wave-pulse {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+    .sync-wave-pulse-dot {
+        width: 0.45rem;
+        height: 0.45rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #f425c0, #00f0ff);
+        box-shadow: 0 0 12px rgba(244, 37, 192, 0.42);
+        animation: sync-wave-pulse 1.8s ease-in-out infinite;
+    }
     @keyframes pulse-glow {
         0%, 100% { box-shadow: 0 0 0 rgba(244, 37, 192, 0); }
         50% { box-shadow: 0 0 24px rgba(244, 37, 192, 0.22); }
@@ -232,6 +325,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     @keyframes chat-slide {
         from { opacity: 0; transform: translateX(14px); }
         to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes sync-wave-scan {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(660%); }
+    }
+    @keyframes sync-wave-pulse {
+        0%, 100% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1.14); opacity: 1; }
     }
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after {
@@ -277,7 +378,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 {% include 'core/header.html' %}
 
-<audio id="live-audio" preload="auto" {% if current_track and current_track.audio_url %}src="{{ current_track.audio_url }}"{% endif %}>
+<audio id="live-audio" preload="auto" crossorigin="anonymous" {% if current_track and current_track.audio_url %}src="{{ current_track.audio_url }}"{% endif %}>
     {% if current_track and current_track.audio_url %}
     <source src="{{ current_track.audio_url }}" {% with lower_audio_url=current_track.audio_url|lower %}type="{% if '.m4a' in lower_audio_url %}audio/mp4{% elif '.wav' in lower_audio_url %}audio/wav{% elif '.flac' in lower_audio_url %}audio/flac{% else %}audio/mpeg{% endif %}"{% endwith %}>
     {% endif %}
@@ -387,11 +488,37 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">Playback Sync</p>
                                 <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-primary">Live Feed</p>
                             </div>
-                            <div class="mt-4 h-1.5 bg-white/10 overflow-hidden">
-                                <div id="live-progress-fill" class="h-full bg-gradient-to-r from-primary to-white/80 transition-[width] duration-200" style="width: 0%"></div>
+                            <div id="live-progress-shell" class="sync-wave-shell mt-4 is-live" style="--wave-progress: 0%;">
+                                <canvas id="live-progress-canvas" class="sync-wave-canvas" aria-hidden="true"></canvas>
+                                <svg class="sync-wave-svg" viewBox="0 0 1200 96" preserveAspectRatio="none" aria-hidden="true">
+                                    <defs>
+                                        <linearGradient id="sync-wave-gradient-main" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#ffd36b"></stop>
+                                            <stop offset="28%" stop-color="#ff6aa6"></stop>
+                                            <stop offset="50%" stop-color="#f425c0"></stop>
+                                            <stop offset="72%" stop-color="#6d4cff"></stop>
+                                            <stop offset="100%" stop-color="#00f0ff"></stop>
+                                        </linearGradient>
+                                        <linearGradient id="sync-wave-gradient-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#ffd36b"></stop>
+                                            <stop offset="45%" stop-color="#f425c0"></stop>
+                                            <stop offset="100%" stop-color="#00f0ff"></stop>
+                                        </linearGradient>
+                                    </defs>
+                                    <path class="sync-wave-track" d="M0 48 C42 48 64 48 84 48 C104 48 118 45 136 38 C154 31 172 26 190 30 C210 34 224 48 242 48 C260 48 278 18 298 18 C320 18 336 48 356 48 C378 48 392 28 412 28 C434 28 452 62 472 62 C492 62 512 22 536 22 C560 22 580 48 600 48 C620 48 638 18 658 18 C680 18 698 56 718 56 C740 56 760 34 778 34 C798 34 818 22 836 24 C854 26 872 64 894 64 C916 64 936 18 960 18 C984 18 1004 62 1028 62 C1048 62 1066 36 1084 36 C1104 36 1120 48 1140 48 C1160 48 1180 48 1200 48"></path>
+                                    <path class="sync-wave-glow" d="M0 48 C42 48 64 48 84 48 C104 48 118 45 136 38 C154 31 172 26 190 30 C210 34 224 48 242 48 C260 48 278 18 298 18 C320 18 336 48 356 48 C378 48 392 28 412 28 C434 28 452 62 472 62 C492 62 512 22 536 22 C560 22 580 48 600 48 C620 48 638 18 658 18 C680 18 698 56 718 56 C740 56 760 34 778 34 C798 34 818 22 836 24 C854 26 872 64 894 64 C916 64 936 18 960 18 C984 18 1004 62 1028 62 C1048 62 1066 36 1084 36 C1104 36 1120 48 1140 48 C1160 48 1180 48 1200 48"></path>
+                                    <g id="live-progress-fill" class="sync-wave-progress-group">
+                                        <path class="sync-wave-progress" d="M0 48 C42 48 64 48 84 48 C104 48 118 45 136 38 C154 31 172 26 190 30 C210 34 224 48 242 48 C260 48 278 18 298 18 C320 18 336 48 356 48 C378 48 392 28 412 28 C434 28 452 62 472 62 C492 62 512 22 536 22 C560 22 580 48 600 48 C620 48 638 18 658 18 C680 18 698 56 718 56 C740 56 760 34 778 34 C798 34 818 22 836 24 C854 26 872 64 894 64 C916 64 936 18 960 18 C984 18 1004 62 1028 62 C1048 62 1066 36 1084 36 C1104 36 1120 48 1140 48 C1160 48 1180 48 1200 48"></path>
+                                    </g>
+                                </svg>
+                                <div class="sync-wave-scan"></div>
                             </div>
-                            <div class="mt-3 flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                            <div class="sync-wave-meta mt-3 text-[11px] uppercase tracking-[0.22em] text-slate-500">
                                 <span id="live-progress-current">0:00</span>
+                                <span class="sync-wave-pulse">
+                                    <span class="sync-wave-pulse-dot"></span>
+                                    <span>Frequency Sync</span>
+                                </span>
                                 <span id="live-progress-total">{% if current_track %}{{ current_track.duration }}{% else %}3:00{% endif %}</span>
                             </div>
                         </div>
@@ -1075,6 +1202,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const audio = document.getElementById('live-audio');
         const voiceAudio = document.getElementById('live-vo-audio');
         const progressFillEl = document.getElementById('live-progress-fill');
+        const progressShellEl = document.getElementById('live-progress-shell');
+        const progressCanvasEl = document.getElementById('live-progress-canvas');
         const progressCurrentEl = document.getElementById('live-progress-current');
         const progressTotalEl = document.getElementById('live-progress-total');
 
@@ -1102,6 +1231,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             let playbackGuardInterval = null;
             let mainFadeInterval = null;
             const pageLoadTime = Date.now();
+            let waveAnimationFrame = null;
+            let waveAudioContext = null;
+            let waveAnalyser = null;
+            let waveData = null;
+            let waveSourceNode = null;
+            let waveUsesRealAudio = false;
+            let lastWaveProgress = 38;
             const shareNowPlayingBtn = document.getElementById('share-now-playing-btn');
             const shareNowPlayingStatus = document.getElementById('share-now-playing-status');
             const saveMomentBtn = document.getElementById('save-moment-btn');
@@ -1160,6 +1296,165 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 }
                 return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            const resizeWaveCanvas = () => {
+                if (!progressCanvasEl || !progressShellEl) return;
+                const rect = progressShellEl.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                progressCanvasEl.width = Math.max(1, Math.floor(rect.width * dpr));
+                progressCanvasEl.height = Math.max(1, Math.floor(rect.height * dpr));
+            };
+
+            const drawWaveformFrame = () => {
+                if (!progressCanvasEl || !progressShellEl) return;
+                const ctx = progressCanvasEl.getContext('2d');
+                if (!ctx) return;
+
+                const width = progressCanvasEl.width;
+                const height = progressCanvasEl.height;
+                if (!width || !height) return;
+
+                const dpr = window.devicePixelRatio || 1;
+                const cssWidth = width / dpr;
+                const cssHeight = height / dpr;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, width, height);
+                ctx.scale(dpr, dpr);
+
+                const now = performance.now() * 0.001;
+                const baseline = cssHeight * 0.5;
+
+                let energy = 0.24;
+                if (waveUsesRealAudio && waveAnalyser && waveData) {
+                    waveAnalyser.getByteFrequencyData(waveData);
+                    let total = 0;
+                    const sampleSize = Math.min(48, waveData.length);
+                    for (let i = 0; i < sampleSize; i += 1) {
+                        total += waveData[i];
+                    }
+                    energy = Math.max(0.12, Math.min(1, (total / Math.max(1, sampleSize)) / 255));
+                } else if (isPlaying) {
+                    energy = 0.28 + (Math.sin(now * 2.8) + 1) * 0.12;
+                }
+
+                const startX = 0;
+                const barCount = Math.max(40, Math.floor(cssWidth / 12));
+                const gap = 2;
+                const barWidth = Math.max(1.5, (cssWidth / barCount) - gap);
+                const activeGradient = ctx.createLinearGradient(startX, 0, cssWidth, 0);
+                activeGradient.addColorStop(0, '#ffd36b');
+                activeGradient.addColorStop(0.28, '#ff6aa6');
+                activeGradient.addColorStop(0.5, '#f425c0');
+                activeGradient.addColorStop(0.72, '#6d4cff');
+                activeGradient.addColorStop(1, '#00f0ff');
+
+                const glowGradient = ctx.createLinearGradient(startX, 0, cssWidth, 0);
+                glowGradient.addColorStop(0, 'rgba(255, 211, 107, 0.18)');
+                glowGradient.addColorStop(0.32, 'rgba(255, 106, 166, 0.24)');
+                glowGradient.addColorStop(0.55, 'rgba(244, 37, 192, 0.34)');
+                glowGradient.addColorStop(0.78, 'rgba(109, 76, 255, 0.28)');
+                glowGradient.addColorStop(1, 'rgba(0, 240, 255, 0.3)');
+
+                ctx.save();
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, baseline);
+                ctx.lineTo(cssWidth, baseline);
+                ctx.stroke();
+                ctx.restore();
+
+                const bars = [];
+                const halfCount = Math.ceil(barCount / 2);
+                const mirroredMagnitudes = [];
+                for (let i = 0; i < halfCount; i += 1) {
+                    const spreadPosition = i / Math.max(1, halfCount - 1);
+                    const centerBoost = 0.76 + (0.24 * Math.pow(1 - spreadPosition, 0.35));
+                    let magnitude = 0.16;
+                    if (waveUsesRealAudio && waveData) {
+                        const focusedIndex = Math.min(
+                            waveData.length - 1,
+                            Math.floor((spreadPosition ** 1.65) * (waveData.length - 1))
+                        );
+                        const neighborIndex = Math.min(waveData.length - 1, focusedIndex + 2);
+                        const focused = waveData[focusedIndex] / 255;
+                        const neighbor = waveData[neighborIndex] / 255;
+                        magnitude = (focused * 0.72) + (neighbor * 0.28);
+                    } else {
+                        magnitude =
+                            0.32
+                            + (Math.sin((spreadPosition * 14) + (now * 3.2)) * 0.18)
+                            + (Math.sin((spreadPosition * 34) - (now * 2.1)) * 0.1);
+                    }
+                    magnitude = Math.max(0.14, Math.min(1, magnitude * centerBoost));
+                    mirroredMagnitudes.push(magnitude);
+                }
+
+                for (let i = 0; i < barCount; i += 1) {
+                    const x = i * (barWidth + gap);
+                    const mirroredIndex = i < halfCount ? (halfCount - 1 - i) : (i - halfCount);
+                    const safeIndex = Math.max(0, Math.min(mirroredMagnitudes.length - 1, mirroredIndex));
+                    const spreadPosition = safeIndex / Math.max(1, halfCount - 1);
+                    const edgeFade = 0.56 + (0.44 * Math.pow(1 - spreadPosition, 0.36));
+                    const magnitude = mirroredMagnitudes[safeIndex];
+                    const barHeight = (cssHeight * 0.18) + (cssHeight * 0.6 * magnitude * edgeFade) + (cssHeight * energy * 0.1);
+                    bars.push({ x, height: barHeight });
+                }
+
+                ctx.save();
+                ctx.shadowBlur = 18;
+                ctx.shadowColor = 'rgba(244, 37, 192, 0.28)';
+                ctx.fillStyle = glowGradient;
+                bars.forEach((bar) => {
+                    const top = baseline - (bar.height * 0.5);
+                    ctx.fillRect(bar.x, top, barWidth, bar.height);
+                });
+                ctx.restore();
+
+                ctx.save();
+                ctx.fillStyle = activeGradient;
+                bars.forEach((bar) => {
+                    const top = baseline - (bar.height * 0.5);
+                    ctx.fillRect(bar.x, top, barWidth, bar.height);
+                });
+                ctx.restore();
+
+                waveAnimationFrame = window.requestAnimationFrame(drawWaveformFrame);
+            };
+
+            const startWaveform = () => {
+                if (!progressCanvasEl || waveAnimationFrame) return;
+                resizeWaveCanvas();
+                waveAnimationFrame = window.requestAnimationFrame(drawWaveformFrame);
+            };
+
+            const stopWaveform = () => {
+                if (!waveAnimationFrame) return;
+                window.cancelAnimationFrame(waveAnimationFrame);
+                waveAnimationFrame = null;
+            };
+
+            const setupWaveAnalyser = async () => {
+                if (!window.AudioContext || waveAnalyser || !audio) return;
+                try {
+                    waveAudioContext = waveAudioContext || new window.AudioContext();
+                    if (waveAudioContext.state === 'suspended') {
+                        await waveAudioContext.resume();
+                    }
+                    if (!waveSourceNode) {
+                        waveSourceNode = waveAudioContext.createMediaElementSource(audio);
+                        waveAnalyser = waveAudioContext.createAnalyser();
+                        waveAnalyser.fftSize = 256;
+                        waveAnalyser.smoothingTimeConstant = 0.82;
+                        waveData = new Uint8Array(waveAnalyser.frequencyBinCount);
+                        waveSourceNode.connect(waveAnalyser);
+                        waveAnalyser.connect(waveAudioContext.destination);
+                    }
+                    waveUsesRealAudio = true;
+                } catch (error) {
+                    waveUsesRealAudio = false;
+                }
             };
 
             const normalizeTitleKey = (value) => String(value || '').trim().toLowerCase();
@@ -1939,13 +2234,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         progressTotalEl.textContent = formatClock(duration);
                     }
                     const pct = Math.max(0, Math.min(100, (safeCurrent / duration) * 100));
-                    if (progressFillEl) {
-                        progressFillEl.style.width = `${pct}%`;
+                    lastWaveProgress = pct;
+                    if (progressShellEl) {
+                        progressShellEl.style.setProperty('--wave-progress', `${pct}%`);
+                        progressShellEl.classList.remove('is-live');
                     }
-                } else if (progressFillEl) {
-                    progressFillEl.style.width = '0%';
+                    if (progressFillEl) {
+                        progressFillEl.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+                    }
+                } else {
+                    lastWaveProgress = 38;
+                    if (progressShellEl) {
+                        progressShellEl.style.setProperty('--wave-progress', '38%');
+                        progressShellEl.classList.add('is-live');
+                    }
+                    if (progressFillEl) {
+                        progressFillEl.style.clipPath = 'inset(0 62% 0 0)';
+                    }
                 }
             };
+
+            startWaveform();
+            window.addEventListener('resize', resizeWaveCanvas);
 
             const getSliderVolume = () => {
                 if (!volumeSlider) return 0.75;
@@ -2187,11 +2497,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                         applyMutedState(false);
                         await audio.play();
+                        await setupWaveAnalyser();
                         syncAudio();
                     } catch (error) {
                         try {
                             applyMutedState(true);
                             await audio.play();
+                            await setupWaveAnalyser();
                             syncAudio();
                             playBtn.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
                             playBtn.classList.add('pulse-glow');
@@ -2250,7 +2562,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 volumeMuteBtn.addEventListener('click', () => {
                     const wasMuted = audio.muted || getSliderVolume() <= 0;
                     applyMutedState(!wasMuted);
-                    if (wasMuted && isPlaying) {
+                if (wasMuted && isPlaying) {
+                        setupWaveAnalyser();
                         syncAudio();
                         playBtn.querySelector('.material-symbols-outlined').textContent = 'pause';
                         playBtn.classList.remove('pulse-glow');
@@ -2392,6 +2705,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
 
             audio.addEventListener('ended', () => triggerRotate('ended'));
+            audio.addEventListener('play', () => {
+                isPlaying = true;
+                setupWaveAnalyser();
+                startWaveform();
+            });
+            audio.addEventListener('pause', () => {
+                if (!audio.ended) {
+                    isPlaying = false;
+                }
+                startWaveform();
+            });
             updateProgressUI(initialServerOffset || 0);
             updatePlaylistUI('up-next-container', currentUpNextTracks, 'primary');
             updateUpNextCountdownTimers();
