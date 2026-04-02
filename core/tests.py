@@ -351,7 +351,22 @@ class RadioCoIntegrationTests(TestCase):
                 'start_time': '2026-04-02T10:00:00Z',
             }
         }
-        mock_get.side_effect = [station_response, track_response]
+        status_response = Mock()
+        status_response.raise_for_status.return_value = None
+        status_response.json.return_value = {
+            'current_track': {'title': 'Radio Artist - Radio Song'},
+            'history': [
+                {'title': 'Radio Artist - Radio Song'},
+                {'title': 'SEVENTEEN - Adore U'},
+                {'title': 'EXO - Growl'},
+                {'title': 'SHINee - View'},
+                {'title': 'TAEMIN - Move'},
+                {'title': 'Red Velvet - Psycho'},
+                {'title': 'Broadcast Starting'},
+            ],
+            'logo_url': 'https://example.com/logo.jpg',
+        }
+        mock_get.side_effect = [station_response, track_response, status_response]
 
         with self.settings(
             RADIOCO_ENABLED=True,
@@ -367,6 +382,9 @@ class RadioCoIntegrationTests(TestCase):
         self.assertEqual(payload['current_track']['title'], 'Radio Song')
         self.assertEqual(payload['current_track']['artist'], 'Radio Artist')
         self.assertEqual(payload['current_track']['audio_url'], 'https://streaming.radio.co/test/listen')
+        self.assertEqual(len(payload['recently_played']), 5)
+        self.assertEqual(payload['recently_played'][0]['artist'], 'SEVENTEEN')
+        self.assertEqual(payload['recently_played'][0]['title'], 'Adore U')
 
     @patch('core.views.requests.get')
     @patch('core.views._build_live_show_snapshot')
@@ -390,7 +408,17 @@ class RadioCoIntegrationTests(TestCase):
                 'artwork_urls': {'large': 'https://example.com/art.jpg'},
             }
         }
-        mock_get.side_effect = [station_response, track_response]
+        status_response = Mock()
+        status_response.raise_for_status.return_value = None
+        status_response.json.return_value = {
+            'current_track': {'title': 'Radio Artist - Radio Song'},
+            'history': [
+                {'title': 'NCT 127 - Fact Check'},
+                {'title': 'ATEEZ - Wave'},
+            ],
+            'logo_url': 'https://example.com/logo.jpg',
+        }
+        mock_get.side_effect = [station_response, track_response, status_response]
 
         with self.settings(
             RADIOCO_ENABLED=True,
@@ -402,3 +430,4 @@ class RadioCoIntegrationTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Radio Song')
+        self.assertContains(response, 'Fact Check')

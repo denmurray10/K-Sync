@@ -354,6 +354,13 @@ def _radioco_current_track_info():
     return _radioco_fetch_json(f"/api/v2/{station_id}/track/current", 'track-current', ttl=8)
 
 
+def _radioco_public_status():
+    station_id = str(getattr(settings, 'RADIOCO_STATION_ID', '') or '').strip()
+    if not station_id:
+        return None
+    return _radioco_fetch_json(f"/stations/{station_id}/status", 'status', ttl=8)
+
+
 def _radioco_track_payload_root(payload):
     if isinstance(payload, dict):
         for key in ('data', 'track', 'current_track', 'currentTrack'):
@@ -379,6 +386,78 @@ def _radioco_track_artwork(track_payload):
         return artwork
     artwork_urls = track_payload.get('artwork_urls') if isinstance(track_payload.get('artwork_urls'), dict) else {}
     return _radioco_pick_first(artwork_urls, 'large', 'medium', 'small')
+
+
+def _radioco_split_artist_and_title(raw_title, raw_artist=''):
+    title = str(raw_title or '').strip()
+    artist = str(raw_artist or '').strip()
+    if title and not artist:
+        for separator in (' - ', ' – ', ' — ', ' | '):
+            if separator in title:
+                maybe_artist, maybe_title = title.split(separator, 1)
+                if maybe_artist.strip() and maybe_title.strip():
+                    return maybe_title.strip(), maybe_artist.strip()
+    return title, artist
+
+
+def _radioco_track_display_parts(track_payload):
+    root = _radioco_track_payload_root(track_payload)
+    raw_title = _radioco_pick_first(root, 'title', 'name')
+    raw_artist = _radioco_pick_first(root, 'artist', 'artist_name', 'subtitle')
+    title, artist = _radioco_split_artist_and_title(raw_title, raw_artist)
+    return title.strip(), artist.strip()
+
+
+def _radioco_recently_played_tracks(limit=5):
+    if not _radioco_is_enabled():
+        return []
+
+    station_payload = _radioco_station_info() or {}
+    status_payload = _radioco_public_status() or {}
+    history = status_payload.get('history') if isinstance(status_payload, dict) else []
+    if not isinstance(history, list):
+        history = []
+
+    current_title, current_artist = _radioco_track_display_parts(
+        status_payload.get('current_track') if isinstance(status_payload, dict) else {}
+    )
+    current_key = f"{current_artist.lower()}::{current_title.lower()}".strip(':')
+    station_root = _radioco_track_payload_root(station_payload)
+    default_artwork = _coalesce_stream_image_url(
+        _radioco_pick_first(status_payload, 'logo_url', 'logo'),
+        _radioco_pick_first(station_root, 'logo', 'logo_url', 'image'),
+    )
+
+    results = []
+    seen = set()
+    placeholder_titles = {'broadcast starting', 'starting soon', 'k-beats live'}
+    for item in history:
+        title, artist = _radioco_track_display_parts(item if isinstance(item, dict) else {'title': item})
+        if not title:
+            continue
+        if title.strip().lower() in placeholder_titles:
+            continue
+
+        item_key = f"{artist.lower()}::{title.lower()}".strip(':')
+        if item_key == current_key or item_key in seen:
+            continue
+        seen.add(item_key)
+
+        item_root = _radioco_track_payload_root(item if isinstance(item, dict) else {})
+        results.append(SimpleNamespace(
+            id=None,
+            pk=None,
+            title=title,
+            artist=artist or 'On Air',
+            album_art=_coalesce_stream_image_url(_radioco_track_artwork(item_root), default_artwork),
+            audio_url='',
+            duration='',
+            duration_seconds=0,
+        ))
+        if len(results) >= limit:
+            break
+
+    return results
 
 
 def _radioco_stream_url(station_payload=None):
@@ -8606,6 +8685,7 @@ def _build_live_page_context(request):
 
     if _radioco_is_enabled():
         current_track = _radioco_current_track_namespace()
+        recently_played_tracks = _radioco_recently_played_tracks(limit=5)
         _record_live_track_play(request, current_track)
         live_show_snapshot = _build_live_show_snapshot(timezone.localtime())
         live_request_momentum = _build_live_request_momentum(
@@ -8630,7 +8710,7 @@ def _build_live_page_context(request):
             'current_track_duration_seconds': 0,
             'current_voice_overlay_json': 'null',
             'up_next_tracks': [],
-            'recently_played_tracks': [],
+            'recently_played_tracks': recently_played_tracks,
             'live_show_snapshot': live_show_snapshot,
             'live_request_momentum': live_request_momentum,
             'requested_track_lookup_json': json.dumps(live_request_momentum.get('request_lookup', {})),
@@ -9202,12 +9282,16 @@ def api_live_status(request):
         current = _radioco_current_track_namespace()
         if not current:
             return JsonResponse({'ok': False, 'error': 'No active Radio.co track'}, status=404)
+        recently_played = _radioco_recently_played_tracks(limit=5)
         return JsonResponse({
             'ok': True,
             'current_offset': 0,
             'current_track': _radioco_current_track_payload(current),
             'up_next': [],
-            'recently_played': [],
+            'recently_played': [
+                {'title': track.title, 'artist': track.artist, 'album_art': track.album_art}
+                for track in recently_played
+            ],
         })
 
     state, _ = RadioStationState.objects.get_or_create(id=1)
