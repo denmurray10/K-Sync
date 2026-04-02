@@ -7565,6 +7565,105 @@ def _build_comeback_release_article_html(release, same_day_releases, nearby_rele
     return ''.join(f'<h2>{heading}</h2>{content}' for heading, content in body_sections)
 
 
+def _estimate_reading_time_from_html(body_html):
+    text = re.sub(r'<[^>]+>', ' ', body_html or '')
+    words = [word for word in text.split() if word.strip()]
+    return max(1, len(words) // 200)
+
+
+def _comeback_blog_subtitle(release):
+    return (
+        f"{release['artist']} just landed with {release['title']}, a {release['type'].lower()} "
+        f"release arriving on {release['weekday_label']} {release['date_label']}."
+    )[:500]
+
+
+def _build_comeback_blog_article_defaults(release, body_html):
+    return {
+        'title': f"{release['artist']} - {release['title']}: What Just Landed",
+        'subtitle': _comeback_blog_subtitle(release),
+        'category': 'Comeback',
+        'source_title': 'Comeback Signal Hub',
+        'source_url': reverse('comeback_timeline'),
+        'source_name': 'K-Beats',
+        'image': release.get('image') or '',
+        'image_2': '',
+        'image_3': '',
+        'body_html': body_html,
+        'reading_time': _estimate_reading_time_from_html(body_html),
+    }
+
+
+def _upsert_comeback_blog_article(release, body_html):
+    article, _created = BlogArticle.objects.update_or_create(
+        slug=release['article_slug'],
+        defaults=_build_comeback_blog_article_defaults(release, body_html),
+    )
+    return article
+
+
+def _build_same_day_release_context(release, releases_by_date):
+    return [
+        {
+            'title': candidate['title'],
+            'artist': candidate['artist'],
+            'type': candidate['type'],
+            'artist_href': candidate['artist_href'],
+            'article_href': candidate['article_href'],
+            'date_label': candidate['date_label'],
+            'is_current': candidate['id'] == release['id'],
+        }
+        for candidate in releases_by_date.get(release['date_str'], [])
+    ]
+
+
+def _build_nearby_release_context(release, all_releases):
+    release_date = datetime.strptime(release['date_str'], '%Y-%m-%d').date()
+    nearby_releases = []
+    for candidate in all_releases:
+        if candidate['id'] == release['id']:
+            continue
+        candidate_date = datetime.strptime(candidate['date_str'], '%Y-%m-%d').date()
+        diff = (candidate_date - release_date).days
+        if 1 <= diff <= 7:
+            nearby_releases.append({
+                'title': candidate['title'],
+                'artist': candidate['artist'],
+                'type': candidate['type'],
+                'date_str': candidate['date_str'],
+                'date_label': candidate['date_label'],
+                'artist_href': candidate['artist_href'],
+                'article_href': candidate['article_href'],
+                'offset_label': f'+{diff}d',
+            })
+    nearby_releases.sort(key=lambda item: (item['date_str'], item['artist'], item['title']))
+    return nearby_releases
+
+
+def _sync_landed_comeback_blog_articles(releases, window_data):
+    landed_releases = [release for release in releases if -14 <= release.get('days_until', 1) < 0]
+    if not landed_releases:
+        return
+
+    existing_slugs = set(
+        BlogArticle.objects.filter(
+            slug__in=[release['article_slug'] for release in landed_releases]
+        ).values_list('slug', flat=True)
+    )
+
+    for release in landed_releases:
+        if release['article_slug'] in existing_slugs:
+            continue
+        body_html = _build_comeback_release_article_html(
+            release,
+            _build_same_day_release_context(release, window_data['releases_by_date']),
+            _build_nearby_release_context(release, window_data['all_releases'])[:6],
+            window_data['birthdays_by_date'].get(release['date_str'], []),
+            window_data['anniversaries_by_date'].get(release['date_str'], []),
+        )
+        _upsert_comeback_blog_article(release, body_html)
+
+
 def _shorten_text(value, max_len=210):
     text = _normalize_social_text(value)
     if not text:
@@ -10630,6 +10729,7 @@ def comeback_timeline(request):
         key=lambda item: (item['date_str'], item['artist_primary'], item['title']),
         reverse=True,
     )[:8]
+    _sync_landed_comeback_blog_articles(recent_releases, window_data)
 
     timeline_source = [item for item in upcoming_releases if item['days_until'] <= 60]
     if not timeline_source:
@@ -10808,36 +10908,8 @@ def comeback_release_article(request, article_slug):
     if not release:
         raise Http404("Release article not found.")
 
-    same_day_releases = []
-    for candidate in window_data['releases_by_date'].get(release['date_str'], []):
-        same_day_releases.append({
-            'title': candidate['title'],
-            'artist': candidate['artist'],
-            'type': candidate['type'],
-            'artist_href': candidate['artist_href'],
-            'article_href': candidate['article_href'],
-            'date_label': candidate['date_label'],
-            'is_current': candidate['article_slug'] == article_slug,
-        })
-
-    release_date = datetime.strptime(release['date_str'], '%Y-%m-%d').date()
-    nearby_releases = []
-    for candidate in window_data['all_releases']:
-        if candidate['article_slug'] == article_slug:
-            continue
-        candidate_date = datetime.strptime(candidate['date_str'], '%Y-%m-%d').date()
-        diff = (candidate_date - release_date).days
-        if 1 <= diff <= 7:
-            nearby_releases.append({
-                'title': candidate['title'],
-                'artist': candidate['artist'],
-                'type': candidate['type'],
-                'date_str': candidate['date_str'],
-                'date_label': candidate['date_label'],
-                'artist_href': candidate['artist_href'],
-                'article_href': candidate['article_href'],
-            })
-    nearby_releases.sort(key=lambda item: (item['date_str'], item['artist'], item['title']))
+    same_day_releases = _build_same_day_release_context(release, window_data['releases_by_date'])
+    nearby_releases = _build_nearby_release_context(release, window_data['all_releases'])
 
     day_birthdays = window_data['birthdays_by_date'].get(release['date_str'], [])
     day_anniversaries = window_data['anniversaries_by_date'].get(release['date_str'], [])
@@ -10848,27 +10920,16 @@ def comeback_release_article(request, article_slug):
         day_birthdays,
         day_anniversaries,
     )
+    saved_article = _upsert_comeback_blog_article(release, body_html)
 
-    article = {
-        'slug': article_slug,
-        'title': f"What Just Landed: {release['artist']} - {release['title']}",
-        'subtitle': (
-            f"A K-Beats explainer on why this {release['type'].lower()} matters, "
-            f"how it fits the current comeback calendar, and what to watch next."
-        ),
-        'category': 'Comeback Briefing',
-        'image': release['image'],
-        'body_html': body_html,
-        'reading_time': 6,
-        'created_at': now,
-    }
+    article = saved_article
 
     related_releases = [
         candidate for candidate in window_data['all_releases']
         if candidate['article_slug'] != article_slug and -14 <= candidate['days_until'] <= 14
     ][:3]
 
-    seo_title = f"{article['title']} | K-Beats"
+    seo_title = f"{article.title} | K-Beats"
     seo_description = (
         f"Read K-Beats' long-form explainer on {release['artist']} - {release['title']}, "
         f"including the release format, same-day lineup, and why the drop matters this week."
@@ -10882,7 +10943,7 @@ def comeback_release_article(request, article_slug):
         'day_birthdays': day_birthdays,
         'day_anniversaries': day_anniversaries,
         'related_releases': related_releases,
-        'canonical_url': request.build_absolute_uri(),
+        'canonical_url': request.build_absolute_uri(reverse('blog_article_read', kwargs={'slug': saved_article.slug})),
         'seo_title': seo_title,
         'seo_description': seo_description,
         'seo_image': release['image'],

@@ -277,3 +277,50 @@ class ComebackPerformanceTests(TestCase):
 
         second = core_views._load_comeback_window_content(today, today.year, today.month)
         self.assertEqual(second['all_releases'][0]['title'], 'Updated Signal')
+
+
+class ComebackNewsSyncTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        today = timezone.localdate()
+        self.group = KPopGroup.objects.create(
+            name='Signal Unit',
+            slug='signal-unit',
+            label='Signal Label',
+            group_type='GIRL',
+            rank=1,
+        )
+        self.date_key = (today - timedelta(days=1)).isoformat()
+        ComebackData.objects.create(
+            year=today.year,
+            month=today.month,
+            data={
+                self.date_key: {
+                    'releases': [
+                        {
+                            'artist': 'Signal Unit',
+                            'title': 'Echo Bloom',
+                            'type': 'Single',
+                            'image': 'https://example.com/echo.jpg',
+                        }
+                    ],
+                    'birthdays': [],
+                    'anniversaries': [],
+                }
+            },
+        )
+
+    def test_comeback_timeline_persists_landed_release_as_blog_article(self):
+        response = self.client.get(reverse('comeback_timeline'))
+        self.assertEqual(response.status_code, 200)
+
+        article = BlogArticle.objects.get(slug__contains='echo-bloom')
+        self.assertEqual(article.category, 'Comeback')
+        self.assertIn('Echo Bloom', article.title)
+
+    def test_news_page_can_surface_synced_comeback_article(self):
+        self.client.get(reverse('comeback_timeline'))
+        response = self.client.get(reverse('news'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Echo Bloom')

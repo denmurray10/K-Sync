@@ -2,7 +2,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}"/>
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/>
+{% if canonical_url %}
+<link rel="canonical" href="{{ canonical_url }}"/>
+{% else %}
 <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
+{% endif %}
 <link rel="icon" href="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2Ffavicon.ico" sizes="any"/>
 <link rel="icon" type="image/svg+xml" href="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2Ffavicon-kb.svg"/>
 <link rel="icon" type="image/png" sizes="32x32" href="https://res.cloudinary.com/diuanqnce/image/fetch/f_auto,q_auto/https%3A%2F%2Ff003.backblazeb2.com%2Ffile%2FStrayKids%2FImages%2Ffavicon-32x32.png"/>
@@ -14,7 +18,11 @@
 <meta property="og:site_name" content="K-Beats Radio"/>
 <meta property="og:title" content="{% firstof seo_title article.title contest.title group.name 'K-Beats Radio | Live K-Pop Music, Charts, News & Community' %}"/>
 <meta property="og:description" content="{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}"/>
+{% if canonical_url %}
+<meta property="og:url" content="{{ canonical_url }}"/>
+{% else %}
 <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
+{% endif %}
 {% firstof seo_image article.image as social_image %}
 {% if social_image %}
 <meta property="og:image" content="{{ social_image }}"/>
@@ -33,7 +41,7 @@
     "@type": "WebPage",
     "name": "{% firstof seo_title article.title contest.title group.name 'K-Beats Radio' %}",
     "description": "{% firstof seo_description article.subtitle contest.subtitle group.description 'Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists.' %}",
-    "url": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}",
+    "url": "{% if canonical_url %}{{ canonical_url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endif %}",
     "inLanguage": "en-GB"
 }
 </script>

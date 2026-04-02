@@ -41,7 +41,6 @@
                 <a class="{% if request.resolver_match.url_name == 'games' or request.resolver_match.url_name == 'song_game' or request.resolver_match.url_name == 'chart_clash' or request.resolver_match.url_name == 'fandom_trivia' or request.resolver_match.url_name == 'idol_scramble' or request.resolver_match.url_name == 'mv_matcher' or request.resolver_match.url_name == 'lyric_drop' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'games' %}">Games</a>
                 <a class="{% if request.resolver_match.url_name == 'comeback_timeline' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
                 <a class="{% if request.resolver_match.url_name == 'news' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
-                <a class="{% if request.resolver_match.url_name == 'shop' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'shop' %}">Shop</a>
             </nav>
         </div>
 
@@ -96,7 +95,6 @@
                 <a class="{% if request.resolver_match.url_name == 'games' or request.resolver_match.url_name == 'song_game' or request.resolver_match.url_name == 'chart_clash' or request.resolver_match.url_name == 'fandom_trivia' or request.resolver_match.url_name == 'idol_scramble' or request.resolver_match.url_name == 'mv_matcher' or request.resolver_match.url_name == 'lyric_drop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'games' %}">Games</a>
                 <a class="{% if request.resolver_match.url_name == 'comeback_timeline' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
                 <a class="{% if request.resolver_match.url_name == 'news' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
-                <a class="{% if request.resolver_match.url_name == 'shop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'shop' %}">Shop</a>
             </nav>
         </div>
         <div class="flex items-center justify-self-end gap-2 sm:gap-4 md:gap-6 shrink-0">
@@ -189,7 +187,6 @@
                 <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'games' %}">Games</a>
                 <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'comeback_timeline' %}">Comebacks</a>
                 <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'news' %}">News</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'shop' %}">Shop</a>
             </nav>
         </div>
 
