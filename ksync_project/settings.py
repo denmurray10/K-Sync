@@ -248,6 +248,8 @@ RADIOCO_STATION_ID = config('RADIOCO_STATION_ID', default='').strip()
 RADIOCO_LISTEN_URL = config('RADIOCO_LISTEN_URL', default='').strip()
 RADIOCO_API_BASE = config('RADIOCO_API_BASE', default='https://public.radio.co').rstrip('/')
 RADIOCO_TIMEOUT_SECONDS = float(config('RADIOCO_TIMEOUT_SECONDS', default='8'))
+RADIOCO_REQUEST_WIDGET_ID = config('RADIOCO_REQUEST_WIDGET_ID', default='').strip()
+RADIOCO_REQUEST_WIDGET_SRC = config('RADIOCO_REQUEST_WIDGET_SRC', default='').strip()
 
 # ── Image delivery optimisation (Cloudinary Fetch in front of B2) ───────────
 # Set to true to rewrite Backblaze image URLs through Cloudinary image/fetch.

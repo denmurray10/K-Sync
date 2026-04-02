@@ -174,7 +174,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 YOUR SONG,<br/><span class="text-primary">ON AIR</span>
             </h2>
             <p class="font-mono text-sm tracking-widest uppercase opacity-70 mb-10 max-w-md leading-relaxed">
+                {% if radioco_request_widget_enabled %}
+                Use the official Radio.co request panel below so every song request goes straight into the live station queue.
+                {% else %}
                 Fill out the form and our DJs will queue your request during the next live show. Dedicate it to someone special or just vibe with the station.
+                {% endif %}
             </p>
 
             <!-- How it works -->
@@ -224,8 +228,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
 
-        <!-- Right: Brutalist Form -->
+        <!-- Right: Request Panel -->
         <div class="flex-1 w-full border border-white/20 bg-black/50 backdrop-blur-md p-6 md:p-10 reveal-up">
+
+            {% if radioco_request_widget_enabled %}
+            <div class="flex flex-col gap-6">
+                <div class="border-b border-white/20 pb-6 mb-2">
+                    <h3 class="text-2xl font-black uppercase tracking-tighter text-white flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-2xl">radio</span>
+                        Live Radio.co Request Queue
+                    </h3>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-2">
+                        Requests submitted here sync directly with your Radio.co station.
+                    </p>
+                </div>
+
+                <div class="border border-white/10 bg-black/70 p-3 md:p-4">
+                    <div id="radioco-request-widget" class="min-h-[720px]">
+                        <script src="{{ radioco_request_widget_src }}"></script>
+                    </div>
+                </div>
+
+                <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">
+                    If the widget looks empty, double-check the widget is enabled in Radio.co under Requests > Widgets and that the embed code matches this site config.
+                </p>
+            </div>
+            {% else %}
 
             <!-- Success state -->
             <div x-show="submitted" x-transition class="flex flex-col items-center justify-center py-16 text-center gap-6">
@@ -365,12 +393,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <span x-show="sending" x-cloak>Sending...</span>
                 </button>
             </form>
+            {% endif %}
         </div>
     </div>
 </section>
 
 <!-- Recent Requests Section -->
-{% if recent_requests %}
+{% if recent_requests and not radioco_request_widget_enabled %}
 <section class="w-full bg-black py-20 border-b border-white/10">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="flex items-end justify-between pb-4 border-b border-white/20 mb-0 reveal-left">

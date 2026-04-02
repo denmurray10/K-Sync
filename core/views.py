@@ -361,6 +361,18 @@ def _radioco_public_status():
     return _radioco_fetch_json(f"/stations/{station_id}/status", 'status', ttl=8)
 
 
+def _radioco_request_widget_src():
+    configured_src = str(getattr(settings, 'RADIOCO_REQUEST_WIDGET_SRC', '') or '').strip()
+    if configured_src:
+        return configured_src
+
+    widget_id = str(getattr(settings, 'RADIOCO_REQUEST_WIDGET_ID', '') or '').strip()
+    if widget_id:
+        return f"https://embed.radio.co/request/{widget_id}.js"
+
+    return ''
+
+
 def _radioco_track_payload_root(payload):
     if isinstance(payload, dict):
         for key in ('data', 'track', 'current_track', 'currentTrack'):
@@ -6302,11 +6314,14 @@ def request_track(request):
         {'slug': g.slug, 'name': g.name}
         for g in groups
     ])
+    radioco_request_widget_src = _radioco_request_widget_src()
     recent_requests = SongRequest.objects.all()[:10]
     return render(request, 'core/request_track.html', {
         'groups': groups,
         'groups_json': groups_json,
         'recent_requests': recent_requests,
+        'radioco_request_widget_src': radioco_request_widget_src,
+        'radioco_request_widget_enabled': bool(radioco_request_widget_src),
     })
 
 
