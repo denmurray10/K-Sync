@@ -20,6 +20,7 @@ from .models import (
     LimitedTimeEvent,
     EventBadgeDrop,
     EventParticipation,
+    RadioTrack,
     UserBadge,
 )
 
@@ -332,6 +333,14 @@ class RadioCoIntegrationTests(TestCase):
     @patch('core.views._build_live_show_snapshot')
     def test_api_live_status_uses_radioco_when_enabled(self, mock_show_snapshot, mock_get):
         cache.clear()
+        RadioTrack.objects.create(
+            title='Adore U',
+            artist='SEVENTEEN',
+            album_art='https://example.com/seventeen-adore-u.jpg',
+            audio_url='https://example.com/adore-u.mp3',
+            duration='3:00',
+            duration_seconds=180,
+        )
         mock_show_snapshot.return_value = {'current': None, 'next': None}
         station_response = Mock()
         station_response.raise_for_status.return_value = None
@@ -385,6 +394,10 @@ class RadioCoIntegrationTests(TestCase):
         self.assertEqual(len(payload['recently_played']), 5)
         self.assertEqual(payload['recently_played'][0]['artist'], 'SEVENTEEN')
         self.assertEqual(payload['recently_played'][0]['title'], 'Adore U')
+        self.assertEqual(
+            payload['recently_played'][0]['album_art'],
+            'https://example.com/seventeen-adore-u.jpg',
+        )
 
     @patch('core.views.requests.get')
     @patch('core.views._build_live_show_snapshot')

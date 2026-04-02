@@ -381,11 +381,18 @@ def _radioco_pick_first(mapping, *keys):
 
 
 def _radioco_track_artwork(track_payload):
-    artwork = _radioco_pick_first(track_payload, 'artwork', 'artwork_url', 'image', 'image_url')
+    artwork = _radioco_pick_first(
+        track_payload,
+        'artwork',
+        'artwork_url_large',
+        'artwork_url',
+        'image',
+        'image_url',
+    )
     if artwork:
         return artwork
     artwork_urls = track_payload.get('artwork_urls') if isinstance(track_payload.get('artwork_urls'), dict) else {}
-    return _radioco_pick_first(artwork_urls, 'large', 'medium', 'small')
+    return _radioco_pick_first(artwork_urls, 'large', 'standard', 'medium', 'small')
 
 
 def _radioco_split_artist_and_title(raw_title, raw_artist=''):
@@ -402,10 +409,43 @@ def _radioco_split_artist_and_title(raw_title, raw_artist=''):
 
 def _radioco_track_display_parts(track_payload):
     root = _radioco_track_payload_root(track_payload)
-    raw_title = _radioco_pick_first(root, 'title', 'name')
-    raw_artist = _radioco_pick_first(root, 'artist', 'artist_name', 'subtitle')
+    raw_title = _radioco_pick_first(root, 'track_title', 'title', 'name')
+    raw_artist = _radioco_pick_first(root, 'track_artist', 'artist', 'artist_name', 'subtitle')
     title, artist = _radioco_split_artist_and_title(raw_title, raw_artist)
     return title.strip(), artist.strip()
+
+
+def _radioco_recent_track_artwork_lookup(track_pairs):
+    normalized_pairs = []
+    seen = set()
+    for title, artist in track_pairs:
+        normalized_title = str(title or '').strip()
+        normalized_artist = str(artist or '').strip()
+        if not normalized_title or not normalized_artist:
+            continue
+        pair_key = (normalized_title.casefold(), normalized_artist.casefold())
+        if pair_key in seen:
+            continue
+        seen.add(pair_key)
+        normalized_pairs.append((normalized_title, normalized_artist))
+
+    if not normalized_pairs:
+        return {}
+
+    query = models.Q()
+    for title, artist in normalized_pairs:
+        query |= models.Q(title__iexact=title, artist__iexact=artist)
+
+    if not query:
+        return {}
+
+    artwork_map = {}
+    matching_tracks = RadioTrack.objects.filter(query).only('title', 'artist', 'album_art')
+    for track in matching_tracks:
+        key = (str(track.title or '').strip().casefold(), str(track.artist or '').strip().casefold())
+        if key not in artwork_map:
+            artwork_map[key] = _coalesce_stream_image_url(track.album_art)
+    return artwork_map
 
 
 def _radioco_recently_played_tracks(limit=5):
@@ -428,6 +468,13 @@ def _radioco_recently_played_tracks(limit=5):
         _radioco_pick_first(station_root, 'logo', 'logo_url', 'image'),
     )
 
+    candidate_pairs = []
+    for item in history:
+        title, artist = _radioco_track_display_parts(item if isinstance(item, dict) else {'title': item})
+        if title and artist:
+            candidate_pairs.append((title, artist))
+    artwork_lookup = _radioco_recent_track_artwork_lookup(candidate_pairs)
+
     results = []
     seen = set()
     placeholder_titles = {'broadcast starting', 'starting soon', 'k-beats live'}
@@ -444,12 +491,14 @@ def _radioco_recently_played_tracks(limit=5):
         seen.add(item_key)
 
         item_root = _radioco_track_payload_root(item if isinstance(item, dict) else {})
+        artwork_key = (title.lower(), artist.lower())
+        matched_artwork = artwork_lookup.get(artwork_key)
         results.append(SimpleNamespace(
             id=None,
             pk=None,
             title=title,
             artist=artist or 'On Air',
-            album_art=_coalesce_stream_image_url(_radioco_track_artwork(item_root), default_artwork),
+            album_art=_coalesce_stream_image_url(_radioco_track_artwork(item_root), matched_artwork, default_artwork),
             audio_url='',
             duration='',
             duration_seconds=0,
@@ -478,8 +527,9 @@ def _radioco_current_track_namespace():
     if not listen_url:
         return None
 
-    title = str(_radioco_pick_first(track_payload, 'title', 'name') or 'K-Beats Live').strip() or 'K-Beats Live'
-    artist = str(_radioco_pick_first(track_payload, 'artist', 'artist_name', 'subtitle') or 'On Air').strip() or 'On Air'
+    title, artist = _radioco_track_display_parts(track_payload)
+    title = title or 'K-Beats Live'
+    artist = artist or 'On Air'
     artwork = _coalesce_stream_image_url(
         _radioco_track_artwork(track_payload),
         _radioco_pick_first(_radioco_track_payload_root(station_payload), 'logo', 'logo_url', 'image'),
