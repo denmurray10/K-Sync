@@ -83,17 +83,26 @@ WSGI_APPLICATION = 'ksync_project.wsgi.application'
 # Database configuration - Using Neon PostgreSQL
 # Defaulting to the provided Neon URL, but allowing override via DATABASE_URL env var
 DEFAULT_DB_URL = 'postgresql://neondb_owner:npg_7BEvOGSUZY8R@ep-little-credit-aggzf1v2.c-2.eu-central-1.aws.neon.tech/stage_ditzy_error_436329'
+USE_SQLITE_LOCAL = config('DJANGO_USE_SQLITE', default=False, cast=bool)
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', DEFAULT_DB_URL),
-        conn_max_age=60,
-    )
-}
+if USE_SQLITE_LOCAL:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL', DEFAULT_DB_URL),
+            conn_max_age=60,
+        )
+    }
 
-# Enable health checks so Django will verify connections before using them.
-# Some versions of dj_database_url do not support conn_health_checks directly.
-DATABASES['default']['CONN_HEALTH_CHECKS'] = True
+    # Enable health checks so Django will verify connections before using them.
+    # Some versions of dj_database_url do not support conn_health_checks directly.
+    DATABASES['default']['CONN_HEALTH_CHECKS'] = True
 
 
 # Password validation

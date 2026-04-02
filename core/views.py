@@ -22,6 +22,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.urls import reverse
+from django.utils.text import slugify
 from django.templatetags.static import static
 from django.contrib.staticfiles import finders
 import requests
@@ -7148,6 +7149,11 @@ def _comeback_release_type_group(type_label):
     return 'other'
 
 
+def _comeback_release_article_slug(date_key, artist_name, title):
+    base = slugify(f'{date_key}-{artist_name}-{title}')[:180].strip('-')
+    return base or hashlib.md5(f'{date_key}:{artist_name}:{title}'.encode('utf-8')).hexdigest()[:18]
+
+
 def _build_comeback_release_item(raw_release, date_key, today):
     date_obj = datetime.strptime(date_key, '%Y-%m-%d').date()
     artist_display = str(raw_release.get('artist') or '').strip()
@@ -7158,10 +7164,12 @@ def _build_comeback_release_item(raw_release, date_key, today):
     base_id = f"{date_key}:{artist_display}:{title}:{type_label}"
     item_id = hashlib.md5(base_id.encode('utf-8')).hexdigest()[:12]
     artist_mark = re.sub(r'[^A-Z0-9]', '', primary_artist.upper())[:3] or 'KB'
+    article_slug = _comeback_release_article_slug(date_key, artist_display or primary_artist, title)
 
     return {
         'id': item_id,
         'slug': str(raw_release.get('slug') or '').strip(),
+        'article_slug': article_slug,
         'title': title,
         'artist': artist_display or 'Unknown Artist',
         'artist_primary': primary_artist or 'Unknown Artist',
@@ -7177,6 +7185,7 @@ def _build_comeback_release_item(raw_release, date_key, today):
         'days_until': (date_obj - today).days,
         'relative_label': _comeback_relative_label(date_obj, today),
         'artist_href': reverse('idol_page', args=[group.slug]) if group else '',
+        'article_href': reverse('comeback_release_article', kwargs={'article_slug': article_slug}),
     }
 
 
@@ -7211,6 +7220,211 @@ def _build_comeback_event_item(raw_item, date_key, today, kind):
         'relative_label': _comeback_relative_label(date_obj, today),
         'href': reverse('idol_page', args=[group.slug]) if group else '',
     }
+
+
+def _comeback_window_months(today, nav_year=None, nav_month=None):
+    window_months = []
+    cursor_year = today.year
+    cursor_month = today.month - 1
+    if cursor_month == 0:
+        cursor_month = 12
+        cursor_year -= 1
+
+    for _ in range(5):
+        window_months.append((cursor_year, cursor_month))
+        cursor_month += 1
+        if cursor_month > 12:
+            cursor_month = 1
+            cursor_year += 1
+
+    if nav_year and nav_month and (nav_year, nav_month) not in window_months:
+        window_months.append((nav_year, nav_month))
+
+    return sorted(set(window_months))
+
+
+def _load_comeback_window_content(today, nav_year=None, nav_month=None):
+    month_records = {}
+    for year, month in _comeback_window_months(today, nav_year, nav_month):
+        month_records[(year, month)] = ComebackData.objects.filter(year=year, month=month).first()
+
+    all_releases = []
+    all_birthdays = []
+    all_anniversaries = []
+    for (_, _), data_obj in sorted(month_records.items()):
+        if not data_obj:
+            continue
+        for date_key, details in sorted((data_obj.data or {}).items()):
+            day_payload = details or {}
+            for raw_release in day_payload.get('releases', []) or []:
+                all_releases.append(_build_comeback_release_item(raw_release, date_key, today))
+            for raw_birthday in day_payload.get('birthdays', []) or []:
+                all_birthdays.append(_build_comeback_event_item(raw_birthday, date_key, today, 'birthday'))
+            for raw_anniversary in day_payload.get('anniversaries', []) or []:
+                all_anniversaries.append(_build_comeback_event_item(raw_anniversary, date_key, today, 'anniversary'))
+
+    all_releases.sort(key=lambda item: (item['date_str'], item['artist_primary'], item['title']))
+    all_birthdays.sort(key=lambda item: (item['date_str'], item['label']))
+    all_anniversaries.sort(key=lambda item: (item['date_str'], item['label']))
+
+    releases_by_date = defaultdict(list)
+    birthdays_by_date = defaultdict(list)
+    anniversaries_by_date = defaultdict(list)
+    releases_by_article_slug = {}
+
+    for release in all_releases:
+        releases_by_date[release['date_str']].append(release)
+        releases_by_article_slug[release['article_slug']] = release
+    for birthday in all_birthdays:
+        birthdays_by_date[birthday['date_str']].append(birthday)
+    for anniversary in all_anniversaries:
+        anniversaries_by_date[anniversary['date_str']].append(anniversary)
+
+    return {
+        'month_records': month_records,
+        'all_releases': all_releases,
+        'all_birthdays': all_birthdays,
+        'all_anniversaries': all_anniversaries,
+        'releases_by_date': releases_by_date,
+        'birthdays_by_date': birthdays_by_date,
+        'anniversaries_by_date': anniversaries_by_date,
+        'releases_by_article_slug': releases_by_article_slug,
+    }
+
+
+def _comeback_type_reader_copy(type_label):
+    lowered = str(type_label or '').strip().lower()
+    if lowered == 'single':
+        return (
+            "A single is usually the sharpest and most immediate kind of release. "
+            "It is built to introduce one core song, define the era fast, and give fans and casual listeners "
+            "a clean entry point into the concept without asking them to absorb a full multi-track project at once."
+        )
+    if lowered in {'mini album', 'ep'}:
+        return (
+            "A mini album or EP tends to be the sweet spot between a standalone single and a full album. "
+            "It gives the artist enough room to show range, but it still feels tightly edited around one visual and sonic thesis."
+        )
+    if lowered in {'album', 'full album'}:
+        return (
+            "A full album usually signals a broader artistic statement. "
+            "It asks listeners to look at sequencing, cohesion, and long-form storytelling rather than only the headline track."
+        )
+    if lowered == 'repackage':
+        return (
+            "A repackage is more than a reissue. "
+            "It often reframes an era, adds a new promotional spike, and gives an already established project a second narrative peak."
+        )
+    return (
+        "This release type still works as a comeback marker because it tells fans where the artist wants attention next. "
+        "Whether it is a special single, collaboration, or formatted project, it changes the conversation around the act's current era."
+    )
+
+
+def _build_comeback_release_article_html(release, same_day_releases, nearby_releases, day_birthdays, day_anniversaries):
+    artist = release['artist']
+    title = release['title']
+    type_label = release['type']
+    date_label = release['date_label']
+    weekday_label = release['weekday_label']
+    competition_count = max(len(same_day_releases) - 1, 0)
+    same_day_names = ', '.join(
+        f"{item['artist']} - {item['title']}" for item in same_day_releases if not item.get('is_current')
+    ) or 'no direct same-day competitors in the current loaded window'
+    nearby_names = ', '.join(
+        f"{item['artist']} - {item['title']} ({item['date_label']})" for item in nearby_releases[:4]
+    ) or 'no closely trailing releases in the next seven days'
+    birthday_names = ', '.join(item['label'] for item in day_birthdays[:4]) or 'no major birthday signals in the loaded schedule'
+    anniversary_names = ', '.join(item['label'] for item in day_anniversaries[:4]) or 'no anniversary markers in the loaded schedule'
+    type_reader_copy = _comeback_type_reader_copy(type_label)
+
+    body_sections = [
+        (
+            "What Just Landed",
+            f"<p>{artist}'s <strong>{title}</strong> landed on <strong>{weekday_label} {date_label}</strong>, and that timing matters because the K-Pop release calendar is never just a list of titles. "
+            f"Every date on the comeback board acts like a pressure point for fan attention, playlist discovery, social momentum, and the wider visual narrative around an artist. "
+            f"This page is treating <strong>{title}</strong> as a release signal rather than a simple listing, which means the important question is not only what dropped, but what kind of era entry this looks like, who it is speaking to, and how it sits inside the wider week of activity. "
+            f"In practical terms, {artist} is arriving with a <strong>{type_label}</strong>, a format that shapes how listeners will approach the project, what critics or fans will judge first, and how quickly the release can spread across timelines, edits, reactions, and fan spaces. "
+            f"Instead of collapsing that into a one-line calendar entry, this explainer treats the release as a real editorial moment and gives it the breathing room a high-interest comeback deserves.</p>"
+        ),
+        (
+            f"What A {type_label} Usually Signals",
+            f"<p>{type_reader_copy} For readers landing here from the comeback page, that context is important because it changes what you should listen for first. "
+            f"With <strong>{title}</strong>, the format tells us whether the release is likely to be judged by one explosive lead track, by the cohesion of a small body of work, or by how successfully it extends an era that already existed before this date. "
+            f"That does not mean we should invent details that are not in the loaded dataset; it means we should read the release through the lens we do know. "
+            f"We know the artist, the title, the release day, and the format. From that alone, we can frame the listener experience much more clearly than a standard calendar card does. "
+            f"It lets fans move from pure scheduling into expectation-setting: are we looking for a clean hook and instant replay value, a compact package with one strong mood, or a larger chapter that could shift how the artist is talked about over the next few weeks?</p>"
+        ),
+        (
+            "Why This Release Date Matters",
+            f"<p>The release date itself gives <strong>{title}</strong> a very readable piece of context. "
+            f"On the same day, the loaded schedule shows <strong>{competition_count + 1} release{'s' if competition_count != 0 else ''}</strong> in total, including {same_day_names}. "
+            f"That matters because the conversation around a comeback is partly created by isolation and partly by contrast. "
+            f"If an act lands on a crowded day, the release has to fight harder for attention, thumbnails, first-play reactions, and the emotional bandwidth of fans who may already be splitting their focus across multiple artists. "
+            f"If the day is quieter, the release can feel more dominant and more clearly framed as the headline signal. "
+            f"Either way, same-day competition changes how a project is perceived. "
+            f"It influences whether the comeback feels like a takeover, a duel, or one important part of a larger release wave. "
+            f"That context is exactly why the comeback page now needs article destinations: a fan should be able to click a landed item and understand the field around it, not just see the same title repeated in a slide-out.</p>"
+        ),
+        (
+            "How To Read The First 24 Hours",
+            f"<p>The first day after a release lands is usually less about final verdicts and more about signal detection. "
+            f"For <strong>{artist}</strong>, the key indicators in the first twenty-four hours are likely to be which visual moments from <strong>{title}</strong> start circulating, which lyrical or performance details fans immediately turn into conversation pieces, and whether the release gets absorbed as a stand-alone statement or as the start of a larger rollout. "
+            f"Even without pretending we have full behind-the-scenes notes, we can still say what a smart fan or editor should watch for. "
+            f"Is the title being talked about as a concept reset, a refinement of what the artist already does well, or a fan-service moment that exists to keep an era hot between larger releases? "
+            f"Does the format encourage people to obsess over one track, or to talk about sequencing and depth? "
+            f"Those are the questions that give a release staying power after the initial notification rush fades.</p>"
+        ),
+        (
+            "The Wider Week Around It",
+            f"<p>One of the most useful pieces of context from the comeback signal hub is what happens in the week around the drop. "
+            f"Within the next seven days, the current loaded window also points to {nearby_names}. "
+            f"That matters because K-Pop listening is rarely linear. "
+            f"Fans do not experience one comeback in a vacuum and then move neatly to the next. "
+            f"They live inside clusters: teaser overlap, social edits, chart chatter, performance clips, and countdown culture all stack together. "
+            f"So when <strong>{title}</strong> lands, it is entering a week that can either amplify it or pull focus away from it. "
+            f"A strong comeback survives that pressure by creating a clear identity quickly. "
+            f"A release that cannot define its own angle gets blurred into the schedule. "
+            f"This is why the comeback page should not stop at dates. "
+            f"It should help readers understand whether a release is arriving into open air or into a storm of competing attention.</p>"
+        ),
+        (
+            "The Scene Signals On The Same Day",
+            f"<p>The page also keeps lighter scene markers visible, and for this release day those signals include birthdays such as {birthday_names} and anniversaries including {anniversary_names}. "
+            f"These side signals do not replace the comeback story, but they do affect how the day feels inside fandom spaces. "
+            f"A birthday can soften the tone of a release day and turn timelines into celebration mode, while an anniversary can pull fans into memory, comparison, and retrospective conversation. "
+            f"When those signals sit next to a new release, they subtly shape how the drop is discussed. "
+            f"Some days feel purely forward-facing; others are full of nostalgia and reflection at the same time. "
+            f"That texture matters because fandom is not just consumption. "
+            f"It is ritual, timing, and shared attention. "
+            f"Putting those side signals into the article helps explain why one release day can feel emotionally louder than another, even when the number of scheduled drops looks similar on paper.</p>"
+        ),
+        (
+            f"What {title} Represents For Fans",
+            f"<p>For fans, a landed release like <strong>{title}</strong> is usually doing at least three jobs at once. "
+            f"First, it is a listening event: people want to hear what is new, what has changed, and what might become the defining hook or image of the era. "
+            f"Second, it is a participation event: timelines fill with reactions, rankings, fancams, edits, and instant discourse about styling, choreography, vocals, production, and symbolism. "
+            f"Third, it is a positioning event: fans want to know where this comeback sits in the artist's bigger story. "
+            f"Is it a bridge to something larger, a high-confidence statement in its own right, or a refinement of a sound the act already owns? "
+            f"That is why an explainer article has real value here. "
+            f"The release card tells you that something happened. "
+            f"The article tells you how to think about it, how to watch the week around it, and why this specific signal matters more than a passive date stamp on a calendar ever could.</p>"
+        ),
+        (
+            "The K-Beats Take",
+            f"<p>The cleanest way to understand <strong>{artist} - {title}</strong> is as a release moment with context, not just an entry in a planner. "
+            f"It landed on {weekday_label} {date_label} as a <strong>{type_label}</strong>, arrived inside a week that also includes {nearby_names}, and shares its day with {competition_count + 1} scheduled release{'s' if competition_count != 0 else ''}. "
+            f"That gives the comeback a measurable position inside the scene even before you start arguing over favorites, visuals, or replay value. "
+            f"What matters now is whether the release can hold attention once the schedule keeps moving. "
+            f"If it creates a clear identity quickly, it becomes one of the dates fans remember when they look back on the month. "
+            f"If it stays vague, it gets swallowed by the next wave. "
+            f"That tension is exactly what the redesigned comeback page is built to surface. "
+            f"So for readers opening this from <em>What Just Landed</em>, the takeaway is simple: <strong>{title}</strong> is not only something that dropped. "
+            f"It is a signal worth reading inside the wider broadcast of the K-Pop calendar.</p>"
+        ),
+    ]
+
+    return ''.join(f'<h2>{heading}</h2>{content}' for heading, content in body_sections)
 
 
 def _shorten_text(value, max_len=210):
@@ -10261,53 +10475,13 @@ def comeback_timeline(request):
     else:
         next_year, next_month = nav_year, nav_month + 1
 
-    window_months = []
-    cursor_year = today.year
-    cursor_month = today.month - 1
-    if cursor_month == 0:
-        cursor_month = 12
-        cursor_year -= 1
-    for _ in range(5):
-        window_months.append((cursor_year, cursor_month))
-        cursor_month += 1
-        if cursor_month > 12:
-            cursor_month = 1
-            cursor_year += 1
-    if (nav_year, nav_month) not in window_months:
-        window_months.append((nav_year, nav_month))
-
-    month_records = {}
-    for year, month in sorted(set(window_months)):
-        month_records[(year, month)] = ComebackData.objects.filter(year=year, month=month).first()
-
-    all_releases = []
-    all_birthdays = []
-    all_anniversaries = []
-    for (_, _), data_obj in sorted(month_records.items()):
-        if not data_obj:
-            continue
-        for date_key, details in sorted((data_obj.data or {}).items()):
-            day_payload = details or {}
-            for raw_release in day_payload.get('releases', []) or []:
-                all_releases.append(_build_comeback_release_item(raw_release, date_key, today))
-            for raw_birthday in day_payload.get('birthdays', []) or []:
-                all_birthdays.append(_build_comeback_event_item(raw_birthday, date_key, today, 'birthday'))
-            for raw_anniversary in day_payload.get('anniversaries', []) or []:
-                all_anniversaries.append(_build_comeback_event_item(raw_anniversary, date_key, today, 'anniversary'))
-
-    all_releases.sort(key=lambda item: (item['date_str'], item['artist_primary'], item['title']))
-    all_birthdays.sort(key=lambda item: (item['date_str'], item['label']))
-    all_anniversaries.sort(key=lambda item: (item['date_str'], item['label']))
-
-    releases_by_date = defaultdict(list)
-    birthdays_by_date = defaultdict(list)
-    anniversaries_by_date = defaultdict(list)
-    for release in all_releases:
-        releases_by_date[release['date_str']].append(release)
-    for birthday in all_birthdays:
-        birthdays_by_date[birthday['date_str']].append(birthday)
-    for anniversary in all_anniversaries:
-        anniversaries_by_date[anniversary['date_str']].append(anniversary)
+    window_data = _load_comeback_window_content(today, nav_year, nav_month)
+    all_releases = window_data['all_releases']
+    all_birthdays = window_data['all_birthdays']
+    all_anniversaries = window_data['all_anniversaries']
+    releases_by_date = window_data['releases_by_date']
+    birthdays_by_date = window_data['birthdays_by_date']
+    anniversaries_by_date = window_data['anniversaries_by_date']
 
     for release in all_releases:
         release_date = datetime.strptime(release['date_str'], '%Y-%m-%d').date()
@@ -10526,6 +10700,96 @@ def comeback_timeline(request):
         'prev_month': prev_month,
         'next_year': next_year,
         'next_month': next_month,
+    })
+
+
+def comeback_release_article(request, article_slug):
+    now = timezone.localtime()
+    today = now.date()
+    window_data = _load_comeback_window_content(today)
+    release = window_data['releases_by_article_slug'].get(article_slug)
+    if not release:
+        raise Http404("Release article not found.")
+
+    same_day_releases = []
+    for candidate in window_data['releases_by_date'].get(release['date_str'], []):
+        same_day_releases.append({
+            'title': candidate['title'],
+            'artist': candidate['artist'],
+            'type': candidate['type'],
+            'artist_href': candidate['artist_href'],
+            'article_href': candidate['article_href'],
+            'date_label': candidate['date_label'],
+            'is_current': candidate['article_slug'] == article_slug,
+        })
+
+    release_date = datetime.strptime(release['date_str'], '%Y-%m-%d').date()
+    nearby_releases = []
+    for candidate in window_data['all_releases']:
+        if candidate['article_slug'] == article_slug:
+            continue
+        candidate_date = datetime.strptime(candidate['date_str'], '%Y-%m-%d').date()
+        diff = (candidate_date - release_date).days
+        if 1 <= diff <= 7:
+            nearby_releases.append({
+                'title': candidate['title'],
+                'artist': candidate['artist'],
+                'type': candidate['type'],
+                'date_str': candidate['date_str'],
+                'date_label': candidate['date_label'],
+                'artist_href': candidate['artist_href'],
+                'article_href': candidate['article_href'],
+            })
+    nearby_releases.sort(key=lambda item: (item['date_str'], item['artist'], item['title']))
+
+    day_birthdays = window_data['birthdays_by_date'].get(release['date_str'], [])
+    day_anniversaries = window_data['anniversaries_by_date'].get(release['date_str'], [])
+    body_html = _build_comeback_release_article_html(
+        release,
+        same_day_releases,
+        nearby_releases,
+        day_birthdays,
+        day_anniversaries,
+    )
+
+    article = {
+        'slug': article_slug,
+        'title': f"What Just Landed: {release['artist']} - {release['title']}",
+        'subtitle': (
+            f"A K-Beats explainer on why this {release['type'].lower()} matters, "
+            f"how it fits the current comeback calendar, and what to watch next."
+        ),
+        'category': 'Comeback Briefing',
+        'image': release['image'],
+        'body_html': body_html,
+        'reading_time': 6,
+        'created_at': now,
+    }
+
+    related_releases = [
+        candidate for candidate in window_data['all_releases']
+        if candidate['article_slug'] != article_slug and -14 <= candidate['days_until'] <= 14
+    ][:3]
+
+    seo_title = f"{article['title']} | K-Beats"
+    seo_description = (
+        f"Read K-Beats' long-form explainer on {release['artist']} - {release['title']}, "
+        f"including the release format, same-day lineup, and why the drop matters this week."
+    )
+
+    return render(request, 'core/comeback_release_article.html', {
+        'article': article,
+        'release': release,
+        'same_day_releases': same_day_releases,
+        'nearby_releases': nearby_releases[:6],
+        'day_birthdays': day_birthdays,
+        'day_anniversaries': day_anniversaries,
+        'related_releases': related_releases,
+        'canonical_url': request.build_absolute_uri(),
+        'seo_title': seo_title,
+        'seo_description': seo_description,
+        'seo_image': release['image'],
+        'seo_type': 'article',
     })
 
 

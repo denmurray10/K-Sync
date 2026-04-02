@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+<meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+<title>{{ seo_title }}</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                primary: "#f425c0",
+                secondary: "#00f0ff",
+                "background-dark": "#000000",
+            },
+            fontFamily: {
+                sans: ["Montserrat", "sans-serif"],
+                cinzel: ["Cinzel", "serif"],
+            },
+            borderRadius: {
+                DEFAULT: "0px",
+                sm: "0px",
+                md: "0px",
+                lg: "0px",
+                xl: "0px",
+                "2xl": "0px",
+            },
+        },
+    },
+}
+</script>
+<style>
+    body {
+        background:
+            radial-gradient(circle at top left, rgba(244, 37, 192, 0.14), transparent 30%),
+            radial-gradient(circle at 86% 10%, rgba(0, 240, 255, 0.08), transparent 24%),
+            #000;
+    }
+    .font-cinzel { font-family: "Cinzel", serif; }
+    .panel-shell {
+        background: linear-gradient(180deg, rgba(14,14,14,0.98), rgba(5,5,5,0.98));
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+    .article-body p {
+        color: #cbd5e1;
+        font-size: 1.03rem;
+        line-height: 1.95;
+        margin-bottom: 1.4rem;
+    }
+    .article-body h2 {
+        color: #fff;
+        font-family: "Cinzel", serif;
+        font-size: 2rem;
+        line-height: 1;
+        margin-top: 3rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .article-body strong {
+        color: #fff;
+        font-weight: 800;
+    }
+    .article-body em {
+        color: #f425c0;
+        font-style: normal;
+    }
+    @media (max-width: 768px) {
+        .article-body p { font-size: 0.98rem; line-height: 1.82; }
+        .article-body h2 { font-size: 1.6rem; }
+    }
+</style>
+</head>
+<body class="bg-background-dark text-slate-100 font-sans min-h-screen flex flex-col overflow-x-hidden">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+{% include 'core/header.html' %}
+
+<main class="flex-grow pt-0">
+    <section class="relative overflow-hidden border-b border-white/10 bg-black">
+        <div class="absolute inset-0">
+            {% if article.image %}
+            <img src="{{ article.image }}" alt="" class="h-full w-full object-cover opacity-20 grayscale"/>
+            {% endif %}
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(244,37,192,0.24),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(0,240,255,0.14),transparent_24%),linear-gradient(180deg,rgba(0,0,0,0.3),rgba(0,0,0,0.9))]"></div>
+        </div>
+        <div class="relative container mx-auto px-4 sm:px-6 pt-32 md:pt-40 pb-20 md:pb-24">
+            <div class="max-w-4xl">
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{% url 'comeback_timeline' %}" class="text-[10px] uppercase tracking-[0.22em] text-slate-400 transition-colors hover:text-white">Comeback Signal</a>
+                    <span class="text-slate-700">/</span>
+                    <span class="text-[10px] uppercase tracking-[0.22em] text-primary">What Just Landed</span>
+                </div>
+                <div class="mt-8 flex flex-wrap items-center gap-3">
+                    <span class="border border-primary/30 bg-primary px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-black">{{ release.type }}</span>
+                    <span class="border border-white/10 bg-white/[0.05] px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">{{ release.date_label }}</span>
+                    <span class="text-[10px] uppercase tracking-[0.22em] text-secondary">{{ release.relative_label }}</span>
+                </div>
+                <p class="mt-8 text-[11px] uppercase tracking-[0.24em] text-primary">{{ release.artist }}</p>
+                <h1 class="mt-3 font-cinzel text-4xl leading-[0.92] text-white sm:text-6xl lg:text-7xl">{{ article.title }}</h1>
+                <p class="mt-6 max-w-3xl text-lg leading-relaxed text-slate-300">{{ article.subtitle }}</p>
+                <div class="mt-8 flex flex-wrap items-center gap-5 text-[10px] uppercase tracking-[0.22em] text-slate-500">
+                    <span>K-Beats Editorial</span>
+                    <span>{{ article.reading_time }} min read</span>
+                    <span>{{ article.created_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 md:py-20">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+                <article class="panel-shell p-6 sm:p-8 md:p-10">
+                    {% if article.image %}
+                    <div class="mb-10 overflow-hidden border border-white/10 bg-black">
+                        <img src="{{ article.image }}" alt="{{ release.artist }} {{ release.title }}" class="h-auto w-full object-cover"/>
+                    </div>
+                    {% endif %}
+                    <div class="article-body">
+                        {{ article.body_html|safe }}
+                    </div>
+                </article>
+
+                <aside class="space-y-6 lg:sticky lg:top-24">
+                    <div class="panel-shell p-6">
+                        <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Release snapshot</p>
+                        <div class="mt-5 space-y-4">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Artist</p>
+                                <p class="mt-1 text-lg font-black uppercase tracking-tight text-white">{{ release.artist }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Title</p>
+                                <p class="mt-1 text-lg font-black uppercase tracking-tight text-white">{{ release.title }}</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Format</p>
+                                    <p class="mt-1 text-sm font-black uppercase tracking-tight text-white">{{ release.type }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Release Day</p>
+                                    <p class="mt-1 text-sm font-black uppercase tracking-tight text-white">{{ release.weekday_label }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            <a href="{% url 'comeback_timeline' %}" class="bg-primary px-6 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-black shadow-[4px_4px_0px_rgba(255,255,255,1)] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none">Back to Signal Hub</a>
+                            {% if release.artist_href %}
+                            <a href="{{ release.artist_href }}" class="border border-white/20 px-5 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white transition-colors hover:border-primary hover:text-primary">Artist Page</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if same_day_releases %}
+                    <div class="panel-shell p-6">
+                        <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Same-day lineup</p>
+                        <div class="mt-5 space-y-4">
+                            {% for item in same_day_releases %}
+                            <div class="border-b border-white/10 pb-4 last:border-b-0 last:pb-0">
+                                <p class="text-[10px] uppercase tracking-[0.18em] {% if item.is_current %}text-secondary{% else %}text-slate-500{% endif %}">{{ item.artist }}</p>
+                                <p class="mt-1 text-sm font-black uppercase tracking-tight text-white">{{ item.title }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if nearby_releases %}
+                    <div class="panel-shell p-6">
+                        <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Coming up next</p>
+                        <div class="mt-5 space-y-4">
+                            {% for item in nearby_releases %}
+                            <a href="{{ item.article_href }}" class="block border-b border-white/10 pb-4 last:border-b-0 last:pb-0">
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.date_label }}</p>
+                                <p class="mt-1 text-[10px] uppercase tracking-[0.18em] text-primary">{{ item.artist }}</p>
+                                <p class="mt-1 text-sm font-black uppercase tracking-tight text-white">{{ item.title }}</p>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if day_birthdays or day_anniversaries %}
+                    <div class="panel-shell p-6">
+                        <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Scene signals that day</p>
+                        <div class="mt-5 space-y-5">
+                            {% if day_birthdays %}
+                            <div>
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Birthdays</p>
+                                <div class="mt-3 space-y-2">
+                                    {% for item in day_birthdays|slice:":4" %}
+                                    <p class="text-sm text-white">{{ item.label }} <span class="text-slate-500">{{ item.detail }}</span></p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if day_anniversaries %}
+                            <div>
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Anniversaries</p>
+                                <div class="mt-3 space-y-2">
+                                    {% for item in day_anniversaries|slice:":4" %}
+                                    <p class="text-sm text-white">{{ item.label }} <span class="text-slate-500">{{ item.detail }}</span></p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </aside>
+            </div>
+
+            {% if related_releases %}
+            <div class="mt-14 border-t border-white/10 pt-10">
+                <div class="flex items-end justify-between gap-6">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Keep reading</p>
+                        <h2 class="mt-4 font-cinzel text-3xl text-white sm:text-4xl">More release signals</h2>
+                    </div>
+                </div>
+                <div class="mt-8 grid gap-4 md:grid-cols-3">
+                    {% for item in related_releases %}
+                    <a href="{{ item.article_href }}" class="panel-shell group overflow-hidden transition-colors hover:border-primary/40">
+                        <div class="relative h-40 overflow-hidden border-b border-white/10 bg-black">
+                            {% if item.image %}
+                            <img src="{{ item.image }}" alt="{{ item.artist }} {{ item.title }}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+                            {% else %}
+                            <div class="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_24%_18%,rgba(244,37,192,0.28),transparent_42%),radial-gradient(circle_at_82%_80%,rgba(0,240,255,0.18),transparent_34%),#080808] text-2xl font-black uppercase tracking-tight text-white">{{ item.artist_mark }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="p-5">
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-primary">{{ item.artist }}</p>
+                            <p class="mt-2 text-lg font-black uppercase tracking-tight text-white">{{ item.title }}</p>
+                            <p class="mt-3 text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.date_label }}</p>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+
+{% include 'core/footer.html' %}
+</body>
+</html>

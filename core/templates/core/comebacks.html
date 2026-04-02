@@ -560,9 +560,8 @@ tailwind.config = {
 
             <div class="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {% for release in recent_releases %}
-                <button type="button"
-                        class="panel-shell group overflow-hidden text-left transition-colors hover:border-primary/40"
-                        @click="openReleaseById('{{ release.id }}')">
+                <a href="{{ release.article_href }}"
+                   class="panel-shell group overflow-hidden text-left transition-colors hover:border-primary/40">
                     <div class="relative h-44 overflow-hidden border-b border-white/10 bg-black">
                         {% if release.image %}
                         <img src="{{ release.image }}" alt="{{ release.artist }} {{ release.title }}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"/>
@@ -581,7 +580,7 @@ tailwind.config = {
                             <span class="material-symbols-outlined text-base text-primary">arrow_forward</span>
                         </div>
                     </div>
-                </button>
+                </a>
                 {% endfor %}
             </div>
         </div>
