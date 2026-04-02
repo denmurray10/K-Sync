@@ -76,6 +76,7 @@ urlpatterns = [
     path('live/', views.live, name='live'),
     path('live/player-popout/', views.live_player_popout, name='live_player_popout'),
     path('comeback-timeline/', views.comeback_timeline, name='comeback_timeline'),
+    path('comebacks/', views.comeback_timeline, name='comebacks'),
     path('comeback-timeline/landed/<slug:article_slug>/', views.comeback_release_article, name='comeback_release_article'),
     path('comeback-design-lab/', views.upcoming_comebacks_design_lab, name='upcoming_comebacks_design_lab'),
     path('calendar/', views.calendar, name='calendar'),
