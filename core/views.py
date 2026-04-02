@@ -37,6 +37,7 @@ import cloudinary.uploader
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 import base64
+from types import SimpleNamespace
 from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
@@ -132,7 +133,7 @@ def _radio_track_base_queryset():
 
 
 def _record_live_track_play(request, track):
-    if not request.user.is_authenticated or not track:
+    if not request.user.is_authenticated or not track or not getattr(track, 'pk', None):
         return
     dedupe_cutoff = timezone.now() - timedelta(minutes=20)
     already_recorded = RadioTrackPlay.objects.filter(
@@ -304,6 +305,148 @@ def _build_stream_audio_url(source_url):
     if transform:
         return f"https://res.cloudinary.com/{cloud_name}/video/fetch/{transform}/{encoded}"
     return f"https://res.cloudinary.com/{cloud_name}/video/fetch/{encoded}"
+
+
+def _radioco_is_enabled():
+    station_id = str(getattr(settings, 'RADIOCO_STATION_ID', '') or '').strip()
+    listen_url = str(getattr(settings, 'RADIOCO_LISTEN_URL', '') or '').strip()
+    return bool(getattr(settings, 'RADIOCO_ENABLED', False) and station_id and listen_url)
+
+
+def _radioco_cache_key(suffix):
+    station_id = str(getattr(settings, 'RADIOCO_STATION_ID', '') or '').strip()
+    return f"radioco:{station_id}:{suffix}"
+
+
+def _radioco_fetch_json(path, cache_suffix, ttl=15):
+    cached = cache.get(_radioco_cache_key(cache_suffix))
+    if cached is not None:
+        return cached
+
+    base = str(getattr(settings, 'RADIOCO_API_BASE', 'https://public.radio.co') or 'https://public.radio.co').rstrip('/')
+    url = f"{base}{path}"
+    timeout = float(getattr(settings, 'RADIOCO_TIMEOUT_SECONDS', 8) or 8)
+    try:
+        response = requests.get(
+            url,
+            timeout=timeout,
+            headers={'User-Agent': 'K-Beats Radio.co Integration'},
+        )
+        response.raise_for_status()
+        payload = response.json()
+        cache.set(_radioco_cache_key(cache_suffix), payload, ttl)
+        return payload
+    except Exception:
+        return None
+
+
+def _radioco_station_info():
+    station_id = str(getattr(settings, 'RADIOCO_STATION_ID', '') or '').strip()
+    if not station_id:
+        return None
+    return _radioco_fetch_json(f"/api/v2/{station_id}", 'station', ttl=300)
+
+
+def _radioco_current_track_info():
+    station_id = str(getattr(settings, 'RADIOCO_STATION_ID', '') or '').strip()
+    if not station_id:
+        return None
+    return _radioco_fetch_json(f"/api/v2/{station_id}/track/current", 'track-current', ttl=8)
+
+
+def _radioco_track_payload_root(payload):
+    if isinstance(payload, dict):
+        for key in ('data', 'track', 'current_track', 'currentTrack'):
+            value = payload.get(key)
+            if isinstance(value, dict):
+                return value
+    return payload if isinstance(payload, dict) else {}
+
+
+def _radioco_pick_first(mapping, *keys):
+    if not isinstance(mapping, dict):
+        return ''
+    for key in keys:
+        value = mapping.get(key)
+        if value:
+            return value
+    return ''
+
+
+def _radioco_track_artwork(track_payload):
+    artwork = _radioco_pick_first(track_payload, 'artwork', 'artwork_url', 'image', 'image_url')
+    if artwork:
+        return artwork
+    artwork_urls = track_payload.get('artwork_urls') if isinstance(track_payload.get('artwork_urls'), dict) else {}
+    return _radioco_pick_first(artwork_urls, 'large', 'medium', 'small')
+
+
+def _radioco_stream_url(station_payload=None):
+    configured = str(getattr(settings, 'RADIOCO_LISTEN_URL', '') or '').strip()
+    if configured:
+        return configured
+    payload = _radioco_track_payload_root(station_payload or {})
+    return str(_radioco_pick_first(payload, 'listen_url', 'listenUrl', 'stream_url', 'streamUrl', 'url') or '').strip()
+
+
+def _radioco_current_track_namespace():
+    if not _radioco_is_enabled():
+        return None
+
+    station_payload = _radioco_station_info() or {}
+    track_payload = _radioco_track_payload_root(_radioco_current_track_info() or {})
+    listen_url = _radioco_stream_url(station_payload)
+    if not listen_url:
+        return None
+
+    title = str(_radioco_pick_first(track_payload, 'title', 'name') or 'K-Beats Live').strip() or 'K-Beats Live'
+    artist = str(_radioco_pick_first(track_payload, 'artist', 'artist_name', 'subtitle') or 'On Air').strip() or 'On Air'
+    artwork = _coalesce_stream_image_url(
+        _radioco_track_artwork(track_payload),
+        _radioco_pick_first(_radioco_track_payload_root(station_payload), 'logo', 'logo_url', 'image'),
+    )
+    started_at_raw = _radioco_pick_first(track_payload, 'start_time', 'started_at', 'startTime')
+    started_at = None
+    if started_at_raw:
+        try:
+            started_at = timezone.make_aware(datetime.fromisoformat(str(started_at_raw).replace('Z', '+00:00'))) if 'T' in str(started_at_raw) else None
+        except Exception:
+            try:
+                from django.utils.dateparse import parse_datetime
+                started_at = parse_datetime(str(started_at_raw))
+            except Exception:
+                started_at = None
+
+    if started_at and timezone.is_naive(started_at):
+        started_at = timezone.make_aware(started_at, timezone.utc)
+
+    return SimpleNamespace(
+        id=None,
+        pk=None,
+        title=title,
+        artist=artist,
+        album_art=artwork,
+        audio_url=listen_url,
+        duration='Live',
+        duration_seconds=0,
+        live_ai_payload={},
+        live_ai_generated_at=None,
+        started_at=started_at,
+    )
+
+
+def _radioco_current_track_payload(track):
+    if not track:
+        return None
+    return {
+        'id': 0,
+        'title': track.title,
+        'artist': track.artist,
+        'album_art': track.album_art,
+        'audio_url': track.audio_url,
+        'duration': 'Live',
+        'duration_seconds': 0,
+    }
 
 
 def _build_stream_image_url(source_url):
@@ -7990,6 +8133,8 @@ def _generate_live_ai_payload(track):
 def _get_or_generate_live_ai_payload(track):
     if not track:
         return _default_live_ai_payload(None)
+    if not getattr(track, 'pk', None):
+        return _default_live_ai_payload(track)
 
     normalized_existing = _normalize_live_ai_payload(track.live_ai_payload or {}, track)
     existing_commentary = str((track.live_ai_payload or {}).get('commentary') or '').strip()
@@ -8459,6 +8604,46 @@ def _build_live_page_context(request):
     ).values_list('song_title', flat=True)
     requested_titles = [t.lower() for t in requested]
 
+    if _radioco_is_enabled():
+        current_track = _radioco_current_track_namespace()
+        _record_live_track_play(request, current_track)
+        live_show_snapshot = _build_live_show_snapshot(timezone.localtime())
+        live_request_momentum = _build_live_request_momentum(
+            current_track,
+            [],
+            requested_titles,
+        )
+        live_poll = _build_live_poll_context(request)
+        live_room_hype = _build_live_room_hype(live_request_momentum, live_poll)
+        live_return_profile = _build_live_return_profile(request.user, profile, current_track)
+        current_track_payload = _radioco_current_track_payload(current_track)
+        live_ai_payload = _default_live_ai_payload(current_track)
+
+        return {
+            'requested_titles': requested_titles,
+            'requested_titles_json': json.dumps(requested_titles),
+            'state': None,
+            'current_track': current_track,
+            'current_track_saved': live_return_profile['current_track_saved'],
+            'current_track_json': json.dumps(current_track_payload),
+            'current_track_id': 0,
+            'current_track_duration_seconds': 0,
+            'current_voice_overlay_json': 'null',
+            'up_next_tracks': [],
+            'recently_played_tracks': [],
+            'live_show_snapshot': live_show_snapshot,
+            'live_request_momentum': live_request_momentum,
+            'requested_track_lookup_json': json.dumps(live_request_momentum.get('request_lookup', {})),
+            'live_poll': live_poll,
+            'live_poll_json': json.dumps(live_poll),
+            'live_room_hype': live_room_hype,
+            'live_return_profile': live_return_profile,
+            'up_next_tracks_json': '[]',
+            'current_offset': 0,
+            'live_ai_payload': live_ai_payload,
+            'live_ai_payload_json': json.dumps(live_ai_payload),
+        }
+
     # Fetch Radio Station State and use scheduler-linked playback when possible
     state, _ = RadioStationState.objects.get_or_create(id=1)
     schedule_context = _compute_schedule_live_context(timezone.localtime())
@@ -8860,6 +9045,9 @@ def api_live_rotate_track(request):
     """
     Rotates the radio station to the next track in the queue.
     """
+    if _radioco_is_enabled():
+        return api_live_status(request)
+
     from core.models import RadioStationState, RadioTrack
     import random
 
@@ -9010,6 +9198,18 @@ def api_live_rotate_track(request):
 
 
 def api_live_status(request):
+    if _radioco_is_enabled():
+        current = _radioco_current_track_namespace()
+        if not current:
+            return JsonResponse({'ok': False, 'error': 'No active Radio.co track'}, status=404)
+        return JsonResponse({
+            'ok': True,
+            'current_offset': 0,
+            'current_track': _radioco_current_track_payload(current),
+            'up_next': [],
+            'recently_played': [],
+        })
+
     state, _ = RadioStationState.objects.get_or_create(id=1)
     schedule_context = _compute_schedule_live_context(timezone.localtime())
     current_offset = 0

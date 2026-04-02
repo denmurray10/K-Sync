@@ -6,6 +6,7 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db import connection
 from django.core.cache import cache
+from unittest.mock import Mock, patch
 
 from core import views as core_views
 
@@ -324,3 +325,80 @@ class ComebackNewsSyncTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Echo Bloom')
+
+
+class RadioCoIntegrationTests(TestCase):
+    @patch('core.views.requests.get')
+    @patch('core.views._build_live_show_snapshot')
+    def test_api_live_status_uses_radioco_when_enabled(self, mock_show_snapshot, mock_get):
+        cache.clear()
+        mock_show_snapshot.return_value = {'current': None, 'next': None}
+        station_response = Mock()
+        station_response.raise_for_status.return_value = None
+        station_response.json.return_value = {
+            'station': {
+                'listen_url': 'https://streaming.radio.co/test/listen',
+                'logo': 'https://example.com/logo.jpg',
+            }
+        }
+        track_response = Mock()
+        track_response.raise_for_status.return_value = None
+        track_response.json.return_value = {
+            'data': {
+                'title': 'Radio Song',
+                'artist': 'Radio Artist',
+                'artwork_urls': {'large': 'https://example.com/art.jpg'},
+                'start_time': '2026-04-02T10:00:00Z',
+            }
+        }
+        mock_get.side_effect = [station_response, track_response]
+
+        with self.settings(
+            RADIOCO_ENABLED=True,
+            RADIOCO_STATION_ID='station123',
+            RADIOCO_LISTEN_URL='https://streaming.radio.co/test/listen',
+            RADIOCO_API_BASE='https://public.radio.co',
+        ):
+            response = self.client.get(reverse('api_live_status'))
+
+        payload = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(payload['ok'])
+        self.assertEqual(payload['current_track']['title'], 'Radio Song')
+        self.assertEqual(payload['current_track']['artist'], 'Radio Artist')
+        self.assertEqual(payload['current_track']['audio_url'], 'https://streaming.radio.co/test/listen')
+
+    @patch('core.views.requests.get')
+    @patch('core.views._build_live_show_snapshot')
+    def test_live_page_context_uses_radioco_track(self, mock_show_snapshot, mock_get):
+        cache.clear()
+        mock_show_snapshot.return_value = {'current': None, 'next': None}
+        station_response = Mock()
+        station_response.raise_for_status.return_value = None
+        station_response.json.return_value = {
+            'station': {
+                'listen_url': 'https://streaming.radio.co/test/listen',
+                'logo': 'https://example.com/logo.jpg',
+            }
+        }
+        track_response = Mock()
+        track_response.raise_for_status.return_value = None
+        track_response.json.return_value = {
+            'data': {
+                'title': 'Radio Song',
+                'artist': 'Radio Artist',
+                'artwork_urls': {'large': 'https://example.com/art.jpg'},
+            }
+        }
+        mock_get.side_effect = [station_response, track_response]
+
+        with self.settings(
+            RADIOCO_ENABLED=True,
+            RADIOCO_STATION_ID='station123',
+            RADIOCO_LISTEN_URL='https://streaming.radio.co/test/listen',
+            RADIOCO_API_BASE='https://public.radio.co',
+        ):
+            response = self.client.get(reverse('live'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Radio Song')

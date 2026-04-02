@@ -242,6 +242,13 @@ AUDIO_STREAM_USE_CLOUDINARY_FETCH = os.environ.get('AUDIO_STREAM_USE_CLOUDINARY_
 # Cloudinary video transformations are used for audio resources as well.
 AUDIO_STREAM_CLOUDINARY_TRANSFORM = os.environ.get('AUDIO_STREAM_CLOUDINARY_TRANSFORM', 'q_auto:eco,br_96k,f_mp3')
 
+# Radio.co live stream integration
+RADIOCO_ENABLED = config('RADIOCO_ENABLED', default=False, cast=bool)
+RADIOCO_STATION_ID = config('RADIOCO_STATION_ID', default='').strip()
+RADIOCO_LISTEN_URL = config('RADIOCO_LISTEN_URL', default='').strip()
+RADIOCO_API_BASE = config('RADIOCO_API_BASE', default='https://public.radio.co').rstrip('/')
+RADIOCO_TIMEOUT_SECONDS = float(config('RADIOCO_TIMEOUT_SECONDS', default='8'))
+
 # ── Image delivery optimisation (Cloudinary Fetch in front of B2) ───────────
 # Set to true to rewrite Backblaze image URLs through Cloudinary image/fetch.
 IMAGE_STREAM_USE_CLOUDINARY_FETCH = os.environ.get('IMAGE_STREAM_USE_CLOUDINARY_FETCH', 'false').lower() == 'true'
