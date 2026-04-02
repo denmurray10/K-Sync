@@ -1281,6 +1281,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
             }
 
+            async function refreshRadioCoStatus() {
+                if (rotateInFlight) return;
+                try {
+                    const response = await fetch(`/api/live/status/?_ts=${Date.now()}`, { cache: 'no-store' });
+                    const data = await response.json();
+                    if (!data.ok || !data.current_track) return;
+
+                    const nextTrack = data.current_track || {};
+                    const nextTrackId = Number(nextTrack.id || 0);
+                    const currentTitle = String(document.getElementById('hero-title')?.textContent || '').trim();
+                    const currentArtist = String(document.getElementById('hero-artist')?.textContent || '').trim();
+                    const hasTrackChanged =
+                        (nextTrackId && nextTrackId !== Number(currentTrackId || 0))
+                        || currentTitle !== String(nextTrack.title || '').trim()
+                        || currentArtist !== String(nextTrack.artist || '').trim();
+
+                    if (hasTrackChanged) {
+                        await triggerRotate('status-poll');
+                    }
+                } catch (error) {
+                    console.warn('Live status refresh failed:', error);
+                }
+            }
+
             audio.addEventListener('ended', () => triggerRotate('ended'));
             updateProgressUI(initialServerOffset || 0);
             updatePlaylistUI('up-next-container', currentUpNextTracks, 'primary');
@@ -1288,6 +1312,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             loadNextShowRail();
             setInterval(updateUpNextCountdownTimers, 1000);
             setInterval(renderUpcomingShowsColumn, 1000);
+            setInterval(refreshRadioCoStatus, 15000);
             applyLiveAiPayload(currentLiveAiPayload);
             updateShareCard({
                 title: document.getElementById('hero-title')?.textContent || 'RADIO LIVE',

@@ -415,6 +415,21 @@ def _radioco_track_identity(title, artist):
     return f"{normalized_artist}::{normalized_title}"
 
 
+def _radioco_synthetic_track_id(title, artist, started_at=None):
+    identity = _radioco_track_identity(title, artist)
+    started_fragment = ''
+    if started_at:
+        try:
+            started_fragment = timezone.localtime(started_at, timezone.utc).isoformat()
+        except Exception:
+            started_fragment = str(started_at)
+    seed = f"{identity}::{started_fragment}".strip(':')
+    if not seed:
+        return 0
+    digest = hashlib.sha1(seed.encode('utf-8')).hexdigest()[:12]
+    return int(digest, 16)
+
+
 def _radioco_artwork_cache_key(title, artist):
     identity = _radioco_track_identity(title, artist)
     if not identity:
@@ -597,7 +612,7 @@ def _radioco_current_track_namespace():
         started_at = timezone.make_aware(started_at, timezone.utc)
 
     return SimpleNamespace(
-        id=None,
+        id=_radioco_synthetic_track_id(title, artist, started_at),
         pk=None,
         title=title,
         artist=artist,
@@ -615,7 +630,7 @@ def _radioco_current_track_payload(track):
     if not track:
         return None
     return {
-        'id': 0,
+        'id': int(getattr(track, 'id', 0) or 0),
         'title': track.title,
         'artist': track.artist,
         'album_art': track.album_art,
@@ -8803,7 +8818,7 @@ def _build_live_page_context(request):
             'current_track': current_track,
             'current_track_saved': live_return_profile['current_track_saved'],
             'current_track_json': json.dumps(current_track_payload),
-            'current_track_id': 0,
+            'current_track_id': int(getattr(current_track, 'id', 0) or 0),
             'current_track_duration_seconds': 0,
             'current_voice_overlay_json': 'null',
             'up_next_tracks': [],
