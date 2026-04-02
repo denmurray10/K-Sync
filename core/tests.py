@@ -444,3 +444,55 @@ class RadioCoIntegrationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Radio Song')
         self.assertContains(response, 'Fact Check')
+
+    @patch('core.views.requests.get')
+    def test_recently_played_reuses_cached_current_track_artwork(self, mock_get):
+        cache.clear()
+        station_response = Mock()
+        station_response.raise_for_status.return_value = None
+        station_response.json.return_value = {
+            'data': {
+                'name': 'K Beats Radio',
+                'logo': 'https://example.com/logo.jpg',
+                'streaming_links': [{'url': 'https://streaming.radio.co/test/listen'}],
+            }
+        }
+        track_response = Mock()
+        track_response.raise_for_status.return_value = None
+        track_response.json.return_value = {
+            'data': {
+                'track_title': 'Monster',
+                'track_artist': 'SEVENTEEN',
+                'artwork_urls': {'large': 'https://example.com/monster.jpg'},
+                'start_time': '2026-04-02T10:00:00Z',
+            }
+        }
+        status_response = Mock()
+        status_response.raise_for_status.return_value = None
+        status_response.json.return_value = {
+            'current_track': {
+                'title': 'NCT DREAM - Beat It Up',
+                'artwork_url_large': 'https://example.com/beat-it-up.jpg',
+            },
+            'history': [
+                {'title': 'SEVENTEEN - Monster'},
+                {'title': 'SEVENTEEN - Monster'},
+            ],
+            'logo_url': 'https://example.com/logo.jpg',
+        }
+        mock_get.side_effect = [station_response, track_response, status_response]
+
+        with self.settings(
+            RADIOCO_ENABLED=True,
+            RADIOCO_STATION_ID='station123',
+            RADIOCO_LISTEN_URL='https://streaming.radio.co/test/listen',
+            RADIOCO_API_BASE='https://public.radio.co',
+        ):
+            current = core_views._radioco_current_track_namespace()
+            recent = core_views._radioco_recently_played_tracks(limit=5)
+
+        self.assertEqual(current.title, 'Monster')
+        self.assertEqual(current.album_art, 'https://example.com/monster.jpg')
+        self.assertEqual(len(recent), 1)
+        self.assertEqual(recent[0].title, 'Monster')
+        self.assertEqual(recent[0].album_art, 'https://example.com/monster.jpg')

@@ -407,6 +407,37 @@ def _radioco_split_artist_and_title(raw_title, raw_artist=''):
     return title, artist
 
 
+def _radioco_track_identity(title, artist):
+    normalized_title = str(title or '').strip().casefold()
+    normalized_artist = str(artist or '').strip().casefold()
+    if not normalized_title or not normalized_artist:
+        return ''
+    return f"{normalized_artist}::{normalized_title}"
+
+
+def _radioco_artwork_cache_key(title, artist):
+    identity = _radioco_track_identity(title, artist)
+    if not identity:
+        return ''
+    digest = hashlib.sha1(identity.encode('utf-8')).hexdigest()
+    return _radioco_cache_key(f"artwork:{digest}")
+
+
+def _radioco_store_track_artwork(title, artist, artwork_url, ttl=60 * 60 * 24 * 14):
+    cache_key = _radioco_artwork_cache_key(title, artist)
+    artwork = str(artwork_url or '').strip()
+    if not cache_key or not artwork:
+        return
+    cache.set(cache_key, artwork, ttl)
+
+
+def _radioco_cached_track_artwork(title, artist):
+    cache_key = _radioco_artwork_cache_key(title, artist)
+    if not cache_key:
+        return ''
+    return str(cache.get(cache_key) or '').strip()
+
+
 def _radioco_track_display_parts(track_payload):
     root = _radioco_track_payload_root(track_payload)
     raw_title = _radioco_pick_first(root, 'track_title', 'title', 'name')
@@ -461,6 +492,14 @@ def _radioco_recently_played_tracks(limit=5):
     current_title, current_artist = _radioco_track_display_parts(
         status_payload.get('current_track') if isinstance(status_payload, dict) else {}
     )
+    current_artwork = _coalesce_stream_image_url(
+        _radioco_track_artwork(
+            status_payload.get('current_track') if isinstance(status_payload, dict) else {}
+        ),
+        _radioco_pick_first(status_payload, 'logo_url', 'logo'),
+    )
+    if current_title and current_artist and current_artwork:
+        _radioco_store_track_artwork(current_title, current_artist, current_artwork)
     current_key = f"{current_artist.lower()}::{current_title.lower()}".strip(':')
     station_root = _radioco_track_payload_root(station_payload)
     default_artwork = _coalesce_stream_image_url(
@@ -493,12 +532,18 @@ def _radioco_recently_played_tracks(limit=5):
         item_root = _radioco_track_payload_root(item if isinstance(item, dict) else {})
         artwork_key = (title.lower(), artist.lower())
         matched_artwork = artwork_lookup.get(artwork_key)
+        cached_artwork = _radioco_cached_track_artwork(title, artist)
         results.append(SimpleNamespace(
             id=None,
             pk=None,
             title=title,
             artist=artist or 'On Air',
-            album_art=_coalesce_stream_image_url(_radioco_track_artwork(item_root), matched_artwork, default_artwork),
+            album_art=_coalesce_stream_image_url(
+                _radioco_track_artwork(item_root),
+                cached_artwork,
+                matched_artwork,
+                default_artwork,
+            ),
             audio_url='',
             duration='',
             duration_seconds=0,
@@ -534,6 +579,8 @@ def _radioco_current_track_namespace():
         _radioco_track_artwork(track_payload),
         _radioco_pick_first(_radioco_track_payload_root(station_payload), 'logo', 'logo_url', 'image'),
     )
+    if title and artist and artwork:
+        _radioco_store_track_artwork(title, artist, artwork)
     started_at_raw = _radioco_pick_first(track_payload, 'start_time', 'started_at', 'startTime')
     started_at = None
     if started_at_raw:
