@@ -2680,6 +2680,49 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
             }
 
+            function applyPolledTrackUpdate(data) {
+                if (!data || !data.current_track) return;
+                const track = data.current_track;
+                currentTrackId = Number(track.id || 0);
+                currentTrackDurationSeconds = Number(track.duration_seconds || 0);
+                currentVoiceOverlay = null;
+
+                document.getElementById('hero-title').textContent = track.title || 'K-Beats Live';
+                document.getElementById('hero-artist').textContent = track.artist || 'On Air';
+                document.getElementById('hero-album-art').src = track.album_art || '';
+
+                const stickyTitle = document.getElementById('sticky-track-title');
+                const stickyArtist = document.getElementById('sticky-track-artist');
+                if (stickyTitle) stickyTitle.textContent = track.title || 'K-Beats Live';
+                if (stickyArtist) stickyArtist.textContent = track.artist || 'On Air';
+
+                const bgImg = document.getElementById('album-bg-img');
+                if (bgImg && track.album_art) bgImg.src = track.album_art;
+                const heroPanelBgImg = document.getElementById('hero-panel-bg-img');
+                if (heroPanelBgImg && track.album_art) heroPanelBgImg.src = track.album_art;
+
+                if (progressTotalEl) {
+                    progressTotalEl.textContent = String(track.duration || 'Live');
+                }
+
+                updateShareCard(track);
+                updateRequestedPill(track.title);
+                setSaveMomentSelected(!!data.current_track_saved);
+
+                currentLiveAiPayload = data.live_ai_payload || {};
+                applyLiveAiPayload(currentLiveAiPayload);
+
+                currentUpNextTracks = Array.isArray(data.up_next) ? data.up_next : [];
+                updatePlaylistUI('up-next-container', currentUpNextTracks, 'primary');
+                updateUpNextCountdownTimers();
+                updatePlaylistUI('recently-played-container', Array.isArray(data.recently_played) ? data.recently_played : [], 'secondary');
+
+                updateProgressUI(0);
+                if (progressShellEl) {
+                    progressShellEl.classList.add('is-live');
+                }
+            }
+
             async function refreshRadioCoStatus() {
                 if (rotateInFlight) return;
                 try {
@@ -2697,7 +2740,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         || currentArtist !== String(nextTrack.artist || '').trim();
 
                     if (hasTrackChanged) {
-                        await triggerRotate('status-poll');
+                        applyPolledTrackUpdate(data);
                     }
                 } catch (error) {
                     console.warn('Live status refresh failed:', error);
