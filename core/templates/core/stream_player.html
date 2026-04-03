@@ -7,7 +7,7 @@
 <title>{{ stream_preset.name }} | K-Beats Stream</title>
 <meta name="description" content="{{ stream_preset.description }}"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
     tailwind.config = {
@@ -19,7 +19,8 @@
                     secondary: "#00f0ff",
                 },
                 fontFamily: {
-                    display: ["Montserrat", "sans-serif"]
+                    display: ["Cinzel", "serif"],
+                    body: ["Montserrat", "sans-serif"]
                 },
                 borderRadius: { "DEFAULT": "0px", "sm": "0px", "md": "0px", "lg": "0px", "xl": "0px", "2xl": "0px", "3xl": "0px", "full": "9999px" },
             }
@@ -66,7 +67,7 @@
     }
 </style>
 </head>
-<body class="min-h-screen bg-black text-white font-display overflow-x-hidden">
+<body class="min-h-screen bg-black text-white font-body overflow-x-hidden">
 {% include 'core/header.html' %}
 
 <audio id="stream-audio" preload="auto" {% if not stream_has_access %}data-locked="true"{% endif %}></audio>
@@ -116,10 +117,10 @@
                                 <button id="stream-play-toggle" class="flex h-16 w-16 items-center justify-center border border-white bg-white text-black transition-colors hover:bg-primary hover:border-primary" aria-label="Play or pause stream">
                                     <span id="stream-play-icon" class="material-symbols-outlined text-4xl">play_arrow</span>
                                 </button>
-                                <div class="min-w-0">
+                                <div class="min-w-0 self-center flex flex-col justify-center">
                                     <p class="text-xs font-black uppercase tracking-[0.18em]" style="color: rgba(var(--stream-accent), 1)">Now Playing</p>
-                                    <p id="stream-track-title" class="mt-2 truncate text-3xl font-black uppercase tracking-tight">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
-                                    <p id="stream-track-artist" class="mt-1 truncate text-sm uppercase tracking-[0.24em] text-slate-400">{% if current_track %}{{ current_track.artist }}{% else %}On Air{% endif %}</p>
+                                    <p id="stream-track-title" class="mt-1 truncate font-display text-3xl font-semibold uppercase tracking-tight leading-none">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
+                                    <p id="stream-track-artist" class="mt-1 truncate text-sm uppercase tracking-[0.24em] text-slate-400 leading-none">{% if current_track %}{{ current_track.artist }}{% else %}On Air{% endif %}</p>
                                 </div>
                             </div>
                             <div class="mt-6">
@@ -145,10 +146,10 @@
                                     <a href="{% url 'fan_clubs' %}" class="border border-white/20 bg-white/5 px-5 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-white transition-colors hover:border-secondary hover:text-secondary">View Fan Clubs</a>
                                 </div>
                             </div>
-                            <div class="mt-8">
+                            <div class="mt-8 self-center flex flex-col justify-center">
                                 <p class="text-xs font-black uppercase tracking-[0.18em]" style="color: rgba(var(--stream-accent), 1)">Previewing Current Broadcast</p>
-                                <p id="stream-track-title" class="mt-2 truncate text-3xl font-black uppercase tracking-tight">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
-                                <p id="stream-track-artist" class="mt-1 truncate text-sm uppercase tracking-[0.24em] text-slate-400">{% if current_track %}{{ current_track.artist }}{% else %}On Air{% endif %}</p>
+                                <p id="stream-track-title" class="mt-1 truncate font-display text-3xl font-semibold uppercase tracking-tight leading-none">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
+                                <p id="stream-track-artist" class="mt-1 truncate text-sm uppercase tracking-[0.24em] text-slate-400 leading-none">{% if current_track %}{{ current_track.artist }}{% else %}On Air{% endif %}</p>
                             </div>
                             {% endif %}
 

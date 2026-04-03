@@ -157,8 +157,8 @@
 
                         <div class="space-y-5 px-6 py-6">
                             <div class="border border-white/10 bg-white/[0.03] p-4">
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="min-w-0 flex-1">
                                         <p class="section-kicker text-[9px] font-semibold uppercase text-slate-400">Live now</p>
                                         <p class="mt-2 text-xl font-semibold uppercase tracking-tight text-white">{{ home_live_track.title|default:"Live Mix" }}</p>
                                         <p class="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ home_live_track.artist|default:"K-Beats Radio" }}</p>
@@ -167,6 +167,30 @@
                                         <span class="h-2 w-2 rounded-full bg-primary"></span>
                                         Live
                                     </span>
+                                </div>
+                                <div class="mt-4 flex items-start gap-4">
+                                    {% if home_live_track and home_live_track.album_art %}
+                                    <img src="{{ home_live_track.album_art }}" alt="{{ home_live_track.artist|default:'K-Beats Radio' }} {{ home_live_track.title|default:'Live Mix' }}" class="h-28 w-24 shrink-0 border border-white/10 object-cover"/>
+                                    {% else %}
+                                    <div class="flex h-28 w-24 shrink-0 items-center justify-center border border-white/10 bg-[radial-gradient(circle_at_20%_20%,rgba(244,37,192,0.35),transparent_60%),radial-gradient(circle_at_82%_78%,rgba(0,240,255,0.22),transparent_52%),#050505]">
+                                        <span class="text-[10px] font-bold uppercase tracking-[0.24em] text-white/70">On Air</span>
+                                    </div>
+                                    {% endif %}
+                                    <div class="min-w-0 flex-1">
+                                        <div class="mt-3 w-full h-[3px] overflow-hidden rounded-full bg-white/10">
+                                            <div class="h-full rounded-full bg-primary" style="width: {% widthratio home_live_track.current_offset home_live_track.duration_seconds 100 %}%; transition: width 1s linear;"></div>
+                                        </div>
+                                        <div class="mt-1.5 flex justify-between">
+                                            <span class="text-[9px] font-mono tabular-nums text-slate-500">0:00</span>
+                                            <span class="text-[9px] font-mono tabular-nums text-slate-500">0:00</span>
+                                        </div>
+                                        <div class="mt-4 flex flex-wrap items-center gap-2">
+                                            <a href="{% url 'live' %}" class="inline-flex items-center gap-2 bg-primary px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-black transition-colors hover:bg-white">
+                                                Listen Live
+                                                <span class="material-symbols-outlined text-sm">play_arrow</span>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

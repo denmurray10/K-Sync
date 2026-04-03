@@ -200,6 +200,119 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .request-chip--light span:last-child {
         color: rgba(15, 23, 42, 0.72);
     }
+    .request-modal-shell {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.14);
+        background:
+            radial-gradient(circle at top left, rgba(244, 37, 192, 0.16), transparent 28%),
+            radial-gradient(circle at 85% 15%, rgba(255,255,255,0.08), transparent 24%),
+            linear-gradient(180deg, rgba(5, 5, 5, 0.98), rgba(0, 0, 0, 0.98));
+        box-shadow:
+            0 30px 100px rgba(0,0,0,0.62),
+            inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .request-modal-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(135deg, rgba(255,255,255,0.06), transparent 28%),
+            linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.02) 100%);
+        pointer-events: none;
+    }
+    .request-modal-grid {
+        display: grid;
+        gap: 1.25rem;
+    }
+    .request-modal-rail {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.1);
+        background:
+            radial-gradient(circle at top left, rgba(244, 37, 192, 0.18), transparent 38%),
+            linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    }
+    .request-modal-rail::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0 0;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(244,37,192,0.85), rgba(255,255,255,0.35), rgba(0,240,255,0.55));
+        opacity: 0.75;
+    }
+    .request-modal-widget-shell {
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(244,245,248,0.98));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .request-modal-widget-shell iframe {
+        display: block;
+        width: 100%;
+        margin: 0 auto;
+        background: #ffffff;
+    }
+    .request-modal-widget-stage {
+        position: relative;
+        min-height: 450px;
+    }
+    .request-modal-widget-stage.is-loading .request-modal-widget-loading {
+        opacity: 1;
+    }
+    .request-modal-widget-loading {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+            linear-gradient(180deg, rgba(248,249,251,0.95), rgba(244,245,248,0.96));
+        color: #0f172a;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+        opacity: 0;
+    }
+    .request-modal-spinner {
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 999px;
+        border: 3px solid rgba(15, 23, 42, 0.12);
+        border-top-color: #f425c0;
+        border-right-color: #00f0ff;
+        animation: request-modal-spin 1s linear infinite;
+    }
+    .request-modal-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.05);
+        padding: 0.55rem 0.75rem;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #e2e8f0;
+    }
+    .request-modal-chip strong {
+        color: #ffffff;
+        letter-spacing: 0.08em;
+    }
+    .request-modal-close {
+        border: 1px solid rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.04);
+        color: #ffffff;
+        transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+    .request-modal-close:hover,
+    .request-modal-close:focus-visible {
+        border-color: rgba(244, 37, 192, 0.75);
+        background: rgba(244, 37, 192, 0.12);
+        color: #f425c0;
+        transform: translateY(-1px);
+        outline: none;
+    }
     .section-eyebrow {
         font-size: 10px;
         font-weight: 700;
@@ -334,6 +447,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         0%, 100% { transform: scale(0.9); opacity: 0.7; }
         50% { transform: scale(1.14); opacity: 1; }
     }
+    @keyframes request-modal-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after {
             animation-duration: 0.01ms !important;
@@ -366,6 +483,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         #live-poll-total {
             font-size: 1.5rem;
             line-height: 1;
+        }
+        .request-modal-widget-stage {
+            min-height: 400px;
+        }
+    }
+    @media (min-width: 1024px) {
+        .request-modal-grid {
+            grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.28fr);
+            align-items: stretch;
+        }
+    }
+    @media (max-width: 639px) {
+        .request-modal-shell {
+            min-height: calc(100vh - 2rem);
+        }
+        .request-modal-widget-stage {
+            min-height: 360px;
         }
     }
 </style>
@@ -464,19 +598,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
 
                     <div class="relative z-10 mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                        <button id="play-btn" class="live-primary-btn pulse-glow inline-flex items-center justify-center gap-3 px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] sm:col-span-2 xl:col-span-1">
+                        <button id="play-btn" data-track="listen_live" data-track-category="hero_player" class="live-primary-btn pulse-glow inline-flex items-center justify-center gap-3 px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] sm:col-span-2 xl:col-span-1">
                             <span class="material-symbols-outlined text-2xl">play_arrow</span>
                             Listen Live
                         </button>
-                        <a href="{% url 'request_track' %}" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                        <a href="{% url 'request_track' %}" data-track="request_track" data-track-category="hero_player" {% if radioco_request_widget_enabled %}data-request-modal-open="true"{% endif %} class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                             Request A Track
                             <span class="material-symbols-outlined text-lg">queue_music</span>
                         </a>
-                        <a href="#community" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                        <a href="#community" data-track="join_room" data-track-category="hero_player" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                             Join The Room
                             <span class="material-symbols-outlined text-lg">forum</span>
                         </a>
-                        <a href="{% url 'schedule' %}" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-white hover:text-white transition-colors">
+                        <a href="{% url 'schedule' %}" data-track="tonights_schedule" data-track-category="hero_player" class="inline-flex items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-6 py-4 text-[11px] font-black uppercase tracking-[0.22em] hover:border-white hover:text-white transition-colors">
                             Tonight's Schedule
                             <span class="material-symbols-outlined text-lg">event_upcoming</span>
                         </a>
@@ -513,13 +647,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 </svg>
                                 <div class="sync-wave-scan"></div>
                             </div>
-                            <div class="sync-wave-meta mt-3 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                                <span id="live-progress-current">0:00</span>
+                            <div class="sync-wave-meta mt-3 justify-center text-[11px] uppercase tracking-[0.22em] text-slate-500">
                                 <span class="sync-wave-pulse">
                                     <span class="sync-wave-pulse-dot"></span>
                                     <span>Frequency Sync</span>
                                 </span>
-                                <span id="live-progress-total">{% if current_track %}{{ current_track.duration }}{% else %}3:00{% endif %}</span>
                             </div>
                         </div>
 
@@ -604,11 +736,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p id="share-card-title" class="mt-4 font-display text-3xl uppercase leading-none tracking-tight">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
                         <p id="share-card-artist" class="mt-2 text-[11px] uppercase tracking-[0.24em] text-slate-400">{% if current_track %}{{ current_track.artist }}{% else %}Always On Air{% endif %}</p>
                         <div class="mt-5 flex flex-wrap gap-3">
-                            <button id="share-now-playing-btn" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
+                            <button id="share-now-playing-btn" data-track="share_now_playing" data-track-category="share_card" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
                                 Share
                                 <span class="material-symbols-outlined text-base">send</span>
                             </button>
-                            <button id="save-moment-btn" class="inline-flex items-center gap-2 border border-white/15 bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white hover:border-primary hover:text-primary transition-colors">
+                            <button id="save-moment-btn" data-track="save_moment" data-track-category="share_card" class="inline-flex items-center gap-2 border border-white/15 bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white hover:border-primary hover:text-primary transition-colors">
                                 Save This Moment
                                 <span class="material-symbols-outlined text-base">bookmark</span>
                             </button>
@@ -659,7 +791,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none"></div>
           <div class="container mx-auto px-6 py-4 sm:px-6 relative z-10">
             <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                <div class="flex items-center gap-4 xl:min-w-[240px] xl:shrink-0">
+                <div class="flex items-center gap-4 self-center xl:min-w-[240px] xl:shrink-0">
                     <div class="hidden h-12 w-12 shrink-0 items-center justify-center border border-black bg-black text-white shadow-[4px_4px_0px_#ffffff] md:flex">
                         <span class="material-symbols-outlined text-3xl">play_arrow</span>
                     </div>
@@ -677,16 +809,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                     </div>
                 </div>
-                <div class="min-w-0 flex-1 text-left xl:px-8 xl:text-center">
+                <div class="min-w-0 flex-1 self-center text-left xl:px-8 xl:text-center">
                     <p id="sticky-track-title" class="font-display text-[1.75rem] uppercase leading-[0.95] tracking-tight text-black sm:text-[2rem] xl:truncate">{% if current_track %}{{ current_track.title }}{% else %}K-Beats Live{% endif %}</p>
                     <p id="sticky-track-artist" class="mt-2 text-[11px] font-mono uppercase tracking-[0.24em] text-black/75 xl:truncate">{% if current_track %}{{ current_track.artist }}{% else %}Always On Air{% endif %}</p>
                 </div>
                 <div class="flex flex-wrap gap-3 xl:min-w-[320px] xl:shrink-0 xl:justify-end">
-                    <a href="{% url 'request_track' %}" class="inline-flex items-center gap-2 border border-black bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white shadow-[4px_4px_0px_#ffffff] transition-colors hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    <a href="{% url 'request_track' %}" data-track="request_song_player" data-track-category="sticky_player" {% if radioco_request_widget_enabled %}data-request-modal-open="true"{% endif %} class="inline-flex items-center gap-2 border border-black bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white shadow-[4px_4px_0px_#ffffff] transition-colors hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                         Request Song
                         <span class="material-symbols-outlined text-base">queue_music</span>
                     </a>
-                    <a href="#community" class="inline-flex items-center gap-2 border border-black bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white shadow-[4px_4px_0px_#ffffff] transition-colors hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                    <a href="#community" data-track="community_player" data-track-category="sticky_player" class="inline-flex items-center gap-2 border border-black bg-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] text-white shadow-[4px_4px_0px_#ffffff] transition-colors hover:bg-white hover:text-black hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
                         Community
                         <span class="material-symbols-outlined text-base">forum</span>
                     </a>
@@ -799,7 +931,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <p class="mt-3 max-w-xl text-sm leading-relaxed text-slate-300">
                                 No requests have landed yet, which means the first vote or fan pick can set the energy for everyone listening.
                             </p>
-                            <a href="{% url 'request_track' %}" class="live-primary-btn mt-4 inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
+                            <a href="{% url 'request_track' %}" data-track="be_the_first_request" data-track-category="queue_impact" {% if radioco_request_widget_enabled %}data-request-modal-open="true"{% endif %} class="live-primary-btn mt-4 inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
                                 Request A Track
                                 <span class="material-symbols-outlined text-base">queue_music</span>
                             </a>
@@ -858,7 +990,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                     <div class="mt-6 space-y-3">
                         {% for option in live_poll.options %}
-                        <button type="button" data-poll-option="{{ option.id }}" class="group relative w-full overflow-hidden border border-white/20 bg-white/5 p-6 text-left transition-all duration-300 hover:border-primary hover:bg-black disabled:cursor-not-allowed disabled:opacity-60" {% if live_poll.locked %}disabled{% endif %}>
+                        <button type="button" data-poll-option="{{ option.id }}" data-track="live_poll_vote_{{ option.id }}" data-track-category="live_poll" class="group relative w-full overflow-hidden border border-white/20 bg-white/5 p-6 text-left transition-all duration-300 hover:border-primary hover:bg-black disabled:cursor-not-allowed disabled:opacity-60" {% if live_poll.locked %}disabled{% endif %}>
                             <span data-poll-bar class="absolute inset-y-0 left-0 bg-primary/20 z-0 transition-all duration-1000" style="width: {% if live_poll.locked %}0{% else %}{{ option.percentage }}%{% endif %}"></span>
                             <span data-poll-selected-bar class="absolute left-0 top-0 bottom-0 w-2 bg-primary z-10 hidden"></span>
 
@@ -923,7 +1055,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             {% endif %}
                             {% else %}
                             <p class="mt-3 text-sm leading-relaxed text-slate-300">No fan picks are in the queue yet, so the next request can be the one that changes the room.</p>
-                            <a href="{% url 'request_track' %}" class="mt-4 inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                            <a href="{% url 'request_track' %}" {% if radioco_request_widget_enabled %}data-request-modal-open="true"{% endif %} class="mt-4 inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                                 Be The First
                                 <span class="material-symbols-outlined text-base">north_east</span>
                             </a>
@@ -943,7 +1075,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Signal Desk</p>
                             <h2 class="mt-3 font-display text-4xl uppercase leading-none">DJ Notes</h2>
                         </div>
-                        <button id="live-ai-helpful-btn" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
+                        <button id="live-ai-helpful-btn" data-track="dj_notes_helpful" data-track-category="signal_desk" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
                             <span id="live-ai-helpful-icon" class="material-symbols-outlined text-base">thumb_up</span>
                             Helpful
                         </button>
@@ -1054,11 +1186,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 Keep K-Beats in your pocket with instant live listening, comeback alerts, and fan-first extras built for the station's biggest listeners.
                             </p>
                             <div class="mt-5 flex flex-wrap gap-3">
-                                <a href="{% url 'promo' %}" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
+                                <a href="{% url 'promo' %}" data-track="open_app_preview" data-track-category="sponsored_spotlight" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
                                     Open App Preview
                                     <span class="material-symbols-outlined text-base">phone_iphone</span>
                                 </a>
-                                <a href="{% url 'signup' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                                <a href="{% url 'signup' %}" data-track="create_account_sponsored" data-track-category="sponsored_spotlight" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                                     Create Account
                                     <span class="material-symbols-outlined text-base">north_east</span>
                                 </a>
@@ -1091,11 +1223,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                         <div class="mt-5 flex flex-wrap gap-3">
                             {% if live_return_profile.is_authenticated %}
-                            <a href="{% url 'dashboard' %}" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
+                            <a href="{% url 'dashboard' %}" data-track="open_dashboard_return" data-track-category="return_loop" class="live-primary-btn inline-flex items-center gap-2 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em]">
                                 Open Dashboard
                                 <span class="material-symbols-outlined text-base">dashboard</span>
                             </a>
-                            <a href="{% url 'profile_personalization_settings' %}" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
+                            <a href="{% url 'profile_personalization_settings' %}" data-track="reminder_settings" data-track-category="return_loop" class="inline-flex items-center gap-2 border border-white/15 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:border-primary hover:text-primary transition-colors">
                                 Reminder Settings
                                 <span class="material-symbols-outlined text-base">notifications</span>
                             </a>
@@ -1143,7 +1275,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <p class="text-[10px] uppercase tracking-[0.24em] text-slate-500">Fan Influence</p>
                     <h3 class="mt-3 font-display text-2xl uppercase leading-tight">Push Songs Into The Room</h3>
                     <p class="mt-3 text-sm leading-relaxed text-slate-300">Requests and live voting make the station feel participatory instead of passive, especially when the queue starts moving.</p>
-                    <a href="{% url 'request_track' %}" class="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
+                    <a href="{% url 'request_track' %}" {% if radioco_request_widget_enabled %}data-request-modal-open="true"{% endif %} class="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-primary hover:text-white transition-colors">
                         Request A Track
                         <span class="material-symbols-outlined text-sm">queue_music</span>
                     </a>
@@ -1183,11 +1315,174 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </section>
 
+    {% if radioco_request_widget_enabled %}
+    <div id="live-request-modal" class="fixed inset-0 z-[120] hidden" aria-hidden="true">
+        <button type="button" data-request-modal-close class="absolute inset-0 bg-black/90 backdrop-blur-md" aria-label="Close request modal"></button>
+        <div class="relative z-10 flex min-h-full items-center justify-center p-4 sm:p-6">
+            <div class="request-modal-shell w-full max-w-6xl" role="dialog" aria-modal="true" aria-labelledby="live-request-modal-title">
+                <div class="relative z-10 flex items-start justify-between gap-4 border-b border-white/10 px-5 py-4 sm:px-6">
+                    <div class="min-w-0">
+                        <div class="inline-flex items-center gap-2 border border-primary/25 bg-primary/10 px-3 py-2">
+                            <span class="relative flex h-2.5 w-2.5">
+                                <span class="absolute inline-flex h-full w-full rounded-full bg-primary opacity-80 animate-ping"></span>
+                                <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary"></span>
+                            </span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">Live Request Desk</span>
+                        </div>
+                        <h2 id="live-request-modal-title" class="mt-4 font-display text-3xl uppercase leading-none text-white sm:text-4xl lg:text-5xl">Request A Track</h2>
+                        <p class="mt-3 max-w-3xl text-sm uppercase tracking-[0.18em] text-slate-300 sm:text-[13px]">
+                            Stay in the live room, send a fan pick, and let the next queue move happen without losing the stream.
+                        </p>
+                    </div>
+                    <button type="button" data-request-modal-close data-request-modal-close-button class="request-modal-close sticky top-0 inline-flex h-11 w-11 shrink-0 items-center justify-center" aria-label="Close request modal">
+                        <span class="material-symbols-outlined text-2xl">close</span>
+                    </button>
+                </div>
+                <div class="request-modal-grid relative z-10 px-4 py-4 sm:px-6 sm:py-6">
+                    <aside class="request-modal-rail flex flex-col justify-between p-5 sm:p-6">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-white/55">Studio Context</p>
+                            <h3 class="mt-4 font-display text-3xl uppercase leading-none text-white">Push The Room</h3>
+                            <p class="mt-4 text-sm leading-relaxed text-slate-300">
+                                A request is more than a search. It is a hand on the pulse of what lands next, what fans hear together, and how the room feels in real time.
+                            </p>
+                        </div>
+                        <div class="mt-6 space-y-3">
+                            <div class="request-modal-chip">
+                                <span class="material-symbols-outlined text-base text-primary">headphones</span>
+                                <span>Live room <strong>open now</strong></span>
+                            </div>
+                            <div class="request-modal-chip">
+                                <span class="material-symbols-outlined text-base text-primary">queue_music</span>
+                                <span>Request goes <strong>straight to Kbeatsradio.co.uk</strong></span>
+                            </div>
+                            <div class="request-modal-chip">
+                                <span class="material-symbols-outlined text-base text-primary">bolt</span>
+                                <span>Best used while <strong>listening live</strong></span>
+                            </div>
+                            <p class="pt-2 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">
+                                Search, confirm, and stay close to the stream.
+                            </p>
+                        </div>
+                    </aside>
+                    <div class="request-modal-widget-shell p-3 sm:p-4 lg:p-5">
+                        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">K-Beats Request Panel</p>
+                                <p class="mt-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-900">Choose your song and send your request live</p>
+                            </div>
+                            <div class="inline-flex items-center gap-2 border border-slate-200 bg-slate-50 px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-600">
+                                <span class="material-symbols-outlined text-sm text-primary">verified</span>
+                                Live On Kbeatsradio.co.uk
+                            </div>
+                        </div>
+                        <div id="live-request-widget-stage" class="request-modal-widget-stage is-loading">
+                            <div class="request-modal-widget-loading" aria-hidden="true">
+                                <div class="flex flex-col items-center gap-4 text-center">
+                                    <span class="request-modal-spinner"></span>
+                                    <div>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">Opening your request panel</p>
+                                        <p class="mt-2 text-sm font-semibold uppercase tracking-[0.14em] text-slate-900">Getting everything ready for your song request</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <script src="{{ radioco_request_widget_src }}"></script>
+                        </div>
+                        <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                            <p id="live-request-widget-helper" class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                                Send your song request here and keep listening while the live room keeps moving.
+                            </p>
+                            <p id="live-request-widget-fallback" class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                                If nothing shows up yet, give it a moment to load or reopen the request panel.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     {% include 'core/footer.html' %}
 </main>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const requestModal = document.getElementById('live-request-modal');
+        if (requestModal) {
+            const requestModalOpeners = Array.from(document.querySelectorAll('[data-request-modal-open]'));
+            const requestModalClosers = Array.from(requestModal.querySelectorAll('[data-request-modal-close]'));
+            const requestWidgetStage = document.getElementById('live-request-widget-stage');
+            const requestWidgetHelper = document.getElementById('live-request-widget-helper');
+            let requestModalTrigger = null;
+            let requestWidgetReady = false;
+
+            const markRequestWidgetReady = (loaded) => {
+                if (!requestWidgetStage) return;
+                requestWidgetStage.classList.remove('is-loading');
+                requestWidgetReady = true;
+                if (requestWidgetHelper && loaded) {
+                    requestWidgetHelper.textContent = 'Send your song request here and keep listening while the live room keeps moving.';
+                }
+            };
+
+            if (requestWidgetStage) {
+                window.setTimeout(() => {
+                    const requestIframe = requestWidgetStage.querySelector('iframe');
+                    if (requestIframe) {
+                        requestIframe.addEventListener('load', () => markRequestWidgetReady(true), { once: true });
+                        window.setTimeout(() => markRequestWidgetReady(true), 900);
+                    }
+                }, 100);
+
+                window.setTimeout(() => {
+                    if (!requestWidgetReady) {
+                        requestWidgetStage.classList.remove('is-loading');
+                        if (requestWidgetHelper) {
+                            requestWidgetHelper.textContent = 'Your request panel is taking a little longer than usual to appear. Give it a moment, then try reopening it if needed.';
+                        }
+                    }
+                }, 3500);
+            }
+
+            const closeRequestModal = () => {
+                requestModal.classList.add('hidden');
+                requestModal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('overflow-hidden');
+                if (requestModalTrigger) {
+                    requestModalTrigger.focus();
+                }
+            };
+
+            const openRequestModal = (trigger) => {
+                requestModalTrigger = trigger || null;
+                requestModal.classList.remove('hidden');
+                requestModal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('overflow-hidden');
+                const closeButton = requestModal.querySelector('[data-request-modal-close-button]');
+                if (closeButton) {
+                    closeButton.focus();
+                }
+            };
+
+            requestModalOpeners.forEach((link) => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    openRequestModal(link);
+                });
+            });
+
+            requestModalClosers.forEach((button) => {
+                button.addEventListener('click', closeRequestModal);
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !requestModal.classList.contains('hidden')) {
+                    closeRequestModal();
+                }
+            });
+        }
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
@@ -1204,9 +1499,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const progressFillEl = document.getElementById('live-progress-fill');
         const progressShellEl = document.getElementById('live-progress-shell');
         const progressCanvasEl = document.getElementById('live-progress-canvas');
-        const progressCurrentEl = document.getElementById('live-progress-current');
-        const progressTotalEl = document.getElementById('live-progress-total');
-
         if (playBtn && audio) {
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({ title: 'K-BEATS LIVE', artist: 'On Air' });
@@ -1799,7 +2091,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (Number.isFinite(audioDuration) && audioDuration > 0) return audioDuration;
                 const knownDuration = Number(currentTrackDurationSeconds || 0);
                 if (Number.isFinite(knownDuration) && knownDuration > 0) return knownDuration;
-                if (progressTotalEl) return parseDurationLabelSeconds(progressTotalEl.textContent || '');
                 return 0;
             };
 
@@ -2225,14 +2516,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 const current = explicitCurrent === null ? Number(audio.currentTime || 0) : Number(explicitCurrent || 0);
                 const safeCurrent = Math.max(0, current);
 
-                if (progressCurrentEl) {
-                    progressCurrentEl.textContent = formatClock(safeCurrent);
-                }
-
                 if (duration > 0) {
-                    if (progressTotalEl) {
-                        progressTotalEl.textContent = formatClock(duration);
-                    }
                     const pct = Math.max(0, Math.min(100, (safeCurrent / duration) * 100));
                     lastWaveProgress = pct;
                     if (progressShellEl) {
@@ -2589,9 +2873,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         currentTrackDurationSeconds = durationFromPayload > 0
                             ? durationFromPayload
                             : parseDurationLabelSeconds(track.duration);
-                        if (progressTotalEl) {
-                            progressTotalEl.textContent = String(track.duration || formatClock(currentTrackDurationSeconds || 0));
-                        }
                         currentVoiceOverlay = data.voice_overlay || null;
                         const previousSrc = String(audio.currentSrc || audio.src || '');
                         const nextSrc = String(track.audio_url || '');
@@ -2700,10 +2981,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (bgImg && track.album_art) bgImg.src = track.album_art;
                 const heroPanelBgImg = document.getElementById('hero-panel-bg-img');
                 if (heroPanelBgImg && track.album_art) heroPanelBgImg.src = track.album_art;
-
-                if (progressTotalEl) {
-                    progressTotalEl.textContent = String(track.duration || 'Live');
-                }
 
                 updateShareCard(track);
                 updateRequestedPill(track.title);

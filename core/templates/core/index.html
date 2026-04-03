@@ -49,7 +49,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
 <link rel="stylesheet" href="{% static 'core/css/home-tailwind.css' %}"/>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <style>
         html.site-loading body {
@@ -57,6 +57,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         body {
             transition: opacity 220ms ease;
+        }
+        #home-live-title,
+        #home-live-status-title-mobile {
+            font-size: 32px;
+            line-height: 0.95;
         }
         .glass-panel {
             background: rgba(0, 0, 0, 0.7);
@@ -246,10 +251,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 width: 2.5rem;
                 height: 2.5rem;
             }
-            #home-live-player-bar #home-live-title {
-                font-size: 1.1rem;
-                line-height: 1;
-            }
             #home-live-player-bar a[href$="/live/"] {
                 padding: 0.55rem 0.7rem;
                 font-size: 9px;
@@ -359,8 +360,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <div class="space-y-5 px-6 py-6">
 <div class="border border-white/10 bg-white/[0.03] p-4">
-<div class="flex items-center justify-between gap-4">
-<div class="min-w-0">
+<div class="flex items-start justify-between gap-4">
+<div class="min-w-0 flex-1">
 <p class="hero-signal-kicker text-[9px] font-semibold uppercase text-slate-400">Live now</p>
 <p id="hero-signal-title" class="mt-2 truncate text-xl font-semibold uppercase tracking-tight text-white">{{ home_live_track.title|default:"Live Mix" }}</p>
 <p id="hero-signal-artist" class="mt-1 truncate text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ home_live_track.artist|default:"K-Beats Radio" }}</p>
@@ -370,13 +371,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 Live
 </span>
 </div>
+<div class="mt-4 flex items-start gap-4">
+{% if home_live_track and home_live_track.album_art %}
+<img src="{{ home_live_track.album_art }}" alt="{{ home_live_track.artist|default:'K-Beats Radio' }} {{ home_live_track.title|default:'Live Mix' }}" class="h-28 w-24 shrink-0 border border-white/10 object-cover"/>
+{% else %}
+<div class="flex h-28 w-24 shrink-0 items-center justify-center border border-white/10 bg-gradient-to-br from-primary/25 via-transparent to-secondary/20">
+<span class="text-[10px] font-bold uppercase tracking-[0.24em] text-white/70">On Air</span>
+</div>
+{% endif %}
+<div class="min-w-0 flex-1">
 <!-- Song progress bar -->
 <div class="mt-3 w-full bg-white/10 h-[3px] overflow-hidden rounded-full">
 <div id="hero-live-progress" class="h-full bg-primary rounded-full" style="width: {% widthratio home_live_track.current_offset home_live_track.duration_seconds 100 %}%; transition: width 1s linear;"></div>
 </div>
-<div class="flex justify-between mt-1.5">
-<span id="hero-live-elapsed" class="text-[9px] font-mono text-slate-500 tabular-nums">0:00</span>
-<span id="hero-live-duration" class="text-[9px] font-mono text-slate-500 tabular-nums">0:00</span>
+<div class="mt-4 flex flex-wrap items-center gap-2">
+<button id="homepage-listen-live-popout" data-track="listen_live_home_hero" data-track-category="homepage_live_now" data-track-destination="/live/player-popout/" type="button" class="inline-flex items-center gap-2 bg-primary px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-black transition-colors hover:bg-white">
+Listen Live
+<span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+</div>
 </div>
 </div>
 
@@ -401,12 +415,6 @@ Live
 <p class="hero-signal-kicker mt-3 text-[9px] font-semibold uppercase text-slate-400">Next comeback</p>
 <h2 class="mt-2 text-3xl font-black uppercase leading-tight text-white">{% if hero_primary_event %}{{ hero_primary_event.title }}{% else %}Calendar updating{% endif %}</h2>
 <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-300">{% if hero_primary_event %}{{ hero_primary_event.artist }}{% else %}Fresh release data is being refreshed.{% endif %}</p>
-<div class="mt-4 flex flex-wrap items-center gap-2">
-<a href="{% url 'live' %}" class="inline-flex items-center gap-2 bg-primary px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-black transition-colors hover:bg-white">
-Listen Live
-<span class="material-symbols-outlined text-sm">play_arrow</span>
-</a>
-</div>
 </div>
 </div>
 </div>
@@ -450,7 +458,7 @@ Listen Live
 <button class="hidden md:flex w-12 h-12 md:w-14 md:h-14 bg-black text-white hover:bg-white hover:text-black items-center justify-center rounded-none transition-colors border border-black shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
 <span class="material-symbols-outlined font-black text-3xl md:text-4xl">play_arrow</span>
 </button>
-<div class="hidden md:flex flex-col">
+<div class="hidden md:flex flex-col justify-center self-center">
 <div class="flex items-center gap-2">
 <span class="relative flex h-2.5 w-2.5">
 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
@@ -462,15 +470,15 @@ Listen Live
 </div>
 </div>
 
-<div id="home-live-status-mobile" class="md:hidden flex flex-col flex-1 px-2 text-center">
-<div class="flex items-start justify-center gap-2 min-w-0">
-<span id="home-live-status-title-mobile" class="text-[14px] font-black uppercase tracking-[0.1em] leading-tight text-black max-w-full min-w-0">{{ home_live_track.title|default:"LIVE MIX" }}</span>
+<div id="home-live-status-mobile" class="md:hidden flex flex-col flex-1 self-center justify-center px-2 text-center">
+<div class="flex items-center justify-center gap-2 min-w-0">
+<span id="home-live-status-title-mobile" class="max-w-full min-w-0 text-[14px] font-normal uppercase tracking-tight text-black leading-[0.95]" style="font-family: 'Cinzel', serif;">{{ home_live_track.title|default:"LIVE MIX" }}</span>
 </div>
-<span id="home-live-status-artist-mobile" class="text-black/80 text-[12px] font-mono uppercase tracking-[0.14em] mt-0.5 max-w-full min-w-0">{{ home_live_track.artist|default:"K-BEATS RADIO" }}</span>
+<span id="home-live-status-artist-mobile" class="mt-1 max-w-full min-w-0 text-[11px] font-mono uppercase tracking-[0.24em] text-black/75">{{ home_live_track.artist|default:"K-BEATS RADIO" }}</span>
 </div>
 
 <!-- Center: Track Info & Visualizer -->
-<div class="hidden md:flex flex-1 items-center justify-center gap-6 px-8 max-w-2xl mx-auto">
+<div class="hidden md:flex flex-1 self-center items-center justify-center gap-6 px-8 max-w-2xl mx-auto">
 <!-- Left Waveform -->
 <div class="flex gap-1.5 items-end h-10 opacity-90 w-16">
 <div class="w-1.5 bg-black bar-animate" style="animation-duration: 0.8s;"></div>
@@ -481,17 +489,9 @@ Listen Live
 </div>
 
 <!-- Track Title -->
-<div class="text-center truncate min-w-[200px] flex-1">
-<span id="home-live-title" class="font-black uppercase tracking-tighter text-2xl md:text-3xl leading-none text-black block truncate">{{ home_live_track.title|default:"LIVE MIX" }}</span>
-<span id="home-live-artist" class="block text-black/70 font-mono text-[10px] tracking-widest uppercase mt-1 truncate">{{ home_live_track.artist|default:"K-BEATS RADIO" }}</span>
-<!-- Song progress bar -->
-<div class="mt-2 w-full bg-black/20 h-[3px] overflow-hidden rounded-full">
-<div id="bar-live-progress" class="h-full bg-black rounded-full" style="width: {% widthratio home_live_track.current_offset home_live_track.duration_seconds 100 %}%; transition: width 1s linear;"></div>
-</div>
-<div class="flex justify-between mt-1">
-<span id="bar-live-elapsed" class="text-[8px] font-mono text-black/50 tabular-nums">0:00</span>
-<span id="bar-live-duration" class="text-[8px] font-mono text-black/50 tabular-nums">0:00</span>
-</div>
+<div class="flex min-w-[200px] flex-1 flex-col justify-center self-center text-center truncate translate-y-[4px]">
+<span id="home-live-title" class="block truncate text-[32px] uppercase leading-[0.95] tracking-tight text-black font-normal" style="font-family: 'Cinzel', serif;">{{ home_live_track.title|default:"LIVE MIX" }}</span>
+<span id="home-live-artist" class="mt-1.5 block truncate text-[11px] font-mono uppercase tracking-[0.24em] text-black">{{ home_live_track.artist|default:"K-BEATS RADIO" }}</span>
 </div>
 
 <!-- Right Waveform -->
@@ -1073,8 +1073,8 @@ window.addEventListener('resize', () => {
     window.requestAnimationFrame(syncHomepageTickerSpeeds);
 });
 
-// ── Homepage Live Bar Sync ──────────────────────────────────────
-// Shared state for progress bars
+// ── Homepage Live Sync ──────────────────────────────────────────
+// Shared state for live progress-driven UI
 let _liveOffset = {{ home_live_track.current_offset|default:"0" }};
 let _liveDuration = {{ home_live_track.duration_seconds|default:"0" }};
 let _liveTickerHandle = null;
@@ -1093,19 +1093,8 @@ function _updateProgressBars() {
 
     // Hero signal panel
     const heroBar = document.getElementById('hero-live-progress');
-    const heroElapsed = document.getElementById('hero-live-elapsed');
-    const heroDuration = document.getElementById('hero-live-duration');
     if (heroBar) heroBar.style.width = pct + '%';
-    if (heroElapsed) heroElapsed.textContent = elapsed;
-    if (heroDuration) heroDuration.textContent = duration;
 
-    // Pink live player bar
-    const barProgress = document.getElementById('bar-live-progress');
-    const barElapsed = document.getElementById('bar-live-elapsed');
-    const barDuration = document.getElementById('bar-live-duration');
-    if (barProgress) barProgress.style.width = pct + '%';
-    if (barElapsed) barElapsed.textContent = elapsed;
-    if (barDuration) barDuration.textContent = duration;
 }
 
 function _startProgressTicker() {
@@ -1169,11 +1158,68 @@ async function refreshHomepageLiveBar() {
     }
 }
 
+async function openHomepagePlayerPopout() {
+    const playerStateKey = 'ksync_station_widget_v1';
+    const readPlayerState = () => {
+        try {
+            return JSON.parse(localStorage.getItem(playerStateKey) || '{}');
+        } catch (e) {
+            return {};
+        }
+    };
+    const writePlayerState = (patch = {}) => {
+        const next = { ...readPlayerState(), ...patch, updatedAt: Date.now() };
+        localStorage.setItem(playerStateKey, JSON.stringify(next));
+        return next;
+    };
+
+    const fallbackTrack = {
+        title: String(document.getElementById('hero-signal-title')?.textContent || document.getElementById('home-live-title')?.textContent || 'K-BEATS LIVE').trim(),
+        artist: String(document.getElementById('hero-signal-artist')?.textContent || document.getElementById('home-live-artist')?.textContent || 'ON AIR').trim(),
+        album_art: String(document.querySelector('#home-live-artwork-mobile')?.getAttribute('src') || '').trim(),
+        audio_url: '',
+    };
+
+    try {
+        const res = await fetch(`/api/live/status/?_ts=${Date.now()}`, { cache: 'no-store' });
+        const data = await res.json();
+        const track = data?.ok && data.current_track ? data.current_track : fallbackTrack;
+        writePlayerState({
+            track,
+            src: String(track.audio_url || ''),
+            playing: true,
+            mode: 'popout',
+            command: {
+                id: Date.now(),
+                type: 'play',
+                at: Date.now(),
+            },
+        });
+    } catch (e) {
+        writePlayerState({
+            track: fallbackTrack,
+            src: '',
+            playing: true,
+            mode: 'popout',
+        });
+    }
+
+    const popout = window.open('/live/player-popout/', 'ksync-live-popout', 'popup=yes,width=430,height=220,left=120,top=120');
+    if (popout) {
+        popout.focus();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     _updateProgressBars();
     _startProgressTicker();
     refreshHomepageLiveBar();
     setInterval(refreshHomepageLiveBar, 15000);
+
+    const homepagePopoutTrigger = document.getElementById('homepage-listen-live-popout');
+    if (homepagePopoutTrigger) {
+        homepagePopoutTrigger.addEventListener('click', openHomepagePlayerPopout);
+    }
 });
 
 function initHomepageEmailPromoForm() {

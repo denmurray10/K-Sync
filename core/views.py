@@ -8796,6 +8796,7 @@ def _build_live_page_context(request):
     from datetime import timedelta
 
     profile = None
+    radioco_request_widget_src = _radioco_request_widget_src()
     station_group_names = []
     if request.user.is_authenticated:
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -8849,6 +8850,8 @@ def _build_live_page_context(request):
             'current_offset': 0,
             'live_ai_payload': live_ai_payload,
             'live_ai_payload_json': json.dumps(live_ai_payload),
+            'radioco_request_widget_src': radioco_request_widget_src,
+            'radioco_request_widget_enabled': bool(radioco_request_widget_src),
         }
 
     # Fetch Radio Station State and use scheduler-linked playback when possible
@@ -8972,6 +8975,8 @@ def _build_live_page_context(request):
         'current_offset': current_offset,
         'live_ai_payload': live_ai_payload,
         'live_ai_payload_json': json.dumps(live_ai_payload),
+        'radioco_request_widget_src': radioco_request_widget_src,
+        'radioco_request_widget_enabled': bool(radioco_request_widget_src),
     }
 
 

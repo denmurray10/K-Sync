@@ -1,6 +1,7 @@
 {% load static %}
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script defer src="{% static 'core/js/button_tracking.js' %}"></script>
 <style>
   .nav-cinzel { font-family: 'Cinzel', serif; letter-spacing: 0.2rem; font-size: 12px; }
   h1, h2, h3, h4, h5, h6 { font-family: 'Cinzel', serif; }
@@ -33,14 +34,14 @@
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
         </a>
         <div class="hidden min-w-0 justify-center md:flex">
-            <nav id="desktop-primary-nav" class="hidden md:flex items-center justify-center gap-6">
-                <a class="{% if request.resolver_match.url_name == 'live' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
-                <a class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
-                <a class="{% if request.resolver_match.url_name == 'charts' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
-                <a class="{% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'idols' %}">Idols</a>
-                <a class="{% if request.resolver_match.url_name == 'games' or request.resolver_match.url_name == 'song_game' or request.resolver_match.url_name == 'chart_clash' or request.resolver_match.url_name == 'fandom_trivia' or request.resolver_match.url_name == 'idol_scramble' or request.resolver_match.url_name == 'mv_matcher' or request.resolver_match.url_name == 'lyric_drop' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'games' %}">Games</a>
-                <a class="{% if request.resolver_match.url_name == 'comeback_timeline' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
-                <a class="{% if request.resolver_match.url_name == 'news' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
+            <nav id="desktop-primary-nav" data-track-category="global_nav" class="hidden md:flex items-center justify-center gap-6">
+                <a data-track="nav_live" class="{% if request.resolver_match.url_name == 'live' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
+                <a data-track="nav_stream" class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
+                <a data-track="nav_charts" class="{% if request.resolver_match.url_name == 'charts' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
+                <a data-track="nav_idols" class="{% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'idols' %}">Idols</a>
+                <a data-track="nav_games" class="{% if request.resolver_match.url_name == 'games' or request.resolver_match.url_name == 'song_game' or request.resolver_match.url_name == 'chart_clash' or request.resolver_match.url_name == 'fandom_trivia' or request.resolver_match.url_name == 'idol_scramble' or request.resolver_match.url_name == 'mv_matcher' or request.resolver_match.url_name == 'lyric_drop' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'games' %}">Games</a>
+                <a data-track="nav_comebacks" class="{% if request.resolver_match.url_name == 'comeback_timeline' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
+                <a data-track="nav_news" class="{% if request.resolver_match.url_name == 'news' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
             </nav>
         </div>
 
@@ -48,6 +49,9 @@
         <div class="flex items-center justify-self-end gap-2 sm:gap-4">
             <!-- Live On Air -->
             <button
+                data-track="live_on_air_header"
+                data-track-category="global_header"
+                data-track-destination="{% url 'live' %}"
                 class="group relative flex items-center gap-2 border border-primary px-6 py-3 font-black text-white hover:bg-primary hover:text-black transition-all"
                 onclick="window.location.href='{% url 'live' %}'"
             >
@@ -63,16 +67,16 @@
                 <span id="listener-count">3,847</span> Listening
             </div>
             <!-- Settings -->
-            <a href="{% url 'profile_personalization_settings' %}" class="w-9 h-9 rounded-full glass-bright flex items-center justify-center text-slate-300 hover:text-white transition-colors border border-white/10">
+            <a data-track="settings_header" data-track-category="global_header" href="{% url 'profile_personalization_settings' %}" class="w-9 h-9 rounded-full glass-bright flex items-center justify-center text-slate-300 hover:text-white transition-colors border border-white/10">
                 <span class="material-symbols-outlined text-xl">settings</span>
             </a>
             <!-- Auth -->
             {% if user.is_authenticated %}
-            <a href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
+            <a data-track="nav_account" data-track-category="global_header" href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
                 <span class="material-symbols-outlined text-xl">account_circle</span>
             </a>
             {% else %}
-            <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
+            <a data-track="nav_login" data-track-category="global_header" class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
             {% endif %}
         </div>
     </div>
@@ -87,14 +91,14 @@
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
         </a>
         <div class="hidden min-w-0 justify-center md:flex">
-            <nav id="desktop-primary-nav" class="hidden md:flex items-center justify-center gap-6">
-                <a class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
-                <a class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
-                <a class="{% if request.resolver_match.url_name == 'charts' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
-                <a class="{% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'idols' %}">Idols</a>
-                <a class="{% if request.resolver_match.url_name == 'games' or request.resolver_match.url_name == 'song_game' or request.resolver_match.url_name == 'chart_clash' or request.resolver_match.url_name == 'fandom_trivia' or request.resolver_match.url_name == 'idol_scramble' or request.resolver_match.url_name == 'mv_matcher' or request.resolver_match.url_name == 'lyric_drop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'games' %}">Games</a>
-                <a class="{% if request.resolver_match.url_name == 'comeback_timeline' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
-                <a class="{% if request.resolver_match.url_name == 'news' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
+            <nav id="desktop-primary-nav" data-track-category="global_nav" class="hidden md:flex items-center justify-center gap-6">
+                <a data-track="nav_live" class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
+                <a data-track="nav_stream" class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
+                <a data-track="nav_charts" class="{% if request.resolver_match.url_name == 'charts' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
+                <a data-track="nav_idols" class="{% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'idols' %}">Idols</a>
+                <a data-track="nav_games" class="{% if request.resolver_match.url_name == 'games' or request.resolver_match.url_name == 'song_game' or request.resolver_match.url_name == 'chart_clash' or request.resolver_match.url_name == 'fandom_trivia' or request.resolver_match.url_name == 'idol_scramble' or request.resolver_match.url_name == 'mv_matcher' or request.resolver_match.url_name == 'lyric_drop' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'games' %}">Games</a>
+                <a data-track="nav_comebacks" class="{% if request.resolver_match.url_name == 'comeback_timeline' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'comeback_timeline' %}">Comebacks</a>
+                <a data-track="nav_news" class="{% if request.resolver_match.url_name == 'news' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
             </nav>
         </div>
         <div class="flex items-center justify-self-end gap-2 sm:gap-4 md:gap-6 shrink-0">
@@ -104,6 +108,8 @@
             </form>
             <div class="flex gap-4 items-center">
                 <a
+                    data-track="nav_live_mobile"
+                    data-track-category="global_header"
                     href="{% url 'live' %}"
                     class="sm:hidden inline-flex items-center justify-center w-10 h-10 border border-primary text-primary hover:bg-primary hover:text-black transition-all"
                     aria-label="Go to live"
@@ -111,6 +117,9 @@
                     <span class="material-symbols-outlined text-lg">radio</span>
                 </a>
                 <button
+                    data-track="live_on_air_header"
+                    data-track-category="global_header"
+                    data-track-destination="{% url 'live' %}"
                     class="group relative hidden sm:flex items-center gap-2 border border-primary px-6 py-3 font-black text-white hover:bg-primary hover:text-black transition-all"
                     onclick="window.location.href='{% url 'live' %}'"
                 >
@@ -121,11 +130,11 @@
                     <span class="text-[10px] md:text-xs uppercase tracking-widest">Live On Air</span>
                 </button>
                 {% if user.is_authenticated %}
-                <a href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
+                <a data-track="nav_account" data-track-category="global_header" href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
                     <span class="material-symbols-outlined text-xl">account_circle</span>
                 </a>
                 {% else %}
-                <a class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
+                <a data-track="nav_login" data-track-category="global_header" class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
                 {% endif %}
             </div>
         </div>
@@ -137,6 +146,8 @@
 <button
     id="mobile-site-menu-toggle"
     type="button"
+    data-track="mobile_menu_open"
+    data-track-category="mobile_menu"
     class="md:hidden fixed bottom-4 right-4 z-[79] bg-primary text-black border border-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_#ffffff] transition-opacity flex items-center gap-2"
     aria-expanded="false"
     aria-controls="mobile-site-menu-panel"
@@ -155,7 +166,7 @@
             <p class="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500">K-BEATS RADIO</p>
             <p class="text-white text-lg font-black uppercase tracking-tight mt-2">Menu</p>
         </div>
-        <button id="mobile-site-menu-close" type="button" class="w-10 h-10 border border-white/20 text-slate-300 hover:text-white hover:border-primary transition-colors flex items-center justify-center" aria-label="Close menu">
+        <button id="mobile-site-menu-close" data-track="mobile_menu_close" data-track-category="mobile_menu" type="button" class="w-10 h-10 border border-white/20 text-slate-300 hover:text-white hover:border-primary transition-colors flex items-center justify-center" aria-label="Close menu">
             <span class="material-symbols-outlined text-lg">close</span>
         </button>
     </div>
@@ -171,7 +182,7 @@
                     <p id="mobile-menu-player-title" class="text-xs font-black uppercase tracking-tight truncate">K-BEATS LIVE</p>
                     <p id="mobile-menu-player-artist" class="text-[10px] font-mono uppercase tracking-widest text-slate-500 truncate">On Air</p>
                 </div>
-                <button id="mobile-menu-player-toggle" type="button" class="w-9 h-9 border border-primary bg-primary text-black flex items-center justify-center disabled:opacity-60" aria-label="Play or pause live radio">
+                <button id="mobile-menu-player-toggle" data-track="mobile_menu_player_toggle" data-track-category="mobile_live_player" type="button" class="w-9 h-9 border border-primary bg-primary text-black flex items-center justify-center disabled:opacity-60" aria-label="Play or pause live radio">
                     <span id="mobile-menu-player-icon" class="material-symbols-outlined text-base">play_arrow</span>
                 </button>
             </div>
@@ -179,14 +190,14 @@
 
         <div class="border border-white/10 bg-white/[0.02] p-4">
             <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500 mb-3">Browse</p>
-            <nav class="grid grid-cols-2 gap-3">
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'live' %}">Live</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'stream_hub' %}">Stream</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'charts' %}">Charts</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'idols' %}">Idols</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'games' %}">Games</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'comeback_timeline' %}">Comebacks</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'news' %}">News</a>
+            <nav data-track-category="mobile_nav" class="grid grid-cols-2 gap-3">
+                <a data-track="nav_live_mobile_menu" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'live' %}">Live</a>
+                <a data-track="nav_stream_mobile_menu" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'stream_hub' %}">Stream</a>
+                <a data-track="nav_charts_mobile_menu" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'charts' %}">Charts</a>
+                <a data-track="nav_idols_mobile_menu" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'idols' %}">Idols</a>
+                <a data-track="nav_games_mobile_menu" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'games' %}">Games</a>
+                <a data-track="nav_comebacks_mobile_menu" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'comeback_timeline' %}">Comebacks</a>
+                <a data-track="nav_news_mobile_menu" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'news' %}">News</a>
             </nav>
         </div>
 
@@ -194,15 +205,15 @@
             <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-slate-500 mb-3">My Account</p>
             <div class="grid grid-cols-2 gap-3">
                 {% if user.is_authenticated %}
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'dashboard' %}">Dashboard</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'profile' %}">Profile</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'logout' %}">Log Out</a>
+                <a data-track="mobile_dashboard" data-track-category="mobile_account" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'dashboard' %}">Dashboard</a>
+                <a data-track="mobile_profile" data-track-category="mobile_account" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'profile' %}">Profile</a>
+                <a data-track="open_my_station" data-track-category="mobile_account" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
+                <a data-track="mobile_logout" data-track-category="mobile_account" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'logout' %}">Log Out</a>
                 {% else %}
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'login' %}">Log In</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'signup' %}">Sign Up</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
-                <a class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'promo' %}">Get App</a>
+                <a data-track="mobile_login" data-track-category="mobile_account" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'login' %}">Log In</a>
+                <a data-track="mobile_signup" data-track-category="mobile_account" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'signup' %}">Sign Up</a>
+                <a data-track="open_my_station" data-track-category="mobile_account" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'my_station_onboarding' %}">My Station</a>
+                <a data-track="footer_download_app" data-track-category="mobile_account" class="border border-white/20 bg-black/40 text-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary hover:bg-black transition-colors" href="{% url 'promo' %}">Get App</a>
                 {% endif %}
             </div>
         </div>
@@ -398,7 +409,7 @@
                             <p class="text-xs font-black uppercase tracking-tight truncate" x-text="playerTrack ? playerTrack.title : 'K-BEATS LIVE'"></p>
                             <p class="text-[10px] font-mono uppercase tracking-widest text-slate-500 truncate" x-text="playerTrack ? playerTrack.artist : 'On Air'"></p>
                         </div>
-                        <button @click="toggleWidgetPlayer()" :disabled="playerLoading" class="w-8 h-8 border border-primary bg-primary text-black flex items-center justify-center disabled:opacity-60" aria-label="Play or pause">
+                        <button data-track="my_station_player_toggle" data-track-category="my_station_flyout" @click="toggleWidgetPlayer()" :disabled="playerLoading" class="w-8 h-8 border border-primary bg-primary text-black flex items-center justify-center disabled:opacity-60" aria-label="Play or pause">
                             <span class="material-symbols-outlined text-base" x-text="playerIsPlaying ? 'pause' : 'play_arrow'"></span>
                         </button>
                     </div>
@@ -433,14 +444,14 @@
                 </div>
 
                 <div class="flex flex-col gap-3 pt-2 border-t border-white/10">
-                    <a href="{% url 'my_station_onboarding' %}" class="bg-secondary text-black border border-secondary px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:bg-white transition-colors">Open My Station</a>
-                    <a href="{% url 'dashboard' %}" class="border border-white/20 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:border-white hover:bg-white/5 transition-colors">Open Dashboard</a>
-                    <a href="{% url 'live' %}" class="border border-white/20 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:border-white hover:bg-white/5 transition-colors">Go Live</a>
+                    <a data-track="open_my_station" data-track-category="my_station_flyout" href="{% url 'my_station_onboarding' %}" class="bg-secondary text-black border border-secondary px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:bg-white transition-colors">Open My Station</a>
+                    <a data-track="open_dashboard_flyout" data-track-category="my_station_flyout" href="{% url 'dashboard' %}" class="border border-white/20 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:border-white hover:bg-white/5 transition-colors">Open Dashboard</a>
+                    <a data-track="go_live_flyout" data-track-category="my_station_flyout" href="{% url 'live' %}" class="border border-white/20 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:border-white hover:bg-white/5 transition-colors">Go Live</a>
                 </div>
             {% else %}
                 <div class="flex flex-col gap-3 pt-1">
-                    <a href="{% url 'signup' %}" class="bg-secondary text-black border border-secondary px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:bg-white transition-colors">Sign Up To Customise</a>
-                    <a href="{% url 'login' %}" class="border border-white/20 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:border-white hover:bg-white/5 transition-colors">Log In</a>
+                    <a data-track="signup_my_station" data-track-category="my_station_flyout" href="{% url 'signup' %}" class="bg-secondary text-black border border-secondary px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:bg-white transition-colors">Sign Up To Customise</a>
+                    <a data-track="login_my_station" data-track-category="my_station_flyout" href="{% url 'login' %}" class="border border-white/20 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-center hover:border-white hover:bg-white/5 transition-colors">Log In</a>
                 </div>
             {% endif %}
         </div>

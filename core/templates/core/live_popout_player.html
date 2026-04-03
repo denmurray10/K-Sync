@@ -3,7 +3,6 @@
 <html class="dark" lang="en">
 <head>
   <meta charset="utf-8" />
-  
 {% include 'core/seo_meta.html' %}
 <title>K-Beats Popout Player</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
@@ -24,10 +23,29 @@
     .glow-card {
       box-shadow: 0 0 0 1px rgba(244, 37, 192, 0.25), 0 0 20px rgba(244, 37, 192, 0.2);
     }
+    .popout-logo-mark {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.05rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .popout-logo-mark .logo-k {
+      color: transparent;
+      -webkit-text-stroke: 1px #ffffff;
+    }
+    .popout-logo-mark .logo-dash {
+      color: #ffffff;
+    }
+    .popout-logo-mark .logo-beats {
+      color: transparent;
+      -webkit-text-stroke: 1px #f425c0;
+      text-shadow: 0 0 8px rgba(244, 37, 192, 0.35);
+    }
   </style>
 </head>
 <body class="bg-black text-white font-display min-h-screen p-3">
-  {% include "core/header.html" %}
   <div class="w-full h-full min-h-[180px] border border-white/15 bg-black/90 glow-card p-4 flex flex-col justify-between">
     <div class="flex items-start gap-3">
       <img id="popout-art" src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album" class="w-16 h-16 object-cover border border-white/20" alt="Album art" />
@@ -49,7 +67,16 @@
       <div class="flex-1 h-1 bg-white/10 overflow-hidden">
         <div id="popout-pulse" class="h-full w-1/2 bg-gradient-to-r from-primary to-secondary"></div>
       </div>
-      <a href="/live/" target="_blank" rel="noopener" class="text-[10px] font-black uppercase tracking-[0.18em] text-primary hover:text-white transition-colors">Live</a>
+      <span class="text-[10px] font-black uppercase tracking-[0.18em] text-primary">Live</span>
+    </div>
+
+    <div class="mt-4 flex items-end justify-between gap-3">
+      <div class="popout-logo-mark text-[22px] leading-none" aria-label="K-Beats">
+        <span class="logo-k">K</span>
+        <span class="logo-dash">-</span>
+        <span class="logo-beats">beats</span>
+      </div>
+      <span class="text-[10px] font-mono uppercase tracking-[0.24em] text-slate-500">Popout Player</span>
     </div>
 
     <audio id="popout-audio" preload="auto"></audio>
