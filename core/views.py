@@ -4318,7 +4318,7 @@ def _publish_facebook_reel(article):
     video_size = os.path.getsize(video_path)
     api_version = _facebook_reels_api_version()
     start_response = requests.post(
-        f"https://graph.facebook.com/{api_version}/me/video_reels",
+        f"https://graph.facebook.com/{api_version}/{page_id}/video_reels",
         params={
             'access_token': token,
             'upload_phase': 'start',
@@ -4348,7 +4348,7 @@ def _publish_facebook_reel(article):
         raise RuntimeError(f"Facebook Reel upload failed: {upload_payload}")
 
     publish_response = requests.post(
-        f"https://graph.facebook.com/{api_version}/me/video_reels",
+        f"https://graph.facebook.com/{api_version}/{page_id}/video_reels",
         params={
             'access_token': token,
             'upload_phase': 'finish',
