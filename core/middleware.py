@@ -184,11 +184,17 @@ class GoogleTagManagerMiddleware:
         clarity_context_script = (
             "<script id=\"ksync-clarity-context\">"
             "window.clarity=window.clarity||function(){(window.clarity.q=window.clarity.q||[]).push(arguments);};"
+            "window.__ksyncAuthState=%s;"
+            "window.__ksyncPageType=%s;"
+            "window.__ksyncPageSection=%s;"
             "window.clarity('set','page_type',%s);"
             "window.clarity('set','page_section',%s);"
             "window.clarity('set','auth_state',%s);"
             "</script>"
         ) % (
+            json.dumps(auth_state),
+            json.dumps(view_name),
+            json.dumps(page_section),
             json.dumps(view_name),
             json.dumps(page_section),
             json.dumps(auth_state),

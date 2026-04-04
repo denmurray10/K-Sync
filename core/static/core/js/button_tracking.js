@@ -10,6 +10,10 @@
     const seenScrollMilestones = new Set();
     const engagementMilestones = [30, 60, 180];
     const seenEngagementMilestones = new Set();
+    const pendingSignupKey = 'ksync_pending_signup';
+    const pendingRequestKey = 'ksync_pending_request_track';
+    const gamePathPattern = /^\/(games|game|song-game|bias-selector)(\/|$)/;
+    let hasTrackedGameStart = false;
     let engagedSeconds = 0;
     let lastEngagementTick = Date.now();
     let maxScrollPercent = 0;
@@ -302,6 +306,112 @@
         });
     };
 
+    const writeStorageFlag = (key, value) => {
+        try {
+            window.localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+            // Ignore storage failures.
+        }
+    };
+
+    const readStorageFlag = (key) => {
+        try {
+            const raw = window.localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    };
+
+    const clearStorageFlag = (key) => {
+        try {
+            window.localStorage.removeItem(key);
+        } catch (e) {
+            // Ignore storage failures.
+        }
+    };
+
+    const isGamePage = () => gamePathPattern.test(window.location.pathname);
+
+    const trackHighValueButton = (element, payload) => {
+        const destination = payload.click_destination || '';
+        const label = payload.click_label || '';
+
+        if (element.hasAttribute('data-request-modal-open')) {
+            fireClarityEvent('request_track_opened', {
+                request_entry_point: label || 'request_modal',
+            });
+        }
+
+        if (label === 'listen_live' || label === 'listen_live_home_hero' || label === 'live_on_air_header') {
+            fireClarityEvent('live_listen_cta_clicked', {
+                live_cta_source: payload.click_category || 'live_cta',
+            });
+        }
+
+        if (destination.includes('/signup/') || label.includes('signup')) {
+            fireClarityEvent('signup_cta_clicked', {
+                signup_entry_point: label || payload.click_category || 'signup_cta',
+            });
+        }
+
+        if ((destination.includes('/games/') || label.includes('game')) && !hasTrackedGameStart) {
+            hasTrackedGameStart = true;
+            fireClarityEvent('game_session_started', {
+                game_entry_point: label || payload.click_category || 'games',
+            });
+        }
+    };
+
+    const trackPageSpecificSuccesses = () => {
+        const signupState = readStorageFlag(pendingSignupKey);
+        if (
+            signupState
+            && signupState.startedAt
+            && (Date.now() - Number(signupState.startedAt)) < 30 * 60 * 1000
+            && window.__ksyncAuthState === 'authenticated'
+            && (/^\/dashboard(\/|$)/.test(window.location.pathname) || /^\/my-station-onboarding(\/|$)/.test(window.location.pathname))
+        ) {
+            fireClarityEvent('signup_completed', {
+                signup_destination: window.location.pathname,
+            });
+            clearStorageFlag(pendingSignupKey);
+        }
+
+        const requestState = readStorageFlag(pendingRequestKey);
+        if (
+            requestState
+            && requestState.startedAt
+            && (Date.now() - Number(requestState.startedAt)) > 10 * 60 * 1000
+        ) {
+            clearStorageFlag(pendingRequestKey);
+        }
+
+        if (/^\/signup(\/|$)/.test(window.location.pathname)) {
+            fireClarityEvent('signup_page_viewed', {
+                signup_view: 'landing',
+            });
+        }
+
+        if (/^\/request(\/|$)/.test(window.location.pathname)) {
+            fireClarityEvent('request_track_page_viewed', {
+                request_view: document.querySelector('[data-request-modal-open]') ? 'modal_enabled' : 'page',
+            });
+        }
+
+        if (/^\/live(\/|$)/.test(window.location.pathname)) {
+            fireClarityEvent('live_page_viewed', {
+                live_surface: window.location.pathname.replace(/\//g, '_') || 'live',
+            });
+        }
+
+        if (isGamePage()) {
+            fireClarityEvent('game_page_viewed', {
+                game_page: window.location.pathname,
+            });
+        }
+    };
+
     document.addEventListener('click', function (event) {
         const target = event.target;
         if (!target || typeof target.closest !== 'function') return;
@@ -311,6 +421,20 @@
         if (interactive.disabled || interactive.getAttribute('aria-disabled') === 'true') return;
 
         pushTrackingEvent(interactive, 'button_click');
+
+        const payload = {
+            click_category: getClosestCategory(interactive),
+            click_label: getLabel(interactive),
+            click_destination: getDestination(interactive),
+        };
+        trackHighValueButton(interactive, payload);
+
+        if (isGamePage() && !hasTrackedGameStart) {
+            hasTrackedGameStart = true;
+            fireClarityEvent('game_session_started', {
+                game_entry_point: payload.click_label || payload.click_category || 'game_page',
+            });
+        }
     }, true);
 
     document.addEventListener('submit', function (event) {
@@ -320,6 +444,23 @@
 
         const submitter = event.submitter instanceof HTMLElement ? event.submitter : form;
         pushTrackingEvent(submitter, 'form_submit');
+
+        const formAction = normalizeDestination(form.getAttribute('action') || '');
+        const formId = toClarityValue(form.getAttribute('id') || form.getAttribute('name') || formAction || 'form');
+
+        if (/^\/signup(\/|$)/.test(window.location.pathname) || formAction.includes('/signup/')) {
+            writeStorageFlag(pendingSignupKey, { startedAt: Date.now(), formId });
+            fireClarityEvent('signup_submitted', {
+                signup_form: formId,
+            });
+        }
+
+        if (/^\/request(\/|$)/.test(window.location.pathname) || formAction.includes('/request/')) {
+            writeStorageFlag(pendingRequestKey, { startedAt: Date.now(), formId });
+            fireClarityEvent('request_track_submitted', {
+                request_form: formId,
+            });
+        }
     }, true);
 
     document.addEventListener('focusin', function (event) {
@@ -349,12 +490,31 @@
         fireClarityEvent('form_start', {
             last_form_started: formName,
         });
+
+        if (/^\/signup(\/|$)/.test(window.location.pathname)) {
+            fireClarityEvent('signup_started', {
+                signup_form: formName,
+            });
+        }
+
+        if (/^\/request(\/|$)/.test(window.location.pathname)) {
+            fireClarityEvent('request_track_started', {
+                request_form: formName,
+            });
+        }
     }, true);
 
     document.addEventListener('play', function (event) {
         const target = event.target;
         if (target instanceof HTMLMediaElement) {
             trackMediaEvent(target, 'play');
+
+            const label = getMediaLabel(target);
+            if (['live_audio', 'mobile_menu_live_audio', 'stream_audio', 'popout_audio'].includes(label)) {
+                fireClarityEvent('live_listen_started', {
+                    live_audio_surface: label,
+                });
+            }
         }
     }, true);
 
@@ -376,7 +536,15 @@
     window.addEventListener('scroll', trackScrollDepth, { passive: true });
     window.addEventListener('beforeunload', trackEngagement);
 
+    document.addEventListener('ksync:request-track-success', function () {
+        fireClarityEvent('request_track_completed', {
+            request_completion: 'success',
+        });
+        clearStorageFlag(pendingRequestKey);
+    });
+
     trackScrollDepth();
+    trackPageSpecificSuccesses();
     lastEngagementTick = Date.now();
     window.setInterval(trackEngagement, 10000);
 })();
