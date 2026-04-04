@@ -3810,14 +3810,14 @@ def upcoming_comebacks_design_lab(request):
 def _what_just_landed_title_layout(title):
     length = len(_normalize_social_text(title))
     if length >= 68:
-        return {'size_rem': 2.3, 'line_height': 0.95, 'max_width_pct': 90}
+        return {'size_rem': 2.95, 'line_height': 0.95, 'max_width_pct': 94}
     if length >= 60:
-        return {'size_rem': 2.55, 'line_height': 0.93, 'max_width_pct': 88}
+        return {'size_rem': 3.15, 'line_height': 0.93, 'max_width_pct': 92}
     if length >= 52:
-        return {'size_rem': 2.8, 'line_height': 0.91, 'max_width_pct': 86}
+        return {'size_rem': 3.45, 'line_height': 0.91, 'max_width_pct': 90}
     if length >= 44:
-        return {'size_rem': 3.1, 'line_height': 0.9, 'max_width_pct': 84}
-    return {'size_rem': 3.45, 'line_height': 0.88, 'max_width_pct': 82}
+        return {'size_rem': 3.8, 'line_height': 0.9, 'max_width_pct': 88}
+    return {'size_rem': 4.3, 'line_height': 0.88, 'max_width_pct': 86}
 
 
 def _extract_what_just_landed_signal(article):
@@ -4151,28 +4151,28 @@ def _render_what_just_landed_reel_frame(payload, progress):
     draw.rounded_rectangle((78, accent_y, 348, accent_y + 12), radius=6, fill='#ff2d7c')
     draw.rounded_rectangle((366, accent_y, 564, accent_y + 12), radius=6, fill='#22d6ff')
 
-    label_font = _load_what_just_landed_reel_font(48, bold=True)
-    meta_font = _load_what_just_landed_reel_font(34, bold=False)
+    label_font = _load_what_just_landed_reel_font(56, bold=True)
+    meta_font = _load_what_just_landed_reel_font(40, bold=False)
     footer_font = _load_what_just_landed_reel_font(38, bold=True)
-    title_font_size = 98
+    title_font_size = 136
     title = payload.get('title') or 'What Just Landed'
-    max_title_width = int(WHAT_JUST_LANDED_REEL_WIDTH * 0.84)
+    max_title_width = int(WHAT_JUST_LANDED_REEL_WIDTH * 0.9)
     line_limit = 4
 
-    while title_font_size >= 54:
+    while title_font_size >= 72:
         title_font = _load_what_just_landed_reel_font(title_font_size, display=True, bold=True)
         title_lines = _wrap_what_just_landed_reel_text(draw, title, title_font, max_title_width)
         if len(title_lines) <= line_limit:
             break
-        title_font_size -= 4
+        title_font_size -= 6
     else:
-        title_font = _load_what_just_landed_reel_font(54, display=True, bold=True)
+        title_font = _load_what_just_landed_reel_font(72, display=True, bold=True)
         title_lines = _wrap_what_just_landed_reel_text(draw, title, title_font, max_title_width)
 
     draw.text((82, 158), 'WHAT JUST LANDED', font=label_font, fill='#f3f5ff')
 
-    title_y = 260
-    line_spacing = int(title_font_size * 1.02)
+    title_y = 236
+    line_spacing = int(title_font_size * 0.98)
     for line in title_lines[:line_limit]:
         shadow_position = (86, title_y + 4)
         draw.text(shadow_position, line, font=title_font, fill=(0, 0, 0, 150))
