@@ -3,10 +3,12 @@ PRE-LAUNCH MIDDLEWARE
 Restricts the live site to only the Coming Soon page and Games.
 To undo: remove 'core.middleware.PreLaunchMiddleware' from MIDDLEWARE in settings.py
 """
+import json
+import re
+
 from django.shortcuts import redirect
 from django.conf import settings
 from django.http.response import StreamingHttpResponse
-import re
 
 
 class PreLaunchMiddleware:
@@ -49,6 +51,8 @@ class GoogleTagManagerMiddleware:
     CONSENT_BANNER_MARKER = 'id="ksync-consent-banner"'
     META_PIXEL_SCRIPT_MARKER = 'id="ksync-meta-pixel"'
     META_PIXEL_NOSCRIPT_MARKER = 'id="ksync-meta-pixel-noscript"'
+    CLARITY_SCRIPT_MARKER = 'id="ksync-microsoft-clarity"'
+    CLARITY_CONTEXT_MARKER = 'id="ksync-clarity-context"'
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -71,6 +75,11 @@ class GoogleTagManagerMiddleware:
 
         gtm_id = getattr(settings, 'GOOGLE_TAG_MANAGER_ID', '').strip()
         pixel_id = str(getattr(settings, 'FACEBOOK_PIXEL_ID', '') or '').strip()
+        clarity_id = str(getattr(settings, 'CLARITY_PROJECT_ID', '') or '').strip()
+        view_name = getattr(getattr(request, 'resolver_match', None), 'url_name', '') or 'unknown'
+        path_parts = [part for part in request.path.split('/') if part]
+        page_section = path_parts[0] if path_parts else 'home'
+        auth_state = 'authenticated' if getattr(getattr(request, 'user', None), 'is_authenticated', False) else 'anonymous'
         if not gtm_id:
             gtm_id = ''
 
@@ -89,6 +98,10 @@ class GoogleTagManagerMiddleware:
             or f'facebook.com/tr?id={pixel_id}' in html
             or 'connect.facebook.net/en_US/fbevents.js' in html
         ) if pixel_id else True
+        has_clarity = (
+            f'clarity.ms/tag/{clarity_id}' in html
+            or self.CLARITY_SCRIPT_MARKER in html
+        ) if clarity_id else True
 
         head_script = (
             "<!-- Google Tag Manager -->\n"
@@ -133,6 +146,54 @@ class GoogleTagManagerMiddleware:
             "<!-- End Meta Pixel (noscript) -->"
         ) % pixel_id
 
+        clarity_head_script = (
+            "<!-- Microsoft Clarity -->\n"
+            "<script id=\"ksync-microsoft-clarity\">"
+            "(function(){"
+            "var STORAGE_KEY='ksync_cookie_consent_v1';"
+            "var clarityId=%s;"
+            "if(!clarityId){return;}"
+            "window.clarity=window.clarity||function(){(window.clarity.q=window.clarity.q||[]).push(arguments);};"
+            "window.ksyncLoadClarity=window.ksyncLoadClarity||function(){"
+            "if(window.ksyncClarityLoaded||document.getElementById('ksync-clarity-loader')){return;}"
+            "var tag=document.createElement('script');"
+            "tag.id='ksync-clarity-loader';"
+            "tag.async=1;"
+            "tag.src='https://www.clarity.ms/tag/'+clarityId;"
+            "var first=document.getElementsByTagName('script')[0];"
+            "if(first&&first.parentNode){first.parentNode.insertBefore(tag,first);}else{(document.head||document.documentElement).appendChild(tag);}"
+            "window.ksyncClarityLoaded=true;"
+            "};"
+            "window.ksyncSyncClarityConsent=window.ksyncSyncClarityConsent||function(choice){"
+            "var analytics=!!(choice&&choice.analytics);"
+            "if(analytics){window.ksyncLoadClarity();window.clarity('consent');return;}"
+            "if(window.ksyncClarityLoaded){window.clarity('consent',false);}"
+            "};"
+            "try{"
+            "var saved=localStorage.getItem(STORAGE_KEY);"
+            "if(saved){"
+            "var parsed=JSON.parse(saved)||{};"
+            "if(parsed.analytics){window.ksyncLoadClarity();window.clarity('consent');}"
+            "}"
+            "}catch(e){}"
+            "})();"
+            "</script>\n"
+            "<!-- End Microsoft Clarity -->"
+        ) % json.dumps(clarity_id)
+
+        clarity_context_script = (
+            "<script id=\"ksync-clarity-context\">"
+            "window.clarity=window.clarity||function(){(window.clarity.q=window.clarity.q||[]).push(arguments);};"
+            "window.clarity('set','page_type',%s);"
+            "window.clarity('set','page_section',%s);"
+            "window.clarity('set','auth_state',%s);"
+            "</script>"
+        ) % (
+            json.dumps(view_name),
+            json.dumps(page_section),
+            json.dumps(auth_state),
+        )
+
         consent_mode_script = (
             "<!-- K-Sync Consent Mode -->\n"
             "<script id=\"ksync-consent-mode\">"
@@ -163,6 +224,7 @@ class GoogleTagManagerMiddleware:
             "security_storage:'granted'"
             "};"
             "window.gtag('consent','update',update);"
+            "if(typeof window.ksyncSyncClarityConsent==='function'){window.ksyncSyncClarityConsent({analytics:analytics});}"
             "try{localStorage.setItem(STORAGE_KEY,JSON.stringify({analytics:analytics,ads:ads,updated_at:new Date().toISOString()}));}catch(e){}"
             "};"
             "try{"
@@ -260,6 +322,10 @@ class GoogleTagManagerMiddleware:
                 html = html[:insert_at] + "\n" + head_script + html[insert_at:]
             if pixel_id and not has_pixel and self.META_PIXEL_SCRIPT_MARKER not in html:
                 html = html[:insert_at] + "\n" + pixel_head_script + html[insert_at:]
+            if clarity_id and not has_clarity and self.CLARITY_SCRIPT_MARKER not in html:
+                html = html[:insert_at] + "\n" + clarity_head_script + html[insert_at:]
+            if clarity_id and self.CLARITY_CONTEXT_MARKER not in html:
+                html = html[:insert_at] + "\n" + clarity_context_script + html[insert_at:]
 
         lower_html = html.lower()
         body_match = re.search(r'<body[^>]*>', lower_html)
