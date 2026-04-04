@@ -10,6 +10,7 @@ from core.views import (
     _chat,
     _do_blog_generate,
     _comment_on_live_facebook_posts,
+    _post_next_what_just_landed_facebook_reel,
     _post_next_article_to_x,
 )
 from core.digests import send_due_user_digests
@@ -245,6 +246,19 @@ def facebook_homepage_comment_job():
         logger.error("[scheduler] Facebook homepage comment pass failed: %s", e)
 
 
+def facebook_reels_job():
+    """Background job: publish one queued What Just Landed article as a Facebook Reel."""
+    logger.info("[scheduler] Starting Facebook Reel pass...")
+    try:
+        result = _post_next_what_just_landed_facebook_reel()
+        if result:
+            logger.info("[scheduler] Facebook Reel pass complete - 1 Reel published.")
+        else:
+            logger.info("[scheduler] Facebook Reel pass complete - no queued Reel published.")
+    except Exception as e:
+        logger.error("[scheduler] Facebook Reel pass failed: %s", e)
+
+
 def x_post_job():
     """Background job: publish one queued blog article to X."""
     logger.info("[scheduler] Starting X post pass...")
@@ -393,6 +407,18 @@ def start_scheduler():
         coalesce=True,
     )
 
+    if getattr(settings, 'FACEBOOK_REELS_ENABLED', False):
+        scheduler.add_job(
+            facebook_reels_job,
+            'cron',
+            hour=int(getattr(settings, 'FACEBOOK_REELS_DAILY_HOUR', 10) or 10),
+            minute=int(getattr(settings, 'FACEBOOK_REELS_DAILY_MINUTE', 0) or 0),
+            id='facebook_reels_job',
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+
     if getattr(settings, 'X_POST_ENABLED', False):
         x_interval_minutes = max(1, int(getattr(settings, 'X_POST_INTERVAL_MINUTES', 40) or 40))
         scheduler.add_job(
@@ -446,6 +472,15 @@ def start_scheduler():
     scheduler.add_job(generate_ranking, 'date', args=['daily'], run_date=timezone.now(), id='initial_daily_sync')
     scheduler.add_job(generate_ranking, 'date', args=['soloists'], run_date=timezone.now(), id='initial_soloists_sync')
     scheduler.add_job(generate_ranking, 'date', args=['groups'], run_date=timezone.now(), id='initial_groups_sync')
+
+    if getattr(settings, 'FACEBOOK_REELS_ENABLED', False) and getattr(settings, 'FACEBOOK_REELS_RUN_ON_STARTUP', True):
+        scheduler.add_job(
+            facebook_reels_job,
+            'date',
+            run_date=timezone.now(),
+            id='initial_facebook_reels_job',
+            replace_existing=True,
+        )
 
     if getattr(settings, 'B2_AUTO_SYNC_ENABLED', False) and getattr(settings, 'B2_AUTO_SYNC_RUN_ON_STARTUP', True):
         scheduler.add_job(

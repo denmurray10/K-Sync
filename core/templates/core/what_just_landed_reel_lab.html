@@ -1,0 +1,444 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    {% include 'core/seo_meta.html' %}
+    <title>{{ seo_title }}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f425c0",
+                        secondary: "#00f0ff",
+                        "background-dark": "#000000",
+                    },
+                    fontFamily: {
+                        display: ["Montserrat", "sans-serif"],
+                        cinzel: ["Cinzel", "serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0px",
+                        sm: "0px",
+                        md: "0px",
+                        lg: "0px",
+                        xl: "0px",
+                        "2xl": "0px",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        body {
+            background:
+                radial-gradient(circle at 14% 0%, rgba(244, 37, 192, 0.16), transparent 32%),
+                radial-gradient(circle at 86% 12%, rgba(0, 240, 255, 0.12), transparent 26%),
+                linear-gradient(180deg, #020202 0%, #000 100%);
+        }
+        .font-cinzel { font-family: "Cinzel", serif; }
+        .font-display { font-family: "Montserrat", sans-serif; }
+        .lab-panel {
+            background: linear-gradient(180deg, rgba(16, 16, 16, 0.96), rgba(5, 5, 5, 0.98));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+                0 18px 40px rgba(0, 0, 0, 0.38);
+        }
+        .device-shell {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background:
+                linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01)),
+                rgba(0, 0, 0, 0.8);
+            box-shadow:
+                0 24px 50px rgba(0, 0, 0, 0.45),
+                0 0 0 1px rgba(255, 255, 255, 0.04);
+            padding: 14px;
+        }
+        .reel-device {
+            position: relative;
+            width: min(100%, 430px);
+            aspect-ratio: 9 / 16;
+            margin-inline: auto;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+        .reel-stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 24% 18%, rgba(244, 37, 192, 0.18), transparent 32%),
+                radial-gradient(circle at 80% 14%, rgba(0, 240, 255, 0.14), transparent 28%),
+                #020202;
+        }
+        .reel-bg {
+            position: absolute;
+            inset: -4%;
+            width: 108%;
+            height: 108%;
+            object-fit: cover;
+            filter: saturate(1.06) contrast(1.02);
+            opacity: 0.88;
+            transform: scale(1.04);
+            animation: reel-pan 14s ease-in-out infinite alternate;
+        }
+        .reel-slide::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.18) 22%, rgba(0, 0, 0, 0.48) 56%, rgba(0, 0, 0, 0.92) 100%);
+            pointer-events: none;
+        }
+        .reel-slide::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(125deg, rgba(255,255,255,0.08), transparent 32%, transparent 70%, rgba(255,255,255,0.05));
+            mix-blend-mode: screen;
+            opacity: 0.34;
+            pointer-events: none;
+        }
+        .reel-title {
+            text-wrap: balance;
+            overflow-wrap: anywhere;
+            text-shadow: 0 10px 26px rgba(0, 0, 0, 0.72);
+        }
+        .reel-copy {
+            text-wrap: pretty;
+            text-shadow: 0 8px 22px rgba(0, 0, 0, 0.68);
+        }
+        .signal-fallback {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at 20% 18%, rgba(244, 37, 192, 0.42), transparent 50%),
+                radial-gradient(circle at 78% 82%, rgba(0, 240, 255, 0.28), transparent 46%),
+                linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)),
+                #050505;
+        }
+        .signal-fallback--full {
+            background:
+                radial-gradient(circle at 20% 18%, rgba(244, 37, 192, 0.44), transparent 38%),
+                radial-gradient(circle at 78% 82%, rgba(0, 240, 255, 0.3), transparent 34%),
+                linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.82)),
+                #050505;
+        }
+        .signal-fallback::after {
+            content: "";
+            position: absolute;
+            inset: 10%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+        .guide-box {
+            position: absolute;
+            border: 1px dashed rgba(255, 255, 255, 0.22);
+            pointer-events: none;
+        }
+        .guide-box--title {
+            inset: 8% 7% auto 7%;
+            height: 28%;
+            border-color: rgba(244, 37, 192, 0.35);
+        }
+        .guide-box--safe {
+            inset: 5% 5% 6% 5%;
+            border-color: rgba(0, 240, 255, 0.28);
+        }
+        .guide-box--footer {
+            left: 7%;
+            right: 7%;
+            bottom: 5%;
+            height: 14%;
+        }
+        .sample-thumb {
+            position: relative;
+            width: 68px;
+            height: 84px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+            background:
+                radial-gradient(circle at 20% 18%, rgba(244, 37, 192, 0.26), transparent 48%),
+                radial-gradient(circle at 78% 82%, rgba(0, 240, 255, 0.22), transparent 42%),
+                #050505;
+        }
+        .sample-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+        @keyframes reel-pan {
+            0% { transform: scale(1.06) translate3d(-1.5%, -1.2%, 0); }
+            100% { transform: scale(1.13) translate3d(1.8%, 1.5%, 0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .reel-bg {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="font-display text-white min-h-screen">
+{% include "core/header.html" %}
+
+<main class="pt-36 pb-20">
+    <section class="container mx-auto px-4 sm:px-6 max-w-[1400px]">
+        <div class="max-w-4xl">
+            <p class="text-primary text-[10px] font-black uppercase tracking-[0.28em]">Internal Preview</p>
+            <h1 class="mt-3 font-cinzel text-4xl leading-[0.9] text-white sm:text-6xl lg:text-7xl">
+                What Just Landed
+                <span class="block text-transparent [-webkit-text-stroke:1px_#f425c0]">Reel Lab</span>
+            </h1>
+            <p class="mt-5 max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-base">
+                A Facebook-first 9:16 browser motion comp for “What Just Landed” articles. The preview uses real article titles exactly as stored, real cover art where available, and one deliberate no-image fallback frame.
+            </p>
+        </div>
+
+        {% if reel_articles %}
+        <div
+            class="mt-10 grid items-start gap-8 xl:grid-cols-[minmax(0,540px)_360px]"
+            x-data="reelLab({{ reel_articles|length }})"
+            x-init="init()"
+        >
+            <div class="lab-panel p-4 sm:p-5">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.24em] text-slate-400">Portrait Preview</p>
+                        <p class="mt-1 text-sm font-semibold text-white">1080x1920 Reel stage with autoplay and safe-zone overlays</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.2em]">
+                        <button
+                            type="button"
+                            class="border border-white/15 px-3 py-2 text-slate-200 transition-colors hover:border-primary hover:text-primary"
+                            @click="togglePlay()"
+                            x-text="playing ? 'Pause Auto' : 'Resume Auto'"
+                        ></button>
+                        <button
+                            type="button"
+                            class="border border-white/15 px-3 py-2 text-slate-200 transition-colors hover:border-secondary hover:text-secondary"
+                            @click="showGuides = !showGuides"
+                            x-text="showGuides ? 'Hide Guides' : 'Show Guides'"
+                        ></button>
+                    </div>
+                </div>
+
+                <div class="device-shell mt-5">
+                    <div class="reel-device">
+                        <div class="absolute inset-x-0 top-0 z-30 flex gap-1 px-4 pt-4">
+                            {% for item in reel_articles %}
+                            <div class="h-1 flex-1 bg-white/10">
+                                <div
+                                    class="h-full bg-primary transition-all duration-300"
+                                    :class="activeIndex === {{ forloop.counter0 }} ? 'w-full' : 'w-0'"
+                                ></div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% for item in reel_articles %}
+                        <article
+                            x-cloak
+                            x-show="activeIndex === {{ forloop.counter0 }}"
+                            x-transition.opacity.duration.500ms
+                            class="reel-slide absolute inset-0"
+                        >
+                            {% if item.background_image %}
+                            <img src="{{ item.background_image }}" alt="" class="reel-bg" loading="eager" decoding="async"/>
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_18%_16%,rgba(244,37,192,0.22),transparent_22%),radial-gradient(circle_at_84%_18%,rgba(0,240,255,0.18),transparent_18%)]"></div>
+                            {% else %}
+                            <div class="signal-fallback signal-fallback--full">
+                                <div class="relative z-10 text-center">
+                                    <div class="mx-auto flex h-28 w-28 items-center justify-center border border-white/20 bg-black/45 text-5xl font-black uppercase tracking-[0.08em] text-white">
+                                        {{ item.monogram }}
+                                    </div>
+                                    <p class="mt-5 text-[10px] font-black uppercase tracking-[0.28em] text-slate-100">What Just Landed</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.2),rgba(0,0,0,0.12)_24%,rgba(0,0,0,0.42)_58%,rgba(0,0,0,0.88)_100%)]"></div>
+
+                            <div class="absolute inset-x-0 top-0 z-20 px-6 pt-7">
+                                <div class="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.24em] text-slate-200">
+                                    <span>K-Beats</span>
+                                    <span>{{ item.sequence_label }}</span>
+                                </div>
+                                <p class="mt-7 text-[10px] font-black uppercase tracking-[0.28em] text-primary">What Just Landed</p>
+                                <h2 class="reel-title mt-3 font-cinzel font-black uppercase text-white" style="{{ item.title_style }}">{{ item.title }}</h2>
+                                {% if item.subtitle %}
+                                <p class="reel-copy mt-4 max-w-[82%] text-[0.78rem] leading-relaxed text-slate-200/90">{{ item.subtitle }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="absolute inset-x-0 bottom-0 z-20 px-6 pb-6">
+                                <div class="border border-white/10 bg-black/55 px-4 py-4 backdrop-blur-md">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div class="min-w-0">
+                                            <p class="text-[10px] font-black uppercase tracking-[0.24em] text-secondary">{{ item.artist }}</p>
+                                            <p class="mt-1 line-clamp-2 text-sm font-semibold uppercase tracking-[0.04em] text-white">{{ item.release_title }}</p>
+                                        </div>
+                                        <div class="shrink-0 text-right">
+                                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">{{ item.release_type }}</p>
+                                            <p class="mt-1 text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.created_at_label }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+                                        <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Full story on K-Beats</p>
+                                        <a href="{{ item.article_href }}" class="text-[10px] font-black uppercase tracking-[0.22em] text-primary transition-colors hover:text-white">
+                                            Open Article
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div x-show="showGuides" x-cloak class="absolute inset-0 z-30">
+                                <div class="guide-box guide-box--safe"></div>
+                                <div class="guide-box guide-box--title"></div>
+                                <div class="guide-box guide-box--footer"></div>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <aside class="space-y-4">
+                <div class="lab-panel p-5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Frame Selector</p>
+                    <div class="mt-4 space-y-3">
+                        {% for item in reel_articles %}
+                        <button
+                            type="button"
+                            class="w-full border border-white/10 bg-white/[0.02] p-3 text-left transition-colors"
+                            :class="activeIndex === {{ forloop.counter0 }} ? 'border-primary bg-primary/10' : 'hover:border-white/25'"
+                            @click="setActive({{ forloop.counter0 }})"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="sample-thumb">
+                                    {% if item.has_image %}
+                                    <img src="{{ item.image }}" alt="{{ item.title }}" loading="lazy" decoding="async"/>
+                                    {% else %}
+                                    <div class="signal-fallback">
+                                        <span class="relative z-10 text-xl font-black uppercase tracking-[0.08em] text-white">{{ item.monogram }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-[9px] font-black uppercase tracking-[0.24em] {% if item.is_fallback_sample %}text-secondary{% else %}text-slate-400{% endif %}">
+                                        {% if item.is_fallback_sample %}Fallback Frame{% else %}Live Article{% endif %}
+                                    </p>
+                                    <h2 class="mt-1 line-clamp-2 text-sm font-semibold uppercase tracking-[0.03em] text-white">{{ item.title }}</h2>
+                                    <p class="mt-1 text-[10px] uppercase tracking-[0.16em] text-slate-500">{{ item.artist }} · {{ item.release_type }}</p>
+                                </div>
+                            </div>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="lab-panel p-5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Template Notes</p>
+                    <div class="mt-4 space-y-3 text-sm leading-relaxed text-slate-300">
+                        <p>The headline stays exact to the stored article title and scales down automatically for longer “What Just Landed” entries.</p>
+                        <p>The artwork now runs as the full background layer so the frame reads like a proper Reel cover, with the title sitting over the image inside the protected top zone.</p>
+                        <p>The fallback frame keeps the same text-first composition so missing artwork does not break the publishing system or cheapen the feed.</p>
+                    </div>
+                </div>
+
+                <div class="lab-panel p-5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Preview Stats</p>
+                    <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                        <div class="border border-white/10 bg-white/[0.02] p-3">
+                            <dt class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Samples</dt>
+                            <dd class="mt-1 text-2xl font-black text-white">{{ reel_lab_stats.sample_count }}</dd>
+                        </div>
+                        <div class="border border-white/10 bg-white/[0.02] p-3">
+                            <dt class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Image-backed</dt>
+                            <dd class="mt-1 text-2xl font-black text-white">{{ reel_lab_stats.image_count }}</dd>
+                        </div>
+                        <div class="border border-white/10 bg-white/[0.02] p-3">
+                            <dt class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Fallbacks</dt>
+                            <dd class="mt-1 text-2xl font-black text-white">{{ reel_lab_stats.fallback_count }}</dd>
+                        </div>
+                        <div class="border border-white/10 bg-white/[0.02] p-3">
+                            <dt class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Longest title</dt>
+                            <dd class="mt-1 text-2xl font-black text-white">{{ reel_lab_stats.longest_title }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </aside>
+        </div>
+        {% else %}
+        <div class="lab-panel mt-10 p-8">
+            <p class="text-[10px] font-black uppercase tracking-[0.24em] text-primary">No Samples Yet</p>
+            <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300">
+                There are no “What Just Landed” articles in the database yet, so the Reel lab cannot render a live preview.
+            </p>
+        </div>
+        {% endif %}
+    </section>
+</main>
+
+{% include "core/footer.html" %}
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('reelLab', (count) => ({
+            count,
+            activeIndex: 0,
+            playing: true,
+            showGuides: true,
+            timer: null,
+            init() {
+                this.restart();
+            },
+            restart() {
+                if (this.timer) {
+                    window.clearInterval(this.timer);
+                    this.timer = null;
+                }
+                if (!this.playing || this.count <= 1) {
+                    return;
+                }
+                this.timer = window.setInterval(() => {
+                    this.next();
+                }, 6500);
+            },
+            next() {
+                if (this.count <= 1) {
+                    return;
+                }
+                this.activeIndex = (this.activeIndex + 1) % this.count;
+            },
+            setActive(index) {
+                this.activeIndex = index;
+                this.restart();
+            },
+            togglePlay() {
+                this.playing = !this.playing;
+                this.restart();
+            },
+        }));
+    });
+</script>
+</body>
+</html>

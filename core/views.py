@@ -5,6 +5,11 @@ import os
 import uuid
 import io
 import mimetypes
+import math
+import shutil
+import subprocess
+import tempfile
+import time
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
@@ -34,6 +39,7 @@ from openai import OpenAI
 import bleach
 import cloudinary
 import cloudinary.uploader
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageOps
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 import base64
@@ -3799,6 +3805,608 @@ def upcoming_comebacks_design_lab(request):
         'upcoming_comebacks': upcoming,
         'current_month': now.strftime('%B %Y'),
     })
+
+
+def _what_just_landed_title_layout(title):
+    length = len(_normalize_social_text(title))
+    if length >= 68:
+        return {'size_rem': 2.3, 'line_height': 0.95, 'max_width_pct': 90}
+    if length >= 60:
+        return {'size_rem': 2.55, 'line_height': 0.93, 'max_width_pct': 88}
+    if length >= 52:
+        return {'size_rem': 2.8, 'line_height': 0.91, 'max_width_pct': 86}
+    if length >= 44:
+        return {'size_rem': 3.1, 'line_height': 0.9, 'max_width_pct': 84}
+    return {'size_rem': 3.45, 'line_height': 0.88, 'max_width_pct': 82}
+
+
+def _extract_what_just_landed_signal(article):
+    title = _normalize_social_text(getattr(article, 'title', ''))
+    subtitle = _normalize_social_text(getattr(article, 'subtitle', ''))
+    artist = ''
+    release_title = ''
+    release_day = ''
+    release_type = _normalize_social_text(getattr(article, 'category', '')) or 'Comeback'
+
+    subtitle_match = re.match(
+        r'^(?P<artist>.+?) just landed with (?P<release>.+?), a (?P<type>.+?) release arriving on (?P<day>.+?)\.$',
+        subtitle,
+        flags=re.IGNORECASE,
+    )
+    if subtitle_match:
+        artist = subtitle_match.group('artist').strip()
+        release_title = subtitle_match.group('release').strip()
+        release_type = subtitle_match.group('type').strip().title()
+        release_day = subtitle_match.group('day').strip()
+
+    cleaned_title = re.sub(r':\s*What Just Landed\s*$', '', title, flags=re.IGNORECASE).strip()
+    if not artist and ' - ' in cleaned_title:
+        artist = cleaned_title.split(' - ', 1)[0].strip()
+    if not release_title and ' - ' in cleaned_title:
+        release_title = cleaned_title.split(' - ', 1)[1].strip()
+
+    tokens = re.findall(r'[A-Za-z0-9]+', artist or cleaned_title)
+    monogram = ''.join(token[0] for token in tokens[:2]).upper()[:2] or 'KB'
+
+    return {
+        'artist': artist or 'K-Beats',
+        'release_title': release_title or cleaned_title or title or 'What Just Landed',
+        'release_day': release_day,
+        'release_type': release_type,
+        'monogram': monogram,
+    }
+
+
+def _build_what_just_landed_reel_preview_payload(article, *, sequence=0, force_fallback=False):
+    if not article:
+        return None
+
+    _apply_stream_images_to_article(article)
+
+    raw_image = _normalize_social_text(getattr(article, 'image', ''))
+    image_url = '' if force_fallback else _optimize_home_image_url(raw_image, width=1200, height=1200)
+    background_image_url = '' if force_fallback else _optimize_home_image_url(raw_image, width=1600, height=1600)
+    title = _normalize_social_text(getattr(article, 'title', '')) or 'What Just Landed'
+    subtitle = _shorten_text(getattr(article, 'subtitle', '') or getattr(article, 'source_title', ''), 128)
+    layout = _what_just_landed_title_layout(title)
+    signal = _extract_what_just_landed_signal(article)
+
+    return {
+        'id': f'what-just-landed-{article.pk}',
+        'sequence': sequence,
+        'sequence_label': f"Frame {sequence + 1}",
+        'title': title,
+        'subtitle': subtitle,
+        'image': image_url,
+        'background_image': background_image_url,
+        'has_image': bool(image_url),
+        'is_fallback_sample': bool(force_fallback or not image_url),
+        'title_style': (
+            f"font-size:{layout['size_rem']}rem;"
+            f"line-height:{layout['line_height']};"
+            f"max-width:{layout['max_width_pct']}%;"
+        ),
+        'artist': signal['artist'],
+        'release_title': signal['release_title'],
+        'release_day': signal['release_day'],
+        'release_type': signal['release_type'],
+        'monogram': signal['monogram'],
+        'created_at_label': timezone.localtime(article.created_at).strftime('%d %b %Y') if article.created_at else '',
+        'source_name': _normalize_social_text(getattr(article, 'source_name', '')) or 'K-Beats',
+        'article_href': reverse('blog_article_read', kwargs={'slug': article.slug}),
+        'slug': article.slug,
+    }
+
+
+def _build_what_just_landed_reel_lab_context():
+    articles_qs = BlogArticle.objects.filter(title__icontains='What Just Landed').order_by('-created_at')
+
+    image_articles = list(
+        articles_qs.exclude(image='').exclude(image__isnull=True)[:3]
+    )
+    selected_ids = {article.pk for article in image_articles}
+
+    fallback_article = (
+        articles_qs.filter(models.Q(image='') | models.Q(image__isnull=True))
+        .exclude(pk__in=selected_ids)
+        .first()
+    )
+    fallback_forced = False
+    if not fallback_article:
+        fallback_article = articles_qs.exclude(pk__in=selected_ids).first()
+        fallback_forced = bool(fallback_article)
+
+    reel_articles = []
+    for sequence, article in enumerate(image_articles):
+        payload = _build_what_just_landed_reel_preview_payload(article, sequence=sequence)
+        if payload:
+            reel_articles.append(payload)
+
+    if fallback_article:
+        payload = _build_what_just_landed_reel_preview_payload(
+            fallback_article,
+            sequence=len(reel_articles),
+            force_fallback=fallback_forced or not getattr(fallback_article, 'image', ''),
+        )
+        if payload:
+            reel_articles.append(payload)
+
+    longest_title = max((len(item['title']) for item in reel_articles), default=0)
+    fallback_count = sum(1 for item in reel_articles if item['is_fallback_sample'])
+
+    return {
+        'reel_articles': reel_articles,
+        'reel_lab_stats': {
+            'sample_count': len(reel_articles),
+            'image_count': sum(1 for item in reel_articles if item['has_image']),
+            'fallback_count': fallback_count,
+            'longest_title': longest_title,
+        },
+    }
+
+
+def what_just_landed_reel_lab(request):
+    context = _build_what_just_landed_reel_lab_context()
+    context.update({
+        'canonical_url': request.build_absolute_uri(reverse('what_just_landed_reel_lab')),
+        'seo_type': 'website',
+        'seo_title': 'What Just Landed Reel Lab | K-Beats',
+        'seo_description': 'Preview the K-Beats 9:16 Facebook Reel template for What Just Landed comeback articles before any publishing flow is added.',
+    })
+    return _render_frameable_page(request, 'core/what_just_landed_reel_lab.html', context)
+
+
+WHAT_JUST_LANDED_REEL_WIDTH = 1080
+WHAT_JUST_LANDED_REEL_HEIGHT = 1920
+WHAT_JUST_LANDED_REEL_BACKGROUND_SCALE = 1.16
+
+
+def _facebook_reels_api_version():
+    version = str(getattr(settings, 'FACEBOOK_REELS_API_VERSION', 'v22.0') or 'v22.0').strip()
+    return version or 'v22.0'
+
+
+def _what_just_landed_reel_output_dir():
+    output_dir = os.path.join(settings.MEDIA_ROOT, 'generated', 'facebook_reels')
+    os.makedirs(output_dir, exist_ok=True)
+    return output_dir
+
+
+def _get_what_just_landed_reel_ffmpeg_binary():
+    configured = str(os.environ.get('FFMPEG_BIN', '') or '').strip()
+    if configured and os.path.exists(configured):
+        return configured
+
+    discovered = shutil.which('ffmpeg')
+    if discovered:
+        return discovered
+
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return ''
+
+
+def _load_what_just_landed_reel_font(size, *, display=False, bold=False):
+    font_candidates = []
+    if display:
+        font_candidates.extend([
+            os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts', 'georgiab.ttf' if bold else 'georgia.ttf'),
+            os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts', 'timesbd.ttf' if bold else 'times.ttf'),
+        ])
+    else:
+        font_candidates.extend([
+            os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts', 'arialbd.ttf' if bold else 'arial.ttf'),
+            os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts', 'segoeui.ttf'),
+        ])
+
+    for candidate in font_candidates:
+        if candidate and os.path.exists(candidate):
+            try:
+                return ImageFont.truetype(candidate, size=size)
+            except OSError:
+                continue
+    return ImageFont.load_default()
+
+
+def _measure_what_just_landed_reel_text(draw, text, font):
+    bbox = draw.textbbox((0, 0), text, font=font)
+    return bbox[2] - bbox[0], bbox[3] - bbox[1]
+
+
+def _wrap_what_just_landed_reel_text(draw, text, font, max_width):
+    words = [word for word in str(text or '').split() if word]
+    if not words:
+        return ['']
+
+    lines = []
+    current_line = words[0]
+    for word in words[1:]:
+        candidate = f"{current_line} {word}"
+        width, _ = _measure_what_just_landed_reel_text(draw, candidate, font)
+        if width <= max_width:
+            current_line = candidate
+            continue
+        lines.append(current_line)
+        current_line = word
+    lines.append(current_line)
+    return lines
+
+
+def _download_what_just_landed_reel_source_image(image_url):
+    url = str(image_url or '').strip()
+    if not url:
+        return None
+    try:
+        response = requests.get(
+            url,
+            timeout=25,
+            allow_redirects=True,
+            headers={'User-Agent': 'Mozilla/5.0'},
+        )
+        response.raise_for_status()
+        image = Image.open(io.BytesIO(response.content))
+        return image.convert('RGB')
+    except Exception as exc:
+        logger.warning("[facebook-reels] Could not fetch source image %s: %s", url, exc)
+        return None
+
+
+def _cover_what_just_landed_reel_image(image, size):
+    if not image:
+        return None
+    fitted = ImageOps.fit(image.convert('RGB'), size, method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+    return fitted
+
+
+def _build_what_just_landed_reel_fallback_background(payload):
+    canvas = Image.new('RGB', (WHAT_JUST_LANDED_REEL_WIDTH, WHAT_JUST_LANDED_REEL_HEIGHT), '#05070d')
+    draw = ImageDraw.Draw(canvas)
+    for index in range(0, WHAT_JUST_LANDED_REEL_HEIGHT, 8):
+        ratio = index / max(1, WHAT_JUST_LANDED_REEL_HEIGHT - 1)
+        red = int(10 + (96 * ratio))
+        green = int(10 + (16 * ratio))
+        blue = int(18 + (54 * ratio))
+        draw.rectangle((0, index, WHAT_JUST_LANDED_REEL_WIDTH, index + 12), fill=(red, green, blue))
+
+    draw.ellipse((120, 180, 860, 920), fill=(34, 214, 255))
+    draw.ellipse((430, 830, 1100, 1500), fill=(255, 44, 120))
+    canvas = canvas.filter(ImageFilter.GaussianBlur(120))
+    overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 110))
+    canvas = Image.alpha_composite(canvas.convert('RGBA'), overlay).convert('RGB')
+
+    monogram = payload.get('monogram') or 'KB'
+    mono_font = _load_what_just_landed_reel_font(340, display=True, bold=True)
+    mono_draw = ImageDraw.Draw(canvas)
+    mono_w, mono_h = _measure_what_just_landed_reel_text(mono_draw, monogram, mono_font)
+    mono_draw.text(
+        ((WHAT_JUST_LANDED_REEL_WIDTH - mono_w) / 2, 690 - mono_h / 2),
+        monogram,
+        font=mono_font,
+        fill=(255, 255, 255, 46),
+    )
+    return canvas
+
+
+def _render_what_just_landed_reel_frame(payload, progress):
+    if payload.get('background_image'):
+        source_image = _download_what_just_landed_reel_source_image(payload.get('background_image'))
+    else:
+        source_image = None
+
+    if source_image:
+        zoom = WHAT_JUST_LANDED_REEL_BACKGROUND_SCALE + (0.07 * progress)
+        scaled_size = (
+            int(WHAT_JUST_LANDED_REEL_WIDTH * zoom),
+            int(WHAT_JUST_LANDED_REEL_HEIGHT * zoom),
+        )
+        background = _cover_what_just_landed_reel_image(source_image, scaled_size)
+        shift_x = int((scaled_size[0] - WHAT_JUST_LANDED_REEL_WIDTH) * (0.48 + 0.18 * progress))
+        shift_y = int((scaled_size[1] - WHAT_JUST_LANDED_REEL_HEIGHT) * 0.35)
+        background = background.crop((
+            max(0, shift_x),
+            max(0, shift_y),
+            max(0, shift_x) + WHAT_JUST_LANDED_REEL_WIDTH,
+            max(0, shift_y) + WHAT_JUST_LANDED_REEL_HEIGHT,
+        ))
+        blurred = background.filter(ImageFilter.GaussianBlur(28))
+        background = Image.blend(background, blurred, 0.34)
+    else:
+        background = _build_what_just_landed_reel_fallback_background(payload)
+
+    canvas = background.convert('RGBA')
+
+    top_gradient = Image.new('L', canvas.size, 0)
+    top_gradient_draw = ImageDraw.Draw(top_gradient)
+    top_gradient_draw.rectangle((0, 0, WHAT_JUST_LANDED_REEL_WIDTH, 880), fill=255)
+    top_gradient = top_gradient.filter(ImageFilter.GaussianBlur(180))
+    top_overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 165))
+    top_overlay.putalpha(top_gradient)
+    canvas = Image.alpha_composite(canvas, top_overlay)
+
+    bottom_overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+    bottom_draw = ImageDraw.Draw(bottom_overlay)
+    bottom_draw.rectangle((0, 1280, WHAT_JUST_LANDED_REEL_WIDTH, WHAT_JUST_LANDED_REEL_HEIGHT), fill=(0, 0, 0, 140))
+    bottom_overlay = bottom_overlay.filter(ImageFilter.GaussianBlur(120))
+    canvas = Image.alpha_composite(canvas, bottom_overlay)
+
+    sweep = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+    sweep_draw = ImageDraw.Draw(sweep)
+    center_x = int((-320) + ((WHAT_JUST_LANDED_REEL_WIDTH + 640) * progress))
+    sweep_draw.polygon(
+        [
+            (center_x - 140, 0),
+            (center_x + 60, 0),
+            (center_x + 360, WHAT_JUST_LANDED_REEL_HEIGHT),
+            (center_x + 160, WHAT_JUST_LANDED_REEL_HEIGHT),
+        ],
+        fill=(34, 214, 255, 28),
+    )
+    sweep = sweep.filter(ImageFilter.GaussianBlur(70))
+    canvas = Image.alpha_composite(canvas, sweep)
+
+    draw = ImageDraw.Draw(canvas)
+    accent_y = 128
+    draw.rounded_rectangle((78, accent_y, 348, accent_y + 12), radius=6, fill='#ff2d7c')
+    draw.rounded_rectangle((366, accent_y, 564, accent_y + 12), radius=6, fill='#22d6ff')
+
+    label_font = _load_what_just_landed_reel_font(48, bold=True)
+    meta_font = _load_what_just_landed_reel_font(34, bold=False)
+    footer_font = _load_what_just_landed_reel_font(38, bold=True)
+    title_font_size = 98
+    title = payload.get('title') or 'What Just Landed'
+    max_title_width = int(WHAT_JUST_LANDED_REEL_WIDTH * 0.84)
+    line_limit = 4
+
+    while title_font_size >= 54:
+        title_font = _load_what_just_landed_reel_font(title_font_size, display=True, bold=True)
+        title_lines = _wrap_what_just_landed_reel_text(draw, title, title_font, max_title_width)
+        if len(title_lines) <= line_limit:
+            break
+        title_font_size -= 4
+    else:
+        title_font = _load_what_just_landed_reel_font(54, display=True, bold=True)
+        title_lines = _wrap_what_just_landed_reel_text(draw, title, title_font, max_title_width)
+
+    draw.text((82, 158), 'WHAT JUST LANDED', font=label_font, fill='#f3f5ff')
+
+    title_y = 260
+    line_spacing = int(title_font_size * 1.02)
+    for line in title_lines[:line_limit]:
+        shadow_position = (86, title_y + 4)
+        draw.text(shadow_position, line, font=title_font, fill=(0, 0, 0, 150))
+        draw.text((82, title_y), line, font=title_font, fill='#ffffff')
+        title_y += line_spacing
+
+    artist_label = payload.get('artist') or 'K-Beats'
+    release_type = payload.get('release_type') or 'Comeback'
+    created_at_label = payload.get('created_at_label') or timezone.localdate().strftime('%d %b %Y')
+    release_day = payload.get('release_day') or created_at_label
+    meta_text = f"{artist_label}  |  {release_type}  |  {release_day}"
+    draw.text((82, min(title_y + 28, 860)), meta_text.upper(), font=meta_font, fill='#f0d2dc')
+
+    footer_y = WHAT_JUST_LANDED_REEL_HEIGHT - 192
+    draw.rounded_rectangle((82, footer_y - 12, 260, footer_y + 60), radius=24, fill=(5, 10, 18, 180), outline=(255, 255, 255, 55), width=2)
+    draw.text((110, footer_y + 2), 'K-BEATS', font=footer_font, fill='#ffffff')
+    draw.text((82, footer_y + 82), 'kbeatsradio.co.uk', font=meta_font, fill='#d6dcef')
+
+    return canvas.convert('RGB')
+
+
+def _encode_what_just_landed_reel_frames(frame_dir, output_path, fps):
+    ffmpeg_binary = _get_what_just_landed_reel_ffmpeg_binary()
+    if not ffmpeg_binary:
+        raise RuntimeError("ffmpeg is not available. Install imageio-ffmpeg or set FFMPEG_BIN.")
+
+    command = [
+        ffmpeg_binary,
+        '-y',
+        '-framerate',
+        str(fps),
+        '-i',
+        os.path.join(frame_dir, 'frame_%03d.png'),
+        '-c:v',
+        'libx264',
+        '-pix_fmt',
+        'yuv420p',
+        '-profile:v',
+        'main',
+        '-movflags',
+        '+faststart',
+        '-r',
+        str(fps),
+        output_path,
+    ]
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or "ffmpeg failed to encode the Reel video.")
+
+
+def _render_what_just_landed_reel_video(article):
+    payload = _build_what_just_landed_reel_preview_payload(
+        article,
+        sequence=0,
+        force_fallback=not bool(_normalize_social_text(getattr(article, 'image', ''))),
+    )
+    if not payload:
+        raise RuntimeError("Could not build the Reel payload for this article.")
+
+    fps = max(23, int(getattr(settings, 'FACEBOOK_REELS_FPS', 24) or 24))
+    duration_seconds = max(4, int(getattr(settings, 'FACEBOOK_REELS_DURATION_SECONDS', 5) or 5))
+    frame_total = fps * duration_seconds
+    output_dir = _what_just_landed_reel_output_dir()
+    output_path = os.path.join(
+        output_dir,
+        f"{slugify(article.slug or article.title or 'what-just-landed')}-{timezone.now().strftime('%Y%m%d%H%M%S')}.mp4",
+    )
+
+    frame_dir = os.path.join(output_dir, f"_frames_{uuid.uuid4().hex}")
+    os.makedirs(frame_dir, exist_ok=True)
+    try:
+        for frame_index in range(frame_total):
+            progress = frame_index / max(1, frame_total - 1)
+            frame = _render_what_just_landed_reel_frame(payload, progress)
+            frame.save(os.path.join(frame_dir, f'frame_{frame_index:03d}.png'), format='PNG')
+
+        _encode_what_just_landed_reel_frames(frame_dir, output_path, fps)
+    finally:
+        shutil.rmtree(frame_dir, ignore_errors=True)
+
+    return output_path
+
+
+def _build_what_just_landed_reel_caption(article):
+    article_url = _social_article_url(article, source='facebook-reels')
+    hook = _social_hook(article)
+    hashtags = ' '.join(_social_hashtags('facebook', article))
+    return (
+        f"{hook}\n"
+        f"{article.title}\n\n"
+        f"Read more on K-Beats: {article_url}\n\n"
+        f"{hashtags}"
+    ).strip()
+
+
+def _poll_facebook_reel_status(video_id):
+    token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
+    attempts = max(1, int(getattr(settings, 'FACEBOOK_REELS_STATUS_POLL_ATTEMPTS', 8) or 8))
+    wait_seconds = max(1, int(getattr(settings, 'FACEBOOK_REELS_STATUS_POLL_SECONDS', 10) or 10))
+    api_version = _facebook_reels_api_version()
+    latest_payload = {}
+
+    for attempt in range(attempts):
+        try:
+            response = requests.get(
+                f"https://graph.facebook.com/{api_version}/{video_id}",
+                params={
+                    'fields': 'status,permalink_url',
+                    'access_token': token,
+                },
+                timeout=20,
+            )
+            latest_payload = response.json()
+            if response.status_code == 200:
+                status = latest_payload.get('status') or {}
+                video_status = str(status.get('video_status') or status.get('processing_phase', {}).get('status') or '').lower()
+                publishing_status = str(status.get('publishing_phase', {}).get('status') or '').lower()
+                if video_status in {'ready', 'complete', 'completed', 'published'} or publishing_status in {'complete', 'completed', 'published'}:
+                    return latest_payload
+                if video_status in {'error', 'failed'} or publishing_status in {'error', 'failed'}:
+                    raise RuntimeError(f"Facebook Reel processing failed: {latest_payload}")
+        except Exception as exc:
+            logger.warning("[facebook-reels] Status poll %s failed for video %s: %s", attempt + 1, video_id, exc)
+
+        if attempt < attempts - 1:
+            time.sleep(wait_seconds)
+
+    return latest_payload
+
+
+def _publish_facebook_reel(article):
+    page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
+    token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
+    if not page_id or not token:
+        logger.debug("[facebook-reels] No credentials configured - skipping Reel publish.")
+        return None
+
+    if article.facebook_reel_posted_at or article.facebook_reel_id:
+        logger.debug("[facebook-reels] Already handled Reel for %r - skipping.", article.slug)
+        return None
+
+    video_path = _render_what_just_landed_reel_video(article)
+    video_size = os.path.getsize(video_path)
+    api_version = _facebook_reels_api_version()
+    start_response = requests.post(
+        f"https://graph.facebook.com/{api_version}/me/video_reels",
+        params={
+            'access_token': token,
+            'upload_phase': 'start',
+        },
+        timeout=20,
+    )
+    start_payload = start_response.json()
+    if start_response.status_code != 200 or 'video_id' not in start_payload or 'upload_url' not in start_payload:
+        raise RuntimeError(f"Facebook Reel start failed: {start_payload}")
+
+    with open(video_path, 'rb') as video_file:
+        upload_response = requests.post(
+            start_payload['upload_url'],
+            params={'access_token': token},
+            data=video_file,
+            headers={
+                'Authorization': f"OAuth {token}",
+                'offset': '0',
+                'file_size': str(video_size),
+                'Content-Type': 'application/octet-stream',
+            },
+            timeout=240,
+        )
+
+    upload_payload = upload_response.json()
+    if upload_response.status_code not in (200, 201) or upload_payload.get('success') is False:
+        raise RuntimeError(f"Facebook Reel upload failed: {upload_payload}")
+
+    publish_response = requests.post(
+        f"https://graph.facebook.com/{api_version}/me/video_reels",
+        params={
+            'access_token': token,
+            'upload_phase': 'finish',
+            'video_id': start_payload['video_id'],
+            'video_state': 'PUBLISHED',
+            'description': _build_what_just_landed_reel_caption(article),
+        },
+        timeout=20,
+    )
+    publish_payload = publish_response.json()
+    if publish_response.status_code != 200 or publish_payload.get('success') is False:
+        raise RuntimeError(f"Facebook Reel publish failed: {publish_payload}")
+
+    status_payload = _poll_facebook_reel_status(start_payload['video_id'])
+    now_value = timezone.now()
+    relative_video_path = os.path.relpath(video_path, settings.MEDIA_ROOT).replace('\\', '/')
+    BlogArticle.objects.filter(pk=article.pk).update(
+        facebook_reel_id=start_payload['video_id'],
+        facebook_reel_posted_at=now_value,
+        facebook_reel_video_path=relative_video_path,
+    )
+    article.facebook_reel_id = start_payload['video_id']
+    article.facebook_reel_posted_at = now_value
+    article.facebook_reel_video_path = relative_video_path
+    logger.info(
+        "[facebook-reels] Reel published for %r - video id: %s status=%s",
+        article.title,
+        start_payload['video_id'],
+        status_payload or publish_payload,
+    )
+    return {
+        'video_id': start_payload['video_id'],
+        'video_path': video_path,
+        'status': status_payload or publish_payload,
+    }
+
+
+def _select_next_what_just_landed_reel_article():
+    return (
+        BlogArticle.objects
+        .filter(title__icontains='What Just Landed')
+        .filter(models.Q(facebook_reel_id='') | models.Q(facebook_reel_id__isnull=True))
+        .order_by('created_at')
+        .first()
+    )
+
+
+def _post_next_what_just_landed_facebook_reel():
+    if not getattr(settings, 'FACEBOOK_REELS_ENABLED', False):
+        logger.info("[facebook-reels] Disabled in settings - skipping pass.")
+        return None
+
+    article = _select_next_what_just_landed_reel_article()
+    if not article:
+        logger.info("[facebook-reels] No queued What Just Landed article found.")
+        return None
+
+    return _publish_facebook_reel(article)
 
 
 def _build_header_mega_menu_context(request):

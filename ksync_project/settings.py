@@ -139,7 +139,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Media files (user-uploaded / generated images)
@@ -189,6 +189,15 @@ FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUV
 FACEBOOK_PIXEL_ID = os.environ.get('FACEBOOK_PIXEL_ID', '1694492738408843').strip()
 FACEBOOK_HOMEPAGE_COMMENT_ENABLED = os.environ.get('FACEBOOK_HOMEPAGE_COMMENT_ENABLED', 'true').lower() == 'true'
 FACEBOOK_HOMEPAGE_COMMENT_TEXT = os.environ.get('FACEBOOK_HOMEPAGE_COMMENT_TEXT', SITE_URL.rstrip('/') + '/')
+FACEBOOK_REELS_ENABLED = os.environ.get('FACEBOOK_REELS_ENABLED', 'true').lower() == 'true'
+FACEBOOK_REELS_RUN_ON_STARTUP = os.environ.get('FACEBOOK_REELS_RUN_ON_STARTUP', 'true').lower() == 'true'
+FACEBOOK_REELS_DAILY_HOUR = int(os.environ.get('FACEBOOK_REELS_DAILY_HOUR', '10'))
+FACEBOOK_REELS_DAILY_MINUTE = int(os.environ.get('FACEBOOK_REELS_DAILY_MINUTE', '0'))
+FACEBOOK_REELS_API_VERSION = os.environ.get('FACEBOOK_REELS_API_VERSION', 'v22.0').strip() or 'v22.0'
+FACEBOOK_REELS_DURATION_SECONDS = max(4, int(os.environ.get('FACEBOOK_REELS_DURATION_SECONDS', '5')))
+FACEBOOK_REELS_FPS = max(23, int(os.environ.get('FACEBOOK_REELS_FPS', '24')))
+FACEBOOK_REELS_STATUS_POLL_ATTEMPTS = max(1, int(os.environ.get('FACEBOOK_REELS_STATUS_POLL_ATTEMPTS', '8')))
+FACEBOOK_REELS_STATUS_POLL_SECONDS = max(1, int(os.environ.get('FACEBOOK_REELS_STATUS_POLL_SECONDS', '10')))
 
 # ── Instagram ─────────────────────────────────────────────────────────────────
 # Instagram Business account must be linked to your Facebook Page.

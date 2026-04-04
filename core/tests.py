@@ -1,14 +1,21 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
+from django.test.client import RequestFactory
 from datetime import timedelta
+import io
+import os
+import tempfile
 from django.contrib.auth.models import User
 from django.db import connection
 from django.core.cache import cache
 from unittest.mock import Mock, patch
+from PIL import Image
 
 from core import views as core_views
+from core import scheduler as core_scheduler
 
 from .models import (
     BlogArticle,
@@ -80,6 +87,29 @@ class BlogArticleSanitizationTests(TestCase):
         )
         self.assertIn('<h3>Header</h3>', article.body_html)
         self.assertIn('<ul><li>One</li></ul>', article.body_html)
+
+
+@override_settings(
+    STORAGES={
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+)
+class SiteIconTests(TestCase):
+    def test_seo_partial_uses_local_favicon_assets(self):
+        request = RequestFactory().get('/')
+        rendered = render_to_string('core/seo_meta.html', {'request': request})
+
+        self.assertIn('href="/static/core/img/favicon.ico"', rendered)
+        self.assertIn('href="/static/core/img/favicon-32x32.png"', rendered)
+        self.assertIn('href="/static/core/img/apple-touch-icon.png"', rendered)
+        self.assertIn('href="/static/core/site.webmanifest"', rendered)
+
+    def test_root_favicon_redirects_to_static_asset(self):
+        response = self.client.get('/favicon.ico')
+
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/static/core/img/favicon.ico')
 
 
 class FanClubTierAndEventTests(TestCase):
@@ -326,6 +356,187 @@ class ComebackNewsSyncTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Echo Bloom')
+
+
+@override_settings(
+    STORAGES={
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+)
+class WhatJustLandedReelLabTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.articles = [
+            BlogArticle.objects.create(
+                slug='ph1-purple-tape',
+                title='pH-1 - PURPLE TAPE: What Just Landed',
+                subtitle='pH-1 just landed with PURPLE TAPE, a album release arriving on Thursday 09 Apr.',
+                category='Comeback',
+                source_title='Comeback Signal Hub',
+                source_url='https://example.com/source/ph1',
+                source_name='K-Beats',
+                image='https://example.com/ph1.jpg',
+                image_2='',
+                image_3='',
+                body_html='<p>Signal copy.</p>',
+                reading_time=3,
+            ),
+            BlogArticle.objects.create(
+                slug='bambam-ready-for-more',
+                title='BamBam - Ready For MORE: What Just Landed',
+                subtitle='BamBam just landed with Ready For MORE, a single release arriving on Wednesday 25 Mar.',
+                category='Comeback',
+                source_title='Comeback Signal Hub',
+                source_url='https://example.com/source/bambam',
+                source_name='K-Beats',
+                image='https://example.com/bambam.jpg',
+                image_2='',
+                image_3='',
+                body_html='<p>Signal copy.</p>',
+                reading_time=3,
+            ),
+            BlogArticle.objects.create(
+                slug='long-title-sample',
+                title='SORAN - Change: Tonight, I\'m Afraid of the First Date: What Just Landed',
+                subtitle='SORAN just landed with Change: Tonight, I\'m Afraid of the First Date, a single release arriving on Friday 10 Apr.',
+                category='Comeback',
+                source_title='Comeback Signal Hub',
+                source_url='https://example.com/source/soran',
+                source_name='K-Beats',
+                image='https://example.com/soran.jpg',
+                image_2='',
+                image_3='',
+                body_html='<p>Signal copy.</p>',
+                reading_time=3,
+            ),
+            BlogArticle.objects.create(
+                slug='ifeye-as-if',
+                title='ifeye - As If: What Just Landed',
+                subtitle='ifeye just landed with As If, a ep release arriving on Wednesday 15 Apr.',
+                category='Comeback',
+                source_title='Comeback Signal Hub',
+                source_url='https://example.com/source/ifeye',
+                source_name='K-Beats',
+                image='',
+                image_2='',
+                image_3='',
+                body_html='<p>Signal copy.</p>',
+                reading_time=3,
+            ),
+        ]
+
+    def test_reel_lab_renders_three_image_samples_and_one_fallback(self):
+        response = self.client.get(reverse('what_just_landed_reel_lab'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'What Just Landed Reel Lab')
+        reel_articles = response.context['reel_articles']
+        self.assertEqual(len(reel_articles), 4)
+        self.assertEqual(sum(1 for item in reel_articles if item['has_image']), 3)
+        self.assertEqual(sum(1 for item in reel_articles if item['is_fallback_sample']), 1)
+
+    def test_reel_lab_preserves_exact_titles_and_builds_layout_styles(self):
+        response = self.client.get(reverse('what_just_landed_reel_lab'))
+
+        reel_articles = response.context['reel_articles']
+        titles = [item['title'] for item in reel_articles]
+        self.assertIn(
+            "SORAN - Change: Tonight, I'm Afraid of the First Date: What Just Landed",
+            titles,
+        )
+        fallback_item = next(item for item in reel_articles if item['is_fallback_sample'])
+        self.assertEqual(fallback_item['title'], 'ifeye - As If: What Just Landed')
+        self.assertIn('font-size:', fallback_item['title_style'])
+
+    def test_select_next_reel_article_skips_already_published_reels(self):
+        first_article = BlogArticle.objects.order_by('created_at').first()
+        first_article.facebook_reel_id = 'reel_123'
+        first_article.save(update_fields=['facebook_reel_id'])
+
+        selected = core_views._select_next_what_just_landed_reel_article()
+
+        self.assertIsNotNone(selected)
+        self.assertNotEqual(selected.pk, first_article.pk)
+        self.assertEqual(selected.slug, 'bambam-ready-for-more')
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch('core.views._download_what_just_landed_reel_source_image')
+    def test_render_reel_frame_returns_vertical_image(self, mock_download):
+        mock_download.return_value = Image.new('RGB', (1400, 1400), '#4f2ddf')
+        article = BlogArticle.objects.get(slug='ph1-purple-tape')
+        payload = core_views._build_what_just_landed_reel_preview_payload(article, sequence=0)
+
+        frame = core_views._render_what_just_landed_reel_frame(payload, 0.5)
+
+        self.assertEqual(frame.size, (1080, 1920))
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch('core.views._render_what_just_landed_reel_video')
+    @patch('core.views._poll_facebook_reel_status')
+    @patch('core.views.requests.post')
+    def test_publish_facebook_reel_updates_article_tracking(self, mock_post, mock_poll, mock_render):
+        article = BlogArticle.objects.get(slug='ph1-purple-tape')
+        with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as handle:
+            handle.write(b'fake-video-bytes')
+            temp_video_path = handle.name
+
+        self.addCleanup(lambda: os.path.exists(temp_video_path) and os.remove(temp_video_path))
+        mock_render.return_value = temp_video_path
+        mock_poll.return_value = {'status': {'video_status': 'ready'}}
+
+        start_response = Mock()
+        start_response.status_code = 200
+        start_response.json.return_value = {
+            'video_id': '987654321',
+            'upload_url': 'https://upload.facebook.example/reel',
+        }
+        upload_response = Mock()
+        upload_response.status_code = 200
+        upload_response.json.return_value = {'success': True}
+        finish_response = Mock()
+        finish_response.status_code = 200
+        finish_response.json.return_value = {'success': True}
+        mock_post.side_effect = [start_response, upload_response, finish_response]
+
+        with self.settings(
+            FACEBOOK_PAGE_ID='123456',
+            FACEBOOK_PAGE_ACCESS_TOKEN='page-token',
+            FACEBOOK_REELS_ENABLED=True,
+            FACEBOOK_REELS_STATUS_POLL_ATTEMPTS=1,
+            FACEBOOK_REELS_STATUS_POLL_SECONDS=1,
+        ):
+            result = core_views._publish_facebook_reel(article)
+
+        article.refresh_from_db()
+        self.assertEqual(article.facebook_reel_id, '987654321')
+        self.assertTrue(bool(article.facebook_reel_posted_at))
+        self.assertTrue(article.facebook_reel_video_path.endswith('.mp4'))
+        self.assertEqual(result['video_id'], '987654321')
+        self.assertEqual(mock_post.call_count, 3)
+
+
+class FacebookReelsSchedulerTests(TestCase):
+    @patch('core.scheduler.BackgroundScheduler')
+    def test_start_scheduler_registers_facebook_reels_jobs_when_enabled(self, mock_scheduler_class):
+        scheduler_instance = Mock()
+        mock_scheduler_class.return_value = scheduler_instance
+
+        with self.settings(
+            FACEBOOK_REELS_ENABLED=True,
+            FACEBOOK_REELS_RUN_ON_STARTUP=True,
+            FACEBOOK_REELS_DAILY_HOUR=11,
+            FACEBOOK_REELS_DAILY_MINUTE=15,
+            X_POST_ENABLED=False,
+            B2_AUTO_SYNC_ENABLED=False,
+            IMAGE_INTEGRITY_CHECK_ENABLED=False,
+            PLAYLIST_WEEKLY_RANDOMIZE_ENABLED=False,
+        ):
+            core_scheduler.start_scheduler()
+
+        scheduled_ids = [call.kwargs.get('id') for call in scheduler_instance.add_job.call_args_list]
+        self.assertIn('facebook_reels_job', scheduled_ids)
+        self.assertIn('initial_facebook_reels_job', scheduled_ids)
 
 
 class RadioCoIntegrationTests(TestCase):
