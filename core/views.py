@@ -39,7 +39,7 @@ from openai import OpenAI
 import bleach
 import cloudinary
 import cloudinary.uploader
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 import base64
@@ -3958,7 +3958,8 @@ def what_just_landed_reel_lab(request):
 
 WHAT_JUST_LANDED_REEL_WIDTH = 1080
 WHAT_JUST_LANDED_REEL_HEIGHT = 1920
-WHAT_JUST_LANDED_REEL_BACKGROUND_SCALE = 1.16
+WHAT_JUST_LANDED_REEL_PREVIEW_WIDTH = 430.0
+WHAT_JUST_LANDED_REEL_PREVIEW_HEIGHT = 430.0 * (16.0 / 9.0)
 
 
 def _facebook_reels_api_version():
@@ -4008,6 +4009,54 @@ def _load_what_just_landed_reel_font(size, *, display=False, bold=False):
             except OSError:
                 continue
     return ImageFont.load_default()
+
+
+def _what_just_landed_reel_scale(value, *, axis='x'):
+    preview_axis = WHAT_JUST_LANDED_REEL_PREVIEW_WIDTH if axis == 'x' else WHAT_JUST_LANDED_REEL_PREVIEW_HEIGHT
+    target_axis = WHAT_JUST_LANDED_REEL_WIDTH if axis == 'x' else WHAT_JUST_LANDED_REEL_HEIGHT
+    return max(1, int(round(value * (target_axis / preview_axis))))
+
+
+def _what_just_landed_reel_layout_metrics(title):
+    layout = _what_just_landed_title_layout(title)
+    top_bar_x = _what_just_landed_reel_scale(24)
+    top_bar_y = _what_just_landed_reel_scale(16, axis='y')
+    top_bar_gap = _what_just_landed_reel_scale(8)
+    content_x = _what_just_landed_reel_scale(24)
+    top_y = _what_just_landed_reel_scale(28, axis='y')
+    title_label_gap = _what_just_landed_reel_scale(28, axis='y')
+    title_gap = _what_just_landed_reel_scale(12, axis='y')
+    subtitle_gap = _what_just_landed_reel_scale(16, axis='y')
+    footer_x = _what_just_landed_reel_scale(24)
+    footer_bottom = _what_just_landed_reel_scale(24, axis='y')
+    footer_padding_x = _what_just_landed_reel_scale(16)
+    footer_padding_y = _what_just_landed_reel_scale(16, axis='y')
+    footer_divider_gap = _what_just_landed_reel_scale(16, axis='y')
+    title_box_width = int((WHAT_JUST_LANDED_REEL_WIDTH - (content_x * 2)) * (layout['max_width_pct'] / 100.0))
+    preview_title_font = layout['size_rem'] * 16.0
+    title_font_size = max(
+        _what_just_landed_reel_scale(72),
+        int(round(preview_title_font * (WHAT_JUST_LANDED_REEL_WIDTH / WHAT_JUST_LANDED_REEL_PREVIEW_WIDTH))),
+    )
+
+    return {
+        'layout': layout,
+        'top_bar_x': top_bar_x,
+        'top_bar_y': top_bar_y,
+        'top_bar_gap': top_bar_gap,
+        'content_x': content_x,
+        'top_y': top_y,
+        'title_label_gap': title_label_gap,
+        'title_gap': title_gap,
+        'subtitle_gap': subtitle_gap,
+        'title_box_width': title_box_width,
+        'title_font_size': title_font_size,
+        'footer_x': footer_x,
+        'footer_bottom': footer_bottom,
+        'footer_padding_x': footer_padding_x,
+        'footer_padding_y': footer_padding_y,
+        'footer_divider_gap': footer_divider_gap,
+    }
 
 
 def _measure_what_just_landed_reel_text(draw, text, font):
@@ -4060,6 +4109,36 @@ def _cover_what_just_landed_reel_image(image, size):
     return fitted
 
 
+def _build_what_just_landed_reel_background(payload, progress):
+    if not payload.get('background_image'):
+        return _build_what_just_landed_reel_fallback_background(payload)
+
+    source_image = _download_what_just_landed_reel_source_image(payload.get('background_image'))
+    if not source_image:
+        return _build_what_just_landed_reel_fallback_background(payload)
+
+    background_width = int(WHAT_JUST_LANDED_REEL_WIDTH * 1.08)
+    background_height = int(WHAT_JUST_LANDED_REEL_HEIGHT * 1.08)
+    background = _cover_what_just_landed_reel_image(source_image, (background_width, background_height))
+    background = ImageEnhance.Color(background).enhance(1.06)
+    background = ImageEnhance.Contrast(background).enhance(1.02)
+
+    start_shift_x = int((background_width - WHAT_JUST_LANDED_REEL_WIDTH) * 0.18)
+    end_shift_x = int((background_width - WHAT_JUST_LANDED_REEL_WIDTH) * 0.56)
+    start_shift_y = int((background_height - WHAT_JUST_LANDED_REEL_HEIGHT) * 0.18)
+    end_shift_y = int((background_height - WHAT_JUST_LANDED_REEL_HEIGHT) * 0.58)
+    shift_x = int(start_shift_x + ((end_shift_x - start_shift_x) * progress))
+    shift_y = int(start_shift_y + ((end_shift_y - start_shift_y) * progress))
+    background = background.crop((
+        shift_x,
+        shift_y,
+        shift_x + WHAT_JUST_LANDED_REEL_WIDTH,
+        shift_y + WHAT_JUST_LANDED_REEL_HEIGHT,
+    ))
+    background = ImageEnhance.Brightness(background).enhance(0.88)
+    return background
+
+
 def _build_what_just_landed_reel_fallback_background(payload):
     canvas = Image.new('RGB', (WHAT_JUST_LANDED_REEL_WIDTH, WHAT_JUST_LANDED_REEL_HEIGHT), '#05070d')
     draw = ImageDraw.Draw(canvas)
@@ -4090,106 +4169,180 @@ def _build_what_just_landed_reel_fallback_background(payload):
 
 
 def _render_what_just_landed_reel_frame(payload, progress):
-    if payload.get('background_image'):
-        source_image = _download_what_just_landed_reel_source_image(payload.get('background_image'))
-    else:
-        source_image = None
-
-    if source_image:
-        zoom = WHAT_JUST_LANDED_REEL_BACKGROUND_SCALE + (0.07 * progress)
-        scaled_size = (
-            int(WHAT_JUST_LANDED_REEL_WIDTH * zoom),
-            int(WHAT_JUST_LANDED_REEL_HEIGHT * zoom),
-        )
-        background = _cover_what_just_landed_reel_image(source_image, scaled_size)
-        shift_x = int((scaled_size[0] - WHAT_JUST_LANDED_REEL_WIDTH) * (0.48 + 0.18 * progress))
-        shift_y = int((scaled_size[1] - WHAT_JUST_LANDED_REEL_HEIGHT) * 0.35)
-        background = background.crop((
-            max(0, shift_x),
-            max(0, shift_y),
-            max(0, shift_x) + WHAT_JUST_LANDED_REEL_WIDTH,
-            max(0, shift_y) + WHAT_JUST_LANDED_REEL_HEIGHT,
-        ))
-        blurred = background.filter(ImageFilter.GaussianBlur(28))
-        background = Image.blend(background, blurred, 0.34)
-    else:
-        background = _build_what_just_landed_reel_fallback_background(payload)
-
+    metrics = _what_just_landed_reel_layout_metrics(payload.get('title') or 'What Just Landed')
+    background = _build_what_just_landed_reel_background(payload, progress)
     canvas = background.convert('RGBA')
 
-    top_gradient = Image.new('L', canvas.size, 0)
-    top_gradient_draw = ImageDraw.Draw(top_gradient)
-    top_gradient_draw.rectangle((0, 0, WHAT_JUST_LANDED_REEL_WIDTH, 880), fill=255)
-    top_gradient = top_gradient.filter(ImageFilter.GaussianBlur(180))
-    top_overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 165))
-    top_overlay.putalpha(top_gradient)
-    canvas = Image.alpha_composite(canvas, top_overlay)
-
-    bottom_overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
-    bottom_draw = ImageDraw.Draw(bottom_overlay)
-    bottom_draw.rectangle((0, 1280, WHAT_JUST_LANDED_REEL_WIDTH, WHAT_JUST_LANDED_REEL_HEIGHT), fill=(0, 0, 0, 140))
-    bottom_overlay = bottom_overlay.filter(ImageFilter.GaussianBlur(120))
-    canvas = Image.alpha_composite(canvas, bottom_overlay)
-
-    sweep = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
-    sweep_draw = ImageDraw.Draw(sweep)
-    center_x = int((-320) + ((WHAT_JUST_LANDED_REEL_WIDTH + 640) * progress))
-    sweep_draw.polygon(
-        [
-            (center_x - 140, 0),
-            (center_x + 60, 0),
-            (center_x + 360, WHAT_JUST_LANDED_REEL_HEIGHT),
-            (center_x + 160, WHAT_JUST_LANDED_REEL_HEIGHT),
-        ],
-        fill=(34, 214, 255, 28),
+    radial_overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+    radial_draw = ImageDraw.Draw(radial_overlay)
+    radial_draw.ellipse(
+        (
+            int(WHAT_JUST_LANDED_REEL_WIDTH * -0.08),
+            int(WHAT_JUST_LANDED_REEL_HEIGHT * -0.03),
+            int(WHAT_JUST_LANDED_REEL_WIDTH * 0.38),
+            int(WHAT_JUST_LANDED_REEL_HEIGHT * 0.24),
+        ),
+        fill=(244, 37, 192, 56),
     )
-    sweep = sweep.filter(ImageFilter.GaussianBlur(70))
-    canvas = Image.alpha_composite(canvas, sweep)
+    radial_draw.ellipse(
+        (
+            int(WHAT_JUST_LANDED_REEL_WIDTH * 0.66),
+            int(WHAT_JUST_LANDED_REEL_HEIGHT * -0.02),
+            int(WHAT_JUST_LANDED_REEL_WIDTH * 1.02),
+            int(WHAT_JUST_LANDED_REEL_HEIGHT * 0.18),
+        ),
+        fill=(0, 240, 255, 46),
+    )
+    radial_overlay = radial_overlay.filter(ImageFilter.GaussianBlur(_what_just_landed_reel_scale(32)))
+    canvas = Image.alpha_composite(canvas, radial_overlay)
+
+    dark_overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+    dark_draw = ImageDraw.Draw(dark_overlay)
+    for y in range(WHAT_JUST_LANDED_REEL_HEIGHT):
+        ratio = y / max(1, WHAT_JUST_LANDED_REEL_HEIGHT - 1)
+        if ratio < 0.22:
+            alpha = int(72 - (ratio / 0.22) * 28)
+        elif ratio < 0.56:
+            alpha = int(44 + ((ratio - 0.22) / 0.34) * 78)
+        else:
+            alpha = int(122 + ((ratio - 0.56) / 0.44) * 113)
+        dark_draw.line((0, y, WHAT_JUST_LANDED_REEL_WIDTH, y), fill=(0, 0, 0, max(0, min(235, alpha))))
+    canvas = Image.alpha_composite(canvas, dark_overlay)
+
+    sheen = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+    sheen_draw = ImageDraw.Draw(sheen)
+    sheen_draw.polygon(
+        [
+            (int(WHAT_JUST_LANDED_REEL_WIDTH * -0.12), 0),
+            (int(WHAT_JUST_LANDED_REEL_WIDTH * 0.2), 0),
+            (int(WHAT_JUST_LANDED_REEL_WIDTH * 0.76), WHAT_JUST_LANDED_REEL_HEIGHT),
+            (int(WHAT_JUST_LANDED_REEL_WIDTH * 0.44), WHAT_JUST_LANDED_REEL_HEIGHT),
+        ],
+        fill=(255, 255, 255, 18),
+    )
+    sheen = sheen.filter(ImageFilter.GaussianBlur(_what_just_landed_reel_scale(26)))
+    canvas = Image.alpha_composite(canvas, sheen)
 
     draw = ImageDraw.Draw(canvas)
-    accent_y = 128
-    draw.rounded_rectangle((78, accent_y, 348, accent_y + 12), radius=6, fill='#ff2d7c')
-    draw.rounded_rectangle((366, accent_y, 564, accent_y + 12), radius=6, fill='#22d6ff')
+    top_bar_y = metrics['top_bar_y']
+    top_bar_height = _what_just_landed_reel_scale(4, axis='y')
+    top_bar_width = _what_just_landed_reel_scale(96)
+    draw.rounded_rectangle(
+        (
+            metrics['top_bar_x'],
+            top_bar_y,
+            metrics['top_bar_x'] + top_bar_width,
+            top_bar_y + top_bar_height,
+        ),
+        radius=max(1, int(top_bar_height / 2)),
+        fill='#f425c0',
+    )
+    cyan_bar_x = metrics['top_bar_x'] + top_bar_width + metrics['top_bar_gap']
+    draw.rounded_rectangle(
+        (
+            cyan_bar_x,
+            top_bar_y,
+            cyan_bar_x + _what_just_landed_reel_scale(72),
+            top_bar_y + top_bar_height,
+        ),
+        radius=max(1, int(top_bar_height / 2)),
+        fill='#00d8ff',
+    )
 
-    label_font = _load_what_just_landed_reel_font(56, bold=True)
-    meta_font = _load_what_just_landed_reel_font(40, bold=False)
-    footer_font = _load_what_just_landed_reel_font(38, bold=True)
-    title_font_size = 136
+    header_font = _load_what_just_landed_reel_font(_what_just_landed_reel_scale(10), bold=True)
+    label_font = _load_what_just_landed_reel_font(_what_just_landed_reel_scale(10), bold=True)
+    meta_font = _load_what_just_landed_reel_font(_what_just_landed_reel_scale(12.5), bold=False)
+    footer_font = _load_what_just_landed_reel_font(_what_just_landed_reel_scale(10), bold=True)
+    release_font = _load_what_just_landed_reel_font(_what_just_landed_reel_scale(14), bold=True)
+    footer_link_font = _load_what_just_landed_reel_font(_what_just_landed_reel_scale(10), bold=True)
+    footer_meta_font = _load_what_just_landed_reel_font(_what_just_landed_reel_scale(10), bold=False)
+
     title = payload.get('title') or 'What Just Landed'
-    max_title_width = int(WHAT_JUST_LANDED_REEL_WIDTH * 0.9)
+    title_font_size = metrics['title_font_size']
+    max_title_width = metrics['title_box_width']
     line_limit = 4
 
-    while title_font_size >= 72:
+    while title_font_size >= _what_just_landed_reel_scale(40):
         title_font = _load_what_just_landed_reel_font(title_font_size, display=True, bold=True)
         title_lines = _wrap_what_just_landed_reel_text(draw, title, title_font, max_title_width)
         if len(title_lines) <= line_limit:
             break
-        title_font_size -= 6
+        title_font_size -= _what_just_landed_reel_scale(2)
     else:
-        title_font = _load_what_just_landed_reel_font(72, display=True, bold=True)
+        title_font = _load_what_just_landed_reel_font(_what_just_landed_reel_scale(40), display=True, bold=True)
         title_lines = _wrap_what_just_landed_reel_text(draw, title, title_font, max_title_width)
 
-    draw.text((82, 158), 'WHAT JUST LANDED', font=label_font, fill='#f3f5ff')
+    top_y = metrics['top_y']
+    content_x = metrics['content_x']
+    draw.text((content_x, top_y), 'K-BEATS', font=header_font, fill='#f3f5ff')
+    frame_label = payload.get('sequence_label') or 'FRAME 1'
+    frame_text_width, _ = _measure_what_just_landed_reel_text(draw, frame_label, header_font)
+    draw.text((WHAT_JUST_LANDED_REEL_WIDTH - content_x - frame_text_width, top_y), frame_label, font=header_font, fill='#f3f5ff')
 
-    title_y = 236
-    line_spacing = int(title_font_size * 0.98)
+    label_y = top_y + metrics['title_label_gap']
+    draw.text((content_x, label_y), 'WHAT JUST LANDED', font=label_font, fill='#f425c0')
+
+    title_y = label_y + metrics['title_gap'] + _what_just_landed_reel_scale(12, axis='y')
+    line_spacing = int(title_font_size * metrics['layout']['line_height'])
     for line in title_lines[:line_limit]:
-        shadow_position = (86, title_y + 4)
+        shadow_position = (content_x + _what_just_landed_reel_scale(2), title_y + _what_just_landed_reel_scale(2, axis='y'))
         draw.text(shadow_position, line, font=title_font, fill=(0, 0, 0, 150))
-        draw.text((82, title_y), line, font=title_font, fill='#ffffff')
+        draw.text((content_x, title_y), line, font=title_font, fill='#ffffff')
         title_y += line_spacing
 
-    artist_label = payload.get('artist') or 'K-Beats'
-    release_type = payload.get('release_type') or 'Comeback'
-    created_at_label = payload.get('created_at_label') or timezone.localdate().strftime('%d %b %Y')
-    release_day = payload.get('release_day') or created_at_label
-    meta_text = f"{artist_label}  |  {release_type}  |  {release_day}"
-    draw.text((82, min(title_y + 28, 860)), meta_text.upper(), font=meta_font, fill='#f0d2dc')
+    subtitle = payload.get('subtitle') or ''
+    if subtitle:
+        subtitle_box_width = int((WHAT_JUST_LANDED_REEL_WIDTH - (content_x * 2)) * 0.82)
+        subtitle_lines = _wrap_what_just_landed_reel_text(draw, subtitle, meta_font, subtitle_box_width)
+        subtitle_y = title_y + metrics['subtitle_gap']
+        subtitle_spacing = int(_what_just_landed_reel_scale(14, axis='y') * 1.25)
+        for line in subtitle_lines[:2]:
+            draw.text(
+                (content_x, subtitle_y),
+                line,
+                font=meta_font,
+                fill=(226, 232, 240),
+            )
+            subtitle_y += subtitle_spacing
 
-    footer_y = WHAT_JUST_LANDED_REEL_HEIGHT - 192
-    draw.rounded_rectangle((82, footer_y - 12, 260, footer_y + 60), radius=24, fill=(5, 10, 18, 180), outline=(255, 255, 255, 55), width=2)
-    draw.text((110, footer_y + 2), 'K-BEATS', font=footer_font, fill='#ffffff')
-    draw.text((82, footer_y + 82), 'kbeatsradio.co.uk', font=meta_font, fill='#d6dcef')
+    footer_left = metrics['footer_x']
+    footer_right = WHAT_JUST_LANDED_REEL_WIDTH - metrics['footer_x']
+    footer_top = WHAT_JUST_LANDED_REEL_HEIGHT - metrics['footer_bottom'] - _what_just_landed_reel_scale(108, axis='y')
+    footer_bottom = WHAT_JUST_LANDED_REEL_HEIGHT - metrics['footer_bottom']
+    footer_box = Image.new('RGBA', (WHAT_JUST_LANDED_REEL_WIDTH, WHAT_JUST_LANDED_REEL_HEIGHT), (0, 0, 0, 0))
+    footer_box_draw = ImageDraw.Draw(footer_box)
+    footer_box_draw.rectangle(
+        (footer_left, footer_top, footer_right, footer_bottom),
+        fill=(0, 0, 0, 140),
+        outline=(255, 255, 255, 26),
+        width=max(1, _what_just_landed_reel_scale(1)),
+    )
+    footer_box = footer_box.filter(ImageFilter.GaussianBlur(_what_just_landed_reel_scale(1)))
+    canvas = Image.alpha_composite(canvas, footer_box)
+    draw = ImageDraw.Draw(canvas)
+
+    inner_left = footer_left + metrics['footer_padding_x']
+    inner_top = footer_top + metrics['footer_padding_y']
+    inner_right = footer_right - metrics['footer_padding_x']
+    draw.text((inner_left, inner_top), (payload.get('artist') or 'K-BEATS').upper(), font=footer_font, fill='#00f0ff')
+    draw.text((inner_left, inner_top + _what_just_landed_reel_scale(18, axis='y')), (payload.get('release_title') or '').upper(), font=release_font, fill='#ffffff')
+
+    right_label = (payload.get('release_type') or 'Comeback').upper()
+    right_date = (payload.get('created_at_label') or timezone.localdate().strftime('%d %b %Y')).upper()
+    right_label_width, _ = _measure_what_just_landed_reel_text(draw, right_label, footer_font)
+    right_date_width, _ = _measure_what_just_landed_reel_text(draw, right_date, footer_meta_font)
+    draw.text((inner_right - right_label_width, inner_top + _what_just_landed_reel_scale(3, axis='y')), right_label, font=footer_font, fill='#d1d5db')
+    draw.text((inner_right - right_date_width, inner_top + _what_just_landed_reel_scale(20, axis='y')), right_date, font=footer_meta_font, fill='#6b7280')
+
+    divider_y = footer_bottom - metrics['footer_padding_y'] - _what_just_landed_reel_scale(18, axis='y')
+    draw.line((inner_left, divider_y, inner_right, divider_y), fill=(255, 255, 255, 24), width=max(1, _what_just_landed_reel_scale(1)))
+    footer_copy_y = divider_y + _what_just_landed_reel_scale(8, axis='y')
+    footer_copy = 'FULL STORY ON K-BEATS'
+    footer_copy_width, _ = _measure_what_just_landed_reel_text(draw, footer_copy, footer_meta_font)
+    footer_link = 'OPEN ARTICLE'
+    footer_link_width, _ = _measure_what_just_landed_reel_text(draw, footer_link, footer_link_font)
+    draw.text((inner_left, footer_copy_y), footer_copy, font=footer_meta_font, fill='#94a3b8')
+    draw.text((inner_right - footer_link_width, footer_copy_y), footer_link, font=footer_link_font, fill='#f425c0')
 
     return canvas.convert('RGB')
 
