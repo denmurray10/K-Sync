@@ -460,6 +460,42 @@ class WhatJustLandedReelLabTests(TestCase):
         self.assertNotEqual(selected.pk, first_article.pk)
         self.assertEqual(selected.slug, 'bambam-ready-for-more')
 
+    def test_select_next_reel_article_skips_preview_ready_articles(self):
+        first_article = BlogArticle.objects.order_by('created_at').first()
+        first_article.facebook_reel_preview_status = 'ready'
+        first_article.facebook_reel_publish_status = 'scheduled'
+        first_article.facebook_reel_preview_video_path = 'generated/facebook_reels/test.mp4'
+        first_article.facebook_reel_publish_scheduled_at = timezone.now() + timedelta(minutes=20)
+        first_article.save(update_fields=[
+            'facebook_reel_preview_status',
+            'facebook_reel_publish_status',
+            'facebook_reel_preview_video_path',
+            'facebook_reel_publish_scheduled_at',
+        ])
+
+        selected = core_views._select_next_what_just_landed_reel_article()
+
+        self.assertIsNotNone(selected)
+        self.assertEqual(selected.slug, 'bambam-ready-for-more')
+
+    def test_select_next_ready_reel_preview_returns_expired_preview(self):
+        article = BlogArticle.objects.get(slug='ph1-purple-tape')
+        article.facebook_reel_preview_status = 'ready'
+        article.facebook_reel_publish_status = 'scheduled'
+        article.facebook_reel_preview_video_path = 'generated/facebook_reels/test.mp4'
+        article.facebook_reel_publish_scheduled_at = timezone.now() - timedelta(minutes=1)
+        article.save(update_fields=[
+            'facebook_reel_preview_status',
+            'facebook_reel_publish_status',
+            'facebook_reel_preview_video_path',
+            'facebook_reel_publish_scheduled_at',
+        ])
+
+        selected = core_views._select_next_ready_what_just_landed_reel_preview()
+
+        self.assertIsNotNone(selected)
+        self.assertEqual(selected.pk, article.pk)
+
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch('core.views._download_what_just_landed_reel_source_image')
     def test_render_reel_frame_returns_vertical_image(self, mock_download):
@@ -473,17 +509,53 @@ class WhatJustLandedReelLabTests(TestCase):
 
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch('core.views._render_what_just_landed_reel_video')
+    def test_generate_reel_preview_updates_hold_tracking(self, mock_render):
+        article = BlogArticle.objects.get(slug='ph1-purple-tape')
+        with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False, dir=tempfile.gettempdir()) as handle:
+            handle.write(b'preview-video-bytes')
+            temp_video_path = handle.name
+
+        self.addCleanup(lambda: os.path.exists(temp_video_path) and os.remove(temp_video_path))
+        mock_render.return_value = temp_video_path
+
+        with self.settings(FACEBOOK_REELS_PREVIEW_HOLD_MINUTES=20):
+            result = core_views._generate_what_just_landed_reel_preview(article)
+
+        article.refresh_from_db()
+        self.assertEqual(article.facebook_reel_preview_status, 'ready')
+        self.assertEqual(article.facebook_reel_publish_status, 'scheduled')
+        self.assertTrue(article.facebook_reel_preview_video_path.endswith('.mp4'))
+        self.assertTrue(bool(article.facebook_reel_preview_created_at))
+        self.assertTrue(bool(article.facebook_reel_publish_scheduled_at))
+        self.assertEqual(
+            article.facebook_reel_publish_scheduled_at - article.facebook_reel_preview_created_at,
+            timedelta(minutes=20),
+        )
+        self.assertIn(article.slug, result['preview_url'])
+        self.assertEqual(result['mode'], 'preview_created')
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch('core.views._render_what_just_landed_reel_video')
     @patch('core.views._poll_facebook_reel_status')
     @patch('core.views.requests.post')
-    def test_publish_facebook_reel_updates_article_tracking(self, mock_post, mock_poll, mock_render):
+    def test_publish_ready_facebook_reel_preview_updates_article_tracking(self, mock_post, mock_poll, mock_render):
         article = BlogArticle.objects.get(slug='ph1-purple-tape')
         with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as handle:
             handle.write(b'fake-video-bytes')
             temp_video_path = handle.name
 
         self.addCleanup(lambda: os.path.exists(temp_video_path) and os.remove(temp_video_path))
-        mock_render.return_value = temp_video_path
         mock_poll.return_value = {'status': {'video_status': 'ready'}}
+        article.facebook_reel_preview_video_path = os.path.relpath(temp_video_path, tempfile.gettempdir()).replace('\\', '/')
+        article.facebook_reel_preview_status = 'ready'
+        article.facebook_reel_publish_status = 'scheduled'
+        article.facebook_reel_publish_scheduled_at = timezone.now() - timedelta(minutes=1)
+        article.save(update_fields=[
+            'facebook_reel_preview_video_path',
+            'facebook_reel_preview_status',
+            'facebook_reel_publish_status',
+            'facebook_reel_publish_scheduled_at',
+        ])
 
         start_response = Mock()
         start_response.status_code = 200
@@ -506,14 +578,41 @@ class WhatJustLandedReelLabTests(TestCase):
             FACEBOOK_REELS_STATUS_POLL_ATTEMPTS=1,
             FACEBOOK_REELS_STATUS_POLL_SECONDS=1,
         ):
-            result = core_views._publish_facebook_reel(article)
+            result = core_views._publish_ready_what_just_landed_reel_preview(article)
 
         article.refresh_from_db()
         self.assertEqual(article.facebook_reel_id, '987654321')
         self.assertTrue(bool(article.facebook_reel_posted_at))
         self.assertTrue(article.facebook_reel_video_path.endswith('.mp4'))
+        self.assertEqual(article.facebook_reel_preview_status, 'published')
+        self.assertEqual(article.facebook_reel_publish_status, 'published')
         self.assertEqual(result['video_id'], '987654321')
         self.assertEqual(mock_post.call_count, 3)
+        mock_render.assert_not_called()
+
+    def test_private_reel_preview_page_embeds_saved_video(self):
+        article = BlogArticle.objects.get(slug='ph1-purple-tape')
+        article.facebook_reel_preview_video_path = 'generated/facebook_reels/ph1-preview.mp4'
+        article.facebook_reel_preview_status = 'ready'
+        article.facebook_reel_publish_status = 'scheduled'
+        article.facebook_reel_preview_created_at = timezone.now()
+        article.facebook_reel_publish_scheduled_at = timezone.now() + timedelta(minutes=20)
+        article.save(update_fields=[
+            'facebook_reel_preview_video_path',
+            'facebook_reel_preview_status',
+            'facebook_reel_publish_status',
+            'facebook_reel_preview_created_at',
+            'facebook_reel_publish_scheduled_at',
+        ])
+
+        response = self.client.get(
+            reverse('what_just_landed_reel_preview', kwargs={'slug': article.slug, 'token': article.facebook_reel_preview_token})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, article.title)
+        self.assertContains(response, '/media/generated/facebook_reels/ph1-preview.mp4')
+        self.assertEqual(response['X-Robots-Tag'], 'noindex, nofollow, noarchive')
 
 
 class FacebookReelsSchedulerTests(TestCase):
@@ -537,6 +636,36 @@ class FacebookReelsSchedulerTests(TestCase):
         scheduled_ids = [call.kwargs.get('id') for call in scheduler_instance.add_job.call_args_list]
         self.assertIn('facebook_reels_job', scheduled_ids)
         self.assertIn('initial_facebook_reels_job', scheduled_ids)
+
+    @patch('core.views._publish_ready_what_just_landed_reel_preview')
+    @patch('core.views._generate_what_just_landed_reel_preview')
+    def test_reel_pass_prefers_publishing_ready_preview_before_generating_new_one(self, mock_generate, mock_publish):
+        article = BlogArticle.objects.create(
+            slug='ready-preview',
+            title='Artist - Ready Preview: What Just Landed',
+            subtitle='Artist just landed with Ready Preview, a single release arriving on Monday 06 Apr.',
+            category='Comeback',
+            source_title='Comeback Signal Hub',
+            source_url='https://example.com/source/ready-preview',
+            source_name='K-Beats',
+            image='https://example.com/ready-preview.jpg',
+            image_2='',
+            image_3='',
+            body_html='<p>Signal copy.</p>',
+            reading_time=3,
+            facebook_reel_preview_video_path='generated/facebook_reels/ready-preview.mp4',
+            facebook_reel_preview_status='ready',
+            facebook_reel_publish_status='scheduled',
+            facebook_reel_publish_scheduled_at=timezone.now() - timedelta(minutes=1),
+        )
+        mock_publish.return_value = {'mode': 'published', 'video_id': 'abc'}
+
+        with self.settings(FACEBOOK_REELS_ENABLED=True):
+            result = core_views._post_next_what_just_landed_facebook_reel()
+
+        self.assertEqual(result['mode'], 'published')
+        mock_publish.assert_called_once_with(article)
+        mock_generate.assert_not_called()
 
 
 class RadioCoIntegrationTests(TestCase):

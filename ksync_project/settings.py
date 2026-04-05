@@ -198,6 +198,7 @@ FACEBOOK_REELS_DURATION_SECONDS = max(4, int(os.environ.get('FACEBOOK_REELS_DURA
 FACEBOOK_REELS_FPS = max(23, int(os.environ.get('FACEBOOK_REELS_FPS', '24')))
 FACEBOOK_REELS_STATUS_POLL_ATTEMPTS = max(1, int(os.environ.get('FACEBOOK_REELS_STATUS_POLL_ATTEMPTS', '8')))
 FACEBOOK_REELS_STATUS_POLL_SECONDS = max(1, int(os.environ.get('FACEBOOK_REELS_STATUS_POLL_SECONDS', '10')))
+FACEBOOK_REELS_PREVIEW_HOLD_MINUTES = max(1, int(os.environ.get('FACEBOOK_REELS_PREVIEW_HOLD_MINUTES', '20')))
 
 # ── Instagram ─────────────────────────────────────────────────────────────────
 # Instagram Business account must be linked to your Facebook Page.

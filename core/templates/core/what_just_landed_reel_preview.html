@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    {% include 'core/seo_meta.html' %}
+    <title>{{ seo_title }}</title>
+    <meta name="robots" content="noindex,nofollow,noarchive"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f425c0",
+                        secondary: "#00f0ff",
+                    },
+                    fontFamily: {
+                        display: ["Montserrat", "sans-serif"],
+                        cinzel: ["Cinzel", "serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 14% 0%, rgba(244, 37, 192, 0.16), transparent 32%),
+                radial-gradient(circle at 86% 12%, rgba(0, 240, 255, 0.12), transparent 26%),
+                linear-gradient(180deg, #020202 0%, #000 100%);
+        }
+        .panel {
+            background: linear-gradient(180deg, rgba(16, 16, 16, 0.96), rgba(5, 5, 5, 0.98));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+                0 18px 40px rgba(0, 0, 0, 0.38);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white font-display">
+    <main class="mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-6 py-10 lg:flex-row">
+        <section class="panel flex-1 p-6 lg:p-8">
+            <div class="mb-5 flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.32em] text-primary">Internal Reel Preview</p>
+                    <h1 class="mt-2 font-cinzel text-3xl font-semibold uppercase leading-none lg:text-5xl">{{ article.title }}</h1>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs uppercase tracking-[0.28em] text-white/45">Hold Window</p>
+                    <p class="mt-2 text-lg font-semibold text-secondary">{{ hold_minutes }} minutes</p>
+                </div>
+            </div>
+
+            <div class="mx-auto max-w-[430px]">
+                <video
+                    class="w-full border border-white/15 bg-black shadow-[0_24px_50px_rgba(0,0,0,0.45)]"
+                    controls
+                    playsinline
+                    preload="metadata"
+                    src="{{ preview_video_url }}"
+                ></video>
+            </div>
+        </section>
+
+        <aside class="panel w-full p-6 lg:w-[360px] lg:p-8">
+            <div class="space-y-5 text-sm">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-white/45">Article Slug</p>
+                    <p class="mt-2 break-all text-base text-white">{{ article.slug }}</p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-white/45">Preview Status</p>
+                    <p class="mt-2 text-base font-semibold uppercase text-primary">{{ preview_status }}</p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-white/45">Publish Status</p>
+                    <p class="mt-2 text-base font-semibold uppercase text-secondary">{{ publish_status }}</p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-white/45">Preview Created</p>
+                    <p class="mt-2 text-base text-white">{% if preview_created_at %}{{ preview_created_at }}{% else %}Pending{% endif %}</p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-white/45">Scheduled Go Live</p>
+                    <p class="mt-2 text-base text-white">{% if publish_at %}{{ publish_at }}{% else %}Not scheduled{% endif %}</p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-white/45">Preview Link</p>
+                    <a class="mt-2 block break-all text-base text-secondary underline decoration-secondary/40 underline-offset-4" href="{{ preview_url }}">{{ preview_url }}</a>
+                </div>
+            </div>
+        </aside>
+    </main>
+</body>
+</html>

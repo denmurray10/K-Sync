@@ -4456,7 +4456,82 @@ def _poll_facebook_reel_status(video_id):
     return latest_payload
 
 
-def _publish_facebook_reel(article):
+def _facebook_reels_preview_hold_minutes():
+    return max(1, int(getattr(settings, 'FACEBOOK_REELS_PREVIEW_HOLD_MINUTES', 20) or 20))
+
+
+def _absolute_what_just_landed_reel_path(relative_path):
+    relative = str(relative_path or '').strip().replace('\\', '/')
+    if not relative:
+        return ''
+    return os.path.join(settings.MEDIA_ROOT, relative.replace('/', os.sep))
+
+
+def _public_what_just_landed_reel_media_url(relative_path):
+    relative = str(relative_path or '').strip().replace('\\', '/')
+    if not relative:
+        return ''
+    return f"{settings.MEDIA_URL.rstrip('/')}/{relative.lstrip('/')}"
+
+
+def _what_just_landed_reel_preview_url(article, request=None):
+    if not article or not article.slug or not article.facebook_reel_preview_token:
+        return ''
+    path = reverse(
+        'what_just_landed_reel_preview',
+        kwargs={'slug': article.slug, 'token': article.facebook_reel_preview_token},
+    )
+    if request:
+        return request.build_absolute_uri(path)
+    return f"{str(getattr(settings, 'SITE_URL', '') or '').rstrip('/')}{path}"
+
+
+def _generate_what_just_landed_reel_preview(article):
+    if article.facebook_reel_id or article.facebook_reel_posted_at:
+        logger.debug("[facebook-reels] %r already published - skipping preview generation.", article.slug)
+        return None
+
+    if article.facebook_reel_preview_status == 'ready' and article.facebook_reel_preview_video_path:
+        logger.debug("[facebook-reels] %r already has a ready preview - skipping generation.", article.slug)
+        return None
+
+    video_path = _render_what_just_landed_reel_video(article)
+    now_value = timezone.now()
+    publish_at = now_value + timedelta(minutes=_facebook_reels_preview_hold_minutes())
+    relative_video_path = os.path.relpath(video_path, settings.MEDIA_ROOT).replace('\\', '/')
+    preview_token = article.facebook_reel_preview_token or uuid.uuid4()
+
+    BlogArticle.objects.filter(pk=article.pk).update(
+        facebook_reel_preview_video_path=relative_video_path,
+        facebook_reel_preview_created_at=now_value,
+        facebook_reel_publish_scheduled_at=publish_at,
+        facebook_reel_preview_status='ready',
+        facebook_reel_publish_status='scheduled',
+        facebook_reel_preview_token=preview_token,
+    )
+    article.facebook_reel_preview_video_path = relative_video_path
+    article.facebook_reel_preview_created_at = now_value
+    article.facebook_reel_publish_scheduled_at = publish_at
+    article.facebook_reel_preview_status = 'ready'
+    article.facebook_reel_publish_status = 'scheduled'
+    article.facebook_reel_preview_token = preview_token
+
+    preview_url = _what_just_landed_reel_preview_url(article)
+    logger.info(
+        "[facebook-reels] Preview generated for %r - publish scheduled at %s preview=%s",
+        article.title,
+        publish_at,
+        preview_url,
+    )
+    return {
+        'mode': 'preview_created',
+        'video_path': video_path,
+        'preview_url': preview_url,
+        'publish_at': publish_at,
+    }
+
+
+def _publish_facebook_reel(article, *, video_path=None):
     page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
     token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
     if not page_id or not token:
@@ -4467,8 +4542,20 @@ def _publish_facebook_reel(article):
         logger.debug("[facebook-reels] Already handled Reel for %r - skipping.", article.slug)
         return None
 
-    video_path = _render_what_just_landed_reel_video(article)
-    video_size = os.path.getsize(video_path)
+    final_video_path = str(video_path or '').strip()
+    if not final_video_path:
+        final_video_path = _render_what_just_landed_reel_video(article)
+    if not os.path.exists(final_video_path):
+        raise RuntimeError(f"Facebook Reel video file is missing: {final_video_path}")
+
+    BlogArticle.objects.filter(pk=article.pk).update(
+        facebook_reel_preview_status='publishing',
+        facebook_reel_publish_status='publishing',
+    )
+    article.facebook_reel_preview_status = 'publishing'
+    article.facebook_reel_publish_status = 'publishing'
+
+    video_size = os.path.getsize(final_video_path)
     api_version = _facebook_reels_api_version()
     start_response = requests.post(
         f"https://graph.facebook.com/{api_version}/{page_id}/video_reels",
@@ -4480,9 +4567,13 @@ def _publish_facebook_reel(article):
     )
     start_payload = start_response.json()
     if start_response.status_code != 200 or 'video_id' not in start_payload or 'upload_url' not in start_payload:
+        BlogArticle.objects.filter(pk=article.pk).update(
+            facebook_reel_preview_status='failed',
+            facebook_reel_publish_status='failed',
+        )
         raise RuntimeError(f"Facebook Reel start failed: {start_payload}")
 
-    with open(video_path, 'rb') as video_file:
+    with open(final_video_path, 'rb') as video_file:
         upload_response = requests.post(
             start_payload['upload_url'],
             params={'access_token': token},
@@ -4498,6 +4589,10 @@ def _publish_facebook_reel(article):
 
     upload_payload = upload_response.json()
     if upload_response.status_code not in (200, 201) or upload_payload.get('success') is False:
+        BlogArticle.objects.filter(pk=article.pk).update(
+            facebook_reel_preview_status='failed',
+            facebook_reel_publish_status='failed',
+        )
         raise RuntimeError(f"Facebook Reel upload failed: {upload_payload}")
 
     publish_response = requests.post(
@@ -4513,19 +4608,27 @@ def _publish_facebook_reel(article):
     )
     publish_payload = publish_response.json()
     if publish_response.status_code != 200 or publish_payload.get('success') is False:
+        BlogArticle.objects.filter(pk=article.pk).update(
+            facebook_reel_preview_status='failed',
+            facebook_reel_publish_status='failed',
+        )
         raise RuntimeError(f"Facebook Reel publish failed: {publish_payload}")
 
     status_payload = _poll_facebook_reel_status(start_payload['video_id'])
     now_value = timezone.now()
-    relative_video_path = os.path.relpath(video_path, settings.MEDIA_ROOT).replace('\\', '/')
+    relative_video_path = os.path.relpath(final_video_path, settings.MEDIA_ROOT).replace('\\', '/')
     BlogArticle.objects.filter(pk=article.pk).update(
         facebook_reel_id=start_payload['video_id'],
         facebook_reel_posted_at=now_value,
         facebook_reel_video_path=relative_video_path,
+        facebook_reel_preview_status='published',
+        facebook_reel_publish_status='published',
     )
     article.facebook_reel_id = start_payload['video_id']
     article.facebook_reel_posted_at = now_value
     article.facebook_reel_video_path = relative_video_path
+    article.facebook_reel_preview_status = 'published'
+    article.facebook_reel_publish_status = 'published'
     logger.info(
         "[facebook-reels] Reel published for %r - video id: %s status=%s",
         article.title,
@@ -4533,8 +4636,9 @@ def _publish_facebook_reel(article):
         status_payload or publish_payload,
     )
     return {
+        'mode': 'published',
         'video_id': start_payload['video_id'],
-        'video_path': video_path,
+        'video_path': final_video_path,
         'status': status_payload or publish_payload,
     }
 
@@ -4544,9 +4648,38 @@ def _select_next_what_just_landed_reel_article():
         BlogArticle.objects
         .filter(title__icontains='What Just Landed')
         .filter(models.Q(facebook_reel_id='') | models.Q(facebook_reel_id__isnull=True))
+        .filter(models.Q(facebook_reel_preview_status='') | models.Q(facebook_reel_preview_status__isnull=True))
         .order_by('created_at')
         .first()
     )
+
+
+def _select_next_ready_what_just_landed_reel_preview():
+    return (
+        BlogArticle.objects
+        .filter(title__icontains='What Just Landed')
+        .filter(models.Q(facebook_reel_id='') | models.Q(facebook_reel_id__isnull=True))
+        .filter(facebook_reel_preview_status='ready')
+        .filter(facebook_reel_publish_status='scheduled')
+        .filter(facebook_reel_publish_scheduled_at__lte=timezone.now())
+        .order_by('facebook_reel_publish_scheduled_at', 'created_at')
+        .first()
+    )
+
+
+def _publish_ready_what_just_landed_reel_preview(article):
+    if not article:
+        return None
+
+    preview_path = _absolute_what_just_landed_reel_path(article.facebook_reel_preview_video_path)
+    if not preview_path or not os.path.exists(preview_path):
+        BlogArticle.objects.filter(pk=article.pk).update(
+            facebook_reel_preview_status='failed',
+            facebook_reel_publish_status='failed',
+        )
+        raise RuntimeError(f"Missing stored Reel preview for {article.slug}.")
+
+    return _publish_facebook_reel(article, video_path=preview_path)
 
 
 def _post_next_what_just_landed_facebook_reel():
@@ -4554,12 +4687,44 @@ def _post_next_what_just_landed_facebook_reel():
         logger.info("[facebook-reels] Disabled in settings - skipping pass.")
         return None
 
-    article = _select_next_what_just_landed_reel_article()
-    if not article:
-        logger.info("[facebook-reels] No queued What Just Landed article found.")
-        return None
+    ready_article = _select_next_ready_what_just_landed_reel_preview()
+    if ready_article:
+        return _publish_ready_what_just_landed_reel_preview(ready_article)
 
-    return _publish_facebook_reel(article)
+    article = _select_next_what_just_landed_reel_article()
+    if article:
+        return _generate_what_just_landed_reel_preview(article)
+
+    logger.info("[facebook-reels] No queued What Just Landed article found.")
+    return None
+
+
+def what_just_landed_reel_preview(request, slug, token):
+    article = get_object_or_404(
+        BlogArticle,
+        slug=slug,
+        facebook_reel_preview_token=token,
+    )
+    if not article.facebook_reel_preview_video_path:
+        raise Http404("No Reel preview is available for this article.")
+
+    context = {
+        'article': article,
+        'preview_video_url': _public_what_just_landed_reel_media_url(article.facebook_reel_preview_video_path),
+        'preview_status': article.facebook_reel_preview_status or 'queued',
+        'publish_status': article.facebook_reel_publish_status or 'not_started',
+        'publish_at': article.facebook_reel_publish_scheduled_at,
+        'preview_created_at': article.facebook_reel_preview_created_at,
+        'preview_url': _what_just_landed_reel_preview_url(article, request=request),
+        'hold_minutes': _facebook_reels_preview_hold_minutes(),
+        'canonical_url': request.build_absolute_uri(),
+        'seo_type': 'website',
+        'seo_title': f"Reel Preview | {article.title}",
+        'seo_description': 'Internal preview for a queued K-Beats Facebook Reel.',
+    }
+    response = _render_frameable_page(request, 'core/what_just_landed_reel_preview.html', context)
+    response['X-Robots-Tag'] = 'noindex, nofollow, noarchive'
+    return response
 
 
 def _build_header_mega_menu_context(request):

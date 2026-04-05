@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.conf import settings
 import bleach
@@ -108,6 +110,20 @@ class LivePollOption(models.Model):
 
 
 class BlogArticle(models.Model):
+    FACEBOOK_REEL_PREVIEW_STATUS_CHOICES = (
+        ('', 'Queued'),
+        ('ready', 'Preview Ready'),
+        ('publishing', 'Publishing'),
+        ('published', 'Published'),
+        ('failed', 'Failed'),
+    )
+    FACEBOOK_REEL_PUBLISH_STATUS_CHOICES = (
+        ('', 'Not Started'),
+        ('scheduled', 'Scheduled'),
+        ('publishing', 'Publishing'),
+        ('published', 'Published'),
+        ('failed', 'Failed'),
+    )
     ALLOWED_TAGS = [
         'p', 'h2', 'h3', 'strong', 'em', 'blockquote',
         'a', 'ul', 'ol', 'li', 'br',
@@ -133,6 +149,20 @@ class BlogArticle(models.Model):
     facebook_reel_id = models.CharField(max_length=100, blank=True)
     facebook_reel_posted_at = models.DateTimeField(null=True, blank=True)
     facebook_reel_video_path = models.CharField(max_length=500, blank=True)
+    facebook_reel_preview_video_path = models.CharField(max_length=500, blank=True)
+    facebook_reel_preview_created_at = models.DateTimeField(null=True, blank=True)
+    facebook_reel_publish_scheduled_at = models.DateTimeField(null=True, blank=True)
+    facebook_reel_preview_status = models.CharField(
+        max_length=20,
+        choices=FACEBOOK_REEL_PREVIEW_STATUS_CHOICES,
+        blank=True,
+    )
+    facebook_reel_publish_status = models.CharField(
+        max_length=20,
+        choices=FACEBOOK_REEL_PUBLISH_STATUS_CHOICES,
+        blank=True,
+    )
+    facebook_reel_preview_token = models.UUIDField(default=uuid.uuid4, editable=False)
     facebook_homepage_comment_id = models.CharField(max_length=100, blank=True)
     facebook_homepage_commented_at = models.DateTimeField(null=True, blank=True)
     x_post_id = models.CharField(max_length=100, blank=True)

@@ -247,14 +247,18 @@ def facebook_homepage_comment_job():
 
 
 def facebook_reels_job():
-    """Background job: publish one queued What Just Landed article as a Facebook Reel."""
+    """Background job: create one Reel preview or publish one held preview when due."""
     logger.info("[scheduler] Starting Facebook Reel pass...")
     try:
         result = _post_next_what_just_landed_facebook_reel()
         if result:
-            logger.info("[scheduler] Facebook Reel pass complete - 1 Reel published.")
+            mode = result.get('mode')
+            if mode == 'preview_created':
+                logger.info("[scheduler] Facebook Reel pass complete - 1 preview created for delayed publish.")
+            else:
+                logger.info("[scheduler] Facebook Reel pass complete - 1 Reel published.")
         else:
-            logger.info("[scheduler] Facebook Reel pass complete - no queued Reel published.")
+            logger.info("[scheduler] Facebook Reel pass complete - no queued Reel action taken.")
     except Exception as e:
         logger.error("[scheduler] Facebook Reel pass failed: %s", e)
 

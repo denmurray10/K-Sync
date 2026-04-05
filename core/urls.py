@@ -82,6 +82,7 @@ urlpatterns = [
     path('comeback-timeline/landed/<slug:article_slug>/', views.comeback_release_article, name='comeback_release_article'),
     path('comeback-design-lab/', views.upcoming_comebacks_design_lab, name='upcoming_comebacks_design_lab'),
     path('what-just-landed-reel-lab/', views.what_just_landed_reel_lab, name='what_just_landed_reel_lab'),
+    path('internal/reels/preview/<slug:slug>/<uuid:token>/', views.what_just_landed_reel_preview, name='what_just_landed_reel_preview'),
     path('calendar/', views.calendar, name='calendar'),
     path('fan-clubs/', views.fan_clubs, name='fan_clubs'),
     path('fan-clubs/start/', views.start_club_view, name='start_club'),
