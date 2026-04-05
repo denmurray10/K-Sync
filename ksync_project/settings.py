@@ -184,9 +184,13 @@ ENABLE_THIRD_PARTY_TRACKING = os.environ.get(
 
 # ── Facebook ─────────────────────────────────────────────────────────────────
 # Required permissions: pages_manage_posts, pages_read_engagement
-FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '966171646586881')
-FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', 'EAAUVcMgjdSoBRLNnSM6y3lyzmuQoO1bMRMFrJ1ZAm0PZA7SpbnF9sURoQLVXXZA6CErrNX4xU9pSWtobwIGE08BeIdp06ZA1Ishh8aM6bD2BQ0HHZCp8MeZBN1oSiPcRJ5anJCFqPCglE0sPgK6SUsEA27i9usOnPZCezZB6LpyFnLOBPVqec8BNTnURreBtZAmr2h7KW9YUHlYQJkPq9PxmUysq4WC6c79N3rQv3WErlC0dtwZB2IurcoT7gmjs1vSTinBZBsNkNKjBeaD')
+FACEBOOK_PAGE_ID = config('FACEBOOK_PAGE_ID', default='966171646586881')
+FACEBOOK_PAGE_ACCESS_TOKEN = config('FACEBOOK_PAGE_ACCESS_TOKEN', default='')
 FACEBOOK_PIXEL_ID = os.environ.get('FACEBOOK_PIXEL_ID', '1694492738408843').strip()
+FACEBOOK_POST_ENABLED = config('FACEBOOK_POST_ENABLED', default='true', cast=bool)
+FACEBOOK_POST_ON_CREATE_ENABLED = config('FACEBOOK_POST_ON_CREATE_ENABLED', default='false', cast=bool)
+FACEBOOK_POST_INTERVAL_MINUTES = int(config('FACEBOOK_POST_INTERVAL_MINUTES', default='60'))
+FACEBOOK_POST_QUEUE_START_DATE = config('FACEBOOK_POST_QUEUE_START_DATE', default='2026-03-26').strip()
 FACEBOOK_HOMEPAGE_COMMENT_ENABLED = os.environ.get('FACEBOOK_HOMEPAGE_COMMENT_ENABLED', 'true').lower() == 'true'
 FACEBOOK_HOMEPAGE_COMMENT_TEXT = os.environ.get('FACEBOOK_HOMEPAGE_COMMENT_TEXT', SITE_URL.rstrip('/') + '/')
 FACEBOOK_REELS_ENABLED = os.environ.get('FACEBOOK_REELS_ENABLED', 'true').lower() == 'true'
@@ -199,6 +203,7 @@ FACEBOOK_REELS_FPS = max(23, int(os.environ.get('FACEBOOK_REELS_FPS', '24')))
 FACEBOOK_REELS_STATUS_POLL_ATTEMPTS = max(1, int(os.environ.get('FACEBOOK_REELS_STATUS_POLL_ATTEMPTS', '8')))
 FACEBOOK_REELS_STATUS_POLL_SECONDS = max(1, int(os.environ.get('FACEBOOK_REELS_STATUS_POLL_SECONDS', '10')))
 FACEBOOK_REELS_PREVIEW_HOLD_MINUTES = max(1, int(os.environ.get('FACEBOOK_REELS_PREVIEW_HOLD_MINUTES', '20')))
+FACEBOOK_REELS_USE_FACEBOOK_SCHEDULER = os.environ.get('FACEBOOK_REELS_USE_FACEBOOK_SCHEDULER', 'true').lower() == 'true'
 
 # ── Instagram ─────────────────────────────────────────────────────────────────
 # Instagram Business account must be linked to your Facebook Page.

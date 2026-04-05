@@ -10,6 +10,7 @@ from core.views import (
     _chat,
     _do_blog_generate,
     _comment_on_live_facebook_posts,
+    _post_next_article_to_facebook,
     _post_next_what_just_landed_facebook_reel,
     _post_next_article_to_x,
 )
@@ -246,6 +247,19 @@ def facebook_homepage_comment_job():
         logger.error("[scheduler] Facebook homepage comment pass failed: %s", e)
 
 
+def facebook_post_job():
+    """Background job: publish one queued blog article to Facebook."""
+    logger.info("[scheduler] Starting Facebook post pass...")
+    try:
+        posted = _post_next_article_to_facebook()
+        if posted:
+            logger.info("[scheduler] Facebook post pass complete - 1 article posted.")
+        else:
+            logger.info("[scheduler] Facebook post pass complete - no queued article posted.")
+    except Exception as e:
+        logger.error("[scheduler] Facebook post pass failed: %s", e)
+
+
 def facebook_reels_job():
     """Background job: create one Reel preview or publish one held preview when due."""
     logger.info("[scheduler] Starting Facebook Reel pass...")
@@ -253,7 +267,9 @@ def facebook_reels_job():
         result = _post_next_what_just_landed_facebook_reel()
         if result:
             mode = result.get('mode')
-            if mode == 'preview_created':
+            if mode == 'preview_created_and_scheduled':
+                logger.info("[scheduler] Facebook Reel pass complete - 1 preview created and scheduled natively on Facebook.")
+            elif mode == 'preview_created':
                 logger.info("[scheduler] Facebook Reel pass complete - 1 preview created for delayed publish.")
             else:
                 logger.info("[scheduler] Facebook Reel pass complete - 1 Reel published.")
@@ -411,6 +427,18 @@ def start_scheduler():
         coalesce=True,
     )
 
+    if getattr(settings, 'FACEBOOK_POST_ENABLED', False):
+        facebook_interval_minutes = max(1, int(getattr(settings, 'FACEBOOK_POST_INTERVAL_MINUTES', 60) or 60))
+        scheduler.add_job(
+            facebook_post_job,
+            'interval',
+            minutes=facebook_interval_minutes,
+            id='facebook_post_job',
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+
     if getattr(settings, 'FACEBOOK_REELS_ENABLED', False):
         scheduler.add_job(
             facebook_reels_job,
@@ -483,6 +511,15 @@ def start_scheduler():
             'date',
             run_date=timezone.now(),
             id='initial_facebook_reels_job',
+            replace_existing=True,
+        )
+
+    if getattr(settings, 'FACEBOOK_POST_ENABLED', False):
+        scheduler.add_job(
+            facebook_post_job,
+            'date',
+            run_date=timezone.now(),
+            id='initial_facebook_post_job',
             replace_existing=True,
         )
 

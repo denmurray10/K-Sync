@@ -12,6 +12,7 @@ import tempfile
 import time
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
+from datetime import timezone as datetime_timezone
 from zoneinfo import ZoneInfo
 from django.db import DatabaseError, models, transaction
 from django.utils import timezone
@@ -4517,6 +4518,17 @@ def _generate_what_just_landed_reel_preview(article):
     article.facebook_reel_preview_token = preview_token
 
     preview_url = _what_just_landed_reel_preview_url(article)
+    scheduled_on_facebook = None
+    if getattr(settings, 'FACEBOOK_REELS_USE_FACEBOOK_SCHEDULER', True):
+        try:
+            scheduled_on_facebook = _schedule_facebook_reel_publication(article, video_path, publish_at)
+        except Exception as exc:
+            logger.warning(
+                "[facebook-reels] Could not place %r into Facebook's native scheduler, keeping internal hold: %s",
+                article.slug,
+                exc,
+            )
+
     logger.info(
         "[facebook-reels] Preview generated for %r - publish scheduled at %s preview=%s",
         article.title,
@@ -4524,10 +4536,11 @@ def _generate_what_just_landed_reel_preview(article):
         preview_url,
     )
     return {
-        'mode': 'preview_created',
+        'mode': 'preview_created_and_scheduled' if scheduled_on_facebook else 'preview_created',
         'video_path': video_path,
         'preview_url': preview_url,
         'publish_at': publish_at,
+        'facebook_schedule': scheduled_on_facebook,
     }
 
 
@@ -4640,6 +4653,88 @@ def _publish_facebook_reel(article, *, video_path=None):
         'video_id': start_payload['video_id'],
         'video_path': final_video_path,
         'status': status_payload or publish_payload,
+    }
+
+
+def _schedule_facebook_reel_publication(article, video_path, publish_at):
+    page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
+    token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
+    if not page_id or not token:
+        logger.debug("[facebook-reels] No credentials configured - skipping Facebook native scheduling.")
+        return None
+
+    final_video_path = str(video_path or '').strip()
+    if not final_video_path or not os.path.exists(final_video_path):
+        raise RuntimeError(f"Facebook Reel video file is missing: {final_video_path}")
+
+    video_size = os.path.getsize(final_video_path)
+    api_version = _facebook_reels_api_version()
+    start_response = requests.post(
+        f"https://graph.facebook.com/{api_version}/{page_id}/video_reels",
+        params={
+            'access_token': token,
+            'upload_phase': 'start',
+        },
+        timeout=20,
+    )
+    start_payload = start_response.json()
+    if start_response.status_code != 200 or 'video_id' not in start_payload or 'upload_url' not in start_payload:
+        raise RuntimeError(f"Facebook Reel scheduling start failed: {start_payload}")
+
+    with open(final_video_path, 'rb') as video_file:
+        upload_response = requests.post(
+            start_payload['upload_url'],
+            params={'access_token': token},
+            data=video_file,
+            headers={
+                'Authorization': f"OAuth {token}",
+                'offset': '0',
+                'file_size': str(video_size),
+                'Content-Type': 'application/octet-stream',
+            },
+            timeout=240,
+        )
+
+    upload_payload = upload_response.json()
+    if upload_response.status_code not in (200, 201) or upload_payload.get('success') is False:
+        raise RuntimeError(f"Facebook Reel scheduling upload failed: {upload_payload}")
+
+    publish_response = requests.post(
+        f"https://graph.facebook.com/{api_version}/{page_id}/video_reels",
+        params={
+            'access_token': token,
+            'upload_phase': 'finish',
+            'video_id': start_payload['video_id'],
+            'video_state': 'SCHEDULED',
+            'scheduled_publish_time': int(publish_at.timestamp()),
+            'description': _build_what_just_landed_reel_caption(article),
+            'title': article.title,
+        },
+        timeout=20,
+    )
+    publish_payload = publish_response.json()
+    if publish_response.status_code != 200 or publish_payload.get('success') is False:
+        raise RuntimeError(f"Facebook Reel scheduling finish failed: {publish_payload}")
+
+    relative_video_path = os.path.relpath(final_video_path, settings.MEDIA_ROOT).replace('\\', '/')
+    BlogArticle.objects.filter(pk=article.pk).update(
+        facebook_reel_id=start_payload['video_id'],
+        facebook_reel_video_path=relative_video_path,
+        facebook_reel_publish_status='scheduled',
+    )
+    article.facebook_reel_id = start_payload['video_id']
+    article.facebook_reel_video_path = relative_video_path
+    article.facebook_reel_publish_status = 'scheduled'
+    logger.info(
+        "[facebook-reels] Scheduled native Facebook Reel for %r - video id: %s publish_at=%s",
+        article.title,
+        start_payload['video_id'],
+        publish_at,
+    )
+    return {
+        'video_id': start_payload['video_id'],
+        'publish_at': publish_at,
+        'status': publish_payload,
     }
 
 
@@ -11016,11 +11111,15 @@ def _do_blog_generate():
         created += 1
         db_titles.append(title)
 
-        # Post to Facebook Page as a scheduled post
-        try:
-            _post_to_facebook_draft(article)
-        except Exception as e:
-            logger.warning("[facebook] Draft post failed for %r: %s", title, e)
+        # Facebook posting normally runs on the queue so articles go out on a
+        # steadier cadence. Immediate posting can be re-enabled via settings.
+        if getattr(settings, 'FACEBOOK_POST_ON_CREATE_ENABLED', False):
+            try:
+                _post_to_facebook_draft(article)
+            except Exception as e:
+                logger.warning("[facebook] Immediate post failed for %r: %s", title, e)
+        else:
+            logger.info("[facebook] Immediate posting disabled - article queued for scheduler for %r", title)
 
         # Post to Instagram
         try:
@@ -11053,73 +11152,124 @@ def _do_blog_generate():
 
 def _post_to_facebook_draft(article, scheduled_unix_ts=None):
     """
-    Schedules a newly created BlogArticle on the connected Facebook Page.
-    The post appears in Meta Business Suite -> Content -> Scheduled.
-    Defaults to 24 hours from now if no timestamp is provided.
-    Requires FACEBOOK_PAGE_ID and FACEBOOK_PAGE_ACCESS_TOKEN in settings.
+    Publish a newly created BlogArticle to the connected Facebook Page.
+    Prefer an image post so Facebook shows native media instead of a link card.
+    The optional scheduled_unix_ts argument is kept for backward compatibility
+    with older helper scripts, but image posts are published immediately.
     """
-    import time as _time
-
     page_id = getattr(settings, 'FACEBOOK_PAGE_ID', '')
     token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', '')
     if not page_id or not token:
-        logger.debug("[facebook] No credentials configured - skipping scheduled post.")
+        logger.debug("[facebook] No credentials configured - skipping image post.")
         return
 
     if article.facebook_posted_at or article.facebook_post_id:
         logger.debug("[facebook] Already handled article %r - skipping.", article.slug)
         return
 
-    # Default: schedule 1 hour from now
-    if scheduled_unix_ts is None:
-        scheduled_unix_ts = int(_time.time()) + 3600
-
     article_url = _social_article_url(article, source='facebook')
     hook = _social_hook(article)
     plain_excerpt = _article_opening_excerpt(article, max_chars=400)
     hashtags = ' '.join(_social_hashtags('facebook', article))
-
-    # Construct a link-first message so Facebook creates a proper article preview.
     message = (
         f"{hook} {article.title}\n\n"
         f"{plain_excerpt}\n\n"
-        f"Read more: {article_url}\n\n"
         f"{hashtags}"
     )
-
-    payload = {
-        'message': message,
-        'link': article_url,
-        'published': False,
-        'scheduled_publish_time': scheduled_unix_ts,
-    }
+    image_url = (
+        str(article.image or '').strip()
+        or str(article.image_2 or '').strip()
+        or str(article.image_3 or '').strip()
+    )
+    posted_at = timezone.now()
 
     try:
-        resp = requests.post(
-            f'https://graph.facebook.com/v22.0/{page_id}/feed',
-            data=payload,
-            params={'access_token': token},
-            timeout=20,
-        )
-        result = resp.json()
-        if resp.status_code == 200 and 'id' in result:
-            # We don't update facebook_posted_at here because it's scheduled, not posted.
-            # But the model uses it to track if we've handled it. 
-            # Let's update the ID so we can track it.
-            BlogArticle.objects.filter(pk=article.pk).update(
-                facebook_post_id=result['id'],
-            )
-            logger.info(
-                "[facebook] Scheduled link post created for %r - post id: %s",
-                article.title, result['id'],
+        if image_url:
+            resp = requests.post(
+                f'https://graph.facebook.com/v22.0/{page_id}/photos',
+                data={
+                    'url': image_url,
+                    'caption': message,
+                    'published': 'true',
+                },
+                params={'access_token': token},
+                timeout=20,
             )
         else:
             logger.warning(
-                "[facebook] Scheduled post failed for %r - status=%s response=%s",
+                "[facebook] No image available for %r - falling back to a text-only feed post.",
+                article.title,
+            )
+            resp = requests.post(
+                f'https://graph.facebook.com/v22.0/{page_id}/feed',
+                data={
+                    'message': f"{message}\n\n{article_url}",
+                    'published': 'true',
+                },
+                params={'access_token': token},
+                timeout=20,
+            )
+        result = resp.json()
+        post_id = str(result.get('post_id') or result.get('id') or '').strip()
+        if resp.status_code == 200 and post_id:
+            BlogArticle.objects.filter(pk=article.pk).update(
+                facebook_post_id=post_id,
+                facebook_posted_at=posted_at,
+            )
+            logger.info(
+                "[facebook] Published %s post for %r - post id: %s",
+                'image' if image_url else 'text',
+                article.title,
+                post_id,
+            )
+        else:
+            logger.warning(
+                "[facebook] Publish failed for %r - status=%s response=%s",
                 article.title, resp.status_code, result,
             )
     except Exception as e:
         logger.warning("[facebook] Request error for %r: %s", article.title, e)
+
+
+def _facebook_post_queue_start_datetime():
+    """Return the inclusive UTC cutoff for queued Facebook article posting."""
+    raw_value = str(getattr(settings, 'FACEBOOK_POST_QUEUE_START_DATE', '') or '').strip()
+    if not raw_value:
+        return None
+
+    try:
+        parsed = datetime.strptime(raw_value, '%Y-%m-%d')
+    except ValueError:
+        logger.warning("[facebook] Invalid FACEBOOK_POST_QUEUE_START_DATE=%r - ignoring cutoff.", raw_value)
+        return None
+
+    return parsed.replace(tzinfo=datetime_timezone.utc)
+
+
+def _post_next_article_to_facebook():
+    """Post the oldest queued Facebook article and return True when sent."""
+    if not getattr(settings, 'FACEBOOK_POST_ENABLED', False):
+        logger.debug("[facebook] Scheduler posting disabled via FACEBOOK_POST_ENABLED - skipping.")
+        return False
+
+    queryset = BlogArticle.objects.filter(
+        facebook_posted_at__isnull=True,
+    ).filter(
+        models.Q(facebook_post_id='') | models.Q(facebook_post_id__isnull=True)
+    )
+
+    cutoff = _facebook_post_queue_start_datetime()
+    if cutoff is not None:
+        queryset = queryset.filter(created_at__gte=cutoff)
+
+    article = queryset.order_by('created_at').first()
+    if not article:
+        logger.debug("[facebook] No queued articles found for scheduler.")
+        return False
+
+    _post_to_facebook_draft(article)
+    article.refresh_from_db(fields=['facebook_posted_at'])
+    return bool(article.facebook_posted_at)
 
 
 def _comment_on_live_facebook_posts():
@@ -11139,6 +11289,7 @@ def _comment_on_live_facebook_posts():
 
     candidates = list(BlogArticle.objects.filter(
         facebook_post_id__gt='',
+        facebook_posted_at__isnull=True,
         facebook_homepage_comment_id='',
     ).order_by('created_at')[:100])
     if not candidates:

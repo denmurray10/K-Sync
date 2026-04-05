@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.test.client import RequestFactory
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone as datetime_timezone
 import io
 import os
 import tempfile
@@ -532,7 +532,46 @@ class WhatJustLandedReelLabTests(TestCase):
             timedelta(minutes=20),
         )
         self.assertIn(article.slug, result['preview_url'])
-        self.assertEqual(result['mode'], 'preview_created')
+        self.assertIn(result['mode'], {'preview_created', 'preview_created_and_scheduled'})
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    @patch('core.views.requests.post')
+    def test_schedule_facebook_reel_publication_uses_meta_scheduled_state(self, mock_post):
+        article = BlogArticle.objects.get(slug='ph1-purple-tape')
+        with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False, dir=tempfile.gettempdir()) as handle:
+            handle.write(b'scheduled-video-bytes')
+            temp_video_path = handle.name
+
+        self.addCleanup(lambda: os.path.exists(temp_video_path) and os.remove(temp_video_path))
+
+        start_response = Mock()
+        start_response.status_code = 200
+        start_response.json.return_value = {
+            'video_id': 'scheduled_123',
+            'upload_url': 'https://upload.facebook.example/reel',
+        }
+        upload_response = Mock()
+        upload_response.status_code = 200
+        upload_response.json.return_value = {'success': True}
+        finish_response = Mock()
+        finish_response.status_code = 200
+        finish_response.json.return_value = {'success': True}
+        mock_post.side_effect = [start_response, upload_response, finish_response]
+
+        publish_at = timezone.now() + timedelta(minutes=20)
+        with self.settings(
+            FACEBOOK_PAGE_ID='123456',
+            FACEBOOK_PAGE_ACCESS_TOKEN='page-token',
+        ):
+            result = core_views._schedule_facebook_reel_publication(article, temp_video_path, publish_at)
+
+        article.refresh_from_db()
+        self.assertEqual(article.facebook_reel_id, 'scheduled_123')
+        self.assertEqual(article.facebook_reel_publish_status, 'scheduled')
+        self.assertEqual(result['video_id'], 'scheduled_123')
+        finish_call = mock_post.call_args_list[2]
+        self.assertEqual(finish_call.kwargs['params']['video_state'], 'SCHEDULED')
+        self.assertEqual(finish_call.kwargs['params']['scheduled_publish_time'], int(publish_at.timestamp()))
 
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     @patch('core.views._render_what_just_landed_reel_video')
@@ -615,6 +654,127 @@ class WhatJustLandedReelLabTests(TestCase):
         self.assertEqual(response['X-Robots-Tag'], 'noindex, nofollow, noarchive')
 
 
+class FacebookArticlePostingTests(TestCase):
+    def setUp(self):
+        self.article = BlogArticle.objects.create(
+            slug='fb-image-post-test',
+            title='Image Post Test',
+            subtitle='A subtitle for the post.',
+            category='Comeback',
+            source_title='Source',
+            source_url='https://example.com/source',
+            source_name='Example',
+            image='https://example.com/post-image.jpg',
+            image_2='',
+            image_3='',
+            body_html='<p>First paragraph for Facebook.</p>',
+            reading_time=2,
+        )
+
+    @patch('core.views.requests.post')
+    def test_post_to_facebook_uses_photo_endpoint_and_marks_article_posted(self, mock_post):
+        response = Mock()
+        response.status_code = 200
+        response.json.return_value = {
+            'id': 'photo_123',
+            'post_id': 'page_456_post_789',
+        }
+        mock_post.return_value = response
+
+        with self.settings(
+            FACEBOOK_PAGE_ID='page_456',
+            FACEBOOK_PAGE_ACCESS_TOKEN='page-token',
+        ):
+            core_views._post_to_facebook_draft(self.article)
+
+        self.article.refresh_from_db()
+        self.assertEqual(self.article.facebook_post_id, 'page_456_post_789')
+        self.assertIsNotNone(self.article.facebook_posted_at)
+        mock_post.assert_called_once()
+        self.assertIn('/photos', mock_post.call_args.args[0])
+        self.assertEqual(
+            mock_post.call_args.kwargs['data']['url'],
+            'https://example.com/post-image.jpg',
+        )
+        self.assertIn('caption', mock_post.call_args.kwargs['data'])
+        self.assertNotIn('link', mock_post.call_args.kwargs['data'])
+
+    @patch('core.views.requests.get')
+    @patch('core.views.requests.post')
+    def test_comment_pass_skips_articles_already_marked_posted(self, mock_post, mock_get):
+        self.article.facebook_post_id = 'page_456_post_789'
+        self.article.facebook_posted_at = timezone.now()
+        self.article.save(update_fields=['facebook_post_id', 'facebook_posted_at'])
+
+        mock_get.return_value = Mock(status_code=200)
+        mock_get.return_value.json.return_value = {'data': [{'id': 'page_456_post_789'}]}
+
+        with self.settings(
+            FACEBOOK_HOMEPAGE_COMMENT_ENABLED=True,
+            FACEBOOK_HOMEPAGE_COMMENT_TEXT='https://kbeatsradio.co.uk/',
+            FACEBOOK_PAGE_ID='page_456',
+            FACEBOOK_PAGE_ACCESS_TOKEN='page-token',
+        ):
+            created = core_views._comment_on_live_facebook_posts()
+
+        self.assertEqual(created, 0)
+        mock_post.assert_not_called()
+
+    @patch('core.views._post_to_facebook_draft')
+    def test_post_next_article_to_facebook_respects_queue_start_date(self, mock_publish):
+        older_article = BlogArticle.objects.create(
+            slug='fb-older-than-cutoff',
+            title='Older Than Cutoff',
+            subtitle='',
+            category='News',
+            source_title='Source',
+            source_url='https://example.com/older',
+            source_name='Example',
+            image='https://example.com/older.jpg',
+            image_2='',
+            image_3='',
+            body_html='<p>Older article.</p>',
+            reading_time=1,
+        )
+        newer_article = BlogArticle.objects.create(
+            slug='fb-newer-than-cutoff',
+            title='Newer Than Cutoff',
+            subtitle='',
+            category='News',
+            source_title='Source',
+            source_url='https://example.com/newer',
+            source_name='Example',
+            image='https://example.com/newer.jpg',
+            image_2='',
+            image_3='',
+            body_html='<p>Newer article.</p>',
+            reading_time=1,
+        )
+        BlogArticle.objects.filter(pk=older_article.pk).update(
+            created_at=datetime(2026, 3, 25, 23, 0, tzinfo=datetime_timezone.utc)
+        )
+        BlogArticle.objects.filter(pk=newer_article.pk).update(
+            created_at=datetime(2026, 3, 26, 0, 10, tzinfo=datetime_timezone.utc)
+        )
+
+        def publish_side_effect(article):
+            article.facebook_post_id = f'post-{article.pk}'
+            article.facebook_posted_at = timezone.now()
+            article.save(update_fields=['facebook_post_id', 'facebook_posted_at'])
+
+        mock_publish.side_effect = publish_side_effect
+
+        with self.settings(
+            FACEBOOK_POST_ENABLED=True,
+            FACEBOOK_POST_QUEUE_START_DATE='2026-03-26',
+        ):
+            result = core_views._post_next_article_to_facebook()
+
+        self.assertTrue(result)
+        mock_publish.assert_called_once()
+        self.assertEqual(mock_publish.call_args.args[0].slug, 'fb-newer-than-cutoff')
+
+
 class FacebookReelsSchedulerTests(TestCase):
     @patch('core.scheduler.BackgroundScheduler')
     def test_start_scheduler_registers_facebook_reels_jobs_when_enabled(self, mock_scheduler_class):
@@ -634,6 +794,8 @@ class FacebookReelsSchedulerTests(TestCase):
             core_scheduler.start_scheduler()
 
         scheduled_ids = [call.kwargs.get('id') for call in scheduler_instance.add_job.call_args_list]
+        self.assertIn('facebook_post_job', scheduled_ids)
+        self.assertIn('initial_facebook_post_job', scheduled_ids)
         self.assertIn('facebook_reels_job', scheduled_ids)
         self.assertIn('initial_facebook_reels_job', scheduled_ids)
 
