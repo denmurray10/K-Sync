@@ -195,8 +195,15 @@ FACEBOOK_HOMEPAGE_COMMENT_ENABLED = os.environ.get('FACEBOOK_HOMEPAGE_COMMENT_EN
 FACEBOOK_HOMEPAGE_COMMENT_TEXT = os.environ.get('FACEBOOK_HOMEPAGE_COMMENT_TEXT', SITE_URL.rstrip('/') + '/')
 FACEBOOK_REELS_ENABLED = os.environ.get('FACEBOOK_REELS_ENABLED', 'true').lower() == 'true'
 FACEBOOK_REELS_RUN_ON_STARTUP = os.environ.get('FACEBOOK_REELS_RUN_ON_STARTUP', 'true').lower() == 'true'
+FACEBOOK_REELS_POST_ONLY_MODE = os.environ.get('FACEBOOK_REELS_POST_ONLY_MODE', 'false').lower() == 'true'
+FACEBOOK_REELS_PERSIST_LOCAL_MEDIA = os.environ.get('FACEBOOK_REELS_PERSIST_LOCAL_MEDIA', 'true').lower() == 'true'
 FACEBOOK_REELS_DAILY_HOUR = int(os.environ.get('FACEBOOK_REELS_DAILY_HOUR', '10'))
 FACEBOOK_REELS_DAILY_MINUTE = int(os.environ.get('FACEBOOK_REELS_DAILY_MINUTE', '0'))
+FACEBOOK_REELS_DAILY_TIMES = [
+    slot.strip()
+    for slot in os.environ.get('FACEBOOK_REELS_DAILY_TIMES', '10:00,13:00,19:00').split(',')
+    if slot.strip()
+]
 FACEBOOK_REELS_API_VERSION = os.environ.get('FACEBOOK_REELS_API_VERSION', 'v22.0').strip() or 'v22.0'
 FACEBOOK_REELS_DURATION_SECONDS = max(4, int(os.environ.get('FACEBOOK_REELS_DURATION_SECONDS', '5')))
 FACEBOOK_REELS_FPS = max(23, int(os.environ.get('FACEBOOK_REELS_FPS', '24')))

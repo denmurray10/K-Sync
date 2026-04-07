@@ -4461,6 +4461,25 @@ def _facebook_reels_preview_hold_minutes():
     return max(1, int(getattr(settings, 'FACEBOOK_REELS_PREVIEW_HOLD_MINUTES', 20) or 20))
 
 
+def _facebook_reels_post_only_mode_enabled():
+    return bool(getattr(settings, 'FACEBOOK_REELS_POST_ONLY_MODE', False))
+
+
+def _facebook_reels_persist_local_media_enabled():
+    return bool(getattr(settings, 'FACEBOOK_REELS_PERSIST_LOCAL_MEDIA', True))
+
+
+def _cleanup_generated_reel_media_file(path):
+    absolute_path = str(path or '').strip()
+    if not absolute_path:
+        return
+    try:
+        if os.path.exists(absolute_path):
+            os.remove(absolute_path)
+    except Exception as exc:
+        logger.warning("[facebook-reels] Could not remove local reel media %r: %s", absolute_path, exc)
+
+
 def _absolute_what_just_landed_reel_path(relative_path):
     relative = str(relative_path or '').strip().replace('\\', '/')
     if not relative:
@@ -4630,18 +4649,27 @@ def _publish_facebook_reel(article, *, video_path=None):
     status_payload = _poll_facebook_reel_status(start_payload['video_id'])
     now_value = timezone.now()
     relative_video_path = os.path.relpath(final_video_path, settings.MEDIA_ROOT).replace('\\', '/')
+    persist_local_media = _facebook_reels_persist_local_media_enabled()
+    stored_video_path = relative_video_path if persist_local_media else ''
     BlogArticle.objects.filter(pk=article.pk).update(
         facebook_reel_id=start_payload['video_id'],
         facebook_reel_posted_at=now_value,
-        facebook_reel_video_path=relative_video_path,
+        facebook_reel_video_path=stored_video_path,
+        facebook_reel_preview_video_path='' if not persist_local_media else models.F('facebook_reel_preview_video_path'),
         facebook_reel_preview_status='published',
         facebook_reel_publish_status='published',
     )
     article.facebook_reel_id = start_payload['video_id']
     article.facebook_reel_posted_at = now_value
-    article.facebook_reel_video_path = relative_video_path
+    article.facebook_reel_video_path = stored_video_path
+    if not persist_local_media:
+        article.facebook_reel_preview_video_path = ''
     article.facebook_reel_preview_status = 'published'
     article.facebook_reel_publish_status = 'published'
+
+    if not persist_local_media:
+        _cleanup_generated_reel_media_file(final_video_path)
+
     logger.info(
         "[facebook-reels] Reel published for %r - video id: %s status=%s",
         article.title,
@@ -4717,14 +4745,23 @@ def _schedule_facebook_reel_publication(article, video_path, publish_at):
         raise RuntimeError(f"Facebook Reel scheduling finish failed: {publish_payload}")
 
     relative_video_path = os.path.relpath(final_video_path, settings.MEDIA_ROOT).replace('\\', '/')
+    persist_local_media = _facebook_reels_persist_local_media_enabled()
+    stored_video_path = relative_video_path if persist_local_media else ''
     BlogArticle.objects.filter(pk=article.pk).update(
         facebook_reel_id=start_payload['video_id'],
-        facebook_reel_video_path=relative_video_path,
+        facebook_reel_video_path=stored_video_path,
+        facebook_reel_preview_video_path='' if not persist_local_media else models.F('facebook_reel_preview_video_path'),
         facebook_reel_publish_status='scheduled',
     )
     article.facebook_reel_id = start_payload['video_id']
-    article.facebook_reel_video_path = relative_video_path
+    article.facebook_reel_video_path = stored_video_path
+    if not persist_local_media:
+        article.facebook_reel_preview_video_path = ''
     article.facebook_reel_publish_status = 'scheduled'
+
+    if not persist_local_media:
+        _cleanup_generated_reel_media_file(final_video_path)
+
     logger.info(
         "[facebook-reels] Scheduled native Facebook Reel for %r - video id: %s publish_at=%s",
         article.title,
@@ -4780,6 +4817,13 @@ def _publish_ready_what_just_landed_reel_preview(article):
 def _post_next_what_just_landed_facebook_reel():
     if not getattr(settings, 'FACEBOOK_REELS_ENABLED', False):
         logger.info("[facebook-reels] Disabled in settings - skipping pass.")
+        return None
+
+    if _facebook_reels_post_only_mode_enabled():
+        article = _select_next_what_just_landed_reel_article()
+        if article:
+            return _publish_facebook_reel(article)
+        logger.info("[facebook-reels] Post-only mode enabled and no queued What Just Landed article found.")
         return None
 
     ready_article = _select_next_ready_what_just_landed_reel_preview()

@@ -21,6 +21,39 @@ from django.core.management import call_command
 
 logger = logging.getLogger(__name__)
 
+
+def _facebook_reels_schedule_slots():
+    """Return validated HH:MM slots for daily reels scheduling."""
+    raw_slots = list(getattr(settings, 'FACEBOOK_REELS_DAILY_TIMES', []) or [])
+    slots = []
+    for value in raw_slots:
+        text = str(value or '').strip()
+        if not text:
+            continue
+        if ':' not in text:
+            logger.warning("[scheduler] Invalid FACEBOOK_REELS_DAILY_TIMES slot %r - expected HH:MM.", text)
+            continue
+        hour_text, minute_text = text.split(':', 1)
+        try:
+            hour = int(hour_text)
+            minute = int(minute_text)
+        except ValueError:
+            logger.warning("[scheduler] Invalid FACEBOOK_REELS_DAILY_TIMES slot %r - non-numeric hour/minute.", text)
+            continue
+        if not (0 <= hour <= 23 and 0 <= minute <= 59):
+            logger.warning("[scheduler] Invalid FACEBOOK_REELS_DAILY_TIMES slot %r - out of range.", text)
+            continue
+        slots.append((hour, minute))
+
+    if slots:
+        return slots
+
+    # Backward-compatible fallback to single daily time.
+    return [(
+        int(getattr(settings, 'FACEBOOK_REELS_DAILY_HOUR', 10) or 10),
+        int(getattr(settings, 'FACEBOOK_REELS_DAILY_MINUTE', 0) or 0),
+    )]
+
 def fetch_album_art(artist, track):
     query = urllib.parse.quote(f"{artist} {track}")
     url = f"https://itunes.apple.com/search?term={query}&entity=song&limit=1"
@@ -440,16 +473,17 @@ def start_scheduler():
         )
 
     if getattr(settings, 'FACEBOOK_REELS_ENABLED', False):
-        scheduler.add_job(
-            facebook_reels_job,
-            'cron',
-            hour=int(getattr(settings, 'FACEBOOK_REELS_DAILY_HOUR', 10) or 10),
-            minute=int(getattr(settings, 'FACEBOOK_REELS_DAILY_MINUTE', 0) or 0),
-            id='facebook_reels_job',
-            replace_existing=True,
-            max_instances=1,
-            coalesce=True,
-        )
+        for index, (reel_hour, reel_minute) in enumerate(_facebook_reels_schedule_slots(), start=1):
+            scheduler.add_job(
+                facebook_reels_job,
+                'cron',
+                hour=reel_hour,
+                minute=reel_minute,
+                id=f'facebook_reels_job_{index}',
+                replace_existing=True,
+                max_instances=1,
+                coalesce=True,
+            )
 
     if getattr(settings, 'X_POST_ENABLED', False):
         x_interval_minutes = max(1, int(getattr(settings, 'X_POST_INTERVAL_MINUTES', 40) or 40))
