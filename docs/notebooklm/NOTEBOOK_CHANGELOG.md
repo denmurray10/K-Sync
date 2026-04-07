@@ -22,6 +22,8 @@
 - Added template, API, analytics, SEO, lifecycle, glossary, and testing-risk docs.
 - Added a root `WORKING_RULES.md` and a sanitized `RELEASE_CHECKLIST.md`.
 - Added notebook maintenance workflow support, including validation and update-process guidance.
+- Added design-system, component-pattern, page-pattern, UX-rule, and copy-style docs so the notebook can guide future page and feature design.
+- Added a visual reference set plus captured page screenshots for the homepage, live experience, signup, and staff login surfaces so future design work can be grounded in the current UI.
 
 ## How To Use This File
 

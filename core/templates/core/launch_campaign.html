@@ -1,0 +1,399 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
+<!-- End Google Tag Manager -->
+<meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+<title>{{ seo_title }}</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#f425c0",
+                    secondary: "#00f0ff",
+                    ink: "#05050a",
+                },
+                fontFamily: {
+                    display: ["Cinzel", "serif"],
+                    body: ["Montserrat", "sans-serif"],
+                },
+            },
+        },
+    };
+</script>
+<style>
+    :root { color-scheme: dark; }
+    html, body { overflow-x: hidden; }
+    body {
+        font-family: "Montserrat", sans-serif;
+        background:
+            radial-gradient(circle at top left, rgba(244, 37, 192, 0.18), transparent 28%),
+            radial-gradient(circle at top right, rgba(0, 240, 255, 0.14), transparent 26%),
+            linear-gradient(180deg, #05050a 0%, #000000 42%, #08070d 100%);
+    }
+    h1, h2, h3, .brand-wordmark { font-family: "Cinzel", serif; }
+    .reveal-up, .reveal-left {
+        opacity: 0;
+        transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-up { transform: translateY(34px); }
+    .reveal-left { transform: translateX(-34px); }
+    .reveal-up.is-visible, .reveal-left.is-visible {
+        opacity: 1;
+        transform: translate(0);
+    }
+    .glass-card {
+        background: linear-gradient(180deg, rgba(16, 16, 24, 0.88), rgba(6, 6, 10, 0.92));
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .signal-border {
+        position: relative;
+    }
+    .signal-border::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        background: linear-gradient(135deg, rgba(244, 37, 192, 0.88), rgba(0, 240, 255, 0.7));
+        opacity: 0.45;
+        pointer-events: none;
+        z-index: -1;
+    }
+    .cta-shadow { box-shadow: 0 18px 44px rgba(244, 37, 192, 0.22); }
+    .panel-hover {
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+    .panel-hover:hover {
+        transform: translateY(-6px);
+        border-color: rgba(255, 255, 255, 0.22);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.32);
+    }
+    .marquee-track {
+        width: max-content;
+        animation: marquee 28s linear infinite;
+    }
+    .sticky-dock {
+        transform: translateY(110%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.32s ease, opacity 0.32s ease;
+    }
+    .sticky-dock.is-visible {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+    @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .reveal-up, .reveal-left {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+        .marquee-track { animation: none !important; }
+        .sticky-dock { transition: none !important; }
+        .panel-hover { transition: none !important; }
+        .panel-hover:hover { transform: none !important; box-shadow: none !important; }
+    }
+</style>
+</head>
+<body class="bg-black text-white font-body">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<div class="relative isolate min-h-screen">
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
+        <div class="container mx-auto flex items-center justify-between gap-4 px-6 py-4 sm:px-6">
+            <a class="flex items-center gap-0 text-primary transition-colors duration-300 hover:text-secondary" href="{% url 'home' %}">
+                <span class="text-3xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none">K</span>
+                <span class="text-3xl font-black text-white tracking-[1px] leading-none">-</span>
+                <span class="text-3xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none">beats</span>
+            </a>
+            <div class="hidden items-center gap-3 sm:flex">
+                <a href="{% url 'charts' %}" class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400 transition hover:text-white">Charts</a>
+                <a href="{% url 'news' %}" class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400 transition hover:text-white">News</a>
+                <a href="{% url 'fan_clubs' %}" class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400 transition hover:text-white">Fan Clubs</a>
+            </div>
+            <a data-preserve-query href="{{ primary_cta_url }}" class="inline-flex min-h-[46px] items-center justify-center border border-primary bg-primary px-5 py-3 text-[10px] font-black uppercase tracking-[0.24em] text-black transition hover:bg-white">
+                Start Listening
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="relative overflow-hidden pb-16 pt-32 sm:pb-20 sm:pt-36">
+            <div class="container mx-auto grid items-start gap-12 px-6 sm:px-6 lg:grid-cols-[1.15fr_0.85fr]">
+                <div class="reveal-left max-w-3xl">
+                    <div class="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-primary">
+                        K-Pop, Live Now
+                    </div>
+                    <h1 class="mt-6 text-5xl font-black uppercase leading-[0.84] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                        Press Play
+                        <span class="block text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)]">Stay For Everything Else.</span>
+                    </h1>
+                    <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+                        K-Beats gives fans one place to listen live, track the charts, follow comebacks, read the stories behind the scene, and drop into the fandom without breaking the flow.
+                    </p>
+                    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                        <a data-preserve-query href="{{ primary_cta_url }}" class="cta-shadow inline-flex min-h-[58px] items-center justify-center gap-3 border border-primary bg-primary px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
+                            <span class="material-symbols-outlined text-base">play_circle</span>
+                            Listen Live Now
+                        </a>
+                        <a data-preserve-query href="{{ secondary_cta_url }}" class="inline-flex min-h-[58px] items-center justify-center gap-3 border border-white/15 bg-white/[0.03] px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary">
+                            <span class="material-symbols-outlined text-base">person_add</span>
+                            Join K-Beats Free
+                        </a>
+                    </div>
+                    <div class="mt-6 flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                        <span class="border border-white/10 bg-white px-4 py-2 text-black">Live radio</span>
+                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">Charts</span>
+                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">Comebacks</span>
+                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">Fan clubs</span>
+                        <span class="border border-white/10 bg-white/[0.03] px-4 py-2">Games</span>
+                    </div>
+                </div>
+
+                <div class="reveal-up">
+                    <div class="glass-card signal-border relative p-6 sm:p-7">
+                        <div class="flex items-center justify-between gap-4 border border-white/10 bg-black/45 px-5 py-4">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">Live now</p>
+                                <p class="mt-1 text-2xl font-black uppercase tracking-tight text-white">{{ preview_track.title }}</p>
+                                <p class="text-sm uppercase tracking-[0.18em] text-slate-300">{{ preview_track.artist }}</p>
+                            </div>
+                            {% if preview_track.album_art %}
+                            <img src="{{ preview_track.album_art }}" alt="{{ preview_track.title }} artwork" class="h-20 w-20 border border-white/10 object-cover"/>
+                            {% else %}
+                            <div class="flex h-20 w-20 items-center justify-center border border-white/10 bg-white/[0.03] text-primary">
+                                <span class="material-symbols-outlined text-3xl">radio</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                            {% for item in proof_points %}
+                            <div class="border border-white/10 bg-white/[0.03] p-4">
+                                <p class="text-2xl font-black uppercase tracking-tight text-white">{{ item.value }}</p>
+                                <p class="mt-2 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">{{ item.label }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mt-4 border border-white/10 bg-white/[0.03] p-5">
+                            <div class="flex items-center justify-between gap-3">
+                                <div>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Why this page exists</p>
+                                    <p class="mt-2 text-sm leading-6 text-slate-300">It gives new visitors one clear first move, then opens up the rest of K-Beats in the order that feels natural.</p>
+                                </div>
+                                <span class="material-symbols-outlined text-3xl text-secondary">ads_click</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-y border-white/10 bg-black/35 py-4">
+            <div class="overflow-hidden whitespace-nowrap">
+                <div class="marquee-track flex items-center gap-4 px-6 text-[10px] font-bold uppercase tracking-[0.32em] text-slate-400">
+                    <span>Live radio</span>
+                    <span class="text-primary">•</span>
+                    <span>Editorials</span>
+                    <span class="text-secondary">•</span>
+                    <span>Charts</span>
+                    <span class="text-primary">•</span>
+                    <span>Comeback tracking</span>
+                    <span class="text-secondary">•</span>
+                    <span>Fan clubs</span>
+                    <span class="text-primary">•</span>
+                    <span>Contests</span>
+                    <span class="text-secondary">•</span>
+                    <span>Games</span>
+                    <span class="text-primary">•</span>
+                    <span>Live radio</span>
+                    <span class="text-secondary">•</span>
+                    <span>Editorials</span>
+                    <span class="text-primary">•</span>
+                    <span>Charts</span>
+                    <span class="text-secondary">•</span>
+                    <span>Comeback tracking</span>
+                    <span class="text-primary">•</span>
+                    <span>Fan clubs</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-20">
+            <div class="container mx-auto px-6 sm:px-6">
+                <div class="reveal-left max-w-3xl">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">What visitors can do</p>
+                    <h2 class="mt-4 text-4xl font-black uppercase leading-[0.9] tracking-tight text-white sm:text-5xl">What Fans Can Explore Next</h2>
+                    <p class="mt-4 text-base leading-7 text-slate-300">The stream brings people in. These are the features that turn a first visit into a real K-Beats session.</p>
+                </div>
+                <div class="mt-10 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+                    {% for card in feature_cards %}
+                    <article class="glass-card panel-hover border border-white/10 p-6">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.24em] {% if card.accent == 'primary' %}text-primary{% else %}text-secondary{% endif %}">{{ card.eyebrow }}</p>
+                                <h3 class="mt-3 text-2xl font-black uppercase tracking-tight text-white">{{ card.title }}</h3>
+                            </div>
+                            <span class="material-symbols-outlined {% if card.accent == 'primary' %}text-primary{% else %}text-secondary{% endif %}">{{ card.icon }}</span>
+                        </div>
+                        <p class="mt-4 text-sm leading-7 text-slate-300">{{ card.body }}</p>
+                        <a data-preserve-query href="{{ card.url }}" class="mt-6 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] {% if card.accent == 'primary' %}text-primary{% else %}text-secondary{% endif %} transition hover:text-white">
+                            {{ card.cta }}
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="border-y border-white/10 bg-white text-black">
+            <div class="container mx-auto grid gap-6 px-6 py-14 sm:px-6 lg:grid-cols-3">
+                {% for item in engagement_steps %}
+                <div class="border border-black/10 bg-white p-6">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">{{ item.step }}</p>
+                    <h3 class="mt-3 text-2xl font-black uppercase tracking-tight">{{ item.title }}</h3>
+                    <p class="mt-4 text-sm leading-7 text-slate-700">{{ item.body }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-20">
+            <div class="container mx-auto grid gap-8 px-6 sm:px-6 lg:grid-cols-[0.95fr_1.05fr]">
+                <div class="reveal-left glass-card border border-white/10 p-7">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.26em] text-primary">Suggested first session</p>
+                    <h2 class="mt-4 text-4xl font-black uppercase leading-[0.9] tracking-tight text-white">The Best First Taste Of K-Beats</h2>
+                    <p class="mt-5 text-base leading-7 text-slate-300">Start with the live station, see what is playing, then move into charts, news, or comeback tracking while the energy is still high.</p>
+                    <div class="mt-6 flex flex-col gap-3">
+                        <a data-preserve-query href="{{ primary_cta_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-primary bg-primary px-6 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
+                            <span class="material-symbols-outlined text-base">headphones</span>
+                            Open Live Radio
+                        </a>
+                        <a data-preserve-query href="{{ stream_hub_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-white/15 bg-white/[0.03] px-6 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:border-secondary hover:text-secondary">
+                            <span class="material-symbols-outlined text-base">library_music</span>
+                            Explore The Stream Hub
+                        </a>
+                    </div>
+                </div>
+
+                <div class="reveal-up glass-card border border-white/10 p-7">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">On deck</p>
+                            <h3 class="mt-2 text-2xl font-black uppercase tracking-tight text-white">There Is Always Something Next</h3>
+                        </div>
+                        <span class="material-symbols-outlined text-secondary">queue_music</span>
+                    </div>
+                    <div class="mt-6 space-y-3">
+                        {% for track in up_next_tracks %}
+                        <div class="flex items-center gap-3 border border-white/10 bg-black/35 p-3">
+                            {% if track.album_art %}
+                            <img src="{{ track.album_art }}" alt="{{ track.title }} by {{ track.artist }}" class="h-14 w-14 border border-white/10 object-cover"/>
+                            {% else %}
+                            <div class="flex h-14 w-14 items-center justify-center border border-white/10 bg-white/[0.03] text-primary">
+                                <span class="material-symbols-outlined">album</span>
+                            </div>
+                            {% endif %}
+                            <div class="min-w-0">
+                                <p class="truncate text-sm font-black uppercase tracking-tight text-white">{{ track.title }}</p>
+                                <p class="truncate text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ track.artist }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-sm leading-7 text-slate-400">Queue details are unavailable right now, but the station is still ready for visitors to jump into.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-t border-white/10 bg-primary">
+            <div class="container mx-auto flex flex-col gap-8 px-6 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+                <div class="max-w-3xl">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-black/70">Campaign close</p>
+                    <h2 class="mt-4 text-4xl font-black uppercase leading-[0.9] tracking-tight text-black sm:text-5xl">Start With The Station. Stay For The World Around It.</h2>
+                    <p class="mt-4 max-w-2xl text-base leading-7 text-black/75">If the music lands, the rest of K-Beats opens naturally. That is the whole point of this page.</p>
+                </div>
+                <div class="flex flex-col gap-3 sm:flex-row">
+                    <a data-preserve-query href="{{ primary_cta_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-black bg-black px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-black">
+                        <span class="material-symbols-outlined text-base">play_circle</span>
+                        Listen Live Now
+                    </a>
+                    <a data-preserve-query href="{{ secondary_cta_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-black/20 bg-white/90 px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition hover:bg-white">
+                        <span class="material-symbols-outlined text-base">person_add</span>
+                        Join K-Beats Free
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="sticky-launch-dock" class="sticky-dock fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/92 px-4 py-3 backdrop-blur-xl sm:hidden">
+        <div class="mx-auto flex max-w-5xl items-center gap-3">
+            <a data-preserve-query href="{{ primary_cta_url }}" class="flex min-h-[52px] flex-1 items-center justify-center border border-primary bg-primary px-4 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-black">
+                Listen Live
+            </a>
+            <a data-preserve-query href="{{ secondary_cta_url }}" class="flex min-h-[52px] flex-1 items-center justify-center border border-white/15 bg-white/[0.03] px-4 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-white">
+                Join Free
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.14 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach((el) => observer.observe(el));
+
+    const currentQuery = window.location.search;
+    if (currentQuery) {
+        document.querySelectorAll('[data-preserve-query]').forEach((link) => {
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#')) return;
+            const separator = href.includes('?') ? '&' : '?';
+            link.setAttribute('href', `${href}${separator}${currentQuery.replace(/^\?/, '')}`);
+        });
+    }
+
+    const dock = document.getElementById('sticky-launch-dock');
+    const toggleDock = () => {
+        if (!dock) return;
+        dock.classList.toggle('is-visible', window.scrollY > 260);
+    };
+    toggleDock();
+    window.addEventListener('scroll', toggleDock, { passive: true });
+});
+</script>
+</body>
+</html>

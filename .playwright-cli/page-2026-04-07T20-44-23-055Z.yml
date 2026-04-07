@@ -1,0 +1,529 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "K - beats" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: K
+        - generic [ref=e6]: "-"
+        - generic [ref=e7]: beats
+      - navigation [ref=e9]:
+        - link "Live" [ref=e10] [cursor=pointer]:
+          - /url: /live/
+        - link "Stream" [ref=e11] [cursor=pointer]:
+          - /url: /stream/
+        - link "Charts" [ref=e12] [cursor=pointer]:
+          - /url: /charts/
+        - link "Idols" [ref=e13] [cursor=pointer]:
+          - /url: /idols/
+        - link "Games" [ref=e14] [cursor=pointer]:
+          - /url: /games/
+        - link "Comebacks" [ref=e15] [cursor=pointer]:
+          - /url: /comeback-timeline/
+        - link "News" [ref=e16] [cursor=pointer]:
+          - /url: /news/
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]: search
+          - textbox "Search artist, song..." [ref=e20]
+        - generic [ref=e21]:
+          - button "Live On Air" [ref=e22] [cursor=pointer]:
+            - generic [ref=e26]: Live On Air
+          - link "Log In" [ref=e27] [cursor=pointer]:
+            - /url: /login/
+  - generic:
+    - dialog [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - paragraph [ref=e31]: My Station
+          - button "Close My Station" [ref=e32] [cursor=pointer]:
+            - generic [ref=e33]: close
+        - heading "Unlock My Station" [level=3] [ref=e34]
+        - paragraph [ref=e35]: Sign up to customise your K-Beats experience with your biases, eras, and live recommendations.
+      - generic [ref=e37]:
+        - link "Sign Up To Customise" [ref=e38] [cursor=pointer]:
+          - /url: /signup/
+        - link "Log In" [ref=e39] [cursor=pointer]:
+          - /url: /login/
+    - button "My Station" [ref=e40] [cursor=pointer]:
+      - generic [ref=e42]: My Station
+  - main [ref=e43]:
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e56]: Live Right Now
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - generic [ref=e59]: headphones
+            - generic [ref=e60]: Listeners
+            - generic [ref=e61]: "3847"
+          - link "Full Schedule event" [ref=e62] [cursor=pointer]:
+            - /url: /schedule/
+            - text: Full Schedule
+            - generic [ref=e63]: event
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - generic [ref=e67]:
+            - paragraph [ref=e68]: K-Beats Live Broadcast
+            - heading "Guilty" [level=1] [ref=e69]
+            - paragraph [ref=e70]: TAEMIN
+            - paragraph [ref=e71]: Live K-pop, fan energy, and real return moments all live in one place. Tune in now, follow the next handoff, and stay close to what the room is feeling.
+            - generic [ref=e72]:
+              - generic [ref=e73]:
+                - text: Next Handoff Tomorrow 14:30
+                - generic [ref=e74]: schedule
+              - generic [ref=e75]:
+                - text: 0 fan requests today
+                - generic [ref=e76]: queue_music
+          - generic [ref=e77]:
+            - button "play_arrow Listen Live" [ref=e78] [cursor=pointer]:
+              - generic [ref=e79]: play_arrow
+              - text: Listen Live
+            - link "Request A Track queue_music" [ref=e80] [cursor=pointer]:
+              - /url: /request/
+              - text: Request A Track
+              - generic [ref=e81]: queue_music
+            - link "Join The Room forum" [ref=e82] [cursor=pointer]:
+              - /url: "#community"
+              - text: Join The Room
+              - generic [ref=e83]: forum
+            - link "Tonight's Schedule event_upcoming" [ref=e84] [cursor=pointer]:
+              - /url: /schedule/
+              - text: Tonight's Schedule
+              - generic [ref=e85]: event_upcoming
+          - generic [ref=e86]:
+            - generic [ref=e87]:
+              - generic [ref=e88]:
+                - paragraph [ref=e89]: Playback Sync
+                - paragraph [ref=e90]: Live Feed
+              - img [ref=e92]
+              - generic [ref=e100]: Frequency Sync
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - paragraph [ref=e103]: Volume
+                - generic [ref=e104]:
+                  - button "Mute live player" [ref=e105] [cursor=pointer]:
+                    - generic [ref=e106]: volume_down
+                    - generic [ref=e107]: Audio On
+                  - generic [ref=e108]: volume_up
+              - slider [ref=e109] [cursor=pointer]: "75"
+          - article [ref=e110]:
+            - generic [ref=e111]:
+              - generic [ref=e112]:
+                - paragraph [ref=e113]: Appointment Layer
+                - paragraph [ref=e114]: Live schedule syncing
+              - generic [ref=e115]: event_upcoming
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - paragraph [ref=e118]: On Air Host
+                - paragraph [ref=e119]: Auto DJ
+                - paragraph [ref=e120]: Now on air
+              - generic [ref=e121]:
+                - paragraph [ref=e122]: Next Return Window
+                - paragraph [ref=e123]: Blackpink
+                - paragraph [ref=e124]: Tomorrow 14:30
+                - paragraph [ref=e125]: Starts in 16:45:37
+            - paragraph [ref=e126]: Expect a punchy blend from top K-pop favourites and fresh cuts, giving blackpink a bright, high-energy flow from start to finish.
+        - complementary [ref=e127]:
+          - img "Guilty by TAEMIN" [ref=e132]
+          - generic [ref=e133]:
+            - generic [ref=e134]:
+              - generic [ref=e135]:
+                - paragraph [ref=e136]: Share Card
+                - paragraph [ref=e137]: Now Playing On K-Beats
+              - generic [ref=e138]: ios_share
+            - paragraph [ref=e139]: Guilty
+            - paragraph [ref=e140]: TAEMIN
+            - generic [ref=e141]:
+              - button "Share send" [ref=e142] [cursor=pointer]:
+                - text: Share
+                - generic [ref=e143]: send
+              - button "Save This Moment bookmark" [ref=e144] [cursor=pointer]:
+                - text: Save This Moment
+                - generic [ref=e145]: bookmark
+            - paragraph [ref=e146]
+          - article [ref=e148]:
+            - generic [ref=e149]:
+              - generic [ref=e150]:
+                - paragraph [ref=e151]: Moment Archive
+                - paragraph [ref=e152]: "0"
+                - paragraph [ref=e153]: Saved live moments
+              - link "Log In login" [ref=e154] [cursor=pointer]:
+                - /url: /login/
+                - text: Log In
+                - generic [ref=e155]: login
+            - paragraph [ref=e157]: Log in to turn live songs into a personal archive
+    - generic [ref=e160]:
+      - generic [ref=e161]:
+        - generic [ref=e163]: play_arrow
+        - generic [ref=e164]:
+          - paragraph [ref=e169]: Now Playing
+          - generic [ref=e170]:
+            - generic [ref=e171]: headphones
+            - generic [ref=e172]: Listening
+      - generic [ref=e173]:
+        - paragraph [ref=e174]: Guilty
+        - paragraph [ref=e175]: TAEMIN
+      - generic [ref=e176]:
+        - link "Request Song queue_music" [ref=e177] [cursor=pointer]:
+          - /url: /request/
+          - text: Request Song
+          - generic [ref=e178]: queue_music
+        - link "Community forum" [ref=e179] [cursor=pointer]:
+          - /url: "#community"
+          - text: Community
+          - generic [ref=e180]: forum
+    - generic [ref=e183]:
+      - article [ref=e184]:
+        - generic [ref=e185]:
+          - paragraph [ref=e186]: Coming Up
+          - heading "Up Next" [level=2] [ref=e187]
+      - article [ref=e188]:
+        - generic [ref=e189]:
+          - paragraph [ref=e190]: Recently Aired
+          - heading "Recently Played" [level=2] [ref=e191]
+        - generic [ref=e192]:
+          - generic [ref=e193]:
+            - generic [ref=e195]:
+              - paragraph [ref=e196]: Knock Knock
+              - paragraph [ref=e197]: TWICE
+            - generic [ref=e198]: Played
+          - generic [ref=e199]:
+            - generic [ref=e201]:
+              - paragraph [ref=e202]: GOLD
+              - paragraph [ref=e203]: ITZY
+            - generic [ref=e204]: Played
+          - generic [ref=e205]:
+            - generic [ref=e207]:
+              - paragraph [ref=e208]: D.N.A.
+              - paragraph [ref=e209]: SUPER JUNIOR
+            - generic [ref=e210]: Played
+          - generic [ref=e211]:
+            - generic [ref=e213]:
+              - paragraph [ref=e214]: Ito
+              - paragraph [ref=e215]: TOMORROW X TOGETHER
+            - generic [ref=e216]: Played
+          - generic [ref=e217]:
+            - generic [ref=e219]:
+              - paragraph [ref=e220]: Rover
+              - paragraph [ref=e221]: KAI
+            - generic [ref=e222]: Played
+      - complementary [ref=e223]:
+        - article [ref=e224]:
+          - generic [ref=e225]:
+            - paragraph [ref=e226]: Schedule Feed
+            - heading "Upcoming Shows" [level=2] [ref=e227]
+          - generic [ref=e228]:
+            - generic [ref=e229]:
+              - generic [ref=e231]: schedule
+              - generic [ref=e232]:
+                - generic [ref=e233]:
+                  - paragraph [ref=e234]: Blackpink
+                  - generic [ref=e235]: Next
+                - paragraph [ref=e236]: WED 14:30
+              - generic [ref=e237]: In 16:45:37
+            - generic [ref=e238]:
+              - generic [ref=e240]: event
+              - generic [ref=e241]:
+                - paragraph [ref=e243]: (G) I-DLE
+                - paragraph [ref=e244]: SAT 02:00
+              - generic [ref=e245]: In 76:15:37
+    - article [ref=e248]:
+      - generic [ref=e249]:
+        - paragraph [ref=e250]: Shape The Room
+        - heading "Artist Of The Week" [level=3] [ref=e251]
+        - paragraph [ref=e252]: Cast your vote for this week's takeover. The winner gets a dedicated K-Beats station playing nothing but their biggest hits all week, so don't miss your chance to decide it.
+        - generic [ref=e253]:
+          - paragraph [ref=e254]: Takeover Leader
+          - paragraph [ref=e255]: BTS is leading this week's station takeover right now.
+      - generic [ref=e256]:
+        - generic [ref=e259]: Live Poll
+        - paragraph [ref=e260]: Who's your artist of the week?
+        - paragraph [ref=e261]: Cast your vote now.
+        - generic [ref=e262]:
+          - generic [ref=e263]: how_to_vote
+          - generic [ref=e264]:
+            - generic [ref=e265]: 1,912
+            - generic [ref=e266]: Total Votes Cast
+        - paragraph [ref=e267]: BTS leads with 38% of the vote. BLACKPINK holds second at 24%, with ATEEZ in third at 16%, BABYMONSTER at 12%, and STRAY KIDS at 10% from 2,096 total votes cast.
+        - generic [ref=e268]:
+          - button "A BTS 38%" [ref=e269] [cursor=pointer]:
+            - generic [ref=e271]:
+              - generic [ref=e272]:
+                - generic [ref=e273]: A
+                - generic [ref=e274]: BTS
+              - generic [ref=e275]: 38%
+          - button "B BLACKPINK 24%" [ref=e276] [cursor=pointer]:
+            - generic [ref=e278]:
+              - generic [ref=e279]:
+                - generic [ref=e280]: B
+                - generic [ref=e281]: BLACKPINK
+              - generic [ref=e282]: 24%
+          - button "C ATEEZ 16%" [ref=e283] [cursor=pointer]:
+            - generic [ref=e285]:
+              - generic [ref=e286]:
+                - generic [ref=e287]: C
+                - generic [ref=e288]: ATEEZ
+              - generic [ref=e289]: 16%
+          - button "D BABYMONSTER 12%" [ref=e290] [cursor=pointer]:
+            - generic [ref=e292]:
+              - generic [ref=e293]:
+                - generic [ref=e294]: D
+                - generic [ref=e295]: BABYMONSTER
+              - generic [ref=e296]: 12%
+          - button "E STRAY KIDS 10%" [ref=e297] [cursor=pointer]:
+            - generic [ref=e299]:
+              - generic [ref=e300]:
+                - generic [ref=e301]: E
+                - generic [ref=e302]: STRAY KIDS
+              - generic [ref=e303]: 10%
+        - paragraph [ref=e304]: Cast your vote now to decide which artist gets the next full-week takeover station.
+      - complementary [ref=e305]:
+        - generic [ref=e306]:
+          - generic [ref=e307]:
+            - generic [ref=e308]:
+              - paragraph [ref=e309]: Room Hype
+              - paragraph [ref=e310]: On Fire
+            - generic [ref=e311]: 100%
+          - paragraph [ref=e314]: Requests, votes, and queue movement are all lighting up the room right now.
+        - generic [ref=e315]:
+          - paragraph [ref=e316]: Queue Impact
+          - paragraph [ref=e317]: No fan picks are in the queue yet, so the next request can be the one that changes the room.
+          - link "Be The First north_east" [ref=e318] [cursor=pointer]:
+            - /url: /request/
+            - text: Be The First
+            - generic [ref=e319]: north_east
+    - generic [ref=e322]:
+      - generic [ref=e323]:
+        - generic [ref=e324]:
+          - generic [ref=e325]:
+            - paragraph [ref=e326]: Signal Desk
+            - heading "DJ Notes" [level=2] [ref=e327]
+          - button "thumb_up Helpful" [ref=e328] [cursor=pointer]:
+            - generic [ref=e329]: thumb_up
+            - text: Helpful
+        - generic [ref=e330]:
+          - paragraph [ref=e331]: About "Guilty"
+          - paragraph [ref=e332]: Now spinning Guilty by TAEMIN on K-Beats Live. This record stands out for its performance-ready structure, strong melodic identity, and polished production choices that translate extremely well in a live radio mix. Its pacing and sonic layering keep momentum high from intro to chorus, making it a dependable anchor track in rotation. From an audience perspective, Guilty works because it balances immediate hooks with replay value. The vocal delivery and arrangement details create emotional lift while still leaving room for personality, which is exactly what keeps listeners engaged across repeat spins and cross-show transitions.
+        - generic [ref=e333]:
+          - generic [ref=e334]:
+            - paragraph [ref=e335]: Track Focus
+            - paragraph [ref=e336]: Now Live
+            - paragraph [ref=e337]: TAEMIN
+          - generic [ref=e338]:
+            - paragraph [ref=e339]: Energy Profile
+            - paragraph [ref=e340]: High
+            - paragraph [ref=e341]: K-Beats AI Estimate
+          - generic [ref=e342]:
+            - paragraph [ref=e343]: On-Air Context
+            - paragraph [ref=e344]: Featured
+            - paragraph [ref=e345]: Current Rotation
+      - generic [ref=e346]:
+        - article [ref=e347]:
+          - generic [ref=e348]:
+            - generic [ref=e349]: lyrics
+            - paragraph [ref=e350]: Lyric Highlight
+          - paragraph [ref=e351]: This section of Guilty hits with sharp hook writing and controlled vocal phrasing, delivering immediate crowd lift while keeping the topline clean, memorable, and built for replay.
+        - article [ref=e352]:
+          - generic [ref=e353]:
+            - generic [ref=e354]: rocket_launch
+            - paragraph [ref=e355]: Era Pulse
+          - paragraph [ref=e356]: Taemin appears in the latest comeback calendar (03/2026), carrying clear era momentum and active fandom conversation.
+        - article [ref=e357]:
+          - generic [ref=e358]:
+            - generic [ref=e359]: group
+            - paragraph [ref=e360]: Taemin
+          - paragraph [ref=e361]: Debuting as SHINee's youngest member before embarking on a solo career, Taemin has meticulously crafted an unparalleled artistic identity. His journey from a talented teenage dancer to a visionary soloist is...
+          - generic [ref=e362]:
+            - generic [ref=e363]: Soloist
+            - generic [ref=e364]: Line-up active
+            - generic [ref=e365]: SHINee member
+    - generic [ref=e368]:
+      - article [ref=e369]:
+        - generic [ref=e370]:
+          - generic [ref=e371]:
+            - paragraph [ref=e372]: Community Layer
+            - heading "Listener Chat" [level=2] [ref=e373]
+          - link "Log In To Join login" [ref=e374] [cursor=pointer]:
+            - /url: /login/
+            - text: Log In To Join
+            - generic [ref=e375]: login
+        - paragraph [ref=e376]: This is the social layer that makes the station feel alive. Even when someone lands in the middle of a song, they can see there is already a room around the music.
+        - generic [ref=e377]:
+          - paragraph [ref=e379]: Loading chat
+          - generic [ref=e380]:
+            - textbox "Log in to join the live room" [disabled] [ref=e381]
+            - button "Send north_east" [disabled] [ref=e382]:
+              - text: Send
+              - generic [ref=e383]: north_east
+      - complementary [ref=e384]:
+        - article [ref=e385]:
+          - paragraph [ref=e386]: Sponsored Spotlight
+          - generic [ref=e387]:
+            - paragraph [ref=e388]: K-Beats Promotion
+            - heading "Download The App" [level=3] [ref=e389]
+            - paragraph [ref=e390]: Keep K-Beats in your pocket with instant live listening, comeback alerts, and fan-first extras built for the station's biggest listeners.
+            - generic [ref=e391]:
+              - link "Open App Preview phone_iphone" [ref=e392] [cursor=pointer]:
+                - /url: /promo/
+                - text: Open App Preview
+                - generic [ref=e393]: phone_iphone
+              - link "Create Account north_east" [ref=e394] [cursor=pointer]:
+                - /url: /signup/
+                - text: Create Account
+                - generic [ref=e395]: north_east
+            - paragraph [ref=e396]: Live stream access. Alerts. Fan club tools. One place.
+        - article [ref=e397]:
+          - paragraph [ref=e398]: Return Loop
+          - heading "Keep The Habit Alive" [level=3] [ref=e399]
+          - generic [ref=e400]:
+            - generic [ref=e401]:
+              - paragraph [ref=e402]: Current Streak
+              - paragraph [ref=e403]: "0"
+            - generic [ref=e404]:
+              - paragraph [ref=e405]: This Week
+              - paragraph [ref=e406]: "0"
+            - generic [ref=e407]:
+              - paragraph [ref=e408]: Tier
+              - paragraph [ref=e409]: FREE
+          - paragraph [ref=e410]: Log in so every live session can build toward a return streak.
+          - paragraph [ref=e411]: Log in to save live moments, build a streak, and unlock reminder nudges.
+          - generic [ref=e412]:
+            - link "Log In To Track login" [ref=e413] [cursor=pointer]:
+              - /url: /login/
+              - text: Log In To Track
+              - generic [ref=e414]: login
+            - link "Open Beat Streak sports_esports" [ref=e415] [cursor=pointer]:
+              - /url: /game/beat-streak-v2/play/
+              - text: Open Beat Streak
+              - generic [ref=e416]: sports_esports
+    - generic [ref=e418]:
+      - generic [ref=e419]:
+        - generic [ref=e420]:
+          - paragraph [ref=e421]: Stay Locked In
+          - heading "Keep The Station In Your Rotation" [level=2] [ref=e422]
+        - link "View Full Schedule event" [ref=e423] [cursor=pointer]:
+          - /url: /schedule/
+          - text: View Full Schedule
+          - generic [ref=e424]: event
+      - generic [ref=e425]:
+        - article [ref=e426]:
+          - paragraph [ref=e427]: Live Queue
+          - heading "Know What Is Coming Next" [level=3] [ref=e428]
+          - paragraph [ref=e429]: The Up Next rail gives listeners instant context, so dropping into the stream never feels random or disconnected.
+          - link "Jump To Queue south" [ref=e430] [cursor=pointer]:
+            - /url: "#up-next-container"
+            - text: Jump To Queue
+            - generic [ref=e431]: south
+        - article [ref=e432]:
+          - paragraph [ref=e433]: Fan Influence
+          - heading "Push Songs Into The Room" [level=3] [ref=e434]
+          - paragraph [ref=e435]: Requests and live voting make the station feel participatory instead of passive, especially when the queue starts moving.
+          - link "Request A Track queue_music" [ref=e436] [cursor=pointer]:
+            - /url: /request/
+            - text: Request A Track
+            - generic [ref=e437]: queue_music
+        - article [ref=e438]:
+          - paragraph [ref=e439]: Return Window
+          - heading "Catch The Next Handoff" [level=3] [ref=e440]
+          - paragraph [ref=e441]: Blackpink lands tomorrow at 14:30, giving fans a real reason to come back at a specific time.
+          - link "Open Schedule event_upcoming" [ref=e442] [cursor=pointer]:
+            - /url: /schedule/
+            - text: Open Schedule
+            - generic [ref=e443]: event_upcoming
+        - article [ref=e444]:
+          - paragraph [ref=e445]: Listener Ritual
+          - heading "Save The Songs You Catch Live" [level=3] [ref=e446]
+          - paragraph [ref=e447]: Saved moments, chat, and your return streak turn one session into something collectible and worth building over time.
+          - link "Log In To Save login" [ref=e448] [cursor=pointer]:
+            - /url: /login/
+            - text: Log In To Save
+            - generic [ref=e449]: login
+    - generic [ref=e451]:
+      - generic [ref=e452]:
+        - generic [ref=e453]:
+          - heading "K-BEATS RADIO" [level=3] [ref=e454]
+          - paragraph [ref=e455]: Est. 2026 · Cornwall, UK
+          - paragraph [ref=e456]: Your leading source for K-pop music, news, and culture. Bringing the heart of Seoul from Cornwall to fans worldwide.
+          - generic [ref=e457]:
+            - link "Facebook" [ref=e458] [cursor=pointer]:
+              - /url: https://www.facebook.com/
+              - generic [ref=e459]: public
+            - link "News" [ref=e460] [cursor=pointer]:
+              - /url: /news/
+              - generic [ref=e461]: article
+            - link "Live" [ref=e462] [cursor=pointer]:
+              - /url: /live/
+              - generic [ref=e463]: music_note
+          - link "phone_iphone Download the App" [ref=e464] [cursor=pointer]:
+            - /url: /promo/
+            - generic [ref=e465]: phone_iphone
+            - text: Download the App
+        - generic [ref=e466]:
+          - generic [ref=e467]:
+            - heading "Music" [level=4] [ref=e468]
+            - list [ref=e469]:
+              - listitem [ref=e470]:
+                - link "Groups" [ref=e471] [cursor=pointer]:
+                  - /url: /idols/?type=groups
+              - listitem [ref=e472]:
+                - link "Male Solo Artists" [ref=e473] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=male
+              - listitem [ref=e474]:
+                - link "Female Solo Artists" [ref=e475] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=female
+              - listitem [ref=e476]:
+                - link "Tours" [ref=e477] [cursor=pointer]:
+                  - /url: /comeback-timeline/
+          - generic [ref=e478]:
+            - heading "Station" [level=4] [ref=e479]
+            - list [ref=e480]:
+              - listitem [ref=e481]:
+                - link "About Us" [ref=e482] [cursor=pointer]:
+                  - /url: /about/
+              - listitem [ref=e483]:
+                - link "Presenters" [ref=e484] [cursor=pointer]:
+                  - /url: /presenters/
+              - listitem [ref=e485]:
+                - link "Schedule" [ref=e486] [cursor=pointer]:
+                  - /url: /schedule/
+              - listitem [ref=e487]:
+                - link "Mobile App" [ref=e488] [cursor=pointer]:
+                  - /url: /promo/
+          - generic [ref=e489]:
+            - heading "Community" [level=4] [ref=e490]
+            - list [ref=e491]:
+              - listitem [ref=e492]:
+                - link "Request Song" [ref=e493] [cursor=pointer]:
+                  - /url: /request/
+              - listitem [ref=e494]:
+                - link "Fan Club" [ref=e495] [cursor=pointer]:
+                  - /url: /fan-clubs/
+              - listitem [ref=e496]:
+                - link "Contests" [ref=e497] [cursor=pointer]:
+                  - /url: /contests/
+              - listitem [ref=e498]:
+                - link "Merch Shop" [ref=e499] [cursor=pointer]:
+                  - /url: /coming-soon/
+          - generic [ref=e500]:
+            - heading "Shop" [level=4] [ref=e501]
+            - list [ref=e502]:
+              - listitem [ref=e503]:
+                - link "Jumpers" [ref=e504] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e505]:
+                - link "T-Shirts" [ref=e506] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e507]:
+                - link "Merch" [ref=e508] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e509]:
+                - link "Albums" [ref=e510] [cursor=pointer]:
+                  - /url: /coming-soon/
+      - generic [ref=e511]:
+        - paragraph [ref=e512]: © 2026 K-Beats Radio. All rights reserved.
+        - generic [ref=e513]:
+          - link "Privacy Policy" [ref=e514] [cursor=pointer]:
+            - /url: /legal/privacy-policy/
+          - link "Cookie Policy" [ref=e515] [cursor=pointer]:
+            - /url: /legal/cookie-policy/
+          - link "Terms of Service" [ref=e516] [cursor=pointer]:
+            - /url: /legal/terms-of-service/

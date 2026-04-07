@@ -38,6 +38,12 @@ Start with these sources:
 - `docs/notebooklm/TESTING_AND_RISK_AREAS.md`
 - `docs/notebooklm/DECISION_LOG.md`
 - `docs/notebooklm/PROJECT_GLOSSARY.md`
+- `docs/notebooklm/DESIGN_SYSTEM.md`
+- `docs/notebooklm/COMPONENT_PATTERNS.md`
+- `docs/notebooklm/PAGE_PATTERNS.md`
+- `docs/notebooklm/UX_RULES.md`
+- `docs/notebooklm/COPY_STYLE_GUIDE.md`
+- `docs/notebooklm/VISUAL_REFERENCE_SET.md`
 - `docs/notebooklm/NOTEBOOK_VALIDATION_SUITE.md`
 - `docs/notebooklm/NOTEBOOK_CHANGELOG.md`
 - `docs/notebooklm/MAINTENANCE_CHECKLIST.md`
@@ -50,6 +56,13 @@ Add vendor docs that are actively relevant to current work:
 - Cloudinary docs
 - Django 4.2 docs
 - AI provider docs you are actively using
+
+Add current visual references when design quality matters:
+
+- `output/playwright/design-refs/home.png`
+- `output/playwright/design-refs/live.png`
+- `output/playwright/design-refs/signup.png`
+- `output/playwright/design-refs/staff-login.png`
 
 Do not upload these files directly:
 
@@ -83,6 +96,8 @@ Good answers should:
 - explain scheduler/runtime behavior without leaking raw secret-bearing settings
 - understand AI/editorial workflows as structured product systems, not isolated experiments
 - classify routes, templates, APIs, permissions, and risk surfaces correctly
+- reason about brand, component, page, UX, and copy decisions using K-Beats-specific guidance
+- use the visual reference set to distinguish cinematic public pages from quieter operator surfaces
 
 ## Authentication And Profile
 

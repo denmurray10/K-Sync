@@ -1,0 +1,221 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "K - beats" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: K
+        - generic [ref=e7]: "-"
+        - generic [ref=e8]: beats
+      - generic [ref=e9]:
+        - link "Charts" [ref=e10] [cursor=pointer]:
+          - /url: /charts/
+        - link "News" [ref=e11] [cursor=pointer]:
+          - /url: /news/
+        - link "Fan Clubs" [ref=e12] [cursor=pointer]:
+          - /url: /fan-clubs/
+      - link "Start Listening" [ref=e13] [cursor=pointer]:
+        - /url: /live/
+  - main [ref=e14]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: Facebook Campaign Landing Page
+        - heading "One Click Into The K-Pop Universe." [level=1] [ref=e19]:
+          - text: One Click
+          - generic [ref=e20]: Into The K-Pop Universe.
+        - paragraph [ref=e21]: K-Beats brings live radio, real-time charts, comeback tracking, editorials, games, and fan spaces into one high-energy destination. This page is built to turn ad clicks into real sessions, not bounces.
+        - generic [ref=e22]:
+          - link "play_circle Start Listening Free" [ref=e23] [cursor=pointer]:
+            - /url: /live/
+            - generic [ref=e24]: play_circle
+            - text: Start Listening Free
+          - link "person_add Create Your Account" [ref=e25] [cursor=pointer]:
+            - /url: /signup/
+            - generic [ref=e26]: person_add
+            - text: Create Your Account
+        - generic [ref=e27]:
+          - generic [ref=e28]: Live radio
+          - generic [ref=e29]: Charts
+          - generic [ref=e30]: Comebacks
+          - generic [ref=e31]: Fan clubs
+          - generic [ref=e32]: Games
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - paragraph [ref=e37]: Live now
+            - paragraph [ref=e38]: RUN
+            - paragraph [ref=e39]: BTS
+          - img "RUN artwork" [ref=e40]
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - paragraph [ref=e43]: 3,847
+            - paragraph [ref=e44]: Live listeners right now
+          - generic [ref=e45]:
+            - paragraph [ref=e46]: 24/7
+            - paragraph [ref=e47]: Always-on stream
+          - generic [ref=e48]:
+            - paragraph [ref=e49]: 6+
+            - paragraph [ref=e50]: K-pop surfaces in one visit
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - paragraph [ref=e54]: Why this page exists
+            - paragraph [ref=e55]: It gives paid traffic one clear first move, then introduces the broader K-Beats product without asking visitors to figure out the site themselves.
+          - generic [ref=e56]: ads_click
+    - generic [ref=e59]:
+      - generic [ref=e60]: Live radio
+      - generic [ref=e61]: •
+      - generic [ref=e62]: Editorials
+      - generic [ref=e63]: •
+      - generic [ref=e64]: Charts
+      - generic [ref=e65]: •
+      - generic [ref=e66]: Comeback tracking
+      - generic [ref=e67]: •
+      - generic [ref=e68]: Fan clubs
+      - generic [ref=e69]: •
+      - generic [ref=e70]: Contests
+      - generic [ref=e71]: •
+      - generic [ref=e72]: Games
+      - generic [ref=e73]: •
+      - generic [ref=e74]: Live radio
+      - generic [ref=e75]: •
+      - generic [ref=e76]: Editorials
+      - generic [ref=e77]: •
+      - generic [ref=e78]: Charts
+      - generic [ref=e79]: •
+      - generic [ref=e80]: Comeback tracking
+      - generic [ref=e81]: •
+      - generic [ref=e82]: Fan clubs
+    - generic [ref=e84]:
+      - generic [ref=e85]:
+        - paragraph [ref=e86]: What visitors can do
+        - heading "Six Reasons The Click Keeps Going" [level=2] [ref=e87]
+        - paragraph [ref=e88]: Instead of sending paid traffic to a generic homepage, this launch page previews the parts of K-Beats most likely to create momentum.
+      - generic [ref=e89]:
+        - article [ref=e90]:
+          - generic [ref=e91]:
+            - generic [ref=e92]:
+              - paragraph [ref=e93]: Live Radio
+              - heading "Jump Straight Into The Station" [level=3] [ref=e94]
+            - generic [ref=e95]: radio
+          - paragraph [ref=e96]: Start listening in seconds and keep browsing while the stream keeps moving with you.
+          - link "Open Live Radio arrow_forward" [ref=e97] [cursor=pointer]:
+            - /url: /live/
+            - text: Open Live Radio
+            - generic [ref=e98]: arrow_forward
+        - article [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - paragraph [ref=e102]: Charts
+              - heading "Track What Fans Are Pushing Up" [level=3] [ref=e103]
+            - generic [ref=e104]: equalizer
+          - paragraph [ref=e105]: See daily movement, breakout songs, and the tracks building real momentum right now.
+          - link "View Charts arrow_forward" [ref=e106] [cursor=pointer]:
+            - /url: /charts/
+            - text: View Charts
+            - generic [ref=e107]: arrow_forward
+        - article [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - paragraph [ref=e111]: Comebacks
+              - heading "Never Miss The Next Drop" [level=3] [ref=e112]
+            - generic [ref=e113]: rocket_launch
+          - paragraph [ref=e114]: Follow new releases, countdowns, and major artist moments without leaving the K-Beats world.
+          - link "See Comebacks arrow_forward" [ref=e115] [cursor=pointer]:
+            - /url: /comeback-timeline/
+            - text: See Comebacks
+            - generic [ref=e116]: arrow_forward
+        - article [ref=e117]:
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - paragraph [ref=e120]: News
+              - heading "Read The Stories Behind The Noise" [level=3] [ref=e121]
+            - generic [ref=e122]: newsmode
+          - paragraph [ref=e123]: Get editorials, trend explainers, and K-pop context that turns a click into a session.
+          - link "Read News arrow_forward" [ref=e124] [cursor=pointer]:
+            - /url: /news/
+            - text: Read News
+            - generic [ref=e125]: arrow_forward
+        - article [ref=e126]:
+          - generic [ref=e127]:
+            - generic [ref=e128]:
+              - paragraph [ref=e129]: Fan Spaces
+              - heading "Find Your Corner Of The Fandom" [level=3] [ref=e130]
+            - generic [ref=e131]: groups
+          - paragraph [ref=e132]: Move from passive listening into fan clubs, contests, and community-led moments.
+          - link "Explore Fan Clubs arrow_forward" [ref=e133] [cursor=pointer]:
+            - /url: /fan-clubs/
+            - text: Explore Fan Clubs
+            - generic [ref=e134]: arrow_forward
+        - article [ref=e135]:
+          - generic [ref=e136]:
+            - generic [ref=e137]:
+              - paragraph [ref=e138]: Games
+              - heading "Stay Longer With Interactive Features" [level=3] [ref=e139]
+            - generic [ref=e140]: stadia_controller
+          - paragraph [ref=e141]: Song games, polls, and side missions keep the experience active instead of one-and-done.
+          - link "Play Games arrow_forward" [ref=e142] [cursor=pointer]:
+            - /url: /games/
+            - text: Play Games
+            - generic [ref=e143]: arrow_forward
+    - generic [ref=e145]:
+      - generic [ref=e146]:
+        - paragraph [ref=e147]: "01"
+        - heading "Hit play first" [level=3] [ref=e148]
+        - paragraph [ref=e149]: Start with the live station so the campaign click becomes an immediate K-pop payoff.
+      - generic [ref=e150]:
+        - paragraph [ref=e151]: "02"
+        - heading "Follow the momentum" [level=3] [ref=e152]
+        - paragraph [ref=e153]: Move naturally from the stream into charts, comeback tracking, and the current news cycle.
+      - generic [ref=e154]:
+        - paragraph [ref=e155]: "03"
+        - heading "Turn visitors into regulars" [level=3] [ref=e156]
+        - paragraph [ref=e157]: Invite them into fan clubs, account creation, and recurring visits once the music has already hooked them.
+    - generic [ref=e159]:
+      - generic [ref=e160]:
+        - paragraph [ref=e161]: Suggested first session
+        - heading "What We Want A New Visitor To Do" [level=2] [ref=e162]
+        - paragraph [ref=e163]: "The cleanest path from a Facebook click is simple: start the live stream, glance at what is playing, then branch into charts, news, or the comeback timeline."
+        - generic [ref=e164]:
+          - link "headphones Go To Live Radio" [ref=e165] [cursor=pointer]:
+            - /url: /live/
+            - generic [ref=e166]: headphones
+            - text: Go To Live Radio
+          - link "library_music Browse Stream Hub" [ref=e167] [cursor=pointer]:
+            - /url: /stream/
+            - generic [ref=e168]: library_music
+            - text: Browse Stream Hub
+      - generic [ref=e169]:
+        - generic [ref=e170]:
+          - generic [ref=e171]:
+            - paragraph [ref=e172]: On deck
+            - heading "The station keeps moving" [level=3] [ref=e173]
+          - generic [ref=e174]: queue_music
+        - generic [ref=e175]:
+          - generic [ref=e176]:
+            - img "Black Swan by BTS" [ref=e177]
+            - generic [ref=e178]:
+              - paragraph [ref=e179]: Black Swan
+              - paragraph [ref=e180]: BTS
+          - generic [ref=e181]:
+            - img "ZEN by JENNIE" [ref=e182]
+            - generic [ref=e183]:
+              - paragraph [ref=e184]: ZEN
+              - paragraph [ref=e185]: JENNIE
+          - generic [ref=e186]:
+            - img "One Of The Girls by The Weeknd" [ref=e187]
+            - generic [ref=e188]:
+              - paragraph [ref=e189]: One Of The Girls
+              - paragraph [ref=e190]: The Weeknd
+    - generic [ref=e192]:
+      - generic [ref=e193]:
+        - paragraph [ref=e194]: Campaign close
+        - heading "Send The Click Somewhere Worth Staying." [level=2] [ref=e195]
+        - paragraph [ref=e196]: "This launch page is built to make the first session feel intentional: music first, discovery second, repeat habits after that."
+      - generic [ref=e197]:
+        - link "play_circle Launch The Stream" [ref=e198] [cursor=pointer]:
+          - /url: /live/
+          - generic [ref=e199]: play_circle
+          - text: Launch The Stream
+        - link "person_add Join K-Beats" [ref=e200] [cursor=pointer]:
+          - /url: /signup/
+          - generic [ref=e201]: person_add
+          - text: Join K-Beats

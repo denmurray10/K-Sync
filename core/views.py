@@ -6278,6 +6278,142 @@ def promo(request):
     return render(request, 'core/promo.html')
 
 
+def launch_campaign(request):
+    listener_count = 3847
+    up_next_tracks = []
+    try:
+        state, _ = RadioStationState.objects.get_or_create(id=1)
+        state = _auto_rotate_station(state)
+        listener_count = int(state.listeners_count or 3847)
+        current_track = state.current_track
+        up_next_ids = list(state.up_next or [])[:3]
+        raw_up_next_tracks = list(RadioTrack.objects.filter(id__in=up_next_ids))
+        raw_up_next_tracks = [
+            track for track in raw_up_next_tracks
+            if track and not _is_generated_voice_track(track)
+        ]
+        raw_up_next_tracks.sort(
+            key=lambda track: up_next_ids.index(track.id) if track.id in up_next_ids else 999
+        )
+        up_next_tracks = [
+            {
+                'title': track.title,
+                'artist': track.artist,
+                'album_art': _coalesce_stream_image_url(track.album_art),
+            }
+            for track in raw_up_next_tracks[:3]
+        ]
+    except DatabaseError:
+        current_track = None
+
+    preview_track = {
+        'title': current_track.title if current_track else 'K-Beats Live',
+        'artist': current_track.artist if current_track else 'Live K-pop, charts, news, and fan energy',
+        'album_art': _coalesce_stream_image_url(
+            current_track.album_art if current_track else '',
+        ),
+    }
+
+    feature_cards = [
+        {
+            'eyebrow': 'Live Radio',
+            'title': 'Start With The Music',
+            'body': 'Go from ad click to live K-pop in seconds, then keep exploring while the station keeps playing.',
+            'url': reverse('live'),
+            'cta': 'Open Live Radio',
+            'icon': 'radio',
+            'accent': 'primary',
+        },
+        {
+            'eyebrow': 'Charts',
+            'title': 'See What Is Rising Now',
+            'body': 'Follow the songs, groups, and fan favourites building real momentum across the scene.',
+            'url': reverse('charts'),
+            'cta': 'View Charts',
+            'icon': 'equalizer',
+            'accent': 'secondary',
+        },
+        {
+            'eyebrow': 'Comebacks',
+            'title': 'Stay Ahead Of Every Comeback',
+            'body': 'Track new releases, countdowns, and major artist moments before they take over your feed.',
+            'url': reverse('comeback_timeline'),
+            'cta': 'See Comebacks',
+            'icon': 'rocket_launch',
+            'accent': 'primary',
+        },
+        {
+            'eyebrow': 'News',
+            'title': 'Get The Story Behind The Hype',
+            'body': 'Read editorials, trend explainers, and fan-first coverage that adds context to the moment.',
+            'url': reverse('news'),
+            'cta': 'Read News',
+            'icon': 'newsmode',
+            'accent': 'secondary',
+        },
+        {
+            'eyebrow': 'Fan Spaces',
+            'title': 'Find Your Fandom Space',
+            'body': 'Move beyond passive listening with fan clubs, contests, and community features built for repeat visits.',
+            'url': reverse('fan_clubs'),
+            'cta': 'Explore Fan Clubs',
+            'icon': 'groups',
+            'accent': 'primary',
+        },
+        {
+            'eyebrow': 'Games',
+            'title': 'Make The Session Stick',
+            'body': 'Games, polls, and interactive features give visitors another reason to stay, click, and come back.',
+            'url': reverse('games'),
+            'cta': 'Play Games',
+            'icon': 'stadia_controller',
+            'accent': 'secondary',
+        },
+    ]
+
+    engagement_steps = [
+        {
+            'step': '01',
+            'title': 'Press play immediately',
+            'body': 'Give new visitors an instant reward by dropping them straight into the live station.',
+        },
+        {
+            'step': '02',
+            'title': 'Follow what is moving',
+            'body': 'Guide them from the stream into charts, comebacks, and current news while the music keeps running.',
+        },
+        {
+            'step': '03',
+            'title': 'Turn interest into habit',
+            'body': 'Once they are engaged, invite them into fan clubs, account creation, and deeper product journeys.',
+        },
+    ]
+
+    proof_points = [
+        {'label': 'Live listeners right now', 'value': f'{listener_count:,}'},
+        {'label': 'Always-on stream', 'value': '24/7'},
+        {'label': 'K-pop surfaces in one visit', 'value': '6+'},
+    ]
+
+    context = {
+        'seo_title': 'K-Beats Launch | Live K-Pop, Charts, News & Fan Culture',
+        'seo_description': 'Start listening to K-Beats and discover live K-pop radio, charts, comeback tracking, fan spaces, games, and news in one fan-first destination.',
+        'seo_type': 'website',
+        'seo_image': preview_track['album_art'],
+        'seo_image_alt': f"K-Beats launch page featuring {preview_track['title']}",
+        'listener_count': listener_count,
+        'preview_track': preview_track,
+        'up_next_tracks': up_next_tracks,
+        'feature_cards': feature_cards,
+        'engagement_steps': engagement_steps,
+        'proof_points': proof_points,
+        'primary_cta_url': reverse('live'),
+        'secondary_cta_url': reverse('signup'),
+        'stream_hub_url': reverse('stream_hub'),
+    }
+    return render(request, 'core/launch_campaign.html', context)
+
+
 def listen_free_landing(request):
     up_next_tracks = []
     artist_marquee = ['BTS', 'Stray Kids', 'ATEEZ', 'ENHYPEN', 'TWICE', 'LE SSERAFIM', 'SEVENTEEN', 'aespa']

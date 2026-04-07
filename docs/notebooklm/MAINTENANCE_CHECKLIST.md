@@ -57,6 +57,7 @@ Update the notebook docs whenever any of these change meaningfully:
 - repo-wide conventions Codex should follow
 - permissions, route ownership, template ownership, or API ownership
 - settings behavior, validation prompts, or release workflow
+- design system, component patterns, page patterns, UX rules, or copy tone
 
 ## Update Process
 
@@ -91,6 +92,7 @@ questions correctly:
 - which external service is actually involved?
 - what rules should Codex follow before editing that area?
 - which route, template, API, or permission boundary owns the feature?
+- whether the feature design still fits K-Beats brand, UX, and copy patterns
 
 ## Anti-Patterns To Avoid
 

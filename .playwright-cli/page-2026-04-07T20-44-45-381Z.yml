@@ -1,0 +1,216 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "K - beats" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: K
+        - generic [ref=e6]: "-"
+        - generic [ref=e7]: beats
+      - navigation [ref=e9]:
+        - link "Live" [ref=e10] [cursor=pointer]:
+          - /url: /live/
+        - link "Stream" [ref=e11] [cursor=pointer]:
+          - /url: /stream/
+        - link "Charts" [ref=e12] [cursor=pointer]:
+          - /url: /charts/
+        - link "Idols" [ref=e13] [cursor=pointer]:
+          - /url: /idols/
+        - link "Games" [ref=e14] [cursor=pointer]:
+          - /url: /games/
+        - link "Comebacks" [ref=e15] [cursor=pointer]:
+          - /url: /comeback-timeline/
+        - link "News" [ref=e16] [cursor=pointer]:
+          - /url: /news/
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]: search
+          - textbox "Search artist, song..." [ref=e20]
+        - generic [ref=e21]:
+          - button "Live On Air" [ref=e22] [cursor=pointer]:
+            - generic [ref=e26]: Live On Air
+          - link "Log In" [ref=e27] [cursor=pointer]:
+            - /url: /login/
+  - generic:
+    - dialog [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - paragraph [ref=e31]: My Station
+          - button "Close My Station" [ref=e32] [cursor=pointer]:
+            - generic [ref=e33]: close
+        - heading "Unlock My Station" [level=3] [ref=e34]
+        - paragraph [ref=e35]: Sign up to customise your K-Beats experience with your biases, eras, and live recommendations.
+      - generic [ref=e37]:
+        - link "Sign Up To Customise" [ref=e38] [cursor=pointer]:
+          - /url: /signup/
+        - link "Log In" [ref=e39] [cursor=pointer]:
+          - /url: /login/
+    - button "My Station" [ref=e40] [cursor=pointer]:
+      - generic [ref=e42]: My Station
+  - main [ref=e43]:
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e53]: New Member
+        - heading "JOIN THE WAVE" [level=1] [ref=e54]:
+          - text: JOIN
+          - text: THE WAVE
+        - paragraph [ref=e55]: Create your free account and unlock the full K-Beats experience — personalised charts, live radio, exclusive content, and a global community of fans.
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e59]: radio
+            - generic [ref=e60]:
+              - text: 24/7 Live Radio
+              - generic [ref=e61]: Non-stop K-Pop hits from Seoul
+          - generic [ref=e62]:
+            - generic [ref=e64]: trending_up
+            - generic [ref=e65]:
+              - text: Real-Time Charts
+              - generic [ref=e66]: Track your favourites across all platforms
+          - generic [ref=e67]:
+            - generic [ref=e69]: groups
+            - generic [ref=e70]:
+              - text: Fan Community
+              - generic [ref=e71]: Join 2M+ fans worldwide
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - heading "Create Account" [level=2] [ref=e77]
+          - paragraph [ref=e78]: Start your journey
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - generic [ref=e81]: Username
+            - generic [ref=e82]:
+              - generic [ref=e83]: person
+              - textbox "Username" [ref=e84]:
+                - /placeholder: your_username
+          - generic [ref=e85]:
+            - generic [ref=e86]: Email Address
+            - generic [ref=e87]:
+              - generic [ref=e88]: mail
+              - textbox "Email Address" [ref=e89]:
+                - /placeholder: you@example.com
+          - generic [ref=e90]:
+            - generic [ref=e91]: Password
+            - generic [ref=e92]:
+              - generic [ref=e93]: lock
+              - textbox "Password" [ref=e94]:
+                - /placeholder: Min 8 characters
+          - generic [ref=e95]:
+            - generic [ref=e96]: Confirm Password
+            - generic [ref=e97]:
+              - generic [ref=e98]: verified_user
+              - textbox "Confirm Password" [ref=e99]:
+                - /placeholder: Re-enter password
+          - generic [ref=e100]:
+            - checkbox "I agree to the Terms of Service and Privacy Policy" [ref=e101] [cursor=pointer]
+            - generic [ref=e102] [cursor=pointer]:
+              - text: I agree to the
+              - link "Terms of Service" [ref=e103]:
+                - /url: /legal/terms-of-service/
+              - text: and
+              - link "Privacy Policy" [ref=e104]:
+                - /url: /legal/privacy-policy/
+          - button "Create Account arrow_forward" [ref=e105] [cursor=pointer]:
+            - text: Create Account
+            - generic [ref=e106]: arrow_forward
+        - generic [ref=e109]: Or sign up with
+        - generic [ref=e111]:
+          - button "chat_bubble" [ref=e112] [cursor=pointer]:
+            - generic [ref=e113]: chat_bubble
+          - button "sms" [ref=e114] [cursor=pointer]:
+            - generic [ref=e115]: sms
+          - button "account_circle" [ref=e116] [cursor=pointer]:
+            - generic [ref=e117]: account_circle
+        - paragraph [ref=e119]:
+          - text: Already have an account?
+          - link "Log In" [ref=e120] [cursor=pointer]:
+            - /url: /login/
+  - contentinfo [ref=e121]:
+    - generic [ref=e122]:
+      - generic [ref=e123]:
+        - generic [ref=e124]:
+          - heading "K-BEATS RADIO" [level=3] [ref=e125]
+          - paragraph [ref=e126]: Est. 2026 · Cornwall, UK
+          - paragraph [ref=e127]: Your leading source for K-pop music, news, and culture. Bringing the heart of Seoul from Cornwall to fans worldwide.
+          - generic [ref=e128]:
+            - link "Facebook" [ref=e129] [cursor=pointer]:
+              - /url: https://www.facebook.com/
+              - generic [ref=e130]: public
+            - link "News" [ref=e131] [cursor=pointer]:
+              - /url: /news/
+              - generic [ref=e132]: article
+            - link "Live" [ref=e133] [cursor=pointer]:
+              - /url: /live/
+              - generic [ref=e134]: music_note
+          - link "phone_iphone Download the App" [ref=e135] [cursor=pointer]:
+            - /url: /promo/
+            - generic [ref=e136]: phone_iphone
+            - text: Download the App
+        - generic [ref=e137]:
+          - generic [ref=e138]:
+            - heading "Music" [level=4] [ref=e139]
+            - list [ref=e140]:
+              - listitem [ref=e141]:
+                - link "Groups" [ref=e142] [cursor=pointer]:
+                  - /url: /idols/?type=groups
+              - listitem [ref=e143]:
+                - link "Male Solo Artists" [ref=e144] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=male
+              - listitem [ref=e145]:
+                - link "Female Solo Artists" [ref=e146] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=female
+              - listitem [ref=e147]:
+                - link "Tours" [ref=e148] [cursor=pointer]:
+                  - /url: /comeback-timeline/
+          - generic [ref=e149]:
+            - heading "Station" [level=4] [ref=e150]
+            - list [ref=e151]:
+              - listitem [ref=e152]:
+                - link "About Us" [ref=e153] [cursor=pointer]:
+                  - /url: /about/
+              - listitem [ref=e154]:
+                - link "Presenters" [ref=e155] [cursor=pointer]:
+                  - /url: /presenters/
+              - listitem [ref=e156]:
+                - link "Schedule" [ref=e157] [cursor=pointer]:
+                  - /url: /schedule/
+              - listitem [ref=e158]:
+                - link "Mobile App" [ref=e159] [cursor=pointer]:
+                  - /url: /promo/
+          - generic [ref=e160]:
+            - heading "Community" [level=4] [ref=e161]
+            - list [ref=e162]:
+              - listitem [ref=e163]:
+                - link "Request Song" [ref=e164] [cursor=pointer]:
+                  - /url: /request/
+              - listitem [ref=e165]:
+                - link "Fan Club" [ref=e166] [cursor=pointer]:
+                  - /url: /fan-clubs/
+              - listitem [ref=e167]:
+                - link "Contests" [ref=e168] [cursor=pointer]:
+                  - /url: /contests/
+              - listitem [ref=e169]:
+                - link "Merch Shop" [ref=e170] [cursor=pointer]:
+                  - /url: /coming-soon/
+          - generic [ref=e171]:
+            - heading "Shop" [level=4] [ref=e172]
+            - list [ref=e173]:
+              - listitem [ref=e174]:
+                - link "Jumpers" [ref=e175] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e176]:
+                - link "T-Shirts" [ref=e177] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e178]:
+                - link "Merch" [ref=e179] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e180]:
+                - link "Albums" [ref=e181] [cursor=pointer]:
+                  - /url: /coming-soon/
+      - generic [ref=e182]:
+        - paragraph [ref=e183]: © 2026 K-Beats Radio. All rights reserved.
+        - generic [ref=e184]:
+          - link "Privacy Policy" [ref=e185] [cursor=pointer]:
+            - /url: /legal/privacy-policy/
+          - link "Cookie Policy" [ref=e186] [cursor=pointer]:
+            - /url: /legal/cookie-policy/
+          - link "Terms of Service" [ref=e187] [cursor=pointer]:
+            - /url: /legal/terms-of-service/

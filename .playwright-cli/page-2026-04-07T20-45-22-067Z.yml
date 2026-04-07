@@ -1,0 +1,64 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "K - beats" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: K
+        - generic [ref=e6]: "-"
+        - generic [ref=e7]: beats
+      - navigation [ref=e9]:
+        - link "Live" [ref=e10] [cursor=pointer]:
+          - /url: /live/
+        - link "Stream" [ref=e11] [cursor=pointer]:
+          - /url: /stream/
+        - link "Charts" [ref=e12] [cursor=pointer]:
+          - /url: /charts/
+        - link "Idols" [ref=e13] [cursor=pointer]:
+          - /url: /idols/
+        - link "Games" [ref=e14] [cursor=pointer]:
+          - /url: /games/
+        - link "Comebacks" [ref=e15] [cursor=pointer]:
+          - /url: /comeback-timeline/
+        - link "News" [ref=e16] [cursor=pointer]:
+          - /url: /news/
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]: search
+          - textbox "Search artist, song..." [ref=e20]
+        - generic [ref=e21]:
+          - button "Live On Air" [ref=e22] [cursor=pointer]:
+            - generic [ref=e26]: Live On Air
+          - link "Log In" [ref=e27] [cursor=pointer]:
+            - /url: /login/
+  - generic:
+    - dialog [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - paragraph [ref=e31]: My Station
+          - button "Close My Station" [ref=e32] [cursor=pointer]:
+            - generic [ref=e33]: close
+        - heading "Unlock My Station" [level=3] [ref=e34]
+        - paragraph [ref=e35]: Sign up to customise your K-Beats experience with your biases, eras, and live recommendations.
+      - generic [ref=e37]:
+        - link "Sign Up To Customise" [ref=e38] [cursor=pointer]:
+          - /url: /signup/
+        - link "Log In" [ref=e39] [cursor=pointer]:
+          - /url: /login/
+    - button "My Station" [ref=e40] [cursor=pointer]:
+      - generic [ref=e42]: My Station
+  - generic [ref=e43]:
+    - generic [ref=e44]:
+      - generic [ref=e45]: admin_panel_settings
+      - heading "Staff Area" [level=1] [ref=e46]
+      - paragraph [ref=e47]: K-Beats Signup Dashboard
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - generic [ref=e50]: Email
+        - textbox "you@kbeats.co.uk" [active] [ref=e51]
+      - generic [ref=e52]:
+        - generic [ref=e53]: Password
+        - textbox "••••••••" [ref=e54]
+      - button "Sign In" [ref=e55] [cursor=pointer]
+    - paragraph [ref=e56]:
+      - link "← Back to site" [ref=e57] [cursor=pointer]:
+        - /url: /

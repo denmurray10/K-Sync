@@ -23,6 +23,10 @@ Use this file for monthly validation or after any meaningful notebook update.
 - What analytics, SEO, or tracking behavior could break if we change this page?
 - What tests are weak here, and what parts of this feature are brittle?
 - What current-versus-legacy distinction matters before editing this code?
+- Which design system, component, page, UX, and copy rules should guide this new page or feature?
+- Is this design direction on-brand for K-Beats, and should it feel more public-facing or more operator-focused?
+- Which current visual reference screen is this design closest to, and what should it borrow or avoid?
+- Does this page read more like the homepage, live page, signup page, or staff login surface?
 
 ## Validation Standard
 

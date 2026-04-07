@@ -48,6 +48,12 @@ These docs should answer:
 - `docs/notebooklm/TESTING_AND_RISK_AREAS.md`
 - `docs/notebooklm/DECISION_LOG.md`
 - `docs/notebooklm/PROJECT_GLOSSARY.md`
+- `docs/notebooklm/DESIGN_SYSTEM.md`
+- `docs/notebooklm/COMPONENT_PATTERNS.md`
+- `docs/notebooklm/PAGE_PATTERNS.md`
+- `docs/notebooklm/UX_RULES.md`
+- `docs/notebooklm/COPY_STYLE_GUIDE.md`
+- `docs/notebooklm/VISUAL_REFERENCE_SET.md`
 - `docs/notebooklm/NOTEBOOK_VALIDATION_SUITE.md`
 - `docs/notebooklm/NOTEBOOK_CHANGELOG.md`
 - `docs/notebooklm/MAINTENANCE_CHECKLIST.md`
@@ -84,6 +90,12 @@ These docs should answer:
 - Use `TESTING_AND_RISK_AREAS.md` before risky edits or when coverage is unclear.
 - Use `DECISION_LOG.md` for "why is it shaped like this?" questions.
 - Use `PROJECT_GLOSSARY.md` to normalize terminology.
+- Use `DESIGN_SYSTEM.md` for brand, typography, spacing, motion, and public-versus-operator design rules.
+- Use `COMPONENT_PATTERNS.md` when designing or refining buttons, forms, cards, chips, lists, or overlays.
+- Use `PAGE_PATTERNS.md` to classify a page into a known K-Sync layout family before designing it.
+- Use `UX_RULES.md` for CTA hierarchy, form behavior, loading/error states, and public-versus-operator UX decisions.
+- Use `COPY_STYLE_GUIDE.md` for headlines, CTA labels, helper text, and tone.
+- Use `VISUAL_REFERENCE_SET.md` with the screenshot pack when a design task needs grounding in the current live UI rather than abstract rules alone.
 - Use `NOTEBOOK_VALIDATION_SUITE.md` for monthly or post-update validation.
 - Use `NOTEBOOK_CHANGELOG.md` to track notebook evolution.
 - Use `MAINTENANCE_CHECKLIST.md` to keep the notebook aligned with the live codebase.
