@@ -1,0 +1,932 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "K-Beats Radio" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "K-Beats Radio" [ref=e5]
+      - navigation [ref=e6]:
+        - link "Live" [ref=e7] [cursor=pointer]:
+          - /url: /live/
+        - link "Stream" [ref=e8] [cursor=pointer]:
+          - /url: /stream/
+        - link "Charts" [ref=e9] [cursor=pointer]:
+          - /url: /charts/
+        - link "Idols" [ref=e10] [cursor=pointer]:
+          - /url: /idols/
+        - link "Games" [ref=e11] [cursor=pointer]:
+          - /url: /games/
+        - link "Comebacks" [ref=e12] [cursor=pointer]:
+          - /url: /comeback-timeline/
+        - link "News" [ref=e13] [cursor=pointer]:
+          - /url: /news/
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]: search
+          - textbox "Search artist, song..." [ref=e17]
+        - generic [ref=e18]:
+          - button "Live On Air" [ref=e19] [cursor=pointer]:
+            - generic [ref=e23]: Live On Air
+          - link "Log In" [ref=e24] [cursor=pointer]:
+            - /url: /login/
+  - generic:
+    - dialog [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - paragraph [ref=e28]: My Station
+          - button "Close My Station" [ref=e29] [cursor=pointer]:
+            - generic [ref=e30]: close
+        - heading "Unlock My Station" [level=3] [ref=e31]
+        - paragraph [ref=e32]: Sign up to customise your K-Beats experience with your biases, eras, and live recommendations.
+      - generic [ref=e34]:
+        - link "Sign Up To Customise" [ref=e35] [cursor=pointer]:
+          - /url: /signup/
+        - link "Log In" [ref=e36] [cursor=pointer]:
+          - /url: /login/
+    - button "My Station" [ref=e37] [cursor=pointer]:
+      - generic [ref=e39]: My Station
+  - main [ref=e40]:
+    - generic [ref=e46]:
+      - generic:
+        - heading "K-BEATS K-BEATS LAUNCHED" [level=1]:
+          - generic:
+            - text: K-BEATS
+            - generic: K-BEATS
+          - generic: LAUNCHED
+        - paragraph: Experience the electrifying beat of K-Pop. 24/7 non-stop hits, exclusive interviews, and live performances direct from Korea.
+        - 'link "Featured JYP''s New Weapon: How KickFlip''s \"Eye-Poppin''\" Dance Practice Chaos Reveals a Masterplan Read Editorial arrow_forward" [ref=e48] [cursor=pointer]':
+          - /url: /blog/watch-kickflip-gets-chaotic-in-boisterous-dance-practice-video-for-eye-poppin/
+          - generic [ref=e49]: Featured
+          - generic [ref=e50]:
+            - generic [ref=e51]: "JYP's New Weapon: How KickFlip's \"Eye-Poppin'\" Dance Practice Chaos Reveals a Masterplan"
+            - generic [ref=e52]:
+              - text: Read Editorial
+              - generic [ref=e53]: arrow_forward
+      - complementary [ref=e55]:
+        - generic [ref=e58]:
+          - paragraph [ref=e59]: Broadcast signal
+          - paragraph [ref=e60]: On Air And Up Next
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - generic [ref=e69]:
+                - paragraph [ref=e70]: Live now
+                - paragraph [ref=e71]: The Happiest Girl
+                - paragraph [ref=e72]: BLACKPINK
+              - generic [ref=e73]: Live
+            - generic [ref=e75]:
+              - img "BLACKPINK The Happiest Girl" [ref=e76]
+              - button "Listen Live play_arrow" [ref=e79] [cursor=pointer]:
+                - text: Listen Live
+                - generic [ref=e80]: play_arrow
+          - generic [ref=e82]:
+            - img "AKMU FLOWERING" [ref=e83]
+            - generic [ref=e84]:
+              - generic [ref=e85]:
+                - generic [ref=e86]: Album
+                - generic [ref=e87]: 2026-04-07
+              - paragraph [ref=e88]: Next comeback
+              - heading "FLOWERING" [level=2] [ref=e89]
+              - paragraph [ref=e90]: AKMU
+          - generic [ref=e91]:
+            - paragraph [ref=e92]: Also on deck
+            - generic [ref=e93]:
+              - link "What's a Girl to Do Dayoung 04-07" [ref=e94] [cursor=pointer]:
+                - /url: /comeback-timeline/
+                - generic [ref=e95]:
+                  - paragraph [ref=e96]: What's a Girl to Do
+                  - paragraph [ref=e97]: Dayoung
+                - generic [ref=e98]: 04-07
+              - link "We Don't Go To Bed Tonight YOUNG POSSE 04-07" [ref=e99] [cursor=pointer]:
+                - /url: /comeback-timeline/
+                - generic [ref=e100]:
+                  - paragraph [ref=e101]: We Don't Go To Bed Tonight
+                  - paragraph [ref=e102]: YOUNG POSSE
+                - generic [ref=e103]: 04-07
+    - generic [ref=e105]:
+      - generic [ref=e106]:
+        - button "play_arrow" [ref=e107] [cursor=pointer]:
+          - generic [ref=e108]: play_arrow
+        - generic [ref=e109]:
+          - generic [ref=e114]: Live On Air
+          - generic [ref=e115]: Global Studio 1
+      - generic [ref=e123]:
+        - generic [ref=e124]: The Happiest Girl
+        - generic [ref=e125]: BLACKPINK
+      - generic [ref=e132]:
+        - button "volume_up" [ref=e133] [cursor=pointer]:
+          - generic [ref=e134]: volume_up
+        - link "Open Studio" [ref=e135] [cursor=pointer]:
+          - /url: /live/
+    - generic [ref=e137]:
+      - generic [ref=e138]:
+        - generic [ref=e139]:
+          - heading "TODAY'S PROGRAMMING" [level=2] [ref=e140]:
+            - text: TODAY'S
+            - text: PROGRAMMING
+          - paragraph [ref=e141]: Live broadcasts from Global Studio 1 · UK time (GMT/BST).
+        - link "Full Schedule" [ref=e142] [cursor=pointer]:
+          - /url: /schedule/
+      - generic [ref=e143]:
+        - generic [ref=e144] [cursor=pointer]:
+          - generic [ref=e145]:
+            - generic [ref=e146]: Up Next
+            - generic [ref=e148]: 14:30
+            - generic [ref=e149]: Until 16:00
+          - generic [ref=e150]:
+            - heading "Blackpink" [level=3] [ref=e151]
+            - paragraph [ref=e152]: Hosted by Yang - Expect a punchy blend from top K-pop favourites and fresh cuts, giving blackpink a bright, high-energy flow from start to finish.
+        - generic [ref=e153] [cursor=pointer]:
+          - generic [ref=e154]:
+            - generic [ref=e156]: 02:00
+            - generic [ref=e157]: Until 02:45
+          - generic [ref=e158]:
+            - heading "(G) I-DLE" [level=3] [ref=e159]
+            - paragraph [ref=e160]: Hosted by Yang - (g) I DLE threads fan favourites with newer sounds, moving cleanly between upbeat peaks and lighter melodic sections.
+    - generic [ref=e161]:
+      - generic: VOTE VOTE
+      - generic [ref=e162]:
+        - generic [ref=e163]:
+          - generic [ref=e166]: Live Poll
+          - heading "Which 2026 comeback are you most hyped for right now?" [level=2] [ref=e167]
+          - paragraph [ref=e168]: Cast your vote now.
+          - generic [ref=e169]:
+            - generic [ref=e170]: how_to_vote
+            - generic [ref=e171]:
+              - generic [ref=e172]: 3,050
+              - generic [ref=e173]: Total Votes Cast
+        - generic [ref=e175]:
+          - button "A BTS – “ARIRANG” (full group comeback, March 20, 2026)" [ref=e176] [cursor=pointer]:
+            - generic [ref=e177]:
+              - generic [ref=e178]: A
+              - generic [ref=e179]: BTS – “ARIRANG” (full group comeback, March 20, 2026)
+          - button "B BLACKPINK – 2026 comeback (highly anticipated, big-3 girl group focus this year)" [ref=e180] [cursor=pointer]:
+            - generic [ref=e181]:
+              - generic [ref=e182]: B
+              - generic [ref=e183]: BLACKPINK – 2026 comeback (highly anticipated, big-3 girl group focus this year)
+          - button "C TXT – next 2026 release (predicted big fanbase growth and viral potential)" [ref=e184] [cursor=pointer]:
+            - generic [ref=e185]:
+              - generic [ref=e186]: C
+              - generic [ref=e187]: TXT – next 2026 release (predicted big fanbase growth and viral potential)
+          - button "D NewJeans – next 2026 comeback (strong performance expected)" [ref=e188] [cursor=pointer]:
+            - generic [ref=e189]:
+              - generic [ref=e190]: D
+              - generic [ref=e191]: NewJeans – next 2026 comeback (strong performance expected)
+          - button "E Stray Kids – next 2026 era (Hyunjin already topping 2026 “fan service” style polls)" [ref=e192] [cursor=pointer]:
+            - generic [ref=e193]:
+              - generic [ref=e194]: E
+              - generic [ref=e195]: Stray Kids – next 2026 era (Hyunjin already topping 2026 “fan service” style polls)
+          - button "F Other (type your group/comeback)" [ref=e196] [cursor=pointer]:
+            - generic [ref=e197]:
+              - generic [ref=e198]: F
+              - generic [ref=e199]: Other (type your group/comeback)
+    - generic [ref=e201]:
+      - generic [ref=e202]:
+        - generic [ref=e203]:
+          - heading "TRENDING NOW" [level=2] [ref=e204]:
+            - text: TRENDING
+            - text: NOW
+          - paragraph [ref=e205]: The hottest tracks lighting up the charts right now.
+          - paragraph [ref=e206]: "Last updated: 07 Apr 2026 · 00:59 UTC"
+        - link "View Full Chart arrow_forward" [ref=e207] [cursor=pointer]:
+          - /url: /charts/
+          - text: View Full Chart
+          - generic [ref=e208]: arrow_forward
+      - generic [ref=e212]:
+        - link "11 BANG BANG IVE(아이브) - /" [ref=e213] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e214]: "11"
+          - generic [ref=e215]: BANG BANG
+          - generic [ref=e216]: IVE(아이브)
+          - generic [ref=e218]: "-"
+          - generic [ref=e219]: /
+        - link "12 404 (New Era) KiiiKiii (키키) - /" [ref=e220] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e221]: "12"
+          - generic [ref=e222]: 404 (New Era)
+          - generic [ref=e223]: KiiiKiii (키키)
+          - generic [ref=e225]: "-"
+          - generic [ref=e226]: /
+        - link "13 RUDE! Hearts2Hearts (하츠투하츠) - /" [ref=e227] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e228]: "13"
+          - generic [ref=e229]: RUDE!
+          - generic [ref=e230]: Hearts2Hearts (하츠투하츠)
+          - generic [ref=e232]: "-"
+          - generic [ref=e233]: /
+        - link "14 SWIM 방탄소년단 - /" [ref=e234] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e235]: "14"
+          - generic [ref=e236]: SWIM
+          - generic [ref=e237]: 방탄소년단
+          - generic [ref=e239]: "-"
+          - generic [ref=e240]: /
+        - link "15 Drowning WOODZ - /" [ref=e241] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e242]: "15"
+          - generic [ref=e243]: Drowning
+          - generic [ref=e244]: WOODZ
+          - generic [ref=e246]: "-"
+          - generic [ref=e247]: /
+        - link "16 사랑하게 될 거야 한로로 - /" [ref=e248] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e249]: "16"
+          - generic [ref=e250]: 사랑하게 될 거야
+          - generic [ref=e251]: 한로로
+          - generic [ref=e253]: "-"
+          - generic [ref=e254]: /
+        - link "17 0+0 한로로 - /" [ref=e255] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e256]: "17"
+          - generic [ref=e257]: 0+0
+          - generic [ref=e258]: 한로로
+          - generic [ref=e260]: "-"
+          - generic [ref=e261]: /
+        - link "18 Good Goodbye 화사(HWASA) - /" [ref=e262] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e263]: "18"
+          - generic [ref=e264]: Good Goodbye
+          - generic [ref=e265]: 화사(HWASA)
+          - generic [ref=e267]: "-"
+          - generic [ref=e268]: /
+        - link "19 Body to Body 방탄소년단 - /" [ref=e269] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e270]: "19"
+          - generic [ref=e271]: Body to Body
+          - generic [ref=e272]: 방탄소년단
+          - generic [ref=e274]: "-"
+          - generic [ref=e275]: /
+        - link "20 멸종위기사랑 이찬혁 - /" [ref=e276] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e277]: "20"
+          - generic [ref=e278]: 멸종위기사랑
+          - generic [ref=e279]: 이찬혁
+          - generic [ref=e281]: "-"
+          - generic [ref=e282]: /
+        - link "11 BANG BANG IVE(아이브) - /" [ref=e283] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e284]: "11"
+          - generic [ref=e285]: BANG BANG
+          - generic [ref=e286]: IVE(아이브)
+          - generic [ref=e288]: "-"
+          - generic [ref=e289]: /
+        - link "12 404 (New Era) KiiiKiii (키키) - /" [ref=e290] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e291]: "12"
+          - generic [ref=e292]: 404 (New Era)
+          - generic [ref=e293]: KiiiKiii (키키)
+          - generic [ref=e295]: "-"
+          - generic [ref=e296]: /
+        - link "13 RUDE! Hearts2Hearts (하츠투하츠) - /" [ref=e297] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e298]: "13"
+          - generic [ref=e299]: RUDE!
+          - generic [ref=e300]: Hearts2Hearts (하츠투하츠)
+          - generic [ref=e302]: "-"
+          - generic [ref=e303]: /
+        - link "14 SWIM 방탄소년단 - /" [ref=e304] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e305]: "14"
+          - generic [ref=e306]: SWIM
+          - generic [ref=e307]: 방탄소년단
+          - generic [ref=e309]: "-"
+          - generic [ref=e310]: /
+        - link "15 Drowning WOODZ - /" [ref=e311] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e312]: "15"
+          - generic [ref=e313]: Drowning
+          - generic [ref=e314]: WOODZ
+          - generic [ref=e316]: "-"
+          - generic [ref=e317]: /
+        - link "16 사랑하게 될 거야 한로로 - /" [ref=e318] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e319]: "16"
+          - generic [ref=e320]: 사랑하게 될 거야
+          - generic [ref=e321]: 한로로
+          - generic [ref=e323]: "-"
+          - generic [ref=e324]: /
+        - link "17 0+0 한로로 - /" [ref=e325] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e326]: "17"
+          - generic [ref=e327]: 0+0
+          - generic [ref=e328]: 한로로
+          - generic [ref=e330]: "-"
+          - generic [ref=e331]: /
+        - link "18 Good Goodbye 화사(HWASA) - /" [ref=e332] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e333]: "18"
+          - generic [ref=e334]: Good Goodbye
+          - generic [ref=e335]: 화사(HWASA)
+          - generic [ref=e337]: "-"
+          - generic [ref=e338]: /
+        - link "19 Body to Body 방탄소년단 - /" [ref=e339] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e340]: "19"
+          - generic [ref=e341]: Body to Body
+          - generic [ref=e342]: 방탄소년단
+          - generic [ref=e344]: "-"
+          - generic [ref=e345]: /
+        - link "20 멸종위기사랑 이찬혁 - /" [ref=e346] [cursor=pointer]:
+          - /url: /charts/
+          - generic [ref=e347]: "20"
+          - generic [ref=e348]: 멸종위기사랑
+          - generic [ref=e349]: 이찬혁
+          - generic [ref=e351]: "-"
+          - generic [ref=e352]: /
+      - generic [ref=e353]:
+        - generic [ref=e355] [cursor=pointer]:
+          - generic [ref=e356]:
+            - generic [ref=e357]: "1"
+            - generic [ref=e359]: "-"
+          - generic [ref=e360]:
+            - img "BANG BANG - IVE(아이브)" [ref=e361]
+            - generic [ref=e363]: play_arrow
+          - generic [ref=e364]:
+            - heading "BANG BANG" [level=3] [ref=e365]
+            - paragraph [ref=e366]: IVE(아이브)
+          - generic [ref=e367]:
+            - generic [ref=e368]: HOT 10
+            - generic [ref=e369]: Global
+        - generic [ref=e371] [cursor=pointer]:
+          - generic [ref=e372]:
+            - generic [ref=e373]: "2"
+            - generic [ref=e375]: "-"
+          - generic [ref=e376]:
+            - img "404 (New Era) - KiiiKiii (키키)" [ref=e377]
+            - generic [ref=e379]: play_arrow
+          - generic [ref=e380]:
+            - heading "404 (New Era)" [level=3] [ref=e381]
+            - paragraph [ref=e382]: KiiiKiii (키키)
+          - generic [ref=e383]:
+            - generic [ref=e384]: HOT 10
+            - generic [ref=e385]: Global
+        - generic [ref=e387] [cursor=pointer]:
+          - generic [ref=e388]:
+            - generic [ref=e389]: "3"
+            - generic [ref=e391]: "-"
+          - generic [ref=e392]:
+            - img "RUDE! - Hearts2Hearts (하츠투하츠)" [ref=e393]
+            - generic [ref=e395]: play_arrow
+          - generic [ref=e396]:
+            - heading "RUDE!" [level=3] [ref=e397]
+            - paragraph [ref=e398]: Hearts2Hearts (하츠투하츠)
+          - generic [ref=e399]:
+            - generic [ref=e400]: HOT 10
+            - generic [ref=e401]: Global
+        - generic [ref=e403] [cursor=pointer]:
+          - generic [ref=e404]:
+            - generic [ref=e405]: "4"
+            - generic [ref=e407]: "-"
+          - generic [ref=e408]:
+            - img "SWIM - 방탄소년단" [ref=e409]
+            - generic [ref=e411]: play_arrow
+          - generic [ref=e412]:
+            - heading "SWIM" [level=3] [ref=e413]
+            - paragraph [ref=e414]: 방탄소년단
+          - generic [ref=e415]:
+            - generic [ref=e416]: HOT 10
+            - generic [ref=e417]: Global
+        - generic [ref=e419] [cursor=pointer]:
+          - generic [ref=e420]:
+            - generic [ref=e421]: "5"
+            - generic [ref=e423]: "-"
+          - generic [ref=e424]:
+            - img "Drowning - WOODZ" [ref=e425]
+            - generic [ref=e427]: play_arrow
+          - generic [ref=e428]:
+            - heading "Drowning" [level=3] [ref=e429]
+            - paragraph [ref=e430]: WOODZ
+          - generic [ref=e431]:
+            - generic [ref=e432]: HOT 10
+            - generic [ref=e433]: Global
+        - generic [ref=e435] [cursor=pointer]:
+          - generic [ref=e436]:
+            - generic [ref=e437]: "6"
+            - generic [ref=e439]: "-"
+          - generic [ref=e440]:
+            - img "사랑하게 될 거야 - 한로로" [ref=e441]
+            - generic [ref=e443]: play_arrow
+          - generic [ref=e444]:
+            - heading "사랑하게 될 거야" [level=3] [ref=e445]
+            - paragraph [ref=e446]: 한로로
+          - generic [ref=e447]:
+            - generic [ref=e448]: HOT 10
+            - generic [ref=e449]: Global
+        - generic [ref=e451] [cursor=pointer]:
+          - generic [ref=e452]:
+            - generic [ref=e453]: "7"
+            - generic [ref=e455]: "-"
+          - generic [ref=e456]:
+            - img "0+0 - 한로로" [ref=e457]
+            - generic [ref=e459]: play_arrow
+          - generic [ref=e460]:
+            - heading "0+0" [level=3] [ref=e461]
+            - paragraph [ref=e462]: 한로로
+          - generic [ref=e463]:
+            - generic [ref=e464]: HOT 10
+            - generic [ref=e465]: Global
+        - generic [ref=e467] [cursor=pointer]:
+          - generic [ref=e468]:
+            - generic [ref=e469]: "8"
+            - generic [ref=e471]: "-"
+          - generic [ref=e472]:
+            - img "Good Goodbye - 화사(HWASA)" [ref=e473]
+            - generic [ref=e475]: play_arrow
+          - generic [ref=e476]:
+            - heading "Good Goodbye" [level=3] [ref=e477]
+            - paragraph [ref=e478]: 화사(HWASA)
+          - generic [ref=e479]:
+            - generic [ref=e480]: HOT 10
+            - generic [ref=e481]: Global
+        - generic [ref=e483] [cursor=pointer]:
+          - generic [ref=e484]:
+            - generic [ref=e485]: "9"
+            - generic [ref=e487]: "-"
+          - generic [ref=e488]:
+            - img "Body to Body - 방탄소년단" [ref=e489]
+            - generic [ref=e491]: play_arrow
+          - generic [ref=e492]:
+            - heading "Body to Body" [level=3] [ref=e493]
+            - paragraph [ref=e494]: 방탄소년단
+          - generic [ref=e495]:
+            - generic [ref=e496]: HOT 10
+            - generic [ref=e497]: Global
+        - generic [ref=e499] [cursor=pointer]:
+          - generic [ref=e500]:
+            - generic [ref=e501]: "10"
+            - generic [ref=e503]: "-"
+          - generic [ref=e504]:
+            - img "멸종위기사랑 - 이찬혁" [ref=e505]
+            - generic [ref=e507]: play_arrow
+          - generic [ref=e508]:
+            - heading "멸종위기사랑" [level=3] [ref=e509]
+            - paragraph [ref=e510]: 이찬혁
+          - generic [ref=e511]:
+            - generic [ref=e512]: HOT 10
+            - generic [ref=e513]: Global
+    - generic [ref=e514]:
+      - img "Stray Kids Featured Artist" [ref=e516]
+      - generic [ref=e518]:
+        - generic [ref=e519]:
+          - generic [ref=e521]: Artist of the Week
+          - heading "STRAY KIDS" [level=2] [ref=e522]:
+            - generic [ref=e523]: STRAY
+            - generic [ref=e524]: KIDS
+          - paragraph [ref=e525]: Experience the explosive energy of this generation's most dynamic self-producing idols. Dive into our exclusive editorial and curated playlist.
+          - link "Explore Profile" [ref=e527] [cursor=pointer]:
+            - /url: /idols/stray-kids/
+        - generic [ref=e528]:
+          - heading "Essential Tracks" [level=3] [ref=e529]
+          - generic [ref=e530]:
+            - link "01. S-Class play_arrow" [ref=e531] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e532]: 01. S-Class
+              - generic [ref=e533]: play_arrow
+            - link "02. MANIAC play_arrow" [ref=e534] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e535]: 02. MANIAC
+              - generic [ref=e536]: play_arrow
+            - link "03. God's Menu play_arrow" [ref=e537] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e538]: 03. God's Menu
+              - generic [ref=e539]: play_arrow
+    - generic [ref=e541]:
+      - generic [ref=e542]:
+        - generic [ref=e543]:
+          - heading "UPCOMING COMEBACKS" [level=2] [ref=e544]:
+            - text: UPCOMING
+            - text: COMEBACKS
+          - paragraph [ref=e545]: The official schedule for upcoming K-Pop releases and debuts.
+        - link "Full Calendar arrow_forward" [ref=e546] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - text: Full Calendar
+          - generic [ref=e547]: arrow_forward
+      - generic [ref=e551]:
+        - link "04-08 Definition AMPERS&ONE Mini Album /" [ref=e552] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e553]: 04-08
+          - generic [ref=e554]: Definition
+          - generic [ref=e555]: AMPERS&ONE
+          - generic [ref=e556]: Mini Album
+          - generic [ref=e557]: /
+        - link "04-08 Sur(fp)hase Kang Seung Sik Single /" [ref=e558] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e559]: 04-08
+          - generic [ref=e560]: Sur(fp)hase
+          - generic [ref=e561]: Kang Seung Sik
+          - generic [ref=e562]: Single
+          - generic [ref=e563]: /
+        - link "04-08 Runaway RESCENE Single /" [ref=e564] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e565]: 04-08
+          - generic [ref=e566]: Runaway
+          - generic [ref=e567]: RESCENE
+          - generic [ref=e568]: Single
+          - generic [ref=e569]: /
+        - link "04-08 To Mars Gaho Single /" [ref=e570] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e571]: 04-08
+          - generic [ref=e572]: To Mars
+          - generic [ref=e573]: Gaho
+          - generic [ref=e574]: Single
+          - generic [ref=e575]: /
+        - link "04-08 KEYVITUP KEYVITUP EP /" [ref=e576] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e577]: 04-08
+          - generic [ref=e578]: KEYVITUP
+          - generic [ref=e579]: KEYVITUP
+          - generic [ref=e580]: EP
+          - generic [ref=e581]: /
+        - link "04-08 Bad Angel Lisa Single /" [ref=e582] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e583]: 04-08
+          - generic [ref=e584]: Bad Angel
+          - generic [ref=e585]: Lisa
+          - generic [ref=e586]: Single
+          - generic [ref=e587]: /
+        - link "04-09 So Cute Hwasa Single /" [ref=e588] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e589]: 04-09
+          - generic [ref=e590]: So Cute
+          - generic [ref=e591]: Hwasa
+          - generic [ref=e592]: Single
+          - generic [ref=e593]: /
+        - link "04-09 Unica LOVEONE Single /" [ref=e594] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e595]: 04-09
+          - generic [ref=e596]: Unica
+          - generic [ref=e597]: LOVEONE
+          - generic [ref=e598]: Single
+          - generic [ref=e599]: /
+        - link "04-09 Re:frame AWU Mini Album /" [ref=e600] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e601]: 04-09
+          - generic [ref=e602]: Re:frame
+          - generic [ref=e603]: AWU
+          - generic [ref=e604]: Mini Album
+          - generic [ref=e605]: /
+        - link "04-09 PINKY UP KATSEYE Single /" [ref=e606] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e607]: 04-09
+          - generic [ref=e608]: PINKY UP
+          - generic [ref=e609]: KATSEYE
+          - generic [ref=e610]: Single
+          - generic [ref=e611]: /
+        - link "04-09 PURPLE TAPE pH-1 Album /" [ref=e612] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e613]: 04-09
+          - generic [ref=e614]: PURPLE TAPE
+          - generic [ref=e615]: pH-1
+          - generic [ref=e616]: Album
+          - generic [ref=e617]: /
+        - 'link "04-13 1. Got Hooked: An Addictive Symphony MODYSSEY Album /" [ref=e618] [cursor=pointer]':
+          - /url: /comeback-timeline/
+          - generic [ref=e619]: 04-13
+          - generic [ref=e620]: "1. Got Hooked: An Addictive Symphony"
+          - generic [ref=e621]: MODYSSEY
+          - generic [ref=e622]: Album
+          - generic [ref=e623]: /
+        - link "04-13 Caligo Pt.2 PLAVE Mini Album /" [ref=e624] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e625]: 04-13
+          - generic [ref=e626]: Caligo Pt.2
+          - generic [ref=e627]: PLAVE
+          - generic [ref=e628]: Mini Album
+          - generic [ref=e629]: /
+        - 'link "04-13 7TH YEAR: A Moment of Stillness in the Thorns TXT Mini Album /" [ref=e630] [cursor=pointer]':
+          - /url: /comeback-timeline/
+          - generic [ref=e631]: 04-13
+          - generic [ref=e632]: "7TH YEAR: A Moment of Stillness in the Thorns"
+          - generic [ref=e633]: TXT
+          - generic [ref=e634]: Mini Album
+          - generic [ref=e635]: /
+        - link "04-15 Don't Look for Me ANGEL NOISE Single /" [ref=e636] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e637]: 04-15
+          - generic [ref=e638]: Don't Look for Me
+          - generic [ref=e639]: ANGEL NOISE
+          - generic [ref=e640]: Single
+          - generic [ref=e641]: /
+        - link "04-15 As If ifeye EP /" [ref=e642] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e643]: 04-15
+          - generic [ref=e644]: As If
+          - generic [ref=e645]: ifeye
+          - generic [ref=e646]: EP
+          - generic [ref=e647]: /
+        - link "04-08 Definition AMPERS&ONE Mini Album /" [ref=e648] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e649]: 04-08
+          - generic [ref=e650]: Definition
+          - generic [ref=e651]: AMPERS&ONE
+          - generic [ref=e652]: Mini Album
+          - generic [ref=e653]: /
+        - link "04-08 Sur(fp)hase Kang Seung Sik Single /" [ref=e654] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e655]: 04-08
+          - generic [ref=e656]: Sur(fp)hase
+          - generic [ref=e657]: Kang Seung Sik
+          - generic [ref=e658]: Single
+          - generic [ref=e659]: /
+        - link "04-08 Runaway RESCENE Single /" [ref=e660] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e661]: 04-08
+          - generic [ref=e662]: Runaway
+          - generic [ref=e663]: RESCENE
+          - generic [ref=e664]: Single
+          - generic [ref=e665]: /
+        - link "04-08 To Mars Gaho Single /" [ref=e666] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e667]: 04-08
+          - generic [ref=e668]: To Mars
+          - generic [ref=e669]: Gaho
+          - generic [ref=e670]: Single
+          - generic [ref=e671]: /
+        - link "04-08 KEYVITUP KEYVITUP EP /" [ref=e672] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e673]: 04-08
+          - generic [ref=e674]: KEYVITUP
+          - generic [ref=e675]: KEYVITUP
+          - generic [ref=e676]: EP
+          - generic [ref=e677]: /
+        - link "04-08 Bad Angel Lisa Single /" [ref=e678] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e679]: 04-08
+          - generic [ref=e680]: Bad Angel
+          - generic [ref=e681]: Lisa
+          - generic [ref=e682]: Single
+          - generic [ref=e683]: /
+        - link "04-09 So Cute Hwasa Single /" [ref=e684] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e685]: 04-09
+          - generic [ref=e686]: So Cute
+          - generic [ref=e687]: Hwasa
+          - generic [ref=e688]: Single
+          - generic [ref=e689]: /
+        - link "04-09 Unica LOVEONE Single /" [ref=e690] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e691]: 04-09
+          - generic [ref=e692]: Unica
+          - generic [ref=e693]: LOVEONE
+          - generic [ref=e694]: Single
+          - generic [ref=e695]: /
+        - link "04-09 Re:frame AWU Mini Album /" [ref=e696] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e697]: 04-09
+          - generic [ref=e698]: Re:frame
+          - generic [ref=e699]: AWU
+          - generic [ref=e700]: Mini Album
+          - generic [ref=e701]: /
+        - link "04-09 PINKY UP KATSEYE Single /" [ref=e702] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e703]: 04-09
+          - generic [ref=e704]: PINKY UP
+          - generic [ref=e705]: KATSEYE
+          - generic [ref=e706]: Single
+          - generic [ref=e707]: /
+        - link "04-09 PURPLE TAPE pH-1 Album /" [ref=e708] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e709]: 04-09
+          - generic [ref=e710]: PURPLE TAPE
+          - generic [ref=e711]: pH-1
+          - generic [ref=e712]: Album
+          - generic [ref=e713]: /
+        - 'link "04-13 1. Got Hooked: An Addictive Symphony MODYSSEY Album /" [ref=e714] [cursor=pointer]':
+          - /url: /comeback-timeline/
+          - generic [ref=e715]: 04-13
+          - generic [ref=e716]: "1. Got Hooked: An Addictive Symphony"
+          - generic [ref=e717]: MODYSSEY
+          - generic [ref=e718]: Album
+          - generic [ref=e719]: /
+        - link "04-13 Caligo Pt.2 PLAVE Mini Album /" [ref=e720] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e721]: 04-13
+          - generic [ref=e722]: Caligo Pt.2
+          - generic [ref=e723]: PLAVE
+          - generic [ref=e724]: Mini Album
+          - generic [ref=e725]: /
+        - 'link "04-13 7TH YEAR: A Moment of Stillness in the Thorns TXT Mini Album /" [ref=e726] [cursor=pointer]':
+          - /url: /comeback-timeline/
+          - generic [ref=e727]: 04-13
+          - generic [ref=e728]: "7TH YEAR: A Moment of Stillness in the Thorns"
+          - generic [ref=e729]: TXT
+          - generic [ref=e730]: Mini Album
+          - generic [ref=e731]: /
+        - link "04-15 Don't Look for Me ANGEL NOISE Single /" [ref=e732] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e733]: 04-15
+          - generic [ref=e734]: Don't Look for Me
+          - generic [ref=e735]: ANGEL NOISE
+          - generic [ref=e736]: Single
+          - generic [ref=e737]: /
+        - link "04-15 As If ifeye EP /" [ref=e738] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e739]: 04-15
+          - generic [ref=e740]: As If
+          - generic [ref=e741]: ifeye
+          - generic [ref=e742]: EP
+          - generic [ref=e743]: /
+      - generic [ref=e745]:
+        - link "04 07 FLOWERING AKMU Album Scheduled 🎉 RELEASED! AKMU FLOWERING" [ref=e746] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e747]:
+            - generic [ref=e748]:
+              - paragraph [ref=e749]: "04"
+              - paragraph [ref=e750]: "07"
+            - generic [ref=e751]:
+              - heading "FLOWERING" [level=4] [ref=e752]
+              - paragraph [ref=e753]: AKMU
+              - generic [ref=e754]:
+                - generic [ref=e755]: Album
+                - generic [ref=e756]: Scheduled
+                - generic [ref=e757]: 🎉 RELEASED!
+            - img "AKMU FLOWERING" [ref=e759]
+        - link "04 07 What's a Girl to Do Dayoung Single Scheduled 🎉 RELEASED! Dayoung What's a Girl to Do" [ref=e760] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e761]:
+            - generic [ref=e762]:
+              - paragraph [ref=e763]: "04"
+              - paragraph [ref=e764]: "07"
+            - generic [ref=e765]:
+              - heading "What's a Girl to Do" [level=4] [ref=e766]
+              - paragraph [ref=e767]: Dayoung
+              - generic [ref=e768]:
+                - generic [ref=e769]: Single
+                - generic [ref=e770]: Scheduled
+                - generic [ref=e771]: 🎉 RELEASED!
+            - img "Dayoung What's a Girl to Do" [ref=e773]
+        - link "04 07 We Don't Go To Bed Tonight YOUNG POSSE Single Scheduled 🎉 RELEASED! YOUNG POSSE We Don't Go To Bed Tonight" [ref=e774] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e775]:
+            - generic [ref=e776]:
+              - paragraph [ref=e777]: "04"
+              - paragraph [ref=e778]: "07"
+            - generic [ref=e779]:
+              - heading "We Don't Go To Bed Tonight" [level=4] [ref=e780]
+              - paragraph [ref=e781]: YOUNG POSSE
+              - generic [ref=e782]:
+                - generic [ref=e783]: Single
+                - generic [ref=e784]: Scheduled
+                - generic [ref=e785]: 🎉 RELEASED!
+            - img "YOUNG POSSE We Don't Go To Bed Tonight" [ref=e787]
+        - link "04 08 The First Wave hrtz.wav Mini Album Scheduled 0d 11h 41m hrtz.wav The First Wave" [ref=e788] [cursor=pointer]:
+          - /url: /comeback-timeline/
+          - generic [ref=e789]:
+            - generic [ref=e790]:
+              - paragraph [ref=e791]: "04"
+              - paragraph [ref=e792]: "08"
+            - generic [ref=e793]:
+              - heading "The First Wave" [level=4] [ref=e794]
+              - paragraph [ref=e795]: hrtz.wav
+              - generic [ref=e796]:
+                - generic [ref=e797]: Mini Album
+                - generic [ref=e798]: Scheduled
+                - generic [ref=e799]: 0d 11h 41m
+            - img "hrtz.wav The First Wave" [ref=e801]
+    - generic [ref=e803]:
+      - generic [ref=e804]:
+        - generic [ref=e805]:
+          - heading "LATEST NEWS" [level=2] [ref=e806]:
+            - text: LATEST
+            - text: NEWS
+          - paragraph [ref=e807]: Stay updated with the latest in the K-Pop universe.
+        - link "Read More News arrow_forward" [ref=e808] [cursor=pointer]:
+          - /url: /news/
+          - text: Read More News
+          - generic [ref=e809]: arrow_forward
+      - generic [ref=e810]:
+        - 'link "JYP''s New Weapon: How KickFlip''s \"Eye-Poppin''\" Dance Practice Chaos Reveals a Masterplan News Apr 07, 2026 JYP''s New Weapon: How KickFlip''s \"Eye-Poppin''\" Dance Practice Chaos Reveals a Masterplan Beyond the laughter and slipped boards lies a calculated move in the hyper-competitive boy group arena. Read Story east" [ref=e811] [cursor=pointer]':
+          - /url: /blog/watch-kickflip-gets-chaotic-in-boisterous-dance-practice-video-for-eye-poppin/
+          - generic [ref=e812]:
+            - 'img "JYP''s New Weapon: How KickFlip''s \"Eye-Poppin''\" Dance Practice Chaos Reveals a Masterplan" [ref=e813]'
+            - generic [ref=e814]: News
+          - generic [ref=e815]:
+            - text: Apr 07, 2026
+            - 'heading "JYP''s New Weapon: How KickFlip''s \"Eye-Poppin''\" Dance Practice Chaos Reveals a Masterplan" [level=3] [ref=e816]'
+            - paragraph [ref=e817]: Beyond the laughter and slipped boards lies a calculated move in the hyper-competitive boy group arena.
+            - generic [ref=e818]:
+              - text: Read Story
+              - generic [ref=e819]: east
+        - 'link "The New Vanguard: TWS Shatters Expectations, Topping March''s Rising Singer Brand Reputation Rankings Comeback Apr 07, 2026 The New Vanguard: TWS Shatters Expectations, Topping March''s Rising Singer Brand Reputation Rankings How a Rookie Group''s \"Sparkling\" Debut Ignited the Chart and Redefined Industry Metrics Read Story east" [ref=e820] [cursor=pointer]':
+          - /url: /blog/rising-singer-brand-reputation-rankings-announced/
+          - generic [ref=e821]:
+            - 'img "The New Vanguard: TWS Shatters Expectations, Topping March''s Rising Singer Brand Reputation Rankings" [ref=e822]'
+            - generic [ref=e823]: Comeback
+          - generic [ref=e824]:
+            - text: Apr 07, 2026
+            - 'heading "The New Vanguard: TWS Shatters Expectations, Topping March''s Rising Singer Brand Reputation Rankings" [level=3] [ref=e825]'
+            - paragraph [ref=e826]: How a Rookie Group's "Sparkling" Debut Ignited the Chart and Redefined Industry Metrics
+            - generic [ref=e827]:
+              - text: Read Story
+              - generic [ref=e828]: east
+        - 'link "The G-Dragon Effect: How a Single Artist''s Cosmic Revenue Pulled Galaxy Corporation from the Brink Comeback Apr 07, 2026 The G-Dragon Effect: How a Single Artist''s Cosmic Revenue Pulled Galaxy Corporation from the Brink An in-depth look at the business of a legend and what it reveals about the modern K-Pop ecosystem. Read Story east" [ref=e829] [cursor=pointer]':
+          - /url: /blog/g-dragons-astronomical-income-singlehandedly-drags-his-label-out-of-loss/
+          - generic [ref=e830]:
+            - 'img "The G-Dragon Effect: How a Single Artist''s Cosmic Revenue Pulled Galaxy Corporation from the Brink" [ref=e831]'
+            - generic [ref=e832]: Comeback
+          - generic [ref=e833]:
+            - text: Apr 07, 2026
+            - 'heading "The G-Dragon Effect: How a Single Artist''s Cosmic Revenue Pulled Galaxy Corporation from the Brink" [level=3] [ref=e834]'
+            - paragraph [ref=e835]: An in-depth look at the business of a legend and what it reveals about the modern K-Pop ecosystem.
+            - generic [ref=e836]:
+              - text: Read Story
+              - generic [ref=e837]: east
+    - generic [ref=e839]:
+      - generic [ref=e840]:
+        - heading "NEVER MISS A BEAT" [level=2] [ref=e841]:
+          - text: NEVER MISS
+          - text: A BEAT
+        - paragraph [ref=e842]: Join the community. Get exclusive access to artist fan-signs, concert ticket giveaways, and weekly chart updates.
+      - generic [ref=e844]:
+        - textbox "Enter your email address" [ref=e845]
+        - button "SUBSCRIBE NOW" [ref=e846] [cursor=pointer]
+  - contentinfo [ref=e847]:
+    - generic [ref=e848]:
+      - generic [ref=e849]:
+        - generic [ref=e850]:
+          - heading "K-BEATS RADIO" [level=3] [ref=e851]
+          - paragraph [ref=e852]: Est. 2026 · Cornwall, UK
+          - paragraph [ref=e853]: Your leading source for K-pop music, news, and culture. Bringing the heart of Seoul from Cornwall to fans worldwide.
+          - generic [ref=e854]:
+            - link "Facebook" [ref=e855] [cursor=pointer]:
+              - /url: https://www.facebook.com/
+              - generic [ref=e856]: public
+            - link "News" [ref=e857] [cursor=pointer]:
+              - /url: /news/
+              - generic [ref=e858]: article
+            - link "Live" [ref=e859] [cursor=pointer]:
+              - /url: /live/
+              - generic [ref=e860]: music_note
+          - link "phone_iphone Download the App" [ref=e861] [cursor=pointer]:
+            - /url: /promo/
+            - generic [ref=e862]: phone_iphone
+            - text: Download the App
+        - generic [ref=e863]:
+          - generic [ref=e864]:
+            - heading "Music" [level=4] [ref=e865]
+            - list [ref=e866]:
+              - listitem [ref=e867]:
+                - link "Groups" [ref=e868] [cursor=pointer]:
+                  - /url: /idols/?type=groups
+              - listitem [ref=e869]:
+                - link "Male Solo Artists" [ref=e870] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=male
+              - listitem [ref=e871]:
+                - link "Female Solo Artists" [ref=e872] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=female
+              - listitem [ref=e873]:
+                - link "Tours" [ref=e874] [cursor=pointer]:
+                  - /url: /comeback-timeline/
+          - generic [ref=e875]:
+            - heading "Station" [level=4] [ref=e876]
+            - list [ref=e877]:
+              - listitem [ref=e878]:
+                - link "About Us" [ref=e879] [cursor=pointer]:
+                  - /url: /about/
+              - listitem [ref=e880]:
+                - link "Presenters" [ref=e881] [cursor=pointer]:
+                  - /url: /presenters/
+              - listitem [ref=e882]:
+                - link "Schedule" [ref=e883] [cursor=pointer]:
+                  - /url: /schedule/
+              - listitem [ref=e884]:
+                - link "Mobile App" [ref=e885] [cursor=pointer]:
+                  - /url: /promo/
+          - generic [ref=e886]:
+            - heading "Community" [level=4] [ref=e887]
+            - list [ref=e888]:
+              - listitem [ref=e889]:
+                - link "Request Song" [ref=e890] [cursor=pointer]:
+                  - /url: /request/
+              - listitem [ref=e891]:
+                - link "Fan Club" [ref=e892] [cursor=pointer]:
+                  - /url: /fan-clubs/
+              - listitem [ref=e893]:
+                - link "Contests" [ref=e894] [cursor=pointer]:
+                  - /url: /contests/
+              - listitem [ref=e895]:
+                - link "Merch Shop" [ref=e896] [cursor=pointer]:
+                  - /url: /coming-soon/
+          - generic [ref=e897]:
+            - heading "Shop" [level=4] [ref=e898]
+            - list [ref=e899]:
+              - listitem [ref=e900]:
+                - link "Jumpers" [ref=e901] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e902]:
+                - link "T-Shirts" [ref=e903] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e904]:
+                - link "Merch" [ref=e905] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e906]:
+                - link "Albums" [ref=e907] [cursor=pointer]:
+                  - /url: /coming-soon/
+      - generic [ref=e908]:
+        - paragraph [ref=e909]: © 2026 K-Beats Radio. All rights reserved.
+        - generic [ref=e910]:
+          - link "Privacy Policy" [ref=e911] [cursor=pointer]:
+            - /url: /legal/privacy-policy/
+          - link "Cookie Policy" [ref=e912] [cursor=pointer]:
+            - /url: /legal/cookie-policy/
+          - link "Terms of Service" [ref=e913] [cursor=pointer]:
+            - /url: /legal/terms-of-service/

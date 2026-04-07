@@ -21,20 +21,39 @@
     backdrop-filter: blur(0px);
     border-bottom: 1px solid transparent;
   }
+  .site-logo {
+    display: block;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+    max-width: min(72vw, 360px);
+    filter:
+      drop-shadow(0 0 8px rgba(0, 240, 255, 0.95))
+      drop-shadow(0 0 18px rgba(0, 240, 255, 0.55))
+      drop-shadow(0 0 10px rgba(244, 37, 192, 0.82))
+      drop-shadow(0 0 22px rgba(244, 37, 192, 0.42));
+  }
+  @media (min-width: 1024px) {
+    .site-logo {
+      max-width: min(34vw, 520px);
+    }
+  }
     [x-cloak] { display: none !important; }
 </style>
 
 {% if request.resolver_match.url_name == '__legacy_live_header_disabled__' %}
 <!-- ───── LIVE PAGE HEADER ───── -->
-<header id="main-header" class="fixed top-0 left-0 right-0 z-50 px-6 py-8 bg-transparent border-none">
-    <div class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 md:grid-cols-[auto_1fr_auto]">
-        <a href="{% url 'home' %}" class="flex items-center gap-0 group shrink-0 py-2">
-            <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
-            <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
-            <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
+<header id="main-header" class="fixed top-0 left-0 right-0 z-50 px-6 py-5 bg-transparent border-none md:absolute md:py-8">
+    <div class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 lg:gap-8 lg:grid-cols-[auto_1fr_auto]">
+        <a href="{% url 'home' %}" class="flex items-center group shrink-0 py-2">
+            <img
+                src="{% static 'core/img/logo.webp' %}"
+                alt="K-Beats Radio"
+                class="site-logo h-[70px] lg:h-[100px]"
+            />
         </a>
-        <div class="hidden min-w-0 justify-center md:flex">
-            <nav id="desktop-primary-nav" data-track-category="global_nav" class="hidden md:flex items-center justify-center gap-6">
+        <div class="hidden min-w-0 justify-center lg:flex">
+            <nav id="desktop-primary-nav" data-track-category="global_nav" class="hidden lg:flex items-center justify-center gap-6">
                 <a data-track="nav_live" class="{% if request.resolver_match.url_name == 'live' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
                 <a data-track="nav_stream" class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
                 <a data-track="nav_charts" class="{% if request.resolver_match.url_name == 'charts' %}text-primary nav-cinzel font-normal uppercase tracking-wide neon-text-pink underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-300 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
@@ -72,26 +91,28 @@
             </a>
             <!-- Auth -->
             {% if user.is_authenticated %}
-            <a data-track="nav_account" data-track-category="global_header" href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
+            <a data-track="nav_account" data-track-category="global_header" href="{% url 'dashboard' %}" title="Dashboard" class="hidden lg:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
                 <span class="material-symbols-outlined text-xl">account_circle</span>
             </a>
             {% else %}
-            <a data-track="nav_login" data-track-category="global_header" class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
+            <a data-track="nav_login" data-track-category="global_header" class="hidden lg:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
             {% endif %}
         </div>
     </div>
 </header>
 {% else %}
 <!-- ───── STANDARD HEADER ───── -->
-<header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-5 sm:py-8 border-none">
-    <div class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 min-w-0 md:grid-cols-[auto_1fr_auto]">
-        <a class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
-            <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
-            <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
-            <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
+<header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-5 border-none md:absolute md:py-8">
+    <div class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 lg:gap-8 min-w-0 lg:grid-cols-[auto_1fr_auto]">
+        <a class="flex items-center group py-2 shrink-0" href="{% url 'home' %}">
+            <img
+                src="{% static 'core/img/logo.webp' %}"
+                alt="K-Beats Radio"
+                class="site-logo h-[70px] lg:h-[100px]"
+            />
         </a>
-        <div class="hidden min-w-0 justify-center md:flex">
-            <nav id="desktop-primary-nav" data-track-category="global_nav" class="hidden md:flex items-center justify-center gap-6">
+        <div class="hidden min-w-0 justify-center lg:flex">
+            <nav id="desktop-primary-nav" data-track-category="global_nav" class="hidden lg:flex items-center justify-center gap-6">
                 <a data-track="nav_live" class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
                 <a data-track="nav_stream" class="{% if request.resolver_match.url_name == 'stream_hub' or request.resolver_match.url_name == 'stream_player' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'stream_hub' %}">Stream</a>
                 <a data-track="nav_charts" class="{% if request.resolver_match.url_name == 'charts' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
@@ -130,11 +151,11 @@
                     <span class="text-[10px] md:text-xs uppercase tracking-widest">Live On Air</span>
                 </button>
                 {% if user.is_authenticated %}
-                <a data-track="nav_account" data-track-category="global_header" href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
+                <a data-track="nav_account" data-track-category="global_header" href="{% url 'dashboard' %}" title="Dashboard" class="hidden lg:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
                     <span class="material-symbols-outlined text-xl">account_circle</span>
                 </a>
                 {% else %}
-                <a data-track="nav_login" data-track-category="global_header" class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
+                <a data-track="nav_login" data-track-category="global_header" class="hidden lg:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
                 {% endif %}
             </div>
         </div>
@@ -148,7 +169,7 @@
     type="button"
     data-track="mobile_menu_open"
     data-track-category="mobile_menu"
-    class="md:hidden fixed bottom-4 right-4 z-[79] bg-primary text-black border border-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_#ffffff] transition-opacity flex items-center gap-2"
+    class="lg:hidden fixed bottom-4 right-4 z-[79] bg-primary text-black border border-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_#ffffff] transition-opacity flex items-center gap-2"
     aria-expanded="false"
     aria-controls="mobile-site-menu-panel"
 >
@@ -158,7 +179,7 @@
 
 <div
     id="mobile-site-menu-panel"
-    class="md:hidden fixed inset-0 z-[80] bg-black/95 backdrop-blur-md p-5 pt-8 pb-24 translate-y-full opacity-0 pointer-events-none transition-all duration-300 overflow-y-auto"
+    class="lg:hidden fixed inset-0 z-[80] bg-black/95 backdrop-blur-md p-5 pt-8 pb-24 translate-y-full opacity-0 pointer-events-none transition-all duration-300 overflow-y-auto"
     aria-hidden="true"
 >
     <div class="flex items-center justify-between mb-6">

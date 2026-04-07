@@ -1,0 +1,217 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "K - beats" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: K
+        - generic [ref=e7]: "-"
+        - generic [ref=e8]: beats
+      - generic [ref=e9]:
+        - link "Charts" [ref=e10] [cursor=pointer]:
+          - /url: /charts/
+        - link "News" [ref=e11] [cursor=pointer]:
+          - /url: /news/
+        - link "Fan Clubs" [ref=e12] [cursor=pointer]:
+          - /url: /fan-clubs/
+      - link "Start Listening" [ref=e13] [cursor=pointer]:
+        - /url: /live/
+  - main [ref=e14]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: K-Pop, Live Now
+        - heading "Press Play Stay For Everything Else." [level=1] [ref=e19]:
+          - text: Press Play
+          - generic [ref=e20]: Stay For Everything Else.
+        - paragraph [ref=e21]: K-Beats gives fans one place to listen live, track the charts, follow comebacks, read the stories behind the scene, and drop into the fandom without breaking the flow.
+        - generic [ref=e22]:
+          - link "play_circle Listen Live Now" [ref=e23] [cursor=pointer]:
+            - /url: /live/
+            - generic [ref=e24]: play_circle
+            - text: Listen Live Now
+          - link "person_add Join K-Beats Free" [ref=e25] [cursor=pointer]:
+            - /url: /signup/
+            - generic [ref=e26]: person_add
+            - text: Join K-Beats Free
+        - generic [ref=e27]:
+          - generic [ref=e28]: Live radio
+          - generic [ref=e29]: Charts
+          - generic [ref=e30]: Comebacks
+          - generic [ref=e31]: Fan clubs
+          - generic [ref=e32]: Games
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - paragraph [ref=e37]: Live now
+            - paragraph [ref=e38]: SWIM
+            - paragraph [ref=e39]: BTS
+          - img "SWIM artwork" [ref=e40]
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - paragraph [ref=e43]: 3,847
+            - paragraph [ref=e44]: Fans listening right now
+          - generic [ref=e45]:
+            - paragraph [ref=e46]: 24/7
+            - paragraph [ref=e47]: Non-stop K-pop
+          - generic [ref=e48]:
+            - paragraph [ref=e49]: 6+
+            - paragraph [ref=e50]: Ways to go deeper
+        - generic [ref=e52]:
+          - paragraph [ref=e54]: K-Beats is live. The music is already playing — explore at your own pace.
+          - generic [ref=e55]: ads_click
+    - generic [ref=e58]:
+      - generic [ref=e59]: Live radio
+      - generic [ref=e60]: •
+      - generic [ref=e61]: Editorials
+      - generic [ref=e62]: •
+      - generic [ref=e63]: Charts
+      - generic [ref=e64]: •
+      - generic [ref=e65]: Comeback tracking
+      - generic [ref=e66]: •
+      - generic [ref=e67]: Fan clubs
+      - generic [ref=e68]: •
+      - generic [ref=e69]: Contests
+      - generic [ref=e70]: •
+      - generic [ref=e71]: Games
+      - generic [ref=e72]: •
+      - generic [ref=e73]: Live radio
+      - generic [ref=e74]: •
+      - generic [ref=e75]: Editorials
+      - generic [ref=e76]: •
+      - generic [ref=e77]: Charts
+      - generic [ref=e78]: •
+      - generic [ref=e79]: Comeback tracking
+      - generic [ref=e80]: •
+      - generic [ref=e81]: Fan clubs
+    - generic [ref=e83]:
+      - generic [ref=e84]:
+        - heading "What Fans Can Explore Next" [level=2] [ref=e85]
+        - paragraph [ref=e86]: Dive into live K-pop radio, then follow the music wherever it takes you.
+      - generic [ref=e87]:
+        - article [ref=e88]:
+          - generic [ref=e89]:
+            - generic [ref=e90]:
+              - paragraph [ref=e91]: Live Radio
+              - heading "Start With The Music" [level=3] [ref=e92]
+            - generic [ref=e93]: radio
+          - paragraph [ref=e94]: Hit play and you're in. The live station keeps going while you explore everything else.
+          - link "Open Live Radio arrow_forward" [ref=e95] [cursor=pointer]:
+            - /url: /live/
+            - text: Open Live Radio
+            - generic [ref=e96]: arrow_forward
+        - article [ref=e97]:
+          - generic [ref=e98]:
+            - generic [ref=e99]:
+              - paragraph [ref=e100]: Charts
+              - heading "See What Is Rising Now" [level=3] [ref=e101]
+            - generic [ref=e102]: equalizer
+          - paragraph [ref=e103]: Follow the songs, groups, and fan favourites building real momentum across the scene.
+          - link "View Charts arrow_forward" [ref=e104] [cursor=pointer]:
+            - /url: /charts/
+            - text: View Charts
+            - generic [ref=e105]: arrow_forward
+        - article [ref=e106]:
+          - generic [ref=e107]:
+            - generic [ref=e108]:
+              - paragraph [ref=e109]: Comebacks
+              - heading "Stay Ahead Of Every Comeback" [level=3] [ref=e110]
+            - generic [ref=e111]: rocket_launch
+          - paragraph [ref=e112]: Track new releases, countdowns, and major artist moments before they take over your feed.
+          - link "See Comebacks arrow_forward" [ref=e113] [cursor=pointer]:
+            - /url: /comeback-timeline/
+            - text: See Comebacks
+            - generic [ref=e114]: arrow_forward
+        - article [ref=e115]:
+          - generic [ref=e116]:
+            - generic [ref=e117]:
+              - paragraph [ref=e118]: News
+              - heading "Get The Story Behind The Hype" [level=3] [ref=e119]
+            - generic [ref=e120]: newsmode
+          - paragraph [ref=e121]: Read editorials, trend explainers, and fan-first coverage that adds context to the moment.
+          - link "Read News arrow_forward" [ref=e122] [cursor=pointer]:
+            - /url: /news/
+            - text: Read News
+            - generic [ref=e123]: arrow_forward
+        - article [ref=e124]:
+          - generic [ref=e125]:
+            - generic [ref=e126]:
+              - paragraph [ref=e127]: Fan Spaces
+              - heading "Find Your Fandom Space" [level=3] [ref=e128]
+            - generic [ref=e129]: groups
+          - paragraph [ref=e130]: Move beyond passive listening with fan clubs, contests, and community features built for repeat visits.
+          - link "Explore Fan Clubs arrow_forward" [ref=e131] [cursor=pointer]:
+            - /url: /fan-clubs/
+            - text: Explore Fan Clubs
+            - generic [ref=e132]: arrow_forward
+        - article [ref=e133]:
+          - generic [ref=e134]:
+            - generic [ref=e135]:
+              - paragraph [ref=e136]: Games
+              - heading "Make The Session Stick" [level=3] [ref=e137]
+            - generic [ref=e138]: stadia_controller
+          - paragraph [ref=e139]: Song quizzes, polls, and fan challenges — because loving K-pop should be active, not passive.
+          - link "Play Games arrow_forward" [ref=e140] [cursor=pointer]:
+            - /url: /games/
+            - text: Play Games
+            - generic [ref=e141]: arrow_forward
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - paragraph [ref=e145]: "01"
+        - heading "Press play immediately" [level=3] [ref=e146]
+        - paragraph [ref=e147]: Hit play and you're already in the right place — live K-pop, no waiting.
+      - generic [ref=e148]:
+        - paragraph [ref=e149]: "02"
+        - heading "Follow what is moving" [level=3] [ref=e150]
+        - paragraph [ref=e151]: Let the music move you — from the stream into charts, comebacks, and news.
+      - generic [ref=e152]:
+        - paragraph [ref=e153]: "03"
+        - heading "Turn interest into habit" [level=3] [ref=e154]
+        - paragraph [ref=e155]: Create a free account, claim your fan club, and make K-Beats your daily home.
+    - generic [ref=e157]:
+      - generic [ref=e158]:
+        - paragraph [ref=e159]: Suggested first session
+        - heading "The Best First Taste Of K-Beats" [level=2] [ref=e160]
+        - paragraph [ref=e161]: Start with the live station, see what is playing, then move into charts, news, or comeback tracking while the energy is still high.
+        - generic [ref=e162]:
+          - link "headphones Open Live Radio" [ref=e163] [cursor=pointer]:
+            - /url: /live/
+            - generic [ref=e164]: headphones
+            - text: Open Live Radio
+          - link "library_music Explore The Stream Hub" [ref=e165] [cursor=pointer]:
+            - /url: /stream/
+            - generic [ref=e166]: library_music
+            - text: Explore The Stream Hub
+      - generic [ref=e167]:
+        - generic [ref=e168]:
+          - generic [ref=e169]:
+            - paragraph [ref=e170]: On deck
+            - heading "There Is Always Something Next" [level=3] [ref=e171]
+          - generic [ref=e172]: queue_music
+        - generic [ref=e173]:
+          - generic [ref=e174]:
+            - img "Spine Breaker by BTS" [ref=e175]
+            - generic [ref=e176]:
+              - paragraph [ref=e177]: Spine Breaker
+              - paragraph [ref=e178]: BTS
+          - generic [ref=e179]:
+            - img "NORMAL by BTS" [ref=e180]
+            - generic [ref=e181]:
+              - paragraph [ref=e182]: NORMAL
+              - paragraph [ref=e183]: BTS
+          - generic [ref=e184]:
+            - img "The Happiest Girl by BLACKPINK" [ref=e185]
+            - generic [ref=e186]:
+              - paragraph [ref=e187]: The Happiest Girl
+              - paragraph [ref=e188]: BLACKPINK
+    - generic [ref=e190]:
+      - generic [ref=e191]:
+        - heading "Start With The Station. Stay For The World Around It." [level=2] [ref=e192]
+        - paragraph [ref=e193]: The station never stops. The charts are always moving. Your fandom is already here — jump in.
+      - generic [ref=e194]:
+        - link "play_circle Listen Live Now" [ref=e195] [cursor=pointer]:
+          - /url: /live/
+          - generic [ref=e196]: play_circle
+          - text: Listen Live Now
+        - link "person_add Join K-Beats Free" [ref=e197] [cursor=pointer]:
+          - /url: /signup/
+          - generic [ref=e198]: person_add
+          - text: Join K-Beats Free

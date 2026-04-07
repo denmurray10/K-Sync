@@ -6318,7 +6318,7 @@ def launch_campaign(request):
         {
             'eyebrow': 'Live Radio',
             'title': 'Start With The Music',
-            'body': 'Go from ad click to live K-pop in seconds, then keep exploring while the station keeps playing.',
+            'body': "Hit play and you're in. The live station keeps going while you explore everything else.",
             'url': reverse('live'),
             'cta': 'Open Live Radio',
             'icon': 'radio',
@@ -6363,7 +6363,7 @@ def launch_campaign(request):
         {
             'eyebrow': 'Games',
             'title': 'Make The Session Stick',
-            'body': 'Games, polls, and interactive features give visitors another reason to stay, click, and come back.',
+            'body': 'Song quizzes, polls, and fan challenges — because loving K-pop should be active, not passive.',
             'url': reverse('games'),
             'cta': 'Play Games',
             'icon': 'stadia_controller',
@@ -6375,24 +6375,24 @@ def launch_campaign(request):
         {
             'step': '01',
             'title': 'Press play immediately',
-            'body': 'Give new visitors an instant reward by dropping them straight into the live station.',
+            'body': "Hit play and you're already in the right place — live K-pop, no waiting.",
         },
         {
             'step': '02',
             'title': 'Follow what is moving',
-            'body': 'Guide them from the stream into charts, comebacks, and current news while the music keeps running.',
+            'body': 'Let the music move you — from the stream into charts, comebacks, and news.',
         },
         {
             'step': '03',
             'title': 'Turn interest into habit',
-            'body': 'Once they are engaged, invite them into fan clubs, account creation, and deeper product journeys.',
+            'body': 'Create a free account, claim your fan club, and make K-Beats your daily home.',
         },
     ]
 
     proof_points = [
-        {'label': 'Live listeners right now', 'value': f'{listener_count:,}'},
-        {'label': 'Always-on stream', 'value': '24/7'},
-        {'label': 'K-pop surfaces in one visit', 'value': '6+'},
+        {'label': 'Fans listening right now', 'value': f'{listener_count:,}'},
+        {'label': 'Non-stop K-pop', 'value': '24/7'},
+        {'label': 'Ways to go deeper', 'value': '6+'},
     ]
 
     context = {
