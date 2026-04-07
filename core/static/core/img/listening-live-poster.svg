@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="800" viewBox="0 0 1400 800" role="img" aria-labelledby="title desc">
+  <title id="title">Listening Live Poster</title>
+  <desc id="desc">A neon themed promotional poster encouraging users to listen live on K-Beats Radio.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#06030c"/>
+      <stop offset="55%" stop-color="#140414"/>
+      <stop offset="100%" stop-color="#02060a"/>
+    </linearGradient>
+    <radialGradient id="glowPink" cx="25%" cy="20%" r="50%">
+      <stop offset="0%" stop-color="#f425c0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#f425c0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowCyan" cx="85%" cy="70%" r="45%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#00f0ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <rect width="1400" height="800" fill="url(#bg)"/>
+  <rect width="1400" height="800" fill="url(#glowPink)"/>
+  <rect width="1400" height="800" fill="url(#glowCyan)"/>
+
+  <circle cx="210" cy="170" r="170" fill="#f425c0" filter="url(#soft)" opacity="0.22"/>
+  <circle cx="1180" cy="640" r="180" fill="#00f0ff" filter="url(#soft)" opacity="0.22"/>
+
+  <g opacity="0.9">
+    <rect x="86" y="84" width="1228" height="632" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="2"/>
+    <rect x="110" y="110" width="1180" height="580" fill="none" stroke="#f425c0" stroke-opacity="0.35" stroke-width="2"/>
+  </g>
+
+  <text x="140" y="220" fill="#9ca3af" font-family="Montserrat, Arial, sans-serif" font-size="30" letter-spacing="8">K-BEATS RADIO</text>
+  <text x="140" y="350" fill="#ffffff" font-family="Montserrat, Arial, sans-serif" font-weight="800" font-size="124" letter-spacing="2">LISTENING</text>
+  <text x="140" y="470" fill="#f425c0" font-family="Montserrat, Arial, sans-serif" font-weight="800" font-size="120" letter-spacing="2">LIVE</text>
+  <text x="142" y="545" fill="#cbd5e1" font-family="Montserrat, Arial, sans-serif" font-size="34" letter-spacing="1">Real-time K-pop tracks, updates, and community energy.</text>
+
+  <g transform="translate(940 250)">
+    <rect x="0" y="0" width="290" height="290" fill="#05070d" stroke="#00f0ff" stroke-opacity="0.5" stroke-width="3"/>
+    <circle cx="145" cy="145" r="88" fill="none" stroke="#f425c0" stroke-width="10"/>
+    <circle cx="145" cy="145" r="42" fill="none" stroke="#00f0ff" stroke-width="8"/>
+    <rect x="133" y="58" width="24" height="50" fill="#ffffff"/>
+    <rect x="133" y="182" width="24" height="50" fill="#ffffff"/>
+    <rect x="58" y="133" width="50" height="24" fill="#ffffff"/>
+    <rect x="182" y="133" width="50" height="24" fill="#ffffff"/>
+  </g>
+
+  <g transform="translate(140 602)">
+    <rect x="0" y="0" width="360" height="74" fill="#f425c0"/>
+    <text x="32" y="48" fill="#000000" font-family="Montserrat, Arial, sans-serif" font-size="30" font-weight="800" letter-spacing="2">OPEN LIVE PAGE</text>
+  </g>
+</svg>

@@ -10825,6 +10825,77 @@ def _strip_html_tags(value):
     return re.sub(r'\s+', ' ', text).strip()
 
 
+def _word_count_from_html(html):
+    return len(_strip_html_tags(html).split())
+
+
+def _ensure_minimum_article_word_count(body_html, *, title, category, minimum_words=1500):
+    """Expand article body when AI returns below the target word count."""
+    current_words = _word_count_from_html(body_html)
+    if current_words >= minimum_words:
+        return body_html, current_words
+
+    expand_prompt = (
+        f"Expand the following K-Pop article body to at least {minimum_words} words while preserving HTML structure and headings. "
+        "Keep existing sections, add deeper analysis, examples, and practical detail. "
+        "Return ONLY HTML body content with <h2>, <h3>, <p>, <ul>, <ol>, <li>, <blockquote>, <table> where useful. "
+        "Do not add TITLE/SUBTITLE headers and do not mention AI.\n\n"
+        f"Topic: {title}\n"
+        f"Category: {category}\n\n"
+        "Current body:\n"
+        f"{body_html}"
+    )
+
+    try:
+        expanded = _chat_reasoner(
+            expand_prompt,
+            system=(
+                "You are a senior K-Pop journalist and SEO editor. Expand content depth while keeping it clear, factual, and highly readable."
+            ),
+        ).strip()
+        if expanded.startswith('---'):
+            expanded = expanded.split('---', 1)[-1].strip()
+        if expanded and not expanded.startswith('<'):
+            paragraphs = expanded.split('\n\n')
+            expanded = ''.join(f'<p>{p.strip()}</p>' for p in paragraphs if p.strip())
+        expanded_words = _word_count_from_html(expanded)
+        if expanded_words > current_words:
+            return expanded, expanded_words
+    except Exception as exc:
+        logger.warning("[blog] Expansion pass failed for %r: %s", title, exc)
+
+    return body_html, current_words
+
+
+def _extract_faq_items_from_html(html, max_items=6):
+    body = html or ''
+    if not body:
+        return []
+
+    faq_section_match = re.search(
+        r'<h2[^>]*>\s*FAQ\s*</h2>(.*?)(?=<h2[^>]*>|\Z)',
+        body,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    if not faq_section_match:
+        return []
+
+    section_html = faq_section_match.group(1)
+    pairs = re.findall(
+        r'<h3[^>]*>(.*?)</h3>\s*<p[^>]*>(.*?)</p>',
+        section_html,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+
+    faq_items = []
+    for question_html, answer_html in pairs[:max_items]:
+        question = _strip_html_tags(question_html)
+        answer = _strip_html_tags(answer_html)
+        if question and answer:
+            faq_items.append({'question': question, 'answer': answer})
+    return faq_items
+
+
 def _build_article_meta_title(article):
     base_title = (article.title or '').strip()
     if not base_title:
@@ -10933,6 +11004,46 @@ def _inject_internal_links(html, article, all_articles):
     return ''.join(chunks), links_added
 
 
+def _inject_article_advert_blocks(html, live_url, poster_url):
+    """Inject lightweight ad blocks into article HTML after every 4 paragraphs."""
+    body = html or ''
+    if not body:
+        return body
+
+    ad_strip = (
+        f'<div class="article-ad-strip">'
+        f'<span class="article-ad-label">Sponsored</span>'
+        f'<p>Stay connected to every comeback, chart update, and breaking K-pop story as it happens.</p>'
+        f'<a href="{live_url}" class="article-ad-cta">Listen Live</a>'
+        f'</div>'
+    )
+    ad_poster = (
+        f'<a href="{live_url}" class="article-ad-poster" title="Listening Live">'
+        f'<img src="{poster_url}" alt="Listening Live poster" loading="lazy" />'
+        f'</a>'
+    )
+
+    chunks = re.split(r'(</p>)', body, flags=re.IGNORECASE)
+    if len(chunks) < 3:
+        return f"{body}{ad_poster}"
+
+    out = []
+    paragraph_count = 0
+    insert_count = 0
+    for chunk in chunks:
+        out.append(chunk)
+        if chunk.lower() == '</p>':
+            paragraph_count += 1
+            if paragraph_count % 4 == 0 and insert_count < 3:
+                out.append(ad_strip if insert_count % 2 == 0 else ad_poster)
+                insert_count += 1
+
+    if insert_count == 0:
+        out.append(ad_poster)
+
+    return ''.join(out)
+
+
 def blog_article_read(request, slug):
     from django.shortcuts import get_object_or_404
     article = get_object_or_404(BlogArticle, slug=slug)
@@ -10948,10 +11059,22 @@ def blog_article_read(request, slug):
     canonical_url = request.build_absolute_uri(
         reverse('blog_article_read', kwargs={'slug': article.slug})
     )
+    article_body_html = _inject_article_advert_blocks(
+        article.body_html,
+        reverse('live'),
+        static('core/img/listening-live-poster.svg'),
+    )
     meta_title = _build_article_meta_title(article)
     meta_description = _build_article_meta_description(article)
+    faq_items = _extract_faq_items_from_html(article.body_html)
+    schema_images = [img for img in [article.image, article.image_2, article.image_3] if str(img or '').strip()]
+    article_word_count = _word_count_from_html(article.body_html)
     return render(request, 'core/blog_article.html', {
         'article': article,
+        'article_body_html': article_body_html,
+        'faq_items': faq_items,
+        'schema_images': schema_images,
+        'article_word_count': article_word_count,
         'related': related,
         'canonical_url': canonical_url,
         'meta_title': meta_title,
@@ -11196,39 +11319,39 @@ def _do_blog_generate():
 
         # â”€â”€ DeepSeek Reasoner article â”€â”€
         prompt = (
-            f"Write an original, in-depth K-Pop news article based on this headline:\n\n"
+            f"Write an original, in-depth K-Pop analysis article based on this story seed:\n\n"
             f"Title: {title}\n"
             f"Source: {source}\n"
             f"Summary: {excerpt}\n\n"
-            f"Write as a professional K-Pop journalist for K-Beats, a major K-Pop media outlet. "
-            f"The article MUST be at least 1,500 words. Make it deeply informative, engaging, and comprehensive.\n\n"
+            f"Write as a senior K-Pop journalist and SEO editor for K-Beats. "
+            f"The article MUST be at least 1,500 words and highly scannable.\n\n"
             f"Structure your response EXACTLY as follows:\n"
-            f"TITLE: (a completely new, engaging, and original headline)\n"
-            f"SUBTITLE: (one catchy subtitle line)\n"
+            f"TITLE: (a fresh, high-CTR headline with clear benefit)\n"
+            f"SUBTITLE: (one sharp supporting line)\n"
             f"---\n"
-            f"(article body in HTML)\n\n"
-            f"HTML Formatting Rules:\n"
-            f"- Use <h2> tags for major section headings (aim for 3-4 per article)\n"
-            f"- Use <h3> tags for sub-section headings within major sections\n"
-            f"- Use <p> for all paragraphs\n"
-            f"- Use <strong> to bold key terms and artist names\n"
-            f"- Use <em> for stylistic emphasis\n"
-            f"- Use <blockquote> for notable quotes or standout statements\n"
-            f"- Use <ul>/<ol>/<li> for lists where appropriate\n"
-            f"- Do NOT use <h1> tags (the page already has an h1 title)\n\n"
-            f"Content Sections Required:\n"
-            f"1. Opening - hook the reader and introduce the story\n"
-            f"2. Background - artist/group history and context\n"
-            f"3. The News - detailed breakdown of the main story\n"
-            f"4. Fan & Community Reaction - what fans are saying\n"
-            f"5. Industry Analysis - impact and significance\n"
-            f"6. What's Next - forward-looking conclusion\n\n"
+            f"(article body in HTML only)\n\n"
+            f"HTML/UX Structure Requirements:\n"
+            f"- Start body with a 40-80 word quick-answer intro that gives the key takeaway first\n"
+            f"- Immediately add a table of contents block after intro using an unordered list of anchor links\n"
+            f"- Include 4-7 <h2> sections, each written as a distinct question readers might ask\n"
+            f"- Under each <h2>, include supporting <h3> explainers, examples, and short paragraphs\n"
+            f"- Include at least one comparison/summary table using <table>, <thead>, <tbody>, <tr>, <th>, <td>\n"
+            f"- Include one dedicated FAQ section near the end with 3-6 Q&As\n"
+            f"- End with a clear conclusion and next-step style guidance\n"
+            f"- Add relevant internal links to related K-Beats pages and article cluster pages\n\n"
+            f"Formatting Rules:\n"
+            f"- Use <h2> and <h3> only for headings, no <h1>\n"
+            f"- Use <p> for paragraphs and keep paragraphs short (2-4 sentences max)\n"
+            f"- Use <ul>/<ol>/<li> for scan-friendly lists where helpful\n"
+            f"- Use <strong> for key terms and entities\n"
+            f"- Use <blockquote> only for notable quotes\n"
+            f"- Keep tone authoritative, specific, and evidence-oriented\n\n"
             f"Rules:\n"
-            f"- Write completely original content, do NOT copy the source\n"
+            f"- Write completely original content, do NOT copy source text\n"
             f"- Total length: minimum 1,500 words\n"
             f"- Do NOT include the article title in the body\n"
-            f"- Do NOT mention AI anywhere in the article\n"
-            f"- Write as a human journalist, not an AI\n"
+            f"- Do NOT mention AI anywhere\n"
+            f"- Write as a human journalist\n"
             f"{internal_links_hint}"
             f"{site_links_hint}"
         )
@@ -11266,7 +11389,16 @@ def _do_blog_generate():
                 f'<p>{p.strip()}</p>' for p in paras if p.strip()
             )
 
-        word_count = len(re.sub(r'<[^>]+>', '', body).split())
+        body, word_count = _ensure_minimum_article_word_count(
+            body,
+            title=generated_title,
+            category=category,
+            minimum_words=1500,
+        )
+        if word_count < 1500:
+            logger.warning("[blog] Skipping article under 1500 words after expansion (%d words): %r", word_count, generated_title)
+            continue
+
         reading_time = max(1, word_count // 200)
 
         # â”€â”€ Fetch image via Serper â”€â”€
@@ -11275,6 +11407,24 @@ def _do_blog_generate():
         except Exception as e:
             logger.exception("Blog image_1 fetch failed for title=%r: %s", title, e)
             image_1 = ''
+
+        try:
+            image_2 = _fetch_blog_image(title, category, excerpt, variant=2)
+        except Exception as e:
+            logger.exception("Blog image_2 fetch failed for title=%r: %s", title, e)
+            image_2 = ''
+
+        try:
+            image_3 = _fetch_blog_image(title, category, excerpt, variant=3)
+        except Exception as e:
+            logger.exception("Blog image_3 fetch failed for title=%r: %s", title, e)
+            image_3 = ''
+
+        # Keep image slots populated when one query variant underperforms.
+        if not image_2:
+            image_2 = image_1
+        if not image_3:
+            image_3 = image_2 or image_1
 
         article = BlogArticle.objects.create(
             slug=base_slug,
@@ -11285,6 +11435,8 @@ def _do_blog_generate():
             source_url=link,
             source_name=source,
             image=image_1,
+            image_2=image_2,
+            image_3=image_3,
             body_html=body,
             reading_time=reading_time,
         )

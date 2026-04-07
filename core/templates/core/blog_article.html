@@ -24,6 +24,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             "dateModified": "{{ article.created_at|date:'c' }}",
             "mainEntityOfPage": "{{ canonical_url|escapejs }}",
             "articleSection": "{{ article.category|escapejs }}",
+            "inLanguage": "en-GB",
+            "wordCount": "{{ article_word_count }}",
+            "keywords": "{{ article.category|escapejs }}, K-Pop, comeback rankings, K-Beats",
             "author": {
                 "@type": "Organization",
                 "name": "K-Beats Editorial"
@@ -31,11 +34,84 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             "publisher": {
                 "@type": "Organization",
                 "name": "K-Beats Radio"
-            }{% if article.image %},
-            "image": "{{ article.image|escapejs }}"
+            }{% if schema_images %},
+            "image": [{% for img in schema_images %}"{{ img|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}]
             {% endif %}
         }
         </script>
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Blog",
+                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'blog_page' %}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": "{{ article.title|escapejs }}",
+                    "item": "{{ canonical_url|escapejs }}"
+                }
+            ]
+        }
+        </script>
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "{{ article.title|escapejs }}",
+            "url": "{{ canonical_url|escapejs }}",
+            "description": "{{ seo_description|escapejs }}",
+            "inLanguage": "en-GB",
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "K-Beats Radio",
+                "url": "{{ request.scheme }}://{{ request.get_host }}/"
+            },
+            "speakable": {
+                "@type": "SpeakableSpecification",
+                "cssSelector": [
+                    "h1",
+                    ".article-body p:first-of-type"
+                ]
+            }{% if article.image %},
+            "primaryImageOfPage": {
+                "@type": "ImageObject",
+                "url": "{{ article.image|escapejs }}"
+            }
+            {% endif %}
+        }
+        </script>
+        {% if faq_items %}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {% for item in faq_items %}
+                {
+                    "@type": "Question",
+                    "name": "{{ item.question|escapejs }}",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "{{ item.answer|escapejs }}"
+                    }
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
+        }
+        </script>
+        {% endif %}
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <script
             defer
@@ -168,6 +244,54 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 color: #94a3b8;
                 font-style: italic;
             }
+            .article-body .article-ad-strip {
+                margin: 2rem 0;
+                border: 1px solid rgba(244, 37, 192, 0.4);
+                background: linear-gradient(135deg, rgba(244, 37, 192, 0.12), rgba(0, 0, 0, 0.9));
+                padding: 1rem 1.25rem;
+            }
+            .article-body .article-ad-label {
+                display: inline-block;
+                margin-bottom: 0.5rem;
+                font-family: monospace;
+                font-size: 10px;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+                color: #00f0ff;
+            }
+            .article-body .article-ad-strip p {
+                margin: 0;
+                color: #e2e8f0;
+                font-size: 0.95rem;
+                line-height: 1.65;
+            }
+            .article-body .article-ad-cta {
+                display: inline-block;
+                margin-top: 0.75rem;
+                border: 1px solid #f425c0;
+                color: #f425c0;
+                text-transform: uppercase;
+                letter-spacing: 0.18em;
+                font-size: 10px;
+                font-weight: 800;
+                padding: 0.55rem 0.9rem;
+                text-decoration: none;
+            }
+            .article-body .article-ad-cta:hover {
+                background: #f425c0;
+                color: #000;
+            }
+            .article-body .article-ad-poster {
+                display: block;
+                margin: 2.2rem 0;
+                border: 1px solid rgba(0, 240, 255, 0.35);
+                overflow: hidden;
+            }
+            .article-body .article-ad-poster img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
         </style>
     </head>
     <body
@@ -288,7 +412,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             {% endif %}
 
                             <div class="article-body">
-                                {{ article.body_html|safe }}
+                                {{ article_body_html|safe }}
                             </div>
                         </article>
 
