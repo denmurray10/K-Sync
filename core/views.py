@@ -4395,8 +4395,8 @@ def _render_what_just_landed_reel_video(article):
         f"{slugify(article.slug or article.title or 'what-just-landed')}-{timezone.now().strftime('%Y%m%d%H%M%S')}.mp4",
     )
 
-    frame_dir = os.path.join(output_dir, f"_frames_{uuid.uuid4().hex}")
-    os.makedirs(frame_dir, exist_ok=True)
+    # Render frame PNGs in the system temp directory so they never bloat MEDIA_ROOT.
+    frame_dir = tempfile.mkdtemp(prefix='_frames_', dir=tempfile.gettempdir())
     try:
         for frame_index in range(frame_total):
             progress = frame_index / max(1, frame_total - 1)
