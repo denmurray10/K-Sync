@@ -98,18 +98,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
     .site-logo {
         display: block;
-        height: auto;
+        height: 70px !important;
         width: auto;
         max-width: min(72vw, 360px);
-        filter:
-            drop-shadow(0 0 8px rgba(0, 240, 255, 0.95))
-            drop-shadow(0 0 18px rgba(0, 240, 255, 0.55))
-            drop-shadow(0 0 10px rgba(244, 37, 192, 0.82))
-            drop-shadow(0 0 22px rgba(244, 37, 192, 0.42));
     }
     @media (min-width: 1024px) {
         .site-logo {
             max-width: min(34vw, 520px);
+            height: 70px !important;
         }
     }
     @keyframes marquee {
@@ -142,7 +138,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <img
                     src="{% static 'core/img/logo.webp' %}"
                     alt="K-Beats Radio"
-                    class="site-logo h-[70px] lg:h-[100px]"
+                    class="site-logo h-[70px]"
                 />
             </a>
             <div class="hidden items-center gap-3 lg:flex">
