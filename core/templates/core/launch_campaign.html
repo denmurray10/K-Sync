@@ -96,18 +96,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         opacity: 1;
         pointer-events: auto;
     }
-    .site-logo {
-        display: block;
-        height: 70px !important;
-        width: auto;
-        max-width: min(72vw, 360px);
-    }
-    @media (min-width: 1024px) {
-        .site-logo {
-            max-width: min(34vw, 520px);
-            height: 70px !important;
-        }
-    }
     @keyframes marquee {
         from { transform: translateX(0); }
         to { transform: translateX(-50%); }
@@ -132,16 +120,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
 <div class="relative isolate min-h-screen">
-    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl md:absolute">
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
         <div class="container mx-auto flex items-center justify-between gap-4 px-6 py-4 sm:px-6">
-            <a class="flex items-center" href="{% url 'home' %}">
-                <img
-                    src="{% static 'core/img/logo.webp' %}"
-                    alt="K-Beats Radio"
-                    class="site-logo h-[70px]"
-                />
+            <a class="flex items-center gap-0 text-primary transition-colors duration-300 hover:text-secondary" href="{% url 'home' %}">
+                <span class="text-3xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none">K</span>
+                <span class="text-3xl font-black text-white tracking-[1px] leading-none">-</span>
+                <span class="text-3xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none">beats</span>
             </a>
-            <div class="hidden items-center gap-3 lg:flex">
+            <div class="hidden items-center gap-3 sm:flex">
                 <a href="{% url 'charts' %}" class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400 transition hover:text-white">Charts</a>
                 <a href="{% url 'news' %}" class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400 transition hover:text-white">News</a>
                 <a href="{% url 'fan_clubs' %}" class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400 transition hover:text-white">Fan Clubs</a>
@@ -214,7 +200,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <div class="mt-4 border border-white/10 bg-white/[0.03] p-5">
                             <div class="flex items-center justify-between gap-3">
                                 <div>
-                                    <p class="text-sm leading-6 text-slate-300">K-Beats is live. The music is already playing — explore at your own pace.</p>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">Why this page exists</p>
+                                    <p class="mt-2 text-sm leading-6 text-slate-300">It gives new visitors one clear first move, then opens up the rest of K-Beats in the order that feels natural.</p>
                                 </div>
                                 <span class="material-symbols-outlined text-3xl text-secondary">ads_click</span>
                             </div>
@@ -257,8 +244,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <section class="py-16 sm:py-20">
             <div class="container mx-auto px-6 sm:px-6">
                 <div class="reveal-left max-w-3xl">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">What visitors can do</p>
                     <h2 class="mt-4 text-4xl font-black uppercase leading-[0.9] tracking-tight text-white sm:text-5xl">What Fans Can Explore Next</h2>
-                    <p class="mt-4 text-base leading-7 text-slate-300">Dive into live K-pop radio, then follow the music wherever it takes you.</p>
+                    <p class="mt-4 text-base leading-7 text-slate-300">The stream brings people in. These are the features that turn a first visit into a real K-Beats session.</p>
                 </div>
                 <div class="mt-10 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
                     {% for card in feature_cards %}
@@ -345,8 +333,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <section class="border-t border-white/10 bg-primary">
             <div class="container mx-auto flex flex-col gap-8 px-6 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
                 <div class="max-w-3xl">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-black/70">Campaign close</p>
                     <h2 class="mt-4 text-4xl font-black uppercase leading-[0.9] tracking-tight text-black sm:text-5xl">Start With The Station. Stay For The World Around It.</h2>
-                    <p class="mt-4 max-w-2xl text-base leading-7 text-black/75">The station never stops. The charts are always moving. Your fandom is already here — jump in.</p>
+                    <p class="mt-4 max-w-2xl text-base leading-7 text-black/75">If the music lands, the rest of K-Beats opens naturally. That is the whole point of this page.</p>
                 </div>
                 <div class="flex flex-col gap-3 sm:flex-row">
                     <a data-preserve-query href="{{ primary_cta_url }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-black bg-black px-7 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-black">
