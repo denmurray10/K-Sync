@@ -295,6 +295,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <!-- Sidebar -->
                         <aside class="lg:w-80 shrink-0 reveal-up" style="transition-delay: 200ms">
                             <div class="lg:sticky lg:top-24">
+                            <!-- Live Now Card -->
+                            <a
+                                href="{% url 'live' %}"
+                                class="group block border border-primary/30 bg-[linear-gradient(145deg,rgba(244,37,192,0.18),rgba(0,0,0,0.96)_55%),radial-gradient(circle_at_top_right,rgba(0,240,255,0.2),transparent_32%),#050505] p-6 mb-6 transition-transform duration-300 hover:-translate-y-1"
+                            >
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <span class="font-mono text-[9px] tracking-widest uppercase text-secondary block">On Air</span>
+                                        <h3 class="font-black text-xl uppercase tracking-tight text-white mt-3">
+                                            Live Now
+                                        </h3>
+                                        <p class="text-sm text-slate-300 mt-3 leading-relaxed">
+                                            Switch from reading to listening and jump straight into the live K-Beats stream.
+                                        </p>
+                                    </div>
+                                    <span class="material-symbols-outlined text-3xl text-primary transition-transform duration-300 group-hover:translate-x-1">
+                                        radio
+                                    </span>
+                                </div>
+                                <div class="mt-5 pt-4 border-t border-white/10 flex items-center justify-between gap-4">
+                                    <span class="font-black text-[10px] uppercase tracking-[0.2em] text-white">
+                                        Open live page
+                                    </span>
+                                    <span class="material-symbols-outlined text-primary text-lg">arrow_forward</span>
+                                </div>
+                            </a>
+
                             <!-- Article Info Card -->
                             <div class="border border-white/10 bg-white/[0.02] p-6 mb-6">
                                 <h3 class="font-black text-xs uppercase tracking-[0.2em] text-white mb-4 pb-3 border-b border-white/10">

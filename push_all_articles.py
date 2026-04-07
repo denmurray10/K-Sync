@@ -1,7 +1,6 @@
 import os
 import django
 import time
-from django.utils import timezone
 
 # Set up Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ksync_project.settings')
@@ -20,27 +19,20 @@ def push_all():
     ).order_by('-created_at')
     
     count = articles.count()
-    print(f"Total New Articles to Schedule: {count}")
+    print(f"Total New Articles to Publish: {count}")
     
     if count == 0:
         print("No new articles found to schedule.")
         return
 
-    # Gap in seconds (1 minute)
-    gap = 60
-    # Start 1 hour from now
-    base_time = int(time.time()) + 3600
+    # Kept for compatibility with the helper signature.
+    scheduled_ts = int(time.time()) + 600
     
     success_count = 0
     fail_count = 0
     
     for i, article in enumerate(articles):
-        # Calculate schedule time for this article
-        scheduled_ts = base_time + (i * gap)
-        scheduled_dt = timezone.datetime.fromtimestamp(scheduled_ts, tz=timezone.utc)
-        
-        print(f"[{i+1}/{count}] Scheduling: {article.title[:50]}...")
-        print(f"    Target Time: {scheduled_dt.strftime('%Y-%m-%d %H:%M:%S UTC')}")
+        print(f"[{i+1}/{count}] Publishing: {article.title[:50]}...")
         
         try:
             _post_to_facebook_draft(article, scheduled_unix_ts=scheduled_ts)

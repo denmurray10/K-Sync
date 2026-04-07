@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import TemplateView
+from django.views.generic import RedirectView
 from django.contrib.sitemaps.views import sitemap
 from django.conf import settings
 from django.conf.urls.static import static
@@ -33,6 +34,9 @@ handler404 = 'core.views.custom_404'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
+    path('favicon.ico', RedirectView.as_view(url=f'{settings.STATIC_URL}core/img/favicon.ico', permanent=True)),
+    path('apple-touch-icon.png', RedirectView.as_view(url=f'{settings.STATIC_URL}core/img/apple-touch-icon.png', permanent=True)),
+    path('site.webmanifest', RedirectView.as_view(url=f'{settings.STATIC_URL}core/site.webmanifest', permanent=True)),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots_txt'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,7 +1,6 @@
 import os
 import django
 import time
-from django.utils import timezone
 
 # Set up Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ksync_project.settings')
@@ -26,10 +25,10 @@ def push_latest():
 
     print(f"Target Article: {article.title} (ID: {article.id})")
     
-    # Schedule for 10 minutes from now
+    # Kept for compatibility with the helper signature.
     scheduled_ts = int(time.time()) + 600
     
-    print(f"Pushing to Facebook (scheduled for 10 mins from now)...")
+    print("Pushing to Facebook as a native image post...")
     try:
         _post_to_facebook_draft(article, scheduled_unix_ts=scheduled_ts)
         
@@ -38,7 +37,7 @@ def push_latest():
         article.refresh_from_db()
         if article.facebook_post_id:
             print(f"SUCCESS! Facebook Post ID: {article.facebook_post_id}")
-            print(f"Check 'Scheduled' content in Meta Business Suite.")
+            print("Check the page feed in Meta Business Suite.")
         else:
             print("FAILED: Post ID not returned. Check logs for details.")
             
