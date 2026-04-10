@@ -223,6 +223,23 @@ class SeoRolloutTests(TestCase):
             html=True,
         )
 
+    def test_core_discovery_pages_show_distinct_keyword_led_hero_copy(self):
+        home_response = self.client.get(reverse('home'))
+        listen_free_response = self.client.get(reverse('listen_free_landing'))
+        live_response = self.client.get(reverse('live'))
+        idols_response = self.client.get(reverse('idols'))
+        comebacks_response = self.client.get(reverse('comebacks'))
+
+        self.assertContains(home_response, 'K-POP RADIO')
+        self.assertContains(home_response, 'ONLINE')
+        self.assertContains(listen_free_response, 'Free K-Pop Radio,')
+        self.assertContains(listen_free_response, 'No app. No card. No download. Just hit play.')
+        self.assertContains(live_response, 'Live K-Pop Stream')
+        self.assertContains(live_response, 'Real-time now playing on K-Beats Radio')
+        self.assertContains(idols_response, 'K-POP')
+        self.assertContains(idols_response, 'IDOLS')
+        self.assertContains(comebacks_response, 'COMEBACKS')
+
 
 class FanClubTierAndEventTests(TestCase):
     def setUp(self):
