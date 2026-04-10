@@ -112,6 +112,45 @@ class SiteIconTests(TestCase):
         self.assertEqual(response['Location'], '/static/core/img/favicon.ico')
 
 
+@override_settings(
+    STORAGES={
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+)
+class SeoRolloutTests(TestCase):
+    def test_homepage_uses_dynamic_seo_metadata(self):
+        response = self.client.get(reverse('home'))
+
+        self.assertContains(response, '<title>K-Pop Radio Online | Live K-Pop Stream UK | K-Beats Radio</title>', html=True)
+        self.assertContains(response, 'Listen to K-pop radio online with K-Beats Radio.')
+        self.assertContains(response, reverse('uk_kpop_radio'))
+
+    def test_keyword_landing_pages_render_and_include_unique_h1(self):
+        pages = [
+            ('uk_kpop_radio', 'K-Pop Radio Station UK'),
+            ('midnight_kpop_vibes', 'Midnight K-Pop Vibes'),
+            ('rainy_day_kpop', 'Rainy Day K-Pop'),
+            ('late_night_kpop_music', 'Late Night K-Pop Music'),
+            ('best_kpop_playlist_2026', 'Best K-Pop Playlist 2026'),
+            ('discover_new_kpop_music', 'Discover New K-Pop Music'),
+        ]
+
+        for url_name, heading in pages:
+            response = self.client.get(reverse(url_name))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, heading)
+
+    def test_sitemap_contains_new_seo_destinations(self):
+        response = self.client.get(reverse('django.contrib.sitemaps.views.sitemap'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse('uk_kpop_radio'))
+        self.assertContains(response, reverse('midnight_kpop_vibes'))
+        self.assertContains(response, reverse('best_kpop_playlist_2026'))
+        self.assertContains(response, reverse('discover_new_kpop_music'))
+
+
 class FanClubTierAndEventTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='tier-user', password='secret123')

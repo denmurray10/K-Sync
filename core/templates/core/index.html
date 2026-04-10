@@ -10,40 +10,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
 <!-- End Google Tag Manager -->
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>K-Beats Radio | Live K-Pop Music, Charts, News & Community</title>
-<meta name="description" content="Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists."/>
-<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"/>
-<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
+{% include 'core/seo_meta.html' %}
+<title>{{ seo_title }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="preconnect" href="https://is1-ssl.mzstatic.com" crossorigin/>
 <link rel="preconnect" href="https://cdn.kpopping.com" crossorigin/>
-
-<meta property="og:type" content="website"/>
-<meta property="og:site_name" content="K-Beats Radio"/>
-<meta property="og:title" content="K-Beats Radio | Live K-Pop Music, Charts, News & Community"/>
-<meta property="og:description" content="Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists."/>
-<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"/>
-
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="K-Beats Radio | Live K-Pop Music, Charts, News & Community"/>
-<meta name="twitter:description" content="Stream live K-pop radio on K-Beats, discover charts and new releases, read K-pop news, join fan clubs, and stay connected with your favourite artists."/>
-
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "K-Beats Radio",
-    "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}",
-    "inLanguage": "en-GB",
-    "potentialAction": {
-        "@type": "SearchAction",
-        "target": "{{ request.scheme }}://{{ request.get_host }}{% url 'search_api' %}?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-    }
-}
-</script>
 <script>
     document.documentElement.classList.add('site-loading');
 </script>
@@ -325,8 +297,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </span>
 <span class="block text-transparent [-webkit-text-stroke:2px_white] outline-outer-glow">LAUNCHED</span>
 </h1>
-<p class="text-base md:text-lg text-slate-300 max-w-[280px] md:max-w-md font-light leading-relaxed mt-8 tracking-wide">
-                        Experience the electrifying beat of K-Pop. 24/7 non-stop hits, exclusive interviews, and live performances direct from Korea.
+<p class="text-base md:text-lg text-slate-300 max-w-[320px] md:max-w-lg font-light leading-relaxed mt-8 tracking-wide">
+                        K-Beats is your K-pop radio online destination for a live K-pop stream, chart discovery, comeback tracking, and fan-first listening from a UK-based station.
                     </p>
 <div class="mt-8 flex items-center pointer-events-auto max-w-full">
 <a href="{% if featured_article %}{% url 'blog_article_read' featured_article.slug %}{% else %}{% url 'news' %}{% endif %}" class="group flex flex-col sm:flex-row items-stretch sm:items-center border border-white/20 hover:border-primary bg-black/50 backdrop-blur-sm transition-colors duration-300 w-full sm:w-max overflow-hidden">
@@ -339,6 +311,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 </a>
 </div>
+{% if seo_jump_links %}
+<div class="mt-5 flex flex-wrap gap-3 pointer-events-auto">
+{% for link in seo_jump_links %}
+<a href="{{ link.href }}" class="inline-flex items-center gap-2 border border-white/15 bg-black/45 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-200 transition hover:border-secondary hover:text-secondary">
+{{ link.title }}
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+{% endfor %}
+</div>
+{% endif %}
 </div>
 <!-- Right Content: Broadcast Signal Panel -->
 <div class="hidden md:flex flex-col w-[360px] mt-12 md:mt-0 z-20">

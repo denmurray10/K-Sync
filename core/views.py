@@ -73,8 +73,270 @@ def _admin_only_json(request):
     return None
 
 
+def _build_seo_collection_schema(*, request, page_name, page_description, path_name, related_links=None):
+    item_list = []
+    for idx, link in enumerate(related_links or [], start=1):
+        item_list.append({
+            '@type': 'ListItem',
+            'position': idx,
+            'name': link['title'],
+            'url': request.build_absolute_uri(link['href']),
+        })
+
+    return json.dumps({
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        'name': page_name,
+        'description': page_description,
+        'url': request.build_absolute_uri(reverse(path_name)),
+        'inLanguage': 'en-GB',
+        'mainEntity': {
+            '@type': 'ItemList',
+            'name': page_name,
+            'itemListElement': item_list,
+        },
+    })
+
+
+def _seo_feature_link(request, *, title, body, url_name):
+    return {
+        'title': title,
+        'body': body,
+        'href': reverse(url_name),
+        'absolute_url': request.build_absolute_uri(reverse(url_name)),
+    }
+
+
+def _build_seo_destination_context(request, destination_key):
+    related_links = [
+        _seo_feature_link(
+            request,
+            title='Listen Live',
+            body='Jump into the live K-Beats stream and hear what is on air right now.',
+            url_name='live',
+        ),
+        _seo_feature_link(
+            request,
+            title='Browse Charts',
+            body='See which songs and artists are moving fastest across the K-Beats charts.',
+            url_name='charts',
+        ),
+        _seo_feature_link(
+            request,
+            title='Read K-Pop News',
+            body='Catch up on fresh comeback coverage, artist stories, and editorial context.',
+            url_name='blog_page',
+        ),
+    ]
+
+    page_map = {
+        'uk_kpop_radio': {
+            'eyebrow': 'UK Discovery',
+            'headline': 'K-Pop Radio Station UK',
+            'lede': 'K-Beats is a UK-based K-pop radio station built for fans who want live music, comeback energy, and a station that feels current every time they press play.',
+            'intro': 'This page is designed for listeners searching specifically for a K-pop radio station in the UK. It keeps the promise simple: live K-pop, quick discovery, and easy routes into charts, artist pages, and comeback coverage.',
+            'primary_cta': {'label': 'Start The Live Stream', 'href': reverse('live')},
+            'secondary_cta': {'label': 'Listen Free First', 'href': reverse('listen_free_landing')},
+            'highlights': [
+                'UK-based positioning with global K-pop coverage.',
+                'Live radio, chart updates, and comeback context in one place.',
+                'Clear routes into fan clubs, idols, and editorial coverage.',
+            ],
+            'sections': [
+                {
+                    'title': 'Why this page matters',
+                    'body': 'Searchers using UK radio phrasing are already close to choosing a station. The page should reassure them that K-Beats is active, fan-aware, and built around repeat listening rather than a static playlist.',
+                },
+                {
+                    'title': 'What to do next',
+                    'body': 'Lead with the live player, then support that with charts, comebacks, and editorial links so first-time visitors can keep exploring after the first click.',
+                },
+            ],
+            'related_links': related_links,
+            'seo_type': 'website',
+        },
+        'midnight_kpop_vibes': {
+            'eyebrow': 'Mood Guide',
+            'headline': 'Midnight K-Pop Vibes',
+            'lede': 'A softer after-hours route into K-pop for listeners who want reflective songs, quieter momentum, and a station that still feels alive after dark.',
+            'intro': 'This landing page targets a highly specific mood keyword. It should feel like a curated listening entry point, then hand visitors into the live stream, chart heat, and artist discovery pages without losing the late-night tone.',
+            'primary_cta': {'label': 'Open The After-Hours Stream', 'href': reverse('stream_player', args=['after-midnight'])},
+            'secondary_cta': {'label': 'See Live K-Pop Now', 'href': reverse('live')},
+            'highlights': [
+                'Built around after-hours K-pop listening intent.',
+                'Pairs calm copy with strong stream and chart links.',
+                'Supports discovery without making the page feel generic.',
+            ],
+            'sections': [
+                {
+                    'title': 'What midnight listeners usually want',
+                    'body': 'They are often looking for atmosphere first, not a giant catalog. The page should frame K-Beats as a place to stay in that mood while still discovering new artists and current songs.',
+                },
+                {
+                    'title': 'How it supports SEO',
+                    'body': 'The keyword is low difficulty and highly descriptive, which makes it a strong entry page for fans who may later move into broader searches around radio, playlists, and charts.',
+                },
+            ],
+            'related_links': related_links,
+            'seo_type': 'website',
+        },
+        'rainy_day_kpop': {
+            'eyebrow': 'Mood Guide',
+            'headline': 'Rainy Day K-Pop',
+            'lede': 'For softer sessions, reflective moods, and fan-picked songs that fit rainy-day K-pop listening without losing the energy of discovery.',
+            'intro': 'This page should feel intentional and comforting, while still moving people deeper into the main listening surfaces. It works best when it behaves like a mood-led introduction to the broader K-Beats experience.',
+            'primary_cta': {'label': 'Listen Live', 'href': reverse('live')},
+            'secondary_cta': {'label': 'Explore The Charts', 'href': reverse('charts')},
+            'highlights': [
+                'Targets a low-competition mood keyword with clear fan intent.',
+                'Supports discovery through charts, comebacks, and live listening.',
+                'Gives K-Beats a softer editorial entry point beyond pure radio terms.',
+            ],
+            'sections': [
+                {
+                    'title': 'Why this keyword fits K-Beats',
+                    'body': 'Mood-led searches work well for a newer domain because the competition is lighter and the intent is clearer. K-Beats can satisfy that intent while also introducing the radio product.',
+                },
+                {
+                    'title': 'How the page should convert',
+                    'body': 'Offer a mood-first promise, then quickly show that the listener can move from a rainy-day vibe into live radio, release tracking, and artist exploration without leaving the ecosystem.',
+                },
+            ],
+            'related_links': related_links,
+            'seo_type': 'website',
+        },
+        'late_night_kpop_music': {
+            'eyebrow': 'Mood Guide',
+            'headline': 'Late Night K-Pop Music',
+            'lede': 'Late-night K-pop music works best when the page feels curated, calm, and useful right away. This one points fans toward live listening, slower discovery, and softer chart-led momentum.',
+            'intro': 'The keyword sits between playlist intent and mood intent, so the page should stay focused on the listening use case instead of trying to compete with every generic playlist result.',
+            'primary_cta': {'label': 'Play Late-Night K-Pop', 'href': reverse('stream_player', args=['after-midnight'])},
+            'secondary_cta': {'label': 'Listen Free', 'href': reverse('listen_free_landing')},
+            'highlights': [
+                'Bridges mood-searchers into the live product.',
+                'Pairs well with the existing after-midnight stream preset.',
+                'Keeps the keyword isolated from broader homepage intent.',
+            ],
+            'sections': [
+                {
+                    'title': 'What makes this page useful',
+                    'body': 'It gives searchers a specific answer for late-night listening while reinforcing that K-Beats is not just a one-off playlist page but an active K-pop radio destination.',
+                },
+                {
+                    'title': 'Where the traffic should flow',
+                    'body': 'From here, users should move into the live stream, mood-adjacent editorial, charts, and artist pages depending on whether they want comfort, discovery, or current momentum.',
+                },
+            ],
+            'related_links': related_links,
+            'seo_type': 'website',
+        },
+        'best_kpop_playlist_2026': {
+            'eyebrow': 'Playlist Guide',
+            'headline': 'Best K-Pop Playlist 2026',
+            'lede': 'A playlist-led discovery page for fans who want the best K-pop playlist for 2026, built around chart momentum, fresh releases, and the fastest routes into active listening.',
+            'intro': 'This keyword has stronger competition than the mood cluster, so the page should lean into freshness, editorial clarity, and internal links to existing chart and blog surfaces rather than trying to mimic a giant catalog product.',
+            'primary_cta': {'label': 'See This Week’s Charts', 'href': reverse('charts')},
+            'secondary_cta': {'label': 'Read The Blog', 'href': reverse('blog_page')},
+            'highlights': [
+                'Targets a freshness-led playlist keyword for 2026.',
+                'Supports charts and blog as the main discovery surfaces.',
+                'Acts as a bridge between playlist intent and active listening.',
+            ],
+            'sections': [
+                {
+                    'title': 'Why the page is different',
+                    'body': 'Instead of trying to be an endless playlist index, it frames the best K-pop playlist for 2026 through momentum, recency, and fan relevance, which fits K-Beats better.',
+                },
+                {
+                    'title': 'How it should perform',
+                    'body': 'The page should capture search interest around fresh playlist phrasing and then move those visitors into charts, new-release coverage, and the live stream.',
+                },
+            ],
+            'related_links': related_links,
+            'seo_type': 'website',
+        },
+        'discover_new_kpop_music': {
+            'eyebrow': 'Discovery Guide',
+            'headline': 'Discover New K-Pop Music',
+            'lede': 'For fans who want to discover new K-pop music without opening ten tabs. K-Beats ties together live radio, current charts, new releases, and editorial picks in one route.',
+            'intro': 'This page is a natural fit for K-Beats because it matches what the site already does well: discovery through multiple surfaces instead of a single static list. It should sound practical, current, and fan-aware.',
+            'primary_cta': {'label': 'Start Discovering Live', 'href': reverse('live')},
+            'secondary_cta': {'label': 'Track New Comebacks', 'href': reverse('comeback_timeline')},
+            'highlights': [
+                'Directly matches a discovery-oriented search intent.',
+                'Lets K-Beats combine radio, charts, and editorial into one answer.',
+                'Creates a strong handoff into blog and comeback content.',
+            ],
+            'sections': [
+                {
+                    'title': 'Why this is an SEO fit',
+                    'body': 'The keyword is highly aligned with the site’s content mix. Instead of competing only as a radio result, K-Beats can answer the full discovery journey with linked surfaces already present in the product.',
+                },
+                {
+                    'title': 'How visitors should move',
+                    'body': 'Lead with discovery language, then surface current charts, comeback pages, artist exploration, and live listening as the next natural actions.',
+                },
+            ],
+            'related_links': related_links + [
+                _seo_feature_link(
+                    request,
+                    title='Track Comebacks',
+                    body='Follow the release calendar and spot what is landing next across K-pop.',
+                    url_name='comeback_timeline',
+                ),
+            ],
+            'seo_type': 'website',
+        },
+    }
+
+    page = page_map[destination_key]
+    seo = SEO_INTERNAL_DESTINATIONS[destination_key]
+    context = {
+        'landing_page': page,
+        'canonical_url': request.build_absolute_uri(reverse(destination_key)),
+        'seo_title': seo['title'],
+        'seo_description': seo['description'],
+        'seo_type': page.get('seo_type', 'website'),
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name=page['headline'],
+            page_description=seo['description'],
+            path_name=destination_key,
+            related_links=page['related_links'],
+        ),
+    }
+    return context
+
+
 LIVE_RADIO_ALLOWED_AUDIO_EXTENSIONS = ('.mp3', '.m4a', '.wav', '.flac')
 RADIO_BUCKET_PREFIX = '/file/StrayKids/Music/'
+
+SEO_INTERNAL_DESTINATIONS = {
+    'uk_kpop_radio': {
+        'title': 'K-Pop Radio Station UK | K-Beats Radio',
+        'description': 'Listen to a UK-based K-pop radio station with live streaming, charts, comeback coverage, and fan-first programming from K-Beats Radio.',
+    },
+    'midnight_kpop_vibes': {
+        'title': 'Midnight K-Pop Vibes | After-Hours K-Pop Stream & Playlist',
+        'description': 'Settle into midnight K-pop vibes with an after-hours listening guide, moody recommendations, and quick links into the live K-Beats stream.',
+    },
+    'rainy_day_kpop': {
+        'title': 'Rainy Day K-Pop | Soft K-Pop Songs, Stream & Fan Picks',
+        'description': 'Find the best rainy day K-pop mood with fan-picked songs, reflective listening cues, and a direct route into the live K-Beats stream.',
+    },
+    'late_night_kpop_music': {
+        'title': 'Late Night K-Pop Music | Calm K-Pop Playlist Energy',
+        'description': 'Discover late night K-pop music for slower sessions, headphone listening, and soft after-hours energy with K-Beats recommendations.',
+    },
+    'best_kpop_playlist_2026': {
+        'title': 'Best K-Pop Playlist 2026 | Fresh Fan Favourites & Chart Heat',
+        'description': 'Explore the best K-pop playlist picks for 2026 with chart momentum, new-release highlights, and fan-first listening routes from K-Beats.',
+    },
+    'discover_new_kpop_music': {
+        'title': 'Discover New K-Pop Music | Fresh Songs, Charts & Comebacks',
+        'description': 'Discover new K-pop music with K-Beats through current charts, comeback coverage, standout artists, and a live stream built for discovery.',
+    },
+}
 
 
 def _normalize_live_audio_path(audio_url):
@@ -3707,6 +3969,37 @@ def _build_homepage_context(request):
     hero_support_events = hero_day_events[1:4] if len(hero_day_events) > 1 else upcoming[1:4]
 
     return {
+        'seo_title': 'K-Pop Radio Online | Live K-Pop Stream UK | K-Beats Radio',
+        'seo_description': 'Listen to K-pop radio online with K-Beats Radio. Stream live K-pop, discover chart songs, follow comebacks, and find a UK-based fan-first station built for repeat listening.',
+        'canonical_url': request.build_absolute_uri(reverse('home')),
+        'seo_type': 'website',
+        'extra_schema_json': json.dumps({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            'name': 'K-Beats Radio',
+            'url': request.build_absolute_uri(reverse('home')),
+            'description': 'A UK-based live K-pop radio station with charts, comeback coverage, artist discovery, and fan-first listening routes.',
+            'inLanguage': 'en-GB',
+            'potentialAction': {
+                '@type': 'SearchAction',
+                'target': request.build_absolute_uri(reverse('search_api')) + '?q={search_term_string}',
+                'query-input': 'required name=search_term_string',
+            },
+        }),
+        'seo_jump_links': [
+            {
+                'title': 'K-Pop Radio UK',
+                'href': reverse('uk_kpop_radio'),
+            },
+            {
+                'title': 'Midnight K-Pop Vibes',
+                'href': reverse('midnight_kpop_vibes'),
+            },
+            {
+                'title': 'Best K-Pop Playlist 2026',
+                'href': reverse('best_kpop_playlist_2026'),
+            },
+        ],
         'upcoming_comebacks': upcoming,
         'hero_day_events': hero_day_events,
         'hero_primary_event': hero_primary_event,
@@ -5694,6 +5987,21 @@ def idols(request):
         group.image_url = _optimize_home_image_url(group.image_url, width=720, height=720)
     
     return render(request, 'core/idols.html', {
+        'canonical_url': request.build_absolute_uri(reverse('idols')),
+        'seo_type': 'website',
+        'seo_title': 'K-Pop Idols & Groups | Discover BTS, Stray Kids, TWICE and More',
+        'seo_description': 'Explore K-pop idols, groups, and discographies on K-Beats. Discover artists, follow releases, and move from idol pages into live listening and charts.',
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name='K-Pop Idols & Groups',
+            page_description='Explore K-pop idols, groups, and discographies on K-Beats.',
+            path_name='idols',
+            related_links=[
+                _seo_feature_link(request, title='Live K-Pop Radio', body='Listen to the live station while you explore artists.', url_name='live'),
+                _seo_feature_link(request, title='K-Pop Charts', body='See which artists are climbing the current rankings.', url_name='charts'),
+                _seo_feature_link(request, title='Comeback Timeline', body='Track upcoming releases and major fan moments.', url_name='comeback_timeline'),
+            ],
+        ),
         'today_events': today_events, 
         'groups': groups,
         'selected_type': group_type,
@@ -5756,7 +6064,12 @@ def idol_universe(request):
     return render(request, 'core/idol_universe.html')
 
 def schedule(request):
-    return render(request, 'core/schedule.html')
+    return render(request, 'core/schedule.html', {
+        'canonical_url': request.build_absolute_uri(reverse('schedule')),
+        'seo_type': 'website',
+        'seo_title': 'K-Pop Radio Schedule | Live K-Beats Shows & Weekly Timetable',
+        'seo_description': 'See the K-Beats radio schedule, live show slots, and weekly K-pop programming so listeners know when to tune in for the next session.',
+    })
 
 def profile(request):
     return render(request, 'core/profile.html')
@@ -5779,6 +6092,21 @@ def news(request):
     )
 
     return render(request, 'core/news.html', {
+        'canonical_url': request.build_absolute_uri(reverse('news')),
+        'seo_type': 'website',
+        'seo_title': 'K-Pop News & New Music Discovery | K-Beats Editorial',
+        'seo_description': 'Discover new K-pop music, comeback updates, artist stories, and fan-aware editorial coverage from the K-Beats team.',
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name='K-Pop News & New Music Discovery',
+            page_description='Discover new K-pop music, comeback updates, artist stories, and fan-aware editorial coverage from K-Beats.',
+            path_name='news',
+            related_links=[
+                _seo_feature_link(request, title='Discover New K-Pop Music', body='Start with a discovery guide built around charts, radio, and fresh releases.', url_name='discover_new_kpop_music'),
+                _seo_feature_link(request, title='Best K-Pop Playlist 2026', body='See the playlist-led entry point for current fan favourites.', url_name='best_kpop_playlist_2026'),
+                _seo_feature_link(request, title='Listen Live', body='Jump into the station while you browse K-pop news.', url_name='live'),
+            ],
+        ),
         'featured': featured,
         'articles': remaining,
         'all_articles': all_blog,
@@ -6598,8 +6926,9 @@ def listen_free_landing(request):
         idol_images = []
 
     context = {
-        'seo_title': 'Listen Free to Live K-Pop 24/7 | K-Beats Radio',
-        'seo_description': 'Stream live K-pop in seconds on K-Beats Radio. No app, no card, just 24/7 hits, charts, fan clubs, and a free 3-day VIP trial when you want more.',
+        'canonical_url': request.build_absolute_uri(reverse('listen_free_landing')),
+        'seo_title': 'Free K-Pop Radio | Listen to K-Pop Music Online No Download',
+        'seo_description': 'Listen to free K-pop radio online with no download required. K-Beats streams live K-pop 24/7 with charts, fan clubs, and instant access from any device.',
         'seo_type': 'website',
         'seo_image': preview_track['album_art'],
         'seo_image_alt': f"Listen free to K-Beats Radio live K-pop stream featuring {preview_track['title']}",
@@ -6629,8 +6958,49 @@ def listen_free_landing(request):
         'feature_sections': feature_sections,
         'comparison_rows': comparison_rows,
         'fan_quotes': fan_quotes,
+        'seo_jump_links': [
+            {
+                'title': 'K-Pop Radio UK',
+                'href': reverse('uk_kpop_radio'),
+                'description': 'See the UK-focused station page for local-intent listeners.',
+            },
+            {
+                'title': 'Rainy Day K-Pop',
+                'href': reverse('rainy_day_kpop'),
+                'description': 'Try a softer mood-led route into K-Beats discovery.',
+            },
+            {
+                'title': 'Discover New K-Pop Music',
+                'href': reverse('discover_new_kpop_music'),
+                'description': 'Use charts, comebacks, and editorials to find your next song.',
+            },
+        ],
     }
     return render(request, 'core/listen_free_landing.html', context)
+
+
+def uk_kpop_radio(request):
+    return render(request, 'core/seo_destination.html', _build_seo_destination_context(request, 'uk_kpop_radio'))
+
+
+def midnight_kpop_vibes(request):
+    return render(request, 'core/seo_destination.html', _build_seo_destination_context(request, 'midnight_kpop_vibes'))
+
+
+def rainy_day_kpop(request):
+    return render(request, 'core/seo_destination.html', _build_seo_destination_context(request, 'rainy_day_kpop'))
+
+
+def late_night_kpop_music(request):
+    return render(request, 'core/seo_destination.html', _build_seo_destination_context(request, 'late_night_kpop_music'))
+
+
+def best_kpop_playlist_2026(request):
+    return render(request, 'core/seo_destination.html', _build_seo_destination_context(request, 'best_kpop_playlist_2026'))
+
+
+def discover_new_kpop_music(request):
+    return render(request, 'core/seo_destination.html', _build_seo_destination_context(request, 'discover_new_kpop_music'))
 
 
 def chart_clash_promo(request):
@@ -10221,7 +10591,23 @@ def _resolve_live_page_context(request):
     if not isinstance(context, dict):
         return context
 
-    context['live_experience_suggestions'] = _get_live_experience_suggestions()
+    context.update({
+        'canonical_url': request.build_absolute_uri(reverse('live')),
+        'seo_type': 'website',
+        'seo_title': 'Live K-Pop Stream | K-Beats Radio On Air 24/7',
+        'seo_description': 'Open the live K-pop stream on K-Beats Radio to see what is playing now, what is coming next, and where the latest chart and comeback energy is moving.',
+        'live_experience_suggestions': _get_live_experience_suggestions(),
+        'extra_schema_json': json.dumps({
+            '@context': 'https://schema.org',
+            '@type': 'RadioStation',
+            'name': 'K-Beats Radio Live',
+            'url': request.build_absolute_uri(reverse('live')),
+            'description': 'Live K-pop stream from K-Beats Radio with real-time now-playing context, queue visibility, and fan-first discovery.',
+            'genre': ['K-pop', 'Pop Music', 'Internet Radio'],
+            'inLanguage': 'en-GB',
+            'areaServed': ['GB', 'Worldwide'],
+        }),
+    })
     return context
 
 
@@ -10815,8 +11201,25 @@ def blog_page(request):
         'categories': cats,
         'canonical_url': request.build_absolute_uri(reverse('blog_page')),
         'seo_type': 'website',
-        'seo_title': 'K-Beats Blog | K-Pop News, Comebacks, and Culture',
-        'seo_description': 'Explore K-Pop blog coverage from K-Beats including comeback updates, artist stories, charts, and fan culture.',
+        'seo_title': 'K-Pop Blog | Discover New K-Pop Music, Playlists and Guides',
+        'seo_description': 'Explore K-pop blog coverage from K-Beats including new music discovery, comeback updates, playlist guides, artist stories, and fan culture.',
+        'editorial_jump_links': [
+            {
+                'title': 'Best K-Pop Playlist 2026',
+                'href': reverse('best_kpop_playlist_2026'),
+                'description': 'A playlist-led entry page built around chart momentum and fresh releases.',
+            },
+            {
+                'title': 'Discover New K-Pop Music',
+                'href': reverse('discover_new_kpop_music'),
+                'description': 'Move from editorial discovery into charts, comebacks, and live radio.',
+            },
+            {
+                'title': 'Midnight K-Pop Vibes',
+                'href': reverse('midnight_kpop_vibes'),
+                'description': 'See one of the mood-based keyword pages connected to the blog ecosystem.',
+            },
+        ],
     })
 
 
@@ -10939,6 +11342,12 @@ def _inject_internal_links(html, article, all_articles):
         (r'\bcomeback(s)?\b', reverse('comeback_timeline'), 'comeback timeline'),
         (r'\bschedule\b', reverse('schedule'), 'radio schedule'),
         (r'\bfan club(s)?\b', reverse('fan_clubs'), 'fan clubs'),
+        (r'\buk k-?pop radio\b', reverse('uk_kpop_radio'), 'UK K-pop radio station'),
+        (r'\bmidnight k-?pop vibes\b', reverse('midnight_kpop_vibes'), 'midnight K-pop vibes'),
+        (r'\brainy day k-?pop\b', reverse('rainy_day_kpop'), 'rainy day K-pop'),
+        (r'\blate night k-?pop music\b', reverse('late_night_kpop_music'), 'late night K-pop music'),
+        (r'\bbest k-?pop playlist 2026\b', reverse('best_kpop_playlist_2026'), 'best K-pop playlist 2026'),
+        (r'\bdiscover new k-?pop music\b', reverse('discover_new_kpop_music'), 'discover new K-pop music'),
     ]
 
     article_targets = []
@@ -12676,6 +13085,21 @@ def comeback_timeline(request):
     }
 
     return render(request, 'core/comebacks.html', {
+        'canonical_url': request.build_absolute_uri(reverse('comeback_timeline')),
+        'seo_type': 'website',
+        'seo_title': 'K-Pop Comebacks & New Releases | Discover What Lands Next',
+        'seo_description': 'Track K-pop comebacks, upcoming releases, and what lands next on K-Beats so fans can discover new music before it fully breaks.',
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name='K-Pop Comebacks & New Releases',
+            page_description='Track K-pop comebacks, upcoming releases, and what lands next on K-Beats.',
+            path_name='comeback_timeline',
+            related_links=[
+                _seo_feature_link(request, title='Discover New K-Pop Music', body='Use the discovery guide to move from releases into broader listening.', url_name='discover_new_kpop_music'),
+                _seo_feature_link(request, title='Listen Live', body='Hear what is already active on the station.', url_name='live'),
+                _seo_feature_link(request, title='K-Pop Charts', body='Check which recent songs are gaining the most momentum.', url_name='charts'),
+            ],
+        ),
         'primary_release': primary_release,
         'hero_queue': hero_queue,
         'timeline_releases': timeline_releases,

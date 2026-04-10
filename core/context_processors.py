@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Dict
 
-DEFAULT_TITLE = 'K-Beats Radio | Live K-Pop Music, Charts, News & Community'
+DEFAULT_TITLE = 'K-Pop Radio Online | Live K-Pop Stream UK | K-Beats Radio'
 DEFAULT_DESCRIPTION = (
-    'Stream live K-pop radio on K-Beats, discover charts and new releases, '
-    'read K-pop news, join fan clubs, and stay connected with your favourite artists.'
+    'Listen to K-pop radio online with K-Beats Radio. Stream live K-pop, discover charts and new releases, '
+    'read K-pop news, and stay connected with your favourite artists.'
 )
 
 SEO_BY_ROUTE: Dict[str, Dict[str, str]] = {
@@ -14,23 +14,23 @@ SEO_BY_ROUTE: Dict[str, Dict[str, str]] = {
         'description': DEFAULT_DESCRIPTION,
     },
     'live': {
-        'title': 'K-Beats Live Radio | 24/7 K-Pop Station, DJs & Requests',
-        'description': 'Listen to live K-pop radio 24/7 with K-Beats. Discover what is playing now, explore DJs, and request your favourite tracks.',
+        'title': 'Live K-Pop Stream | K-Beats Radio On Air 24/7',
+        'description': 'Open the live K-pop stream on K-Beats Radio to see what is playing now, explore DJs, and request your favourite tracks.',
     },
     'charts': {
         'title': 'K-Pop Charts | Trending Songs and Artist Rankings on K-Beats',
         'description': 'Track trending K-pop songs and artist rankings with K-Beats charts, updated with fan momentum and fresh releases.',
     },
     'news': {
-        'title': 'K-Pop News | Latest Comebacks, Releases and Fandom Updates',
-        'description': 'Read the latest K-pop news, comeback updates, artist stories and fandom highlights from the K-Beats editorial team.',
+        'title': 'K-Pop News & New Music Discovery | K-Beats Editorial',
+        'description': 'Read the latest K-pop news, comeback updates, artist stories and new music discovery coverage from the K-Beats editorial team.',
     },
     'idols': {
-        'title': 'K-Pop Idol Universe | Explore Groups, Members and Discographies',
+        'title': 'K-Pop Idols & Groups | Discover BTS, Stray Kids, TWICE and More',
         'description': 'Explore K-pop groups, member profiles and releases in the K-Beats Idol Universe with easy discovery and fan-focused detail.',
     },
     'schedule': {
-        'title': 'K-Beats Radio Schedule | Shows, Hosts and Weekly Timetable',
+        'title': 'K-Pop Radio Schedule | Live K-Beats Shows & Weekly Timetable',
         'description': 'View the K-Beats radio schedule with live show times, presenter slots and weekly programming for nonstop K-pop listening.',
     },
     'games': {
@@ -38,12 +38,12 @@ SEO_BY_ROUTE: Dict[str, Dict[str, str]] = {
         'description': 'Play free K-pop games including lyric challenges, trivia and chart battles on K-Beats.',
     },
     'comeback_timeline': {
-        'title': 'K-Pop Comeback Timeline | Upcoming Releases and D-Day Alerts',
+        'title': 'K-Pop Comebacks & New Releases | Discover What Lands Next',
         'description': 'Follow upcoming K-pop comebacks, release dates and countdowns in the K-Beats comeback timeline.',
     },
     'blog_page': {
-        'title': 'K-Beats Blog | K-Pop Features, Guides and Editorials',
-        'description': 'Discover K-pop features, explainers and fan culture editorials in the K-Beats blog.',
+        'title': 'K-Pop Blog | Discover New K-Pop Music, Playlists and Guides',
+        'description': 'Discover K-pop features, playlist guides, explainers and fan culture editorials in the K-Beats blog.',
     },
     'contests': {
         'title': 'K-Beats Contests | Enter K-Pop Giveaways and Fan Challenges',

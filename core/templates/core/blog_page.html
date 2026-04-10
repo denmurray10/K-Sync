@@ -151,8 +151,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         class="text-slate-400 mt-6 font-mono text-sm tracking-widest uppercase max-w-xl reveal-left"
                         style="transition-delay: 100ms"
                     >
-                        Original K-Pop articles — generated
-                        from the latest breaking headlines.
+                        Discover new K-pop music, playlist ideas,
+                        comeback context, and fan-aware editorial guides.
                     </p>
 
                     <div class="flex items-center gap-4 mt-8 reveal-left" style="transition-delay: 200ms">
@@ -170,6 +170,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             News Feed
                         </a>
                     </div>
+                    {% if editorial_jump_links %}
+                    <div class="mt-8 grid gap-4 reveal-left md:grid-cols-3" style="transition-delay: 260ms">
+                        {% for link in editorial_jump_links %}
+                        <a href="{{ link.href }}" class="border border-white/10 bg-white/[0.03] p-5 transition hover:border-primary hover:bg-white/[0.06]">
+                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary">SEO guide</p>
+                            <p class="mt-3 text-lg font-black uppercase tracking-tight text-white">{{ link.title }}</p>
+                            <p class="mt-3 text-sm leading-6 text-slate-300">{{ link.description }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
             </section>
 
