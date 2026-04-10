@@ -37,6 +37,10 @@ SEO_BY_ROUTE: Dict[str, Dict[str, str]] = {
         'title': 'K-Pop Games | Play Free Fan Games on K-Beats',
         'description': 'Play free K-pop games including lyric challenges, trivia and chart battles on K-Beats.',
     },
+    'request_track': {
+        'title': 'Request K-Pop Songs Online | Ask K-Beats Radio To Play Your Track',
+        'description': 'Request K-pop songs online with K-Beats Radio and send your favourite artist picks straight to the station queue.',
+    },
     'comeback_timeline': {
         'title': 'K-Pop Comebacks & New Releases | Discover What Lands Next',
         'description': 'Follow upcoming K-pop comebacks, release dates and countdowns in the K-Beats comeback timeline.',
@@ -57,6 +61,10 @@ SEO_BY_ROUTE: Dict[str, Dict[str, str]] = {
         'title': 'K-Beats Presenters | Meet the Voices Behind the Station',
         'description': 'Meet the K-Beats presenters and explore the personalities curating your daily K-pop listening experience.',
     },
+    'stream_hub': {
+        'title': 'K-Pop Stream Player Modes | K-Beats Stream Hub',
+        'description': 'Browse K-Beats stream player modes for live K-pop listening, premium vibe presets, and quick routes back into the station.',
+    },
     'pricing': {
         'title': 'K-Beats Pricing | Membership Plans and Fan Perks',
         'description': 'Compare K-Beats pricing plans and unlock premium fan perks, personalised experiences and exclusive content.',
@@ -64,6 +72,10 @@ SEO_BY_ROUTE: Dict[str, Dict[str, str]] = {
     'about_us': {
         'title': 'About K-Beats | Our Story, Mission and K-Pop Community',
         'description': 'Learn about K-Beats, our mission for global K-pop fans, and the team building a better community radio experience.',
+    },
+    'promo': {
+        'title': 'K-Beats Mobile App | Listen To K-Pop Radio Anywhere',
+        'description': 'Take K-Beats with you on mobile and keep live K-pop radio, fan perks, and station updates close wherever you listen.',
     },
 }
 

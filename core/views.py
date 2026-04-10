@@ -3669,6 +3669,23 @@ def _split_story_paragraphs(text, *, fallback=''):
 def _render_frameable_page(request, template_name, context):
     response = render(request, template_name, context)
     response['X-Frame-Options'] = 'SAMEORIGIN'
+    if context.get('seo_robots', '').startswith('noindex'):
+        response['X-Robots-Tag'] = context['seo_robots']
+    return response
+
+
+def _render_noindex_page(request, template_name, context=None, *, status=200, frameable=False):
+    merged_context = {
+        'seo_robots': 'noindex, nofollow, noarchive',
+        **(context or {}),
+    }
+    if frameable:
+        response = _render_frameable_page(request, template_name, merged_context)
+        response.status_code = status
+        return response
+
+    response = render(request, template_name, merged_context, status=status)
+    response['X-Robots-Tag'] = merged_context['seo_robots']
     return response
 
 
@@ -4045,7 +4062,7 @@ def home_redesign_lab(request):
             'summary': 'The redesign drops the client-side artwork fetch pattern and avoids the null-target particle logic that currently adds console noise.',
         },
     ]
-    return _render_frameable_page(request, 'core/home_redesign_lab.html', context)
+    return _render_noindex_page(request, 'core/home_redesign_lab.html', context, frameable=True)
 
 
 def upcoming_comebacks_design_lab(request):
@@ -4095,7 +4112,7 @@ def upcoming_comebacks_design_lab(request):
         image_url = artwork_cache.get(cache_key, '') or source_image
         release['image'] = _optimize_home_image_url(image_url, width=320, height=320)
 
-    return render(request, 'core/upcoming_comebacks_design_lab.html', {
+    return _render_noindex_page(request, 'core/upcoming_comebacks_design_lab.html', {
         'upcoming_comebacks': upcoming,
         'current_month': now.strftime('%B %Y'),
     })
@@ -4247,7 +4264,7 @@ def what_just_landed_reel_lab(request):
         'seo_title': 'What Just Landed Reel Lab | K-Beats',
         'seo_description': 'Preview the K-Beats 9:16 Facebook Reel template for What Just Landed comeback articles before any publishing flow is added.',
     })
-    return _render_frameable_page(request, 'core/what_just_landed_reel_lab.html', context)
+    return _render_noindex_page(request, 'core/what_just_landed_reel_lab.html', context, frameable=True)
 
 
 WHAT_JUST_LANDED_REEL_WIDTH = 1080
@@ -5862,6 +5879,13 @@ def api_header_mega_menu_data(request):
 
 def charts(request):
     chart_type = request.GET.get('type', 'songs')
+    chart_labels = {
+        'songs': 'Daily K-Pop Songs Chart',
+        'weekly': 'Weekly K-Pop Chart',
+        'monthly': 'Monthly K-Pop Chart',
+        'soloists': 'Top K-Pop Solo Artists',
+        'groups': 'Top K-Pop Groups',
+    }
     
     # Map 'songs' to 'daily' for now as that's our main track chart
     db_type = 'daily' if chart_type == 'songs' else chart_type
@@ -5950,6 +5974,21 @@ def charts(request):
         'ranking_methodology': ranking_methodology,
         'ranking_sources': ranking_sources,
         'ranking_explain_label': ranking_explain_label,
+        'canonical_url': request.build_absolute_uri(reverse('charts')),
+        'seo_type': 'website',
+        'seo_title': f"{chart_labels.get(chart_type, 'K-Pop Charts')} | K-Beats Charts",
+        'seo_description': f"Follow the {chart_labels.get(chart_type, 'K-pop charts').lower()} on K-Beats to discover rising songs, artist momentum, and fresh fan favourites.",
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name=chart_labels.get(chart_type, 'K-Pop Charts'),
+            page_description=f"Follow the {chart_labels.get(chart_type, 'K-pop charts').lower()} on K-Beats and move straight into artist pages, news, and live radio.",
+            path_name='charts',
+            related_links=[
+                _seo_feature_link(request, title='Listen Live', body='Hear the station while you browse the chart movers.', url_name='live'),
+                _seo_feature_link(request, title='Read K-Pop News', body='Open editorials around the songs and comebacks climbing the charts.', url_name='news'),
+                _seo_feature_link(request, title='Explore Idols', body='Visit artist pages for the groups behind the rankings.', url_name='idols'),
+            ],
+        ),
     }
     return render(request, 'core/charts.html', context)
 
@@ -6072,7 +6111,7 @@ def schedule(request):
     })
 
 def profile(request):
-    return render(request, 'core/profile.html')
+    return _render_noindex_page(request, 'core/profile.html')
 
 _news_cache = {'articles': [], 'ts': 0}
 
@@ -6393,16 +6432,25 @@ def shop(request):
     return render(request, 'core/shop.html')
 
 def pricing(request):
-    return render(request, 'core/pricing.html')
+    return render(request, 'core/pricing.html', {
+        'canonical_url': request.build_absolute_uri(reverse('pricing')),
+        'seo_type': 'website',
+    })
 
 def about_us(request):
-    return render(request, 'core/about_us.html')
+    return render(request, 'core/about_us.html', {
+        'canonical_url': request.build_absolute_uri(reverse('about_us')),
+        'seo_type': 'website',
+    })
 
 def coming_soon(request):
     return render(request, 'core/coming_soon.html')
 
 def games(request):
-    return render(request, 'core/games.html')
+    return render(request, 'core/games.html', {
+        'canonical_url': request.build_absolute_uri(reverse('games')),
+        'seo_type': 'website',
+    })
 
 
 def _build_404_context(request):
@@ -6480,7 +6528,7 @@ def _build_404_context(request):
 
 
 def preview_404(request):
-    return render(request, 'core/404.html', _build_404_context(request))
+    return _render_noindex_page(request, 'core/404.html', _build_404_context(request))
 
 
 def custom_404(request, exception):
@@ -6561,7 +6609,7 @@ def signups_login_view(request):
                 error = 'Invalid email or password.'
         else:
             error = 'Invalid email or password.'
-    return render(request, 'core/signups_login.html', {'error': error})
+    return _render_noindex_page(request, 'core/signups_login.html', {'error': error})
 
 @login_required(login_url='/staff/login/')
 def signups_dashboard_view(request):
@@ -6577,7 +6625,7 @@ def signups_dashboard_view(request):
     week_count = signups.filter(signed_up_at__gte=now - timedelta(days=7)).count()
     avg_age = signups.aggregate(avg=Avg('age'))['avg']
     avg_age = round(avg_age) if avg_age else 0
-    return render(request, 'core/signups_dashboard.html', {
+    return _render_noindex_page(request, 'core/signups_dashboard.html', {
         'signups': signups,
         'total': total,
         'today_count': today_count,
@@ -6605,7 +6653,10 @@ def signups_logout_view(request):
     return redirect('signups_login')
 
 def presenters(request):
-    return render(request, 'core/presenters.html')
+    return render(request, 'core/presenters.html', {
+        'canonical_url': request.build_absolute_uri(reverse('presenters')),
+        'seo_type': 'website',
+    })
 
 def achievement_popup(request):
     return render(request, 'core/achievement_popup.html')
@@ -6638,7 +6689,7 @@ def login_page(request):
                 error = 'Invalid email or password.'
         else:
             error = 'Invalid email or password.'
-    return render(request, 'core/login.html', {'error': error})
+    return _render_noindex_page(request, 'core/login.html', {'error': error})
 
 
 def logout_view(request):
@@ -6647,7 +6698,10 @@ def logout_view(request):
 
 
 def promo(request):
-    return render(request, 'core/promo.html')
+    return render(request, 'core/promo.html', {
+        'canonical_url': request.build_absolute_uri(reverse('promo')),
+        'seo_type': 'website',
+    })
 
 
 def launch_campaign(request):
@@ -7359,7 +7413,7 @@ def signup(request):
             if not profile.onboarding_completed:
                 return redirect('my_station_onboarding')
             return redirect('dashboard')
-    return render(request, 'core/signup.html', {'error': error})
+    return _render_noindex_page(request, 'core/signup.html', {'error': error})
 
 
 @login_required
@@ -7575,7 +7629,7 @@ def dashboard(request):
 
     badges = list(user.badges.all())
 
-    return render(request, 'core/dashboard.html', {
+    return _render_noindex_page(request, 'core/dashboard.html', {
         'trending': trending,
         'upcoming': upcoming,
         'articles': articles,
@@ -7893,6 +7947,19 @@ def request_track(request):
         'recent_requests': recent_requests,
         'radioco_request_widget_src': radioco_request_widget_src,
         'radioco_request_widget_enabled': bool(radioco_request_widget_src),
+        'canonical_url': request.build_absolute_uri(reverse('request_track')),
+        'seo_type': 'website',
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name='Request K-Pop Songs Online',
+            page_description='Request your favourite K-pop songs on K-Beats Radio and jump back into the live stream, charts, and artist pages.',
+            path_name='request_track',
+            related_links=[
+                _seo_feature_link(request, title='Listen Live', body='See what is playing before you send your request.', url_name='live'),
+                _seo_feature_link(request, title='Browse Charts', body='Pick a request from the songs fans are pushing right now.', url_name='charts'),
+                _seo_feature_link(request, title='Explore Idols', body='Open artist pages for more tracks and member details.', url_name='idols'),
+            ],
+        ),
     })
 
 
@@ -8350,6 +8417,19 @@ def contests(request):
     return render(request, 'core/contests.html', {
         'featured': featured,
         'grid': grid,
+        'canonical_url': request.build_absolute_uri(reverse('contests')),
+        'seo_type': 'website',
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name='K-Pop Contests and Giveaways',
+            page_description='Enter active K-Beats contests, giveaways, and fan challenges built around K-pop artists, fandom energy, and station rewards.',
+            path_name='contests',
+            related_links=[
+                _seo_feature_link(request, title='Listen Free', body='Keep the station on while you browse active fan rewards.', url_name='listen_free_landing'),
+                _seo_feature_link(request, title='Join Fan Clubs', body='Find artist communities with more ongoing perks.', url_name='fan_clubs'),
+                _seo_feature_link(request, title='Read K-Pop News', body='Catch up on the stories behind the artists in current giveaways.', url_name='news'),
+            ],
+        ),
     })
 
 
@@ -8379,6 +8459,19 @@ def contest_entry(request, slug):
         'contest': contest,
         'prizes': prizes,
         'rules': rules,
+        'canonical_url': request.build_absolute_uri(reverse('contest_entry', args=[contest.slug])),
+        'seo_type': 'website',
+        'seo_title': f"{contest.title} | Enter This K-Pop Contest on K-Beats",
+        'seo_description': (contest.subtitle or f"Enter {contest.title} on K-Beats and take part in a live K-pop fan giveaway with prizes, perks, and community energy.")[:160],
+        'extra_schema_json': json.dumps({
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            'name': contest.title,
+            'description': contest.subtitle or f'Enter {contest.title} on K-Beats.',
+            'url': request.build_absolute_uri(reverse('contest_entry', args=[contest.slug])),
+            'isPartOf': request.build_absolute_uri(reverse('contests')),
+            'inLanguage': 'en-GB',
+        }),
     })
 
 def _search_all(q):
@@ -8554,7 +8647,7 @@ def results(request):
             KPopGroup.objects.filter(rank__isnull=False).order_by('rank')[:6]
         )
         latest_articles = list(BlogArticle.objects.order_by('-created_at')[:3])
-    return render(request, 'core/results.html', {
+    return _render_noindex_page(request, 'core/results.html', {
         'q': q,
         'artists': data.get('artists', []),
         'members': data.get('members', []),
@@ -8564,6 +8657,8 @@ def results(request):
         'comebacks': data.get('comebacks', []),
         'trending_artists': trending_artists,
         'latest_articles': latest_articles,
+        'seo_title': f"K-Pop Search Results | {q} | K-Beats" if q else 'Search K-Pop Artists, Songs and News | K-Beats',
+        'seo_description': f"Search results for {q} across K-pop artists, songs, articles, and comeback pages on K-Beats." if q else 'Search across K-pop artists, songs, articles, and comeback pages on K-Beats.',
     })
 
 
@@ -10771,7 +10866,7 @@ def live(request):
 
 
 def test_page(request):
-    return render(request, 'core/test_page.html', {
+    return _render_noindex_page(request, 'core/test_page.html', {
         'current_home_url': reverse('home'),
         'redesign_home_url': reverse('home_redesign_lab'),
         'comparison_cards': [
@@ -10811,6 +10906,21 @@ def stream_hub(request):
         'stream_presets_free': [preset for preset in presets if preset['required_tier'] == 'FREE'],
         'stream_presets_premium': [preset for preset in presets if preset['required_tier'] != 'FREE'],
         'user_stream_tier': user_tier,
+        'canonical_url': request.build_absolute_uri(reverse('stream_hub')),
+        'seo_type': 'website',
+        'seo_title': 'K-Pop Stream Player Modes | K-Beats Stream Hub',
+        'seo_description': 'Browse K-Beats stream player modes for live K-pop listening, premium vibe presets, and quick routes back into the station.',
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name='K-Pop Stream Player Modes',
+            page_description='Browse K-Beats stream player modes for live listening, mood-led presets, and fan-first playback options.',
+            path_name='stream_hub',
+            related_links=[
+                _seo_feature_link(request, title='Listen Live', body='Go straight to the on-air K-pop stream.', url_name='live'),
+                _seo_feature_link(request, title='Listen Free', body='Start with the free K-pop radio entry page.', url_name='listen_free_landing'),
+                _seo_feature_link(request, title='Request A Song', body='Send a track request before you settle into a stream preset.', url_name='request_track'),
+            ],
+        ),
     })
     return render(request, 'core/stream_hub.html', context)
 
@@ -10837,6 +10947,19 @@ def stream_player(request, slug):
         'stream_required_tier': preset['required_tier'],
         'user_stream_tier': user_tier,
         'stream_related_presets': related_presets,
+        'canonical_url': request.build_absolute_uri(reverse('stream_player', args=[slug])),
+        'seo_type': 'website',
+        'seo_title': f"{preset['name']} K-Pop Stream | K-Beats Player",
+        'seo_description': f"{preset['description']} Open the {preset['name']} K-pop stream on K-Beats and move between live radio, charts, and fan discovery pages.",
+        'extra_schema_json': json.dumps({
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            'name': f"{preset['name']} K-Pop Stream",
+            'description': preset['description'],
+            'url': request.build_absolute_uri(reverse('stream_player', args=[slug])),
+            'isPartOf': request.build_absolute_uri(reverse('stream_hub')),
+            'inLanguage': 'en-GB',
+        }),
     })
     return render(request, 'core/stream_player.html', context)
 
@@ -11141,7 +11264,7 @@ def neon_home_variant_2(request):
 
 def test_landing_wow_hero(request):
     featured_article = BlogArticle.objects.order_by('-created_at').first()
-    return render(request, 'core/test_landing_wow_hero.html', {
+    return _render_noindex_page(request, 'core/test_landing_wow_hero.html', {
         'featured_article': featured_article,
     })
 
@@ -13430,6 +13553,19 @@ def idol_page(request, slug):
         'tracks': tracks,
         'events': events,
         'gallery': [],
+        'canonical_url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
+        'seo_type': 'website',
+        'seo_title': f"{group.name} K-Pop Group Guide | Songs, Members and Albums | K-Beats",
+        'seo_description': (group.description or f"Explore {group.name} on K-Beats with member details, top songs, albums, recent activity, and related K-pop discovery paths.")[:160],
+        'extra_schema_json': json.dumps({
+            '@context': 'https://schema.org',
+            '@type': 'MusicGroup',
+            'name': group.name,
+            'description': group.description or story_text,
+            'url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
+            'genre': 'K-pop',
+            'inLanguage': 'en-GB',
+        }),
     }
     return render(request, 'core/idol_band_page.html', context)
 
@@ -13544,6 +13680,22 @@ def album_detail(request, slug, collection_id):
         'accent_rgb': accent_rgb_map.get(
             group.group_type, '255,142,175'
         ),
+        'canonical_url': request.build_absolute_uri(reverse('album_detail', args=[group.slug, collection_id])),
+        'seo_type': 'website',
+        'seo_title': f"{album_info.get('title', 'Album')} by {group.name} | Tracklist and Album Guide | K-Beats",
+        'seo_description': f"Explore {album_info.get('title', 'this album')} by {group.name} with tracklist, release details, runtime, and quick links back to the artist page on K-Beats.",
+        'extra_schema_json': json.dumps({
+            '@context': 'https://schema.org',
+            '@type': 'MusicAlbum',
+            'name': album_info.get('title', ''),
+            'byArtist': {
+                '@type': 'MusicGroup',
+                'name': group.name,
+            },
+            'url': request.build_absolute_uri(reverse('album_detail', args=[group.slug, collection_id])),
+            'numTracks': len(tracks),
+            'inLanguage': 'en-GB',
+        }),
     }
     return render(request, 'core/album_detail.html', context)
 
@@ -13731,7 +13883,20 @@ def fan_clubs(request):
         'total_members': total_members,
         'active_events': active_events,
         'joined_ids': joined_ids,
-        'launches': launches
+        'launches': launches,
+        'canonical_url': request.build_absolute_uri(reverse('fan_clubs')),
+        'seo_type': 'website',
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name='K-Pop Fan Clubs',
+            page_description='Join K-pop fan clubs on K-Beats, explore artist communities, and unlock rewards tied to events, badges, and fandom participation.',
+            path_name='fan_clubs',
+            related_links=[
+                _seo_feature_link(request, title='Explore Idols', body='Choose the artist pages behind the fan clubs.', url_name='idols'),
+                _seo_feature_link(request, title='See Comebacks', body='Track the releases your fan clubs are rallying around.', url_name='comebacks'),
+                _seo_feature_link(request, title='Listen Live', body='Bring the station with you while you browse club perks.', url_name='live'),
+            ],
+        ),
     })
 
 
@@ -14155,7 +14320,7 @@ def get_artist_stats(request):
     })
 
 def placeholder(request):
-    return render(request, 'core/placeholder.html')
+    return _render_noindex_page(request, 'core/placeholder.html')
 
 
 def privacy_policy(request):

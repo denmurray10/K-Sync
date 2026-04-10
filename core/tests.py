@@ -20,6 +20,7 @@ from core import scheduler as core_scheduler
 from .models import (
     BlogArticle,
     ComebackData,
+    Contest,
     KPopGroup,
     LivePoll,
     LivePollOption,
@@ -119,6 +120,28 @@ class SiteIconTests(TestCase):
     }
 )
 class SeoRolloutTests(TestCase):
+    def setUp(self):
+        self.group = KPopGroup.objects.create(
+            name='Signal Queens',
+            slug='signal-queens',
+            label='Signal Label',
+            group_type='GIRL',
+            description='Signal Queens are a rising K-pop group known for glossy hooks and midnight-pop choruses.',
+            rank=7,
+        )
+        self.contest = Contest.objects.create(
+            slug='signal-queens-giveaway',
+            title='Signal Queens Signed Album Giveaway',
+            subtitle='Win signed merch and album rewards from the latest Signal Queens era.',
+            description='A fan giveaway for the latest Signal Queens comeback.',
+            artist='Signal Queens',
+            prizes=[{'title': 'Signed album'}],
+            rules='One entry per person',
+            entry_question='What is your favourite track?',
+            deadline=timezone.now() + timedelta(days=5),
+            is_active=True,
+        )
+
     def test_homepage_uses_dynamic_seo_metadata(self):
         response = self.client.get(reverse('home'))
 
@@ -149,6 +172,56 @@ class SeoRolloutTests(TestCase):
         self.assertContains(response, reverse('midnight_kpop_vibes'))
         self.assertContains(response, reverse('best_kpop_playlist_2026'))
         self.assertContains(response, reverse('discover_new_kpop_music'))
+
+    def test_non_seo_routes_emit_noindex_headers(self):
+        routes = [
+            reverse('preview_404'),
+            reverse('home_redesign_lab'),
+            reverse('upcoming_comebacks_design_lab'),
+            reverse('test_page'),
+            reverse('test_landing_wow_hero'),
+            reverse('placeholder'),
+            reverse('login'),
+            reverse('signup'),
+            reverse('results'),
+        ]
+
+        for route in routes:
+            response = self.client.get(route)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response['X-Robots-Tag'], 'noindex, nofollow, noarchive')
+
+    def test_public_pages_now_emit_route_specific_titles(self):
+        page_expectations = [
+            ('charts', 'Daily K-Pop Songs Chart | K-Beats Charts'),
+            ('request_track', 'Request K-Pop Songs Online | Ask K-Beats Radio To Play Your Track'),
+            ('contests', 'K-Beats Contests | Enter K-Pop Giveaways and Fan Challenges'),
+            ('fan_clubs', 'K-Pop Fan Clubs | Join Communities and Unlock Rewards'),
+            ('stream_hub', 'K-Pop Stream Player Modes | K-Beats Stream Hub'),
+            ('pricing', 'K-Beats Pricing | Membership Plans and Fan Perks'),
+            ('about_us', 'About K-Beats | Our Story, Mission and K-Pop Community'),
+            ('presenters', 'K-Beats Presenters | Meet the Voices Behind the Station'),
+            ('promo', 'K-Beats Mobile App | Listen To K-Pop Radio Anywhere'),
+        ]
+
+        for route_name, expected_title in page_expectations:
+            response = self.client.get(reverse(route_name))
+            self.assertContains(response, f'<title>{expected_title}</title>', html=True)
+
+    def test_dynamic_artist_and_contest_pages_emit_unique_titles(self):
+        idol_response = self.client.get(reverse('idol_page', args=[self.group.slug]))
+        contest_response = self.client.get(reverse('contest_entry', args=[self.contest.slug]))
+
+        self.assertContains(
+            idol_response,
+            '<title>Signal Queens K-Pop Group Guide | Songs, Members and Albums | K-Beats</title>',
+            html=True,
+        )
+        self.assertContains(
+            contest_response,
+            '<title>Signal Queens Signed Album Giveaway | Enter This K-Pop Contest on K-Beats</title>',
+            html=True,
+        )
 
 
 class FanClubTierAndEventTests(TestCase):
