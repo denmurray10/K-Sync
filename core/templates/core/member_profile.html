@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en-GB">
+    <head>
+        <meta charset="UTF-8" />
+        {% include 'core/seo_meta.html' %}
+        <title>{{ seo_title }}</title>
+        <link rel="stylesheet" href="{% static 'core/css/idols-tailwind.css' %}" />
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+        <style>
+            body { background: #050505; color: #fff; font-family: 'Montserrat', sans-serif; }
+            .accent-border { border-color: {{ accent_color }}; }
+            .accent-text { color: {{ accent_color }}; }
+            .accent-bg { background: {{ accent_color }}; color: #000; }
+            .panel { border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.03); }
+        </style>
+    </head>
+    <body>
+        {% include 'core/header.html' %}
+        <main class="min-h-screen bg-black">
+            <section class="border-b border-white/10">
+                <div class="container mx-auto px-4 sm:px-6 py-16 md:py-20">
+                    <div class="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-slate-500">
+                        {% for crumb in breadcrumbs %}
+                        <a href="{{ crumb.url }}" class="hover:text-white transition-colors">{{ crumb.name }}</a>{% if not forloop.last %}<span>/</span>{% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="mt-8 grid gap-10 lg:grid-cols-[340px_minmax(0,1fr)] lg:items-end">
+                        <div class="overflow-hidden border border-white/10 bg-white/[0.03]">
+                            <img src="{{ member_image }}" alt="{{ member.display_name }}" class="h-full w-full object-cover" />
+                        </div>
+                        <div>
+                            <p class="text-[11px] uppercase tracking-[0.22em] accent-text">{{ group.name }}</p>
+                            <h1 class="mt-3 text-5xl md:text-6xl font-black uppercase tracking-tighter">{{ member.display_name }}</h1>
+                            {% if member.korean_name or member.resolved_full_name != member.display_name %}
+                            <p class="mt-4 text-sm uppercase tracking-[0.18em] text-slate-400">{{ member.resolved_full_name }}{% if member.korean_name %} / {{ member.korean_name }}{% endif %}</p>
+                            {% endif %}
+                            {% if member.resolved_positions %}
+                            <p class="mt-6 text-lg text-slate-300">{{ member.resolved_positions }}</p>
+                            {% endif %}
+                            <div class="mt-8 flex flex-wrap gap-4">
+                                <a href="{{ birthday_page_url }}" class="accent-bg px-6 py-4 text-xs font-black uppercase tracking-[0.22em]">Birthday Page</a>
+                                <a href="{% url 'idol_page' slug=group.slug %}" class="border border-white/20 px-6 py-4 text-xs font-black uppercase tracking-[0.22em] text-white">Group Profile</a>
+                                <a href="{% url 'live' %}" class="border border-white/20 px-6 py-4 text-xs font-black uppercase tracking-[0.22em] text-white">Listen Live</a>
+                            </div>
+                            {% if next_birthday %}
+                            <div class="mt-8 panel p-5">
+                                <p class="text-[10px] uppercase tracking-[0.18em] accent-text">Next birthday</p>
+                                <p class="mt-3 text-2xl font-black text-white">{{ next_birthday|date:"d F Y" }}</p>
+                                <p class="mt-2 text-sm text-slate-400">{{ birthday_countdown_days }} day{{ birthday_countdown_days|pluralize }} away{% if current_age is not None %} • currently {{ current_age }}{% endif %}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="border-b border-white/10">
+                <div class="container mx-auto px-4 sm:px-6 py-16 grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,.7fr)]">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Profile story</p>
+                        {% for paragraph in description_paragraphs %}
+                        <p class="{% if not forloop.first %}mt-6{% else %}mt-5{% endif %} text-lg leading-relaxed text-slate-300">{{ paragraph }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="panel p-6">
+                        <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Quick facts</p>
+                        <div class="mt-5 space-y-4">
+                            {% for fact in fact_rows %}
+                            <div class="border-b border-white/10 pb-3 last:border-b-0">
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ fact.label }}</p>
+                                {% if fact.label == 'Instagram' %}
+                                <a href="{{ fact.value }}" class="mt-2 block text-sm text-white hover:underline">{{ fact.value }}</a>
+                                {% else %}
+                                <p class="mt-2 text-sm text-white">{{ fact.value }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {% if milestones %}
+            <section class="border-b border-white/10">
+                <div class="container mx-auto px-4 sm:px-6 py-16">
+                    <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Milestones</p>
+                    <div class="mt-8 grid gap-4 md:grid-cols-2">
+                        {% for item in milestones %}
+                        <article class="panel p-5">
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.get_category_display }}{% if item.milestone_date %} • {{ item.milestone_date|date:"d M Y" }}{% endif %}</p>
+                            <h2 class="mt-3 text-xl font-black uppercase tracking-tight">{{ item.title }}</h2>
+                            {% if item.description %}<p class="mt-3 text-sm leading-relaxed text-slate-300">{{ item.description }}</p>{% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {% if related_articles %}
+            <section>
+                <div class="container mx-auto px-4 sm:px-6 py-16">
+                    <p class="text-[10px] uppercase tracking-[0.22em] accent-text">K-Beats routes</p>
+                    <div class="mt-8 grid gap-4 md:grid-cols-2">
+                        {% for article in related_articles %}
+                        <a href="{{ article.url }}" class="panel p-5 transition-colors hover:border-[{{ accent_color }}]">
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Editorial</p>
+                            <h2 class="mt-3 text-xl font-black uppercase tracking-tight">{{ article.title }}</h2>
+                            {% if article.subtitle %}<p class="mt-3 text-sm leading-relaxed text-slate-300">{{ article.subtitle }}</p>{% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </main>
+        {% include 'core/footer.html' %}
+    </body>
+</html>

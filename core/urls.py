@@ -146,6 +146,8 @@ urlpatterns = [
     path('stream/<slug:slug>/', views.stream_player, name='stream_player'),
 
     # ── Dynamic Idol Pages ────────────────────────────────────────────────
+    path('idols/<slug:group_slug>/members/<slug:member_slug>/', views.member_page, name='member_page'),
+    path('idols/<slug:group_slug>/members/<slug:member_slug>/birthday/', views.member_birthday_page, name='member_birthday_page'),
     path('idols/<slug:slug>/', views.idol_page, name='idol_page'),
     path('idols/<slug:slug>/album/<int:collection_id>/', views.album_detail, name='album_detail'),
     path('legal/placeholder/', views.placeholder, name='placeholder'),

@@ -203,7 +203,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         class="flex items-center gap-6 overflow-x-auto scrollbar-hide"
                     >
                         {% for event in today_events %}
-                        <span class="inline-flex items-center gap-2 shrink-0">
+                        {% if event.href %}<a href="{{ event.href }}" class="inline-flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">{% else %}<span class="inline-flex items-center gap-2 shrink-0">{% endif %}
                             <span
                                 class="font-black text-sm text-black uppercase tracking-tight"
                                 >{{ event.name }}</span
@@ -214,7 +214,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 >{{ event.group }}</span
                             >
                             {% endif %}
-                        </span>
+                        {% if event.href %}</a>{% else %}</span>{% endif %}
                         {% if not forloop.last %}
                         <span class="text-black/30">/</span>
                         {% endif %} {% endfor %}

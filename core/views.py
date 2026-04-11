@@ -133,26 +133,43 @@ def _build_seo_destination_context(request, destination_key):
         'uk_kpop_radio': {
             'eyebrow': 'UK Discovery',
             'headline': 'K-Pop Radio Station UK',
-            'lede': 'K-Beats is a UK-based K-pop radio station built for fans who want live music, comeback energy, and a station that feels current every time they press play.',
-            'intro': 'This page is designed for listeners searching specifically for a K-pop radio station in the UK. It keeps the promise simple: live K-pop, quick discovery, and easy routes into charts, artist pages, and comeback coverage.',
+            'lede': 'K-Beats is a UK-based K-pop radio station for listeners who want a live stream, current comeback energy, and a station that feels active the moment they press play.',
+            'intro': 'This page is built for listeners searching specifically for a K-pop radio station in the UK. The promise is simple: live K-pop, low-friction listening, and clear routes into charts, artist discovery, and comeback coverage without sending fans into a generic playlist maze.',
             'primary_cta': {'label': 'Start The Live Stream', 'href': reverse('live')},
             'secondary_cta': {'label': 'Listen Free First', 'href': reverse('listen_free_landing')},
             'highlights': [
-                'UK-based positioning with global K-pop coverage.',
-                'Live radio, chart updates, and comeback context in one place.',
-                'Clear routes into fan clubs, idols, and editorial coverage.',
+                'UK-based positioning with global K-pop coverage and fan-first discovery.',
+                'A live K-pop stream, chart updates, and comeback context in one route.',
+                'Clear handoffs into idols, editorial coverage, and free listening surfaces.',
             ],
             'sections': [
                 {
-                    'title': 'Why this page matters',
-                    'body': 'Searchers using UK radio phrasing are already close to choosing a station. The page should reassure them that K-Beats is active, fan-aware, and built around repeat listening rather than a static playlist.',
+                    'title': 'Why UK radio intent matters',
+                    'body': 'Searchers using UK radio phrasing are usually close to choosing a listening destination. This page needs to reassure them that K-Beats is active, current, and built around repeat live listening rather than a one-off playlist result.',
                 },
                 {
-                    'title': 'What to do next',
-                    'body': 'Lead with the live player, then support that with charts, comebacks, and editorial links so first-time visitors can keep exploring after the first click.',
+                    'title': 'How the page should convert',
+                    'body': 'Lead with the live player, support it with a free-listen fallback, and then move first-time visitors toward charts, comebacks, and editorial routes so they stay inside the wider K-Beats discovery loop.',
+                },
+                {
+                    'title': 'What makes K-Beats useful',
+                    'body': 'A strong UK K-pop radio page should feel practical, not fluffy. Fans need to know they can listen immediately, track what is moving in the scene, and keep exploring artists and new releases without friction.',
                 },
             ],
-            'related_links': related_links,
+            'related_links': related_links + [
+                _seo_feature_link(
+                    request,
+                    title='Track K-Pop Comebacks',
+                    body='Follow the comeback calendar to see what is landing next across K-pop.',
+                    url_name='comeback_timeline',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Explore K-Pop Idols',
+                    body='Open artist pages for groups, members, releases, and fandom context.',
+                    url_name='idols',
+                ),
+            ],
             'seo_type': 'website',
         },
         'midnight_kpop_vibes': {
@@ -183,26 +200,43 @@ def _build_seo_destination_context(request, destination_key):
         'rainy_day_kpop': {
             'eyebrow': 'Mood Guide',
             'headline': 'Rainy Day K-Pop',
-            'lede': 'For softer sessions, reflective moods, and fan-picked songs that fit rainy-day K-pop listening without losing the energy of discovery.',
-            'intro': 'This page should feel intentional and comforting, while still moving people deeper into the main listening surfaces. It works best when it behaves like a mood-led introduction to the broader K-Beats experience.',
+            'lede': 'For softer sessions, reflective moods, and fan-picked songs that fit rainy-day K-pop listening without losing the momentum of discovery.',
+            'intro': 'This page should feel intentional, comforting, and useful right away. It works best when it acts as a mood-led entry into the wider K-Beats experience, guiding listeners from a rainy-day vibe into live radio, charts, comebacks, and artist pages.',
             'primary_cta': {'label': 'Listen Live', 'href': reverse('live')},
             'secondary_cta': {'label': 'Explore The Charts', 'href': reverse('charts')},
             'highlights': [
-                'Targets a low-competition mood keyword with clear fan intent.',
-                'Supports discovery through charts, comebacks, and live listening.',
-                'Gives K-Beats a softer editorial entry point beyond pure radio terms.',
+                'Targets a low-competition mood keyword with clear listener intent.',
+                'Supports discovery through live listening, charts, comebacks, and editorial routes.',
+                'Gives K-Beats a softer entry point without becoming a thin playlist page.',
             ],
             'sections': [
                 {
                     'title': 'Why this keyword fits K-Beats',
-                    'body': 'Mood-led searches work well for a newer domain because the competition is lighter and the intent is clearer. K-Beats can satisfy that intent while also introducing the radio product.',
+                    'body': 'Mood-led searches work well for a newer domain because the competition is lighter and the intent is sharper. K-Beats can satisfy that mood immediately, then introduce the radio product and the broader discovery ecosystem.',
                 },
                 {
                     'title': 'How the page should convert',
-                    'body': 'Offer a mood-first promise, then quickly show that the listener can move from a rainy-day vibe into live radio, release tracking, and artist exploration without leaving the ecosystem.',
+                    'body': 'Start with a rainy-day promise, then show that the listener can move from a reflective mood into live radio, release tracking, artist discovery, and K-pop news without leaving the ecosystem.',
+                },
+                {
+                    'title': 'What the page should feel like',
+                    'body': 'The copy should feel fan-aware and calm, not generic. Rainy-day listeners are usually looking for atmosphere first, so the page should deliver that tone while still making the next action obvious.',
                 },
             ],
-            'related_links': related_links,
+            'related_links': related_links + [
+                _seo_feature_link(
+                    request,
+                    title='Track K-Pop Comebacks',
+                    body='Follow what is landing next when you want fresh songs to match the mood.',
+                    url_name='comeback_timeline',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Discover New K-Pop Music',
+                    body='Use the discovery guide to move from mood listening into broader fan picks and current releases.',
+                    url_name='discover_new_kpop_music',
+                ),
+            ],
             'seo_type': 'website',
         },
         'late_night_kpop_music': {
@@ -4006,23 +4040,27 @@ def _build_homepage_context(request):
         'seo_jump_links': [
             {
                 'title': 'K-Pop Radio UK',
+                'label': 'Tune In Live',
                 'href': reverse('uk_kpop_radio'),
-                'description': 'Open the UK-focused station page for local-intent listeners looking for live K-pop radio.',
+                'description': "The UK's only dedicated K-pop broadcast, live around the clock. Real shows, real presenters, and a signal built for fans who want more than a playlist.",
             },
             {
                 'title': 'Midnight K-Pop Vibes',
+                'label': 'Enter The Vibe',
                 'href': reverse('midnight_kpop_vibes'),
-                'description': 'Use the after-hours mood page to branch into softer late-night discovery.',
+                'description': 'Soft hours, big feelings. Drift into ballads, late-night B-sides, and slow-burn deep cuts handpicked for the hours after everything goes quiet.',
             },
             {
                 'title': 'Best K-Pop Playlist 2026',
+                'label': 'Play It Now',
                 'href': reverse('best_kpop_playlist_2026'),
-                'description': 'Jump from the homepage into the playlist-led discovery page built around current momentum.',
+                'description': "Every track that's defined 2026 so far, updated weekly. If it's charting, trending, or taking over Weverse right now — it's on this list.",
             },
             {
                 'title': 'Discover New K-Pop Music',
+                'label': 'Find Your Next Bias',
                 'href': reverse('discover_new_kpop_music'),
-                'description': 'Move into the discovery guide that ties radio, charts, comebacks, and editorial together.',
+                'description': "Debut acts, hidden B-sides, under-the-radar groups — this is everything the algorithm hasn't served you yet. Your next obsession is one scroll away.",
             },
         ],
         'upcoming_comebacks': upcoming,
@@ -6004,12 +6042,19 @@ def idols(request):
     now = timezone.now()
     data_obj = ComebackData.objects.filter(year=now.year, month=now.month).first()
     today_str = now.strftime('%Y-%m-%d')
+    member_resolver = _build_member_lookup_resolver()
     
     today_events = []
     if data_obj and today_str in data_obj.data:
         day_data = data_obj.data[today_str]
         for b in day_data.get('birthdays', []):
-            today_events.append({'type': 'Birthday', 'name': b.get('name'), 'group': b.get('group')})
+            member = _find_member_for_names(b.get('name'), b.get('group'), resolver=member_resolver)
+            today_events.append({
+                'type': 'Birthday',
+                'name': b.get('name'),
+                'group': b.get('group'),
+                'href': _member_birthday_url(member) if member else '',
+            })
 
     group_type = request.GET.get('type')
     gender = request.GET.get('gender')
@@ -8710,7 +8755,7 @@ def search_api(request):
             'type': 'member',
             'name': m.stage_name or m.name,
             'image': m.image_url or '',
-            'url': f'/idols/{m.group.slug}/',
+            'url': _member_profile_url(m),
             'sub': m.group.name,
         })
     for a in BlogArticle.objects.filter(
@@ -9196,6 +9241,173 @@ def _find_group_for_artist_name(artist_name, resolver=None):
     return _build_group_lookup_resolver()(artist_name)
 
 
+def _build_member_lookup_resolver():
+    members = list(
+        KPopMember.objects.select_related('group').only(
+            'slug',
+            'name',
+            'full_name',
+            'stage_name',
+            'group__slug',
+            'group__name',
+        ).order_by('group__rank', 'group__name', 'order', 'name')
+    )
+    member_map = {}
+    grouped_map = {}
+
+    for member in members:
+        group_key = _normalize_group_lookup_name(member.group.name)
+        for raw_name in [member.stage_name, member.name, member.full_name]:
+            normalized = _normalize_group_lookup_name(raw_name)
+            if not normalized:
+                continue
+            member_map.setdefault(normalized, []).append(member)
+            grouped_map.setdefault((group_key, normalized), member)
+
+    def resolve(member_name, group_name=''):
+        member_key = _normalize_group_lookup_name(member_name)
+        group_key = _normalize_group_lookup_name(group_name)
+        if not member_key:
+            return None
+        if group_key and (group_key, member_key) in grouped_map:
+            return grouped_map[(group_key, member_key)]
+        candidates = member_map.get(member_key, [])
+        if len(candidates) == 1:
+            return candidates[0]
+        if group_key:
+            for candidate in candidates:
+                candidate_group_key = _normalize_group_lookup_name(candidate.group.name)
+                if candidate_group_key == group_key or group_key in candidate_group_key:
+                    return candidate
+        return candidates[0] if candidates else None
+
+    return resolve
+
+
+def _find_member_for_names(member_name, group_name='', resolver=None):
+    if resolver:
+        return resolver(member_name, group_name)
+    return _build_member_lookup_resolver()(member_name, group_name)
+
+
+def _build_breadcrumb_schema(request, crumbs):
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+            {
+                '@type': 'ListItem',
+                'position': index,
+                'name': crumb['name'],
+                'item': request.build_absolute_uri(crumb['url']),
+            }
+            for index, crumb in enumerate(crumbs, start=1)
+        ],
+    }
+
+
+def _member_profile_url(member):
+    return reverse('member_page', args=[member.group.slug, member.slug])
+
+
+def _member_birthday_url(member):
+    return reverse('member_birthday_page', args=[member.group.slug, member.slug])
+
+
+def _calculate_age_on_date(date_of_birth, target_date):
+    if not date_of_birth or not target_date:
+        return None
+    years = target_date.year - date_of_birth.year
+    if (target_date.month, target_date.day) < (date_of_birth.month, date_of_birth.day):
+        years -= 1
+    return years
+
+
+def _next_birthday_date(date_of_birth, today):
+    if not date_of_birth:
+        return None
+    try:
+        candidate = date_of_birth.replace(year=today.year)
+    except ValueError:
+        candidate = date_of_birth.replace(year=today.year, day=min(date_of_birth.day, 28))
+    if candidate < today:
+        try:
+            candidate = candidate.replace(year=today.year + 1)
+        except ValueError:
+            candidate = candidate.replace(year=today.year + 1, day=min(candidate.day, 28))
+    return candidate
+
+
+def _member_fact_rows(member, group):
+    return [
+        {'label': 'Stage name', 'value': member.display_name},
+        {'label': 'Full name', 'value': member.resolved_full_name},
+        {'label': 'Korean name', 'value': member.korean_name},
+        {'label': 'Group', 'value': group.name},
+        {'label': 'Agency', 'value': group.agency or group.label},
+        {'label': 'Positions', 'value': member.resolved_positions},
+        {'label': 'Birth date', 'value': member.date_of_birth.strftime('%d %B %Y') if member.date_of_birth else ''},
+        {'label': 'Birthplace', 'value': member.birthplace},
+        {'label': 'Nationality', 'value': member.nationality},
+        {'label': 'MBTI', 'value': member.mbti},
+        {'label': 'Blood type', 'value': member.blood_type},
+        {'label': 'Height', 'value': f"{member.height_cm} cm" if member.height_cm else ''},
+        {'label': 'Instagram', 'value': member.instagram_url},
+    ]
+
+
+def _group_member_cards(group, *, accent_fallback=''):
+    cards = []
+    for member in group.members.all():
+        cards.append({
+            'name': member.display_name,
+            'full_name': member.resolved_full_name,
+            'position': member.resolved_positions,
+            'image': _optimize_home_image_url(
+                _coalesce_stream_image_url(
+                    member.resolved_image_url,
+                    getattr(group, 'image_url', ''),
+                    fallback=getattr(group, 'logo_path', '') or DEFAULT_STREAM_IMAGE_URL,
+                ),
+                width=720,
+                height=720,
+            ),
+            'profile_url': _member_profile_url(member),
+            'birthday_url': _member_birthday_url(member),
+            'has_birthday_page': bool(member.date_of_birth),
+            'accent': accent_fallback,
+        })
+    return cards
+
+
+def _member_related_release_context(member):
+    group = member.group
+    related_articles = list(
+        BlogArticle.objects.filter(title__icontains=group.name).order_by('-created_at')[:4]
+    )
+    return [
+        {
+            'title': article.title,
+            'subtitle': article.subtitle,
+            'url': reverse('blog_article_read', args=[article.slug]),
+            'image': article.image,
+        }
+        for article in related_articles
+    ]
+
+
+def _member_birthday_event_context(member, today, window_data=None):
+    payload = window_data or _load_comeback_window_content(today, today.year, today.month)
+    birthday_items = []
+    for item in payload['all_birthdays']:
+        if item.get('member_slug') == member.slug and item.get('group_slug') == member.group.slug:
+            birthday_items.append(item)
+    birthday_items.sort(key=lambda item: item['date_str'])
+    next_event = next((item for item in birthday_items if item['date_str'] >= today.isoformat()), None)
+    latest_event = birthday_items[-1] if birthday_items else None
+    return birthday_items, next_event, latest_event
+
+
 def _comeback_relative_label(target_date, today):
     days_until = (target_date - today).days
     if days_until <= 0:
@@ -9258,8 +9470,9 @@ def _build_comeback_release_item(raw_release, date_key, today, resolver=None):
     }
 
 
-def _build_comeback_event_item(raw_item, date_key, today, kind, resolver=None):
+def _build_comeback_event_item(raw_item, date_key, today, kind, resolver=None, member_resolver=None):
     date_obj = datetime.strptime(date_key, '%Y-%m-%d').date()
+    member = None
     if kind == 'birthday':
         label = str(raw_item.get('name') or 'Birthday').strip()
         group_name = str(raw_item.get('group') or '').strip()
@@ -9271,6 +9484,7 @@ def _build_comeback_event_item(raw_item, date_key, today, kind, resolver=None):
         else:
             detail = group_name or 'Birthday spotlight'
         lookup_name = group_name or label
+        member = _find_member_for_names(label, group_name, resolver=member_resolver)
     else:
         label = str(raw_item.get('group') or 'Anniversary').strip()
         years = raw_item.get('years')
@@ -9287,7 +9501,10 @@ def _build_comeback_event_item(raw_item, date_key, today, kind, resolver=None):
         'date_label': date_obj.strftime('%d %b'),
         'weekday_label': date_obj.strftime('%A'),
         'relative_label': _comeback_relative_label(date_obj, today),
-        'href': reverse('idol_page', args=[group.slug]) if group else '',
+        'href': _member_birthday_url(member) if member and kind == 'birthday' else reverse('idol_page', args=[group.slug]) if group else '',
+        'profile_href': _member_profile_url(member) if member else reverse('idol_page', args=[group.slug]) if group else '',
+        'member_slug': member.slug if member else '',
+        'group_slug': member.group.slug if member else group.slug if group else '',
     }
 
 
@@ -9422,6 +9639,7 @@ def _load_comeback_window_content(today, nav_year=None, nav_month=None):
         return cached_payload
 
     resolver = _build_group_lookup_resolver()
+    member_resolver = _build_member_lookup_resolver()
     all_releases = []
     all_birthdays = []
     all_anniversaries = []
@@ -9433,9 +9651,9 @@ def _load_comeback_window_content(today, nav_year=None, nav_month=None):
             for raw_release in day_payload.get('releases', []) or []:
                 all_releases.append(_build_comeback_release_item(raw_release, date_key, today, resolver=resolver))
             for raw_birthday in day_payload.get('birthdays', []) or []:
-                all_birthdays.append(_build_comeback_event_item(raw_birthday, date_key, today, 'birthday', resolver=resolver))
+                all_birthdays.append(_build_comeback_event_item(raw_birthday, date_key, today, 'birthday', resolver=resolver, member_resolver=member_resolver))
             for raw_anniversary in day_payload.get('anniversaries', []) or []:
-                all_anniversaries.append(_build_comeback_event_item(raw_anniversary, date_key, today, 'anniversary', resolver=resolver))
+                all_anniversaries.append(_build_comeback_event_item(raw_anniversary, date_key, today, 'anniversary', resolver=resolver, member_resolver=member_resolver))
 
     all_releases.sort(key=lambda item: (item['date_str'], item['artist_primary'], item['title']))
     all_birthdays.sort(key=lambda item: (item['date_str'], item['label']))
@@ -13562,7 +13780,31 @@ def idol_page(request, slug):
     albums = itunes_albums if itunes_albums else comeback_albums
     tracks = itunes_tracks if itunes_tracks else chart_tracks
 
-    story_text = group.description or f"Explore the world of {group.name} - members, discography, top tracks, and more."
+    story_text = group.resolved_bio or f"Explore the world of {group.name} - members, discography, top tracks, and more."
+    members_qs = group.members.all()
+    member_cards = _group_member_cards(
+        group,
+        accent_fallback=accent_map.get(group.group_type, '#FF8EAF'),
+    )
+    today_local = timezone.localdate()
+    upcoming_member_birthdays = []
+    for member in members_qs:
+        next_birthday = _next_birthday_date(member.date_of_birth, today_local)
+        if not next_birthday:
+            continue
+        upcoming_member_birthdays.append({
+            'name': member.display_name,
+            'date_label': next_birthday.strftime('%d %b'),
+            'days_until': (next_birthday - today_local).days,
+            'profile_url': _member_profile_url(member),
+            'birthday_url': _member_birthday_url(member),
+        })
+    upcoming_member_birthdays.sort(key=lambda item: item['days_until'])
+    breadcrumb_items = [
+        {'name': 'Home', 'url': reverse('home')},
+        {'name': 'Idols', 'url': reverse('idols')},
+        {'name': group.name, 'url': reverse('idol_page', args=[group.slug])},
+    ]
 
     context = {
         'group': group,
@@ -13574,42 +13816,248 @@ def idol_page(request, slug):
             story_text,
             fallback=f"Explore the world of {group.name} - members, discography, top tracks, and more.",
         ),
-        'members': [
-            {
-                'name': m.stage_name or m.name,
-                'full_name': m.name,
-                'position': m.position,
-                'image': _optimize_home_image_url(
-                    _coalesce_stream_image_url(
-                        getattr(m, 'image_url', ''),
-                        getattr(group, 'image_url', ''),
-                        fallback=getattr(group, 'logo_path', '') or DEFAULT_STREAM_IMAGE_URL,
-                    ),
-                    width=720,
-                    height=720,
-                ),
-            }
-            for m in group.members.all()
-        ],
+        'members': member_cards,
+        'member_facts': {
+            'agency': group.agency or group.label,
+            'debut_date': group.debut_date.strftime('%d %B %Y') if group.debut_date else '',
+            'fandom_name': group.fandom_name,
+            'fandom_color': group.fandom_color,
+            'member_count': group.members.filter(is_active=True).count() or members_qs.count(),
+        },
+        'upcoming_member_birthdays': upcoming_member_birthdays[:6],
+        'breadcrumbs': breadcrumb_items,
         'albums': albums,
         'tracks': tracks,
         'events': events,
         'gallery': [],
         'canonical_url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
         'seo_type': 'website',
-        'seo_title': f"{group.name} K-Pop Group Guide | Songs, Members and Albums | K-Beats",
-        'seo_description': (group.description or f"Explore {group.name} on K-Beats with member details, top songs, albums, recent activity, and related K-pop discovery paths.")[:160],
-        'extra_schema_json': json.dumps({
-            '@context': 'https://schema.org',
-            '@type': 'MusicGroup',
-            'name': group.name,
-            'description': group.description or story_text,
-            'url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
-            'genre': 'K-pop',
-            'inLanguage': 'en-GB',
-        }),
+        'seo_title': f"{group.name} Profile | Members, Birthday Timeline and K-Pop Guide | K-Beats",
+        'seo_description': (group.seo_description_override if hasattr(group, 'seo_description_override') else '' or story_text or f"Explore {group.name} on K-Beats with member details, birthdays, top songs, albums, and discovery routes.")[:160],
+        'extra_schema_json': json.dumps([
+            {
+                '@context': 'https://schema.org',
+                '@type': 'MusicGroup',
+                'name': group.name,
+                'description': story_text,
+                'url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
+                'genre': 'K-pop',
+                'inLanguage': 'en-GB',
+                'foundingDate': group.debut_date.isoformat() if group.debut_date else '',
+                'member': [
+                    {
+                        '@type': 'Person',
+                        'name': member['name'],
+                        'url': request.build_absolute_uri(member['profile_url']),
+                    }
+                    for member in member_cards[:12]
+                ],
+            },
+            _build_breadcrumb_schema(request, breadcrumb_items),
+        ]),
     }
     return render(request, 'core/idol_band_page.html', context)
+
+
+def member_page(request, group_slug, member_slug):
+    member = get_object_or_404(
+        KPopMember.objects.select_related('group').prefetch_related('milestones', 'birthday_features'),
+        group__slug=group_slug,
+        slug=member_slug,
+    )
+    group = member.group
+    _apply_stream_image_to_field(group, 'image_url')
+    _apply_logo_path(group)
+
+    accent_map = {
+        'GIRL': '#FF8EAF',
+        'BOY': '#00f0ff',
+        'SOLO': '#c084fc',
+    }
+    accent_color = accent_map.get(group.group_type, '#FF8EAF')
+    story_text = member.resolved_bio or group.resolved_bio or f"{member.display_name} is part of {group.name}'s current K-pop story on K-Beats."
+    today = timezone.localdate()
+    next_birthday = _next_birthday_date(member.date_of_birth, today)
+    current_age = _calculate_age_on_date(member.date_of_birth, today) if member.date_of_birth else None
+    related_articles = _member_related_release_context(member)
+    fact_rows = [row for row in _member_fact_rows(member, group) if row['value']]
+    breadcrumb_items = [
+        {'name': 'Home', 'url': reverse('home')},
+        {'name': 'Idols', 'url': reverse('idols')},
+        {'name': group.name, 'url': reverse('idol_page', args=[group.slug])},
+        {'name': member.display_name, 'url': _member_profile_url(member)},
+    ]
+
+    context = {
+        'group': group,
+        'member': member,
+        'member_image': _optimize_home_image_url(
+            _coalesce_stream_image_url(
+                member.resolved_image_url,
+                group.image_url,
+                fallback=group.logo_path or DEFAULT_STREAM_IMAGE_URL,
+            ),
+            width=900,
+            height=900,
+        ),
+        'accent_color': accent_color,
+        'description': story_text,
+        'description_paragraphs': _split_story_paragraphs(story_text, fallback=story_text),
+        'fact_rows': fact_rows,
+        'current_age': current_age,
+        'next_birthday': next_birthday,
+        'birthday_countdown_days': (next_birthday - today).days if next_birthday else None,
+        'birthday_page_url': _member_birthday_url(member),
+        'breadcrumbs': breadcrumb_items,
+        'milestones': list(member.milestones.all()[:8]),
+        'birthday_features': list(member.birthday_features.all()[:4]),
+        'related_articles': related_articles,
+        'canonical_url': request.build_absolute_uri(_member_profile_url(member)),
+        'seo_type': 'profile',
+        'seo_title': f"{member.display_name} Profile | Birthday, Facts and K-Pop Guide | K-Beats",
+        'seo_description': (member.seo_description_override or f"Explore {member.display_name} from {group.name} with birthday facts, profile details, milestones, and K-Beats discovery links.")[:160],
+        'extra_schema_json': json.dumps([
+            {
+                '@context': 'https://schema.org',
+                '@type': 'Person',
+                'name': member.display_name,
+                'alternateName': [value for value in [member.resolved_full_name, member.korean_name] if value and value != member.display_name],
+                'description': story_text,
+                'birthDate': member.date_of_birth.isoformat() if member.date_of_birth else '',
+                'nationality': member.nationality,
+                'memberOf': {
+                    '@type': 'MusicGroup',
+                    'name': group.name,
+                    'url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
+                },
+                'image': request.build_absolute_uri(_coalesce_stream_image_url(member.resolved_image_url, group.image_url)),
+                'url': request.build_absolute_uri(_member_profile_url(member)),
+                'sameAs': [link for link in [member.instagram_url] + list(member.official_links or []) if link],
+            },
+            _build_breadcrumb_schema(request, breadcrumb_items),
+        ]),
+    }
+    return render(request, 'core/member_profile.html', context)
+
+
+def member_birthday_page(request, group_slug, member_slug):
+    member = get_object_or_404(
+        KPopMember.objects.select_related('group').prefetch_related('milestones', 'birthday_features'),
+        group__slug=group_slug,
+        slug=member_slug,
+    )
+    group = member.group
+    _apply_stream_image_to_field(group, 'image_url')
+    _apply_logo_path(group)
+
+    accent_map = {
+        'GIRL': '#FF8EAF',
+        'BOY': '#00f0ff',
+        'SOLO': '#c084fc',
+    }
+    accent_color = accent_map.get(group.group_type, '#FF8EAF')
+    today = timezone.localdate()
+    window_data = _load_comeback_window_content(today, today.year, today.month)
+    birthday_events, next_event, latest_event = _member_birthday_event_context(member, today, window_data=window_data)
+    next_birthday = _next_birthday_date(member.date_of_birth, today)
+    birthday_anchor = next_birthday or (datetime.strptime(next_event['date_str'], '%Y-%m-%d').date() if next_event else None)
+    birthday_today = bool(birthday_anchor and birthday_anchor == today)
+    current_age = _calculate_age_on_date(member.date_of_birth, today) if member.date_of_birth else None
+    next_age = _calculate_age_on_date(member.date_of_birth, birthday_anchor) if member.date_of_birth and birthday_anchor else None
+    story_text = member.resolved_bio or group.resolved_bio or f"Celebrate {member.display_name}'s birthday with profile facts, milestones, and K-Beats listening routes."
+    fact_rows = [row for row in _member_fact_rows(member, group) if row['value']]
+    related_articles = _member_related_release_context(member)
+    faq_items = [
+        {
+            'question': f"When is {member.display_name}'s birthday?",
+            'answer': member.date_of_birth.strftime('%d %B %Y') if member.date_of_birth else (next_event['date_label'] if next_event else f"K-Beats is still filling {member.display_name}'s birthday record."),
+        },
+        {
+            'question': f"How old is {member.display_name}?",
+            'answer': f"{member.display_name} is {current_age} years old right now." if current_age is not None else f"K-Beats has not published a verified age for {member.display_name} yet.",
+        },
+        {
+            'question': f"What group is {member.display_name} in?",
+            'answer': f"{member.display_name} is part of {group.name}.",
+        },
+    ]
+    breadcrumb_items = [
+        {'name': 'Home', 'url': reverse('home')},
+        {'name': 'Idols', 'url': reverse('idols')},
+        {'name': group.name, 'url': reverse('idol_page', args=[group.slug])},
+        {'name': member.display_name, 'url': _member_profile_url(member)},
+        {'name': 'Birthday', 'url': _member_birthday_url(member)},
+    ]
+
+    context = {
+        'group': group,
+        'member': member,
+        'member_image': _optimize_home_image_url(
+            _coalesce_stream_image_url(
+                member.resolved_image_url,
+                group.image_url,
+                fallback=group.logo_path or DEFAULT_STREAM_IMAGE_URL,
+            ),
+            width=1000,
+            height=1000,
+        ),
+        'accent_color': accent_color,
+        'description': story_text,
+        'description_paragraphs': _split_story_paragraphs(story_text, fallback=story_text),
+        'fact_rows': fact_rows,
+        'current_age': current_age,
+        'next_age': next_age,
+        'birthday_today': birthday_today,
+        'birthday_anchor': birthday_anchor,
+        'birthday_countdown_days': (birthday_anchor - today).days if birthday_anchor else None,
+        'birthday_events': birthday_events[:8],
+        'latest_birthday_event': latest_event,
+        'milestones': list(member.milestones.filter(category__in=['birthday', 'career', 'release'])[:8]),
+        'birthday_features': list(member.birthday_features.all()[:4]),
+        'related_articles': related_articles,
+        'member_profile_url': _member_profile_url(member),
+        'group_profile_url': reverse('idol_page', args=[group.slug]),
+        'listen_live_url': reverse('live'),
+        'breadcrumbs': breadcrumb_items,
+        'faq_items': faq_items,
+        'canonical_url': request.build_absolute_uri(_member_birthday_url(member)),
+        'seo_type': 'profile',
+        'seo_title': f"{member.display_name} Birthday | Age, Countdown and Profile | K-Beats",
+        'seo_description': (member.seo_description_override or f"Track {member.display_name}'s birthday, age, countdown, profile facts, and K-Beats discovery routes for {group.name}.")[:160],
+        'extra_schema_json': json.dumps([
+            {
+                '@context': 'https://schema.org',
+                '@type': 'Person',
+                'name': member.display_name,
+                'birthDate': member.date_of_birth.isoformat() if member.date_of_birth else '',
+                'description': story_text,
+                'memberOf': {
+                    '@type': 'MusicGroup',
+                    'name': group.name,
+                    'url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
+                },
+                'url': request.build_absolute_uri(_member_birthday_url(member)),
+                'sameAs': [link for link in [member.instagram_url] + list(member.official_links or []) if link],
+            },
+            {
+                '@context': 'https://schema.org',
+                '@type': 'FAQPage',
+                'mainEntity': [
+                    {
+                        '@type': 'Question',
+                        'name': item['question'],
+                        'acceptedAnswer': {
+                            '@type': 'Answer',
+                            'text': item['answer'],
+                        },
+                    }
+                    for item in faq_items
+                ],
+            },
+            _build_breadcrumb_schema(request, breadcrumb_items),
+        ]),
+    }
+    return render(request, 'core/member_birthday.html', context)
 
 
 def album_detail(request, slug, collection_id):

@@ -22,11 +22,20 @@ from django.contrib.sitemaps.views import sitemap
 from django.conf import settings
 from django.conf.urls.static import static
 
-from core.sitemaps import StaticViewSitemap, BlogArticleSitemap
+from core.sitemaps import (
+    StaticViewSitemap,
+    BlogArticleSitemap,
+    GroupProfileSitemap,
+    MemberProfileSitemap,
+    MemberBirthdaySitemap,
+)
 
 sitemaps = {
     'static': StaticViewSitemap,
     'blog': BlogArticleSitemap,
+    'groups': GroupProfileSitemap,
+    'members': MemberProfileSitemap,
+    'member-birthdays': MemberBirthdaySitemap,
 }
 
 handler404 = 'core.views.custom_404'

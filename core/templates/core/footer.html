@@ -64,6 +64,20 @@ Download the App
 </div>
 </div>
 
+{% if seo_jump_links %}
+<div class="mt-10 md:mt-14">
+<div class="flex flex-col gap-3 md:flex-row md:flex-nowrap">
+{% for link in seo_jump_links %}
+<a href="{{ link.href }}" class="flex min-h-[150px] flex-1 flex-col border border-white/10 bg-white/[0.02] p-4 transition hover:border-primary/60 hover:bg-white/[0.05]">
+<p class="text-[10px] font-black uppercase tracking-[0.24em] text-primary">{% firstof link.label 'Explore Next' %}</p>
+<p class="mt-2 text-sm font-black uppercase tracking-tight text-white">{{ link.title }}</p>
+<p class="mt-2 text-xs leading-5 text-slate-400">{{ link.description }}</p>
+</a>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+
 <div class="border-t border-white/5 mt-8 md:mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
 <p>&copy; 2026 K-Beats Radio. All rights reserved.</p>
 <div class="flex gap-6">

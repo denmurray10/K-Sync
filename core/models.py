@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 import bleach
 
 class Ranking(models.Model):
@@ -52,6 +53,16 @@ class KPopGroup(models.Model):
     logo_path = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     image_url = models.URLField(max_length=500, null=True, blank=True)
+    debut_date = models.DateField(null=True, blank=True)
+    agency = models.CharField(max_length=150, blank=True)
+    fandom_name = models.CharField(max_length=100, blank=True)
+    fandom_color = models.CharField(max_length=50, blank=True)
+    group_bio = models.TextField(blank=True)
+    official_links = models.JSONField(default=list, blank=True)
+
+    @property
+    def resolved_bio(self):
+        return (self.group_bio or self.description or '').strip()
 
     def __str__(self):
         return f"{self.name} ({self.group_type})"
@@ -60,16 +71,108 @@ class KPopGroup(models.Model):
 class KPopMember(models.Model):
     group = models.ForeignKey(KPopGroup, related_name='members', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=140, blank=True)
+    full_name = models.CharField(max_length=150, blank=True)
+    korean_name = models.CharField(max_length=150, blank=True)
     stage_name = models.CharField(max_length=100, blank=True)
     position = models.CharField(max_length=100, blank=True)
+    positions = models.CharField(max_length=255, blank=True)
     image_url = models.URLField(max_length=500, null=True, blank=True)
+    profile_image_url = models.URLField(max_length=500, null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    birthplace = models.CharField(max_length=150, blank=True)
+    nationality = models.CharField(max_length=100, blank=True)
+    mbti = models.CharField(max_length=16, blank=True)
+    blood_type = models.CharField(max_length=10, blank=True)
+    height_cm = models.PositiveSmallIntegerField(null=True, blank=True)
+    instagram_url = models.URLField(max_length=500, blank=True)
+    official_links = models.JSONField(default=list, blank=True)
+    fan_facts = models.TextField(blank=True)
+    profile_bio = models.TextField(blank=True)
+    seo_description_override = models.CharField(max_length=180, blank=True)
+    is_active = models.BooleanField(default=True)
+    debut_date = models.DateField(null=True, blank=True)
     order = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['order', 'name']
+        unique_together = [('group', 'slug')]
+
+    @property
+    def display_name(self):
+        return (self.stage_name or self.name or self.full_name).strip()
+
+    @property
+    def resolved_full_name(self):
+        return (self.full_name or self.name or self.stage_name).strip()
+
+    @property
+    def resolved_positions(self):
+        return (self.positions or self.position).strip()
+
+    @property
+    def resolved_image_url(self):
+        return (self.profile_image_url or self.image_url or '').strip()
+
+    @property
+    def resolved_bio(self):
+        return (self.profile_bio or self.fan_facts or '').strip()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.stage_name or self.name or self.full_name)[:120] or f"member-{uuid.uuid4().hex[:8]}"
+            slug = base_slug
+            suffix = 2
+            while KPopMember.objects.exclude(pk=self.pk).filter(group=self.group, slug=slug).exists():
+                slug = f"{base_slug[:110]}-{suffix}"
+                suffix += 1
+            self.slug = slug
+        if not self.full_name:
+            self.full_name = self.name or self.stage_name
+        if not self.positions and self.position:
+            self.positions = self.position
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} ({self.group.name})"
+
+
+class MemberMilestone(models.Model):
+    CATEGORY_CHOICES = (
+        ('birthday', 'Birthday'),
+        ('career', 'Career'),
+        ('release', 'Release'),
+        ('editorial', 'Editorial'),
+    )
+
+    member = models.ForeignKey(KPopMember, related_name='milestones', on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    milestone_date = models.DateField(null=True, blank=True)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='career')
+    sort_order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['sort_order', '-milestone_date', 'title']
+
+    def __str__(self):
+        return f"{self.member.display_name} - {self.title}"
+
+
+class BirthdayFeature(models.Model):
+    member = models.ForeignKey(KPopMember, related_name='birthday_features', on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    embed_url = models.URLField(max_length=500, blank=True)
+    cta_label = models.CharField(max_length=80, blank=True)
+    cta_url = models.URLField(max_length=500, blank=True)
+    sort_order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['sort_order', 'title']
+
+    def __str__(self):
+        return f"{self.member.display_name} - {self.title}"
 
 class LivePoll(models.Model):
     TIER_CHOICES = (

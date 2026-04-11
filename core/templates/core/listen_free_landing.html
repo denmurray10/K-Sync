@@ -555,21 +555,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
     </main>
 
-    <footer class="border-t border-white/10 bg-black">
-        <div class="container mx-auto flex flex-col gap-6 px-6 py-10 sm:px-6 md:flex-row md:items-center md:justify-between">
-            <div class="max-w-2xl">
-                <p class="nav-cinzel text-xl font-black uppercase tracking-[0.24em] text-white">K-Beats Radio</p>
-                <p class="mt-3 text-sm leading-6 text-slate-400">A UK-based 24/7 live K-pop station built by fans, for fans - streaming for listeners across the country and beyond.</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-[0.22em]">
-                <a href="{{ listen_live_url }}" class="border border-primary bg-primary px-4 py-2 text-black transition hover:bg-white">Open live page</a>
-                <a href="{{ vip_trial_url }}" class="border border-white/15 px-4 py-2 text-white transition hover:border-secondary hover:text-secondary">Free VIP Trial</a>
-                <a href="{% url 'privacy_policy' %}" class="text-slate-500 transition hover:text-white">Privacy</a>
-                <a href="{% url 'cookie_policy' %}" class="text-slate-500 transition hover:text-white">Cookies</a>
-                <a href="{% url 'terms_of_service' %}" class="text-slate-500 transition hover:text-white">Terms</a>
-            </div>
-        </div>
-    </footer>
+    {% include 'core/footer.html' %}
 
     <div id="listen-dock" class="live-dock fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/92 backdrop-blur-xl">
         <div class="container mx-auto flex items-center gap-3 px-6 py-3 sm:px-6">

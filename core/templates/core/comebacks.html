@@ -790,9 +790,20 @@ tailwind.config = {
                             <div class="space-y-3" x-show="activeRelease.day_birthdays.length || activeRelease.day_anniversaries.length">
                                 <template x-for="item in activeRelease.day_birthdays" :key="item.label + item.date_str">
                                     <div class="panel-shell px-4 py-4">
-                                        <p class="text-[10px] uppercase tracking-[0.18em] text-primary">Birthday</p>
-                                        <p class="mt-2 text-sm font-black uppercase tracking-tight text-white" x-text="item.label"></p>
-                                        <p class="mt-2 text-sm text-slate-400" x-text="item.detail"></p>
+                                        <template x-if="item.href">
+                                            <a :href="item.href" class="block transition-colors hover:text-primary">
+                                                <p class="text-[10px] uppercase tracking-[0.18em] text-primary">Birthday</p>
+                                                <p class="mt-2 text-sm font-black uppercase tracking-tight text-white" x-text="item.label"></p>
+                                                <p class="mt-2 text-sm text-slate-400" x-text="item.detail"></p>
+                                            </a>
+                                        </template>
+                                        <template x-if="!item.href">
+                                            <div>
+                                                <p class="text-[10px] uppercase tracking-[0.18em] text-primary">Birthday</p>
+                                                <p class="mt-2 text-sm font-black uppercase tracking-tight text-white" x-text="item.label"></p>
+                                                <p class="mt-2 text-sm text-slate-400" x-text="item.detail"></p>
+                                            </div>
+                                        </template>
                                     </div>
                                 </template>
                                 <template x-for="item in activeRelease.day_anniversaries" :key="item.label + item.date_str">
@@ -850,8 +861,18 @@ tailwind.config = {
                             <div class="mt-4 space-y-3" x-show="activeDay.birthdays.length">
                                 <template x-for="item in activeDay.birthdays" :key="item.label + item.date_str">
                                     <div class="panel-shell px-4 py-4">
-                                        <p class="text-sm font-black uppercase tracking-tight text-white" x-text="item.label"></p>
-                                        <p class="mt-2 text-sm text-slate-400" x-text="item.detail"></p>
+                                        <template x-if="item.href">
+                                            <a :href="item.href" class="block transition-colors hover:text-primary">
+                                                <p class="text-sm font-black uppercase tracking-tight text-white" x-text="item.label"></p>
+                                                <p class="mt-2 text-sm text-slate-400" x-text="item.detail"></p>
+                                            </a>
+                                        </template>
+                                        <template x-if="!item.href">
+                                            <div>
+                                                <p class="text-sm font-black uppercase tracking-tight text-white" x-text="item.label"></p>
+                                                <p class="mt-2 text-sm text-slate-400" x-text="item.detail"></p>
+                                            </div>
+                                        </template>
                                     </div>
                                 </template>
                             </div>

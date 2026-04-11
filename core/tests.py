@@ -22,6 +22,7 @@ from .models import (
     ComebackData,
     Contest,
     KPopGroup,
+    KPopMember,
     LivePoll,
     LivePollOption,
     FanClubMembership,
@@ -127,7 +128,17 @@ class SeoRolloutTests(TestCase):
             label='Signal Label',
             group_type='GIRL',
             description='Signal Queens are a rising K-pop group known for glossy hooks and midnight-pop choruses.',
+            agency='Signal Label',
+            fandom_name='Signal Lights',
             rank=7,
+        )
+        self.member = KPopMember.objects.create(
+            group=self.group,
+            name='Kim Rin',
+            stage_name='Rin',
+            positions='Leader, Vocalist',
+            date_of_birth=datetime(2002, 4, 18, tzinfo=datetime_timezone.utc).date(),
+            profile_bio='Rin is known for sharp live vocals and polished performance leadership.',
         )
         self.contest = Contest.objects.create(
             slug='signal-queens-giveaway',
@@ -172,6 +183,9 @@ class SeoRolloutTests(TestCase):
         self.assertContains(response, reverse('midnight_kpop_vibes'))
         self.assertContains(response, reverse('best_kpop_playlist_2026'))
         self.assertContains(response, reverse('discover_new_kpop_music'))
+        self.assertContains(response, reverse('idol_page', args=[self.group.slug]))
+        self.assertContains(response, reverse('member_page', args=[self.group.slug, self.member.slug]))
+        self.assertContains(response, reverse('member_birthday_page', args=[self.group.slug, self.member.slug]))
 
     def test_non_seo_routes_emit_noindex_headers(self):
         routes = [
@@ -214,7 +228,7 @@ class SeoRolloutTests(TestCase):
 
         self.assertContains(
             idol_response,
-            '<title>Signal Queens K-Pop Group Guide | Songs, Members and Albums | K-Beats</title>',
+            '<title>Signal Queens Profile | Members, Birthday Timeline and K-Pop Guide | K-Beats</title>',
             html=True,
         )
         self.assertContains(
@@ -222,6 +236,17 @@ class SeoRolloutTests(TestCase):
             '<title>Signal Queens Signed Album Giveaway | Enter This K-Pop Contest on K-Beats</title>',
             html=True,
         )
+
+    def test_member_profile_and_birthday_pages_render(self):
+        profile_response = self.client.get(reverse('member_page', args=[self.group.slug, self.member.slug]))
+        birthday_response = self.client.get(reverse('member_birthday_page', args=[self.group.slug, self.member.slug]))
+
+        self.assertEqual(profile_response.status_code, 200)
+        self.assertEqual(birthday_response.status_code, 200)
+        self.assertContains(profile_response, 'Rin Profile')
+        self.assertContains(profile_response, reverse('member_birthday_page', args=[self.group.slug, self.member.slug]))
+        self.assertContains(birthday_response, 'Rin Birthday')
+        self.assertContains(birthday_response, 'How old is Rin?')
 
     def test_core_discovery_pages_show_distinct_keyword_led_hero_copy(self):
         home_response = self.client.get(reverse('home'))
@@ -256,6 +281,18 @@ class SeoRolloutTests(TestCase):
         self.assertContains(comebacks_response, reverse('discover_new_kpop_music'))
         self.assertContains(comebacks_response, reverse('charts'))
         self.assertContains(comebacks_response, reverse('idols'))
+
+    def test_day4_priority_landing_pages_have_publish_ready_routes(self):
+        uk_response = self.client.get(reverse('uk_kpop_radio'))
+        rainy_response = self.client.get(reverse('rainy_day_kpop'))
+
+        self.assertContains(uk_response, 'Track K-Pop Comebacks')
+        self.assertContains(uk_response, reverse('idols'))
+        self.assertContains(uk_response, 'Lead with the main listening action for this page')
+
+        self.assertContains(rainy_response, 'Discover New K-Pop Music')
+        self.assertContains(rainy_response, reverse('comeback_timeline'))
+        self.assertContains(rainy_response, 'The copy should feel fan-aware and calm, not generic.')
 
 
 class FanClubTierAndEventTests(TestCase):
@@ -338,7 +375,12 @@ class FanClubTierAndEventTests(TestCase):
         self.assertTrue(claimed.json().get('claimed'))
         self.assertTrue(UserBadge.objects.filter(user=self.user, name='Spotlight Collector').exists())
 
-
+@override_settings(
+    STORAGES={
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+)
 class ComebackPerformanceTests(TestCase):
     def setUp(self):
         cache.clear()
@@ -348,6 +390,12 @@ class ComebackPerformanceTests(TestCase):
             label='Alpha Label',
             group_type='GIRL',
             rank=1,
+        )
+        self.member = KPopMember.objects.create(
+            group=self.group,
+            name='Rin',
+            stage_name='Rin',
+            date_of_birth=datetime(2002, 4, 18, tzinfo=datetime_timezone.utc).date(),
         )
         today = timezone.localdate()
         self.nav_year = today.year
@@ -419,6 +467,10 @@ class ComebackPerformanceTests(TestCase):
         self.assertIn('nearby_releases', payload)
         self.assertIn('day_birthdays', payload)
         self.assertIn('day_anniversaries', payload)
+        self.assertEqual(
+            payload['day_birthdays'][0]['href'],
+            reverse('member_birthday_page', args=[self.group.slug, self.member.slug]),
+        )
 
     def test_day_drawer_endpoint_returns_expected_payload(self):
         today = timezone.localdate()
@@ -433,6 +485,10 @@ class ComebackPerformanceTests(TestCase):
         self.assertEqual(payload['release_count'], 2)
         self.assertEqual(payload['birthday_count'], 1)
         self.assertEqual(payload['anniversary_count'], 1)
+        self.assertEqual(
+            payload['birthdays'][0]['href'],
+            reverse('member_birthday_page', args=[self.group.slug, self.member.slug]),
+        )
 
     def test_comeback_window_cache_invalidates_on_data_update(self):
         today = timezone.localdate()

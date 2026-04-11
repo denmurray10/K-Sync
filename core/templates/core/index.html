@@ -320,15 +320,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </a>
 {% endfor %}
 </div>
-<div class="mt-4 grid gap-3 pointer-events-auto sm:grid-cols-2">
-{% for link in seo_jump_links %}
-<a href="{{ link.href }}" class="border border-white/10 bg-black/35 p-4 transition hover:border-primary/60 hover:bg-black/50">
-<p class="text-[10px] font-black uppercase tracking-[0.24em] text-primary">SEO route</p>
-<p class="mt-2 text-sm font-black uppercase tracking-tight text-white">{{ link.title }}</p>
-<p class="mt-2 text-xs leading-5 text-slate-300">{{ link.description }}</p>
-</a>
-{% endfor %}
-</div>
 {% endif %}
 </div>
 <!-- Right Content: Broadcast Signal Panel -->
@@ -410,22 +401,6 @@ Listen Live
 </div>
 </div>
 
-{% if hero_support_events %}
-<div class="border border-white/10 bg-white/[0.03] p-4">
-<p class="hero-signal-kicker text-[9px] font-semibold uppercase text-slate-400">Also on deck</p>
-<div class="mt-4 space-y-3">
-{% for release in hero_support_events %}
-<a href="{% url 'comeback_timeline' %}" class="flex items-center justify-between gap-3 border-b border-white/10 pb-3 last:border-b-0 last:pb-0">
-<div class="min-w-0">
-<p class="truncate text-sm font-semibold uppercase tracking-tight text-white">{{ release.title }}</p>
-<p class="mt-1 truncate text-[10px] uppercase tracking-[0.16em] text-slate-400">{{ release.artist }}</p>
-</div>
-<span class="shrink-0 text-[10px] uppercase tracking-[0.16em] text-slate-500">{{ release.date_str|slice:"5:" }}</span>
-</a>
-{% endfor %}
-</div>
-</div>
-{% endif %}
 </div>
 </aside>
 </div>

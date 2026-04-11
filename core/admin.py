@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import (
+    KPopGroup, KPopMember, MemberMilestone, BirthdayFeature,
     LivePoll, LivePollOption, UserProfile, FavouriteSong,
     GameScore, SongRequest, Contest, ContestEntry,
     FanClubMembership, PreLaunchSignup, BlogArticle,
@@ -9,6 +10,40 @@ from .models import (
     RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
     ChatBlockedTerm,
 )
+
+
+class MemberMilestoneInline(admin.TabularInline):
+    model = MemberMilestone
+    extra = 0
+
+
+class BirthdayFeatureInline(admin.TabularInline):
+    model = BirthdayFeature
+    extra = 0
+
+
+@admin.register(KPopGroup)
+class KPopGroupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'group_type', 'agency', 'label', 'rank')
+    list_filter = ('group_type',)
+    search_fields = ('name', 'slug', 'agency', 'fandom_name')
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(KPopMember)
+class KPopMemberAdmin(admin.ModelAdmin):
+    list_display = ('display_name_admin', 'group', 'resolved_positions_admin', 'date_of_birth', 'is_active')
+    list_filter = ('group', 'is_active')
+    search_fields = ('name', 'stage_name', 'full_name', 'slug', 'group__name')
+    inlines = [MemberMilestoneInline, BirthdayFeatureInline]
+
+    @admin.display(description='Display name')
+    def display_name_admin(self, obj):
+        return obj.display_name
+
+    @admin.display(description='Positions')
+    def resolved_positions_admin(self, obj):
+        return obj.resolved_positions
 
 class RadioPlaylistTrackInline(admin.TabularInline):
     model = RadioPlaylistTrack
