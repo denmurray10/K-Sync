@@ -1,120 +1,167 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en-GB">
-    <head>
-        <meta charset="UTF-8" />
-        {% include 'core/seo_meta.html' %}
-        <title>{{ seo_title }}</title>
-        <link rel="stylesheet" href="{% static 'core/css/idols-tailwind.css' %}" />
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-        <style>
-            body { background: #050505; color: #fff; font-family: 'Montserrat', sans-serif; }
-            .accent-border { border-color: {{ accent_color }}; }
-            .accent-text { color: {{ accent_color }}; }
-            .accent-bg { background: {{ accent_color }}; color: #000; }
-            .panel { border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.03); }
-        </style>
-    </head>
-    <body>
-        {% include 'core/header.html' %}
-        <main class="min-h-screen bg-black">
-            <section class="border-b border-white/10">
-                <div class="container mx-auto px-4 sm:px-6 py-16 md:py-20">
-                    <div class="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-slate-500">
-                        {% for crumb in breadcrumbs %}
-                        <a href="{{ crumb.url }}" class="hover:text-white transition-colors">{{ crumb.name }}</a>{% if not forloop.last %}<span>/</span>{% endif %}
-                        {% endfor %}
+<head>
+    <meta charset="UTF-8" />
+    {% include 'core/seo_meta.html' %}
+    <title>{{ seo_title }}</title>
+    <link rel="stylesheet" href="{% static 'core/css/idols-tailwind.css' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        :root{--pink:#f425c0;--cyan:#00f0ff;--soft:#cbd5e1;--slate:#94a3b8;--accent:{{ accent_color }}}
+        *{box-sizing:border-box} body{margin:0;color:#fff;font-family:'Montserrat',sans-serif;background:radial-gradient(circle at 8% 2%,rgba(0,240,255,.14),transparent 18%),radial-gradient(circle at 88% 4%,rgba(244,37,192,.18),transparent 20%),radial-gradient(circle at 50% 38%,rgba(67,19,99,.12),transparent 22%),linear-gradient(180deg,#030305 0%,#000 100%)}
+        .display{font-family:'Cinzel',serif}.wrap{width:min(1344px,calc(100% - 48px));margin:0 auto}.eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.28em;font-size:10px;font-weight:700}
+        .hero,.panel,.card,.note,.spot{border:1px solid rgba(255,255,255,.1);background:rgba(8,9,15,.88);box-shadow:0 24px 70px rgba(0,0,0,.42)} .hero{display:grid;grid-template-columns:228px minmax(0,1fr) 252px;gap:24px;padding:36px 30px 30px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,.02),transparent 42%),radial-gradient(circle at top right,rgba(244,37,192,.12),transparent 26%),rgba(7,8,12,.94)}
+        .hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,240,255,.06),transparent 12%),linear-gradient(180deg,transparent 0%,rgba(0,0,0,.18) 100%);pointer-events:none}
+        .rail{position:relative;padding:18px 18px 20px 26px;background:rgba(10,11,18,.9);border:1px solid rgba(0,240,255,.16)} .rail:before{content:"";position:absolute;left:-1px;top:28px;width:4px;height:102px;background:linear-gradient(180deg,var(--cyan),rgba(0,240,255,.12));box-shadow:0 0 24px rgba(0,240,255,.28)}
+        .portrait{display:block;width:116px;height:160px;object-fit:cover;object-position:center top}.title{margin:18px 0 0;font-size:clamp(54px,7vw,92px);line-height:.92;letter-spacing:.08em;text-transform:uppercase}.sub{margin-top:14px;color:var(--soft);font-size:15px;font-weight:600;letter-spacing:.34em;text-transform:uppercase}
+        .line{width:180px;height:3px;margin-top:22px;background:linear-gradient(90deg,var(--accent),rgba(255,255,255,0))}.copy{max-width:640px;margin-top:28px;color:#fff;font-size:18px;line-height:1.85}
+        .tabs{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}.tab{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.14);color:#fff;background:rgba(255,255,255,.04);text-decoration:none;text-transform:uppercase;letter-spacing:.22em;font-size:11px;font-weight:800}.tab.active{background:var(--pink);border-color:var(--pink);color:#000;box-shadow:0 0 24px rgba(244,37,192,.22)}
+        .hero-note,.muted,.rail-copy{color:var(--soft);font-size:15px;line-height:1.8}.hero-note{margin-top:14px;max-width:620px}.snap{display:flex;flex-direction:column;gap:16px}.row{padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08)}.row:last-child{border-bottom:0;padding-bottom:0}.label{color:var(--slate);font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase}.value{margin-top:10px;color:#fff;font-size:15px;line-height:1.45;word-break:break-word}
+        .kicker{color:var(--pink);font-size:12px;font-weight:700;letter-spacing:.28em;text-transform:uppercase}.section{margin-top:34px}.section h2{margin:14px 0 0;font-size:clamp(32px,5vw,44px);line-height:1;letter-spacing:.06em;text-transform:uppercase}
+        [hidden]{display:none!important}.split{display:grid;grid-template-columns:minmax(0,1.1fr) 360px;gap:28px;margin-top:26px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card,.note,.spot{padding:22px}.card h3,.note h3,.spot h3{margin-top:14px;font-size:28px;line-height:1.1;letter-spacing:.04em;text-transform:uppercase}
+        .facts{margin-top:16px;display:flex;flex-direction:column;gap:14px}.fact{padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08)}.fact:last-child{border-bottom:0;padding-bottom:0}.fact .value a,.row .value a{color:#fff;text-decoration:none}.fact .value a:hover,.row .value a:hover{text-decoration:underline}
+        .timeline{position:relative;margin-top:22px;padding:34px 26px 34px 218px}.timeline:before{content:"";position:absolute;left:110px;top:44px;bottom:44px;width:2px;background:rgba(255,255,255,.12)} .entry{position:relative;padding-bottom:28px}.entry:last-child{padding-bottom:0}.dot{position:absolute;left:-121px;top:6px;width:22px;height:22px;border-radius:999px;background:var(--accent);box-shadow:0 0 20px rgba(244,37,192,.28)}.date{position:absolute;left:-176px;top:2px;width:56px;color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;text-align:right}.entry .body{padding-left:22px}
+        .entry .body h3{margin-top:10px;font-size:28px;line-height:1.08;letter-spacing:.04em;text-transform:uppercase}.entry .body p{margin-top:12px;color:var(--soft);font-size:15px;line-height:1.8}
+        .notes{margin-top:18px;display:flex;flex-direction:column;gap:14px}.pill{padding:16px 18px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--soft);font-size:14px;line-height:1.75}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}.stat{padding:18px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
+        @media (max-width:1180px){.hero,.split,.grid3,.grid2,.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr}.timeline{padding-left:138px}.timeline:before{left:82px}.date{left:-112px;width:48px}.dot{left:-66px}}
+        @media (max-width:820px){.wrap{width:min(100% - 28px,1344px)}.hero{padding:26px 18px 22px;gap:20px}.grid3,.grid2,.stats,.split{grid-template-columns:1fr}.timeline{padding:24px 16px 24px 74px}.timeline:before{left:32px}.dot{left:-54px;width:18px;height:18px}.date{position:static;width:auto;text-align:left;margin-bottom:8px}.entry .body{padding-left:0}}
+    </style>
+</head>
+<body data-selected-tab="{{ selected_tab|default:'profile' }}">
+    {% include 'core/header.html' %}
+    <main class="pb-14 pt-24 md:pt-28">
+        <div class="wrap">
+            <section class="hero">
+                <aside class="rail">
+                    <img src="{{ member_image }}" alt="{{ member.display_name }}" class="portrait" />
+                    <h2 class="display mt-5 text-[34px] uppercase tracking-[0.16em]">{{ member.display_name }}</h2>
+                    <p class="mt-3 text-[11px] font-bold uppercase tracking-[0.3em] text-slate-300">{{ group.name }} / {% if member.resolved_positions %}{{ member.resolved_positions }}{% else %}Artist profile{% endif %}</p>
+                    <div class="mt-5 h-[2px] w-[104px]" style="background:var(--accent)"></div>
+                    <p class="rail-copy mt-5">This page keeps {{ member.display_name }} at the centre, with profile and birthday content living in one cleaner K-Beats destination.</p>
+                    <p class="eyebrow mt-8">Birthday next</p>
+                    <p class="mt-3 text-sm font-semibold uppercase tracking-[0.12em] text-white">{% if next_birthday %}{{ next_birthday|date:"d M Y" }}{% else %}Pending{% endif %}</p>
+                    <p class="mt-2 text-sm text-slate-300">{% if birthday_countdown_days is not None %}{% if birthday_countdown_days == 0 %}Today on K-Beats{% else %}{{ birthday_countdown_days }} day{{ birthday_countdown_days|pluralize }} away{% endif %}{% else %}Countdown updating{% endif %}</p>
+                </aside>
+                <div class="relative z-[1]">
+                    <p class="eyebrow">K-Beats Artist Dossier</p>
+                    <h1 class="display title">{{ member.display_name }}</h1>
+                    <p class="sub">{{ group.name }}{% if member.resolved_positions %} / {{ member.resolved_positions }}{% endif %}{% if member.resolved_full_name and member.resolved_full_name != member.display_name %} / {{ member.resolved_full_name }}{% endif %}</p>
+                    <div class="line"></div>
+                    {% for paragraph in description_paragraphs|slice:":2" %}<p class="copy{% if not forloop.first %} mt-4{% endif %}">{{ paragraph }}</p>{% endfor %}
+                    <div class="tabs">
+                        <a href="{{ member_profile_url }}" class="tab" data-tab="profile">Profile File</a>
+                        <a href="{{ birthday_page_url }}" class="tab" data-tab="birthday">Birthday File</a>
+                        <a href="#discovery-routes" class="tab">Live Routes</a>
                     </div>
-                    <div class="mt-8 grid gap-10 lg:grid-cols-[340px_minmax(0,1fr)] lg:items-end">
-                        <div class="overflow-hidden border border-white/10 bg-white/[0.03]">
-                            <img src="{{ member_image }}" alt="{{ member.display_name }}" class="h-full w-full object-cover" />
-                        </div>
-                        <div>
-                            <p class="text-[11px] uppercase tracking-[0.22em] accent-text">{{ group.name }}</p>
-                            <h1 class="mt-3 text-5xl md:text-6xl font-black uppercase tracking-tighter">{{ member.display_name }}</h1>
-                            {% if member.korean_name or member.resolved_full_name != member.display_name %}
-                            <p class="mt-4 text-sm uppercase tracking-[0.18em] text-slate-400">{{ member.resolved_full_name }}{% if member.korean_name %} / {{ member.korean_name }}{% endif %}</p>
-                            {% endif %}
-                            {% if member.resolved_positions %}
-                            <p class="mt-6 text-lg text-slate-300">{{ member.resolved_positions }}</p>
-                            {% endif %}
-                            <div class="mt-8 flex flex-wrap gap-4">
-                                <a href="{{ birthday_page_url }}" class="accent-bg px-6 py-4 text-xs font-black uppercase tracking-[0.22em]">Birthday Page</a>
-                                <a href="{% url 'idol_page' slug=group.slug %}" class="border border-white/20 px-6 py-4 text-xs font-black uppercase tracking-[0.22em] text-white">Group Profile</a>
-                                <a href="{% url 'live' %}" class="border border-white/20 px-6 py-4 text-xs font-black uppercase tracking-[0.22em] text-white">Listen Live</a>
-                            </div>
-                            {% if next_birthday %}
-                            <div class="mt-8 panel p-5">
-                                <p class="text-[10px] uppercase tracking-[0.18em] accent-text">Next birthday</p>
-                                <p class="mt-3 text-2xl font-black text-white">{{ next_birthday|date:"d F Y" }}</p>
-                                <p class="mt-2 text-sm text-slate-400">{{ birthday_countdown_days }} day{{ birthday_countdown_days|pluralize }} away{% if current_age is not None %} • currently {{ current_age }}{% endif %}</p>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                    <p class="hero-note">Switch sections without leaving the artist page. The birthday file is integrated into the same profile flow instead of feeling like a detached template.</p>
                 </div>
-            </section>
-
-            <section class="border-b border-white/10">
-                <div class="container mx-auto px-4 sm:px-6 py-16 grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,.7fr)]">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Profile story</p>
-                        {% for paragraph in description_paragraphs %}
-                        <p class="{% if not forloop.first %}mt-6{% else %}mt-5{% endif %} text-lg leading-relaxed text-slate-300">{{ paragraph }}</p>
+                <aside class="panel p-6">
+                    <p class="eyebrow">Live Profile Snapshot</p>
+                    <div class="snap mt-6">
+                        {% for item in dossier_snapshot %}
+                        <div class="row"><p class="label">{{ item.label }}</p><div class="value">{{ item.value }}</div></div>
                         {% endfor %}
                     </div>
-                    <div class="panel p-6">
-                        <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Quick facts</p>
-                        <div class="mt-5 space-y-4">
-                            {% for fact in fact_rows %}
-                            <div class="border-b border-white/10 pb-3 last:border-b-0">
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ fact.label }}</p>
-                                {% if fact.label == 'Instagram' %}
-                                <a href="{{ fact.value }}" class="mt-2 block text-sm text-white hover:underline">{{ fact.value }}</a>
-                                {% else %}
-                                <p class="mt-2 text-sm text-white">{{ fact.value }}</p>
-                                {% endif %}
-                            </div>
+                    {% if official_links %}
+                    <div class="mt-8">
+                        <p class="eyebrow">Official Signals</p>
+                        <div class="snap mt-5">
+                            {% for link in official_links|slice:":4" %}
+                            <div class="row"><p class="label">{{ link.label }}</p><div class="value"><a href="{{ link.url }}">{{ link.url }}</a></div></div>
                             {% endfor %}
                         </div>
                     </div>
+                    {% endif %}
+                </aside>
+            </section>
+
+            <section class="section" data-panel="profile">
+                <p class="kicker">Integrated Page Content</p>
+                <h2 class="display">Profile + Birthday In One Flow</h2>
+                <div class="grid2 mt-6">
+                    <article class="card"><p class="eyebrow">Profile Mode</p><h3 class="display">Verified artist identity and a clearer personal read</h3><p class="muted mt-4">The default state keeps {{ member.display_name }} front and centre with profile facts, editorial overview, and a real timeline instead of flat wiki-style blocks.</p></article>
+                    <article class="card"><p class="eyebrow">Birthday Mode</p><h3 class="display">Birthday content opens inside the same layout</h3><p class="muted mt-4">Countdown, turning age, birthday editorial, FAQ prompts, and celebration notes stay in the same destination so fans do not feel pushed into a second page.</p></article>
+                </div>
+                <div class="split">
+                    <div>
+                        <section class="panel p-6">
+                            <p class="eyebrow">Profile File</p><h2 class="display mt-4 text-[38px] uppercase tracking-[0.06em]">Verified Artist Identity</h2>
+                            <div class="grid3 mt-6">
+                                {% for section in profile_grouped_facts %}
+                                <article class="card"><p class="eyebrow">{{ section.title }}</p><div class="facts">{% for fact in section.rows %}<div class="fact"><p class="label">{{ fact.label }}</p><div class="value">{% if fact.label == 'Instagram' %}<a href="{{ fact.value }}">{{ fact.value }}</a>{% else %}{{ fact.value }}{% endif %}</div></div>{% endfor %}</div></article>
+                                {% endfor %}
+                            </div>
+                        </section>
+                        <section class="panel p-6 mt-7">
+                            <p class="eyebrow">Editorial Overview</p><h2 class="display mt-4 text-[38px] uppercase tracking-[0.06em]">A Cleaner, More Personal Read</h2>
+                            <div class="grid3 mt-6">{% for section in profile_editorial_sections %}<article class="card"><p class="eyebrow">{{ section.kicker }}</p><h3 class="display text-[24px]">{{ section.title }}</h3><p class="muted mt-4">{{ section.body }}</p></article>{% endfor %}</div>
+                        </section>
+                        <section class="panel p-6 mt-7">
+                            <p class="eyebrow">Career Timeline</p><h2 class="display mt-4 text-[38px] uppercase tracking-[0.06em]">A Real Timeline, Not A Grid</h2>
+                            <div class="timeline">{% for item in profile_timeline_entries %}<article class="entry"><span class="date">{{ item.date_label }}</span><span class="dot"></span><div class="body"><p class="eyebrow">{{ item.eyebrow }}</p><h3 class="display">{{ item.title }}</h3><p>{{ item.body }}</p></div></article>{% empty %}<article class="entry"><span class="dot"></span><div class="body"><p class="eyebrow">Timeline</p><h3 class="display">Career file is still building</h3><p>K-Beats is still assembling a fuller timeline for {{ member.display_name }}.</p></div></article>{% endfor %}</div>
+                        </section>
+                    </div>
+                    <aside>
+                        {% if fan_notes %}
+                        <section class="note"><p class="eyebrow">Fan Notes</p><h3 class="display">Fast, memorable facts</h3><div class="notes">{% for note in fan_notes %}<div class="pill">{{ note }}</div>{% endfor %}</div></section>
+                        {% endif %}
+                        <section class="note mt-7" id="discovery-routes"><p class="eyebrow">K-Beats Discovery</p><h3 class="display">Routes</h3><div class="notes">{% for item in discovery_routes %}<a href="{{ item.url }}" class="spot"><p class="eyebrow">{{ item.eyebrow }}</p><h3 class="display text-[24px]">{{ item.title }}</h3><p class="muted mt-4">{{ item.body }}</p></a>{% endfor %}</div></section>
+                    </aside>
                 </div>
             </section>
 
-            {% if milestones %}
-            <section class="border-b border-white/10">
-                <div class="container mx-auto px-4 sm:px-6 py-16">
-                    <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Milestones</p>
-                    <div class="mt-8 grid gap-4 md:grid-cols-2">
-                        {% for item in milestones %}
-                        <article class="panel p-5">
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.get_category_display }}{% if item.milestone_date %} • {{ item.milestone_date|date:"d M Y" }}{% endif %}</p>
-                            <h2 class="mt-3 text-xl font-black uppercase tracking-tight">{{ item.title }}</h2>
-                            {% if item.description %}<p class="mt-3 text-sm leading-relaxed text-slate-300">{{ item.description }}</p>{% endif %}
-                        </article>
-                        {% endfor %}
+            <section class="section" data-panel="birthday">
+                <p class="kicker">Birthday File</p>
+                <h2 class="display">{% if birthday_today %}{{ member.display_name }} Birthday{% else %}Bring In The Live-Page Atmosphere{% endif %}</h2>
+                <div class="stats">
+                    <article class="stat"><p class="label">Birth date</p><div class="value">{% if member.date_of_birth %}{{ member.date_of_birth|date:"d F Y" }}{% elif birthday_anchor %}{{ birthday_anchor|date:"d F" }}{% else %}Pending{% endif %}</div></article>
+                    <article class="stat"><p class="label">Current age</p><div class="value">{% if current_age is not None %}{{ current_age }}{% else %}Unknown{% endif %}</div></article>
+                    <article class="stat"><p class="label">Countdown</p><div class="value">{% if birthday_countdown_days is not None %}{% if birthday_countdown_days == 0 %}Today{% else %}{{ birthday_countdown_days }} days{% endif %}{% else %}Pending{% endif %}</div></article>
+                </div>
+                <div class="grid2 mt-6">
+                    <article class="card"><p class="eyebrow">Profile + Birthday</p><h3 class="display text-[24px]">Birthday content lives inside the same artist page</h3><p class="muted mt-4">This mode carries the seasonal details fans search for first, but it stays inside the same premium K-Beats destination.</p></article>
+                    <article class="card"><p class="eyebrow">Homepage Alignment</p><h3 class="display text-[24px]">Dark-stage gradients keep the page feeling native</h3><p class="muted mt-4">Pink and cyan are used like live-broadcast signals, not decoration. The result is cleaner, more modern, and more aligned with the homepage.</p></article>
+                </div>
+                <div class="split">
+                    <div>
+                        <section class="panel p-6">
+                            <p class="eyebrow">Birthday Profile File</p><h2 class="display mt-4 text-[38px] uppercase tracking-[0.06em]">Verified Birthday Data</h2>
+                            <div class="grid2 mt-6">{% for section in birthday_grouped_facts %}<article class="card"><p class="eyebrow">{{ section.title }}</p><div class="facts">{% for fact in section.rows %}<div class="fact"><p class="label">{{ fact.label }}</p><div class="value">{% if fact.label == 'Instagram' %}<a href="{{ fact.value }}">{{ fact.value }}</a>{% else %}{{ fact.value }}{% endif %}</div></div>{% endfor %}</div></article>{% endfor %}</div>
+                        </section>
+                        <section class="panel p-6 mt-7">
+                            <p class="eyebrow">Birthday Editorial</p><h2 class="display mt-4 text-[38px] uppercase tracking-[0.06em]">Why Fans Mark This Date</h2>
+                            <div class="grid2 mt-6">{% for section in birthday_editorial_sections %}<article class="card"><p class="eyebrow">{{ section.kicker }}</p><h3 class="display text-[24px]">{{ section.title }}</h3><p class="muted mt-4">{{ section.body }}</p></article>{% endfor %}</div>
+                        </section>
+                        <section class="panel p-6 mt-7">
+                            <p class="eyebrow">Birthday Timeline</p><h2 class="display mt-4 text-[38px] uppercase tracking-[0.06em]">Signals And Milestones</h2>
+                            <div class="timeline">{% for item in birthday_timeline_entries %}<article class="entry"><span class="date">{{ item.date_label }}</span><span class="dot"></span><div class="body"><p class="eyebrow">{{ item.eyebrow }}</p><h3 class="display">{{ item.title }}</h3><p>{{ item.body }}</p></div></article>{% empty %}<article class="entry"><span class="dot"></span><div class="body"><p class="eyebrow">Birthday Timeline</p><h3 class="display">Seasonal archive is building</h3><p>K-Beats is still assembling a richer birthday archive for {{ member.display_name }}.</p></div></article>{% endfor %}</div>
+                        </section>
                     </div>
+                    <aside>
+                        <section class="note"><p class="eyebrow">Birthday Highlights</p><h3 class="display">Seasonal routes</h3><div class="notes">{% for item in birthday_spotlights %}<article class="spot"><p class="eyebrow">{{ item.eyebrow }}</p><h3 class="display text-[24px]">{{ item.title }}</h3><p class="muted mt-4">{{ item.body }}</p>{% if item.url %}<a href="{{ item.url }}" class="mt-4 inline-block text-sm font-semibold text-white hover:underline">{{ item.cta_label|default:"Open highlight" }}</a>{% endif %}</article>{% empty %}<article class="spot"><p class="muted">The birthday archive is ready for future K-Beats editorials, highlights, and share prompts.</p></article>{% endfor %}</div></section>
+                        <section class="note mt-7"><p class="eyebrow">Birthday FAQ</p><h3 class="display">What fans ask first</h3><div class="notes">{% for item in faq_items %}<article class="spot"><p class="eyebrow">FAQ</p><h3 class="display text-[22px]">{{ item.question }}</h3><p class="muted mt-4">{{ item.answer }}</p></article>{% endfor %}</div></section>
+                    </aside>
                 </div>
             </section>
-            {% endif %}
-
-            {% if related_articles %}
-            <section>
-                <div class="container mx-auto px-4 sm:px-6 py-16">
-                    <p class="text-[10px] uppercase tracking-[0.22em] accent-text">K-Beats routes</p>
-                    <div class="mt-8 grid gap-4 md:grid-cols-2">
-                        {% for article in related_articles %}
-                        <a href="{{ article.url }}" class="panel p-5 transition-colors hover:border-[{{ accent_color }}]">
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Editorial</p>
-                            <h2 class="mt-3 text-xl font-black uppercase tracking-tight">{{ article.title }}</h2>
-                            {% if article.subtitle %}<p class="mt-3 text-sm leading-relaxed text-slate-300">{{ article.subtitle }}</p>{% endif %}
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </section>
-            {% endif %}
-        </main>
-        {% include 'core/footer.html' %}
-    </body>
+        </div>
+    </main>
+    {% include 'core/footer.html' %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const selected = document.body.dataset.selectedTab || 'profile';
+            const buttons = document.querySelectorAll('[data-tab]');
+            const panels = document.querySelectorAll('[data-panel]');
+            function activate(tab) {
+                buttons.forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
+                panels.forEach((p) => p.hidden = p.dataset.panel !== tab);
+            }
+            buttons.forEach((button) => button.addEventListener('click', function (event) {
+                event.preventDefault();
+                activate(button.dataset.tab);
+            }));
+            activate(selected);
+        });
+    </script>
+</body>
 </html>

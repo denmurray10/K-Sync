@@ -87,6 +87,7 @@ class KPopMember(models.Model):
     height_cm = models.PositiveSmallIntegerField(null=True, blank=True)
     instagram_url = models.URLField(max_length=500, blank=True)
     official_links = models.JSONField(default=list, blank=True)
+    profile_metadata = models.JSONField(default=dict, blank=True)
     fan_facts = models.TextField(blank=True)
     profile_bio = models.TextField(blank=True)
     seo_description_override = models.CharField(max_length=180, blank=True)

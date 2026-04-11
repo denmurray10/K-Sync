@@ -6,165 +6,337 @@
         {% include 'core/seo_meta.html' %}
         <title>{{ seo_title }}</title>
         <link rel="stylesheet" href="{% static 'core/css/idols-tailwind.css' %}" />
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
         <style>
-            body { background: #050505; color: #fff; font-family: 'Montserrat', sans-serif; }
-            .accent-border { border-color: {{ accent_color }}; }
-            .accent-text { color: {{ accent_color }}; }
-            .accent-bg { background: {{ accent_color }}; color: #000; }
-            .panel { border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.03); }
-            .hero-burst {
+            :root {
+                --kb-pink: #f425c0;
+                --kb-cyan: #00f0ff;
+                --accent: {{ accent_color }};
+            }
+            body {
                 background:
-                    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 30%),
-                    radial-gradient(circle at 80% 0%, {{ accent_color }}55, transparent 28%),
-                    linear-gradient(135deg, #090909 0%, #111 100%);
+                    radial-gradient(circle at 12% 0%, rgba(0, 240, 255, 0.14), transparent 20%),
+                    radial-gradient(circle at 88% 8%, rgba(244, 37, 192, 0.22), transparent 24%),
+                    linear-gradient(180deg, #050505 0%, #000000 100%);
+                color: #fff;
+                font-family: 'Montserrat', sans-serif;
+            }
+            .display-face { font-family: 'Cinzel', serif; }
+            .shell {
+                border: 1px solid rgba(255,255,255,0.1);
+                background:
+                    linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
+                    radial-gradient(circle at top right, rgba(244, 37, 192, 0.12), transparent 30%);
+                box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+            }
+            .glass {
+                border: 1px solid rgba(255,255,255,0.1);
+                background: rgba(255,255,255,0.035);
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+            }
+            .hero-grid {
+                background:
+                    linear-gradient(120deg, rgba(255,255,255,0.02), transparent 50%),
+                    radial-gradient(circle at top right, rgba(244, 37, 192, 0.18), transparent 30%);
+            }
+            .hero-shell-grid {
+                display: grid;
+                gap: 0;
+            }
+            .hero-intro-grid {
+                display: grid;
+                gap: 2rem;
+                align-items: start;
+            }
+            .portrait-stack {
+                width: 72px;
+                max-width: 72px;
+            }
+            .portrait-image {
+                display: block;
+                width: 72px;
+                height: 96px;
+                object-fit: cover;
+            }
+            .signal-line {
+                background: linear-gradient(90deg, var(--accent), rgba(255,255,255,0));
+            }
+            .eyebrow {
+                color: var(--accent);
+                letter-spacing: 0.28em;
+                text-transform: uppercase;
+                font-size: 10px;
+                font-weight: 700;
+            }
+            .pill {
+                border: 1px solid rgba(255,255,255,0.14);
+                background: rgba(255,255,255,0.03);
+            }
+            .count-card {
+                border: 1px solid rgba(255,255,255,0.08);
+                background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            }
+            .timeline-item {
+                position: relative;
+                padding-left: 1.5rem;
+            }
+            .timeline-item::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0.35rem;
+                width: 0.65rem;
+                height: 0.65rem;
+                background: var(--accent);
+                box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 60%, transparent);
+            }
+            .timeline-item::after {
+                content: "";
+                position: absolute;
+                left: 0.28rem;
+                top: 1.3rem;
+                bottom: -1.25rem;
+                width: 1px;
+                background: rgba(255,255,255,0.1);
+            }
+            .timeline-item:last-child::after { display: none; }
+            @media (min-width: 1024px) {
+                .hero-intro-grid {
+                    grid-template-columns: 72px minmax(0, 1fr);
+                }
+            }
+            @media (min-width: 1280px) {
+                .hero-shell-grid {
+                    grid-template-columns: minmax(0, 1.28fr) 280px;
+                }
+            }
+            @media (max-width: 1024px) {
+                .portrait-stack {
+                    width: 84px;
+                    max-width: 84px;
+                }
+                .portrait-image {
+                    width: 84px;
+                    height: 108px;
+                }
             }
         </style>
     </head>
     <body>
         {% include 'core/header.html' %}
-        <main class="min-h-screen bg-black">
-            <section class="hero-burst border-b border-white/10">
-                <div class="container mx-auto px-4 sm:px-6 py-16 md:py-20">
-                    <div class="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-slate-400">
-                        {% for crumb in breadcrumbs %}
-                        <a href="{{ crumb.url }}" class="hover:text-white transition-colors">{{ crumb.name }}</a>{% if not forloop.last %}<span>/</span>{% endif %}
-                        {% endfor %}
-                    </div>
-                    <div class="mt-8 grid gap-10 lg:grid-cols-[360px_minmax(0,1fr)] lg:items-center">
-                        <div class="overflow-hidden border border-white/10 bg-black/30">
-                            <img src="{{ member_image }}" alt="{{ member.display_name }} birthday profile" class="h-full w-full object-cover" />
-                        </div>
-                        <div>
-                            <p class="text-[11px] uppercase tracking-[0.22em] accent-text">{{ group.name }} birthday file</p>
-                            <h1 class="mt-3 text-5xl md:text-6xl font-black uppercase tracking-tighter">{{ member.display_name }} Birthday</h1>
-                            <p class="mt-5 text-lg leading-relaxed text-slate-300">
-                                {% if birthday_today %}
-                                Today is {{ member.display_name }}'s birthday. K-Beats is surfacing the core facts, countdown state, and discovery routes fans need in one place.
-                                {% else %}
-                                Track {{ member.display_name }}'s birthday countdown, profile facts, milestones, and K-Beats listening routes in one editorial destination.
-                                {% endif %}
-                            </p>
-                            <div class="mt-8 grid gap-4 sm:grid-cols-3">
-                                <div class="panel p-5">
-                                    <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Birth date</p>
-                                    <p class="mt-3 text-xl font-black">{% if member.date_of_birth %}{{ member.date_of_birth|date:"d F Y" }}{% elif birthday_anchor %}{{ birthday_anchor|date:"d F" }}{% else %}Pending{% endif %}</p>
+        <main class="px-4 pb-8 pt-24 sm:px-6 md:pt-28 lg:px-8">
+            <div class="mx-auto max-w-7xl">
+                <section class="shell overflow-hidden">
+                    <div class="hero-grid hero-shell-grid">
+                        <div class="px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
+                            <div class="hero-intro-grid">
+                                <div class="portrait-stack space-y-5">
+                                    <div>
+                                        <img src="{{ member_image }}" alt="{{ member.display_name }} birthday dossier" class="portrait-image" />
+                                    </div>
+                                    <div class="grid grid-cols-1 gap-3">
+                                        <div class="count-card p-3">
+                                            <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Birth date</p>
+                                            <p class="mt-2 text-sm font-semibold text-white">{% if member.date_of_birth %}{{ member.date_of_birth|date:"d F Y" }}{% elif birthday_anchor %}{{ birthday_anchor|date:"d F" }}{% else %}Pending{% endif %}</p>
+                                        </div>
+                                        <div class="count-card p-3">
+                                            <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Current age</p>
+                                            <p class="mt-2 text-sm font-semibold text-white">{% if current_age is not None %}{{ current_age }}{% else %}Unknown{% endif %}</p>
+                                        </div>
+                                        <div class="count-card p-3 col-span-2 lg:col-span-1">
+                                            <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">Countdown</p>
+                                            <p class="mt-2 text-sm font-semibold text-white">{% if birthday_countdown_days is not None %}{% if birthday_countdown_days == 0 %}Today{% else %}{{ birthday_countdown_days }} days{% endif %}{% else %}Pending{% endif %}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="panel p-5">
-                                    <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Current age</p>
-                                    <p class="mt-3 text-xl font-black">{% if current_age is not None %}{{ current_age }}{% else %}Unknown{% endif %}</p>
-                                </div>
-                                <div class="panel p-5">
-                                    <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Countdown</p>
-                                    <p class="mt-3 text-xl font-black">
-                                        {% if birthday_countdown_days is not None %}
-                                            {% if birthday_countdown_days == 0 %}Today{% else %}{{ birthday_countdown_days }} days{% endif %}
-                                        {% else %}
-                                            Pending
-                                        {% endif %}
-                                    </p>
+
+                                <div class="flex flex-col justify-between">
+                                    <div>
+                                        <p class="eyebrow">K-Beats Birthday Dossier</p>
+                                        <h1 class="display-face mt-4 text-4xl font-semibold uppercase tracking-[0.08em] sm:text-5xl lg:text-6xl">{{ member.display_name }}</h1>
+                                        <p class="mt-3 text-sm uppercase tracking-[0.18em] text-slate-400">{{ group.name }}</p>
+                                        <div class="mt-5 h-px w-40 signal-line"></div>
+                                        <div class="mt-6 flex flex-wrap gap-2">
+                                            {% if birthday_today %}
+                                            <span class="px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-black" style="background: var(--accent);">Birthday Today</span>
+                                            {% endif %}
+                                            {% if next_age %}
+                                            <span class="pill px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white">Turning {{ next_age }}</span>
+                                            {% endif %}
+                                            {% if member.resolved_positions %}
+                                            <span class="pill px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white">{{ member.resolved_positions }}</span>
+                                            {% endif %}
+                                        </div>
+                                        {% for paragraph in description_paragraphs %}
+                                        <p class="{% if not forloop.first %}mt-5{% else %}mt-7{% endif %} max-w-3xl text-[15px] leading-8 text-slate-300">{{ paragraph }}</p>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="mt-8 flex flex-wrap gap-3">
+                                        <a href="{{ member_profile_url }}" class="px-5 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-black" style="background: var(--accent);">Main Profile</a>
+                                        <a href="{{ listen_live_url }}" class="border border-white/15 px-5 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-white">Listen Live</a>
+                                        <a href="{{ group_profile_url }}" class="border border-white/15 px-5 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-white">Group Profile</a>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="mt-8 flex flex-wrap gap-4">
-                                <a href="{{ listen_live_url }}" class="accent-bg px-6 py-4 text-xs font-black uppercase tracking-[0.22em]">Listen Live</a>
-                                <a href="{{ member_profile_url }}" class="border border-white/20 px-6 py-4 text-xs font-black uppercase tracking-[0.22em] text-white">Member Profile</a>
-                                <a href="{{ group_profile_url }}" class="border border-white/20 px-6 py-4 text-xs font-black uppercase tracking-[0.22em] text-white">Group Profile</a>
+                        </div>
+
+                        <aside class="border-t border-white/10 bg-black/35 px-6 py-8 xl:border-l xl:border-t-0">
+                            <p class="eyebrow">Birthday Snapshot</p>
+                            <div class="mt-5 space-y-3">
+                                {% for item in dossier_snapshot %}
+                                <div class="flex items-start justify-between gap-4 border-b border-white/10 pb-3">
+                                    <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ item.label }}</p>
+                                    <p class="max-w-[58%] text-right text-sm font-medium text-white">{{ item.value }}</p>
+                                </div>
+                                {% endfor %}
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
-            <section class="border-b border-white/10">
-                <div class="container mx-auto px-4 sm:px-6 py-16 grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,.8fr)]">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Birthday profile</p>
-                        {% for paragraph in description_paragraphs %}
-                        <p class="{% if not forloop.first %}mt-6{% else %}mt-5{% endif %} text-lg leading-relaxed text-slate-300">{{ paragraph }}</p>
-                        {% endfor %}
-                    </div>
-                    <div class="panel p-6">
-                        <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Quick facts</p>
-                        <div class="mt-5 space-y-4">
-                            {% for fact in fact_rows %}
-                            <div class="border-b border-white/10 pb-3 last:border-b-0">
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ fact.label }}</p>
-                                {% if fact.label == 'Instagram' %}
-                                <a href="{{ fact.value }}" class="mt-2 block text-sm text-white hover:underline">{{ fact.value }}</a>
-                                {% else %}
-                                <p class="mt-2 text-sm text-white">{{ fact.value }}</p>
-                                {% endif %}
+                            {% if official_links %}
+                            <div class="mt-8">
+                                <p class="eyebrow">Official Signals</p>
+                                <div class="mt-4 space-y-3">
+                                    {% for link in official_links|slice:":4" %}
+                                    <a href="{{ link.url }}" class="glass block px-4 py-3 transition-colors hover:border-white/30">
+                                        <span class="text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ link.label }}</span>
+                                        <span class="mt-2 block break-all text-sm font-medium text-white">{{ link.url }}</span>
+                                    </a>
+                                    {% endfor %}
+                                </div>
                             </div>
-                            {% endfor %}
-                        </div>
+                            {% endif %}
+                        </aside>
                     </div>
-                </div>
-            </section>
 
-            {% if birthday_events or milestones %}
-            <section class="border-b border-white/10">
-                <div class="container mx-auto px-4 sm:px-6 py-16">
-                    <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Birthday timeline</p>
-                    <div class="mt-8 grid gap-4 md:grid-cols-2">
-                        {% for item in birthday_events %}
-                        <article class="panel p-5">
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.date_label }} • {{ item.relative_label }}</p>
-                            <h2 class="mt-3 text-xl font-black uppercase tracking-tight">{{ item.label }}</h2>
-                            <p class="mt-3 text-sm leading-relaxed text-slate-300">{{ item.detail }}</p>
-                        </article>
-                        {% endfor %}
-                        {% for item in milestones %}
-                        <article class="panel p-5">
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">{{ item.get_category_display }}{% if item.milestone_date %} • {{ item.milestone_date|date:"d M Y" }}{% endif %}</p>
-                            <h2 class="mt-3 text-xl font-black uppercase tracking-tight">{{ item.title }}</h2>
-                            {% if item.description %}<p class="mt-3 text-sm leading-relaxed text-slate-300">{{ item.description }}</p>{% endif %}
-                        </article>
-                        {% endfor %}
-                    </div>
-                </div>
-            </section>
-            {% endif %}
+                    <div class="grid gap-0 border-t border-white/10 lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,.9fr)]">
+                        <div class="px-6 py-8 sm:px-8 lg:px-10">
+                            {% if grouped_facts %}
+                            <section>
+                                <p class="eyebrow">Birthday Profile File</p>
+                                <h2 class="display-face mt-3 text-3xl uppercase tracking-[0.08em]">Verified Birthday Data</h2>
+                                <div class="mt-8 grid gap-4 md:grid-cols-2">
+                                    {% for section in grouped_facts %}
+                                    <article class="glass p-5">
+                                        <p class="eyebrow">{{ section.title }}</p>
+                                        <div class="mt-4 space-y-4">
+                                            {% for fact in section.rows %}
+                                            <div class="border-b border-white/10 pb-3 last:border-b-0">
+                                                <p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ fact.label }}</p>
+                                                {% if fact.label == 'Instagram' %}
+                                                <a href="{{ fact.value }}" class="mt-2 block break-all text-sm font-medium text-white hover:underline">{{ fact.value }}</a>
+                                                {% else %}
+                                                <p class="mt-2 text-sm font-medium text-white">{{ fact.value }}</p>
+                                                {% endif %}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                            </section>
+                            {% endif %}
 
-            {% if birthday_features or related_articles %}
-            <section>
-                <div class="container mx-auto px-4 sm:px-6 py-16 grid gap-10 lg:grid-cols-2">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-[0.22em] accent-text">Birthday highlights</p>
-                        <div class="mt-8 space-y-4">
-                            {% for item in birthday_features %}
-                            <article class="panel p-5">
-                                <h2 class="text-xl font-black uppercase tracking-tight">{{ item.title }}</h2>
-                                {% if item.description %}<p class="mt-3 text-sm leading-relaxed text-slate-300">{{ item.description }}</p>{% endif %}
-                                {% if item.embed_url %}<a href="{{ item.embed_url }}" class="mt-4 inline-block text-sm accent-text hover:underline">Open highlight</a>{% endif %}
-                            </article>
-                            {% empty %}
-                            <article class="panel p-5">
-                                <h2 class="text-xl font-black uppercase tracking-tight">Editorial spotlight</h2>
-                                <p class="mt-3 text-sm leading-relaxed text-slate-300">This birthday page is ready for curated K-Beats highlights, milestone notes, and birthday-day editorial callouts as the archive grows.</p>
-                            </article>
-                            {% endfor %}
+                            <section class="mt-12">
+                                <p class="eyebrow">Birthday Editorial</p>
+                                <h2 class="display-face mt-3 text-3xl uppercase tracking-[0.08em]">Why Fans Mark This Date</h2>
+                                <div class="mt-8 grid gap-4 xl:grid-cols-2">
+                                    {% for section in editorial_sections %}
+                                    <article class="glass p-5">
+                                        <p class="eyebrow">{{ section.kicker }}</p>
+                                        <h3 class="mt-3 text-xl font-black uppercase tracking-tight">{{ section.title }}</h3>
+                                        <p class="mt-4 text-sm leading-7 text-slate-300">{{ section.body }}</p>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                            </section>
+
+                            <section class="mt-12">
+                                <p class="eyebrow">Birthday Timeline</p>
+                                <h2 class="display-face mt-3 text-3xl uppercase tracking-[0.08em]">Signals And Milestones</h2>
+                                <div class="mt-8 space-y-8">
+                                    {% for item in timeline_entries %}
+                                    <article class="timeline-item">
+                                        <div class="glass p-5">
+                                            <div class="flex flex-wrap items-center gap-3">
+                                                <p class="eyebrow">{{ item.eyebrow }}</p>
+                                                {% if item.date_label %}<p class="text-[10px] uppercase tracking-[0.22em] text-slate-500">{{ item.date_label }}</p>{% endif %}
+                                            </div>
+                                            <h3 class="mt-3 text-2xl font-black uppercase tracking-tight">{{ item.title }}</h3>
+                                            <p class="mt-4 text-sm leading-7 text-slate-300">{{ item.body }}</p>
+                                        </div>
+                                    </article>
+                                    {% empty %}
+                                    <article class="glass p-5">
+                                        <p class="text-sm leading-7 text-slate-300">K-Beats is still building the birthday archive for {{ member.display_name }}.</p>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                            </section>
                         </div>
+
+                        <aside class="border-t border-white/10 bg-black/30 px-6 py-8 sm:px-8 lg:border-l lg:border-t-0">
+                            {% if fan_notes %}
+                            <section>
+                                <p class="eyebrow">Fan Search Notes</p>
+                                <h2 class="display-face mt-3 text-3xl uppercase tracking-[0.08em]">Fast Facts</h2>
+                                <div class="mt-6 space-y-3">
+                                    {% for note in fan_notes %}
+                                    <div class="glass px-4 py-4 text-sm leading-7 text-slate-300">{{ note }}</div>
+                                    {% endfor %}
+                                </div>
+                            </section>
+                            {% endif %}
+
+                            <section class="mt-10">
+                                <p class="eyebrow">Birthday Highlights</p>
+                                <h2 class="display-face mt-3 text-3xl uppercase tracking-[0.08em]">Seasonal Routes</h2>
+                                <div class="mt-6 space-y-4">
+                                    {% for item in birthday_spotlights %}
+                                    <article class="glass p-5">
+                                        <p class="eyebrow">{{ item.eyebrow }}</p>
+                                        <h3 class="mt-3 text-xl font-black uppercase tracking-tight">{{ item.title }}</h3>
+                                        <p class="mt-3 text-sm leading-7 text-slate-300">{{ item.body }}</p>
+                                        {% if item.url %}<a href="{{ item.url }}" class="mt-4 inline-block text-sm font-semibold text-white hover:underline">{{ item.cta_label|default:"Open highlight" }}</a>{% endif %}
+                                    </article>
+                                    {% empty %}
+                                    <article class="glass p-5">
+                                        <p class="text-sm leading-7 text-slate-300">The birthday archive is ready for K-Beats editorials, timeline notes, and fan-facing highlight cards.</p>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                            </section>
+
+                            <section class="mt-10">
+                                <p class="eyebrow">K-Beats Discovery</p>
+                                <h2 class="display-face mt-3 text-3xl uppercase tracking-[0.08em]">Routes</h2>
+                                <div class="mt-6 space-y-4">
+                                    {% for item in discovery_routes %}
+                                    <a href="{{ item.url }}" class="glass block p-5 transition-colors hover:border-white/30 hover:bg-white/[0.045]">
+                                        <p class="eyebrow">{{ item.eyebrow }}</p>
+                                        <h3 class="mt-3 text-xl font-black uppercase tracking-tight">{{ item.title }}</h3>
+                                        <p class="mt-3 text-sm leading-7 text-slate-300">{{ item.body }}</p>
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </section>
+
+                            <section class="mt-10">
+                                <p class="eyebrow">Birthday FAQ</p>
+                                <h2 class="display-face mt-3 text-3xl uppercase tracking-[0.08em]">Common Questions</h2>
+                                <div class="mt-6 space-y-4">
+                                    {% for item in faq_items %}
+                                    <article class="glass p-5">
+                                        <p class="text-sm font-black uppercase tracking-tight text-white">{{ item.question }}</p>
+                                        <p class="mt-3 text-sm leading-7 text-slate-300">{{ item.answer }}</p>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                            </section>
+                        </aside>
                     </div>
-                    <div>
-                        <p class="text-[10px] uppercase tracking-[0.22em] accent-text">K-Beats routes</p>
-                        <div class="mt-8 space-y-4">
-                            {% for article in related_articles %}
-                            <a href="{{ article.url }}" class="panel block p-5 transition-colors hover:border-[{{ accent_color }}]">
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Editorial</p>
-                                <h2 class="mt-3 text-xl font-black uppercase tracking-tight">{{ article.title }}</h2>
-                                {% if article.subtitle %}<p class="mt-3 text-sm leading-relaxed text-slate-300">{{ article.subtitle }}</p>{% endif %}
-                            </a>
-                            {% empty %}
-                            <article class="panel p-5">
-                                <h2 class="text-xl font-black uppercase tracking-tight">K-Beats discovery</h2>
-                                <p class="mt-3 text-sm leading-relaxed text-slate-300">This page already connects back into the live stream, group profile, and editorial routes while the birthday archive fills out.</p>
-                            </article>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </section>
-            {% endif %}
+                </section>
+            </div>
         </main>
         {% include 'core/footer.html' %}
     </body>

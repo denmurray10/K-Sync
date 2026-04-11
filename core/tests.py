@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.template.loader import render_to_string
@@ -11,6 +13,7 @@ import tempfile
 from django.contrib.auth.models import User
 from django.db import connection
 from django.core.cache import cache
+from django.core.management import call_command
 from unittest.mock import Mock, patch
 from PIL import Image
 
@@ -19,6 +22,7 @@ from core import scheduler as core_scheduler
 
 from .models import (
     BlogArticle,
+    BirthdayFeature,
     ComebackData,
     Contest,
     KPopGroup,
@@ -247,6 +251,11 @@ class SeoRolloutTests(TestCase):
         self.assertContains(profile_response, reverse('member_birthday_page', args=[self.group.slug, self.member.slug]))
         self.assertContains(birthday_response, 'Rin Birthday')
         self.assertContains(birthday_response, 'How old is Rin?')
+        self.assertContains(profile_response, 'Verified Artist Identity')
+        self.assertContains(profile_response, 'Profile File')
+        self.assertContains(profile_response, 'A Real Timeline, Not A Grid')
+        self.assertContains(birthday_response, 'Verified Birthday Data')
+        self.assertContains(birthday_response, 'Birthday FAQ')
 
     def test_core_discovery_pages_show_distinct_keyword_led_hero_copy(self):
         home_response = self.client.get(reverse('home'))
@@ -1200,3 +1209,61 @@ class RadioCoIntegrationTests(TestCase):
         self.assertEqual(len(recent), 1)
         self.assertEqual(recent[0].title, 'Monster')
         self.assertEqual(recent[0].album_art, 'https://example.com/monster.jpg')
+
+
+class GenerateMemberProfilesCommandTests(TestCase):
+    def setUp(self):
+        self.group = KPopGroup.objects.create(
+            name='Signal Queens',
+            slug='signal-queens',
+            label='Signal Label',
+            group_type='GIRL',
+            agency='Signal Label',
+            fandom_name='Signal Lights',
+        )
+        self.member = KPopMember.objects.create(
+            group=self.group,
+            name='Kim Rin',
+            stage_name='Rin',
+            positions='Leader, Vocalist',
+            date_of_birth=datetime(2002, 4, 18, tzinfo=datetime_timezone.utc).date(),
+            birthplace='Seoul, South Korea',
+            nationality='Korean',
+            mbti='INFJ',
+            blood_type='A',
+            height_cm=168,
+        )
+
+    @patch('core.management.commands.generate_member_profiles._chat_reasoner')
+    def test_command_writes_member_copy_and_birthday_spotlight(self, mock_chat):
+        mock_chat.return_value = json.dumps({
+            'profile_bio': 'Rin is presented on K-Beats as a focused performer with a steady leadership presence.\n\nHer dossier keeps the emphasis on verified identity details and a clean editorial tone.',
+            'fan_facts': '- Leader of Signal Queens\n- Known for vocal presence\n- Birthday file connects profile and seasonal discovery\n- Verified profile built from K-Sync facts',
+            'seo_description_override': 'Explore Rin of Signal Queens with verified birthday facts, profile notes, and K-Beats discovery links.',
+            'birthday_spotlight': 'Rin\'s birthday page gives fans a focused place to track her age, countdown, and verified identity file on K-Beats.',
+        })
+
+        call_command('generate_member_profiles', '--member', self.member.slug, '--include-birthday')
+
+        self.member.refresh_from_db()
+        self.assertIn('focused performer', self.member.profile_bio)
+        self.assertIn('Leader of Signal Queens', self.member.fan_facts)
+        self.assertIn('Explore Rin', self.member.seo_description_override)
+        self.assertTrue(
+            BirthdayFeature.objects.filter(member=self.member, title='Birthday editorial spotlight').exists()
+        )
+
+    @patch('core.management.commands.generate_member_profiles._chat_reasoner')
+    def test_command_dry_run_does_not_save(self, mock_chat):
+        mock_chat.return_value = json.dumps({
+            'profile_bio': 'Rin is presented on K-Beats as a focused performer with a steady leadership presence.\n\nThis should not persist in dry-run mode.',
+            'fan_facts': '- Verified note one\n- Verified note two\n- Verified note three\n- Verified note four',
+            'seo_description_override': 'Dry run only profile description.',
+            'birthday_spotlight': 'Dry run spotlight.',
+        })
+
+        call_command('generate_member_profiles', '--member', self.member.slug, '--dry-run', '--include-birthday')
+
+        self.member.refresh_from_db()
+        self.assertEqual(self.member.profile_bio, '')
+        self.assertFalse(BirthdayFeature.objects.filter(member=self.member).exists())

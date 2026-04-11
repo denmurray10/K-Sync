@@ -11,7 +11,7 @@ import subprocess
 import tempfile
 import time
 from collections import Counter, defaultdict
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from datetime import timezone as datetime_timezone
 from zoneinfo import ZoneInfo
 from django.db import DatabaseError, models, transaction
@@ -9346,14 +9346,343 @@ def _member_fact_rows(member, group):
         {'label': 'Group', 'value': group.name},
         {'label': 'Agency', 'value': group.agency or group.label},
         {'label': 'Positions', 'value': member.resolved_positions},
+        {'label': 'Status', 'value': _member_meta_value(member, 'status')},
         {'label': 'Birth date', 'value': member.date_of_birth.strftime('%d %B %Y') if member.date_of_birth else ''},
+        {'label': 'Zodiac sign', 'value': _member_meta_value(member, 'zodiac_sign')},
+        {'label': 'Chinese zodiac', 'value': _member_meta_value(member, 'chinese_zodiac')},
         {'label': 'Birthplace', 'value': member.birthplace},
+        {'label': 'Hometown', 'value': _member_meta_value(member, 'hometown')},
         {'label': 'Nationality', 'value': member.nationality},
         {'label': 'MBTI', 'value': member.mbti},
         {'label': 'Blood type', 'value': member.blood_type},
         {'label': 'Height', 'value': f"{member.height_cm} cm" if member.height_cm else ''},
+        {'label': 'Weight', 'value': _member_meta_value(member, 'weight')},
+        {'label': 'Education', 'value': _member_meta_value(member, 'education')},
+        {'label': 'Representative unit', 'value': _member_meta_value(member, 'unit')},
         {'label': 'Instagram', 'value': member.instagram_url},
     ]
+
+
+def _member_meta(member):
+    metadata = member.profile_metadata or {}
+    return metadata if isinstance(metadata, dict) else {}
+
+
+def _member_meta_list(member, key):
+    value = _member_meta(member).get(key)
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()]
+    if isinstance(value, str):
+        cleaned = [part.strip() for part in re.split(r'\n+|[•]|(?:\s+-\s+)', value) if part.strip()]
+        return cleaned
+    return []
+
+
+def _member_meta_value(member, key):
+    value = _member_meta(member).get(key)
+    if isinstance(value, (list, dict)):
+        return ''
+    return str(value or '').strip()
+
+
+def _member_biography_paragraphs(member, group):
+    biography = _member_meta_value(member, 'biography')
+    if biography:
+        paragraphs = _split_story_paragraphs(biography, fallback=biography)
+        if paragraphs:
+            return paragraphs
+
+    if member.profile_bio:
+        paragraphs = _split_story_paragraphs(member.profile_bio, fallback=member.profile_bio)
+        if paragraphs:
+            return paragraphs
+
+    fallback_bits = []
+    if member.display_name:
+        fallback_bits.append(f"{member.display_name} is profiled on K-Beats as a member of {group.name}.")
+    if member.resolved_positions:
+        fallback_bits.append(f"The current role file lists {member.resolved_positions.lower()} as the closest shorthand for their place inside the group.")
+    if member.birthplace:
+        fallback_bits.append(f"The verified profile record places their background in {member.birthplace}.")
+    if member.nationality:
+        fallback_bits.append(f"K-Beats currently lists their nationality as {member.nationality}.")
+
+    fallback = " ".join(fallback_bits) or f"K-Beats is building a fuller member-first profile for {member.display_name}."
+    return [fallback]
+
+
+def _member_filter_fact_rows(rows, labels):
+    label_set = set(labels)
+    return [row for row in rows if row['label'] in label_set and row['value']]
+
+
+def _split_profile_notes(text, *, max_items=4):
+    raw = str(text or '').strip()
+    if not raw:
+        return []
+
+    segments = [
+        re.sub(r'^\s*[-*•]\s*', '', chunk.strip())
+        for chunk in re.split(r'\n+|[•]|(?:\s+-\s+)', raw)
+        if chunk.strip()
+    ]
+    if len(segments) >= 2:
+        return segments[:max_items]
+
+    sentences = [segment.strip() for segment in re.split(r'(?<=[.!?])\s+', raw) if segment.strip()]
+    return sentences[:max_items]
+
+
+def _member_verified_fact_notes(member, *, max_items=8):
+    notes = _member_meta_list(member, 'facts')
+    if not notes:
+        notes = _split_profile_notes(member.fan_facts or member.profile_bio, max_items=max_items)
+    return notes[:max_items]
+
+
+def _member_editorial_sections(member, group, current_age, birthday_countdown_days):
+    artistic_bits = []
+    profile_focus = _member_meta_value(member, 'profile_focus')
+    if member.resolved_positions:
+        artistic_bits.append(f"In {group.name}, {member.display_name} is most closely identified with the role of {member.resolved_positions.lower()}.")
+    if profile_focus:
+        artistic_bits.append(profile_focus)
+    if _member_meta_value(member, 'unit'):
+        artistic_bits.append(f"K-Beats also tracks {member.display_name} under the unit or sub-line marker {_member_meta_value(member, 'unit')}.")
+    if member.debut_date:
+        artistic_bits.append(f"Their debut timeline on K-Beats starts on {member.debut_date.strftime('%d %B %Y')}.")
+    elif group.debut_date:
+        artistic_bits.append(f"The group's debut era began on {group.debut_date.strftime('%d %B %Y')}, which shapes how fans read {member.display_name}'s journey.")
+
+    personal_bits = []
+    if current_age is not None:
+        personal_bits.append(f"{member.display_name} is currently {current_age} years old.")
+    if member.birthplace:
+        personal_bits.append(f"They were born in {member.birthplace}.")
+    if member.nationality:
+        personal_bits.append(f"K-Beats lists {member.display_name} as {member.nationality}.")
+    if _member_meta_value(member, 'education'):
+        personal_bits.append(f"The current verified notes also point to {_member_meta_value(member, 'education')}.")
+    if member.mbti or member.blood_type:
+        personal_meta = []
+        if member.mbti:
+            personal_meta.append(f"MBTI: {member.mbti}")
+        if member.blood_type:
+            personal_meta.append(f"blood type: {member.blood_type}")
+        personal_bits.append(", ".join(personal_meta) + ".")
+
+    birthday_bits = []
+    if member.date_of_birth:
+        birthday_bits.append(f"Their birthday falls on {member.date_of_birth.strftime('%d %B %Y')}.")
+    if birthday_countdown_days is not None:
+        if birthday_countdown_days == 0:
+            birthday_bits.append(f"Today is {member.display_name}'s birthday on K-Beats.")
+        else:
+            birthday_bits.append(f"The next birthday checkpoint is {birthday_countdown_days} day{'' if birthday_countdown_days == 1 else 's'} away.")
+    birthday_bits.append(f"The dedicated birthday page extends this profile with countdown context, milestones, and editorial birthday notes.")
+
+    return [
+        {
+            'kicker': 'Artistic identity',
+            'title': f"{member.display_name} as an artist",
+            'body': " ".join(artistic_bits) if artistic_bits else f"K-Beats is still enriching the verified artistic profile for {member.display_name}.",
+        },
+        {
+            'kicker': 'Personal file',
+            'title': 'Core facts fans search for first',
+            'body': " ".join(personal_bits) if personal_bits else f"K-Beats is still filling the verified personal profile for {member.display_name}.",
+        },
+        {
+            'kicker': 'Birthday file',
+            'title': 'The seasonal route into this profile',
+            'body': " ".join(birthday_bits),
+        },
+    ]
+
+
+def _member_official_links(member):
+    links = []
+    seen = set()
+
+    def _add(label, url):
+        normalized = str(url or '').strip()
+        if not normalized or normalized in seen:
+            return
+        seen.add(normalized)
+        links.append({'label': label, 'url': normalized})
+
+    _add('Instagram', member.instagram_url)
+
+    for index, raw in enumerate(member.official_links or [], start=1):
+        if isinstance(raw, dict):
+            label = str(raw.get('label') or raw.get('title') or raw.get('name') or f'Official Link {index}').strip()
+            url = raw.get('url') or raw.get('href')
+            _add(label, url)
+        else:
+            _add(f'Official Link {index}', raw)
+
+    return links
+
+
+def _member_same_as_links(member):
+    return [item['url'] for item in _member_official_links(member)]
+
+
+def _member_discovery_routes(member, group, related_articles):
+    routes = [
+        {
+            'eyebrow': 'K-Beats live',
+            'title': f'Listen while you read {member.display_name}\'s profile',
+            'body': 'Move from the dossier into the live station and keep the artist discovery journey inside K-Beats.',
+            'url': reverse('live'),
+        },
+        {
+            'eyebrow': 'Group profile',
+            'title': f'Return to the full {group.name} encyclopedia page',
+            'body': f'Use the parent profile for group context, members, releases, and the wider K-Beats discovery graph around {group.name}.',
+            'url': reverse('idol_page', args=[group.slug]),
+        },
+        {
+            'eyebrow': 'Birthday page',
+            'title': f'Open the birthday destination for {member.display_name}',
+            'body': 'The birthday file tracks countdown context, age, and seasonal editorial framing built for birthday search intent.',
+            'url': _member_birthday_url(member),
+        },
+    ]
+    for article in related_articles[:2]:
+        routes.append({
+            'eyebrow': 'Editorial',
+            'title': article['title'],
+            'body': article.get('subtitle') or f"Read the K-Beats editorial route connected to {group.name}.",
+            'url': article['url'],
+        })
+    return routes
+
+
+def _member_timeline_entries(member, group, milestones, birthday_events):
+    entries = []
+    for item in milestones:
+        entries.append({
+            'eyebrow': item.get_category_display(),
+            'title': item.title,
+            'date_label': item.milestone_date.strftime('%d %b %Y') if item.milestone_date else '',
+            'sort_key': item.milestone_date or date.min,
+            'body': item.description or f"K-Beats has marked {item.title.lower()} as part of {member.display_name}'s profile timeline.",
+        })
+
+    if member.date_of_birth:
+        entries.append({
+            'eyebrow': 'Birthday',
+            'title': f"{member.display_name} birthday record",
+            'date_label': member.date_of_birth.strftime('%d %b %Y'),
+            'sort_key': member.date_of_birth,
+            'body': f"The profile record anchors {member.display_name}'s birthday on {member.date_of_birth.strftime('%d %B')}, giving the birthday page a stable factual base.",
+        })
+
+    if member.debut_date or group.debut_date:
+        debut_date = member.debut_date or group.debut_date
+        entries.append({
+            'eyebrow': 'Debut',
+            'title': f"{member.display_name} enters the K-pop timeline",
+            'date_label': debut_date.strftime('%d %b %Y') if debut_date else '',
+            'sort_key': debut_date or date.min,
+            'body': f"K-Beats uses the debut marker to place {member.display_name} inside the wider {group.name} era and career arc.",
+        })
+
+    for event in birthday_events[:3]:
+        event_sort_key = None
+        event_date_str = str(event.get('date_str') or '').strip()
+        if event_date_str:
+            try:
+                event_sort_key = datetime.strptime(event_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                event_sort_key = None
+        entries.append({
+            'eyebrow': 'Birthday signal',
+            'title': event.get('label') or f"{member.display_name} birthday",
+            'date_label': event.get('date_label') or '',
+            'sort_key': event_sort_key or date.min,
+            'body': event.get('detail') or f"The comeback calendar also tracks this birthday signal for {member.display_name}.",
+        })
+
+    entries.sort(key=lambda item: item.get('sort_key') or date.min, reverse=True)
+    cleaned_entries = []
+    for item in entries[:8]:
+        normalized = dict(item)
+        normalized.pop('sort_key', None)
+        cleaned_entries.append(normalized)
+    return cleaned_entries
+
+
+def _member_cv_snapshot(member, group, current_age, next_birthday, birthday_countdown_days):
+    snapshot = []
+    snapshot.append({'label': 'Current role', 'value': member.resolved_positions or 'Artist profile in progress'})
+    snapshot.append({'label': 'Group', 'value': group.name})
+    snapshot.append({'label': 'Agency', 'value': group.agency or group.label})
+    snapshot.append({'label': 'Age now', 'value': str(current_age) if current_age is not None else 'Unconfirmed'})
+    snapshot.append({'label': 'Birthday', 'value': member.date_of_birth.strftime('%d %B %Y') if member.date_of_birth else 'Pending'})
+    if next_birthday:
+        snapshot.append({'label': 'Next birthday', 'value': next_birthday.strftime('%d %B %Y')})
+    if birthday_countdown_days is not None:
+        snapshot.append({'label': 'Countdown', 'value': 'Today' if birthday_countdown_days == 0 else f'{birthday_countdown_days} days'})
+    return [item for item in snapshot if item['value']]
+
+
+def _member_birthday_editorial_sections(member, group, current_age, next_age, birthday_today, birthday_countdown_days):
+    celebration_copy = []
+    if birthday_today:
+        celebration_copy.append(f"Today is {member.display_name}'s birthday, which makes this page the live birthday dossier for fans arriving from search, socials, and the K-Beats calendar.")
+    elif birthday_countdown_days is not None:
+        celebration_copy.append(f"The next birthday checkpoint for {member.display_name} is {birthday_countdown_days} day{'' if birthday_countdown_days == 1 else 's'} away.")
+    if current_age is not None:
+        celebration_copy.append(f"{member.display_name} is currently {current_age} years old.")
+    if next_age is not None and not birthday_today:
+        celebration_copy.append(f"On the next birthday marker, K-Beats will read that page as turning {next_age}.")
+
+    why_it_matters = []
+    if member.resolved_positions:
+        why_it_matters.append(f"As one of {group.name}'s {member.resolved_positions.lower()}, {member.display_name} carries a recognizable role inside the group's public identity.")
+    else:
+        why_it_matters.append(f"{member.display_name} remains a key part of the wider {group.name} story on K-Beats.")
+    if member.resolved_bio:
+        why_it_matters.append("This birthday file extends the verified profile notes already stored in K-Sync into a seasonal celebration format.")
+    if member.mbti or member.blood_type or member.birthplace:
+        why_it_matters.append("It also gathers the personal data points fans usually search for first when a birthday date starts trending.")
+
+    return [
+        {
+            'kicker': 'Birthday signal',
+            'title': f'{member.display_name} birthday status',
+            'body': " ".join(celebration_copy) if celebration_copy else f'K-Beats is building out the verified birthday record for {member.display_name}.',
+        },
+        {
+            'kicker': 'Why fans celebrate',
+            'title': f'Why {member.display_name} matters in the {group.name} story',
+            'body': " ".join(why_it_matters),
+        },
+    ]
+
+
+def _member_birthday_spotlights(member, birthday_features, birthday_events):
+    spotlights = []
+    for item in birthday_features:
+        spotlights.append({
+            'eyebrow': 'Birthday highlight',
+            'title': item.title,
+            'body': item.description or f"K-Beats has marked {item.title.lower()} as part of {member.display_name}'s birthday archive.",
+            'url': item.cta_url or item.embed_url or '',
+            'cta_label': item.cta_label or ('Open highlight' if (item.cta_url or item.embed_url) else ''),
+        })
+    if not spotlights and birthday_events:
+        first_event = birthday_events[0]
+        spotlights.append({
+            'eyebrow': 'Calendar signal',
+            'title': first_event.get('label') or f"{member.display_name} birthday marker",
+            'body': first_event.get('detail') or f"The K-Beats comeback calendar is already tracking birthday activity around {member.display_name}.",
+            'url': first_event.get('href') or '',
+            'cta_label': 'Open calendar route' if first_event.get('href') else '',
+        })
+    return spotlights[:4]
 
 
 def _group_member_cards(group, *, accent_fallback=''):
@@ -13859,92 +14188,10 @@ def idol_page(request, slug):
     return render(request, 'core/idol_band_page.html', context)
 
 
-def member_page(request, group_slug, member_slug):
+def _build_member_profile_context(request, member, *, birthday_mode=False):
     member = get_object_or_404(
         KPopMember.objects.select_related('group').prefetch_related('milestones', 'birthday_features'),
-        group__slug=group_slug,
-        slug=member_slug,
-    )
-    group = member.group
-    _apply_stream_image_to_field(group, 'image_url')
-    _apply_logo_path(group)
-
-    accent_map = {
-        'GIRL': '#FF8EAF',
-        'BOY': '#00f0ff',
-        'SOLO': '#c084fc',
-    }
-    accent_color = accent_map.get(group.group_type, '#FF8EAF')
-    story_text = member.resolved_bio or group.resolved_bio or f"{member.display_name} is part of {group.name}'s current K-pop story on K-Beats."
-    today = timezone.localdate()
-    next_birthday = _next_birthday_date(member.date_of_birth, today)
-    current_age = _calculate_age_on_date(member.date_of_birth, today) if member.date_of_birth else None
-    related_articles = _member_related_release_context(member)
-    fact_rows = [row for row in _member_fact_rows(member, group) if row['value']]
-    breadcrumb_items = [
-        {'name': 'Home', 'url': reverse('home')},
-        {'name': 'Idols', 'url': reverse('idols')},
-        {'name': group.name, 'url': reverse('idol_page', args=[group.slug])},
-        {'name': member.display_name, 'url': _member_profile_url(member)},
-    ]
-
-    context = {
-        'group': group,
-        'member': member,
-        'member_image': _optimize_home_image_url(
-            _coalesce_stream_image_url(
-                member.resolved_image_url,
-                group.image_url,
-                fallback=group.logo_path or DEFAULT_STREAM_IMAGE_URL,
-            ),
-            width=900,
-            height=900,
-        ),
-        'accent_color': accent_color,
-        'description': story_text,
-        'description_paragraphs': _split_story_paragraphs(story_text, fallback=story_text),
-        'fact_rows': fact_rows,
-        'current_age': current_age,
-        'next_birthday': next_birthday,
-        'birthday_countdown_days': (next_birthday - today).days if next_birthday else None,
-        'birthday_page_url': _member_birthday_url(member),
-        'breadcrumbs': breadcrumb_items,
-        'milestones': list(member.milestones.all()[:8]),
-        'birthday_features': list(member.birthday_features.all()[:4]),
-        'related_articles': related_articles,
-        'canonical_url': request.build_absolute_uri(_member_profile_url(member)),
-        'seo_type': 'profile',
-        'seo_title': f"{member.display_name} Profile | Birthday, Facts and K-Pop Guide | K-Beats",
-        'seo_description': (member.seo_description_override or f"Explore {member.display_name} from {group.name} with birthday facts, profile details, milestones, and K-Beats discovery links.")[:160],
-        'extra_schema_json': json.dumps([
-            {
-                '@context': 'https://schema.org',
-                '@type': 'Person',
-                'name': member.display_name,
-                'alternateName': [value for value in [member.resolved_full_name, member.korean_name] if value and value != member.display_name],
-                'description': story_text,
-                'birthDate': member.date_of_birth.isoformat() if member.date_of_birth else '',
-                'nationality': member.nationality,
-                'memberOf': {
-                    '@type': 'MusicGroup',
-                    'name': group.name,
-                    'url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
-                },
-                'image': request.build_absolute_uri(_coalesce_stream_image_url(member.resolved_image_url, group.image_url)),
-                'url': request.build_absolute_uri(_member_profile_url(member)),
-                'sameAs': [link for link in [member.instagram_url] + list(member.official_links or []) if link],
-            },
-            _build_breadcrumb_schema(request, breadcrumb_items),
-        ]),
-    }
-    return render(request, 'core/member_profile.html', context)
-
-
-def member_birthday_page(request, group_slug, member_slug):
-    member = get_object_or_404(
-        KPopMember.objects.select_related('group').prefetch_related('milestones', 'birthday_features'),
-        group__slug=group_slug,
-        slug=member_slug,
+        pk=member.pk,
     )
     group = member.group
     _apply_stream_image_to_field(group, 'image_url')
@@ -13964,9 +14211,41 @@ def member_birthday_page(request, group_slug, member_slug):
     birthday_today = bool(birthday_anchor and birthday_anchor == today)
     current_age = _calculate_age_on_date(member.date_of_birth, today) if member.date_of_birth else None
     next_age = _calculate_age_on_date(member.date_of_birth, birthday_anchor) if member.date_of_birth and birthday_anchor else None
-    story_text = member.resolved_bio or group.resolved_bio or f"Celebrate {member.display_name}'s birthday with profile facts, milestones, and K-Beats listening routes."
+    biography_paragraphs = _member_biography_paragraphs(member, group)
+    story_text = "\n\n".join(biography_paragraphs)
     fact_rows = [row for row in _member_fact_rows(member, group) if row['value']]
     related_articles = _member_related_release_context(member)
+    birthday_countdown_days = (birthday_anchor - today).days if birthday_anchor else None
+    profile_milestones = list(member.milestones.all()[:8])
+    birthday_milestones = list(member.milestones.filter(category__in=['birthday', 'career', 'release'])[:8])
+    birthday_features = list(member.birthday_features.all()[:4])
+    profile_grouped_facts = [
+        {'title': 'Core identity', 'rows': _member_filter_fact_rows(fact_rows, ['Stage name', 'Full name', 'Korean name', 'Group', 'Positions', 'Status'])},
+        {'title': 'Personal details', 'rows': _member_filter_fact_rows(fact_rows, ['Birth date', 'Zodiac sign', 'Chinese zodiac', 'Birthplace', 'Hometown', 'Nationality', 'Height', 'Weight'])},
+        {'title': 'Profile notes', 'rows': _member_filter_fact_rows(fact_rows, ['MBTI', 'Blood type', 'Education', 'Representative unit', 'Instagram'])},
+    ]
+    profile_grouped_facts = [section for section in profile_grouped_facts if section['rows']]
+    birthday_grouped_facts = [
+        {'title': 'Birthday snapshot', 'rows': _member_filter_fact_rows(fact_rows, ['Stage name', 'Full name', 'Group', 'Status', 'Birth date', 'Zodiac sign', 'Chinese zodiac'])},
+        {'title': 'Personal details', 'rows': _member_filter_fact_rows(fact_rows, ['Birthplace', 'Hometown', 'Nationality', 'Height', 'Weight', 'MBTI', 'Blood type'])},
+    ]
+    birthday_grouped_facts = [section for section in birthday_grouped_facts if section['rows']]
+    profile_editorial_sections = _member_editorial_sections(member, group, current_age, birthday_countdown_days)
+    birthday_editorial_sections = _member_birthday_editorial_sections(
+        member,
+        group,
+        current_age,
+        next_age,
+        birthday_today,
+        birthday_countdown_days,
+    )
+    profile_timeline_entries = _member_timeline_entries(member, group, profile_milestones, [])
+    birthday_timeline_entries = _member_timeline_entries(member, group, birthday_milestones, birthday_events)
+    official_links = _member_official_links(member)
+    discovery_routes = _member_discovery_routes(member, group, related_articles)
+    birthday_spotlights = _member_birthday_spotlights(member, birthday_features, birthday_events)
+    dossier_snapshot = _member_cv_snapshot(member, group, current_age, next_birthday, birthday_countdown_days)
+    fan_notes = _member_verified_fact_notes(member, max_items=8)
     faq_items = [
         {
             'question': f"When is {member.display_name}'s birthday?",
@@ -13986,8 +14265,48 @@ def member_birthday_page(request, group_slug, member_slug):
         {'name': 'Idols', 'url': reverse('idols')},
         {'name': group.name, 'url': reverse('idol_page', args=[group.slug])},
         {'name': member.display_name, 'url': _member_profile_url(member)},
-        {'name': 'Birthday', 'url': _member_birthday_url(member)},
     ]
+    if birthday_mode:
+        breadcrumb_items.append({'name': 'Birthday', 'url': _member_birthday_url(member)})
+
+    canonical_url = request.build_absolute_uri(_member_birthday_url(member) if birthday_mode else _member_profile_url(member))
+    page_url = request.build_absolute_uri(_member_birthday_url(member) if birthday_mode else _member_profile_url(member))
+    schema_items = [
+        {
+            '@context': 'https://schema.org',
+            '@type': 'Person',
+            'name': member.display_name,
+            'alternateName': [value for value in [member.resolved_full_name, member.korean_name] if value and value != member.display_name],
+            'description': story_text,
+            'birthDate': member.date_of_birth.isoformat() if member.date_of_birth else '',
+            'nationality': member.nationality,
+            'memberOf': {
+                '@type': 'MusicGroup',
+                'name': group.name,
+                'url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
+            },
+            'image': request.build_absolute_uri(_coalesce_stream_image_url(member.resolved_image_url, group.image_url)),
+            'url': page_url,
+            'sameAs': _member_same_as_links(member),
+        },
+    ]
+    if birthday_mode:
+        schema_items.append({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            'mainEntity': [
+                {
+                    '@type': 'Question',
+                    'name': item['question'],
+                    'acceptedAnswer': {
+                        '@type': 'Answer',
+                        'text': item['answer'],
+                    },
+                }
+                for item in faq_items
+            ],
+        })
+    schema_items.append(_build_breadcrumb_schema(request, breadcrumb_items))
 
     context = {
         'group': group,
@@ -14003,61 +14322,73 @@ def member_birthday_page(request, group_slug, member_slug):
         ),
         'accent_color': accent_color,
         'description': story_text,
-        'description_paragraphs': _split_story_paragraphs(story_text, fallback=story_text),
+        'description_paragraphs': biography_paragraphs,
         'fact_rows': fact_rows,
+        'profile_grouped_facts': profile_grouped_facts,
+        'birthday_grouped_facts': birthday_grouped_facts,
+        'profile_editorial_sections': profile_editorial_sections,
+        'birthday_editorial_sections': birthday_editorial_sections,
+        'official_links': official_links,
+        'profile_timeline_entries': profile_timeline_entries,
+        'birthday_timeline_entries': birthday_timeline_entries,
+        'discovery_routes': discovery_routes,
+        'birthday_spotlights': birthday_spotlights,
+        'dossier_snapshot': dossier_snapshot,
+        'fan_notes': fan_notes,
         'current_age': current_age,
         'next_age': next_age,
         'birthday_today': birthday_today,
         'birthday_anchor': birthday_anchor,
-        'birthday_countdown_days': (birthday_anchor - today).days if birthday_anchor else None,
+        'birthday_countdown_days': birthday_countdown_days,
         'birthday_events': birthday_events[:8],
         'latest_birthday_event': latest_event,
-        'milestones': list(member.milestones.filter(category__in=['birthday', 'career', 'release'])[:8]),
-        'birthday_features': list(member.birthday_features.all()[:4]),
+        'milestones': profile_milestones,
+        'birthday_features': birthday_features,
         'related_articles': related_articles,
         'member_profile_url': _member_profile_url(member),
         'group_profile_url': reverse('idol_page', args=[group.slug]),
         'listen_live_url': reverse('live'),
+        'birthday_page_url': _member_birthday_url(member),
         'breadcrumbs': breadcrumb_items,
         'faq_items': faq_items,
-        'canonical_url': request.build_absolute_uri(_member_birthday_url(member)),
+        'selected_tab': 'birthday' if birthday_mode else 'profile',
+        'canonical_url': canonical_url,
         'seo_type': 'profile',
-        'seo_title': f"{member.display_name} Birthday | Age, Countdown and Profile | K-Beats",
-        'seo_description': (member.seo_description_override or f"Track {member.display_name}'s birthday, age, countdown, profile facts, and K-Beats discovery routes for {group.name}.")[:160],
-        'extra_schema_json': json.dumps([
-            {
-                '@context': 'https://schema.org',
-                '@type': 'Person',
-                'name': member.display_name,
-                'birthDate': member.date_of_birth.isoformat() if member.date_of_birth else '',
-                'description': story_text,
-                'memberOf': {
-                    '@type': 'MusicGroup',
-                    'name': group.name,
-                    'url': request.build_absolute_uri(reverse('idol_page', args=[group.slug])),
-                },
-                'url': request.build_absolute_uri(_member_birthday_url(member)),
-                'sameAs': [link for link in [member.instagram_url] + list(member.official_links or []) if link],
-            },
-            {
-                '@context': 'https://schema.org',
-                '@type': 'FAQPage',
-                'mainEntity': [
-                    {
-                        '@type': 'Question',
-                        'name': item['question'],
-                        'acceptedAnswer': {
-                            '@type': 'Answer',
-                            'text': item['answer'],
-                        },
-                    }
-                    for item in faq_items
-                ],
-            },
-            _build_breadcrumb_schema(request, breadcrumb_items),
-        ]),
+        'seo_title': (
+            f"{member.display_name} Birthday | Age, Countdown and Profile | K-Beats"
+            if birthday_mode
+            else f"{member.display_name} Profile | Birthday, Facts and K-Pop Guide | K-Beats"
+        ),
+        'seo_description': (
+            (member.seo_description_override or f"Track {member.display_name}'s birthday, age, countdown, profile facts, and K-Beats discovery routes for {group.name}.")
+            if birthday_mode
+            else (member.seo_description_override or f"Explore {member.display_name} from {group.name} with birthday facts, profile details, milestones, and K-Beats discovery links.")
+        )[:160],
+        'extra_schema_json': json.dumps(schema_items),
     }
-    return render(request, 'core/member_birthday.html', context)
+    return context
+
+
+def member_page(request, group_slug, member_slug):
+    member = get_object_or_404(
+        KPopMember.objects.select_related('group').prefetch_related('milestones', 'birthday_features'),
+        group__slug=group_slug,
+        slug=member_slug,
+    )
+    context = _build_member_profile_context(request, member, birthday_mode=False)
+    if request.GET.get('tab') == 'birthday':
+        context['selected_tab'] = 'birthday'
+    return render(request, 'core/member_profile.html', context)
+
+
+def member_birthday_page(request, group_slug, member_slug):
+    member = get_object_or_404(
+        KPopMember.objects.select_related('group').prefetch_related('milestones', 'birthday_features'),
+        group__slug=group_slug,
+        slug=member_slug,
+    )
+    context = _build_member_profile_context(request, member, birthday_mode=True)
+    return render(request, 'core/member_profile.html', context)
 
 
 def album_detail(request, slug, collection_id):
