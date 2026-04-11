@@ -412,6 +412,23 @@ tailwind.config = {
                         </div>
                     </a>
 
+                    {% if comeback_jump_links %}
+                    <section class="panel-shell overflow-hidden">
+                        <div class="border-b border-white/10 px-5 py-4">
+                            <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Keep Exploring</p>
+                            <h3 class="mt-3 font-cinzel text-2xl text-white">Release Cluster Links</h3>
+                        </div>
+                        <div class="divide-y divide-white/10">
+                            {% for link in comeback_jump_links %}
+                            <a href="{{ link.href }}" class="block px-5 py-4 transition-colors hover:bg-white/[0.04] hover:text-primary">
+                                <p class="text-[11px] font-black uppercase tracking-[0.2em] text-white">{{ link.title }}</p>
+                                <p class="mt-2 text-sm leading-6 text-slate-400">{{ link.description }}</p>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% endif %}
+
                     <section class="panel-shell overflow-hidden">
                         <div class="border-b border-white/10 px-5 py-4">
                             <p class="text-[10px] uppercase tracking-[0.22em] text-primary">Today in K-Pop</p>

@@ -4007,14 +4007,22 @@ def _build_homepage_context(request):
             {
                 'title': 'K-Pop Radio UK',
                 'href': reverse('uk_kpop_radio'),
+                'description': 'Open the UK-focused station page for local-intent listeners looking for live K-pop radio.',
             },
             {
                 'title': 'Midnight K-Pop Vibes',
                 'href': reverse('midnight_kpop_vibes'),
+                'description': 'Use the after-hours mood page to branch into softer late-night discovery.',
             },
             {
                 'title': 'Best K-Pop Playlist 2026',
                 'href': reverse('best_kpop_playlist_2026'),
+                'description': 'Jump from the homepage into the playlist-led discovery page built around current momentum.',
+            },
+            {
+                'title': 'Discover New K-Pop Music',
+                'href': reverse('discover_new_kpop_music'),
+                'description': 'Move into the discovery guide that ties radio, charts, comebacks, and editorial together.',
             },
         ],
         'upcoming_comebacks': upcoming,
@@ -6151,6 +6159,23 @@ def news(request):
         'all_articles': all_blog,
         'categories': cats,
         'total_count': len(all_blog),
+        'editorial_jump_links': [
+            {
+                'title': 'Discover New K-Pop Music',
+                'href': reverse('discover_new_kpop_music'),
+                'description': 'Use the discovery guide to move from editorial stories into live radio, charts, and comeback tracking.',
+            },
+            {
+                'title': 'Best K-Pop Playlist 2026',
+                'href': reverse('best_kpop_playlist_2026'),
+                'description': 'Send playlist-intent visitors into the freshness-led playlist page instead of keeping them only in article loops.',
+            },
+            {
+                'title': 'K-Pop Radio Station UK',
+                'href': reverse('uk_kpop_radio'),
+                'description': 'Hand UK-intent readers into the station page that is built for local discovery and repeat listening.',
+            },
+        ],
     })
 
 
@@ -13239,6 +13264,23 @@ def comeback_timeline(request):
         'next_month': next_month,
         'comeback_release_api_base': reverse('comeback_release_drawer_api', kwargs={'release_id': 'release-id-placeholder'}).replace('release-id-placeholder', ''),
         'comeback_day_api_base': reverse('comeback_day_drawer_api', kwargs={'date_str': 'date-placeholder'}).replace('date-placeholder', ''),
+        'comeback_jump_links': [
+            {
+                'title': 'Discover New K-Pop Music',
+                'href': reverse('discover_new_kpop_music'),
+                'description': 'Move from release tracking into the broader discovery guide built around radio, charts, and editorial.',
+            },
+            {
+                'title': 'K-Pop Charts',
+                'href': reverse('charts'),
+                'description': 'Check which comeback songs are already turning release buzz into chart momentum.',
+            },
+            {
+                'title': 'Explore K-Pop Idols',
+                'href': reverse('idols'),
+                'description': 'Jump from comeback dates into the artist directory for member details, discographies, and group pages.',
+            },
+        ],
     })
 
 

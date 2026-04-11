@@ -240,6 +240,23 @@ class SeoRolloutTests(TestCase):
         self.assertContains(idols_response, 'IDOLS')
         self.assertContains(comebacks_response, 'COMEBACKS')
 
+    def test_day3_internal_link_clusters_are_present(self):
+        home_response = self.client.get(reverse('home'))
+        news_response = self.client.get(reverse('news'))
+        comebacks_response = self.client.get(reverse('comebacks'))
+
+        self.assertContains(home_response, reverse('uk_kpop_radio'))
+        self.assertContains(home_response, reverse('midnight_kpop_vibes'))
+        self.assertContains(home_response, reverse('discover_new_kpop_music'))
+
+        self.assertContains(news_response, reverse('discover_new_kpop_music'))
+        self.assertContains(news_response, reverse('best_kpop_playlist_2026'))
+        self.assertContains(news_response, reverse('uk_kpop_radio'))
+
+        self.assertContains(comebacks_response, reverse('discover_new_kpop_music'))
+        self.assertContains(comebacks_response, reverse('charts'))
+        self.assertContains(comebacks_response, reverse('idols'))
+
 
 class FanClubTierAndEventTests(TestCase):
     def setUp(self):

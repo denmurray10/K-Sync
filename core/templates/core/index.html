@@ -320,6 +320,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </a>
 {% endfor %}
 </div>
+<div class="mt-4 grid gap-3 pointer-events-auto sm:grid-cols-2">
+{% for link in seo_jump_links %}
+<a href="{{ link.href }}" class="border border-white/10 bg-black/35 p-4 transition hover:border-primary/60 hover:bg-black/50">
+<p class="text-[10px] font-black uppercase tracking-[0.24em] text-primary">SEO route</p>
+<p class="mt-2 text-sm font-black uppercase tracking-tight text-white">{{ link.title }}</p>
+<p class="mt-2 text-xs leading-5 text-slate-300">{{ link.description }}</p>
+</a>
+{% endfor %}
+</div>
 {% endif %}
 </div>
 <!-- Right Content: Broadcast Signal Panel -->
