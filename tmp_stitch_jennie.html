@@ -1,81 +1,50 @@
-{% load static %}
 <!DOCTYPE html>
 
-<html lang="en-GB"><head>
+<html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-{% include 'core/seo_meta.html' %}
-<title>{% firstof seo_title "Artist Dossier | K-Beats" %}</title>
-<link rel="stylesheet" href="{% static 'core/css/home-tailwind.css' %}" />
+<title>Jennie - Artist Dossier</title>
+<!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Space Grotesk -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <script>
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            "primary": "#f425c0",
-            "secondary": "#00f0ff",
-            "background-dark": "#000000",
-            "neon-pink": "#FF00FF",
-            "dark-bg": "#050505",
-            "card-bg": "#121212",
-            "border-gray": "#2A2A2A"
-          },
           fontFamily: {
-            display: ["Montserrat", "sans-serif"],
+            sans: ['Space Grotesk', 'sans-serif'],
           },
-          borderRadius: {
-            DEFAULT: "0px",
-            sm: "0px",
-            md: "0px",
-            lg: "0px",
-            xl: "0px",
-            "2xl": "0px",
-            "3xl": "0px",
-            full: "9999px"
+          colors: {
+            'neon-pink': '#FF00FF',
+            'dark-bg': '#050505',
+            'card-bg': '#121212',
+            'border-gray': '#2A2A2A',
           }
         }
       }
     }
   </script>
 <style data-purpose="global-styles">
-    .artist-dossier-page {
+    body {
       background-color: #050505;
       color: #FFFFFF;
       -webkit-font-smoothing: antialiased;
-      font-family: "Montserrat", sans-serif;
     }
-    .artist-dossier-page h1,
-    .artist-dossier-page h2,
-    .artist-dossier-page h3,
-    .artist-dossier-page h4,
-    .artist-dossier-page h5,
-    .artist-dossier-page h6 {
-      font-family: "Cinzel", serif;
-    }
-    .artist-dossier-page .glass-card {
+    .glass-card {
       background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .artist-dossier-page .serif-title {
-      font-family: "Cinzel", serif;
+    .serif-title {
+      font-family: serif; /* Mimicking the elegant serif in the image */
       letter-spacing: 0.05em;
-    }
-    .artist-dossier-page .text-neon-pink {
-      color: #f425c0;
-    }
-    .artist-dossier-page .bg-neon-pink {
-      background-color: #f425c0;
     }
   </style>
 </head>
-<body class="dark bg-black text-white">
-{% include 'core/header.html' %}
+<body class="font-sans">
 <!-- BEGIN: MainContainer -->
-<main class="artist-dossier-page">
-<div class="container mx-auto w-full px-4 sm:px-6 pt-32 pb-12 md:pt-40 md:pb-20">
+<main class="max-w-6xl mx-auto px-6 py-12 lg:py-20">
 <!-- BEGIN: ArtistDossierHeader -->
 <header class="mb-24">
 <div class="glass-card p-8 lg:p-12 flex flex-col lg:flex-row gap-12">
@@ -291,8 +260,6 @@
 </div>
 </section>
 <!-- END: CareerTimeline -->
-</div>
 </main>
 <!-- END: MainContainer -->
-{% include 'core/footer.html' %}
 </body></html>

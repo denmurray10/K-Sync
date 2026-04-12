@@ -9685,6 +9685,35 @@ def _member_birthday_spotlights(member, birthday_features, birthday_events):
     return spotlights[:4]
 
 
+def _default_footer_jump_links():
+    return [
+        {
+            'title': 'K-Pop Radio UK',
+            'label': 'Tune In Live',
+            'href': reverse('uk_kpop_radio'),
+            'description': "The UK's only dedicated K-pop broadcast, live around the clock. Real shows, real presenters, and a signal built for fans who want more than a playlist.",
+        },
+        {
+            'title': 'Midnight K-Pop Vibes',
+            'label': 'Enter The Vibe',
+            'href': reverse('midnight_kpop_vibes'),
+            'description': 'Soft hours, big feelings. Drift into ballads, late-night B-sides, and slow-burn deep cuts handpicked for the hours after everything goes quiet.',
+        },
+        {
+            'title': 'Best K-Pop Playlist 2026',
+            'label': 'Play It Now',
+            'href': reverse('best_kpop_playlist_2026'),
+            'description': "Every track that's defined 2026 so far, updated weekly. If it's charting, trending, or taking over Weverse right now — it's on this list.",
+        },
+        {
+            'title': 'Discover New K-Pop Music',
+            'label': 'Find Your Next Bias',
+            'href': reverse('discover_new_kpop_music'),
+            'description': "Debut acts, hidden B-sides, under-the-radar groups — this is everything the algorithm hasn't served you yet. Your next obsession is one scroll away.",
+        },
+    ]
+
+
 def _group_member_cards(group, *, accent_fallback=''):
     cards = []
     for member in group.members.all():
@@ -14354,6 +14383,8 @@ def _build_member_profile_context(request, member, *, birthday_mode=False):
         'selected_tab': 'birthday' if birthday_mode else 'profile',
         'canonical_url': canonical_url,
         'seo_type': 'profile',
+        'seo_jump_links': _default_footer_jump_links(),
+        'footer_jump_links': _default_footer_jump_links(),
         'seo_title': (
             f"{member.display_name} Birthday | Age, Countdown and Profile | K-Beats"
             if birthday_mode
