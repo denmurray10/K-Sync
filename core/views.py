@@ -9528,6 +9528,117 @@ def _member_same_as_links(member):
     return [item['url'] for item in _member_official_links(member)]
 
 
+def _member_social_links(member):
+    platform_rules = [
+        (['instagram.com', 'instagram'], {'label': 'Instagram', 'icon': 'photo_camera'}),
+        (['youtube.com', 'youtu.be', 'youtube'], {'label': 'YouTube', 'icon': 'video_library'}),
+        (['tiktok.com', 'tiktok'], {'label': 'TikTok', 'icon': 'music_note'}),
+        (['weverse.io', 'weverse'], {'label': 'Weverse', 'icon': 'public'}),
+        (['spotify.com', 'spotify'], {'label': 'Spotify', 'icon': 'album'}),
+        (['x.com', 'twitter.com', ' twitter', 'x '], {'label': 'X', 'icon': 'alternate_email'}),
+        (['weibo.com', 'weibo'], {'label': 'Weibo', 'icon': 'language'}),
+    ]
+    links = []
+    for item in _member_official_links(member):
+        label = str(item.get('label') or '').strip()
+        url = str(item.get('url') or '').strip()
+        lowered = f'{label} {url}'.lower()
+        meta = {'label': label or 'Official', 'icon': 'link'}
+        for patterns, candidate in platform_rules:
+            if any(pattern in lowered for pattern in patterns):
+                meta = candidate
+                break
+        links.append({
+            'label': meta['label'],
+            'icon': meta['icon'],
+            'url': url,
+            'aria_label': f"{meta['label']} for {member.display_name}",
+        })
+    return links[:6]
+
+
+def _member_catalog_data(member, group):
+    import logging
+    import urllib.parse
+    import urllib.request
+
+    logger = logging.getLogger(__name__)
+    terms = [
+        member.display_name,
+        member.resolved_full_name,
+        f"{member.display_name} {group.name}",
+        group.name,
+    ]
+    search_terms = []
+    for term in terms:
+        term = str(term or '').strip()
+        if term and term not in search_terms:
+            search_terms.append(term)
+
+    member_terms = {member.display_name.lower(), member.resolved_full_name.lower()}
+
+    def _fetch(entity, limit):
+        for term in search_terms:
+            encoded_term = urllib.parse.quote_plus(term)
+            url = (
+                f"https://itunes.apple.com/search?term={encoded_term}"
+                f"&entity={entity}&attribute=artistTerm&limit={limit}"
+            )
+            request_obj = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            try:
+                with urllib.request.urlopen(request_obj, timeout=6) as response:
+                    payload = json.loads(response.read().decode())
+                    results = payload.get('results', [])
+                    if results:
+                        filtered = []
+                        for result in results:
+                            haystack = " ".join(
+                                [
+                                    str(result.get('artistName') or ''),
+                                    str(result.get('collectionName') or ''),
+                                    str(result.get('trackName') or ''),
+                                ]
+                            ).lower()
+                            if any(member_term and member_term in haystack for member_term in member_terms):
+                                filtered.append(result)
+                        return filtered or results
+            except Exception as exc:
+                logger.warning("iTunes %s fetch failed for %s: %s", entity, term, exc)
+        return []
+
+    release_cards = []
+    for item in _fetch('album', 12):
+        artwork = str(item.get('artworkUrl100') or '').replace('100x100bb', '1200x1200bb')
+        release_cards.append({
+            'title': item.get('collectionName', '') or 'Untitled release',
+            'type': (item.get('collectionType', 'Release') or 'Release').upper(),
+            'year': ((item.get('releaseDate', '') or '')[:4] or '-'),
+            'image': _optimize_home_image_url(artwork, width=640, height=640),
+            'href': reverse('album_detail', args=[group.slug, item.get('collectionId')]) if item.get('collectionId') else '',
+        })
+        if len(release_cards) >= 4:
+            break
+
+    track_rows = []
+    for item in _fetch('song', 12):
+        duration_ms = int(item.get('trackTimeMillis') or 0)
+        minutes, seconds = divmod(duration_ms // 1000, 60)
+        artwork = str(item.get('artworkUrl100') or '').replace('100x100bb', '600x600bb')
+        track_rows.append({
+            'title': item.get('trackName', '') or 'Untitled track',
+            'album': item.get('collectionName', '') or 'Single',
+            'views_label': item.get('primaryGenreName', '') or 'Spotlight',
+            'delta_label': f"{minutes}:{seconds:02d}" if duration_ms else 'Live',
+            'trend': 'signal',
+            'image': _optimize_home_image_url(artwork, width=240, height=140),
+            'preview_url': item.get('previewUrl', ''),
+        })
+        if len(track_rows) >= 5:
+            break
+
+    return release_cards, track_rows
+
+
 def _member_discovery_routes(member, group, related_articles):
     routes = [
         {
@@ -14271,10 +14382,18 @@ def _build_member_profile_context(request, member, *, birthday_mode=False):
     profile_timeline_entries = _member_timeline_entries(member, group, profile_milestones, [])
     birthday_timeline_entries = _member_timeline_entries(member, group, birthday_milestones, birthday_events)
     official_links = _member_official_links(member)
+    social_links = _member_social_links(member)
+    release_cards, track_rows = _member_catalog_data(member, group)
     discovery_routes = _member_discovery_routes(member, group, related_articles)
     birthday_spotlights = _member_birthday_spotlights(member, birthday_features, birthday_events)
     dossier_snapshot = _member_cv_snapshot(member, group, current_age, next_birthday, birthday_countdown_days)
     fan_notes = _member_verified_fact_notes(member, max_items=8)
+    hero_stats = [
+        {'label': 'Milestones', 'value': len(profile_timeline_entries)},
+        {'label': 'Signals', 'value': len(fan_notes)},
+        {'label': 'Stories', 'value': len(related_articles)},
+        {'label': 'Links', 'value': len(social_links)},
+    ]
     faq_items = [
         {
             'question': f"When is {member.display_name}'s birthday?",
@@ -14358,12 +14477,16 @@ def _build_member_profile_context(request, member, *, birthday_mode=False):
         'profile_editorial_sections': profile_editorial_sections,
         'birthday_editorial_sections': birthday_editorial_sections,
         'official_links': official_links,
+        'social_links': social_links,
         'profile_timeline_entries': profile_timeline_entries,
         'birthday_timeline_entries': birthday_timeline_entries,
+        'release_cards': release_cards,
+        'track_rows': track_rows,
         'discovery_routes': discovery_routes,
         'birthday_spotlights': birthday_spotlights,
         'dossier_snapshot': dossier_snapshot,
         'fan_notes': fan_notes,
+        'hero_stats': hero_stats,
         'current_age': current_age,
         'next_age': next_age,
         'birthday_today': birthday_today,
@@ -14419,7 +14542,10 @@ def member_birthday_page(request, group_slug, member_slug):
         slug=member_slug,
     )
     context = _build_member_profile_context(request, member, birthday_mode=True)
-    return render(request, 'core/member_profile.html', context)
+    context['grouped_facts'] = context.get('birthday_grouped_facts', [])
+    context['editorial_sections'] = context.get('birthday_editorial_sections', [])
+    context['timeline_entries'] = context.get('birthday_timeline_entries', [])
+    return render(request, 'core/member_birthday.html', context)
 
 
 def album_detail(request, slug, collection_id):

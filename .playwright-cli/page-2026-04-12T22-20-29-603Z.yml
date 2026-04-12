@@ -1,0 +1,476 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "K - beats" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: K
+        - generic [ref=e6]: "-"
+        - generic [ref=e7]: beats
+      - navigation [ref=e9]:
+        - link "Live" [ref=e10] [cursor=pointer]:
+          - /url: /live/
+        - link "Charts" [ref=e11] [cursor=pointer]:
+          - /url: /charts/
+        - link "Idols" [ref=e12] [cursor=pointer]:
+          - /url: /idols/
+        - link "Games" [ref=e13] [cursor=pointer]:
+          - /url: /games/
+        - link "Comebacks" [ref=e14] [cursor=pointer]:
+          - /url: /comeback-timeline/
+        - link "News" [ref=e15] [cursor=pointer]:
+          - /url: /news/
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: search
+          - textbox "Search artist, song..." [ref=e19]
+        - generic [ref=e20]:
+          - button "Live On Air" [ref=e21] [cursor=pointer]:
+            - generic [ref=e25]: Live On Air
+          - link "Log In" [ref=e26] [cursor=pointer]:
+            - /url: /login/
+  - generic:
+    - dialog [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - paragraph [ref=e30]: My Station
+          - button "Close My Station" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: close
+        - heading "Unlock My Station" [level=3] [ref=e33]
+        - paragraph [ref=e34]: Sign up to customise your K-Beats experience with your biases, eras, and live recommendations.
+      - generic [ref=e36]:
+        - link "Sign Up To Customise" [ref=e37] [cursor=pointer]:
+          - /url: /signup/
+        - link "Log In" [ref=e38] [cursor=pointer]:
+          - /url: /login/
+    - button "My Station" [ref=e39] [cursor=pointer]:
+      - generic [ref=e41]: My Station
+  - main [ref=e42]:
+    - generic [ref=e43]:
+      - img "Jennie portrait" [ref=e45]
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - generic [ref=e49]: Main Rapper, Lead Vocalist
+          - heading "JENNIE" [level=1] [ref=e50]
+          - paragraph [ref=e51]: BLACKPINK / Main Rapper, Lead Vocalist
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - paragraph [ref=e54]: Milestones
+            - paragraph [ref=e55]: "1"
+          - generic [ref=e56]:
+            - paragraph [ref=e57]: Signals
+            - paragraph [ref=e58]: "8"
+          - generic [ref=e59]:
+            - paragraph [ref=e60]: Stories
+            - paragraph [ref=e61]: "4"
+          - generic [ref=e62]:
+            - paragraph [ref=e63]: Links
+            - paragraph [ref=e64]: "6"
+        - generic [ref=e65]:
+          - link "Set As Bias" [ref=e66] [cursor=pointer]:
+            - /url: /login/?next=/idols/blackpink/members/jennie/
+          - link "Birthday File" [ref=e67] [cursor=pointer]:
+            - /url: /idols/blackpink/members/jennie/birthday/
+          - button "Share" [ref=e68] [cursor=pointer]
+    - navigation [ref=e69]:
+      - generic [ref=e70]:
+        - link "OVERVIEW" [ref=e71] [cursor=pointer]:
+          - /url: "#OVERVIEW"
+        - link "BIOGRAPHY" [ref=e72] [cursor=pointer]:
+          - /url: "#BIOGRAPHY"
+        - link "DISCOGRAPHY" [ref=e73] [cursor=pointer]:
+          - /url: "#DISCOGRAPHY"
+        - link "TRACK RADAR" [ref=e74] [cursor=pointer]:
+          - /url: "#TRACK_RADAR"
+        - link "MILESTONES" [ref=e75] [cursor=pointer]:
+          - /url: "#MILESTONES"
+        - link "NEWS" [ref=e76] [cursor=pointer]:
+          - /url: "#NEWS"
+    - generic [ref=e78]:
+      - generic [ref=e79]:
+        - heading "Biography" [level=2] [ref=e80]
+        - generic [ref=e81]:
+          - paragraph [ref=e82]: Jennie Kim, popularly known as Jennie, is a South Korean rapper, singer-songwriter, and actress under ODD ATELIER and Columbia Records. She rose to global fame as the main rapper and lead vocalist of the internationally recognized K-pop girl group BLACKPINK, which debuted under YG Entertainment in 2016. Jennie has since built a successful solo career, becoming one of the most prominent figures in the Korean entertainment industry. Jennie spent her formative years across South Korea, Australia, and New Zealand before returning to Seoul to train under YG Entertainment. Prior to her official debut, she gained early recognition through high-profile collaborations, including G-Dragon's"That XX"and features on tracks by Lee Hi, Seungri, and G-Dragon. Her global debut with BLACKPINK marked the beginning of her rise as a household name in K-pop. Jennie launched her solo music career with the single"Solo"in 2018. The track topped South Koreas Circle Digital Chart and the Billboard World Digital Songs chart, while its music video became the first by a Korean female soloist to surpass one billion views on YouTube.
+          - paragraph [ref=e83]: Her later releases, including"You & Me"and"One of the Girls,"further cemented her position as a leading solo artist on the global stage. In 2023, Jennie made her acting debut in the HBO series The Idol under the name Jennie Ruby Jane, gaining international attention for her performance. That same year, she renewed her group contract with BLACKPINK while taking control of her solo ventures. She established her agency, ODD ATELIER, to oversee her individual projects and later signed with Columbia Records to expand her presence in the United States. Her 2024 single"Mantra"and the album Ruby (2025) achieved significant commercial success. The album sold over one million copies worldwide and produced multiple top-charting tracks, including"like JENNIE"."Mantra"made history as the highest-ranking song by a Korean female soloist on the UK Singles Chart. Jennie has earned numerous accolades, including awards from MAMA, the Circle Chart, Golden Disc, and Billboard Women in Music, where she became the first Korean soloist to win. Renowned for her influence in fashion, she serves as a global ambassador for Chanel and is frequently referred to as the"Human Chanel"in media and fan communities.
+      - generic [ref=e84]:
+        - heading "Core Data" [level=3] [ref=e85]
+        - generic [ref=e86]:
+          - generic [ref=e87]:
+            - generic [ref=e88]: Stage name
+            - generic [ref=e89]: Jennie
+          - generic [ref=e90]:
+            - generic [ref=e91]: Full name
+            - generic [ref=e92]: Kim Jennie
+          - generic [ref=e93]:
+            - generic [ref=e94]: Group
+            - generic [ref=e95]: BLACKPINK
+          - generic [ref=e96]:
+            - generic [ref=e97]: Positions
+            - generic [ref=e98]: Main Rapper, Lead Vocalist
+          - generic [ref=e99]:
+            - generic [ref=e100]: Status
+            - generic [ref=e101]: Active
+          - generic [ref=e102]:
+            - generic [ref=e103]: Birth date
+            - generic [ref=e104]: 16 January 1996
+          - generic [ref=e105]:
+            - generic [ref=e106]: Hometown
+            - generic [ref=e107]: Seongnam
+          - generic [ref=e108]:
+            - generic [ref=e109]: Nationality
+            - generic [ref=e110]: South Korean
+          - generic [ref=e111]:
+            - generic [ref=e112]: Height
+            - generic [ref=e113]: 163 cm
+          - generic [ref=e114]:
+            - generic [ref=e115]: Weight
+            - generic [ref=e116]: 48 kg
+          - generic [ref=e117]:
+            - generic [ref=e118]: MBTI
+            - generic [ref=e119]: INFJ
+          - generic [ref=e120]:
+            - generic [ref=e121]: Blood type
+            - generic [ref=e122]: B
+          - generic [ref=e123]:
+            - generic [ref=e124]: Education
+            - generic [ref=e125]: ACG Parnell College
+          - generic [ref=e126]:
+            - generic [ref=e127]: Instagram
+            - generic [ref=e128]: https://www.instagram.com/jennierubyjane/
+    - generic [ref=e130]:
+      - heading "Broadcast Performance Stats" [level=2] [ref=e131]
+      - generic [ref=e132]:
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - paragraph [ref=e140]: Current role
+            - paragraph [ref=e141]: Main Rapper, Lead Vocalist
+          - generic [ref=e142]:
+            - paragraph [ref=e143]: Group
+            - paragraph [ref=e144]: BLACKPINK
+          - generic [ref=e145]:
+            - paragraph [ref=e146]: Agency
+            - paragraph [ref=e147]: YG Entertainment
+          - generic [ref=e148]:
+            - paragraph [ref=e149]: Age now
+            - paragraph [ref=e150]: "30"
+          - generic [ref=e151]:
+            - paragraph [ref=e152]: Birthday
+            - paragraph [ref=e153]: 16 January 1996
+          - generic [ref=e154]:
+            - paragraph [ref=e155]: Next birthday
+            - paragraph [ref=e156]: 16 January 2027
+        - generic [ref=e157]:
+          - generic [ref=e158]:
+            - heading "Jennie as an artist" [level=4] [ref=e159]
+            - paragraph [ref=e160]: In BLACKPINK, Jennie is most closely identified with the role of main rapper, lead vocalist. The current solo or individual company file on K-Beats lists ODD ATELIER. The idol profile timeline currently reads 2011-present.
+          - generic [ref=e161]:
+            - heading "Core facts fans search for first" [level=4] [ref=e162]
+            - paragraph [ref=e163]: "Jennie is currently 30 years old. K-Beats lists Jennie as South Korean. The current verified notes also point to ACG Parnell College. MBTI: INFJ, blood type: B."
+    - generic [ref=e164]:
+      - img "BLACKPINK group photo" [ref=e165]
+      - generic [ref=e167]:
+        - generic [ref=e168]: Active Member Of
+        - heading "BLACKPINK" [level=2] [ref=e169]
+    - generic [ref=e171]:
+      - generic [ref=e172]:
+        - heading "Discography" [level=2] [ref=e173]
+        - generic [ref=e174]:
+          - generic [ref=e175]: ALL
+          - generic [ref=e176]: RELEASES
+          - generic [ref=e177]: SPOTLIGHT
+      - generic [ref=e178]:
+        - link "ExtraL - Single cover play_circle ExtraL - Single ALBUM · 2025" [ref=e179] [cursor=pointer]:
+          - /url: /idols/blackpink/album/1797383523/
+          - generic [ref=e180]:
+            - img "ExtraL - Single cover" [ref=e181]
+            - generic [ref=e183]: play_circle
+          - heading "ExtraL - Single" [level=3] [ref=e184]
+          - paragraph [ref=e185]: ALBUM · 2025
+        - link "JENNIE Special Single [You & Me] - Single cover play_circle JENNIE Special Single [You & Me] - Single ALBUM · 2023" [ref=e186] [cursor=pointer]:
+          - /url: /idols/blackpink/album/1710020667/
+          - generic [ref=e187]:
+            - img "JENNIE Special Single [You & Me] - Single cover" [ref=e188]
+            - generic [ref=e190]: play_circle
+          - heading "JENNIE Special Single [You & Me] - Single" [level=3] [ref=e191]
+          - paragraph [ref=e192]: ALBUM · 2023
+        - link "SPOT! (feat. JENNIE) - Single cover play_circle SPOT! (feat. JENNIE) - Single ALBUM · 2024" [ref=e193] [cursor=pointer]:
+          - /url: /idols/blackpink/album/1742019065/
+          - generic [ref=e194]:
+            - img "SPOT! (feat. JENNIE) - Single cover" [ref=e195]
+            - generic [ref=e197]: play_circle
+          - heading "SPOT! (feat. JENNIE) - Single" [level=3] [ref=e198]
+          - paragraph [ref=e199]: ALBUM · 2024
+        - link "SOLO - Single cover play_circle SOLO - Single ALBUM · 2018" [ref=e200] [cursor=pointer]:
+          - /url: /idols/blackpink/album/1441819348/
+          - generic [ref=e201]:
+            - img "SOLO - Single cover" [ref=e202]
+            - generic [ref=e204]: play_circle
+          - heading "SOLO - Single" [level=3] [ref=e205]
+          - paragraph [ref=e206]: ALBUM · 2018
+    - generic [ref=e208]:
+      - heading "Track Radar" [level=2] [ref=e209]
+      - table [ref=e211]:
+        - rowgroup [ref=e212]:
+          - row "Track Project Length Signal" [ref=e213]:
+            - columnheader "Track" [ref=e214]
+            - columnheader "Project" [ref=e215]
+            - columnheader "Length" [ref=e216]
+            - columnheader "Signal" [ref=e217]
+        - rowgroup [ref=e218]:
+          - row "Seoul City artwork Seoul City play_circle Preview Ruby 2:44 trending_up Pop" [ref=e219]:
+            - cell "Seoul City artwork Seoul City play_circle Preview" [ref=e220]:
+              - generic [ref=e221]:
+                - img "Seoul City artwork" [ref=e223]
+                - generic [ref=e224]:
+                  - paragraph [ref=e225]: Seoul City
+                  - link "play_circle Preview" [ref=e226] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e8/99/b5/e899b5d8-728b-302b-5f05-434ff4a5cf19/mzaf_14021106904547392780.plus.aac.p.m4a
+                    - generic [ref=e227]: play_circle
+                    - text: Preview
+            - cell "Ruby" [ref=e228]
+            - cell "2:44" [ref=e229]
+            - cell "trending_up Pop" [ref=e230]:
+              - generic [ref=e231]:
+                - generic [ref=e232]: trending_up
+                - generic [ref=e233]: Pop
+          - row "One Of The Girls artwork One Of The Girls play_circle Preview The Idol Episode 4 (Music from the HBO Original Series) - Single 4:04 trending_up Soundtrack" [ref=e234]:
+            - cell "One Of The Girls artwork One Of The Girls play_circle Preview" [ref=e235]:
+              - generic [ref=e236]:
+                - img "One Of The Girls artwork" [ref=e238]
+                - generic [ref=e239]:
+                  - paragraph [ref=e240]: One Of The Girls
+                  - link "play_circle Preview" [ref=e241] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9e/2f/1f/9e2f1f11-20a8-767a-0e33-9029028a7024/mzaf_1603981766065362477.plus.aac.p.m4a
+                    - generic [ref=e242]: play_circle
+                    - text: Preview
+            - cell "The Idol Episode 4 (Music from the HBO Original Series) - Single" [ref=e243]
+            - cell "4:04" [ref=e244]
+            - cell "trending_up Soundtrack" [ref=e245]:
+              - generic [ref=e246]:
+                - generic [ref=e247]: trending_up
+                - generic [ref=e248]: Soundtrack
+          - row "like JENNIE artwork like JENNIE play_circle Preview Ruby 2:03 trending_up Pop" [ref=e249]:
+            - cell "like JENNIE artwork like JENNIE play_circle Preview" [ref=e250]:
+              - generic [ref=e251]:
+                - img "like JENNIE artwork" [ref=e253]
+                - generic [ref=e254]:
+                  - paragraph [ref=e255]: like JENNIE
+                  - link "play_circle Preview" [ref=e256] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/dc/06/42dc069a-1683-2d2b-6442-b3655f2b2a97/mzaf_15363406353889961611.plus.aac.p.m4a
+                    - generic [ref=e257]: play_circle
+                    - text: Preview
+            - cell "Ruby" [ref=e258]
+            - cell "2:03" [ref=e259]
+            - cell "trending_up Pop" [ref=e260]:
+              - generic [ref=e261]:
+                - generic [ref=e262]: trending_up
+                - generic [ref=e263]: Pop
+          - row "You & Me artwork You & Me play_circle Preview JENNIE Special Single [You & Me] - Single 2:59 trending_up K-Pop" [ref=e264]:
+            - cell "You & Me artwork You & Me play_circle Preview" [ref=e265]:
+              - generic [ref=e266]:
+                - img "You & Me artwork" [ref=e268]
+                - generic [ref=e269]:
+                  - paragraph [ref=e270]: You & Me
+                  - link "play_circle Preview" [ref=e271] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/92/c8/06/92c806b3-2977-67f5-1463-fd6ceacd36e7/mzaf_9879973441146838578.plus.aac.p.m4a
+                    - generic [ref=e272]: play_circle
+                    - text: Preview
+            - cell "JENNIE Special Single [You & Me] - Single" [ref=e273]
+            - cell "2:59" [ref=e274]
+            - cell "trending_up K-Pop" [ref=e275]:
+              - generic [ref=e276]:
+                - generic [ref=e277]: trending_up
+                - generic [ref=e278]: K-Pop
+          - row "SOLO artwork SOLO play_circle Preview SOLO - Single 2:49 trending_up K-Pop" [ref=e279]:
+            - cell "SOLO artwork SOLO play_circle Preview" [ref=e280]:
+              - generic [ref=e281]:
+                - img "SOLO artwork" [ref=e283]
+                - generic [ref=e284]:
+                  - paragraph [ref=e285]: SOLO
+                  - link "play_circle Preview" [ref=e286] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/07/2d/78/072d781a-cc43-ed37-71b0-05024934e765/mzaf_10147715758979437465.plus.aac.p.m4a
+                    - generic [ref=e287]: play_circle
+                    - text: Preview
+            - cell "SOLO - Single" [ref=e288]
+            - cell "2:49" [ref=e289]
+            - cell "trending_up K-Pop" [ref=e290]:
+              - generic [ref=e291]:
+                - generic [ref=e292]: trending_up
+                - generic [ref=e293]: K-Pop
+    - generic [ref=e295]:
+      - generic [ref=e296]:
+        - heading "Milestone Signals" [level=2] [ref=e297]
+        - paragraph [ref=e298]: Jennie’s profile thread combines verified personal facts, debut markers, editorial notes, and fandom-search moments so the page reads like a live K-Beats feature rather than a flat directory entry.
+        - generic [ref=e299]:
+          - generic [ref=e300]:
+            - heading "1" [level=5] [ref=e301]
+            - paragraph [ref=e302]: Timeline Entries
+          - generic [ref=e303]:
+            - heading "5" [level=5] [ref=e304]
+            - paragraph [ref=e305]: Discovery Routes
+      - generic [ref=e307]:
+        - generic [ref=e309]: emoji_events
+        - heading "Jennie birthday record" [level=4] [ref=e310]
+        - paragraph [ref=e311]: 16 Jan 1996 · Birthday
+        - paragraph [ref=e312]: The profile record anchors Jennie's birthday on 16 January, giving the birthday page a stable factual base.
+    - generic [ref=e314]:
+      - link "Instagram for Jennie" [ref=e315] [cursor=pointer]:
+        - /url: https://www.instagram.com/jennierubyjane/
+        - generic [ref=e316]: photo_camera
+        - generic [ref=e317]: Instagram
+      - link "X for Jennie" [ref=e318] [cursor=pointer]:
+        - /url: https://x.com/jennierubyjane
+        - generic [ref=e319]: alternate_email
+        - generic [ref=e320]: X
+      - link "YouTube for Jennie" [ref=e321] [cursor=pointer]:
+        - /url: https://www.youtube.com/channel/UCNYi_zGmR519r5gYdOKLTjQ
+        - generic [ref=e322]: video_library
+        - generic [ref=e323]: YouTube
+      - link "TikTok for Jennie" [ref=e324] [cursor=pointer]:
+        - /url: https://www.tiktok.com/@jennierubyjane?_t=8nGozURczbe&_r=1
+        - generic [ref=e325]: music_note
+        - generic [ref=e326]: TikTok
+      - link "Spotify for Jennie" [ref=e327] [cursor=pointer]:
+        - /url: https://open.spotify.com/artist/250b0Wlc5Vk0CoUsaCY84M?si=tLQvX0y5SzyyYJvEvr7ILA
+        - generic [ref=e328]: album
+        - generic [ref=e329]: Spotify
+      - link "Weibo for Jennie" [ref=e330] [cursor=pointer]:
+        - /url: https://m.weibo.cn/u/7457158939?jumpfrom=weibocom
+        - generic [ref=e331]: language
+        - generic [ref=e332]: Weibo
+    - generic [ref=e333]:
+      - generic [ref=e335]: "How BLACKPINK's 2.2 Billion View Milestone Shatters the K-Pop Algorithm & What It Means For Everyone Else • The Soloist's Burden: How Rosé's Candid Remarks on BLACKPINK's Future Ignited a Blaze of Fan Fury • Behind the Blush: How Seo In Guk's Fiery Ears Revealed the High-Stakes Pressure of a BLACKPINK Jisoo On-Screen Kiss • From Bangkok to The Strip: BLACKPINK's Lisa Secures Historic Las Vegas Residency \"VIVA LA LISA • How BLACKPINK's 2.2 Billion View Milestone Shatters the K-Pop Algorithm & What It Means For Everyone Else • The Soloist's Burden: How Rosé's Candid Remarks on BLACKPINK's Future Ignited a Blaze of Fan Fury • Behind the Blush: How Seo In Guk's Fiery Ears Revealed the High-Stakes Pressure of a BLACKPINK Jisoo On-Screen Kiss • From Bangkok to The Strip: BLACKPINK's Lisa Secures Historic Las Vegas Residency \"VIVA LA LISA •"
+      - generic [ref=e336]:
+        - link "How BLACKPINK's 2.2 Billion View Milestone Shatters the K-Pop Algorithm & What It Means For Everyone Else K-BEATS EDITORIAL How BLACKPINK's 2.2 Billion View Milestone Shatters the K-Pop Algorithm & What It Means For Everyone Else Beyond the record, we analyze the strategic blueprint that redefined global fandom and the looming industry-wide pressure it creates." [ref=e337] [cursor=pointer]:
+          - /url: /blog/blackpink-becomes-1st-k-pop-artist-in-history-to-hit-22-billion-views-with-2-mvs/
+          - img "How BLACKPINK's 2.2 Billion View Milestone Shatters the K-Pop Algorithm & What It Means For Everyone Else" [ref=e339]
+          - generic [ref=e340]:
+            - text: K-BEATS EDITORIAL
+            - heading "How BLACKPINK's 2.2 Billion View Milestone Shatters the K-Pop Algorithm & What It Means For Everyone Else" [level=3] [ref=e341]
+            - paragraph [ref=e342]: Beyond the record, we analyze the strategic blueprint that redefined global fandom and the looming industry-wide pressure it creates.
+        - 'link "The Soloist''s Burden: How Rosé''s Candid Remarks on BLACKPINK''s Future Ignited a Blaze of Fan Fury K-BEATS EDITORIAL The Soloist''s Burden: How Rosé''s Candid Remarks on BLACKPINK''s Future Ignited a Blaze of Fan Fury A single interview question fractures the fandom, exposing the raw nerves of contracts, commerce, and collective identity in K-Pop''s new era." [ref=e343] [cursor=pointer]':
+          - /url: /blog/rose-hit-with-scathing-backlash-after-comments-on-blackpink-spark-fury/
+          - 'img "The Soloist''s Burden: How Rosé''s Candid Remarks on BLACKPINK''s Future Ignited a Blaze of Fan Fury" [ref=e345]'
+          - generic [ref=e346]:
+            - text: K-BEATS EDITORIAL
+            - 'heading "The Soloist''s Burden: How Rosé''s Candid Remarks on BLACKPINK''s Future Ignited a Blaze of Fan Fury" [level=3] [ref=e347]'
+            - paragraph [ref=e348]: A single interview question fractures the fandom, exposing the raw nerves of contracts, commerce, and collective identity in K-Pop's new era.
+        - 'link "Behind the Blush: How Seo In Guk''s Fiery Ears Revealed the High-Stakes Pressure of a BLACKPINK Jisoo On-Screen Kiss K-BEATS EDITORIAL Behind the Blush: How Seo In Guk''s Fiery Ears Revealed the High-Stakes Pressure of a BLACKPINK Jisoo On-Screen Kiss A single BTS detail from ''I Am Somi'' exposes the intense physical and psychological demands of K-drama romance scenes." [ref=e349] [cursor=pointer]':
+          - /url: /blog/seo-in-guk-had-to-wear-makeup-on-his-burning-red-ears-while-kissing-blackpinks-jisoo/
+          - 'img "Behind the Blush: How Seo In Guk''s Fiery Ears Revealed the High-Stakes Pressure of a BLACKPINK Jisoo On-Screen Kiss" [ref=e351]'
+          - generic [ref=e352]:
+            - text: K-BEATS EDITORIAL
+            - 'heading "Behind the Blush: How Seo In Guk''s Fiery Ears Revealed the High-Stakes Pressure of a BLACKPINK Jisoo On-Screen Kiss" [level=3] [ref=e353]'
+            - paragraph [ref=e354]: A single BTS detail from 'I Am Somi' exposes the intense physical and psychological demands of K-drama romance scenes.
+  - paragraph [ref=e356]: ©2026 K-BEATS RADIO BROADCASTING CO. PROFILE SIGNAL
+  - contentinfo [ref=e357]:
+    - generic [ref=e358]:
+      - generic [ref=e359]:
+        - generic [ref=e360]:
+          - heading "K-BEATS RADIO" [level=3] [ref=e361]
+          - paragraph [ref=e362]: Est. 2026 · Cornwall, UK
+          - paragraph [ref=e363]: Your leading source for K-pop music, news, and culture. Bringing the heart of Seoul from Cornwall to fans worldwide.
+          - generic [ref=e364]:
+            - link "Facebook" [ref=e365] [cursor=pointer]:
+              - /url: https://www.facebook.com/
+              - generic [ref=e366]: public
+            - link "News" [ref=e367] [cursor=pointer]:
+              - /url: /news/
+              - generic [ref=e368]: article
+            - link "Live" [ref=e369] [cursor=pointer]:
+              - /url: /live/
+              - generic [ref=e370]: music_note
+          - link "phone_iphone Download the App" [ref=e371] [cursor=pointer]:
+            - /url: /promo/
+            - generic [ref=e372]: phone_iphone
+            - text: Download the App
+        - generic [ref=e373]:
+          - generic [ref=e374]:
+            - heading "Music" [level=4] [ref=e375]
+            - list [ref=e376]:
+              - listitem [ref=e377]:
+                - link "Groups" [ref=e378] [cursor=pointer]:
+                  - /url: /idols/?type=groups
+              - listitem [ref=e379]:
+                - link "Male Solo Artists" [ref=e380] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=male
+              - listitem [ref=e381]:
+                - link "Female Solo Artists" [ref=e382] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=female
+              - listitem [ref=e383]:
+                - link "Tours" [ref=e384] [cursor=pointer]:
+                  - /url: /comeback-timeline/
+          - generic [ref=e385]:
+            - heading "Station" [level=4] [ref=e386]
+            - list [ref=e387]:
+              - listitem [ref=e388]:
+                - link "About Us" [ref=e389] [cursor=pointer]:
+                  - /url: /about/
+              - listitem [ref=e390]:
+                - link "Presenters" [ref=e391] [cursor=pointer]:
+                  - /url: /presenters/
+              - listitem [ref=e392]:
+                - link "Schedule" [ref=e393] [cursor=pointer]:
+                  - /url: /schedule/
+              - listitem [ref=e394]:
+                - link "Mobile App" [ref=e395] [cursor=pointer]:
+                  - /url: /promo/
+          - generic [ref=e396]:
+            - heading "Community" [level=4] [ref=e397]
+            - list [ref=e398]:
+              - listitem [ref=e399]:
+                - link "Request Song" [ref=e400] [cursor=pointer]:
+                  - /url: /request/
+              - listitem [ref=e401]:
+                - link "Fan Club" [ref=e402] [cursor=pointer]:
+                  - /url: /fan-clubs/
+              - listitem [ref=e403]:
+                - link "Contests" [ref=e404] [cursor=pointer]:
+                  - /url: /contests/
+              - listitem [ref=e405]:
+                - link "Merch Shop" [ref=e406] [cursor=pointer]:
+                  - /url: /coming-soon/
+          - generic [ref=e407]:
+            - heading "Shop" [level=4] [ref=e408]
+            - list [ref=e409]:
+              - listitem [ref=e410]:
+                - link "Jumpers" [ref=e411] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e412]:
+                - link "T-Shirts" [ref=e413] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e414]:
+                - link "Merch" [ref=e415] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e416]:
+                - link "Albums" [ref=e417] [cursor=pointer]:
+                  - /url: /coming-soon/
+      - generic [ref=e419]:
+        - link "Tune In Live K-Pop Radio UK The UK's only dedicated K-pop broadcast, live around the clock. Real shows, real presenters, and a signal built for fans who want more than a playlist." [ref=e420] [cursor=pointer]:
+          - /url: /kpop-radio-station-uk/
+          - paragraph [ref=e421]: Tune In Live
+          - paragraph [ref=e422]: K-Pop Radio UK
+          - paragraph [ref=e423]: The UK's only dedicated K-pop broadcast, live around the clock. Real shows, real presenters, and a signal built for fans who want more than a playlist.
+        - link "Enter The Vibe Midnight K-Pop Vibes Soft hours, big feelings. Drift into ballads, late-night B-sides, and slow-burn deep cuts handpicked for the hours after everything goes quiet." [ref=e424] [cursor=pointer]:
+          - /url: /midnight-kpop-vibes/
+          - paragraph [ref=e425]: Enter The Vibe
+          - paragraph [ref=e426]: Midnight K-Pop Vibes
+          - paragraph [ref=e427]: Soft hours, big feelings. Drift into ballads, late-night B-sides, and slow-burn deep cuts handpicked for the hours after everything goes quiet.
+        - link "Play It Now Best K-Pop Playlist 2026 Every track that's defined 2026 so far, updated weekly. If it's charting, trending, or taking over Weverse right now — it's on this list." [ref=e428] [cursor=pointer]:
+          - /url: /best-kpop-playlist-2026/
+          - paragraph [ref=e429]: Play It Now
+          - paragraph [ref=e430]: Best K-Pop Playlist 2026
+          - paragraph [ref=e431]: Every track that's defined 2026 so far, updated weekly. If it's charting, trending, or taking over Weverse right now — it's on this list.
+        - link "Find Your Next Bias Discover New K-Pop Music Debut acts, hidden B-sides, under-the-radar groups — this is everything the algorithm hasn't served you yet. Your next obsession is one scroll away." [ref=e432] [cursor=pointer]:
+          - /url: /discover-new-kpop-music/
+          - paragraph [ref=e433]: Find Your Next Bias
+          - paragraph [ref=e434]: Discover New K-Pop Music
+          - paragraph [ref=e435]: Debut acts, hidden B-sides, under-the-radar groups — this is everything the algorithm hasn't served you yet. Your next obsession is one scroll away.
+      - generic [ref=e436]:
+        - paragraph [ref=e437]: © 2026 K-Beats Radio. All rights reserved.
+        - generic [ref=e438]:
+          - link "Privacy Policy" [ref=e439] [cursor=pointer]:
+            - /url: /legal/privacy-policy/
+          - link "Cookie Policy" [ref=e440] [cursor=pointer]:
+            - /url: /legal/cookie-policy/
+          - link "Terms of Service" [ref=e441] [cursor=pointer]:
+            - /url: /legal/terms-of-service/
