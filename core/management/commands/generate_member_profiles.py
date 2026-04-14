@@ -14,6 +14,10 @@ def _clean_text(text):
     return raw.strip()
 
 
+def _paragraphs(text):
+    return [part.strip() for part in re.split(r"\n\s*\n", str(text or "").strip()) if part.strip()]
+
+
 def _safe_json_payload(text):
     raw = str(text or "").strip()
     match = re.search(r"\{.*\}\s*$", raw, flags=re.DOTALL)
@@ -59,13 +63,38 @@ def _build_prompt(member):
     return (
         "Using only the verified facts below, generate JSON with exactly these keys: "
         '"profile_bio", "fan_facts", "seo_description_override", "birthday_spotlight". '
-        '"profile_bio" must be 2 short paragraphs, polished and professional, with no invented facts. '
+        '"profile_bio" must be exactly 2 paragraphs separated by a blank line. Each paragraph should be 2 to 4 sentences, polished, specific, and professional, with no invented facts. '
+        'Avoid generic openings like "is a key member" or "is a prominent member" unless the verified facts give you nothing more specific. '
+        'Use the verified role, group context, agency, nationality, debut timing, and any explicit solo/company details to make the copy feel distinctive. '
         '"fan_facts" must be 4 to 6 short bullet-style lines separated by \\n, each grounded in the facts provided. '
-        '"seo_description_override" must be one sentence under 160 characters. '
+        '"seo_description_override" must be one specific sentence between 90 and 155 characters. '
         '"birthday_spotlight" must be 2 to 3 sentences explaining why this member\'s birthday page matters, again using only provided facts. '
         "Do not mention missing data. Do not invent family details, achievements, nicknames, training history, or preferences unless explicitly present in the facts. "
         "Return JSON only.\n\n"
         f"Verified facts:\n{facts}"
+    )
+
+
+def _is_quality_thin(member):
+    bio = _clean_text(member.profile_bio)
+    fan_facts = _clean_text(member.fan_facts)
+    seo_description = _clean_text(member.seo_description_override)
+    paragraphs = _paragraphs(bio)
+    weak_opening = ""
+    if paragraphs:
+        weak_opening = " ".join(paragraphs[0].split()[:10]).lower()
+    return any(
+        [
+            not bio,
+            not fan_facts,
+            not seo_description,
+            len(paragraphs) < 2,
+            len(bio) < 260,
+            len(seo_description) < 80,
+            weak_opening.startswith("is a key member"),
+            weak_opening.startswith("is a prominent member"),
+            weak_opening.startswith("is a member of"),
+        ]
     )
 
 
@@ -77,6 +106,7 @@ class Command(BaseCommand):
         parser.add_argument("--member", help="Limit generation to one member slug.")
         parser.add_argument("--limit", type=int, default=0, help="Maximum number of members to process.")
         parser.add_argument("--force", action="store_true", help="Regenerate even when copy already exists.")
+        parser.add_argument("--quality-pass", action="store_true", help="Regenerate members whose saved copy is present but still weak or too generic.")
         parser.add_argument("--include-birthday", action="store_true", help="Write a birthday spotlight into BirthdayFeature.")
         parser.add_argument("--dry-run", action="store_true", help="Generate output without saving.")
 
@@ -85,6 +115,7 @@ class Command(BaseCommand):
         member_slug = str(options.get("member") or "").strip()
         limit = int(options.get("limit") or 0)
         force = bool(options.get("force"))
+        quality_pass = bool(options.get("quality_pass"))
         include_birthday = bool(options.get("include_birthday"))
         dry_run = bool(options.get("dry_run"))
 
@@ -95,7 +126,9 @@ class Command(BaseCommand):
             queryset = queryset.filter(slug=member_slug)
 
         members = list(queryset)
-        if not force:
+        if quality_pass:
+            members = [member for member in members if _is_quality_thin(member)]
+        elif not force:
             members = [
                 member for member in members
                 if not (
@@ -137,8 +170,14 @@ class Command(BaseCommand):
             fan_facts = _clean_text(parsed.get("fan_facts"))
             seo_description = _clean_text(parsed.get("seo_description_override"))[:160]
             birthday_spotlight = _clean_text(parsed.get("birthday_spotlight"))
+            bio_paragraphs = _paragraphs(profile_bio)
 
-            if len(profile_bio) < 120 or len(fan_facts) < 40:
+            if (
+                len(profile_bio) < 260
+                or len(fan_facts) < 40
+                or len(seo_description) < 80
+                or len(bio_paragraphs) < 2
+            ):
                 failed += 1
                 self.stdout.write(self.style.WARNING(f"FAIL  {member.display_name}: generated copy was too thin"))
                 continue

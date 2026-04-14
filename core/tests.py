@@ -1239,7 +1239,7 @@ class GenerateMemberProfilesCommandTests(TestCase):
     @patch('core.management.commands.generate_member_profiles._chat_reasoner')
     def test_command_writes_member_copy_and_birthday_spotlight(self, mock_chat):
         mock_chat.return_value = json.dumps({
-            'profile_bio': 'Rin is presented on K-Beats as a focused performer with a steady leadership presence.\n\nHer dossier keeps the emphasis on verified identity details and a clean editorial tone.',
+            'profile_bio': 'Rin is presented on K-Beats as a focused performer with a steady leadership presence inside Signal Queens. Her verified file anchors her identity in the group\'s line-up, her Seoul background, and her role as a vocalist with clear stage responsibility.\n\nHer dossier keeps the emphasis on verified identity details and a clean editorial tone. The copy is written to feel specific, fan-facing, and grounded in K-Sync facts instead of generic idol-profile filler.',
             'fan_facts': '- Leader of Signal Queens\n- Known for vocal presence\n- Birthday file connects profile and seasonal discovery\n- Verified profile built from K-Sync facts',
             'seo_description_override': 'Explore Rin of Signal Queens with verified birthday facts, profile notes, and K-Beats discovery links.',
             'birthday_spotlight': 'Rin\'s birthday page gives fans a focused place to track her age, countdown, and verified identity file on K-Beats.',
@@ -1258,9 +1258,9 @@ class GenerateMemberProfilesCommandTests(TestCase):
     @patch('core.management.commands.generate_member_profiles._chat_reasoner')
     def test_command_dry_run_does_not_save(self, mock_chat):
         mock_chat.return_value = json.dumps({
-            'profile_bio': 'Rin is presented on K-Beats as a focused performer with a steady leadership presence.\n\nThis should not persist in dry-run mode.',
+            'profile_bio': 'Rin is presented on K-Beats as a focused performer with a steady leadership presence inside Signal Queens. Her role and verified profile details are written with a clean editorial tone for fans.\n\nThis should not persist in dry-run mode, even though the generated copy is long enough to pass the quality thresholds used by the command.',
             'fan_facts': '- Verified note one\n- Verified note two\n- Verified note three\n- Verified note four',
-            'seo_description_override': 'Dry run only profile description.',
+            'seo_description_override': 'Dry run only profile description built to clear the stronger quality rules in the member profile generator.',
             'birthday_spotlight': 'Dry run spotlight.',
         })
 
