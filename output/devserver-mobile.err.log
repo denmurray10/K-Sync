@@ -35,3 +35,6 @@
 [17/Apr/2026 00:24:20] "GET /api/live/status/?_ts=1776381859538 HTTP/1.1" 200 427
 [17/Apr/2026 00:24:20] "GET /api/live/status/?t=1776381859539 HTTP/1.1" 200 479
 [17/Apr/2026 00:24:44] "GET /api/live/status/?t=1776381874538 HTTP/1.1" 200 436
+[17/Apr/2026 00:24:49] "GET /api/live/status/?_ts=1776381889533 HTTP/1.1" 200 485
+[17/Apr/2026 00:24:49] "GET /api/live/status/?t=1776381889540 HTTP/1.1" 200 403
+[17/Apr/2026 00:25:05] "GET /api/live/status/?t=1776381904540 HTTP/1.1" 200 416
