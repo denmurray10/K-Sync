@@ -21,7 +21,19 @@
     backdrop-filter: blur(0px);
     border-bottom: 1px solid transparent;
   }
-    [x-cloak] { display: none !important; }
+  .header-mobile-nav-active [data-header-nav-shell] {
+    display: none !important;
+  }
+  .header-mobile-nav-active [data-header-desktop-only] {
+    display: none !important;
+  }
+  .header-mobile-nav-active [data-header-mobile-trigger] {
+    display: inline-flex !important;
+  }
+  .header-mobile-nav-active [data-header-actions] {
+    gap: 0.5rem !important;
+  }
+  [x-cloak] { display: none !important; }
 </style>
 
 {% if request.resolver_match.url_name == '__legacy_live_header_disabled__' %}
@@ -83,13 +95,13 @@
 {% else %}
 <!-- ───── STANDARD HEADER ───── -->
 <header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-5 sm:py-8 border-none">
-    <div class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 min-w-0 md:grid-cols-[auto_1fr_auto]">
-        <a class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
+    <div id="header-layout-row" class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 min-w-0 md:grid-cols-[auto_1fr_auto]">
+        <a id="header-logo" class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
             <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
         </a>
-        <div class="hidden min-w-0 justify-center md:flex">
+        <div data-header-nav-shell class="hidden min-w-0 justify-center md:flex">
             <nav id="desktop-primary-nav" data-track-category="global_nav" class="hidden md:flex items-center justify-center gap-6">
                 <a data-track="nav_live" class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
                 <a data-track="nav_charts" class="{% if request.resolver_match.url_name == 'charts' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
@@ -99,7 +111,7 @@
                 <a data-track="nav_news" class="{% if request.resolver_match.url_name == 'news' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'news' %}">News</a>
             </nav>
         </div>
-        <div class="flex items-center justify-self-end gap-2 sm:gap-4 md:gap-6 shrink-0">
+        <div id="header-actions" data-header-actions class="flex items-center justify-self-end gap-2 sm:gap-4 md:gap-6 shrink-0">
             <form action="{% url 'results' %}" method="GET" class="hidden lg:flex items-center relative group">
                 <span class="material-symbols-outlined absolute left-3 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
                 <input name="q" class="bg-black/30 border border-primary/30 py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-64 placeholder:text-slate-500" placeholder="Search artist, song..." type="text"/>
@@ -115,6 +127,19 @@
                     <span class="material-symbols-outlined text-lg">radio</span>
                 </a>
                 <button
+                    id="header-inline-mobile-toggle"
+                    type="button"
+                    data-header-mobile-trigger
+                    data-track="header_inline_mobile_menu"
+                    data-track-category="global_header"
+                    class="hidden h-10 w-10 items-center justify-center border border-primary text-primary hover:bg-primary hover:text-black transition-all"
+                    aria-label="Open menu"
+                    aria-expanded="false"
+                    aria-controls="mobile-site-menu-panel"
+                >
+                    <span class="material-symbols-outlined text-lg">menu</span>
+                </button>
+                <button
                     data-track="live_on_air_header"
                     data-track-category="global_header"
                     data-track-destination="{% url 'live' %}"
@@ -128,11 +153,11 @@
                     <span class="text-[10px] md:text-xs uppercase tracking-widest">Live On Air</span>
                 </button>
                 {% if user.is_authenticated %}
-                <a data-track="nav_account" data-track-category="global_header" href="{% url 'dashboard' %}" title="Dashboard" class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
+                <a data-track="nav_account" data-track-category="global_header" href="{% url 'dashboard' %}" title="Dashboard" data-header-desktop-only class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
                     <span class="material-symbols-outlined text-xl">account_circle</span>
                 </a>
                 {% else %}
-                <a data-track="nav_login" data-track-category="global_header" class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
+                <a data-track="nav_login" data-track-category="global_header" data-header-desktop-only class="hidden md:block nav-cinzel text-white hover:text-primary transition-colors font-normal uppercase tracking-wide px-2" href="{% url 'login' %}">Log In</a>
                 {% endif %}
             </div>
         </div>
@@ -475,6 +500,11 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const header = document.getElementById('main-header');
+        const headerLayoutRow = document.getElementById('header-layout-row');
+        const headerLogo = document.getElementById('header-logo');
+        const headerActions = document.getElementById('header-actions');
+        const desktopPrimaryNav = document.getElementById('desktop-primary-nav');
+        const inlineMobileToggle = document.getElementById('header-inline-mobile-toggle');
         const mobileMenuToggle = document.getElementById('mobile-site-menu-toggle');
         const mobileMenuPanel = document.getElementById('mobile-site-menu-panel');
         const mobileMenuClose = document.getElementById('mobile-site-menu-close');
@@ -498,6 +528,45 @@
         }
 
         const playerStateKey = 'ksync_station_widget_v1';
+        let headerMobileNavActive = false;
+
+        const syncHeaderMenuTriggers = () => {
+            const expanded = mobileMenuToggle ? mobileMenuToggle.getAttribute('aria-expanded') === 'true' : false;
+            if (inlineMobileToggle) {
+                inlineMobileToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            }
+        };
+
+        const updateResponsiveHeaderMode = () => {
+            if (!header || !headerLayoutRow || !headerLogo || !headerActions || !desktopPrimaryNav) return;
+
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+            const hardMobile = viewportWidth < 768;
+            let shouldUseMobileNav = hardMobile;
+
+            if (!hardMobile) {
+                header.classList.remove('header-mobile-nav-active');
+                const rowRect = headerLayoutRow.getBoundingClientRect();
+                const logoRect = headerLogo.getBoundingClientRect();
+                const navRect = desktopPrimaryNav.getBoundingClientRect();
+                const actionsRect = headerActions.getBoundingClientRect();
+                const navVisible = navRect.width > 0 && navRect.height > 0;
+                const gapBuffer = 20;
+
+                if (
+                    !navVisible ||
+                    navRect.left <= logoRect.right + gapBuffer ||
+                    navRect.right >= actionsRect.left - gapBuffer ||
+                    actionsRect.right > rowRect.right + 1
+                ) {
+                    shouldUseMobileNav = true;
+                }
+            }
+
+            header.classList.toggle('header-mobile-nav-active', shouldUseMobileNav);
+            headerMobileNavActive = shouldUseMobileNav;
+            syncHeaderMenuTriggers();
+        };
 
         const readPlayerState = () => {
             try {
@@ -564,6 +633,7 @@
             mobileMenuPanel.setAttribute('aria-hidden', 'false');
             mobileMenuToggle.classList.add('opacity-0', 'pointer-events-none');
             document.body.classList.add('overflow-hidden');
+            syncHeaderMenuTriggers();
         };
 
         const closeMobileMenu = () => {
@@ -574,6 +644,7 @@
             mobileMenuPanel.setAttribute('aria-hidden', 'true');
             mobileMenuToggle.classList.remove('opacity-0', 'pointer-events-none');
             document.body.classList.remove('overflow-hidden');
+            syncHeaderMenuTriggers();
         };
 
         if (mobileMenuToggle && mobileMenuPanel) {
@@ -587,6 +658,16 @@
             });
 
             if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+            if (inlineMobileToggle) {
+                inlineMobileToggle.addEventListener('click', function() {
+                    const isOpen = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+                    if (isOpen) {
+                        closeMobileMenu();
+                    } else {
+                        openMobileMenu();
+                    }
+                });
+            }
 
             mobileMenuPanel.querySelectorAll('a').forEach((link) => {
                 link.addEventListener('click', closeMobileMenu);
@@ -667,5 +748,19 @@
                 header.classList.remove('header-glass');
             }
         });
+
+        const responsiveHeaderObserver = typeof ResizeObserver !== 'undefined'
+            ? new ResizeObserver(() => updateResponsiveHeaderMode())
+            : null;
+
+        if (responsiveHeaderObserver) {
+            [headerLayoutRow, headerLogo, headerActions, desktopPrimaryNav].forEach((node) => {
+                if (node) responsiveHeaderObserver.observe(node);
+            });
+        }
+
+        window.addEventListener('resize', updateResponsiveHeaderMode);
+        window.addEventListener('load', updateResponsiveHeaderMode);
+        updateResponsiveHeaderMode();
     });
 </script>

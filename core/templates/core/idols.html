@@ -58,11 +58,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 opacity: 1;
                 transform: translate(0);
             }
-            body {
-                zoom: 0.9;
-                -moz-transform: scale(0.9);
-                -moz-transform-origin: 0 0;
-            }
             [x-cloak] {
                 display: none !important;
             }
@@ -99,9 +94,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 class="relative w-full bg-black pt-[180px] md:pt-64 pb-16 md:pb-24 border-b border-white/10 overflow-hidden"
             >
                 <!-- Giant ghost text -->
-                <div class="absolute inset-0 z-0 pointer-events-none">
+                <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                     <div
-                        class="absolute -top-10 -right-20 text-[10rem] md:text-[18rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap select-none"
+                        class="absolute top-0 right-0 hidden translate-x-1/4 text-[18rem] font-black text-white/[0.02] uppercase leading-none whitespace-nowrap select-none md:block"
                     >
                         IDOLS
                     </div>
@@ -238,7 +233,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     >
                         <!-- Type Tabs -->
                         <div
-                            class="flex items-center gap-0 border border-white/20"
+                            class="flex w-full items-center gap-0 overflow-x-auto border border-white/20 scrollbar-hide md:w-auto"
                         >
                             <template
                                 x-for="tab in ['ALL', 'BOY', 'GIRL', 'SOLO']"
@@ -249,7 +244,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     :class="filter === tab
                                         ? 'bg-primary text-black border-primary'
                                         : 'bg-transparent text-slate-400 border-transparent hover:text-white'"
-                                    class="px-5 md:px-8 py-3 font-black text-[10px] uppercase tracking-[0.2em] transition-colors border-b-2"
+                                    class="shrink-0 px-5 py-3 font-black text-[10px] uppercase tracking-[0.2em] transition-colors border-b-2 md:px-8"
                                     x-text="tab === 'ALL' ? 'All Artists' : tab === 'BOY' ? 'Boy Groups' : tab === 'GIRL' ? 'Girl Groups' : 'Soloists'"
                                 ></button>
                             </template>

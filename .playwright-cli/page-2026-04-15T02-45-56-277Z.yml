@@ -1,0 +1,412 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "K - beats" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: K
+        - generic [ref=e6]: "-"
+        - generic [ref=e7]: beats
+      - navigation [ref=e9]:
+        - link "Live" [ref=e10] [cursor=pointer]:
+          - /url: /live/
+        - link "Charts" [ref=e11] [cursor=pointer]:
+          - /url: /charts/
+        - link "Idols" [ref=e12] [cursor=pointer]:
+          - /url: /idols/
+        - link "Games" [ref=e13] [cursor=pointer]:
+          - /url: /games/
+        - link "Comebacks" [ref=e14] [cursor=pointer]:
+          - /url: /comeback-timeline/
+        - link "News" [ref=e15] [cursor=pointer]:
+          - /url: /news/
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: search
+          - textbox "Search artist, song..." [ref=e19]
+        - generic [ref=e20]:
+          - button "Live On Air" [ref=e21] [cursor=pointer]:
+            - generic [ref=e25]: Live On Air
+          - link "Log In" [ref=e26] [cursor=pointer]:
+            - /url: /login/
+  - generic:
+    - dialog [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - paragraph [ref=e30]: My Station
+          - button "Close My Station" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: close
+        - heading "Unlock My Station" [level=3] [ref=e33]
+        - paragraph [ref=e34]: Sign up to customise your K-Beats experience with your biases, eras, and live recommendations.
+      - generic [ref=e36]:
+        - link "Sign Up To Customise" [ref=e37] [cursor=pointer]:
+          - /url: /signup/
+        - link "Log In" [ref=e38] [cursor=pointer]:
+          - /url: /login/
+    - button "My Station" [ref=e39] [cursor=pointer]:
+      - generic [ref=e41]: My Station
+  - main [ref=e42]:
+    - generic [ref=e43]:
+      - img "Karina portrait" [ref=e45]
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - generic [ref=e49]: Leader, Main Dancer, Lead Rapper, Sub Vocalist
+          - heading "KARINA" [level=1] [ref=e50]
+          - paragraph [ref=e51]: aespa / Leader, Main Dancer, Lead Rapper, Sub Vocalist
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - paragraph [ref=e54]: Milestones
+            - paragraph [ref=e55]: "0"
+          - generic [ref=e56]:
+            - paragraph [ref=e57]: Signals
+            - paragraph [ref=e58]: "5"
+          - generic [ref=e59]:
+            - paragraph [ref=e60]: Stories
+            - paragraph [ref=e61]: "4"
+          - generic [ref=e62]:
+            - paragraph [ref=e63]: Links
+            - paragraph [ref=e64]: "0"
+        - generic [ref=e65]:
+          - link "Set As Bias" [ref=e66] [cursor=pointer]:
+            - /url: /login/?next=/idols/aespa/members/karina/
+          - link "Birthday File" [ref=e67] [cursor=pointer]:
+            - /url: /idols/aespa/members/karina/birthday/
+          - button "Share" [ref=e68] [cursor=pointer]
+    - navigation [ref=e69]:
+      - generic [ref=e70]:
+        - link "OVERVIEW" [ref=e71] [cursor=pointer]:
+          - /url: "#OVERVIEW"
+        - link "BIOGRAPHY" [ref=e72] [cursor=pointer]:
+          - /url: "#BIOGRAPHY"
+        - link "DISCOGRAPHY" [ref=e73] [cursor=pointer]:
+          - /url: "#DISCOGRAPHY"
+        - link "TRACK RADAR" [ref=e74] [cursor=pointer]:
+          - /url: "#TRACK_RADAR"
+        - link "MILESTONES" [ref=e75] [cursor=pointer]:
+          - /url: "#MILESTONES"
+        - link "NEWS" [ref=e76] [cursor=pointer]:
+          - /url: "#NEWS"
+    - generic [ref=e78]:
+      - generic [ref=e79]:
+        - heading "Biography" [level=2] [ref=e80]
+        - generic [ref=e81]:
+          - paragraph [ref=e82]: Karina, whose full name is Kim Minjeong, is the leader and main dancer of the girl group aespa under SM Entertainment. She directs the group's activities and anchors their choreography with precision.
+          - paragraph [ref=e83]: In addition to her leadership, Karina serves as the lead rapper and sub vocalist for aespa. Her versatility across these roles enhances the group's musical and performance depth, solidifying her as a core member.
+      - generic [ref=e84]:
+        - heading "Core Data" [level=3] [ref=e85]
+        - generic [ref=e86]:
+          - generic [ref=e87]:
+            - generic [ref=e88]: Stage name
+            - generic [ref=e89]: Karina
+          - generic [ref=e90]:
+            - generic [ref=e91]: Full name
+            - generic [ref=e92]: Kim Minjeong
+          - generic [ref=e93]:
+            - generic [ref=e94]: Group
+            - generic [ref=e95]: aespa
+          - generic [ref=e96]:
+            - generic [ref=e97]: Positions
+            - generic [ref=e98]: Leader, Main Dancer, Lead Rapper, Sub Vocalist
+    - generic [ref=e100]:
+      - heading "Broadcast Performance Stats" [level=2] [ref=e101]
+      - generic [ref=e102]:
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - paragraph [ref=e110]: Current role
+            - paragraph [ref=e111]: Leader, Main Dancer, Lead Rapper, Sub Vocalist
+          - generic [ref=e112]:
+            - paragraph [ref=e113]: Group
+            - paragraph [ref=e114]: aespa
+          - generic [ref=e115]:
+            - paragraph [ref=e116]: Agency
+            - paragraph [ref=e117]: SM Entertainment
+          - generic [ref=e118]:
+            - paragraph [ref=e119]: Age now
+            - paragraph [ref=e120]: Unconfirmed
+          - generic [ref=e121]:
+            - paragraph [ref=e122]: Birthday
+            - paragraph [ref=e123]: Pending
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - heading "Karina as an artist" [level=4] [ref=e126]
+            - paragraph [ref=e127]: In aespa, Karina is most closely identified with the role of leader, main dancer, lead rapper, sub vocalist.
+          - generic [ref=e128]:
+            - heading "Core facts fans search for first" [level=4] [ref=e129]
+            - paragraph [ref=e130]: K-Beats is still filling the verified personal profile for Karina.
+    - generic [ref=e131]:
+      - img "aespa group photo" [ref=e132]
+      - generic [ref=e134]:
+        - generic [ref=e135]: Active Member Of
+        - heading "aespa" [level=2] [ref=e136]
+    - generic [ref=e138]:
+      - generic [ref=e139]:
+        - heading "Discography" [level=2] [ref=e140]
+        - generic [ref=e141]:
+          - generic [ref=e142]: ALL
+          - generic [ref=e143]: RELEASES
+          - generic [ref=e144]: SPOTLIGHT
+      - generic [ref=e145]:
+        - link "Sé Como Duele cover play_circle Sé Como Duele ALBUM · 1987" [ref=e146] [cursor=pointer]:
+          - /url: /idols/aespa/album/1450617701/
+          - generic [ref=e147]:
+            - img "Sé Como Duele cover" [ref=e148]
+            - generic [ref=e150]: play_circle
+          - heading "Sé Como Duele" [level=3] [ref=e151]
+          - paragraph [ref=e152]: ALBUM · 1987
+        - link "Siempre Karina cover play_circle Siempre Karina ALBUM · 2005" [ref=e153] [cursor=pointer]:
+          - /url: /idols/aespa/album/1721214033/
+          - generic [ref=e154]:
+            - img "Siempre Karina cover" [ref=e155]
+            - generic [ref=e157]: play_circle
+          - heading "Siempre Karina" [level=3] [ref=e158]
+          - paragraph [ref=e159]: ALBUM · 2005
+        - link "tired of me (Gekkaland remix) - Single cover play_circle tired of me (Gekkaland remix) - Single ALBUM · 2022" [ref=e160] [cursor=pointer]:
+          - /url: /idols/aespa/album/1633741301/
+          - generic [ref=e161]:
+            - img "tired of me (Gekkaland remix) - Single cover" [ref=e162]
+            - generic [ref=e164]: play_circle
+          - heading "tired of me (Gekkaland remix) - Single" [level=3] [ref=e165]
+          - paragraph [ref=e166]: ALBUM · 2022
+        - link "tired of me - Single cover play_circle tired of me - Single ALBUM · 2021" [ref=e167] [cursor=pointer]:
+          - /url: /idols/aespa/album/1873997667/
+          - generic [ref=e168]:
+            - img "tired of me - Single cover" [ref=e169]
+            - generic [ref=e171]: play_circle
+          - heading "tired of me - Single" [level=3] [ref=e172]
+          - paragraph [ref=e173]: ALBUM · 2021
+    - generic [ref=e175]:
+      - heading "Track Radar" [level=2] [ref=e176]
+      - table [ref=e178]:
+        - rowgroup [ref=e179]:
+          - row "Track Project Length Signal" [ref=e180]:
+            - columnheader "Track" [ref=e181]
+            - columnheader "Project" [ref=e182]
+            - columnheader "Length" [ref=e183]
+            - columnheader "Signal" [ref=e184]
+        - rowgroup [ref=e185]:
+          - row "Sé Cómo Duele artwork Sé Cómo Duele play_circle Preview Siempre Karina 3:33 trending_up Pop" [ref=e186]:
+            - cell "Sé Cómo Duele artwork Sé Cómo Duele play_circle Preview" [ref=e187]:
+              - generic [ref=e188]:
+                - img "Sé Cómo Duele artwork" [ref=e190]
+                - generic [ref=e191]:
+                  - paragraph [ref=e192]: Sé Cómo Duele
+                  - link "play_circle Preview" [ref=e193] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/df/2b/f3/df2bf32a-95f9-9066-ab35-e86e97461970/mzaf_237886418820737557.plus.aac.p.m4a
+                    - generic [ref=e194]: play_circle
+                    - text: Preview
+            - cell "Siempre Karina" [ref=e195]
+            - cell "3:33" [ref=e196]
+            - cell "trending_up Pop" [ref=e197]:
+              - generic [ref=e198]:
+                - generic [ref=e199]: trending_up
+                - generic [ref=e200]: Pop
+          - 'row "UP (KARINA Solo) artwork UP (KARINA Solo) play_circle Preview SYNK : PARALLEL LINE - Special Digital Single - EP 2:46 trending_up K-Pop" [ref=e201]':
+            - cell "UP (KARINA Solo) artwork UP (KARINA Solo) play_circle Preview" [ref=e202]:
+              - generic [ref=e203]:
+                - img "UP (KARINA Solo) artwork" [ref=e205]
+                - generic [ref=e206]:
+                  - paragraph [ref=e207]: UP (KARINA Solo)
+                  - link "play_circle Preview" [ref=e208] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4a/ff/3c/4aff3c25-2265-c0f1-7c44-c33b5cdc07e9/mzaf_5994566525694125328.plus.aac.p.m4a
+                    - generic [ref=e209]: play_circle
+                    - text: Preview
+            - 'cell "SYNK : PARALLEL LINE - Special Digital Single - EP" [ref=e210]'
+            - cell "2:46" [ref=e211]
+            - cell "trending_up K-Pop" [ref=e212]:
+              - generic [ref=e213]:
+                - generic [ref=e214]: trending_up
+                - generic [ref=e215]: K-Pop
+          - row "A Quien artwork A Quien play_circle Preview Siempre Karina 3:54 trending_up Pop" [ref=e216]:
+            - cell "A Quien artwork A Quien play_circle Preview" [ref=e217]:
+              - generic [ref=e218]:
+                - img "A Quien artwork" [ref=e220]
+                - generic [ref=e221]:
+                  - paragraph [ref=e222]: A Quien
+                  - link "play_circle Preview" [ref=e223] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/e6/6d/6c/e66d6cc4-6984-7036-4e98-20a50c60c9e5/mzaf_2235230806605587100.plus.aac.p.m4a
+                    - generic [ref=e224]: play_circle
+                    - text: Preview
+            - cell "Siempre Karina" [ref=e225]
+            - cell "3:54" [ref=e226]
+            - cell "trending_up Pop" [ref=e227]:
+              - generic [ref=e228]:
+                - generic [ref=e229]: trending_up
+                - generic [ref=e230]: Pop
+          - row "Díganle artwork Díganle play_circle Preview Con la Misma Moneda 3:22 trending_up Música tropical" [ref=e231]:
+            - cell "Díganle artwork Díganle play_circle Preview" [ref=e232]:
+              - generic [ref=e233]:
+                - img "Díganle artwork" [ref=e235]
+                - generic [ref=e236]:
+                  - paragraph [ref=e237]: Díganle
+                  - link "play_circle Preview" [ref=e238] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/a6/99/4b/a6994bae-f7d2-b03a-311c-5c3c13947740/mzaf_8990948535519302055.plus.aac.p.m4a
+                    - generic [ref=e239]: play_circle
+                    - text: Preview
+            - cell "Con la Misma Moneda" [ref=e240]
+            - cell "3:22" [ref=e241]
+            - cell "trending_up Música tropical" [ref=e242]:
+              - generic [ref=e243]:
+                - generic [ref=e244]: trending_up
+                - generic [ref=e245]: Música tropical
+          - row "Karina artwork Karina play_circle Preview Con Tu Amor 4:20 trending_up Baladas y Boleros" [ref=e246]:
+            - cell "Karina artwork Karina play_circle Preview" [ref=e247]:
+              - generic [ref=e248]:
+                - img "Karina artwork" [ref=e250]
+                - generic [ref=e251]:
+                  - paragraph [ref=e252]: Karina
+                  - link "play_circle Preview" [ref=e253] [cursor=pointer]:
+                    - /url: https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/0e/7b/7b/0e7b7b2f-751f-7c4a-a08e-e1863e0f56dc/mzaf_13057475556307531242.plus.aac.p.m4a
+                    - generic [ref=e254]: play_circle
+                    - text: Preview
+            - cell "Con Tu Amor" [ref=e255]
+            - cell "4:20" [ref=e256]
+            - cell "trending_up Baladas y Boleros" [ref=e257]:
+              - generic [ref=e258]:
+                - generic [ref=e259]: trending_up
+                - generic [ref=e260]: Baladas y Boleros
+    - generic [ref=e263]:
+      - heading "Milestone Signals" [level=2] [ref=e264]
+      - paragraph [ref=e265]: Karina’s profile thread combines verified personal facts, debut markers, editorial notes, and fandom-search moments so the page reads like a live K-Beats feature rather than a flat directory entry.
+      - generic [ref=e266]:
+        - generic [ref=e267]:
+          - heading "0" [level=5] [ref=e268]
+          - paragraph [ref=e269]: Timeline Entries
+        - generic [ref=e270]:
+          - heading "5" [level=5] [ref=e271]
+          - paragraph [ref=e272]: Discovery Routes
+    - generic [ref=e274]:
+      - generic [ref=e276]: "Beyond The Filter: Decoding aespa Giselle's Evolution & What It Reveals About K-Pop's Shifting Ideals • The Giselle Paradox: How aespa's \"Skill Gap\" Debate Reveals 4th Gen K-Pop's Evolving Priorities & Fan Culture • The Blush Ban: How aespa's Radical Makeup Choice Redefines K-Pop Persona & Performance • The Unfiltered Idol: How aespa's Giselle's Live Stream Retort Ignites a Global Conversation on Parasocial Boundaries • Beyond The Filter: Decoding aespa Giselle's Evolution & What It Reveals About K-Pop's Shifting Ideals • The Giselle Paradox: How aespa's \"Skill Gap\" Debate Reveals 4th Gen K-Pop's Evolving Priorities & Fan Culture • The Blush Ban: How aespa's Radical Makeup Choice Redefines K-Pop Persona & Performance • The Unfiltered Idol: How aespa's Giselle's Live Stream Retort Ignites a Global Conversation on Parasocial Boundaries •"
+      - generic [ref=e277]:
+        - 'link "Beyond The Filter: Decoding aespa Giselle''s Evolution & What It Reveals About K-Pop''s Shifting Ideals K-BEATS EDITORIAL Beyond The Filter: Decoding aespa Giselle''s Evolution & What It Reveals About K-Pop''s Shifting Ideals From fan concern to industry analysis, we examine the forces shaping an idol''s image in the AI era." [ref=e278] [cursor=pointer]':
+          - /url: /blog/aespa-giselles-unrecognizable-visual-transformation-sparks-concern/
+          - 'img "Beyond The Filter: Decoding aespa Giselle''s Evolution & What It Reveals About K-Pop''s Shifting Ideals" [ref=e280]'
+          - generic [ref=e281]:
+            - text: K-BEATS EDITORIAL
+            - 'heading "Beyond The Filter: Decoding aespa Giselle''s Evolution & What It Reveals About K-Pop''s Shifting Ideals" [level=3] [ref=e282]'
+            - paragraph [ref=e283]: From fan concern to industry analysis, we examine the forces shaping an idol's image in the AI era.
+        - 'link "The Giselle Paradox: How aespa''s \"Skill Gap\" Debate Reveals 4th Gen K-Pop''s Evolving Priorities & Fan Culture K-BEATS EDITORIAL The Giselle Paradox: How aespa''s \"Skill Gap\" Debate Reveals 4th Gen K-Pop''s Evolving Priorities & Fan Culture Beyond the viral criticism—analyzing performance standards, group synergy, and the real metrics of survival in the hyper-competitive AI era." [ref=e284] [cursor=pointer]':
+          - /url: /blog/aespas-giselle-gets-slammed-for-affecting-other-members-with-poor-dance-skills/
+          - 'img "The Giselle Paradox: How aespa''s \"Skill Gap\" Debate Reveals 4th Gen K-Pop''s Evolving Priorities & Fan Culture" [ref=e286]'
+          - generic [ref=e287]:
+            - text: K-BEATS EDITORIAL
+            - 'heading "The Giselle Paradox: How aespa''s \"Skill Gap\" Debate Reveals 4th Gen K-Pop''s Evolving Priorities & Fan Culture" [level=3] [ref=e288]'
+            - paragraph [ref=e289]: Beyond the viral criticism—analyzing performance standards, group synergy, and the real metrics of survival in the hyper-competitive AI era.
+        - 'link "The Blush Ban: How aespa''s Radical Makeup Choice Redefines K-Pop Persona & Performance K-BEATS EDITORIAL The Blush Ban: How aespa''s Radical Makeup Choice Redefines K-Pop Persona & Performance We analyze the stunning strategic sacrifice behind the flaw-less look and what it means for the future of idol concepts." [ref=e290] [cursor=pointer]':
+          - /url: /blog/aespa-gave-up-one-crucial-makeup-step-to-commit-to-their-ai-concept/
+          - 'img "The Blush Ban: How aespa''s Radical Makeup Choice Redefines K-Pop Persona & Performance" [ref=e292]'
+          - generic [ref=e293]:
+            - text: K-BEATS EDITORIAL
+            - 'heading "The Blush Ban: How aespa''s Radical Makeup Choice Redefines K-Pop Persona & Performance" [level=3] [ref=e294]'
+            - paragraph [ref=e295]: We analyze the stunning strategic sacrifice behind the flaw-less look and what it means for the future of idol concepts.
+  - paragraph [ref=e297]: ©2026 K-BEATS RADIO BROADCASTING CO. PROFILE SIGNAL
+  - contentinfo [ref=e298]:
+    - generic [ref=e299]:
+      - generic [ref=e300]:
+        - generic [ref=e301]:
+          - heading "K-BEATS RADIO" [level=3] [ref=e302]
+          - paragraph [ref=e303]: Est. 2026 · Cornwall, UK
+          - paragraph [ref=e304]: Your leading source for K-pop music, news, and culture. Bringing the heart of Seoul from Cornwall to fans worldwide.
+          - generic [ref=e305]:
+            - link "Facebook" [ref=e306] [cursor=pointer]:
+              - /url: https://www.facebook.com/
+              - generic [ref=e307]: public
+            - link "News" [ref=e308] [cursor=pointer]:
+              - /url: /news/
+              - generic [ref=e309]: article
+            - link "Live" [ref=e310] [cursor=pointer]:
+              - /url: /live/
+              - generic [ref=e311]: music_note
+          - link "phone_iphone Download the App" [ref=e312] [cursor=pointer]:
+            - /url: /promo/
+            - generic [ref=e313]: phone_iphone
+            - text: Download the App
+        - generic [ref=e314]:
+          - generic [ref=e315]:
+            - heading "Music" [level=4] [ref=e316]
+            - list [ref=e317]:
+              - listitem [ref=e318]:
+                - link "Groups" [ref=e319] [cursor=pointer]:
+                  - /url: /idols/?type=groups
+              - listitem [ref=e320]:
+                - link "Male Solo Artists" [ref=e321] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=male
+              - listitem [ref=e322]:
+                - link "Female Solo Artists" [ref=e323] [cursor=pointer]:
+                  - /url: /idols/?type=solo&gender=female
+              - listitem [ref=e324]:
+                - link "Tours" [ref=e325] [cursor=pointer]:
+                  - /url: /comeback-timeline/
+          - generic [ref=e326]:
+            - heading "Station" [level=4] [ref=e327]
+            - list [ref=e328]:
+              - listitem [ref=e329]:
+                - link "About Us" [ref=e330] [cursor=pointer]:
+                  - /url: /about/
+              - listitem [ref=e331]:
+                - link "Presenters" [ref=e332] [cursor=pointer]:
+                  - /url: /presenters/
+              - listitem [ref=e333]:
+                - link "Schedule" [ref=e334] [cursor=pointer]:
+                  - /url: /schedule/
+              - listitem [ref=e335]:
+                - link "Mobile App" [ref=e336] [cursor=pointer]:
+                  - /url: /promo/
+          - generic [ref=e337]:
+            - heading "Community" [level=4] [ref=e338]
+            - list [ref=e339]:
+              - listitem [ref=e340]:
+                - link "Request Song" [ref=e341] [cursor=pointer]:
+                  - /url: /request/
+              - listitem [ref=e342]:
+                - link "Fan Club" [ref=e343] [cursor=pointer]:
+                  - /url: /fan-clubs/
+              - listitem [ref=e344]:
+                - link "Contests" [ref=e345] [cursor=pointer]:
+                  - /url: /contests/
+              - listitem [ref=e346]:
+                - link "Merch Shop" [ref=e347] [cursor=pointer]:
+                  - /url: /coming-soon/
+          - generic [ref=e348]:
+            - heading "Shop" [level=4] [ref=e349]
+            - list [ref=e350]:
+              - listitem [ref=e351]:
+                - link "Jumpers" [ref=e352] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e353]:
+                - link "T-Shirts" [ref=e354] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e355]:
+                - link "Merch" [ref=e356] [cursor=pointer]:
+                  - /url: /coming-soon/
+              - listitem [ref=e357]:
+                - link "Albums" [ref=e358] [cursor=pointer]:
+                  - /url: /coming-soon/
+      - generic [ref=e360]:
+        - link "Tune In Live K-Pop Radio UK The UK's only dedicated K-pop broadcast, live around the clock. Real shows, real presenters, and a signal built for fans who want more than a playlist." [ref=e361] [cursor=pointer]:
+          - /url: /kpop-radio-station-uk/
+          - paragraph [ref=e362]: Tune In Live
+          - paragraph [ref=e363]: K-Pop Radio UK
+          - paragraph [ref=e364]: The UK's only dedicated K-pop broadcast, live around the clock. Real shows, real presenters, and a signal built for fans who want more than a playlist.
+        - link "Enter The Vibe Midnight K-Pop Vibes Soft hours, big feelings. Drift into ballads, late-night B-sides, and slow-burn deep cuts handpicked for the hours after everything goes quiet." [ref=e365] [cursor=pointer]:
+          - /url: /midnight-kpop-vibes/
+          - paragraph [ref=e366]: Enter The Vibe
+          - paragraph [ref=e367]: Midnight K-Pop Vibes
+          - paragraph [ref=e368]: Soft hours, big feelings. Drift into ballads, late-night B-sides, and slow-burn deep cuts handpicked for the hours after everything goes quiet.
+        - link "Play It Now Best K-Pop Playlist 2026 Every track that's defined 2026 so far, updated weekly. If it's charting, trending, or taking over Weverse right now — it's on this list." [ref=e369] [cursor=pointer]:
+          - /url: /best-kpop-playlist-2026/
+          - paragraph [ref=e370]: Play It Now
+          - paragraph [ref=e371]: Best K-Pop Playlist 2026
+          - paragraph [ref=e372]: Every track that's defined 2026 so far, updated weekly. If it's charting, trending, or taking over Weverse right now — it's on this list.
+        - link "Find Your Next Bias Discover New K-Pop Music Debut acts, hidden B-sides, under-the-radar groups — this is everything the algorithm hasn't served you yet. Your next obsession is one scroll away." [ref=e373] [cursor=pointer]:
+          - /url: /discover-new-kpop-music/
+          - paragraph [ref=e374]: Find Your Next Bias
+          - paragraph [ref=e375]: Discover New K-Pop Music
+          - paragraph [ref=e376]: Debut acts, hidden B-sides, under-the-radar groups — this is everything the algorithm hasn't served you yet. Your next obsession is one scroll away.
+      - generic [ref=e377]:
+        - paragraph [ref=e378]: © 2026 K-Beats Radio. All rights reserved.
+        - generic [ref=e379]:
+          - link "Privacy Policy" [ref=e380] [cursor=pointer]:
+            - /url: /legal/privacy-policy/
+          - link "Cookie Policy" [ref=e381] [cursor=pointer]:
+            - /url: /legal/cookie-policy/
+          - link "Terms of Service" [ref=e382] [cursor=pointer]:
+            - /url: /legal/terms-of-service/
