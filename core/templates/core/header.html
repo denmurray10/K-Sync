@@ -56,6 +56,82 @@
     gap: 0.5rem !important;
   }
   [x-cloak] { display: none !important; }
+  .mobile-app-bar {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+    z-index: 79;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.4rem;
+    padding: 0.65rem 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(180deg, rgba(7, 7, 7, 0.92), rgba(0, 0, 0, 0.98));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  }
+  .mobile-app-bar__item {
+    min-width: 0;
+    flex: 1 1 0;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.28rem;
+    color: rgba(226, 232, 240, 0.78);
+    padding: 0.45rem 0.2rem;
+    text-align: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+  .mobile-app-bar__item:hover,
+  .mobile-app-bar__item:focus-visible {
+    color: #ffffff;
+    outline: none;
+    transform: translateY(-1px);
+  }
+  .mobile-app-bar__label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .mobile-app-bar__item.is-active {
+    color: #f425c0;
+  }
+  .mobile-app-bar__item--live {
+    flex: 0 0 auto;
+    width: 4.4rem;
+    margin-top: -1.75rem;
+    padding: 0;
+    color: #ffffff;
+  }
+  .mobile-app-bar__live-pill {
+    width: 4.4rem;
+    height: 4.4rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(244, 37, 192, 0.6);
+    background: radial-gradient(circle at 30% 30%, rgba(244, 37, 192, 0.3), rgba(0, 0, 0, 0.96) 70%);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.95), 0 14px 30px rgba(244, 37, 192, 0.22);
+  }
+  .mobile-app-bar__live-pill .mobile-app-bar__label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+  }
+  @media (min-width: 768px) {
+    .mobile-app-bar {
+      display: none;
+    }
+  }
 </style>
 
 {% if request.resolver_match.url_name == '__legacy_live_header_disabled__' %}
@@ -149,19 +225,6 @@
                     <span class="material-symbols-outlined text-lg">radio</span>
                 </a>
                 <button
-                    id="header-inline-mobile-toggle"
-                    type="button"
-                    data-header-mobile-trigger
-                    data-track="header_inline_mobile_menu"
-                    data-track-category="global_header"
-                    class="hidden h-10 w-10 items-center justify-center border border-primary text-primary hover:bg-primary hover:text-black transition-all"
-                    aria-label="Open menu"
-                    aria-expanded="false"
-                    aria-controls="mobile-site-menu-panel"
-                >
-                    <span class="material-symbols-outlined text-lg">menu</span>
-                </button>
-                <button
                     data-track="live_on_air_header"
                     data-track-category="global_header"
                     data-track-destination="{% url 'live' %}"
@@ -188,18 +251,55 @@
 {% endif %}
 
 <!-- ───── MOBILE SITE MENU ───── -->
-<button
-    id="mobile-site-menu-toggle"
-    type="button"
-    data-track="mobile_menu_open"
-    data-track-category="mobile_menu"
-    class="md:hidden fixed bottom-4 right-4 z-[79] bg-primary text-black border border-black px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_#ffffff] transition-opacity flex items-center gap-2"
-    aria-expanded="false"
-    aria-controls="mobile-site-menu-panel"
->
-    <span class="material-symbols-outlined text-sm">menu</span>
-    Menu
-</button>
+<nav class="mobile-app-bar md:hidden" aria-label="Mobile app navigation" data-track-category="mobile_bottom_nav">
+    <a
+        data-track="bottom_nav_idols"
+        href="{% url 'idols' %}"
+        class="mobile-app-bar__item {% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}is-active{% endif %}"
+    >
+        <span class="material-symbols-outlined text-[1.2rem]">star</span>
+        <span class="mobile-app-bar__label">Idols</span>
+    </a>
+    <a
+        data-track="bottom_nav_news"
+        href="{% url 'news' %}"
+        class="mobile-app-bar__item {% if request.resolver_match.url_name == 'news' %}is-active{% endif %}"
+    >
+        <span class="material-symbols-outlined text-[1.2rem]">article</span>
+        <span class="mobile-app-bar__label">News</span>
+    </a>
+    <a
+        data-track="bottom_nav_live"
+        href="{% url 'live' %}"
+        class="mobile-app-bar__item mobile-app-bar__item--live {% if request.resolver_match.url_name == 'live' %}is-active{% endif %}"
+        aria-label="Open Live"
+    >
+        <span class="mobile-app-bar__live-pill">
+            <span class="material-symbols-outlined text-[1.45rem]">radio</span>
+            <span class="mobile-app-bar__label">Live</span>
+        </span>
+    </a>
+    <a
+        data-track="bottom_nav_request"
+        href="{% url 'request_track' %}"
+        class="mobile-app-bar__item {% if request.resolver_match.url_name == 'request_track' %}is-active{% endif %}"
+    >
+        <span class="material-symbols-outlined text-[1.2rem]">queue_music</span>
+        <span class="mobile-app-bar__label">Request</span>
+    </a>
+    <button
+        id="mobile-site-menu-toggle"
+        type="button"
+        data-track="mobile_menu_open"
+        data-track-category="mobile_menu"
+        class="mobile-app-bar__item"
+        aria-expanded="false"
+        aria-controls="mobile-site-menu-panel"
+    >
+        <span class="material-symbols-outlined text-[1.2rem]">menu</span>
+        <span class="mobile-app-bar__label">Menu</span>
+    </button>
+</nav>
 
 <div
     id="mobile-site-menu-panel"

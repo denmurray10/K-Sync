@@ -129,9 +129,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             #hero-section h1 {
                 font-size: clamp(3rem, 15vw, 4.25rem);
                 line-height: 0.82;
+                max-width: 100%;
             }
             #hero-section h1 > span {
-                white-space: nowrap;
+                white-space: normal;
+            }
+            #hero-section .container {
+                padding-left: var(--site-gutter-x, 1rem) !important;
+                padding-right: var(--site-gutter-x, 1rem) !important;
+                max-width: 100%;
             }
             .relative.w-full.bg-primary {
                 margin-top: 0;
@@ -153,6 +159,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             #hero-section .container {
                 height: auto !important;
                 padding-top: 1.5rem;
+            }
+            #hero-section .container > div:first-child {
+                width: 100%;
+                max-width: 100%;
+                align-self: stretch;
+            }
+            #hero-section p,
+            #hero-section .pointer-events-auto,
+            #hero-section #hero-jump-links {
+                max-width: 100%;
             }
             #hero-bg-video {
                 min-height: 600px;
