@@ -116,6 +116,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             overflow-x: hidden;
         }
         @media (max-width: 768px) {
+            :root {
+                --mobile-header-offset: 6.5rem;
+            }
+            #hero-jump-links {
+                display: none !important;
+            }
             main .container {
                 padding-left: 1.5rem !important;
                 padding-right: 1.5rem !important;
@@ -137,14 +143,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 border-top: none;
             }
             .flex.flex-col.max-w-2xl.reveal-left {
-                padding-top: 72px;
+                padding-top: 0;
             }
             #hero-section {
                 height: auto !important;
                 min-height: 600px !important;
+                padding-top: var(--mobile-header-offset);
             }
             #hero-section .container {
                 height: auto !important;
+                padding-top: 1.5rem;
             }
             #hero-bg-video {
                 min-height: 600px;
@@ -152,7 +160,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             #home-live-player-bar {
                 height: auto;
                 min-height: 96px;
-                margin-top: -60px;
+                margin-top: 0;
             }
             #home-live-player-bar .container {
                 display: grid;
@@ -191,11 +199,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 justify-self: end;
             }
         }
+        @media (min-width: 768px) {
+            #hero-jump-links {
+                display: flex !important;
+            }
+        }
         @media (max-width: 380px) {
             #hero-section .container {
                 padding-left: 1.5rem;
                 padding-right: 1.5rem;
-                padding-top: 1.5rem;
+                padding-top: 1rem;
                 padding-bottom: 1.5rem;
             }
             #hero-section p {
@@ -312,7 +325,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </a>
 </div>
 {% if seo_jump_links %}
-<div class="mt-5 flex flex-wrap gap-3 pointer-events-auto">
+<div id="hero-jump-links" class="mt-5 flex-wrap gap-3 pointer-events-auto" style="display: none;">
 {% for link in seo_jump_links %}
 <a href="{{ link.href }}" class="inline-flex items-center gap-2 border border-white/15 bg-black/45 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-200 transition hover:border-secondary hover:text-secondary">
 {{ link.title }}
@@ -1186,6 +1199,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (homepagePopoutTrigger) {
         homepagePopoutTrigger.addEventListener('click', openHomepagePlayerPopout);
     }
+});
+
+// Keep the editorial jump-links hidden on mobile even if later styles mutate layout.
+document.addEventListener('DOMContentLoaded', () => {
+    const heroJumpLinks = document.getElementById('hero-jump-links');
+    if (!heroJumpLinks) return;
+
+    const syncHeroJumpLinksVisibility = () => {
+        if (window.matchMedia('(max-width: 767px)').matches) {
+            heroJumpLinks.style.setProperty('display', 'none', 'important');
+            heroJumpLinks.setAttribute('aria-hidden', 'true');
+        } else {
+            heroJumpLinks.style.removeProperty('display');
+            heroJumpLinks.removeAttribute('aria-hidden');
+        }
+    };
+
+    syncHeroJumpLinksVisibility();
+    window.addEventListener('resize', syncHeroJumpLinksVisibility);
 });
 
 function initHomepageEmailPromoForm() {
