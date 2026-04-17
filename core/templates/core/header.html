@@ -136,7 +136,7 @@
 
 {% if request.resolver_match.url_name == '__legacy_live_header_disabled__' %}
 <!-- ───── LIVE PAGE HEADER ───── -->
-<header id="main-header" class="fixed top-0 left-0 right-0 z-50 px-6 py-8 bg-transparent border-none">
+<header id="main-header" class="fixed top-0 left-0 right-0 z-50 py-8 bg-transparent border-none">
     <div class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 md:grid-cols-[auto_1fr_auto]">
         <a href="{% url 'home' %}" class="flex items-center gap-0 group shrink-0 py-2">
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
@@ -192,7 +192,7 @@
 </header>
 {% else %}
 <!-- ───── STANDARD HEADER ───── -->
-<header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-5 sm:py-8 border-none">
+<header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 py-5 sm:py-8 border-none">
     <div id="header-layout-row" class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 min-w-0 md:grid-cols-[auto_1fr_auto]">
         <a id="header-logo" class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>

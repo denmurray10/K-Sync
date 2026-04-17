@@ -33,6 +33,7 @@ from .models import (
     LimitedTimeEvent,
     EventBadgeDrop,
     EventParticipation,
+    RadioStationState,
     RadioTrack,
     UserBadge,
 )
@@ -1113,6 +1114,72 @@ class RadioCoIntegrationTests(TestCase):
             payload['recently_played'][0]['album_art'],
             'https://example.com/seventeen-adore-u.jpg',
         )
+
+    @patch('core.views.requests.get')
+    @patch('core.views._build_live_show_snapshot')
+    def test_api_live_status_prefers_local_song_metadata_when_radioco_returns_show_branding(self, mock_show_snapshot, mock_get):
+        cache.clear()
+        local_track = RadioTrack.objects.create(
+            title='I Need U',
+            artist='BTS',
+            album_art='https://example.com/i-need-u.jpg',
+            audio_url='https://example.com/i-need-u.mp3',
+            duration='3:31',
+            duration_seconds=211,
+        )
+        RadioStationState.objects.update_or_create(
+            id=1,
+            defaults={
+                'current_track': local_track,
+                'started_at': timezone.now(),
+            },
+        )
+        mock_show_snapshot.return_value = {'current': None, 'next': None}
+        station_response = Mock()
+        station_response.raise_for_status.return_value = None
+        station_response.json.return_value = {
+            'station': {
+                'listen_url': 'https://streaming.radio.co/test/listen',
+                'logo': 'https://example.com/logo.jpg',
+            }
+        }
+        track_response = Mock()
+        track_response.raise_for_status.return_value = None
+        track_response.json.return_value = {
+            'data': {
+                'title': 'Midnight Velvet Mood',
+                'artist': 'K Beats Radio',
+                'artwork_urls': {'large': 'https://example.com/radioco-show.jpg'},
+                'start_time': '2026-04-17T21:00:00Z',
+            }
+        }
+        status_response = Mock()
+        status_response.raise_for_status.return_value = None
+        status_response.json.return_value = {
+            'current_track': {'title': 'Midnight Velvet Mood', 'artist': 'K Beats Radio'},
+            'history': [
+                {'title': 'BTS - I Need U'},
+                {'title': 'IVE - I AM'},
+            ],
+            'logo_url': 'https://example.com/logo.jpg',
+        }
+        mock_get.side_effect = [station_response, track_response, status_response]
+
+        with self.settings(
+            RADIOCO_ENABLED=True,
+            RADIOCO_STATION_ID='station123',
+            RADIOCO_LISTEN_URL='https://streaming.radio.co/test/listen',
+            RADIOCO_API_BASE='https://public.radio.co',
+        ):
+            response = self.client.get(reverse('api_live_status'))
+
+        payload = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(payload['ok'])
+        self.assertEqual(payload['current_track']['title'], 'I Need U')
+        self.assertEqual(payload['current_track']['artist'], 'BTS')
+        self.assertEqual(payload['current_track']['album_art'], 'https://example.com/radioco-show.jpg')
+        self.assertEqual(payload['current_track']['audio_url'], 'https://streaming.radio.co/test/listen')
 
     @patch('core.views.requests.get')
     @patch('core.views._build_live_show_snapshot')

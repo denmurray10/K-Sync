@@ -776,6 +776,56 @@ def _radioco_track_display_parts(track_payload):
     return title.strip(), artist.strip()
 
 
+def _radioco_local_metadata_fallback():
+    state = (
+        RadioStationState.objects
+        .select_related('current_track')
+        .filter(id=1)
+        .first()
+    )
+    track = state.current_track if state else None
+    if not track or _is_generated_voice_track(track):
+        return None
+
+    title = str(getattr(track, 'title', '') or '').strip()
+    artist = str(getattr(track, 'artist', '') or '').strip()
+    if not title or not artist:
+        return None
+
+    return track
+
+
+def _radioco_should_prefer_local_metadata(title, artist):
+    normalized_title = str(title or '').strip().casefold()
+    normalized_artist = str(artist or '').strip().casefold()
+    if not normalized_title:
+        return False
+
+    branded_artists = {
+        'k beats radio',
+        'k-beats radio',
+        'kbeats radio',
+        'on air',
+    }
+    if normalized_artist in branded_artists:
+        return True
+
+    try:
+        active_slot, _start_seconds, _end_seconds = _get_active_schedule_slot(timezone.localtime())
+    except Exception:
+        active_slot = None
+
+    if not active_slot:
+        return False
+
+    candidate_labels = {
+        str(getattr(active_slot, 'description', '') or '').strip().casefold(),
+        str(getattr(getattr(active_slot, 'playlist', None), 'name', '') or '').strip().casefold(),
+    }
+    candidate_labels.discard('')
+    return normalized_title in candidate_labels
+
+
 def _radioco_recent_track_artwork_lookup(track_pairs):
     normalized_pairs = []
     seen = set()
@@ -903,10 +953,17 @@ def _radioco_current_track_namespace():
         return None
 
     title, artist = _radioco_track_display_parts(track_payload)
+    fallback_track = None
+    if _radioco_should_prefer_local_metadata(title, artist):
+        fallback_track = _radioco_local_metadata_fallback()
+        if fallback_track:
+            title = str(fallback_track.title or '').strip() or title
+            artist = str(fallback_track.artist or '').strip() or artist
     title = title or 'K-Beats Live'
     artist = artist or 'On Air'
     artwork = _coalesce_stream_image_url(
         _radioco_track_artwork(track_payload),
+        fallback_track.album_art if fallback_track else '',
         _radioco_pick_first(_radioco_track_payload_root(station_payload), 'logo', 'logo_url', 'image'),
     )
     if title and artist and artwork:
