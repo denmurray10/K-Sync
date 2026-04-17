@@ -58,20 +58,20 @@
   [x-cloak] { display: none !important; }
   .mobile-app-bar {
     position: fixed;
-    left: 0.75rem;
-    right: 0.75rem;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 79;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: 0.4rem;
-    padding: 0.65rem 0.7rem;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 0.65rem 0.7rem calc(env(safe-area-inset-bottom, 0px) + 0.65rem);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
     background: linear-gradient(180deg, rgba(7, 7, 7, 0.92), rgba(0, 0, 0, 0.98));
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.42);
   }
   .mobile-app-bar__item {
     min-width: 0;
