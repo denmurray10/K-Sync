@@ -22,7 +22,6 @@ class StaticViewSitemap(Sitemap):
             "schedule",
             "charts",
             "news",
-            "blog_page",
             "idols",
             "comeback_timeline",
             "presenters",

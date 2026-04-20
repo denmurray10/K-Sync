@@ -1,0 +1,388 @@
+{% load static %}
+<!doctype html>
+<html class="dark" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        {% include 'core/seo_meta.html' %}
+        <title>{{ seo_title }}</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+            rel="stylesheet"
+        />
+        <script>
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: "#f425c0",
+                            secondary: "#00f0ff",
+                            stage: "#000000",
+                            panel: "#0b0b10",
+                            ink: "#f3f4f6",
+                        },
+                        fontFamily: {
+                            display: ["Cinzel", "serif"],
+                            sans: ["Montserrat", "sans-serif"],
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            body {
+                font-family: "Montserrat", sans-serif;
+                background:
+                    radial-gradient(circle at top left, rgba(244, 37, 192, 0.14), transparent 30%),
+                    radial-gradient(circle at top right, rgba(0, 240, 255, 0.1), transparent 24%),
+                    #000;
+            }
+            .news-shell {
+                background:
+                    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+                    rgba(0, 0, 0, 0.92);
+            }
+            .news-rule {
+                border-color: rgba(255, 255, 255, 0.12);
+            }
+            .news-link:hover h2,
+            .news-link:hover h3,
+            .news-link:hover h4 {
+                color: #f425c0;
+            }
+            .headline-scroll::-webkit-scrollbar {
+                height: 6px;
+            }
+            .headline-scroll::-webkit-scrollbar-thumb {
+                background: rgba(244, 37, 192, 0.45);
+            }
+            .story-kicker {
+                letter-spacing: 0.24em;
+            }
+        </style>
+    </head>
+    <body class="bg-stage text-white min-h-screen overflow-x-hidden">
+        {% include 'core/header.html' %}
+
+        <main class="pt-28 md:pt-36 pb-20">
+            <div class="container mx-auto px-4 sm:px-6">
+                <div class="news-shell border border-white/10 shadow-[0_30px_120px_rgba(0,0,0,0.45)]">
+                    <section class="border-b border-white/10 px-4 py-3 sm:px-6">
+                        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                            <div class="flex flex-wrap items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+                                <span class="text-primary">Test Lab</span>
+                                <span>{{ total_count }} stories loaded</span>
+                                <span>{{ categories|length }} desks active</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+                                <a href="{% url 'news' %}" class="hover:text-white transition-colors">Live News Page</a>
+                                <a href="{% url 'blog_page' %}" class="hover:text-white transition-colors">Blog Page</a>
+                                <a href="{% url 'live' %}" class="text-secondary hover:text-white transition-colors">Listen Live</a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="border-b border-white/10 px-4 py-6 sm:px-6">
+                        <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                            <div>
+                                <p class="story-kicker text-[10px] font-bold uppercase text-primary">K-Beats Editorial Prototype</p>
+                                <h1 class="mt-2 font-display text-4xl uppercase tracking-tight text-white sm:text-5xl lg:text-6xl">
+                                    News Magazine Lab
+                                </h1>
+                                <p class="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
+                                    A dense K-Beats reinterpretation of a classic editorial newspaper front page, powered by the real `BlogArticle` feed.
+                                </p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 text-xs uppercase tracking-[0.2em] text-slate-400 sm:flex">
+                                <span class="border border-white/10 px-3 py-2">Black Stage</span>
+                                <span class="border border-primary/40 px-3 py-2 text-primary">Signal Pink</span>
+                                <span class="border border-secondary/40 px-3 py-2 text-secondary">Electric Cyan</span>
+                                <span class="border border-white/10 px-3 py-2">Sharp Editorial</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="border-b border-white/10 px-4 py-3 sm:px-6">
+                        <div class="headline-scroll flex gap-4 overflow-x-auto">
+                            {% for article in headline_strip %}
+                            <a href="{% url 'blog_article_read' slug=article.slug %}" class="min-w-[240px] border-r border-white/10 pr-4 last:border-r-0 last:pr-0">
+                                <p class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ article.category }}</p>
+                                <p class="mt-2 text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</p>
+                                <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">{{ article.created_at|date:"d M Y" }}</p>
+                            </a>
+                            {% empty %}
+                            <p class="text-sm text-slate-500">No headlines available yet.</p>
+                            {% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="grid gap-0 xl:grid-cols-[1.55fr_0.9fr_0.75fr]">
+                        <div class="border-b border-white/10 xl:border-b-0 xl:border-r xl:border-white/10">
+                            {% if hero_article %}
+                            <article class="p-4 sm:p-6">
+                                <a href="{% url 'blog_article_read' slug=hero_article.slug %}" class="news-link block">
+                                    <div class="relative overflow-hidden border border-white/10 bg-panel">
+                                        {% if hero_article.image %}
+                                        <img src="{{ hero_article.image }}" alt="{{ hero_article.title }}" class="aspect-[16/10] w-full object-cover opacity-90" />
+                                        {% else %}
+                                        <div class="aspect-[16/10] w-full bg-white/5"></div>
+                                        {% endif %}
+                                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent p-4">
+                                            <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ hero_article.category }}</p>
+                                            <h2 class="mt-2 font-display text-3xl uppercase leading-tight tracking-tight text-white transition-colors sm:text-4xl">
+                                                {{ hero_article.title }}
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </a>
+                                <div class="mt-4 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    <span>{{ hero_article.created_at|date:"d M Y" }}</span>
+                                    <span class="text-secondary">{{ hero_article.source_name|default:"K-Beats Editorial" }}</span>
+                                    <span>{{ hero_article.reading_time }} min read</span>
+                                </div>
+                                {% if hero_article.subtitle %}
+                                <p class="mt-4 text-sm leading-7 text-slate-300 sm:text-base">
+                                    {{ hero_article.subtitle }}
+                                </p>
+                                {% endif %}
+                            </article>
+                            {% else %}
+                            <div class="p-6 text-slate-500">No lead story available yet.</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="border-b border-white/10 xl:border-b-0 xl:border-r xl:border-white/10">
+                            <div class="p-4 sm:p-6">
+                                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                                    <h3 class="font-display text-2xl uppercase tracking-tight">Front Desk</h3>
+                                    <span class="story-kicker text-[10px] font-bold uppercase text-primary">Main File</span>
+                                </div>
+                                <div class="mt-5 space-y-5">
+                                    {% for article in hero_support %}
+                                    <article class="border-b border-white/10 pb-5 last:border-b-0 last:pb-0">
+                                        <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block">
+                                            {% if article.image %}
+                                            <img src="{{ article.image }}" alt="{{ article.title }}" class="mb-3 aspect-[16/10] w-full border border-white/10 object-cover" />
+                                            {% endif %}
+                                            <p class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ article.category }}</p>
+                                            <h3 class="mt-2 font-display text-2xl uppercase leading-tight tracking-tight text-white transition-colors">
+                                                {{ article.title }}
+                                            </h3>
+                                            {% if article.subtitle %}
+                                            <p class="mt-3 text-sm leading-6 text-slate-300">{{ article.subtitle }}</p>
+                                            {% endif %}
+                                        </a>
+                                        <div class="mt-3 flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                                            <span>{{ article.created_at|date:"d M" }}</span>
+                                            <span>{{ article.reading_time }} min</span>
+                                        </div>
+                                    </article>
+                                    {% empty %}
+                                    <p class="text-sm text-slate-500">Secondary stories will appear here when more articles are available.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <aside class="p-4 sm:p-6">
+                            <div class="border border-primary/30 bg-primary/10 p-4">
+                                <p class="story-kicker text-[10px] font-bold uppercase text-primary">Live Signal</p>
+                                <h3 class="mt-3 font-display text-2xl uppercase tracking-tight">K-Beats On Air</h3>
+                                <p class="mt-3 text-sm leading-6 text-slate-300">
+                                    Keep the station playing while you scan the latest stories, charts, and comeback analysis.
+                                </p>
+                                <div class="mt-5 flex flex-col gap-3">
+                                    <a href="{% url 'live' %}" class="border border-primary bg-primary px-4 py-3 text-center text-xs font-extrabold uppercase tracking-[0.2em] text-black transition hover:bg-white">
+                                        Launch Live Radio
+                                    </a>
+                                    <a href="{% url 'signup' %}" class="border border-white/15 px-4 py-3 text-center text-xs font-extrabold uppercase tracking-[0.2em] text-white transition hover:border-secondary hover:text-secondary">
+                                        Join The Community
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 border border-white/10 p-4">
+                                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                                    <h3 class="font-display text-xl uppercase">Pulse Picks</h3>
+                                    <span class="story-kicker text-[10px] font-bold uppercase text-secondary">Fast Read</span>
+                                </div>
+                                <div class="mt-4 space-y-4">
+                                    {% for article in spotlight_stack %}
+                                    <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block border-b border-white/10 pb-4 last:border-b-0 last:pb-0">
+                                        <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ article.category }}</p>
+                                        <h4 class="mt-2 text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
+                                        <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.created_at|date:"d M" }}</p>
+                                    </a>
+                                    {% empty %}
+                                    <p class="text-sm text-slate-500">No pulse picks yet.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </aside>
+                    </section>
+
+                    <section class="grid gap-0 border-t border-white/10 lg:grid-cols-[1fr_1fr_0.75fr]">
+                        <div class="border-b border-white/10 p-4 sm:p-6 lg:border-b-0 lg:border-r lg:border-white/10">
+                            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                                <h3 class="font-display text-2xl uppercase">Culture</h3>
+                                <span class="story-kicker text-[10px] font-bold uppercase text-primary">Feature Desk</span>
+                            </div>
+                            <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                                {% for article in culture_stack %}
+                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block">
+                                    {% if article.image %}
+                                    <img src="{{ article.image }}" alt="{{ article.title }}" class="aspect-[4/3] w-full border border-white/10 object-cover" />
+                                    {% endif %}
+                                    <p class="mt-3 story-kicker text-[10px] font-bold uppercase text-secondary">{{ article.category }}</p>
+                                    <h4 class="mt-2 font-display text-xl uppercase leading-tight tracking-tight text-white transition-colors">
+                                        {{ article.title }}
+                                    </h4>
+                                    <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.created_at|date:"d M Y" }}</p>
+                                </a>
+                                {% empty %}
+                                <p class="text-sm text-slate-500">Culture stories will populate here as the feed grows.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="border-b border-white/10 p-4 sm:p-6 lg:border-b-0 lg:border-r lg:border-white/10">
+                            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                                <h3 class="font-display text-2xl uppercase">Community</h3>
+                                <span class="story-kicker text-[10px] font-bold uppercase text-primary">Reader Energy</span>
+                            </div>
+                            <div class="mt-5 space-y-4">
+                                {% for article in community_stack %}
+                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link grid gap-3 border-b border-white/10 pb-4 sm:grid-cols-[110px_1fr] last:border-b-0 last:pb-0">
+                                    {% if article.image %}
+                                    <img src="{{ article.image }}" alt="{{ article.title }}" class="aspect-square w-full border border-white/10 object-cover" />
+                                    {% endif %}
+                                    <div>
+                                        <p class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ article.category }}</p>
+                                        <h4 class="mt-2 text-base font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
+                                        {% if article.subtitle %}
+                                        <p class="mt-2 text-sm leading-6 text-slate-300">{{ article.subtitle|truncatechars:110 }}</p>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <p class="text-sm text-slate-500">Community coverage will appear here when available.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="p-4 sm:p-6">
+                            <div class="border border-secondary/25 bg-secondary/10 p-4">
+                                <p class="story-kicker text-[10px] font-bold uppercase text-secondary">Programming Note</p>
+                                <h3 class="mt-3 font-display text-2xl uppercase tracking-tight">Need More K-Pop?</h3>
+                                <p class="mt-3 text-sm leading-6 text-slate-300">
+                                    Move from news into charts, comebacks, and the station feed without leaving the K-Beats ecosystem.
+                                </p>
+                            </div>
+                            <div class="mt-6 space-y-4">
+                                {% for article in food_stack %}
+                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block border border-white/10 p-4 transition hover:border-primary/60">
+                                    <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ article.category }}</p>
+                                    <h4 class="mt-2 text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
+                                    <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.reading_time }} min read</p>
+                                </a>
+                                {% empty %}
+                                <p class="text-sm text-slate-500">Additional briefs will appear here.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </section>
+
+                    {% if category_groups %}
+                    <section class="border-t border-white/10">
+                        <div class="grid gap-0 xl:grid-cols-3">
+                            {% for group in category_groups %}
+                            <div class="border-b border-white/10 p-4 sm:p-6 xl:border-b-0 xl:border-r xl:border-white/10 last:border-r-0">
+                                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                                    <h3 class="font-display text-2xl uppercase">{{ group.name }}</h3>
+                                    <span class="story-kicker text-[10px] font-bold uppercase text-primary">Desk</span>
+                                </div>
+                                <div class="mt-5">
+                                    <a href="{% url 'blog_article_read' slug=group.lead.slug %}" class="news-link block">
+                                        {% if group.lead.image %}
+                                        <img src="{{ group.lead.image }}" alt="{{ group.lead.title }}" class="aspect-[16/10] w-full border border-white/10 object-cover" />
+                                        {% endif %}
+                                        <h4 class="mt-3 font-display text-2xl uppercase leading-tight tracking-tight text-white transition-colors">
+                                            {{ group.lead.title }}
+                                        </h4>
+                                        {% if group.lead.subtitle %}
+                                        <p class="mt-3 text-sm leading-6 text-slate-300">{{ group.lead.subtitle|truncatechars:140 }}</p>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="mt-5 space-y-4">
+                                    {% for article in group.items %}
+                                    <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block border-t border-white/10 pt-4">
+                                        <p class="text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</p>
+                                        <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.created_at|date:"d M Y" }}</p>
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% endif %}
+
+                    <section class="grid gap-0 border-t border-white/10 xl:grid-cols-[1.5fr_0.85fr]">
+                        <div class="border-b border-white/10 p-4 sm:p-6 xl:border-b-0 xl:border-r xl:border-white/10">
+                            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                                <h3 class="font-display text-3xl uppercase">Recent Posts</h3>
+                                <span class="story-kicker text-[10px] font-bold uppercase text-secondary">Archive Flow</span>
+                            </div>
+                            <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                                {% for article in recent_posts %}
+                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block">
+                                    {% if article.image %}
+                                    <img src="{{ article.image }}" alt="{{ article.title }}" class="aspect-[4/3] w-full border border-white/10 object-cover" />
+                                    {% endif %}
+                                    <p class="mt-3 story-kicker text-[10px] font-bold uppercase text-primary">{{ article.category }}</p>
+                                    <h4 class="mt-2 text-base font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
+                                    <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.source_name|default:"K-Beats Editorial" }}</p>
+                                </a>
+                                {% empty %}
+                                <p class="text-sm text-slate-500">Recent posts will appear here.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <aside class="p-4 sm:p-6">
+                            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                                <h3 class="font-display text-2xl uppercase">Briefing Rail</h3>
+                                <span class="story-kicker text-[10px] font-bold uppercase text-primary">Quick Hits</span>
+                            </div>
+                            <div class="mt-5 space-y-4">
+                                {% for article in compact_rows %}
+                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block border-b border-white/10 pb-4 last:border-b-0 last:pb-0">
+                                    <p class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ article.category }}</p>
+                                    <h4 class="mt-2 text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
+                                    <div class="mt-2 flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                                        <span>{{ article.created_at|date:"d M" }}</span>
+                                        <span>{{ article.reading_time }} min</span>
+                                        {% if article.source_url %}
+                                        <span class="text-primary">External source</span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <p class="text-sm text-slate-500">Quick-hit briefs will appear here.</p>
+                                {% endfor %}
+                            </div>
+                        </aside>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        {% include 'core/footer.html' %}
+    </body>
+</html>

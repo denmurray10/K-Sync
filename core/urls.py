@@ -127,6 +127,7 @@ urlpatterns = [
     path('gift-to-a-friend/', views.gift_to_a_friend, name='gift_to_a_friend'),
     path('d-day-comeback-notification/', views.d_day_comeback_notification, name='d_day_comeback_notification'),
     path('test-page/', views.test_page, name='test_page'),
+    path('test-news-magazine-lab/', views.test_news_magazine_lab, name='test_news_magazine_lab'),
     path('blog-page/', views.blog_page, name='blog_page'),
     path('blog/generate/', views.blog_generate, name='blog_generate'),
     path('blog/link-pass/', views.blog_internal_link_pass, name='blog_internal_link_pass'),

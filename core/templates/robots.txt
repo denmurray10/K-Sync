@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /staff/
+Disallow: /internal/
+Disallow: /404-preview/
+Disallow: /home-redesign-lab/
+Disallow: /comeback-design-lab/
+Disallow: /what-just-landed-reel-lab/
+Disallow: /test-landing-wow/
+Disallow: /test-page/
 
 Sitemap: {{ request.scheme }}://{{ request.get_host }}{% url 'django.contrib.sitemaps.views.sitemap' %}

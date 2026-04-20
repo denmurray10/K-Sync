@@ -53,8 +53,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 {
                     "@type": "ListItem",
                     "position": 2,
-                    "name": "Blog",
-                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'blog_page' %}"
+                    "name": "News",
+                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'news' %}"
                 },
                 {
                     "@type": "ListItem",
@@ -332,9 +332,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             >
                             <span class="text-slate-600">/</span>
                             <a
-                                href="{% url 'blog_page' %}"
+                                href="{% url 'news' %}"
                                 class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors"
-                                >Blog</a
+                                >News</a
                             >
                             <span class="text-slate-600">/</span>
                             <span
@@ -498,11 +498,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <!-- Navigation -->
                             <div class="mt-6 space-y-3">
                                 <a
-                                    href="{% url 'blog_page' %}"
+                                    href="{% url 'news' %}"
                                     class="flex items-center gap-2 p-4 border border-white/10 bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] hover:border-primary hover:text-primary transition-colors"
                                 >
                                     <span class="material-symbols-outlined text-sm">arrow_back</span>
-                                    All Articles
+                                    All News
                                 </a>
                                 <a
                                     href="{% url 'news' %}"
@@ -534,10 +534,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                     <div class="flex items-center gap-4 reveal-left" style="transition-delay: 200ms">
                         <a
-                            href="{% url 'blog_page' %}"
+                            href="{% url 'news' %}"
                             class="bg-black text-white font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
                         >
-                            All Articles
+                            All News
                             <span class="material-symbols-outlined text-sm align-middle ml-1">article</span>
                         </a>
                         <a

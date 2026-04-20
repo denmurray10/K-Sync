@@ -191,6 +191,7 @@ class SeoRolloutTests(TestCase):
         self.assertContains(response, reverse('idol_page', args=[self.group.slug]))
         self.assertContains(response, reverse('member_page', args=[self.group.slug, self.member.slug]))
         self.assertContains(response, reverse('member_birthday_page', args=[self.group.slug, self.member.slug]))
+        self.assertNotContains(response, reverse('blog_page'))
 
     def test_non_seo_routes_emit_noindex_headers(self):
         routes = [
@@ -203,6 +204,10 @@ class SeoRolloutTests(TestCase):
             reverse('login'),
             reverse('signup'),
             reverse('results'),
+            reverse('blog_page'),
+            reverse('shop'),
+            reverse('coming_soon'),
+            reverse('gift_to_a_friend'),
         ]
 
         for route in routes:
@@ -305,6 +310,13 @@ class SeoRolloutTests(TestCase):
         self.assertContains(rainy_response, 'Discover New K-Pop Music')
         self.assertContains(rainy_response, reverse('comeback_timeline'))
         self.assertContains(rainy_response, 'The copy should feel fan-aware and calm, not generic.')
+
+    def test_blog_archive_consolidates_to_news_hub(self):
+        response = self.client.get(reverse('blog_page'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['X-Robots-Tag'], 'noindex, nofollow, noarchive')
+        self.assertContains(response, f'<link rel="canonical" href="http://testserver{reverse("news")}"/>', html=True)
 
 
 class FanClubTierAndEventTests(TestCase):
