@@ -172,17 +172,19 @@ class BlogArticleAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'category',
+        'writer_name',
+        'tags_preview',
         'created_at',
         'facebook_status',
         'x_status',
         'pinterest_status',
     )
     list_filter = (
-        'category', 'created_at', 'facebook_posted_at',
+        'category', 'writer_slug', 'created_at', 'facebook_posted_at',
         'x_posted_at', 'pinterest_posted_at',
     )
     search_fields = (
-        'title', 'subtitle', 'slug', 'source_name', 'source_title',
+        'title', 'subtitle', 'slug', 'writer_slug', 'source_name', 'source_title', 'editorial_tags',
     )
     readonly_fields = (
         'slug',
@@ -194,6 +196,14 @@ class BlogArticleAdmin(admin.ModelAdmin):
         'pinterest_post_id',
         'pinterest_posted_at',
     )
+
+    @admin.display(description='Writer')
+    def writer_name(self, obj):
+        return obj.writer_name
+
+    @admin.display(description='Tags')
+    def tags_preview(self, obj):
+        return ', '.join(obj.tags_list[:2]) or '—'
 
     @admin.display(description='Facebook')
     def facebook_status(self, obj):

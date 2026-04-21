@@ -64,25 +64,65 @@
             .story-kicker {
                 letter-spacing: 0.24em;
             }
+            .tag-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                border: 1px solid rgba(255, 255, 255, 0.14);
+                background: rgba(255, 255, 255, 0.05);
+                padding: 0.45rem 0.65rem;
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+            }
+            .writer-avatar {
+                height: 6.5rem;
+                width: 6.5rem;
+                min-height: 6.5rem;
+                min-width: 6.5rem;
+                flex-shrink: 0;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.14);
+                background: rgba(255, 255, 255, 0.04);
+            }
+            [x-cloak] {
+                display: none !important;
+            }
         </style>
     </head>
     <body class="bg-stage text-white min-h-screen overflow-x-hidden">
         {% include 'core/header.html' %}
 
-        <main class="pt-28 md:pt-36 pb-20">
+        <main
+            class="pt-28 md:pt-36 pb-20"
+            x-data="{
+                filter: 'All',
+                matches(category) {
+                    return this.filter === 'All' || this.filter === category;
+                }
+            }"
+        >
             <div class="container mx-auto px-4 sm:px-6">
                 <div class="news-shell border border-white/10 shadow-[0_30px_120px_rgba(0,0,0,0.45)]">
                     <section class="border-b border-white/10 px-4 py-3 sm:px-6">
                         <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                             <div class="flex flex-wrap items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">
-                                <span class="text-primary">Test Lab</span>
+                                <span class="text-primary">{{ top_status_label }}</span>
                                 <span>{{ total_count }} stories loaded</span>
                                 <span>{{ categories|length }} desks active</span>
+                                <span>{{ live_writer_count }} staff writers</span>
                             </div>
                             <div class="flex flex-wrap items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">
-                                <a href="{% url 'news' %}" class="hover:text-white transition-colors">Live News Page</a>
-                                <a href="{% url 'blog_page' %}" class="hover:text-white transition-colors">Blog Page</a>
-                                <a href="{% url 'live' %}" class="text-secondary hover:text-white transition-colors">Listen Live</a>
+                                <span>Updated {{ latest_story_label }}</span>
+                                {% for link in utility_links %}
+                                <a
+                                    href="{{ link.href }}"
+                                    class="{% if link.accent == 'secondary' %}text-secondary{% endif %} hover:text-white transition-colors"
+                                >
+                                    {{ link.label }}
+                                </a>
+                                {% endfor %}
                             </div>
                         </div>
                     </section>
@@ -90,30 +130,29 @@
                     <section class="border-b border-white/10 px-4 py-6 sm:px-6">
                         <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                             <div>
-                                <p class="story-kicker text-[10px] font-bold uppercase text-primary">K-Beats Editorial Prototype</p>
+                                <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ page_kicker }}</p>
                                 <h1 class="mt-2 font-display text-4xl uppercase tracking-tight text-white sm:text-5xl lg:text-6xl">
-                                    News Magazine Lab
+                                    {{ page_title }}
                                 </h1>
                                 <p class="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
-                                    A dense K-Beats reinterpretation of a classic editorial newspaper front page, powered by the real `BlogArticle` feed.
+                                    {{ page_intro }}
                                 </p>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3 text-xs uppercase tracking-[0.2em] text-slate-400 sm:flex">
-                                <span class="border border-white/10 px-3 py-2">Black Stage</span>
-                                <span class="border border-primary/40 px-3 py-2 text-primary">Signal Pink</span>
-                                <span class="border border-secondary/40 px-3 py-2 text-secondary">Electric Cyan</span>
-                                <span class="border border-white/10 px-3 py-2">Sharp Editorial</span>
                             </div>
                         </div>
                     </section>
 
-                    <section class="border-b border-white/10 px-4 py-3 sm:px-6">
+                    <section class="mt-[5px] border-b border-white/10 px-4 py-3 sm:px-6">
                         <div class="headline-scroll flex gap-4 overflow-x-auto">
                             {% for article in headline_strip %}
-                            <a href="{% url 'blog_article_read' slug=article.slug %}" class="min-w-[240px] border-r border-white/10 pr-4 last:border-r-0 last:pr-0">
+                            <a
+                                href="{% url 'blog_article_read' slug=article.slug %}"
+                                class="min-w-[240px] border-r border-white/10 pr-4 pb-[10px] last:border-r-0 last:pr-0"
+                                x-show="matches('{{ article.category|escapejs }}')"
+                                x-cloak
+                            >
                                 <p class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ article.category }}</p>
                                 <p class="mt-2 text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</p>
-                                <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">{{ article.created_at|date:"d M Y" }}</p>
+                                <p class="mt-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">{{ article.writer_name }} • {{ article.created_at|date:"d M Y" }}</p>
                             </a>
                             {% empty %}
                             <p class="text-sm text-slate-500">No headlines available yet.</p>
@@ -121,10 +160,43 @@
                         </div>
                     </section>
 
+                    <section class="border-b border-white/10 px-4 py-3 sm:px-6">
+                        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    type="button"
+                                    @click="filter = 'All'"
+                                    class="border px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.22em] transition"
+                                    :class="filter === 'All' ? 'border-primary bg-primary text-black' : 'border-white/10 text-slate-400 hover:border-white/30 hover:text-white'"
+                                >
+                                    All
+                                </button>
+                                {% for category in categories %}
+                                <button
+                                    type="button"
+                                    @click="filter = '{{ category|escapejs }}'"
+                                    class="border px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.22em] transition"
+                                    :class="filter === '{{ category|escapejs }}' ? 'border-primary bg-primary text-black' : 'border-white/10 text-slate-400 hover:border-white/30 hover:text-white'"
+                                >
+                                    {{ category }}
+                                </button>
+                                {% endfor %}
+                            </div>
+                            <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+                                Showing:
+                                <span class="text-secondary" x-text="filter"></span>
+                            </div>
+                        </div>
+                    </section>
+
                     <section class="grid gap-0 xl:grid-cols-[1.55fr_0.9fr_0.75fr]">
                         <div class="border-b border-white/10 xl:border-b-0 xl:border-r xl:border-white/10">
                             {% if hero_article %}
-                            <article class="p-4 sm:p-6">
+                            <article
+                                class="p-4 sm:p-6"
+                                x-show="matches('{{ hero_article.category|escapejs }}')"
+                                x-cloak
+                            >
                                 <a href="{% url 'blog_article_read' slug=hero_article.slug %}" class="news-link block">
                                     <div class="relative overflow-hidden border border-white/10 bg-panel">
                                         {% if hero_article.image %}
@@ -134,6 +206,13 @@
                                         {% endif %}
                                         <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent p-4">
                                             <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ hero_article.category }}</p>
+                                            {% if hero_article.tags_list %}
+                                            <div class="mt-3 flex flex-wrap gap-2">
+                                                {% for tag in hero_article.tags_list|slice:":2" %}
+                                                <span class="tag-pill">{{ tag }}</span>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
                                             <h2 class="mt-2 font-display text-3xl uppercase leading-tight tracking-tight text-white transition-colors sm:text-4xl">
                                                 {{ hero_article.title }}
                                             </h2>
@@ -142,13 +221,80 @@
                                 </a>
                                 <div class="mt-4 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                                     <span>{{ hero_article.created_at|date:"d M Y" }}</span>
-                                    <span class="text-secondary">{{ hero_article.source_name|default:"K-Beats Editorial" }}</span>
+                                    <span class="text-secondary">{{ hero_article.writer_name }}</span>
                                     <span>{{ hero_article.reading_time }} min read</span>
                                 </div>
                                 {% if hero_article.subtitle %}
                                 <p class="mt-4 text-sm leading-7 text-slate-300 sm:text-base">
                                     {{ hero_article.subtitle }}
                                 </p>
+                                {% endif %}
+                                {% if culture_stack %}
+                                {% with secondary_feature=culture_stack.0 %}
+                                <div class="mt-8 border-t border-white/10 pt-6">
+                                    <a
+                                        href="{% url 'blog_article_read' slug=secondary_feature.slug %}"
+                                        class="news-link block"
+                                        x-show="matches('{{ secondary_feature.category|escapejs }}')"
+                                        x-cloak
+                                    >
+                                        <div class="relative overflow-hidden border border-white/10 bg-panel">
+                                            {% if secondary_feature.image %}
+                                            <img src="{{ secondary_feature.image }}" alt="{{ secondary_feature.title }}" class="aspect-[16/10] w-full object-cover opacity-90" />
+                                            {% else %}
+                                            <div class="aspect-[16/10] w-full bg-white/5"></div>
+                                            {% endif %}
+                                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent p-4">
+                                                <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ secondary_feature.category }}</p>
+                                                <h3 class="mt-3 font-display text-2xl uppercase leading-tight tracking-tight text-white transition-colors sm:text-3xl">
+                                                    {{ secondary_feature.title }}
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="mt-4 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                        <span>{{ secondary_feature.created_at|date:"d M Y" }}</span>
+                                        <span class="text-secondary">{{ secondary_feature.writer_name }}</span>
+                                        <span>{{ secondary_feature.reading_time }} min read</span>
+                                        {% if secondary_feature.tags_list %}
+                                        <span class="text-primary">{{ secondary_feature.tags_list.0 }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if secondary_feature.subtitle %}
+                                    <p class="mt-4 text-sm leading-7 text-slate-300 sm:text-base">
+                                        {{ secondary_feature.subtitle }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                                {% endwith %}
+                                {% endif %}
+                                {% if compact_rows %}
+                                <div class="mt-8 border-t border-white/10 pt-5">
+                                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                                        <h3 class="font-display text-xl uppercase tracking-tight text-white">More On This Desk</h3>
+                                        <span class="story-kicker text-[10px] font-bold uppercase text-secondary">Quick Scan</span>
+                                    </div>
+                                    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                                        {% for article in compact_rows|slice:":2" %}
+                                        <a
+                                            href="{% url 'blog_article_read' slug=article.slug %}"
+                                            class="news-link block border border-white/10 p-4 transition hover:border-primary/60"
+                                            x-show="matches('{{ article.category|escapejs }}')"
+                                            x-cloak
+                                        >
+                                            <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ article.category }}</p>
+                                            <h4 class="mt-2 text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
+                                            <div class="mt-3 flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                                                <span>{{ article.created_at|date:"d M" }}</span>
+                                                <span class="text-secondary">{{ article.writer_name }}</span>
+                                                {% if article.tags_list %}
+                                                <span class="text-primary">{{ article.tags_list.0 }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                                 {% endif %}
                             </article>
                             {% else %}
@@ -159,12 +305,16 @@
                         <div class="border-b border-white/10 xl:border-b-0 xl:border-r xl:border-white/10">
                             <div class="p-4 sm:p-6">
                                 <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                                    <h3 class="font-display text-2xl uppercase tracking-tight">Front Desk</h3>
-                                    <span class="story-kicker text-[10px] font-bold uppercase text-primary">Main File</span>
+                                    <h3 class="font-display text-2xl uppercase tracking-tight">{{ front_desk_title }}</h3>
+                                    <span class="story-kicker text-[10px] font-bold uppercase text-primary">{{ front_desk_kicker }}</span>
                                 </div>
                                 <div class="mt-5 space-y-5">
-                                    {% for article in hero_support %}
-                                    <article class="border-b border-white/10 pb-5 last:border-b-0 last:pb-0">
+                                {% for article in hero_support|slice:":3" %}
+                                    <article
+                                        class="border-b border-white/10 pb-5 last:border-b-0 last:pb-0"
+                                        x-show="matches('{{ article.category|escapejs }}')"
+                                        x-cloak
+                                    >
                                         <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block">
                                             {% if article.image %}
                                             <img src="{{ article.image }}" alt="{{ article.title }}" class="mb-3 aspect-[16/10] w-full border border-white/10 object-cover" />
@@ -179,6 +329,7 @@
                                         </a>
                                         <div class="mt-3 flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-500">
                                             <span>{{ article.created_at|date:"d M" }}</span>
+                                            <span class="text-secondary">{{ article.writer_name }}</span>
                                             <span>{{ article.reading_time }} min</span>
                                         </div>
                                     </article>
@@ -191,11 +342,12 @@
 
                         <aside class="p-4 sm:p-6">
                             <div class="border border-primary/30 bg-primary/10 p-4">
-                                <p class="story-kicker text-[10px] font-bold uppercase text-primary">Live Signal</p>
-                                <h3 class="mt-3 font-display text-2xl uppercase tracking-tight">K-Beats On Air</h3>
+                                <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ live_panel_kicker }}</p>
+                                <h3 class="mt-3 font-display text-2xl uppercase tracking-tight">{{ live_panel_title }}</h3>
                                 <p class="mt-3 text-sm leading-6 text-slate-300">
-                                    Keep the station playing while you scan the latest stories, charts, and comeback analysis.
+                                    {{ live_panel_body }}
                                 </p>
+                                <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ live_panel_meta }}</p>
                                 <div class="mt-5 flex flex-col gap-3">
                                     <a href="{% url 'live' %}" class="border border-primary bg-primary px-4 py-3 text-center text-xs font-extrabold uppercase tracking-[0.2em] text-black transition hover:bg-white">
                                         Launch Live Radio
@@ -208,15 +360,27 @@
 
                             <div class="mt-6 border border-white/10 p-4">
                                 <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                                    <h3 class="font-display text-xl uppercase">Pulse Picks</h3>
-                                    <span class="story-kicker text-[10px] font-bold uppercase text-secondary">Fast Read</span>
+                                    <h3 class="font-display text-xl uppercase">{{ spotlight_title }}</h3>
+                                    <span class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ spotlight_kicker }}</span>
                                 </div>
                                 <div class="mt-4 space-y-4">
-                                    {% for article in spotlight_stack %}
-                                    <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block border-b border-white/10 pb-4 last:border-b-0 last:pb-0">
+                                {% for article in spotlight_stack %}
+                                    <a
+                                        href="{% url 'blog_article_read' slug=article.slug %}"
+                                        class="news-link block border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
+                                        x-show="matches('{{ article.category|escapejs }}')"
+                                        x-cloak
+                                    >
                                         <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ article.category }}</p>
+                                        {% if article.tags_list %}
+                                        <div class="mt-2 flex flex-wrap gap-2">
+                                            {% for tag in article.tags_list|slice:":2" %}
+                                            <span class="tag-pill">{{ tag }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
                                         <h4 class="mt-2 text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
-                                        <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.created_at|date:"d M" }}</p>
+                                        <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.writer_name }} • {{ article.created_at|date:"d M" }}</p>
                                     </a>
                                     {% empty %}
                                     <p class="text-sm text-slate-500">No pulse picks yet.</p>
@@ -229,16 +393,22 @@
                     <section class="grid gap-0 border-t border-white/10 lg:grid-cols-[1fr_1fr_0.75fr]">
                         <div class="border-b border-white/10 p-4 sm:p-6 lg:border-b-0 lg:border-r lg:border-white/10">
                             <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                                <h3 class="font-display text-2xl uppercase">Culture</h3>
-                                <span class="story-kicker text-[10px] font-bold uppercase text-primary">Feature Desk</span>
+                                <h3 class="font-display text-2xl uppercase">{{ culture_title }}</h3>
+                                <span class="story-kicker text-[10px] font-bold uppercase text-primary">{{ culture_kicker }}</span>
                             </div>
                             <div class="mt-5 grid gap-5 sm:grid-cols-2">
                                 {% for article in culture_stack %}
-                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block">
+                                <a
+                                    href="{% url 'blog_article_read' slug=article.slug %}"
+                                    class="news-link block"
+                                    x-show="matches('{{ article.category|escapejs }}')"
+                                    x-cloak
+                                >
                                     {% if article.image %}
                                     <img src="{{ article.image }}" alt="{{ article.title }}" class="aspect-[4/3] w-full border border-white/10 object-cover" />
                                     {% endif %}
                                     <p class="mt-3 story-kicker text-[10px] font-bold uppercase text-secondary">{{ article.category }}</p>
+                                    <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-secondary">{{ article.writer_name }}</p>
                                     <h4 class="mt-2 font-display text-xl uppercase leading-tight tracking-tight text-white transition-colors">
                                         {{ article.title }}
                                     </h4>
@@ -252,17 +422,23 @@
 
                         <div class="border-b border-white/10 p-4 sm:p-6 lg:border-b-0 lg:border-r lg:border-white/10">
                             <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                                <h3 class="font-display text-2xl uppercase">Community</h3>
-                                <span class="story-kicker text-[10px] font-bold uppercase text-primary">Reader Energy</span>
+                                <h3 class="font-display text-2xl uppercase">{{ community_title }}</h3>
+                                <span class="story-kicker text-[10px] font-bold uppercase text-primary">{{ community_kicker }}</span>
                             </div>
                             <div class="mt-5 space-y-4">
                                 {% for article in community_stack %}
-                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link grid gap-3 border-b border-white/10 pb-4 sm:grid-cols-[110px_1fr] last:border-b-0 last:pb-0">
+                                <a
+                                    href="{% url 'blog_article_read' slug=article.slug %}"
+                                    class="news-link grid gap-3 border-b border-white/10 pb-4 sm:grid-cols-[110px_1fr] last:border-b-0 last:pb-0"
+                                    x-show="matches('{{ article.category|escapejs }}')"
+                                    x-cloak
+                                >
                                     {% if article.image %}
                                     <img src="{{ article.image }}" alt="{{ article.title }}" class="aspect-square w-full border border-white/10 object-cover" />
                                     {% endif %}
                                     <div>
                                         <p class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ article.category }}</p>
+                                        <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-secondary">{{ article.writer_name }}</p>
                                         <h4 class="mt-2 text-base font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
                                         {% if article.subtitle %}
                                         <p class="mt-2 text-sm leading-6 text-slate-300">{{ article.subtitle|truncatechars:110 }}</p>
@@ -277,18 +453,24 @@
 
                         <div class="p-4 sm:p-6">
                             <div class="border border-secondary/25 bg-secondary/10 p-4">
-                                <p class="story-kicker text-[10px] font-bold uppercase text-secondary">Programming Note</p>
-                                <h3 class="mt-3 font-display text-2xl uppercase tracking-tight">Need More K-Pop?</h3>
+                                <p class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ discovery_panel_kicker }}</p>
+                                <h3 class="mt-3 font-display text-2xl uppercase tracking-tight">{{ discovery_panel_title }}</h3>
                                 <p class="mt-3 text-sm leading-6 text-slate-300">
-                                    Move from news into charts, comebacks, and the station feed without leaving the K-Beats ecosystem.
+                                    {{ discovery_panel_body }}
                                 </p>
                             </div>
                             <div class="mt-6 space-y-4">
                                 {% for article in food_stack %}
-                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block border border-white/10 p-4 transition hover:border-primary/60">
+                                <a
+                                    href="{% url 'blog_article_read' slug=article.slug %}"
+                                    class="news-link block border border-white/10 p-4 transition hover:border-primary/60"
+                                    x-show="matches('{{ article.category|escapejs }}')"
+                                    x-cloak
+                                >
                                     <p class="story-kicker text-[10px] font-bold uppercase text-primary">{{ article.category }}</p>
+                                    <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-secondary">{{ article.writer_name }}</p>
                                     <h4 class="mt-2 text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
-                                    <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.reading_time }} min read</p>
+                                    <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.reading_time }} min read{% if article.tags_list %} • {{ article.tags_list|join:", " }}{% endif %}</p>
                                 </a>
                                 {% empty %}
                                 <p class="text-sm text-slate-500">Additional briefs will appear here.</p>
@@ -301,7 +483,11 @@
                     <section class="border-t border-white/10">
                         <div class="grid gap-0 xl:grid-cols-3">
                             {% for group in category_groups %}
-                            <div class="border-b border-white/10 p-4 sm:p-6 xl:border-b-0 xl:border-r xl:border-white/10 last:border-r-0">
+                            <div
+                                class="border-b border-white/10 p-4 sm:p-6 xl:border-b-0 xl:border-r xl:border-white/10 last:border-r-0"
+                                x-show="filter === 'All' || filter === '{{ group.name|escapejs }}'"
+                                x-cloak
+                            >
                                 <div class="flex items-center justify-between border-b border-white/10 pb-3">
                                     <h3 class="font-display text-2xl uppercase">{{ group.name }}</h3>
                                     <span class="story-kicker text-[10px] font-bold uppercase text-primary">Desk</span>
@@ -336,18 +522,23 @@
                     <section class="grid gap-0 border-t border-white/10 xl:grid-cols-[1.5fr_0.85fr]">
                         <div class="border-b border-white/10 p-4 sm:p-6 xl:border-b-0 xl:border-r xl:border-white/10">
                             <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                                <h3 class="font-display text-3xl uppercase">Recent Posts</h3>
-                                <span class="story-kicker text-[10px] font-bold uppercase text-secondary">Archive Flow</span>
+                                <h3 class="font-display text-3xl uppercase">{{ recent_posts_title }}</h3>
+                                <span class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ recent_posts_kicker }}</span>
                             </div>
                             <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                                 {% for article in recent_posts %}
-                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block">
+                                <a
+                                    href="{% url 'blog_article_read' slug=article.slug %}"
+                                    class="news-link block"
+                                    x-show="matches('{{ article.category|escapejs }}')"
+                                    x-cloak
+                                >
                                     {% if article.image %}
                                     <img src="{{ article.image }}" alt="{{ article.title }}" class="aspect-[4/3] w-full border border-white/10 object-cover" />
                                     {% endif %}
                                     <p class="mt-3 story-kicker text-[10px] font-bold uppercase text-primary">{{ article.category }}</p>
                                     <h4 class="mt-2 text-base font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
-                                    <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.source_name|default:"K-Beats Editorial" }}</p>
+                                    <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ article.writer_name }}{% if article.tags_list %} • {{ article.tags_list|join:", " }}{% endif %}</p>
                                 </a>
                                 {% empty %}
                                 <p class="text-sm text-slate-500">Recent posts will appear here.</p>
@@ -357,20 +548,26 @@
 
                         <aside class="p-4 sm:p-6">
                             <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                                <h3 class="font-display text-2xl uppercase">Briefing Rail</h3>
-                                <span class="story-kicker text-[10px] font-bold uppercase text-primary">Quick Hits</span>
+                                <h3 class="font-display text-2xl uppercase">{{ briefing_rail_title }}</h3>
+                                <span class="story-kicker text-[10px] font-bold uppercase text-primary">{{ briefing_rail_kicker }}</span>
                             </div>
                             <div class="mt-5 space-y-4">
                                 {% for article in compact_rows %}
-                                <a href="{% url 'blog_article_read' slug=article.slug %}" class="news-link block border-b border-white/10 pb-4 last:border-b-0 last:pb-0">
+                                <a
+                                    href="{% url 'blog_article_read' slug=article.slug %}"
+                                    class="news-link block border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
+                                    x-show="matches('{{ article.category|escapejs }}')"
+                                    x-cloak
+                                >
                                     <p class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ article.category }}</p>
                                     <h4 class="mt-2 text-sm font-extrabold uppercase leading-5 text-white transition-colors">{{ article.title }}</h4>
                                     <div class="mt-2 flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-500">
                                         <span>{{ article.created_at|date:"d M" }}</span>
+                                        <span class="text-secondary">{{ article.writer_name }}</span>
                                         <span>{{ article.reading_time }} min</span>
-                                        {% if article.source_url %}
-                                        <span class="text-primary">External source</span>
-                                        {% endif %}
+                                        {% for tag in article.tags_list|slice:":1" %}
+                                        <span class="text-primary">{{ tag }}</span>
+                                        {% endfor %}
                                     </div>
                                 </a>
                                 {% empty %}
@@ -379,6 +576,32 @@
                             </div>
                         </aside>
                     </section>
+
+                    <section class="border-t border-white/10 px-4 py-6 sm:px-6">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                            <div>
+                                <p class="story-kicker text-[10px] font-bold uppercase text-primary">Editorial Desk</p>
+                                <h2 class="mt-2 font-display text-2xl uppercase tracking-tight text-white sm:text-3xl">Meet The K-Beats Writers</h2>
+                            </div>
+                            <span class="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Every story now runs through the in-house desk</span>
+                        </div>
+                        <div class="mt-5 grid gap-4 lg:grid-cols-3">
+                            {% for writer in writer_profiles %}
+                            <article class="border border-white/10 bg-white/[0.02] p-4">
+                                <div class="flex items-start gap-4">
+                                    <img src="{% static writer.avatar_path %}" alt="{{ writer.name }}" class="writer-avatar object-cover" />
+                                    <div>
+                                        <p class="story-kicker text-[10px] font-bold uppercase text-secondary">{{ writer.name }}</p>
+                                        <h3 class="mt-2 text-sm font-extrabold uppercase tracking-[0.18em] text-white">{{ writer.role }}</h3>
+                                    </div>
+                                </div>
+                                <p class="mt-4 text-sm leading-6 text-slate-300">{{ writer.bio }}</p>
+                                <p class="mt-3 text-[11px] uppercase tracking-[0.18em] text-primary">{{ writer.tone }}</p>
+                            </article>
+                            {% endfor %}
+                        </div>
+                    </section>
+
                 </div>
             </div>
         </main>

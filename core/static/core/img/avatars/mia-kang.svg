@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#05050A"/>
+  <circle cx="392" cy="118" r="84" fill="#F425C0" fill-opacity="0.2"/>
+  <circle cx="120" cy="420" r="92" fill="#00F0FF" fill-opacity="0.14"/>
+  <rect x="40" y="40" width="432" height="432" stroke="#F425C0" stroke-opacity="0.35" stroke-width="2"/>
+  <path d="M135 407C145 329 193 282 256 282C319 282 367 329 377 407" fill="#171A27"/>
+  <path d="M180 192C180 146.713 216.713 110 262 110C307.287 110 344 146.713 344 192V214C344 259.287 307.287 296 262 296C216.713 296 180 259.287 180 214V192Z" fill="#F2C4A8"/>
+  <path d="M175 194C175 116.68 226.788 88 268.886 88C327.286 88 357 130.845 357 193V213H338V192C338 149.026 310.274 120 268 120C221.608 120 194 151.935 194 194V212H175V194Z" fill="#0F1219"/>
+  <path d="M203 194C210 160 233 138 267 134C313 128 344 156 352 196C324 196 300 186 280 166C258 183 231 193 203 194Z" fill="#0F1219"/>
+  <circle cx="233" cy="210" r="8" fill="#0B0B10"/>
+  <circle cx="293" cy="210" r="8" fill="#0B0B10"/>
+  <path d="M232 251C246 263 278 264 292 251" stroke="#A35555" stroke-width="6" stroke-linecap="round"/>
+  <path d="M193 335C211 312 232 300 256 300C280 300 301 312 319 335L295 407H217L193 335Z" fill="#0F1219"/>
+  <path d="M256 330L281 362L256 392L231 362L256 330Z" fill="#F425C0"/>
+  <text x="65" y="96" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="6">MIA KANG</text>
+  <text x="66" y="126" fill="#00F0FF" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="4">NEWS REPORTER</text>
+</svg>

@@ -56,6 +56,7 @@ from .models import (
     RadioTrack, RadioStationState, RadioPlaylist, RadioPlaylistTrack, RadioSchedule,
     RadioScheduleTemplate, RadioScheduleTemplateSlot,
 )
+from .editorial import get_writer_profile, infer_editorial_tags, infer_writer_slug, serialize_editorial_tags
 
 def _staff_only_json(request):
     if not request.user.is_authenticated:
@@ -6239,74 +6240,18 @@ def profile(request):
 
 _news_cache = {'articles': [], 'ts': 0}
 
-def news(request):
-    all_blog_qs = BlogArticle.objects.order_by('-created_at')
-    all_blog = list(all_blog_qs)
-    for article in all_blog:
-        _apply_stream_images_to_article(article)
-
-    featured = all_blog[0] if all_blog else None
-    remaining = all_blog[1:] if len(all_blog) > 1 else []
-
-    cats = list(
-        all_blog_qs.order_by()
-        .values_list('category', flat=True)
-        .distinct()
-    )
-
-    return render(request, 'core/news.html', {
-        'canonical_url': request.build_absolute_uri(reverse('news')),
-        'seo_type': 'website',
-        'seo_title': 'K-Pop News & New Music Discovery | K-Beats Editorial',
-        'seo_description': 'Discover new K-pop music, comeback updates, artist stories, and fan-aware editorial coverage from the K-Beats team.',
-        'extra_schema_json': _build_seo_collection_schema(
-            request=request,
-            page_name='K-Pop News & New Music Discovery',
-            page_description='Discover new K-pop music, comeback updates, artist stories, and fan-aware editorial coverage from K-Beats.',
-            path_name='news',
-            related_links=[
-                _seo_feature_link(request, title='Discover New K-Pop Music', body='Start with a discovery guide built around charts, radio, and fresh releases.', url_name='discover_new_kpop_music'),
-                _seo_feature_link(request, title='Best K-Pop Playlist 2026', body='See the playlist-led entry point for current fan favourites.', url_name='best_kpop_playlist_2026'),
-                _seo_feature_link(request, title='Listen Live', body='Jump into the station while you browse K-pop news.', url_name='live'),
-            ],
-        ),
-        'featured': featured,
-        'articles': remaining,
-        'all_articles': all_blog,
-        'categories': cats,
-        'total_count': len(all_blog),
-        'editorial_jump_links': [
-            {
-                'title': 'Discover New K-Pop Music',
-                'href': reverse('discover_new_kpop_music'),
-                'description': 'Use the discovery guide to move from editorial stories into live radio, charts, and comeback tracking.',
-            },
-            {
-                'title': 'Best K-Pop Playlist 2026',
-                'href': reverse('best_kpop_playlist_2026'),
-                'description': 'Send playlist-intent visitors into the freshness-led playlist page instead of keeping them only in article loops.',
-            },
-            {
-                'title': 'K-Pop Radio Station UK',
-                'href': reverse('uk_kpop_radio'),
-                'description': 'Hand UK-intent readers into the station page that is built for local discovery and repeat listening.',
-            },
-        ],
-    })
-
-
 def _build_test_news_magazine_layout(articles, categories):
     article_count = len(articles)
 
     hero_article = articles[0] if article_count > 0 else None
-    hero_support = articles[1:3]
-    headline_strip = articles[3:9]
-    spotlight_stack = articles[9:13]
-    culture_stack = articles[13:17]
-    community_stack = articles[17:21]
-    food_stack = articles[21:25]
-    recent_posts = articles[25:33]
-    compact_rows = articles[33:45]
+    hero_support = articles[1:4]
+    headline_strip = articles[4:10]
+    spotlight_stack = articles[10:14]
+    culture_stack = articles[14:18]
+    community_stack = articles[18:22]
+    food_stack = articles[22:26]
+    recent_posts = articles[26:34]
+    compact_rows = articles[34:46]
 
     category_groups = []
     used_categories = set()
@@ -6332,7 +6277,7 @@ def _build_test_news_magazine_layout(articles, categories):
 
     if len(category_groups) < 3:
         fallback_names = ['Latest Dispatches', 'Scene Notes', 'After Dark Picks']
-        fallback_segments = [articles[45:49], articles[49:53], articles[53:57]]
+        fallback_segments = [articles[46:50], articles[50:54], articles[54:58]]
         for fallback_name, segment in zip(fallback_names, fallback_segments):
             if not segment:
                 continue
@@ -6380,7 +6325,7 @@ def _build_test_news_magazine_layout(articles, categories):
     }
 
 
-def test_news_magazine_lab(request):
+def _build_news_magazine_page_context(request, *, route_name):
     all_blog_qs = BlogArticle.objects.order_by('-created_at')
     all_blog = list(all_blog_qs)
     for article in all_blog:
@@ -6393,17 +6338,111 @@ def test_news_magazine_lab(request):
     )
     layout = _build_test_news_magazine_layout(all_blog, categories)
 
+    stack_titles = {
+        'hero_support': hero_article.category if (hero_article := layout.get('hero_article')) and getattr(hero_article, 'category', '') else 'Top Stories',
+        'spotlight': layout['spotlight_stack'][0].category if layout['spotlight_stack'] else 'Latest Briefs',
+        'culture': layout['culture_stack'][0].category if layout['culture_stack'] else 'Feature Stories',
+        'community': layout['community_stack'][0].category if layout['community_stack'] else 'Editor Picks',
+        'food': layout['food_stack'][0].category if layout['food_stack'] else 'More To Read',
+        'recent_posts': layout['recent_posts'][0].category if layout['recent_posts'] else 'Recent Posts',
+        'briefing_rail': layout['compact_rows'][0].category if layout['compact_rows'] else 'Latest Headlines',
+    }
+
+    distinct_writers = {
+        str(article.writer_slug or '').strip()
+        for article in all_blog
+        if str(article.writer_slug or '').strip()
+    }
+    latest_story = all_blog[0] if all_blog else None
+    latest_story_label = latest_story.created_at.strftime('%d %b %Y') if latest_story and latest_story.created_at else 'No stories yet'
+
+    live_track = None
+    live_listeners = ''
+    try:
+        live_state = RadioStationState.objects.select_related('current_track').filter(id=1).first()
+        if live_state and live_state.current_track and not _is_generated_voice_track(live_state.current_track):
+            live_track = live_state.current_track
+            if getattr(live_state, 'listeners_count', None):
+                live_listeners = f"{int(live_state.listeners_count):,} listening"
+    except Exception:
+        live_track = None
+        live_listeners = ''
+
     context = {
-        'canonical_url': request.build_absolute_uri(reverse('test_news_magazine_lab')),
+        'canonical_url': request.build_absolute_uri(reverse(route_name)),
         'seo_type': 'website',
-        'seo_title': 'K-Beats News Magazine Lab',
-        'seo_description': 'A test-only K-Beats editorial news page exploring a dense magazine layout with real article content.',
+        'seo_title': 'K-Pop News & New Music Discovery | K-Beats Editorial',
+        'seo_description': 'Discover new K-pop music, comeback updates, artist stories, and fan-aware editorial coverage from the K-Beats team.',
         'total_count': len(all_blog),
         'categories': categories,
         'all_articles': all_blog,
+        'live_writer_count': len(distinct_writers),
+        'writer_profiles': [
+            get_writer_profile('mia-kang'),
+            get_writer_profile('sunny-park'),
+            get_writer_profile('james-elliott'),
+        ],
+        'latest_story_label': latest_story_label,
+        'page_kicker': 'K-Beats Editorial',
+        'page_title': 'K-Pop News',
+        'page_intro': (
+            f"{len(all_blog)} live stories across {len(categories)} active categories"
+            + (f", written by {len(distinct_writers)} editorial voices." if distinct_writers else '.')
+        ),
+        'top_status_label': 'Live Feed',
+        'utility_links': [
+            {'label': 'Listen Live', 'href': reverse('live'), 'accent': 'secondary'},
+            {'label': 'Charts', 'href': reverse('charts'), 'accent': ''},
+        ],
+        'front_desk_title': stack_titles['hero_support'],
+        'front_desk_kicker': 'Lead Stories',
+        'spotlight_title': stack_titles['spotlight'],
+        'spotlight_kicker': 'Fast Read',
+        'culture_title': stack_titles['culture'],
+        'culture_kicker': 'Feature Desk',
+        'community_title': stack_titles['community'],
+        'community_kicker': 'Latest Coverage',
+        'food_title': stack_titles['food'],
+        'food_kicker': 'Quick Scan',
+        'recent_posts_title': stack_titles['recent_posts'],
+        'recent_posts_kicker': 'Archive Flow',
+        'briefing_rail_title': stack_titles['briefing_rail'],
+        'briefing_rail_kicker': 'Quick Hits',
+        'live_panel_kicker': 'Now Streaming',
+        'live_panel_title': live_track.title if live_track else 'K-Beats On Air',
+        'live_panel_body': (
+            f"{live_track.artist} is currently on air."
+            if live_track and getattr(live_track, 'artist', '')
+            else 'Keep the station playing while you scan the latest stories, charts, and comeback analysis.'
+        ),
+        'live_panel_meta': live_listeners or (live_track.artist if live_track and getattr(live_track, 'artist', '') else '24/7 stream'),
+        'discovery_panel_kicker': 'Next Routes',
+        'discovery_panel_title': 'Move Through K-Beats',
+        'discovery_panel_body': 'Jump from the news desk into charts, comebacks, and the live stream without losing the current story.',
+        'extra_schema_json': _build_seo_collection_schema(
+            request=request,
+            page_name='K-Pop News & New Music Discovery',
+            page_description='Discover new K-pop music, comeback updates, artist stories, and fan-aware editorial coverage from K-Beats.',
+            path_name='news',
+            related_links=[
+                _seo_feature_link(request, title='Discover New K-Pop Music', body='Start with a discovery guide built around charts, radio, and fresh releases.', url_name='discover_new_kpop_music'),
+                _seo_feature_link(request, title='Best K-Pop Playlist 2026', body='See the playlist-led entry point for current fan favourites.', url_name='best_kpop_playlist_2026'),
+                _seo_feature_link(request, title='Listen Live', body='Jump into the station while you browse K-pop news.', url_name='live'),
+            ],
+        ),
         'footer_jump_links': layout['promo_links'],
         **layout,
     }
+    return context
+
+
+def news(request):
+    context = _build_news_magazine_page_context(request, route_name='news')
+    return render(request, 'core/test_news_magazine_lab.html', context)
+
+
+def test_news_magazine_lab(request):
+    context = _build_news_magazine_page_context(request, route_name='test_news_magazine_lab')
     return _render_noindex_page(request, 'core/test_news_magazine_lab.html', context)
 
 
@@ -12357,12 +12396,23 @@ def _extract_faq_items_from_html(html, max_items=6):
 def _build_article_meta_title(article):
     base_title = (article.title or '').strip()
     if not base_title:
-        return 'K-Beats Blog'
-    title = f"{base_title} | K-Beats K-Pop Blog"
-    return title[:60].rstrip()
+        return 'K-Pop News | K-Beats Radio'
+
+    category = (article.category or 'K-Pop News').strip()
+    primary_tag = article.tags_list[0] if getattr(article, 'tags_list', None) else ''
+    title_parts = [base_title]
+    if primary_tag and primary_tag.lower() not in base_title.lower():
+        title_parts.append(primary_tag)
+    if category and category.lower() not in base_title.lower():
+        title_parts.append(category)
+    title_parts.append('K-Beats Radio')
+    title = ' | '.join(part for part in title_parts if part)
+    return title[:68].rstrip(' |')
 
 
 def _build_article_meta_description(article):
+    category = (article.category or 'K-Pop').strip()
+    writer_name = getattr(article, 'writer_name', 'K-Beats Editorial')
     candidates = [
         (article.subtitle or '').strip(),
         _strip_html_tags(article.body_html),
@@ -12370,13 +12420,43 @@ def _build_article_meta_description(article):
     for raw in candidates:
         if not raw:
             continue
-        text = raw[:157].rstrip()
-        if len(raw) > 157:
-            text = f"{text}..."
-        if len(text) >= 70:
-            return text
-        return f"{text} | K-Beats K-Pop blog update"
-    return "Read the latest K-Pop news, comebacks, and culture features on the K-Beats blog."
+        trimmed = re.sub(r'\s+', ' ', raw).strip()
+        if len(trimmed) >= 110:
+            suffix = " Read more on K-Beats."
+            available = max(0, 158 - len(suffix))
+            text = trimmed[:available].rstrip(' ,.;:')
+            return f"{text}{suffix}"
+        if len(trimmed) >= 50:
+            suffix = f" Read the full {category.lower()} story on K-Beats."
+            available = max(0, 158 - len(suffix))
+            text = trimmed[:available].rstrip(' ,.;:')
+            return f"{text}{suffix}"
+
+    fallback = f"Read {category.lower()} coverage, analysis, and related artist updates from {writer_name} on K-Beats Radio."
+    return fallback[:158].rstrip(' ,.;:') + '.'
+
+
+def _article_anchor_phrases(title):
+    title = re.sub(r'\s+', ' ', (title or '')).strip()
+    if not title:
+        return []
+
+    phrases = [title]
+    split_parts = re.split(r'\s[:-]\s|[|()]', title)
+    for part in split_parts:
+        part = part.strip(" -:|")
+        if len(part) >= 8:
+            phrases.append(part)
+
+    deduped = []
+    seen = set()
+    for phrase in phrases:
+        normalized = phrase.casefold()
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        deduped.append(phrase)
+    return deduped
 
 
 def _inject_internal_links(html, article, all_articles):
@@ -12385,8 +12465,8 @@ def _inject_internal_links(html, article, all_articles):
         return body, 0
 
     # Keep links relevant and not spammy.
-    max_total_links = 6
-    max_article_links = 4
+    max_total_links = 10
+    max_article_links = 6
     links_added = 0
     article_links_added = 0
 
@@ -12409,10 +12489,11 @@ def _inject_internal_links(html, article, all_articles):
     for candidate in all_articles:
         if candidate.pk == article.pk:
             continue
-        phrase = (candidate.title or '').strip()
-        if len(phrase) < 8:
-            continue
-        article_targets.append((phrase, reverse('blog_article_read', kwargs={'slug': candidate.slug})))
+        candidate_url = reverse('blog_article_read', kwargs={'slug': candidate.slug})
+        for phrase in _article_anchor_phrases(candidate.title):
+            if len(phrase) < 8:
+                continue
+            article_targets.append((phrase, candidate_url, candidate.title))
 
     article_targets.sort(key=lambda item: len(item[0]), reverse=True)
 
@@ -12444,7 +12525,7 @@ def _inject_internal_links(html, article, all_articles):
             segment_lower = segment.lower()
 
         # Then connect to related articles.
-        for phrase, url in article_targets:
+        for phrase, url, title in article_targets:
             if links_added >= max_total_links or article_links_added >= max_article_links:
                 break
             if url.lower() in segment_lower:
@@ -12454,7 +12535,7 @@ def _inject_internal_links(html, article, all_articles):
                 continue
             segment = phrase_pattern.sub(
                 lambda m: (
-                    f'<a href="{url}" title="Read: {phrase}" rel="internal">{m.group(0)}</a>'
+                    f'<a href="{url}" title="Read: {title}" rel="internal">{m.group(0)}</a>'
                 ),
                 segment,
                 count=1,
@@ -12466,6 +12547,50 @@ def _inject_internal_links(html, article, all_articles):
         chunks[idx] = segment
 
     return ''.join(chunks), links_added
+
+
+def _build_related_article_cluster(article, all_articles, limit=6):
+    article_tags = {tag.casefold() for tag in getattr(article, 'tags_list', [])}
+    scored = []
+    for candidate in all_articles:
+        if candidate.pk == article.pk:
+            continue
+
+        score = 0
+        if candidate.category == article.category:
+            score += 4
+        if getattr(candidate, 'writer_slug', '') == getattr(article, 'writer_slug', ''):
+            score += 2
+        candidate_tags = {tag.casefold() for tag in getattr(candidate, 'tags_list', [])}
+        score += len(article_tags & candidate_tags) * 2
+        if not score:
+            score = 1
+        scored.append((score, getattr(candidate, 'created_at', None), candidate))
+
+    scored.sort(key=lambda item: (item[0], item[1] or timezone.now()), reverse=True)
+    return [candidate for _, __, candidate in scored[:limit]]
+
+
+def _inject_related_reading_block(html, article, related_articles):
+    body = html or ''
+    if not body or not related_articles:
+        return body
+    if 'article-related-reading' in body:
+        return body
+
+    items = ''.join(
+        f'<li><a href="{reverse("blog_article_read", kwargs={"slug": related.slug})}" '
+        f'title="Read {related.title}">{related.title}</a></li>'
+        for related in related_articles
+    )
+    related_block = (
+        '<section class="article-related-reading">'
+        '<h2>Related Reading</h2>'
+        '<p>Explore the next part of this story cluster with more K-Beats coverage.</p>'
+        f'<ul>{items}</ul>'
+        '</section>'
+    )
+    return f'{body}{related_block}'
 
 
 def _inject_article_advert_blocks(html, live_url, poster_url):
@@ -12512,19 +12637,16 @@ def blog_article_read(request, slug):
     from django.shortcuts import get_object_or_404
     article = get_object_or_404(BlogArticle, slug=slug)
     _apply_stream_images_to_article(article)
-    related = (
-        BlogArticle.objects
-        .filter(category=article.category)
-        .exclude(pk=article.pk)[:3]
-    )
-    related = list(related)
+    all_articles = list(BlogArticle.objects.order_by('-created_at'))
+    related = _build_related_article_cluster(article, all_articles, limit=6)
     for related_article in related:
         _apply_stream_images_to_article(related_article)
     canonical_url = request.build_absolute_uri(
         reverse('blog_article_read', kwargs={'slug': article.slug})
     )
+    article_body_html = _inject_related_reading_block(article.body_html, article, related[:6])
     article_body_html = _inject_article_advert_blocks(
-        article.body_html,
+        article_body_html,
         reverse('live'),
         static('core/img/listening-live-poster.svg'),
     )
@@ -12890,11 +13012,27 @@ def _do_blog_generate():
         if not image_3:
             image_3 = image_2 or image_1
 
+        writer_slug = infer_writer_slug(
+            title=generated_title,
+            category=category,
+            source_name=source,
+        )
+        editorial_tags = serialize_editorial_tags(
+            infer_editorial_tags(
+                title=generated_title,
+                category=category,
+                source_name=source,
+                source_url=link,
+            )
+        )
+
         article = BlogArticle.objects.create(
             slug=base_slug,
             title=generated_title,
             subtitle=subtitle,
             category=category,
+            writer_slug=writer_slug,
+            editorial_tags=editorial_tags,
             source_title=title,
             source_url=link,
             source_name=source,

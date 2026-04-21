@@ -5,6 +5,8 @@ from django.conf import settings
 from django.utils.text import slugify
 import bleach
 
+from .editorial import WRITER_CHOICES, get_writer_profile, parse_editorial_tags
+
 class Ranking(models.Model):
     TIMEFRAME_CHOICES = (
         ('daily', 'Daily'),
@@ -240,6 +242,12 @@ class BlogArticle(models.Model):
     title = models.CharField(max_length=300)
     subtitle = models.CharField(max_length=500, blank=True)
     category = models.CharField(max_length=50)
+    writer_slug = models.CharField(max_length=40, choices=WRITER_CHOICES, default='mia-kang')
+    editorial_tags = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text='Comma-separated editorial tags, for example: Breaking News, Exclusive',
+    )
     source_title = models.CharField(max_length=300)
     source_url = models.URLField(max_length=500, blank=True)
     source_name = models.CharField(max_length=100, blank=True)
@@ -290,6 +298,18 @@ class BlogArticle(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def writer_profile(self):
+        return get_writer_profile(self.writer_slug)
+
+    @property
+    def writer_name(self):
+        return self.writer_profile.name
+
+    @property
+    def tags_list(self):
+        return parse_editorial_tags(self.editorial_tags)
 
 
 class UserProfile(models.Model):

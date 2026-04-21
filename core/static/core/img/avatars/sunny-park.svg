@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#05050A"/>
+  <circle cx="98" cy="112" r="84" fill="#00F0FF" fill-opacity="0.18"/>
+  <circle cx="408" cy="406" r="92" fill="#F425C0" fill-opacity="0.16"/>
+  <rect x="40" y="40" width="432" height="432" stroke="#00F0FF" stroke-opacity="0.35" stroke-width="2"/>
+  <path d="M136 407C148 330 197 280 258 280C319 280 368 330 380 407" fill="#1A1325"/>
+  <path d="M182 194C182 147.608 219.608 110 266 110C312.392 110 350 147.608 350 194V217C350 263.392 312.392 301 266 301C219.608 301 182 263.392 182 217V194Z" fill="#F5CAA7"/>
+  <path d="M168 182C168 119 214 90 262 90C309 90 363 119 363 182C363 202 355 220 344 232C333 214 322 202 300 195C279 188 260 188 244 196C216 210 198 233 187 249C176 235 168 209 168 182Z" fill="#24192E"/>
+  <path d="M198 192C230 198 258 188 284 166C305 184 326 193 348 194" stroke="#24192E" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="235" cy="218" r="8" fill="#0B0B10"/>
+  <circle cx="297" cy="218" r="8" fill="#0B0B10"/>
+  <path d="M239 256C252 270 282 270 295 256" stroke="#B05A66" stroke-width="6" stroke-linecap="round"/>
+  <path d="M205 339C223 316 244 305 266 305C288 305 309 316 327 339L304 407H228L205 339Z" fill="#24192E"/>
+  <path d="M216 344C228 356 244 362 266 362C288 362 304 356 316 344" stroke="#00F0FF" stroke-width="5" stroke-linecap="round"/>
+  <text x="66" y="96" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="6">SUNNY PARK</text>
+  <text x="66" y="126" fill="#F425C0" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="4">FAN CULTURE</text>
+</svg>

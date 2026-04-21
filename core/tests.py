@@ -95,6 +95,117 @@ class BlogArticleSanitizationTests(TestCase):
         self.assertIn('<h3>Header</h3>', article.body_html)
         self.assertIn('<ul><li>One</li></ul>', article.body_html)
 
+    def test_writer_profile_and_tags_are_exposed(self):
+        article = BlogArticle.objects.create(
+            slug='writer-profile-test',
+            title='Why K-pop Keeps Growing Worldwide',
+            subtitle='',
+            category='News',
+            writer_slug='james-elliott',
+            editorial_tags='Breaking News, Opinion',
+            source_title='Source',
+            source_url='https://example.com',
+            source_name='Example',
+            image='',
+            image_2='',
+            body_html='<p>Hello</p>',
+            reading_time=4,
+        )
+
+        self.assertEqual(article.writer_name, 'James Park')
+        self.assertEqual(article.writer_profile.role, 'Music Critic & Global K-pop Commentator')
+        self.assertEqual(article.tags_list, ['Breaking News', 'Opinion'])
+
+    def test_article_meta_helpers_are_more_specific(self):
+        article = BlogArticle.objects.create(
+            slug='meta-helper-test',
+            title='IVE Expand Their Global Tour',
+            subtitle='IVE announce new Europe dates and a broader global tour expansion for fans following the latest comeback cycle.',
+            category='Tour',
+            writer_slug='mia-kang',
+            editorial_tags='Breaking News, Exclusive',
+            source_title='Source',
+            source_url='https://example.com',
+            source_name='Example',
+            image='',
+            image_2='',
+            body_html='<p>Story body.</p>',
+            reading_time=3,
+        )
+
+        title = core_views._build_article_meta_title(article)
+        description = core_views._build_article_meta_description(article)
+
+        self.assertIn('IVE Expand Their Global Tour', title)
+        self.assertIn('K-Beats Radio', title)
+        self.assertGreaterEqual(len(description), 90)
+        self.assertIn('K-Beats', description)
+
+
+@override_settings(
+    STORAGES={
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+)
+class NewsEditorialRenderingTests(TestCase):
+    def setUp(self):
+        self.article = BlogArticle.objects.create(
+            slug='ateez-global-takeover',
+            title='ATEEZ Global Takeover Continues',
+            subtitle='A sharp look at the latest momentum.',
+            category='News',
+            writer_slug='mia-kang',
+            editorial_tags='Breaking News, Exclusive',
+            source_title='External Source',
+            source_url='https://example.com/story',
+            source_name='Koreaboo',
+            image='https://example.com/image.jpg',
+            image_2='',
+            body_html='<p>Story body.</p>',
+            reading_time=3,
+        )
+
+    def test_news_page_uses_writer_bylines_and_shows_editorial_desk(self):
+        response = self.client.get(reverse('news'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Meet The K-Beats Writers')
+        self.assertContains(response, 'Mia Kang')
+        self.assertContains(response, 'Breaking News')
+        self.assertNotContains(response, 'Koreaboo')
+
+    def test_article_page_schema_uses_person_author(self):
+        response = self.client.get(reverse('blog_article_read', args=[self.article.slug]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"@type": "Person"')
+        self.assertContains(response, '"name": "Mia Kang"')
+        self.assertContains(response, 'K-pop News Reporter &amp; Trend Analyst')
+
+    def test_article_page_injects_related_reading_cluster(self):
+        BlogArticle.objects.create(
+            slug='related-follow-up',
+            title='ATEEZ Follow-Up Analysis',
+            subtitle='More context for linked reading.',
+            category='News',
+            writer_slug='mia-kang',
+            editorial_tags='Breaking News',
+            source_title='Source',
+            source_url='https://example.com/follow-up',
+            source_name='Example',
+            image='https://example.com/related.jpg',
+            image_2='',
+            body_html='<p>Related story.</p>',
+            reading_time=4,
+        )
+
+        response = self.client.get(reverse('blog_article_read', args=[self.article.slug]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Related Reading')
+        self.assertContains(response, 'ATEEZ Follow-Up Analysis')
+
 
 @override_settings(
     STORAGES={

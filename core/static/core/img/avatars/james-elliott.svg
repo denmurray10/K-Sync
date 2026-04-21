@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#05050A"/>
+  <circle cx="382" cy="100" r="86" fill="#00F0FF" fill-opacity="0.16"/>
+  <circle cx="102" cy="416" r="96" fill="#F425C0" fill-opacity="0.14"/>
+  <rect x="40" y="40" width="432" height="432" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="2"/>
+  <path d="M136 410C144 332 194 280 258 280C322 280 372 332 380 410" fill="#16202A"/>
+  <path d="M182 196C182 149.608 219.608 112 266 112C312.392 112 350 149.608 350 196V219C350 265.392 312.392 303 266 303C219.608 303 182 265.392 182 219V196Z" fill="#E9C3A1"/>
+  <path d="M180 197C180 127 231 92 284 92C328 92 364 128 364 177C364 219 336 224 326 202C321 191 313 181 298 171C282 160 267 156 246 158C220 160 198 176 180 197Z" fill="#11161C"/>
+  <path d="M199 199C226 198 252 188 279 167C298 184 319 196 345 201" stroke="#11161C" stroke-width="17" stroke-linecap="round"/>
+  <circle cx="238" cy="220" r="8" fill="#0B0B10"/>
+  <circle cx="299" cy="220" r="8" fill="#0B0B10"/>
+  <path d="M240 257C253 269 283 269 296 257" stroke="#8F5B4F" stroke-width="6" stroke-linecap="round"/>
+  <path d="M207 344C226 318 246 307 266 307C286 307 306 318 325 344L301 410H231L207 344Z" fill="#11161C"/>
+  <path d="M240 339H292L302 355H230L240 339Z" fill="#00F0FF"/>
+  <text x="64" y="96" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="6">JAMES ELLIOTT</text>
+  <text x="66" y="126" fill="#00F0FF" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="4">GLOBAL COMMENTARY</text>
+</svg>

@@ -26,10 +26,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             "articleSection": "{{ article.category|escapejs }}",
             "inLanguage": "en-GB",
             "wordCount": "{{ article_word_count }}",
-            "keywords": "{{ article.category|escapejs }}, K-Pop, comeback rankings, K-Beats",
+            "keywords": "{% if article.tags_list %}{{ article.tags_list|join:', '|escapejs }}, {% endif %}{{ article.category|escapejs }}, K-Pop, K-Beats",
             "author": {
-                "@type": "Organization",
-                "name": "K-Beats Editorial"
+                "@type": "Person",
+                "name": "{{ article.writer_name|escapejs }}"
             },
             "publisher": {
                 "@type": "Organization",
@@ -285,6 +285,46 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 height: auto;
                 display: block;
             }
+            .article-body .article-related-reading {
+                margin: 2.4rem 0;
+                border: 1px solid rgba(0, 240, 255, 0.25);
+                background: linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 0, 0, 0.96));
+                padding: 1.4rem 1.5rem;
+            }
+            .article-body .article-related-reading h2 {
+                margin-top: 0;
+            }
+            .article-body .article-related-reading p {
+                margin-bottom: 0.9rem;
+            }
+            .article-body .article-related-reading ul {
+                margin: 0;
+                padding-left: 1.2rem;
+            }
+            .article-body .article-related-reading li {
+                margin-bottom: 0.7rem;
+                color: #e2e8f0;
+            }
+            .article-body .article-related-reading a {
+                color: #00f0ff;
+                text-decoration: none;
+                font-weight: 700;
+            }
+            .article-body .article-related-reading a:hover {
+                color: #f425c0;
+            }
+            .tag-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                border: 1px solid rgba(255, 255, 255, 0.14);
+                background: rgba(255, 255, 255, 0.05);
+                padding: 0.45rem 0.65rem;
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+            }
         </style>
     </head>
     <body
@@ -350,6 +390,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             >
                                 {{ article.category }}
                             </span>
+                            {% for tag in article.tags_list %}
+                            <span class="tag-pill">{{ tag }}</span>
+                            {% endfor %}
                             <span class="bg-white/10 text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest">
                                 {{ article.reading_time }} min read
                             </span>
@@ -378,9 +421,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <span class="font-mono text-[10px] tracking-widest uppercase text-slate-500">
                                 {{ article.created_at|date:"M d, Y \a\t H:i" }}
                             </span>
-                            <span class="font-mono text-[10px] tracking-widest uppercase text-slate-600">
-                                K-Beats Editorial
-                            </span>
+                            <div class="flex items-center gap-3">
+                                <img src="{% static article.writer_profile.avatar_path %}" alt="{{ article.writer_name }}" class="h-10 w-10 border border-white/10 object-cover" />
+                                <div>
+                                    <span class="block font-mono text-[10px] tracking-widest uppercase text-secondary">
+                                        {{ article.writer_name }}
+                                    </span>
+                                    <span class="block text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                                        {{ article.writer_profile.role }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -441,6 +492,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                             <!-- Article Info Card -->
                             <div class="border border-white/10 bg-white/[0.02] p-6 mb-6">
+                                <div class="flex items-start gap-4 border-b border-white/10 pb-4">
+                                    <img src="{% static article.writer_profile.avatar_path %}" alt="{{ article.writer_name }}" class="h-16 w-16 border border-white/10 object-cover" />
+                                    <div>
+                                        <span class="font-mono text-[9px] tracking-widest uppercase text-secondary block">Written by</span>
+                                        <h3 class="mt-2 font-black text-lg uppercase tracking-[0.16em] text-white">{{ article.writer_name }}</h3>
+                                        <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-primary">{{ article.writer_profile.role }}</p>
+                                        <p class="mt-3 text-sm leading-6 text-slate-300">{{ article.writer_profile.bio }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border border-white/10 bg-white/[0.02] p-6 mb-6">
                                 <h3 class="font-black text-xs uppercase tracking-[0.2em] text-white mb-4 pb-3 border-b border-white/10">
                                     Article Info
                                 </h3>
@@ -457,6 +520,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Reading Time</span>
                                         <span class="font-black text-sm uppercase tracking-tight text-white">{{ article.reading_time }} minutes</span>
                                     </div>
+                                    {% if article.tags_list %}
+                                    <div>
+                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Tags</span>
+                                        <div class="mt-2 flex flex-wrap gap-2">
+                                            {% for tag in article.tags_list %}
+                                            <span class="tag-pill">{{ tag }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
                                 </div>
                             </div>
 
