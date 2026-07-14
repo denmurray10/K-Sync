@@ -328,3 +328,27 @@ Use this document as the baseline for:
 - launch preflight checks
 
 If the brand evolves, update this file first so future work stays continuous rather than drifting page by page.
+
+---
+
+## Addendum — Consistency Rulings (14 Jul 2026)
+
+Recorded during the site-wide completeness and design pass so future work doesn't re-litigate these.
+
+### Component exceptions to "sharp edges"
+- **Circular icon chips** (footer social/quick links, header settings, avatar frames) are an allowed exception: `rounded-full` on square icon-only buttons reads as a "control", not a "card". Everything else stays sharp (0px radius).
+- The legacy `neon-gradient` + pill buttons (achievement popup) are grandfathered but should not be used in new work; prefer the sharp-shadow CTA (`shadow-[4px_4px_0px] → translate` hover).
+
+### Shared head fragment
+- Every page template includes `core/shared_head.html`, which is now the single source for: the Cinzel font load (fixes the logo changing typeface between pages), the `.nav-cinzel` rule, and the `prefers-reduced-motion` guard. Do not remove it from new templates.
+
+### Tracking
+- Google Tag Manager, Meta Pixel, Clarity, and the consent banner are injected by `GoogleTagManagerMiddleware` only. Never hardcode tracking snippets into templates again — the middleware is the single source of truth (IDs come from env, with safe defaults in settings).
+
+### Accessibility floors
+- Minimum body-copy contrast on black: use `text-slate-400` (7:1) or brighter for anything meaningful; `text-slate-600` (2.8:1) is decoration-only.
+- Micro-labels: keep the mono-caps style, but treat 11px as the floor for labels a user must read; 9–10px is reserved for pure decoration.
+- All reveal/scroll animations must remain functional under `prefers-reduced-motion` (handled globally by the shared head fragment).
+
+### Truth-in-content rule
+- No invented numbers (member counts, listener stats), no fake scarcity ("Sold Out", strikethrough discounts) on placeholder content. If the real thing doesn't exist yet, label it honestly ("Coming soon", "Launch drop", "Launch price").

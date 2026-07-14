@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8" />
     
@@ -59,12 +52,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         [x-cloak] { display: none !important; }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
     {% include 'core/header.html' %}
 
@@ -109,7 +99,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 </span>
                                 <div>
                                     <span class="font-black text-xs uppercase tracking-tight text-white">24/7 Live Radio</span>
-                                    <span class="block font-mono text-[9px] tracking-widest uppercase text-slate-600">Non-stop K-Pop hits from Seoul</span>
+                                    <span class="block font-mono text-[9px] tracking-widest uppercase text-slate-400">Non-stop K-Pop hits from Seoul</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 group">
@@ -118,7 +108,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 </span>
                                 <div>
                                     <span class="font-black text-xs uppercase tracking-tight text-white">Real-Time Charts</span>
-                                    <span class="block font-mono text-[9px] tracking-widest uppercase text-slate-600">Track your favourites across all platforms</span>
+                                    <span class="block font-mono text-[9px] tracking-widest uppercase text-slate-400">Track your favourites across all platforms</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 group">
@@ -127,7 +117,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 </span>
                                 <div>
                                     <span class="font-black text-xs uppercase tracking-tight text-white">Fan Community</span>
-                                    <span class="block font-mono text-[9px] tracking-widest uppercase text-slate-600">Join 2M+ fans worldwide</span>
+                                    <span class="block font-mono text-[9px] tracking-widest uppercase text-slate-400">Join 2M+ fans worldwide</span>
                                 </div>
                             </div>
                         </div>
@@ -142,7 +132,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <div class="p-8 md:p-10">
                                 <div class="mb-8">
                                     <h2 class="font-black text-2xl uppercase tracking-tight text-white">Create Account</h2>
-                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mt-2">Start your journey</p>
+                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mt-2">Start your journey</p>
                                 </div>
 
                                 <form class="space-y-5" action="{% url 'signup' %}" method="post">
@@ -159,7 +149,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <div>
                                         <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-2" for="username">Username</label>
                                         <div class="relative">
-                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">person</span>
+                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400 text-lg">person</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-secondary transition-colors font-mono text-sm"
                                                 id="username" name="username" placeholder="your_username" type="text" required />
@@ -170,7 +160,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <div>
                                         <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-2" for="email">Email Address</label>
                                         <div class="relative">
-                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">mail</span>
+                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400 text-lg">mail</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-secondary transition-colors font-mono text-sm"
                                                 id="email" name="email" placeholder="you@example.com" type="email" required />
@@ -181,7 +171,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <div>
                                         <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-2" for="password">Password</label>
                                         <div class="relative">
-                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">lock</span>
+                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400 text-lg">lock</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-secondary transition-colors font-mono text-sm"
                                                 id="password" name="password" placeholder="Min 8 characters" type="password" required />
@@ -192,7 +182,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <div>
                                         <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-2" for="password2">Confirm Password</label>
                                         <div class="relative">
-                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">verified_user</span>
+                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400 text-lg">verified_user</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-secondary transition-colors font-mono text-sm"
                                                 id="password2" name="password2" placeholder="Re-enter password" type="password" required />
@@ -221,7 +211,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- Divider -->
                                 <div class="flex items-center my-6">
                                     <div class="flex-1 border-t border-white/10"></div>
-                                    <span class="px-4 font-mono text-[9px] tracking-widest uppercase text-slate-600">Or sign up with</span>
+                                    <span class="px-4 font-mono text-[9px] tracking-widest uppercase text-slate-400">Or sign up with</span>
                                     <div class="flex-1 border-t border-white/10"></div>
                                 </div>
 
@@ -240,7 +230,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                                 <!-- Login link -->
                                 <div class="mt-6 text-center border-t border-white/10 pt-6">
-                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600">
+                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400">
                                         Already have an account?
                                         <a class="text-secondary font-black hover:text-white transition-colors ml-1" href="{% url 'login' %}">Log In</a>
                                     </p>

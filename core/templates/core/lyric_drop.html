@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     
@@ -44,12 +37,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .option-btn { transition: all 0.2s ease; }
         .option-btn:hover:not(:disabled) { border-color: #f425c0; background: rgba(244, 37, 192, 0.05); transform: translateY(-2px); }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="font-sans text-white" x-data="lyricDrop()" x-init="boot()">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 
     <div class="relative min-h-screen bg-black flex flex-col">
@@ -63,20 +53,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </a>
                 <div>
                     <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Lyric Drop</h1>
-                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600">Fill in the Blank</p>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-400">Fill in the Blank</p>
                 </div>
             </div>
             <div class="flex items-center gap-6">
                 <div class="text-center">
-                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Round</span>
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Round</span>
                     <span class="font-black text-lg text-white" x-text="`${currentRound}/${totalRounds}`">0/0</span>
                 </div>
                 <div class="text-center">
-                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Score</span>
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Score</span>
                     <span class="font-black text-lg text-primary" :class="{'animate-score-pop': scorePop}" x-text="score">0</span>
                 </div>
                 <div class="text-center">
-                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Time</span>
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Time</span>
                     <span class="font-black text-lg" :class="timer <= 5 ? 'text-red-500 animate-countdown' : 'text-secondary'" x-text="timer + 's'">0s</span>
                 </div>
             </div>

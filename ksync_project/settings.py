@@ -72,6 +72,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.seo_defaults',
+                'core.context_processors.gamification',
             ],
         },
     },
@@ -287,3 +288,17 @@ IMAGE_INTEGRITY_CHECK_HOUR = int(os.environ.get('IMAGE_INTEGRITY_CHECK_HOUR', '3
 IMAGE_INTEGRITY_CHECK_MINUTE = int(os.environ.get('IMAGE_INTEGRITY_CHECK_MINUTE', '15'))
 IMAGE_INTEGRITY_CHECK_LIMIT = int(os.environ.get('IMAGE_INTEGRITY_CHECK_LIMIT', '0'))
 IMAGE_INTEGRITY_CHECK_TIMEOUT_SECONDS = float(os.environ.get('IMAGE_INTEGRITY_CHECK_TIMEOUT_SECONDS', '15'))
+
+# ── Email (password reset + transactional) ───────────────────────────────────
+# Configure SMTP via env in production; falls back to console backend so
+# password-reset emails print to the server log instead of silently failing.
+EMAIL_HOST = config('EMAIL_HOST', default='').strip()
+if EMAIL_HOST:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_PORT = int(config('EMAIL_PORT', default='587'))
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+    EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='K-Beats <no-reply@kbeats.radio>')

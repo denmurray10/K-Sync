@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
 <meta charset="utf-8"/>
 
@@ -83,12 +76,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         animation: float-note 4s ease-in-out infinite;
     }
 </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 
 {% include 'core/header.html' %}
@@ -354,7 +344,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">expand_more</span>
                         </div>
                     </div>
-                    <p x-show="selectedGroup && !loadingSongs && songs.length > 0" class="text-slate-600 font-mono text-[10px] tracking-widest uppercase" x-text="songs.length + ' songs available'"></p>
+                    <p x-show="selectedGroup && !loadingSongs && songs.length > 0" class="text-slate-400 font-mono text-[10px] tracking-widest uppercase" x-text="songs.length + ' songs available'"></p>
                 </div>
 
                 <!-- Hidden field to pass group name instead of slug -->
@@ -425,7 +415,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         {% if req.listener_name %}
                         <span class="text-white text-xs font-bold tracking-tight">{{ req.listener_name }}</span>
                         {% endif %}
-                        <span class="text-slate-600 font-mono text-[10px] tracking-widest uppercase">{{ req.created_at|timesince }} ago</span>
+                        <span class="text-slate-400 font-mono text-[10px] tracking-widest uppercase">{{ req.created_at|timesince }} ago</span>
                     </div>
                 </div>
             </div>

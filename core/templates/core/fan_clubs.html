@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     
@@ -80,12 +73,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
 
 
 {% include 'core/header.html' %}
@@ -194,7 +184,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <h2 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase">OFFICIAL <br/><span class="text-primary [-webkit-text-stroke:1px_theme(colors.primary)] text-transparent">CLUBS</span></h2>
                     <p class="text-slate-400 mt-4 font-mono text-sm tracking-widest uppercase">Verified fan communities for your favourite groups.</p>
                 </div>
-                <a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase reveal-left" style="transition-delay: 200ms;" href="#">
+                <a class="hidden sm:flex items-center text-white text-xs tracking-[0.2em] font-bold hover:text-primary transition-colors gap-2 pb-2 uppercase reveal-left" style="transition-delay: 200ms;" href="{% url 'idols' %}?type=groups">
                     Browse All <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
@@ -300,9 +290,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                     <div class="p-6 border-t border-white/10">
                         <h3 class="text-white/30 font-black text-2xl uppercase tracking-tight leading-tight">{% cycle "STRAY KIDS" "BLACKPINK" "BTS" "TWICE" "IU" "aespa" %}</h3>
-                        <p class="text-slate-600 font-mono text-[10px] tracking-widest uppercase mt-1">{% cycle "JYP Entertainment" "YG Entertainment" "BIGHIT" "JYP Entertainment" "EDAM" "SM Entertainment" %}</p>
+                        <p class="text-slate-400 font-mono text-[10px] tracking-widest uppercase mt-1">{% cycle "JYP Entertainment" "YG Entertainment" "BIGHIT" "JYP Entertainment" "EDAM" "SM Entertainment" %}</p>
                         <div class="flex items-center justify-between pt-4 mt-4 border-t border-white/10">
-                            <div class="flex items-center gap-1.5 text-slate-600 text-xs">
+                            <div class="flex items-center gap-1.5 text-slate-400 text-xs">
                                 <span class="material-symbols-outlined text-sm">group</span>
                                 <span class="font-mono text-[10px]">{% cycle "2.1K" "3.8K" "5.2K" "1.9K" "2.4K" "1.7K" %} fans</span>
                             </div>
@@ -1109,7 +1099,3 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 });
-</script>
-</body>
-</html>
-

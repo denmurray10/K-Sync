@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     
@@ -78,13 +71,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         @keyframes vs-bounce { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
         .vs-badge { animation: vs-bounce 2s ease-in-out infinite; }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="font-sans text-white">
 {% include "core/header.html" %}
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 
     <!-- ── NAV ── -->
@@ -139,7 +129,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 Start Playing
             </a>
 
-            <p class="mt-6 font-mono text-[10px] text-slate-600 uppercase tracking-widest">10 rounds · free to play · no login needed</p>
+            <p class="mt-6 font-mono text-[10px] text-slate-400 uppercase tracking-widest">10 rounds · free to play · no login needed</p>
 
             <!-- Floating VS mock -->
             <div class="mt-20 flex items-center justify-center gap-4 md:gap-8 animate-float" style="padding-bottom: 50px;">
@@ -177,7 +167,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <!-- Scroll hint -->
         <div class="absolute bottom-8 left-0 right-0 flex justify-center">
-            <div class="flex flex-col items-center gap-2 text-slate-600">
+            <div class="flex flex-col items-center gap-2 text-slate-400">
                 <span class="font-mono text-[9px] uppercase tracking-widest">Scroll to explore</span>
                 <span class="material-symbols-outlined text-sm animate-bounce">keyboard_arrow_down</span>
             </div>
@@ -279,7 +269,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
 
-            <p class="reveal text-center font-mono text-[10px] text-slate-600 uppercase tracking-widest">
+            <p class="reveal text-center font-mono text-[10px] text-slate-400 uppercase tracking-widest">
                 Perfect game = 10 correct answers at ×5 = <span class="text-primary font-black">4,500 points</span>
             </p>
         </div>
@@ -361,17 +351,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="mt-8 flex items-center justify-center gap-8 text-center">
                 <div>
                     <span class="block font-black text-2xl text-white">10</span>
-                    <span class="font-mono text-[9px] uppercase tracking-widest text-slate-600">Rounds</span>
+                    <span class="font-mono text-[9px] uppercase tracking-widest text-slate-400">Rounds</span>
                 </div>
                 <div class="w-px h-8 bg-white/10"></div>
                 <div>
                     <span class="block font-black text-2xl text-primary">×5</span>
-                    <span class="font-mono text-[9px] uppercase tracking-widest text-slate-600">Max Multiplier</span>
+                    <span class="font-mono text-[9px] uppercase tracking-widest text-slate-400">Max Multiplier</span>
                 </div>
                 <div class="w-px h-8 bg-white/10"></div>
                 <div>
                     <span class="block font-black text-2xl text-secondary">4,500</span>
-                    <span class="font-mono text-[9px] uppercase tracking-widest text-slate-600">Max Score</span>
+                    <span class="font-mono text-[9px] uppercase tracking-widest text-slate-400">Max Score</span>
                 </div>
             </div>
         </div>

@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     
@@ -77,12 +70,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         .countdown-pulse { animation: countdown-pulse 2s ease-in-out infinite; }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
 
 {% include 'core/header.html' %}
 
@@ -213,7 +203,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="flex flex-col items-center justify-center py-24 border border-white/10">
                 <span class="material-symbols-outlined text-6xl text-white/10 mb-4">event_busy</span>
                 <h3 class="text-2xl font-black text-white/30 uppercase tracking-tighter">No Active Contests</h3>
-                <p class="font-mono text-xs tracking-widest uppercase text-slate-600 mt-3">Check back soon for new contests and giveaways.</p>
+                <p class="font-mono text-xs tracking-widest uppercase text-slate-400 mt-3">Check back soon for new contests and giveaways.</p>
             </div>
             {% endif %}
 

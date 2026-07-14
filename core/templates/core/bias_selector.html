@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     
@@ -46,12 +39,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .audio-card:hover { border-color: #f425c0; }
         .audio-card.selected { border-color: #f425c0; background: rgba(244,37,192,0.08); }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="font-sans text-white" x-data="biasQuiz()">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 
     <div class="relative min-h-screen bg-black flex flex-col">
@@ -65,13 +55,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </a>
                 <div>
                     <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Bias Selector</h1>
-                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600">Find Your Perfect Match</p>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-400">Find Your Perfect Match</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-6">
                 <div class="text-center">
-                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Step</span>
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Step</span>
                     <span class="font-black text-lg text-white" x-text="(currentStep + 1) + '/' + totalSteps"></span>
                 </div>
             </div>
@@ -110,7 +100,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <!-- AUDIO COMPARISON (blind pick) -->
                 <template x-if="currentQ && currentQ.type === 'audio'">
                     <div class="text-center">
-                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-2 block">Blind Listen</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mb-2 block">Blind Listen</span>
                         <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase mb-8"
                             x-text="currentQ.question"></h3>
 
@@ -177,7 +167,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <!-- MULTIPLE CHOICE -->
                 <template x-if="currentQ && currentQ.type === 'choice'">
                     <div class="text-center">
-                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-2 block" x-text="currentQ.label || 'Choose One'"></span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mb-2 block" x-text="currentQ.label || 'Choose One'"></span>
                         <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase mb-10"
                             x-text="currentQ.question"></h3>
 
@@ -203,7 +193,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <!-- IMAGE COMPARISON (two images, no names) -->
                 <template x-if="currentQ && currentQ.type === 'image'">
                     <div class="text-center">
-                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-2 block">Visual Vibe</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mb-2 block">Visual Vibe</span>
                         <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase mb-8"
                             x-text="currentQ.question"></h3>
 
@@ -228,7 +218,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <!-- SLIDER / SPECTRUM QUESTION -->
                 <template x-if="currentQ && currentQ.type === 'spectrum'">
                     <div class="text-center max-w-xl mx-auto">
-                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-2 block">Preference Scale</span>
+                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mb-2 block">Preference Scale</span>
                         <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase mb-10"
                             x-text="currentQ.question"></h3>
 
@@ -257,12 +247,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div x-show="state === 'loading'" x-transition class="text-center px-6">
                 <div class="inline-block w-16 h-16 border-4 border-primary border-t-transparent rounded-full" style="animation: spin-slow 1s linear infinite"></div>
                 <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 mt-6">Analyzing your preferences...</p>
-                <p class="text-slate-600 text-xs mt-2">Our AI is finding your perfect match</p>
+                <p class="text-slate-400 text-xs mt-2">Our AI is finding your perfect match</p>
             </div>
 
             <!-- ================= RESULT SCREEN ================= -->
             <div x-show="state === 'result'" x-transition class="text-center px-6 max-w-lg animate-slide-up">
-                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-4 block">Your Perfect Bias Is</span>
+                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mb-4 block">Your Perfect Bias Is</span>
 
                 <!-- Artist Image -->
                 <div class="mx-auto w-48 h-48 md:w-56 md:h-56 border-2 border-primary overflow-hidden mb-6 animate-reveal animate-pulse-glow">

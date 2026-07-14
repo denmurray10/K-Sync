@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 
 <html class="dark" lang="en"><head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 <meta charset="utf-8"/>
 {% include 'core/seo_meta.html' %}
 <title>{{ seo_title }}</title>
@@ -283,12 +276,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             }
         }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
 <!-- Top Navigation -->
 {% include 'core/header.html' %}
 <!-- Main Content -->
@@ -800,18 +790,17 @@ Experience the explosive energy of this generation's most dynamic self-producing
 <div class="hidden lg:flex flex-col gap-4 w-72 backdrop-blur-md bg-black/60 border border-white/20 p-6 self-end mb-6 reveal-up" style="transition-delay: 200ms;">
 <h3 class="text-white font-black uppercase tracking-widest text-sm mb-4 border-b border-white/20 pb-2">Essential Tracks</h3>
 <div class="flex flex-col gap-4">
-<a href="#" class="group/track flex items-center justify-between hover:text-primary transition-colors">
-<span class="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover/track:text-primary transition-colors">01. S-Class</span>
-<span class="material-symbols-outlined text-sm opacity-0 group-hover/track:opacity-100 transition-opacity">play_arrow</span>
+{% for track in trending_tracks|slice:":3" %}
+<a href="{% url 'charts' %}" class="group/track flex items-center justify-between hover:text-primary transition-colors">
+<span class="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover/track:text-primary transition-colors truncate">{{ forloop.counter|stringformat:"02d" }}. {{ track.title }}</span>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover/track:opacity-100 transition-opacity shrink-0">play_arrow</span>
 </a>
-<a href="#" class="group/track flex items-center justify-between hover:text-primary transition-colors">
-<span class="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover/track:text-primary transition-colors">02. MANIAC</span>
-<span class="material-symbols-outlined text-sm opacity-0 group-hover/track:opacity-100 transition-opacity">play_arrow</span>
+{% empty %}
+<a href="{% url 'charts' %}" class="group/track flex items-center justify-between hover:text-primary transition-colors">
+<span class="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover/track:text-primary transition-colors">View Today's Chart</span>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover/track:opacity-100 transition-opacity">arrow_forward</span>
 </a>
-<a href="#" class="group/track flex items-center justify-between hover:text-primary transition-colors">
-<span class="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover/track:text-primary transition-colors">03. God's Menu</span>
-<span class="material-symbols-outlined text-sm opacity-0 group-hover/track:opacity-100 transition-opacity">play_arrow</span>
-</a>
+{% endfor %}
 </div>
 </div>
 </div>
@@ -988,7 +977,7 @@ Experience the explosive energy of this generation's most dynamic self-producing
 </div>
 </section>
 <!-- Newsletter / CTA (Sharp Block) -->
-<section class="border-t border-b border-white/20 bg-primary overflow-hidden">
+<section id="stay-in-the-loop" class="border-t border-b border-white/20 bg-primary overflow-hidden">
 <div class="container mx-auto px-4 sm:px-6 py-16 md:py-24 max-w-5xl flex flex-col md:flex-row items-center justify-between gap-10 md:gap-12">
 <div class="w-full md:w-1/2 reveal-left">
 <h2 class="text-5xl md:text-7xl font-black text-black leading-none tracking-tighter uppercase mb-4">NEVER MISS <br/>A BEAT</h2>

@@ -2,13 +2,6 @@
 <!doctype html>
 <html class="dark" lang="en">
     <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
         <meta charset="utf-8" />
         
@@ -104,14 +97,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 display: none !important;
             }
         </style>
-    </head>
+    {% include 'core/shared_head.html' %}
+</head>
     <body
-        class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden"
+        class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden"
     >
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
         {% include 'core/header.html' %}
         <main class="flex-grow pt-0">
@@ -277,6 +267,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             Live rankings powered by iChart. Updated hourly from
                             Korea's real-time music charts.
                         </p>
+
+                        <!-- Daily chart drop moment -->
+                        <div class="inline-flex flex-wrap items-center gap-x-5 gap-y-2 mt-8 border border-white/15 bg-black/60 backdrop-blur-sm px-5 py-3">
+                            <span class="flex items-center gap-2">
+                                <span class="relative flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                </span>
+                                <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-white font-bold">New chart drops daily · {{ chart_drop_hour_utc|stringformat:"02d" }}:00 UTC</span>
+                            </span>
+                            <span class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-400">Next drop in <span id="chart-drop-countdown" class="text-secondary font-bold" data-drop-hour="{{ chart_drop_hour_utc }}">—:—:—</span></span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -809,7 +811,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </a>
                             <!-- Instagram Story hint -->
                             <div
-                                class="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-6 py-5 bg-transparent font-black text-[10px] uppercase tracking-widest text-slate-600 cursor-default select-none"
+                                class="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-6 py-5 bg-transparent font-black text-[10px] uppercase tracking-widest text-slate-400 cursor-default select-none"
                             >
                                 <span
                                     class="material-symbols-outlined text-base"
@@ -970,6 +972,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             window.addEventListener("load", fetchLiveArtwork);
         </script>
-    </body>
+    <script id="chart-drop-countdown-js">
+(function () {
+    var el = document.getElementById('chart-drop-countdown');
+    if (!el) return;
+    var dropHour = parseInt(el.getAttribute('data-drop-hour') || '8', 10);
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+        var now = new Date();
+        var next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), dropHour, 0, 0));
+        if (now >= next) next.setUTCDate(next.getUTCDate() + 1);
+        var s = Math.floor((next - now) / 1000);
+        el.textContent = pad(Math.floor(s / 3600)) + ':' + pad(Math.floor((s % 3600) / 60)) + ':' + pad(s % 60);
+    }
+    tick();
+    setInterval(tick, 1000);
+})();
+</script>
+</body>
 </html>
 

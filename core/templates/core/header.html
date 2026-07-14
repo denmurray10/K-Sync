@@ -428,11 +428,13 @@
                 </span>
                 <span class="text-[10px] md:text-xs uppercase tracking-widest">Live On Air</span>
             </button>
-            <!-- Listener count -->
-            <div class="hidden sm:flex items-center gap-1.5 text-slate-400 text-xs font-medium">
-                <span class="material-symbols-outlined text-base text-secondary">headphones</span>
-                <span id="listener-count">3,847</span> Listening
-            </div>
+            <!-- Streak chip -->
+            {% if user.is_authenticated and play_streak %}
+            <a data-track="streak_chip" data-track-category="global_header" href="{% url 'games' %}" title="Daily play streak — keep it alive!" class="hidden sm:flex items-center gap-1 px-2.5 h-9 border {% if played_today %}border-primary/60 text-primary{% else %}border-white/20 text-slate-300{% endif %} hover:border-primary hover:text-primary transition-colors">
+                <span class="material-symbols-outlined text-base">local_fire_department</span>
+                <span class="font-mono text-xs font-bold">{{ play_streak }}</span>
+            </a>
+            {% endif %}
             <!-- Settings -->
             <a data-track="settings_header" data-track-category="global_header" href="{% url 'profile_personalization_settings' %}" class="w-9 h-9 rounded-full glass-bright flex items-center justify-center text-slate-300 hover:text-white transition-colors border border-white/10">
                 <span class="material-symbols-outlined text-xl">settings</span>
@@ -496,6 +498,12 @@
                     <span class="text-[10px] md:text-xs uppercase tracking-widest">Live On Air</span>
                 </button>
                 {% if user.is_authenticated %}
+                {% if play_streak %}
+                <a data-track="streak_chip" data-track-category="global_header" href="{% url 'games' %}" title="Daily play streak — keep it alive!" data-header-desktop-only class="hidden md:flex items-center gap-1 px-2.5 h-9 border {% if played_today %}border-primary/60 text-primary{% else %}border-white/20 text-slate-300{% endif %} hover:border-primary hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-base">local_fire_department</span>
+                    <span class="font-mono text-xs font-bold">{{ play_streak }}</span>
+                </a>
+                {% endif %}
                 <a data-track="nav_account" data-track-category="global_header" href="{% url 'dashboard' %}" title="Dashboard" data-header-desktop-only class="hidden md:flex w-9 h-9 items-center justify-center border border-white/20 hover:border-primary text-slate-300 hover:text-primary transition-colors">
                     <span class="material-symbols-outlined text-xl">account_circle</span>
                 </a>

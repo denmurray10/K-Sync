@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8" />
     
@@ -59,12 +52,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         [x-cloak] { display: none !important; }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
     {% include 'core/header.html' %}
 
@@ -103,18 +93,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                         <div class="hidden lg:flex items-center gap-6 mt-12">
                             <div class="flex flex-col items-center">
-                                <span class="font-black text-3xl text-white">2M+</span>
-                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1">Active Fans</span>
+                                <span class="font-black text-3xl text-white">25+</span>
+                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mt-1">Artist Worlds</span>
                             </div>
                             <div class="w-px h-12 bg-white/10"></div>
                             <div class="flex flex-col items-center">
                                 <span class="font-black text-3xl text-white">24/7</span>
-                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1">Live Radio</span>
+                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mt-1">Live Radio</span>
                             </div>
                             <div class="w-px h-12 bg-white/10"></div>
                             <div class="flex flex-col items-center">
                                 <span class="font-black text-3xl text-white">500+</span>
-                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1">Artists</span>
+                                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mt-1">Tracks On Rotation</span>
                             </div>
                         </div>
                     </div>
@@ -128,7 +118,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <div class="p-8 md:p-10">
                                 <div class="mb-8">
                                     <h2 class="font-black text-2xl uppercase tracking-tight text-white">Log In</h2>
-                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mt-2">Continue your rhythm</p>
+                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mt-2">Continue your rhythm</p>
                                 </div>
 
                                 <form class="space-y-6" action="{% url 'login' %}" method="post">
@@ -145,7 +135,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <div>
                                         <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-2" for="email">Email Address</label>
                                         <div class="relative">
-                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">mail</span>
+                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400 text-lg">mail</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm"
                                                 id="email" name="email" placeholder="you@example.com" type="email" required />
@@ -156,10 +146,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <div>
                                         <div class="flex items-center justify-between mb-2">
                                             <label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500" for="password">Password</label>
-                                            <a class="font-mono text-[10px] tracking-widest uppercase text-primary hover:text-white transition-colors" href="#">Forgot?</a>
+                                            <a class="font-mono text-[10px] tracking-widest uppercase text-primary hover:text-white transition-colors" href="{% url 'password_reset' %}">Forgot?</a>
                                         </div>
                                         <div class="relative">
-                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-600 text-lg">lock</span>
+                                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400 text-lg">lock</span>
                                             <input
                                                 class="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm"
                                                 id="password" name="password" placeholder="••••••••" type="password" required />
@@ -175,29 +165,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     </button>
                                 </form>
 
-                                <!-- Divider -->
-                                <div class="flex items-center my-8">
-                                    <div class="flex-1 border-t border-white/10"></div>
-                                    <span class="px-4 font-mono text-[9px] tracking-widest uppercase text-slate-600">Or continue with</span>
-                                    <div class="flex-1 border-t border-white/10"></div>
-                                </div>
-
-                                <!-- Social buttons -->
-                                <div class="grid grid-cols-3 gap-3">
-                                    <button class="flex items-center justify-center py-3 border border-white/10 bg-white/[0.02] hover:border-primary hover:text-primary transition-colors group">
-                                        <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">chat_bubble</span>
-                                    </button>
-                                    <button class="flex items-center justify-center py-3 border border-white/10 bg-white/[0.02] hover:border-primary hover:text-primary transition-colors group">
-                                        <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">sms</span>
-                                    </button>
-                                    <button class="flex items-center justify-center py-3 border border-white/10 bg-white/[0.02] hover:border-primary hover:text-primary transition-colors group">
-                                        <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">account_circle</span>
-                                    </button>
-                                </div>
-
                                 <!-- Sign up link -->
                                 <div class="mt-8 text-center border-t border-white/10 pt-6">
-                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600">
+                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400">
                                         Don't have an account?
                                         <a class="text-primary font-black hover:text-white transition-colors ml-1" href="{% url 'signup' %}">Create Account</a>
                                     </p>

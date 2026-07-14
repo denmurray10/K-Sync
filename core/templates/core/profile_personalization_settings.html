@@ -1,0 +1,173 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+
+    <meta charset="utf-8" />
+
+{% include 'core/seo_meta.html' %}
+<title>Settings — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f425c0",
+                        "background-dark": "#000000",
+                        secondary: "#00f0ff",
+                    },
+                    fontFamily: {
+                        display: ["Montserrat", "sans-serif"],
+                        cinzel: ["Cinzel", "serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0px", sm: "0px", md: "0px", lg: "0px",
+                        xl: "0px", "2xl": "0px", "3xl": "0px", full: "9999px",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .nav-cinzel { font-family: 'Cinzel', serif; }
+        .reveal-up { opacity: 0; transform: translateY(40px); transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-up.is-visible { opacity: 1; transform: translate(0); }
+    </style>
+{% include 'core/shared_head.html' %}
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+    {% include 'core/header.html' %}
+
+    <main class="flex-grow">
+        <section class="relative w-full bg-black">
+            <div class="container mx-auto px-4 sm:px-6 pt-32 md:pt-40 pb-20 max-w-4xl">
+
+                <div class="mb-12">
+                    <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-black text-[10px] font-black tracking-[0.2em] uppercase mb-6">
+                        Account
+                    </span>
+                    <h1 class="text-5xl md:text-6xl font-black text-white leading-[0.9] tracking-tighter uppercase">
+                        SET<span class="text-transparent [-webkit-text-stroke:2px_white]">TINGS</span>
+                    </h1>
+                </div>
+
+                <!-- Identity -->
+                <div class="border border-white/10 mb-8 reveal-up">
+                    <div class="h-1 bg-primary w-full"></div>
+                    <div class="p-8">
+                        <h2 class="font-black text-lg uppercase tracking-tight text-white mb-6">Identity</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-2">Username</p>
+                                <p class="w-full bg-white/[0.03] border border-white/10 py-3 px-4 text-white font-mono text-sm">{{ request.user.username }}</p>
+                            </div>
+                            <div>
+                                <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-2">Email</p>
+                                <p class="w-full bg-white/[0.03] border border-white/10 py-3 px-4 text-white font-mono text-sm truncate">{{ request.user.email|default:"—" }}</p>
+                            </div>
+                        </div>
+                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mt-4">Member since {{ request.user.date_joined|date:"j M Y" }}</p>
+                    </div>
+                </div>
+
+                <!-- Personalisation -->
+                <div class="border border-white/10 mb-8 reveal-up">
+                    <div class="h-1 bg-secondary w-full"></div>
+                    <div class="p-8">
+                        <h2 class="font-black text-lg uppercase tracking-tight text-white mb-6">Personalisation</h2>
+
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border border-white/10 bg-white/[0.02] p-6">
+                            <div class="flex items-center gap-5 min-w-0">
+                                {% if bias.image_url %}
+                                <img src="{{ bias.image_url }}" alt="{{ bias.name }}" class="w-16 h-16 object-cover border border-primary/50" />
+                                {% else %}
+                                <div class="w-16 h-16 border border-white/10 bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-slate-700">favorite</span>
+                                </div>
+                                {% endif %}
+                                <div class="min-w-0">
+                                    <p class="font-mono text-[9px] tracking-[0.25em] uppercase text-slate-400">My Bias</p>
+                                    <p class="text-xl font-black uppercase tracking-tight text-white truncate">{% if bias %}{{ bias.name }}{% else %}Not set{% endif %}</p>
+                                </div>
+                            </div>
+                            <a href="{% url 'bias_selector' %}" class="shrink-0 inline-flex items-center gap-2 border border-primary text-primary px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-primary hover:text-black transition-colors">
+                                {% if bias %}Change Bias{% else %}Take the Quiz{% endif %}
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border border-white/10 bg-white/[0.02] p-6 mt-4">
+                            <div>
+                                <p class="font-mono text-[9px] tracking-[0.25em] uppercase text-slate-400">My Station</p>
+                                <p class="text-sm text-slate-300 mt-1">Re-run onboarding to retune your personalised station.</p>
+                            </div>
+                            <a href="{% url 'my_station_onboarding' %}" class="shrink-0 inline-flex items-center gap-2 border border-secondary text-secondary px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-secondary hover:text-black transition-colors">
+                                Retune Station <span class="material-symbols-outlined text-sm">tune</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy & data -->
+                <div class="border border-white/10 mb-8 reveal-up">
+                    <div class="h-1 bg-white/30 w-full"></div>
+                    <div class="p-8">
+                        <h2 class="font-black text-lg uppercase tracking-tight text-white mb-6">Privacy &amp; Data</h2>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border border-white/10 bg-white/[0.02] p-6">
+                            <div>
+                                <p class="font-mono text-[9px] tracking-[0.25em] uppercase text-slate-400">Cookie Preferences</p>
+                                <p class="text-sm text-slate-300 mt-1">Manage analytics and ads consent at any time.</p>
+                            </div>
+                            <button type="button" onclick="window.dispatchEvent(new Event('ksync:open-consent-settings'))" class="shrink-0 inline-flex items-center gap-2 border border-white/30 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:border-primary hover:text-primary transition-colors">
+                                Open Cookie Settings <span class="material-symbols-outlined text-sm">cookie</span>
+                            </button>
+                        </div>
+                        <div class="flex gap-6 mt-4">
+                            <a href="{% url 'privacy_policy' %}" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-primary transition-colors">Privacy Policy</a>
+                            <a href="{% url 'cookie_policy' %}" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-primary transition-colors">Cookie Policy</a>
+                            <a href="{% url 'terms_of_service' %}" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-primary transition-colors">Terms</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="border border-white/10 reveal-up">
+                    <div class="h-1 bg-red-500/70 w-full"></div>
+                    <div class="p-8">
+                        <h2 class="font-black text-lg uppercase tracking-tight text-white mb-6">Security</h2>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="{% url 'password_reset' %}" class="inline-flex items-center justify-center gap-2 border border-white/30 text-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:border-primary hover:text-primary transition-colors">
+                                Reset Password <span class="material-symbols-outlined text-sm">key</span>
+                            </a>
+                            <a href="{% url 'logout' %}" class="inline-flex items-center justify-center gap-2 border border-red-500/40 text-red-400 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-red-500/10 transition-colors">
+                                Log Out <span class="material-symbols-outlined text-sm">logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10">
+                    <a href="{% url 'profile' %}" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors">← Back to Profile</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'core/footer.html' %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new IntersectionObserver(
+                (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("is-visible"); }),
+                { threshold: 0.15 }
+            );
+            document.querySelectorAll(".reveal-up").forEach((el) => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

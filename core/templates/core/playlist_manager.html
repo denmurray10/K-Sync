@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     
@@ -47,12 +40,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .sortable-ghost { opacity: 0.4; background: #f425c0 !important; }
         .glass-panel { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px); }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-black text-white font-display min-h-screen flex flex-col overflow-hidden" x-data="playlistApp()">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 
 <!-- Header -->
@@ -157,7 +147,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div id="playlist-builder" :class="isPlaylistDropActive ? 'border border-secondary/70 shadow-[0_0_0_1px_rgba(0,240,255,0.35)]' : ''" class="h-full overflow-y-scroll no-scrollbar overscroll-contain p-3 space-y-2 bg-black/20">
                     <template x-for="(track, index) in currentPlaylist.tracks" :key="`${index}-${playlistRenderKey}`">
                         <div class="playlist-track-item flex items-center gap-3 p-3 bg-white/[0.03] border border-white/10 group">
-                            <span class="text-[10px] font-mono text-slate-600 w-4" x-text="(index + 1).toString().padStart(2, '0')"></span>
+                            <span class="text-[10px] font-mono text-slate-400 w-4" x-text="(index + 1).toString().padStart(2, '0')"></span>
                             <div class="w-10 h-10 bg-black border border-white/10 group-hover:border-secondary/50 overflow-hidden flex-shrink-0">
                                 <img x-show="track.album_art" :src="track.album_art" alt="album art" class="w-full h-full object-cover">
                                 <div x-show="!track.album_art" class="w-full h-full flex items-center justify-center">
@@ -169,7 +159,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <input type="text" x-model="track.artist" class="bg-transparent border-none p-0 text-[9px] font-mono text-slate-500 uppercase tracking-widest focus:ring-0 w-full">
                             </div>
                             <p class="text-[9px] font-mono text-slate-400 uppercase w-12 text-right" x-text="track.duration || '3:00'"></p>
-                            <button @click="removeTrack(index)" class="text-slate-600 hover:text-red-500"><span class="material-symbols-outlined text-sm">delete</span></button>
+                            <button @click="removeTrack(index)" class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-sm">delete</span></button>
                             <span class="material-symbols-outlined text-slate-700 cursor-move">drag_indicator</span>
                         </div>
                     </template>

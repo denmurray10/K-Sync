@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
 <meta charset="utf-8"/>
 {% include 'core/seo_meta.html' %}
@@ -569,12 +562,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
     }
 </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-ink text-white font-body min-h-screen overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 {% include 'core/header.html' %}
 
@@ -3345,7 +3335,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         ${containerId === 'up-next-container'
                             ? `<span id="up-next-eta-${idx}" class="w-full pl-[5.5rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-500 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">${upNextEta}</span>`
-                            : `<span class="w-full pl-[4rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-600 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">Played</span>`}
+                            : `<span class="w-full pl-[4rem] pt-1 text-left text-[10px] uppercase tracking-[0.2em] text-slate-400 sm:w-auto sm:pl-0 sm:pt-0 sm:text-right">Played</span>`}
                     </div>
                 `;
             }).join('');

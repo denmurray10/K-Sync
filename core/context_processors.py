@@ -92,3 +92,31 @@ def seo_defaults(request):
         'seo_description': route_defaults.get('description', DEFAULT_DESCRIPTION),
         'seo_type': 'website',
     }
+
+
+def gamification(request):
+    """Daily play streak for the header chip. Cheap: one indexed query, auth users only."""
+    user = getattr(request, 'user', None)
+    if not user or not user.is_authenticated:
+        return {}
+    try:
+        from datetime import timedelta
+        from django.utils import timezone as tz
+        today = tz.now().date()
+        window_start = today - timedelta(days=90)
+        played_dates = set(
+            user.game_scores.filter(played_at__date__gte=window_start)
+            .values_list('played_at__date', flat=True)
+        )
+        if not played_dates:
+            return {'play_streak': 0, 'played_today': False}
+        played_today = today in played_dates
+        # Streak counts back from today (or yesterday if not yet played today)
+        cursor = today if played_today else today - timedelta(days=1)
+        streak = 0
+        while cursor in played_dates:
+            streak += 1
+            cursor -= timedelta(days=1)
+        return {'play_streak': streak, 'played_today': played_today}
+    except Exception:
+        return {}

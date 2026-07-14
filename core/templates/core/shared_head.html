@@ -1,0 +1,28 @@
+{% comment %} Shared head fragment — single source for brand font + a11y guards.
+Included on every page template so the logo/nav (Cinzel) renders identically
+site-wide and animations respect prefers-reduced-motion. {% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style id="ksync-shared-head">
+    .nav-cinzel { font-family: 'Cinzel', serif; }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+        .reveal-up, .reveal-left, .reveal-right {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+    }
+</style>
+<link rel="manifest" href="/site.webmanifest"/>
+<meta name="theme-color" content="#000000"/>
+<script id="ksync-sw-register">
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+    }
+</script>

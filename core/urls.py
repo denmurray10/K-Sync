@@ -1,7 +1,26 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
+    # ── Password reset ────────────────────────────────────────────────────
+    path('password-reset/', auth_views.PasswordResetView.as_view(
+        template_name='core/password_reset_form.html',
+        email_template_name='core/password_reset_email.txt',
+        subject_template_name='core/password_reset_subject.txt',
+        success_url=reverse_lazy('password_reset_done'),
+    ), name='password_reset'),
+    path('password-reset/sent/', auth_views.PasswordResetDoneView.as_view(
+        template_name='core/password_reset_done.html',
+    ), name='password_reset_done'),
+    path('password-reset/confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+        template_name='core/password_reset_confirm.html',
+        success_url=reverse_lazy('password_reset_complete'),
+    ), name='password_reset_confirm'),
+    path('password-reset/complete/', auth_views.PasswordResetCompleteView.as_view(
+        template_name='core/password_reset_complete.html',
+    ), name='password_reset_complete'),
+
     path('', views.home, name='home'),
     path('404-preview/', views.preview_404, name='preview_404'),
     path('home-redesign-lab/', views.home_redesign_lab, name='home_redesign_lab'),
@@ -105,36 +124,17 @@ urlpatterns = [
     path('api/notifications/', views.get_notifications, name='get_notifications'),
     path('api/notifications/<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),
     
-    # New Stitch Export Pages
-    path('top-cheerleader-badges/', views.top_cheerleader_badges, name='top_cheerleader_badges'),
-    path('cheerleader-leaderboard/', views.cheerleader_leaderboard, name='cheerleader_leaderboard'),
+    # Reward / gifting pages
     path('legendary-item-claimed/', views.legendary_item_claimed, name='legendary_item_claimed'),
-    path('neon-home-v1/', views.neon_home_variant_1, name='neon_home_variant_1'),
-    path('neon-home-v2/', views.neon_home_variant_2, name='neon_home_variant_2'),
     path('test-landing-wow/', views.test_landing_wow_hero, name='test_landing_wow_hero'),
-    path('celebration-toggle/', views.celebration_toggle, name='celebration_toggle'),
     path('profile-personalization-settings/', views.profile_personalization_settings, name='profile_personalization_settings'),
-    path('avatar-frame-gallery/', views.avatar_frame_gallery, name='avatar_frame_gallery'),
-    path('legendary-item-drop/', views.legendary_item_drop, name='legendary_item_drop'),
-    path('gift-received/', views.gift_received, name='gift_received'),
-    path('k-pop-pulse-idol-emote/', views.k_pop_pulse_idol_emote, name='k_pop_pulse_idol_emote'),
-    path('emote-unlocked/', views.emote_unlocked, name='emote_unlocked'),
-    path('daily-login-rewards-calendar/', views.daily_login_rewards_calendar, name='daily_login_rewards_calendar'),
-    path('streak-recovery/', views.streak_recovery, name='streak_recovery'),
-    path('pulse-point-store/', views.pulse_point_store, name='pulse_point_store'),
-    path('k-pop-pulse-home-neon-variant/', views.k_pop_pulse_home_neon_variant, name='k_pop_pulse_home_neon_variant'),
-    path('purchase-successful-celebration-modal/', views.purchase_successful_celebration_modal, name='purchase_successful_celebration_modal'),
     path('gift-to-a-friend/', views.gift_to_a_friend, name='gift_to_a_friend'),
-    path('d-day-comeback-notification/', views.d_day_comeback_notification, name='d_day_comeback_notification'),
     path('test-page/', views.test_page, name='test_page'),
     path('test-news-magazine-lab/', views.test_news_magazine_lab, name='test_news_magazine_lab'),
     path('blog-page/', views.blog_page, name='blog_page'),
     path('blog/generate/', views.blog_generate, name='blog_generate'),
     path('blog/link-pass/', views.blog_internal_link_pass, name='blog_internal_link_pass'),
     path('blog/<slug:slug>/', views.blog_article_read, name='blog_article_read'),
-    path('new-release-spotlight/', views.new_release_spotlight, name='new_release_spotlight'),
-    path('streaming-party-chat/', views.streaming_party_chat, name='streaming_party_chat'),
-    path('confetti-rain/', views.confetti_rain, name='confetti_rain'),
     
     # ── AI endpoints ───────────────────────────────────────────────────────
     path('ai/generate-image/', views.ai_generate_image, name='ai_generate_image'),

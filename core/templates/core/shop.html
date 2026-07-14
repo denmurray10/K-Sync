@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8" />
     
@@ -72,12 +65,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             transform: translate(0);
         }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
 
 
 {% include 'core/header.html' %}
@@ -129,17 +119,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <!-- Category Filter Tabs -->
-    <section class="w-full bg-black border-b border-white/10" x-data="{ activeTab: 'all' }">
+    <section class="w-full bg-black border-b border-white/10">
         <div class="container mx-auto px-4 sm:px-6 py-6">
-            <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-                <template x-for="tab in ['all', 'apparel', 'albums', 'accessories', 'lightsticks', 'posters']" :key="tab">
-                    <button
-                        @click="activeTab = tab"
-                        :class="activeTab === tab ? 'bg-primary text-black border-primary' : 'bg-transparent text-white border-white/20 hover:border-primary hover:text-primary'"
-                        class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border transition-colors whitespace-nowrap"
-                        x-text="tab"
-                    ></button>
-                </template>
+            <div id="shop-category-tabs" class="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+                <button data-cat="all" class="shop-tab px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border transition-colors whitespace-nowrap bg-primary text-black border-primary">All</button>
+                <button data-cat="apparel" class="shop-tab px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border transition-colors whitespace-nowrap bg-transparent text-white border-white/20 hover:border-primary hover:text-primary">Apparel</button>
+                <button data-cat="albums" class="shop-tab px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border transition-colors whitespace-nowrap bg-transparent text-white border-white/20 hover:border-primary hover:text-primary">Albums</button>
+                <button data-cat="accessories" class="shop-tab px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border transition-colors whitespace-nowrap bg-transparent text-white border-white/20 hover:border-primary hover:text-primary">Accessories</button>
+                <button data-cat="lightsticks" class="shop-tab px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border transition-colors whitespace-nowrap bg-transparent text-white border-white/20 hover:border-primary hover:text-primary">Lightsticks</button>
+                <button data-cat="posters" class="shop-tab px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] border transition-colors whitespace-nowrap bg-transparent text-white border-white/20 hover:border-primary hover:text-primary">Posters</button>
             </div>
         </div>
     </section>
@@ -172,11 +160,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </p>
                     <div class="flex items-center gap-4 mb-8">
                         <span class="text-white font-black text-3xl tracking-tighter">£89.00</span>
-                        <span class="text-slate-500 line-through text-lg">£120.00</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-400">Launch price</span>
                     </div>
-                    <button class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] w-max">
-                        Shop Now
-                    </button>
+                    <a href="#shop-waitlist" class="bg-primary text-black font-black uppercase tracking-[0.2em] text-xs px-8 py-4 border border-primary hover:bg-black hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] w-max inline-block">
+                        Join The Launch Waitlist
+                    </a>
                 </div>
             </div>
         </div>
@@ -192,7 +180,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
                 <div class="hidden sm:flex items-center gap-4 pb-2">
                     <span class="text-white/40 font-mono text-[10px] uppercase tracking-widest">Sort by</span>
-                    <select class="bg-transparent border border-white/20 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 focus:outline-none focus:border-primary">
+                    <select id="shop-sort" class="bg-transparent border border-white/20 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 focus:outline-none focus:border-primary">
                         <option value="newest">Newest</option>
                         <option value="price-low">Price: Low</option>
                         <option value="price-high">Price: High</option>
@@ -201,10 +189,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal-up">
+            <div id="shop-product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal-up">
 
                 <!-- Product 1 -->
-                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                <div data-category="apparel" data-price="79.00" class="shop-card group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
                     <div class="relative aspect-square overflow-hidden bg-black/50">
                         <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
@@ -217,36 +205,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Neon Logo Hoodie</h3>
                         <div class="flex items-center justify-between mt-4">
                             <span class="text-white font-black text-xl tracking-tighter">£79.00</span>
-                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
-                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                            </button>
+                            <a href="#shop-waitlist" title="Join the launch waitlist" aria-label="Join the launch waitlist" class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors inline-flex">
+                                <span class="material-symbols-outlined text-lg">notification_add</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 2 -->
-                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                <div data-category="albums" data-price="34.99" class="shop-card group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
                     <div class="relative aspect-square overflow-hidden bg-black/50">
                         <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
                             <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">album</span>
                         </div>
-                        <span class="absolute top-4 left-4 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Sold Out</span>
+                        <span class="absolute top-4 left-4 bg-secondary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Launch Drop</span>
                     </div>
                     <div class="p-6 border-t border-white/10">
                         <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Albums</span>
                         <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Stray Kids &middot; ROCK-STAR</h3>
                         <div class="flex items-center justify-between mt-4">
                             <span class="text-white font-black text-xl tracking-tighter">£34.99</span>
-                            <button class="border border-white/20 text-white/30 p-2 cursor-not-allowed" disabled>
-                                <span class="material-symbols-outlined text-lg">remove_shopping_cart</span>
-                            </button>
+                            <a href="#shop-waitlist" title="Join the launch waitlist" aria-label="Join the launch waitlist" class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors inline-flex">
+                                <span class="material-symbols-outlined text-lg">notification_add</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 3 -->
-                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                <div data-category="lightsticks" data-price="59.99" class="shop-card group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
                     <div class="relative aspect-square overflow-hidden bg-black/50">
                         <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-black group-hover:opacity-100 opacity-50 transition-opacity"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
@@ -258,15 +246,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Official ARMY Bomb Ver.4</h3>
                         <div class="flex items-center justify-between mt-4">
                             <span class="text-white font-black text-xl tracking-tighter">£59.99</span>
-                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
-                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                            </button>
+                            <a href="#shop-waitlist" title="Join the launch waitlist" aria-label="Join the launch waitlist" class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors inline-flex">
+                                <span class="material-symbols-outlined text-lg">notification_add</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 4 -->
-                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                <div data-category="posters" data-price="24.99" class="shop-card group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
                     <div class="relative aspect-square overflow-hidden bg-black/50">
                         <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
@@ -279,39 +267,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">NewJeans &middot; Get Up Poster</h3>
                         <div class="flex items-center justify-between mt-4">
                             <span class="text-white font-black text-xl tracking-tighter">£24.99</span>
-                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
-                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                            </button>
+                            <a href="#shop-waitlist" title="Join the launch waitlist" aria-label="Join the launch waitlist" class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors inline-flex">
+                                <span class="material-symbols-outlined text-lg">notification_add</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 5 -->
-                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                <div data-category="apparel" data-price="39.00" class="shop-card group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
                     <div class="relative aspect-square overflow-hidden bg-black/50">
                         <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
                             <span class="material-symbols-outlined text-[80px] text-white/10 group-hover:text-white/20 transition-colors group-hover:scale-110 transition-transform duration-500">checkroom</span>
                         </div>
-                        <span class="absolute top-4 left-4 bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Sale</span>
+                        <span class="absolute top-4 left-4 bg-primary text-black text-[9px] font-black px-2 py-0.5 uppercase tracking-widest">Launch Drop</span>
                     </div>
                     <div class="p-6 border-t border-white/10">
                         <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">Apparel</span>
                         <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Spectrum Oversized Tee</h3>
                         <div class="flex items-center justify-between mt-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-primary font-black text-xl tracking-tighter">£39.00</span>
-                                <span class="text-slate-500 line-through text-sm">£55.00</span>
-                            </div>
-                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
-                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                            </button>
+                            <span class="text-white font-black text-xl tracking-tighter">£39.00</span>
+                            <a href="#shop-waitlist" title="Join the launch waitlist" aria-label="Join the launch waitlist" class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors inline-flex">
+                                <span class="material-symbols-outlined text-lg">notification_add</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 6 -->
-                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                <div data-category="albums" data-price="29.99" class="shop-card group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
                     <div class="relative aspect-square overflow-hidden bg-black/50">
                         <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
@@ -323,15 +308,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">aespa &middot; Armageddon</h3>
                         <div class="flex items-center justify-between mt-4">
                             <span class="text-white font-black text-xl tracking-tighter">£29.99</span>
-                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
-                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                            </button>
+                            <a href="#shop-waitlist" title="Join the launch waitlist" aria-label="Join the launch waitlist" class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors inline-flex">
+                                <span class="material-symbols-outlined text-lg">notification_add</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 7 -->
-                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                <div data-category="accessories" data-price="19.99" class="shop-card group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
                     <div class="relative aspect-square overflow-hidden bg-black/50">
                         <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-black group-hover:opacity-100 opacity-50 transition-opacity"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
@@ -343,15 +328,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">Photocard Binder Set</h3>
                         <div class="flex items-center justify-between mt-4">
                             <span class="text-white font-black text-xl tracking-tighter">£19.99</span>
-                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
-                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                            </button>
+                            <a href="#shop-waitlist" title="Join the launch waitlist" aria-label="Join the launch waitlist" class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors inline-flex">
+                                <span class="material-symbols-outlined text-lg">notification_add</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 8 -->
-                <div class="group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
+                <div data-category="lightsticks" data-price="54.99" class="shop-card group border border-white/10 bg-white/[0.02] hover:border-primary transition-colors cursor-pointer">
                     <div class="relative aspect-square overflow-hidden bg-black/50">
                         <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 group-hover:opacity-100 opacity-50 transition-opacity"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
@@ -364,20 +349,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <h3 class="text-white font-black text-lg uppercase tracking-tight mt-1 group-hover:text-primary transition-colors">BLINK Official Lightstick</h3>
                         <div class="flex items-center justify-between mt-4">
                             <span class="text-white font-black text-xl tracking-tighter">£54.99</span>
-                            <button class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors">
-                                <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
-                            </button>
+                            <a href="#shop-waitlist" title="Join the launch waitlist" aria-label="Join the launch waitlist" class="border border-white/20 hover:border-primary hover:bg-primary hover:text-black text-white p-2 transition-colors inline-flex">
+                                <span class="material-symbols-outlined text-lg">notification_add</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Load More -->
-            <div class="flex justify-center mt-16 reveal-up">
-                <button class="bg-transparent text-white font-black uppercase tracking-[0.2em] text-xs px-12 py-5 border border-white/20 hover:border-primary hover:text-primary transition-colors shadow-[4px_4px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
-                    Load More Products
-                </button>
+            <!-- No-results message (shown when a category filter has no items) -->
+            <div id="shop-no-results" class="hidden text-center mt-16 border border-white/10 bg-white/[0.02] p-10">
+                <p class="text-slate-400 font-mono text-xs tracking-widest uppercase">Nothing in this category yet — new drops land at launch.</p>
             </div>
         </div>
     </section>
@@ -411,7 +394,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </section>
 
     <!-- Newsletter CTA -->
-    <section class="border-t border-b border-white/20 bg-primary overflow-hidden">
+    <section id="shop-waitlist" class="border-t border-b border-white/20 bg-primary overflow-hidden">
         <div class="container mx-auto px-6 py-24 max-w-5xl flex flex-col md:flex-row items-center justify-between gap-12">
             <div class="w-full md:w-1/2 reveal-left">
                 <h2 class="text-5xl md:text-7xl font-black text-black leading-none tracking-tighter uppercase mb-4">GET 10%<br/>OFF</h2>
@@ -420,33 +403,4 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="w-full md:w-1/2 reveal-left" style="transition-delay: 200ms;">
                 <form class="flex flex-col w-full gap-4">
                     <input class="w-full bg-black border border-black px-6 py-4 text-white placeholder:text-slate-500 focus:outline-none placeholder:font-mono placeholder:uppercase placeholder:text-xs placeholder:tracking-widest rounded-none text-sm" placeholder="Enter your email address" type="email" />
-                    <button class="w-full bg-white hover:bg-black hover:text-white text-black font-black px-10 py-5 rounded-none transition-colors uppercase tracking-[0.2em] text-sm border border-black" type="button">
-                        Get My Discount
-                    </button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-</main>
-
-{% include 'core/footer.html' %}
-
-<script>
-// Scroll Reveal
-const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
-const observer = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => observer.observe(el));
-});
-</script>
-</body>
-</html>
-
+                    <button class="w-full 

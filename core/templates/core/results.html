@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8" />
     
@@ -56,12 +49,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         [x-cloak] { display: none !important; }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
     {% include 'core/header.html' %}
 
@@ -96,7 +86,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <!-- Breadcrumb -->
                 <div class="flex items-center gap-2 mb-6 reveal-left">
                     <a href="{% url 'home' %}" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors">Home</a>
-                    <span class="text-slate-600">/</span>
+                    <span class="text-slate-400">/</span>
                     <span class="font-mono text-[10px] tracking-widest uppercase text-primary">Search</span>
                 </div>
 
@@ -296,7 +286,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <div class="p-4 border-t border-white/10">
                             <h3 class="text-white text-sm font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors truncate">{{ artist.name }}</h3>
-                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block">{{ artist.label }}</span>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mt-1 block">{{ artist.label }}</span>
                         </div>
                     </a>
                     {% endfor %}
@@ -335,7 +325,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <div class="p-4 border-t border-white/10">
                             <h3 class="text-white text-sm font-black uppercase tracking-tight leading-tight group-hover:text-secondary transition-colors truncate">{{ member.stage_name|default:member.name }}</h3>
-                            {% if member.position %}<span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block truncate">{{ member.position }}</span>{% endif %}
+                            {% if member.position %}<span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mt-1 block truncate">{{ member.position }}</span>{% endif %}
                         </div>
                     </a>
                     {% endfor %}
@@ -368,7 +358,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                              else { document.querySelectorAll('audio').forEach(a => { a.pause(); }); $refs.audio{{ forloop.counter }}.play(); playing = true; }
                          "{% endif %}>
                         <!-- # -->
-                        <span class="text-slate-600 font-black text-lg w-8 text-right shrink-0">{{ forloop.counter }}</span>
+                        <span class="text-slate-400 font-black text-lg w-8 text-right shrink-0">{{ forloop.counter }}</span>
                         <!-- Artwork -->
                         <div class="relative w-12 h-12 shrink-0 overflow-hidden border border-white/10">
                             {% if song.image %}
@@ -391,15 +381,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <!-- Album name -->
                         {% if song.album %}
-                        <span class="hidden md:block text-slate-600 font-mono text-[9px] tracking-widest uppercase truncate max-w-[200px]">{{ song.album }}</span>
+                        <span class="hidden md:block text-slate-400 font-mono text-[9px] tracking-widest uppercase truncate max-w-[200px]">{{ song.album }}</span>
                         {% endif %}
                         <!-- Duration -->
                         {% if song.duration %}
-                        <span class="text-slate-600 font-mono text-[10px] tracking-wider shrink-0">{{ song.duration }}</span>
+                        <span class="text-slate-400 font-mono text-[10px] tracking-wider shrink-0">{{ song.duration }}</span>
                         {% endif %}
                         <!-- iTunes link -->
                         {% if song.itunes_url %}
-                        <a href="{{ song.itunes_url }}" target="_blank" rel="noopener" class="shrink-0 text-slate-600 hover:text-primary transition-colors" @click.stop>
+                        <a href="{{ song.itunes_url }}" target="_blank" rel="noopener" class="shrink-0 text-slate-400 hover:text-primary transition-colors" @click.stop>
                             <span class="material-symbols-outlined text-lg">open_in_new</span>
                         </a>
                         {% endif %}
@@ -446,7 +436,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <div class="p-4 border-t border-white/10">
                             <h3 class="text-white text-sm font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors truncate">{{ album.title }}</h3>
-                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block truncate">{{ album.artist }}</span>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mt-1 block truncate">{{ album.artist }}</span>
                         </div>
                     </a>
                     {% endfor %}
@@ -507,7 +497,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <!-- Arrow (only if linkable) -->
                         {% if cb.slug %}
-                        <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors shrink-0">east</span>
+                        <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors shrink-0">east</span>
                         {% endif %}
                     {% if cb.slug %}</a>{% else %}</div>{% endif %}
                     {% endfor %}
@@ -624,7 +614,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <div class="p-4 border-t border-white/10">
                             <h3 class="text-white text-sm font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors truncate">{{ artist.name }}</h3>
-                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block">{{ artist.get_group_type_display }}</span>
+                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mt-1 block">{{ artist.get_group_type_display }}</span>
                         </div>
                     </a>
                     {% endfor %}
@@ -684,19 +674,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase mt-4 max-w-md mx-auto">Find your favourite artists, groups, songs, albums, and articles</p>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-0 max-w-3xl mx-auto mt-16">
                     <a href="{% url 'idols' %}" class="group border border-white/10 bg-black hover:border-primary p-8 transition-all duration-300 flex flex-col items-center gap-3">
-                        <span class="material-symbols-outlined text-3xl text-slate-600 group-hover:text-primary transition-colors">groups</span>
+                        <span class="material-symbols-outlined text-3xl text-slate-400 group-hover:text-primary transition-colors">groups</span>
                         <span class="font-black text-xs uppercase tracking-tight text-white group-hover:text-primary transition-colors">Artists</span>
                     </a>
                     <a href="{% url 'charts' %}" class="group border border-white/10 bg-black hover:border-primary p-8 transition-all duration-300 flex flex-col items-center gap-3">
-                        <span class="material-symbols-outlined text-3xl text-slate-600 group-hover:text-primary transition-colors">trending_up</span>
+                        <span class="material-symbols-outlined text-3xl text-slate-400 group-hover:text-primary transition-colors">trending_up</span>
                         <span class="font-black text-xs uppercase tracking-tight text-white group-hover:text-primary transition-colors">Charts</span>
                     </a>
                     <a href="{% url 'news' %}" class="group border border-white/10 bg-black hover:border-primary p-8 transition-all duration-300 flex flex-col items-center gap-3">
-                        <span class="material-symbols-outlined text-3xl text-slate-600 group-hover:text-primary transition-colors">newspaper</span>
+                        <span class="material-symbols-outlined text-3xl text-slate-400 group-hover:text-primary transition-colors">newspaper</span>
                         <span class="font-black text-xs uppercase tracking-tight text-white group-hover:text-primary transition-colors">News</span>
                     </a>
                     <a href="{% url 'live' %}" class="group border border-white/10 bg-black hover:border-primary p-8 transition-all duration-300 flex flex-col items-center gap-3">
-                        <span class="material-symbols-outlined text-3xl text-slate-600 group-hover:text-primary transition-colors">radio</span>
+                        <span class="material-symbols-outlined text-3xl text-slate-400 group-hover:text-primary transition-colors">radio</span>
                         <span class="font-black text-xs uppercase tracking-tight text-white group-hover:text-primary transition-colors">Live Radio</span>
                     </a>
                 </div>

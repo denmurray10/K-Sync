@@ -65,6 +65,7 @@
         background: linear-gradient(90deg, rgba(var(--stream-secondary), 1), rgba(var(--stream-accent), 1));
     }
 </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="min-h-screen bg-black text-white font-body overflow-x-hidden">
 {% include 'core/header.html' %}
@@ -82,7 +83,7 @@
         <div class="relative container mx-auto px-4 sm:px-6 pb-16 pt-28 lg:px-8 lg:pb-20 lg:pt-36">
             <div class="mb-6 flex flex-wrap items-center gap-3 text-[11px] font-black uppercase tracking-[0.18em]">
                 <a href="{% url 'stream_hub' %}" class="text-slate-400 transition-colors hover:text-white">Stream</a>
-                <span class="text-slate-600">/</span>
+                <span class="text-slate-400">/</span>
                 <span style="color: rgba(var(--stream-accent), 1)">{{ stream_preset.name }}</span>
                 <span class="border border-white/15 bg-white/5 px-2 py-1 text-[10px] text-slate-200">{{ stream_preset.required_tier }}</span>
             </div>

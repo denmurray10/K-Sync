@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     
@@ -46,12 +39,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .frame-blur { filter: blur(20px); transition: filter 0.5s ease; }
         .frame-clear { filter: blur(0); }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="font-sans text-white" x-data="mvMatcher()">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 
     <!-- Full-screen modal overlay -->
@@ -66,19 +56,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </a>
                 <div>
                     <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">MV Matcher</h1>
-                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600">Exclusive Frames</p>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-400">Exclusive Frames</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-6">
                 <!-- Round -->
                 <div class="text-center">
-                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Round</span>
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Round</span>
                     <span class="font-black text-lg text-white" x-text="(currentRound + 1) + '/' + totalRounds"></span>
                 </div>
                 <!-- Score -->
                 <div class="text-center">
-                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Score</span>
+                    <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Score</span>
                     <span class="font-black text-lg text-secondary" :class="scoreAnimating && 'animate-score-pop'" x-text="score"></span>
                 </div>
             </div>
@@ -135,7 +125,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div>
                         <!-- Timer -->
                         <div class="flex items-center gap-3 mb-3 md:mb-8">
-                            <span class="material-symbols-outlined text-lg" :class="timeLeft <= 3 ? 'text-red-400 animate-countdown' : 'text-slate-600'">timer_3</span>
+                            <span class="material-symbols-outlined text-lg" :class="timeLeft <= 3 ? 'text-red-400 animate-countdown' : 'text-slate-400'">timer_3</span>
                             <div class="flex-1 h-1 bg-white/10">
                                 <div class="h-full transition-all duration-1000 ease-linear"
                                      :class="timeLeft <= 3 ? 'bg-red-400' : 'bg-secondary'"
@@ -144,7 +134,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <span class="font-mono text-xs font-bold w-6 text-right" :class="timeLeft <= 3 ? 'text-red-400' : 'text-slate-500'" x-text="timeLeft"></span>
                         </div>
 
-                        <h3 class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mb-2 md:mb-6 block">Identify the subject...</h3>
+                        <h3 class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mb-2 md:mb-6 block">Identify the subject...</h3>
 
                         <div class="grid grid-cols-1 gap-1.5 md:gap-3">
                             <template x-for="(opt, i) in currentRoundData.options" :key="i">
@@ -193,12 +183,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="flex items-center justify-center gap-1 my-10 border-y border-white/10 py-10">
                     <div class="text-center px-10">
                         <span class="text-5xl font-black text-secondary block" x-text="score"></span>
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-600 block mt-2">Total Score</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-400 block mt-2">Total Score</span>
                     </div>
                     <div class="w-px h-16 bg-white/10"></div>
                     <div class="text-center px-10">
                         <span class="text-5xl font-black text-white block" x-text="correctCount + '/' + totalRounds"></span>
-                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-600 block mt-2">Accuracy</span>
+                        <span class="font-mono text-[10px] tracking-widest uppercase text-slate-400 block mt-2">Accuracy</span>
                     </div>
                 </div>
 

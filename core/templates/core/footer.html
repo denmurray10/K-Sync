@@ -9,9 +9,6 @@
     Your leading source for K-pop music, news, and culture. Bringing the heart of Seoul from Cornwall to fans worldwide.
 </p>
 <div class="flex gap-3 mt-6">
-<a class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-<span class="material-symbols-outlined text-sm">public</span>
-</a>
 <a class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all" href="{% url 'news' %}" aria-label="News">
 <span class="material-symbols-outlined text-sm">article</span>
 </a>
@@ -49,16 +46,16 @@ Download the App
 <li><a class="hover:text-primary transition-colors" href="{% url 'request_track' %}">Request Song</a></li>
 <li><a class="hover:text-primary transition-colors" href="{% url 'fan_clubs' %}">Fan Club</a></li>
 <li><a class="hover:text-primary transition-colors" href="{% url 'contests' %}">Contests</a></li>
-<li><a class="hover:text-primary transition-colors" href="{% url 'coming_soon' %}">Merch Shop</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'shop' %}">Merch Shop</a></li>
 </ul>
 </div>
 <div>
 <h4 class="text-white font-normal nav-cinzel mb-4">Shop</h4>
 <ul class="flex flex-col gap-2 text-sm text-slate-400">
-<li><a class="hover:text-primary transition-colors" href="{% url 'coming_soon' %}">Jumpers</a></li>
-<li><a class="hover:text-primary transition-colors" href="{% url 'coming_soon' %}">T-Shirts</a></li>
-<li><a class="hover:text-primary transition-colors" href="{% url 'coming_soon' %}">Merch</a></li>
-<li><a class="hover:text-primary transition-colors" href="{% url 'coming_soon' %}">Albums</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'shop' %}?category=apparel">Apparel</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'shop' %}?category=lightsticks">Light Sticks</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'shop' %}?category=albums">Albums</a></li>
+<li><a class="hover:text-primary transition-colors" href="{% url 'shop' %}?category=accessories">Accessories</a></li>
 </ul>
 </div>
 </div>

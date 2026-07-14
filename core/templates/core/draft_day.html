@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     
@@ -42,12 +35,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .animate-float { animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="font-sans text-white" x-data="draftGame()">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
     <section class="pt-24 px-6">
         <div class="bg-black/80 backdrop-blur-md border border-white/10 px-4 py-4 md:px-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -110,7 +100,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <template x-if="filteredPool.length === 0">
                 <div class="py-20 text-center">
                     <span class="material-symbols-outlined text-4xl text-white/10 block mb-3">search_off</span>
-                    <p class="text-slate-600 font-mono text-[10px] uppercase tracking-widest">No idols match &ldquo;<span x-text="search"></span>&rdquo;</p>
+                    <p class="text-slate-400 font-mono text-[10px] uppercase tracking-widest">No idols match &ldquo;<span x-text="search"></span>&rdquo;</p>
                 </div>
             </template>
 
@@ -131,11 +121,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <!-- Mini Stats -->
                             <div class="space-y-1.5 mt-2">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[8px] font-mono uppercase text-slate-600">VCL</span>
+                                    <span class="text-[8px] font-mono uppercase text-slate-400">VCL</span>
                                     <div class="flex-1 mx-2 stat-bar"><div class="stat-fill bg-white/40" :style="'width:'+idol.stats.vocal+'%'"></div></div>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[8px] font-mono uppercase text-slate-600">DNC</span>
+                                    <span class="text-[8px] font-mono uppercase text-slate-400">DNC</span>
                                     <div class="flex-1 mx-2 stat-bar"><div class="stat-fill bg-white/40" :style="'width:'+idol.stats.dance+'%'"></div></div>
                                 </div>
                             </div>
@@ -171,7 +161,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <p class="text-[8px] font-mono text-accent" x-text="'£' + idol.cost + 'M'"></p>
                                 </div>
                             </div>
-                            <button @click="removeFromTeam(index)" class="text-slate-600 hover:text-red-400 transition-colors">
+                            <button @click="removeFromTeam(index)" class="text-slate-400 hover:text-red-400 transition-colors">
                                 <span class="material-symbols-outlined text-sm">remove_circle</span>
                             </button>
                         </div>
@@ -180,7 +170,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <template x-if="myTeam.length === 0">
                         <div class="border-2 border-dashed border-white/5 p-12 text-center">
                             <span class="material-symbols-outlined text-4xl text-white/10 mb-2">person_add</span>
-                            <p class="text-slate-600 font-mono text-[9px] uppercase tracking-widest leading-relaxed">Your agency is empty.<br/>Draft your first idol.</p>
+                            <p class="text-slate-400 font-mono text-[9px] uppercase tracking-widest leading-relaxed">Your agency is empty.<br/>Draft your first idol.</p>
                         </div>
                     </template>
                 </div>
@@ -277,7 +267,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </template>
                 </div>
                 <template x-if="myTeam.length === 0">
-                    <p class="text-center text-slate-600 font-mono text-[10px] uppercase py-8">No idols drafted yet</p>
+                    <p class="text-center text-slate-400 font-mono text-[10px] uppercase py-8">No idols drafted yet</p>
                 </template>
             </div>
 

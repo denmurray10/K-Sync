@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -129,12 +122,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             animation-delay:var(--delay);
         }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
     {% include 'core/header.html' %}
 
@@ -210,6 +200,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span>Beat Streak</span>
         </div>
     </div>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         TODAY'S CHALLENGE — rotates daily
+         ══════════════════════════════════════════════════════════ -->
+    {% if daily_challenge %}
+    <section class="w-full bg-primary border-b border-white/20 overflow-hidden">
+        <div class="container mx-auto px-4 sm:px-6 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div class="flex items-center gap-5">
+                <span class="material-symbols-outlined text-black text-5xl">{{ daily_challenge.icon }}</span>
+                <div>
+                    <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-black/60 font-bold">Today's Challenge · Resets daily</p>
+                    <h2 class="text-2xl md:text-4xl font-black text-black leading-none tracking-tighter uppercase mt-1">{{ daily_challenge.name }}</h2>
+                    <p class="font-mono text-[11px] tracking-widest uppercase text-black/70 mt-2">{{ daily_challenge.blurb }}{% if user.is_authenticated and play_streak %} · Streak: {{ play_streak }} day{{ play_streak|pluralize }}{% endif %}</p>
+                </div>
+            </div>
+            <a data-track="daily_challenge_play" data-track-category="games" href="{{ daily_challenge.play_url }}" class="shrink-0 inline-flex items-center gap-3 bg-black text-white px-8 py-4 text-xs font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]">
+                Play Now <span class="material-symbols-outlined text-sm">play_arrow</span>
+            </a>
+        </div>
+    </section>
+    {% endif %}
 
     <!-- ══════════════════════════════════════════════════════════════
          FEATURED GAMES — Large brutalist cards

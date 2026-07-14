@@ -2,13 +2,6 @@
 <!doctype html>
 <html class="dark" lang="en">
     <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
         <meta charset="utf-8" />
         
@@ -326,14 +319,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 text-transform: uppercase;
             }
         </style>
-    </head>
+    {% include 'core/shared_head.html' %}
+</head>
     <body
         class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden"
     >
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
         {% include 'core/header.html' %}
         <main class="flex-grow pt-0">
@@ -370,13 +360,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors"
                                 >Home</a
                             >
-                            <span class="text-slate-600">/</span>
+                            <span class="text-slate-400">/</span>
                             <a
                                 href="{% url 'news' %}"
                                 class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors"
                                 >News</a
                             >
-                            <span class="text-slate-600">/</span>
+                            <span class="text-slate-400">/</span>
                             <span
                                 class="font-mono text-[10px] tracking-widest uppercase text-primary"
                                 >Article</span
@@ -509,20 +499,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 </h3>
                                 <div class="space-y-4">
                                     <div>
-                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Category</span>
+                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Category</span>
                                         <span class="font-black text-sm uppercase tracking-tight text-primary">{{ article.category }}</span>
                                     </div>
                                     <div>
-                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Published</span>
+                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Published</span>
                                         <span class="font-black text-sm uppercase tracking-tight text-white">{{ article.created_at|date:"M d, Y" }}</span>
                                     </div>
                                     <div>
-                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Reading Time</span>
+                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Reading Time</span>
                                         <span class="font-black text-sm uppercase tracking-tight text-white">{{ article.reading_time }} minutes</span>
                                     </div>
                                     {% if article.tags_list %}
                                     <div>
-                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 block">Tags</span>
+                                        <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Tags</span>
                                         <div class="mt-2 flex flex-wrap gap-2">
                                             {% for tag in article.tags_list %}
                                             <span class="tag-pill">{{ tag }}</span>
@@ -558,7 +548,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                             <h4 class="font-black text-xs uppercase tracking-tight text-white group-hover:text-primary transition-colors line-clamp-2 leading-snug">
                                                 {{ r.title }}
                                             </h4>
-                                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1 block">
+                                            <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mt-1 block">
                                                 {{ r.created_at|date:"M d" }}
                                             </span>
                                         </div>

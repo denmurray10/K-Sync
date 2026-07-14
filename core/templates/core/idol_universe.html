@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+
+    <meta charset="utf-8" />
+
+{% include 'core/seo_meta.html' %}
+<title>Idol Universe — Every Group on K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f425c0",
+                        "background-dark": "#000000",
+                        secondary: "#00f0ff",
+                    },
+                    fontFamily: {
+                        display: ["Montserrat", "sans-serif"],
+                        cinzel: ["Cinzel", "serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0px", sm: "0px", md: "0px", lg: "0px",
+                        xl: "0px", "2xl": "0px", "3xl": "0px", full: "9999px",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .nav-cinzel { font-family: 'Cinzel', serif; }
+        .reveal-up { opacity: 0; transform: translateY(40px); transition: opacity 1.5s ease-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-up.is-visible { opacity: 1; transform: translate(0); }
+    </style>
+{% include 'core/shared_head.html' %}
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+    {% include 'core/header.html' %}
+
+    <main class="flex-grow">
+        <section class="relative w-full bg-black border-b border-white/10">
+            <div class="absolute inset-0 bg-gradient-to-b from-secondary/10 via-transparent to-black pointer-events-none"></div>
+            <div class="relative container mx-auto px-4 sm:px-6 pt-32 md:pt-40 pb-14">
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary text-black text-[10px] font-black tracking-[0.2em] uppercase mb-6">
+                    {{ group_count }} Artists · One Universe
+                </span>
+                <h1 class="text-5xl sm:text-6xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase">
+                    IDOL<br/>
+                    <span class="text-transparent [-webkit-text-stroke:2px_white]">UNIVERSE</span>
+                </h1>
+                <p class="text-slate-400 text-base md:text-lg font-light leading-relaxed mt-8 max-w-xl">
+                    Every group and soloist on K-Beats in one constellation. Pick an artist to open their world — profiles, members, albums, and comebacks.
+                </p>
+            </div>
+        </section>
+
+        <section class="w-full bg-black">
+            <div class="container mx-auto px-4 sm:px-6 py-16">
+                {% if groups %}
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-0 border border-white/10 reveal-up">
+                    {% for group in groups %}
+                    <a href="{% url 'idol_page' slug=group.slug %}" class="group relative border border-white/10 bg-black hover:bg-white/5 transition-all duration-500 overflow-hidden">
+                        <div class="relative aspect-square overflow-hidden">
+                            {% if group.image_url %}
+                            <img src="{{ group.image_url }}" alt="{{ group.name }}" loading="lazy"
+                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 opacity-60 group-hover:opacity-95" />
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center bg-white/5">
+                                <span class="material-symbols-outlined text-slate-700 text-5xl">star</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                            <span class="absolute top-3 left-3 font-mono text-[9px] tracking-widest uppercase px-2 py-1 border {% if group.group_type == 'GIRL' %}border-primary/60 text-primary{% elif group.group_type == 'BOY' %}border-secondary/60 text-secondary{% else %}border-white/40 text-white{% endif %} bg-black/60 backdrop-blur-sm">
+                                {{ group.get_group_type_display|default:group.group_type }}
+                            </span>
+                        </div>
+                        <div class="absolute bottom-0 inset-x-0 p-4">
+                            <p class="text-white font-black uppercase tracking-tight text-sm sm:text-base leading-tight group-hover:text-primary transition-colors">{{ group.name }}</p>
+                            <p class="font-mono text-[9px] tracking-widest uppercase text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Enter world →</p>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="border border-white/10 bg-white/[0.02] p-12 text-center reveal-up">
+                    <p class="text-slate-400 text-sm">The universe is still forming. Check back soon.</p>
+                </div>
+                {% endif %}
+
+                <div class="mt-10 flex justify-center">
+                    <a href="{% url 'idols' %}" class="inline-flex items-center gap-2 border border-white/20 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white hover:border-primary hover:text-primary transition-colors">
+                        Browse With Filters <span class="material-symbols-outlined text-sm">tune</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'core/footer.html' %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new IntersectionObserver(
+                (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("is-visible"); }),
+                { threshold: 0.1 }
+            );
+            document.querySelectorAll(".reveal-up").forEach((el) => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

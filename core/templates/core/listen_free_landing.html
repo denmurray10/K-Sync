@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 <meta charset="utf-8"/>
 {% include 'core/seo_meta.html' %}
 <title>{{ seo_title }}</title>
@@ -158,12 +151,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .panel-hover:hover { transform: none !important; box-shadow: none !important; }
     }
 </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-black text-white font-body">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 <div class="relative isolate min-h-screen">
     <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
@@ -457,10 +447,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <tr>
                                     <td class="border-b border-white/10 px-4 py-4 text-sm text-slate-200 sm:px-5">{{ row.label }}</td>
                                     <td class="border-b border-white/10 px-4 py-4 text-center sm:px-5">
-                                        {% if row.free %}<span class="material-symbols-outlined text-lg text-green-400">check_circle</span>{% else %}<span class="material-symbols-outlined text-lg text-slate-600">close</span>{% endif %}
+                                        {% if row.free %}<span class="material-symbols-outlined text-lg text-green-400">check_circle</span>{% else %}<span class="material-symbols-outlined text-lg text-slate-400">close</span>{% endif %}
                                     </td>
                                     <td class="border-b border-white/10 px-4 py-4 text-center sm:px-5">
-                                        {% if row.vip %}<span class="material-symbols-outlined text-lg text-primary">check_circle</span>{% else %}<span class="material-symbols-outlined text-lg text-slate-600">close</span>{% endif %}
+                                        {% if row.vip %}<span class="material-symbols-outlined text-lg text-primary">check_circle</span>{% else %}<span class="material-symbols-outlined text-lg text-slate-400">close</span>{% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}

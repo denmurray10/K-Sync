@@ -2,9 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
 <meta charset="utf-8"/>
 {% include 'core/seo_meta.html' %}
@@ -89,11 +86,9 @@ tailwind.config = {
             inset 0 0 0 1px rgba(255, 255, 255, 0.04);
     }
 </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-background-dark text-slate-100 font-sans min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 {% include 'core/header.html' %}
 
@@ -376,7 +371,7 @@ tailwind.config = {
                                                 </div>
                                                 <div class="flex items-center justify-between border-t border-white/10 pt-4 sm:block sm:border-t-0 sm:pt-0 sm:text-right">
                                                     <div>
-                                                        <p class="text-[10px] uppercase tracking-[0.18em] text-slate-600">Desk</p>
+                                                        <p class="text-[10px] uppercase tracking-[0.18em] text-slate-400">Desk</p>
                                                         <p class="mt-2 text-sm font-black uppercase tracking-[0.18em] text-white">Open</p>
                                                     </div>
                                                     <span class="material-symbols-outlined text-2xl text-primary transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>

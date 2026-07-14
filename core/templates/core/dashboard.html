@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8" />
     
@@ -53,12 +46,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         .animate-badge-glow { animation: badge-glow 3s ease-in-out infinite; }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
 <body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
     {% include 'core/header.html' %}
 
@@ -75,7 +65,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="container mx-auto px-4 sm:px-6 pt-48 pb-20 md:pb-28 relative z-10">
                 <div class="flex items-center gap-2 mb-6 reveal-left">
                     <a href="{% url 'home' %}" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 hover:text-white transition-colors">Home</a>
-                    <span class="text-slate-600">/</span>
+                    <span class="text-slate-400">/</span>
                     <span class="font-mono text-[10px] tracking-widest uppercase text-primary">Dashboard</span>
                 </div>
 
@@ -271,14 +261,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <div class="flex-1 min-w-0">
                                         <h5 class="text-white text-xs font-black uppercase tracking-tight truncate group-hover:text-primary transition-colors">{{ member.stage_name|default:member.name }}</h5>
                                         {% if member.position %}
-                                        <span class="text-slate-600 font-mono text-[8px] tracking-widest uppercase">{{ member.position }}</span>
+                                        <span class="text-slate-400 font-mono text-[8px] tracking-widest uppercase">{{ member.position }}</span>
                                         {% endif %}
                                     </div>
                                 </div>
                                 {% endfor %}
                             </div>
                             {% else %}
-                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600">No member data available</p>
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400">No member data available</p>
                             {% endif %}
                         </div>
 
@@ -302,7 +292,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                             <span class="bg-secondary text-black text-[7px] font-black px-1.5 py-0.5 uppercase tracking-widest">{{ r.type }}</span>
                                         </div>
                                         <h5 class="text-white text-xs font-black uppercase tracking-tight truncate group-hover:text-secondary transition-colors">{{ r.title }}</h5>
-                                        <span class="text-slate-600 font-mono text-[8px] tracking-widest">{{ r.date_str }}</span>
+                                        <span class="text-slate-400 font-mono text-[8px] tracking-widest">{{ r.date_str }}</span>
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -310,7 +300,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             {% else %}
                             <div class="py-6 text-center">
                                 <span class="material-symbols-outlined text-3xl text-white/10">event_busy</span>
-                                <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mt-3">No upcoming releases for {{ bias.name }}</p>
+                                <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mt-3">No upcoming releases for {{ bias.name }}</p>
                             </div>
                             {% endif %}
 
@@ -427,7 +417,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Song Game</h4>
                                 <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Test your K-Pop knowledge</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">play_arrow</span>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">play_arrow</span>
                         </div>
                     </a>
 
@@ -441,7 +431,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Idol Scramble</h4>
                                 <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Unscramble idol &amp; group names</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">play_arrow</span>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">play_arrow</span>
                         </div>
                     </a>
 
@@ -455,7 +445,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors">Lyric Drop</h4>
                                 <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Fill in the missing lyric</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-600 group-hover:text-secondary transition-colors">play_arrow</span>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-secondary transition-colors">play_arrow</span>
                         </div>
                     </a>
 
@@ -469,7 +459,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Chart Clash</h4>
                                 <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Which song charted higher?</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">play_arrow</span>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">play_arrow</span>
                         </div>
                     </a>
 
@@ -483,7 +473,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors">Bias Selector</h4>
                                 <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Find your perfect match</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-600 group-hover:text-secondary transition-colors">east</span>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-secondary transition-colors">east</span>
                         </div>
                     </a>
 
@@ -497,7 +487,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Fandom Trivia</h4>
                                 <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Test your mastery of K-Pop history</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">play_arrow</span>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">play_arrow</span>
                         </div>
                     </a>
 
@@ -511,7 +501,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors">MV Matcher</h4>
                                 <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Identify the MV from a single frame</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-600 group-hover:text-secondary transition-colors">play_arrow</span>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-secondary transition-colors">play_arrow</span>
                         </div>
                     </a>
 
@@ -525,7 +515,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors">Draft Day</h4>
                                 <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Build your fantasy idol group</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">play_arrow</span>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">play_arrow</span>
                         </div>
                     </a>
 
@@ -539,7 +529,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <h4 class="text-white text-sm font-black uppercase tracking-tight group-hover:text-secondary transition-colors">Beat Streak</h4>
                                 <p class="text-slate-500 font-mono text-[9px] tracking-widest uppercase mt-0.5">Tap to the rhythm of latest hits</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-600 group-hover:text-secondary transition-colors">play_arrow</span>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-secondary transition-colors">play_arrow</span>
                         </div>
                     </a>
 
@@ -589,15 +579,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <h3 class="text-white text-sm font-black uppercase tracking-tight truncate group-hover:text-secondary transition-colors">{{ fav.title }}</h3>
                             <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">{{ fav.artist }}</span>
                         </div>
-                        <span class="font-mono text-[9px] tracking-widest text-slate-600 shrink-0 hidden sm:block">{{ fav.added_at|date:"M d" }}</span>
+                        <span class="font-mono text-[9px] tracking-widest text-slate-400 shrink-0 hidden sm:block">{{ fav.added_at|date:"M d" }}</span>
                         <form method="post" action="{% url 'remove_favourite' pk=fav.pk %}" class="shrink-0">
                             {% csrf_token %}
-                            <button type="submit" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
+                            <button type="submit" class="text-slate-400 hover:text-red-400 transition-colors" title="Remove">
                                 <span class="material-symbols-outlined text-lg">close</span>
                             </button>
                         </form>
                         {% if fav.itunes_url %}
-                        <a href="{{ fav.itunes_url }}" target="_blank" rel="noopener" class="text-slate-600 hover:text-secondary transition-colors shrink-0">
+                        <a href="{{ fav.itunes_url }}" target="_blank" rel="noopener" class="text-slate-400 hover:text-secondary transition-colors shrink-0">
                             <span class="material-symbols-outlined text-lg">open_in_new</span>
                         </a>
                         {% endif %}
@@ -660,12 +650,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         <h3 class="text-white text-sm font-black uppercase tracking-tight truncate group-hover:text-primary transition-colors">{{ track.title }}</h3>
                                         <span class="text-slate-500 font-mono text-[9px] tracking-widest uppercase">{{ track.artist }}</span>
                                     </div>
-                                    <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors shrink-0">east</span>
+                                    <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors shrink-0">east</span>
                                 </a>
                                 {% empty %}
                                 <div class="py-8 text-center">
                                     <span class="material-symbols-outlined text-4xl text-white/10">music_off</span>
-                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mt-3">No trending data available</p>
+                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mt-3">No trending data available</p>
                                 </div>
                                 {% endfor %}
                             </div>
@@ -712,7 +702,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 {% empty %}
                                 <div class="col-span-2 py-8 text-center">
                                     <span class="material-symbols-outlined text-4xl text-white/10">event_busy</span>
-                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mt-3">No upcoming releases</p>
+                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mt-3">No upcoming releases</p>
                                 </div>
                                 {% endfor %}
                             </div>
@@ -749,7 +739,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2 mb-1">
                                             <span class="bg-primary text-black text-[8px] font-black px-1.5 py-0.5 uppercase tracking-widest">{{ article.category }}</span>
-                                            <span class="font-mono text-[9px] tracking-widest text-slate-600">{{ article.created_at|date:"M d" }}</span>
+                                            <span class="font-mono text-[9px] tracking-widest text-slate-400">{{ article.created_at|date:"M d" }}</span>
                                         </div>
                                         <h3 class="text-white text-sm font-bold tracking-tight truncate group-hover:text-primary transition-colors">{{ article.title }}</h3>
                                         {% if article.subtitle %}
@@ -758,14 +748,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     </div>
                                     <!-- Reading time -->
                                     {% if article.reading_time %}
-                                    <span class="font-mono text-[9px] tracking-widest text-slate-600 shrink-0 hidden sm:block">{{ article.reading_time }} min</span>
+                                    <span class="font-mono text-[9px] tracking-widest text-slate-400 shrink-0 hidden sm:block">{{ article.reading_time }} min</span>
                                     {% endif %}
-                                    <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors shrink-0">east</span>
+                                    <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors shrink-0">east</span>
                                 </a>
                                 {% empty %}
                                 <div class="py-8 text-center">
                                     <span class="material-symbols-outlined text-4xl text-white/10">newspaper</span>
-                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600 mt-3">No articles yet</p>
+                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mt-3">No articles yet</p>
                                 </div>
                                 {% endfor %}
                             </div>
@@ -789,11 +779,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <div class="grid grid-cols-2 gap-0">
                                 <div class="p-3 border border-white/5 text-center">
                                     <span class="text-xl font-black text-primary block">{{ total_favourites }}</span>
-                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">Favourites</span>
+                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-400 block mt-1">Favourites</span>
                                 </div>
                                 <div class="p-3 border border-white/5 text-center">
                                     <span class="text-[11px] font-black text-white block mt-1">{{ user.date_joined|date:'M Y' }}</span>
-                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600 block mt-1">Joined</span>
+                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-400 block mt-1">Joined</span>
                                 </div>
                             </div>
                             {% if profile.bias %}
@@ -887,7 +877,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             {% else %}
                             <div class="border border-dashed border-white/10 p-8 text-center">
                                 <span class="material-symbols-outlined text-white/10 text-3xl mb-3 block">lock</span>
-                                <p class="font-mono text-[8px] tracking-widest uppercase text-slate-600">No badges earned yet. Join a launch team to unlock.</p>
+                                <p class="font-mono text-[8px] tracking-widest uppercase text-slate-400">No badges earned yet. Join a launch team to unlock.</p>
                             </div>
                             {% endif %}
                         </div>
@@ -911,7 +901,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400">Best</span>
                                 </div>
                                 <span class="font-black text-lg text-primary">{{ best_score.score }}</span>
-                                <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600">{{ best_score.correct }}/{{ best_score.total }} correct</span>
+                                <span class="font-mono text-[8px] tracking-widest uppercase text-slate-400">{{ best_score.correct }}/{{ best_score.total }} correct</span>
                             </div>
                             {% endif %}
 
@@ -924,15 +914,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <span class="font-black text-lg text-white">{{ latest.score }}</span>
-                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-600">{{ latest.correct }}/{{ latest.total }} correct</span>
-                                    <span class="font-mono text-[8px] tracking-widest text-slate-600 ml-2">{{ latest.played_at|date:"M d" }}</span>
+                                    <span class="font-mono text-[8px] tracking-widest uppercase text-slate-400">{{ latest.correct }}/{{ latest.total }} correct</span>
+                                    <span class="font-mono text-[8px] tracking-widest text-slate-400 ml-2">{{ latest.played_at|date:"M d" }}</span>
                                 </div>
                             </div>
                             {% endwith %}
                             {% else %}
                             <div class="text-center py-6">
                                 <span class="material-symbols-outlined text-3xl text-white/10 mb-2 block">sports_esports</span>
-                                <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mb-4">No scores yet</p>
+                                <p class="font-mono text-[9px] tracking-widest uppercase text-slate-400 mb-4">No scores yet</p>
                                 <a href="{% url 'song_game_promo' %}" class="inline-flex items-center gap-1.5 bg-primary text-black px-4 py-2.5 font-black uppercase tracking-[0.2em] text-[9px] hover:bg-white transition-colors">
                                     <span class="material-symbols-outlined text-sm">play_arrow</span> Play Now
                                 </a>
@@ -986,7 +976,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <!-- Name -->
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-white text-xs font-black uppercase tracking-tight truncate group-hover:text-primary transition-colors">{{ artist.name }}</h4>
-                                        <span class="text-slate-600 font-mono text-[8px] tracking-widest uppercase">{{ artist.get_group_type_display }}</span>
+                                        <span class="text-slate-400 font-mono text-[8px] tracking-widest uppercase">{{ artist.get_group_type_display }}</span>
                                     </div>
                                 </a>
                                 {% endfor %}
@@ -1114,7 +1104,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <template x-if="contests.length === 0">
                         <div class="py-12 text-center">
                             <span class="material-symbols-outlined text-4xl text-white/10 mb-3 block">emoji_events</span>
-                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-600">No contests yet. Create your first one above.</p>
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400">No contests yet. Create your first one above.</p>
                         </div>
                     </template>
 
@@ -1339,7 +1329,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="container mx-auto px-4 sm:px-6 flex items-center justify-between">
             <div>
                 <span class="text-white font-black text-sm uppercase tracking-tight">{{ user.username }}</span>
-                <span class="text-slate-600 font-mono text-[9px] tracking-widest uppercase block mt-0.5">Signed in</span>
+                <span class="text-slate-400 font-mono text-[9px] tracking-widest uppercase block mt-0.5">Signed in</span>
             </div>
             <a href="{% url 'logout' %}" class="flex items-center gap-2 text-slate-400 hover:text-red-400 transition-colors font-mono text-[10px] tracking-[0.2em] uppercase">
                 <span class="material-symbols-outlined text-base">logout</span> Log Out

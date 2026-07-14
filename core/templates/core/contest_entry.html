@@ -2,13 +2,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KDMN68PM');</script>
-<!-- End Google Tag Manager -->
 
     <meta charset="utf-8"/>
     
@@ -81,12 +74,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .step-done { background: #f425c0; color: #000; border-color: #f425c0; }
         .step-pending { background: transparent; color: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.2); }
     </style>
+{% include 'core/shared_head.html' %}
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDMN68PM"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
 
 {% include 'core/header.html' %}
 
@@ -318,7 +308,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <span x-show="agreed" class="material-symbols-outlined text-black text-sm">check</span>
                                 </button>
                                 <p class="text-slate-400 text-xs leading-relaxed">
-                                    I agree to the <a href="#" class="text-primary hover:underline">contest rules and terms</a>. I confirm I am 16 or older and consent to being contacted via email if selected as a winner. One entry per person.
+                                    I agree to the <a href="{% url 'terms_of_service' %}" target="_blank" rel="noopener" class="text-primary hover:underline">contest rules and terms</a>. I confirm I am 16 or older and consent to being contacted via email if selected as a winner. One entry per person.
                                 </p>
                             </div>
 
@@ -489,10 +479,4 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => observer.observe(el));
-});
-</script>
-
-</body>
-</html>
-
+    document.querySelectorAll('.reveal-up, .reveal-left').forEach(el 

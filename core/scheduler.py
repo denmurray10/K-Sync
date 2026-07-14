@@ -260,6 +260,20 @@ def auto_blog_generate():
         logger.error("[scheduler] Auto blog generation failed: %s", e)
 
 
+def send_comeback_dday_alerts_job():
+    """Background job: D-1 comeback alert emails to opted-in fan-club members."""
+    import os
+    if os.environ.get('COMEBACK_DDAY_ALERTS_ENABLED', 'true').lower() != 'true':
+        return
+    logger.info("[scheduler] Starting comeback D-day alert dispatch...")
+    try:
+        from django.core.management import call_command
+        call_command('send_comeback_dday_alerts')
+        logger.info("[scheduler] Comeback D-day alert dispatch complete.")
+    except Exception as e:
+        logger.error("[scheduler] Comeback D-day alert dispatch failed: %s", e)
+
+
 def send_user_digests_job():
     """Background job: send opt-in user digests for users due in their local timezone."""
     logger.info("[scheduler] Starting user digest dispatch...")
@@ -448,6 +462,9 @@ def start_scheduler():
 
     # Schedule User Digests: Run every hour (timezone-aware per user)
     scheduler.add_job(send_user_digests_job, 'interval', hours=1, id='send_user_digests', replace_existing=True)
+
+    # D-1 comeback alerts for fan-club members (opt-in), daily at 09:00 UTC
+    scheduler.add_job(send_comeback_dday_alerts_job, 'cron', hour=9, minute=0, id='send_comeback_dday_alerts', replace_existing=True)
 
     # Schedule Facebook homepage comments: run frequently so newly published posts get a follow-up quickly.
     scheduler.add_job(

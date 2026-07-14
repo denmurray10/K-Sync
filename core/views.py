@@ -5997,6 +5997,8 @@ def api_header_mega_menu_data(request):
 
 def charts(request):
     chart_type = request.GET.get('type', 'songs')
+    # The daily chart regenerates on the 08:00 UTC scheduler run (core/scheduler.py)
+    chart_drop_hour_utc = 8
     chart_labels = {
         'songs': 'Daily K-Pop Songs Chart',
         'weekly': 'Weekly K-Pop Chart',
@@ -6082,6 +6084,7 @@ def charts(request):
     chart_ticker = rankings[10:20] if len(rankings) > 10 else []
     
     context = {
+        'chart_drop_hour_utc': chart_drop_hour_utc,
         'rankings': rankings,
         'number_one': number_one,
         'chart_main': chart_main,
@@ -6225,7 +6228,14 @@ def stray_kids(request):
     return render(request, 'core/stray_kids.html', context)
 
 def idol_universe(request):
-    return render(request, 'core/idol_universe.html')
+    groups = list(KPopGroup.objects.order_by('rank'))
+    for g in groups:
+        _apply_stream_image_to_field(g, 'image_url')
+        g.image_url = _optimize_home_image_url(g.image_url, width=720, height=720)
+    return render(request, 'core/idol_universe.html', {
+        'groups': groups,
+        'group_count': len(groups),
+    })
 
 def schedule(request):
     return render(request, 'core/schedule.html', {
@@ -6235,8 +6245,74 @@ def schedule(request):
         'seo_description': 'See the K-Beats radio schedule, live show slots, and weekly K-pop programming so listeners know when to tune in for the next session.',
     })
 
+@login_required
 def profile(request):
-    return _render_noindex_page(request, 'core/profile.html')
+    from .models import UserProfile, FavouriteSong, GameScore, FanClubMembership
+
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    favourites = list(request.user.favourite_songs.all()[:12])
+    memberships = list(
+        request.user.fan_club_memberships.select_related('group')
+    )
+
+    # Best score per game
+    best_scores = []
+    seen_games = set()
+    for s in request.user.game_scores.order_by('-score'):
+        if s.game in seen_games:
+            continue
+        seen_games.add(s.game)
+        best_scores.append(s)
+
+    bias = user_profile.bias
+    if bias:
+        _apply_stream_image_to_field(bias, 'image_url')
+        bias.image_url = _optimize_home_image_url(bias.image_url, width=320, height=320)
+
+    # "For you" — upcoming releases (next 14 days) from followed fan-club groups
+    upcoming_for_you = []
+    try:
+        from datetime import timedelta
+        followed_names = [m.group.name.lower() for m in memberships]
+        if bias and bias.name.lower() not in followed_names:
+            followed_names.append(bias.name.lower())
+        if followed_names:
+            now = timezone.now()
+            horizon = now.date() + timedelta(days=14)
+            months = {(now.year, now.month), (horizon.year, horizon.month)}
+            for (y, m) in months:
+                data_obj = ComebackData.objects.filter(year=y, month=m).first()
+                if not data_obj or not data_obj.data:
+                    continue
+                for day_key, day_data in sorted(data_obj.data.items()):
+                    try:
+                        day_date = timezone.datetime.strptime(day_key, '%Y-%m-%d').date()
+                    except ValueError:
+                        continue
+                    if not (now.date() <= day_date <= horizon):
+                        continue
+                    for rel in day_data.get('releases', []):
+                        artist = str(rel.get('artist') or rel.get('name') or '').strip()
+                        if artist and any(fn in artist.lower() or artist.lower() in fn for fn in followed_names):
+                            upcoming_for_you.append({
+                                'date': day_date,
+                                'artist': artist,
+                                'title': str(rel.get('title') or rel.get('album') or '').strip(),
+                            })
+        upcoming_for_you = upcoming_for_you[:4]
+    except Exception:
+        upcoming_for_you = []
+
+    return _render_noindex_page(request, 'core/profile.html', {
+        'upcoming_for_you': upcoming_for_you,
+        'bias': bias,
+        'favourites': favourites,
+        'favourites_count': request.user.favourite_songs.count(),
+        'games_played': request.user.game_scores.count(),
+        'clubs_count': len(memberships),
+        'memberships': memberships,
+        'best_scores': best_scores,
+    })
 
 _news_cache = {'articles': [], 'ts': 0}
 
@@ -6762,6 +6838,17 @@ def coming_soon(request):
         ),
     )
 
+DAILY_CHALLENGE_ROTATION = [
+    {'key': 'song_game', 'name': 'Song Game', 'blurb': 'Guess the track from a 5-second clip.', 'icon': 'music_note', 'play_url_name': 'song_game_play'},
+    {'key': 'beat_streak', 'name': 'Beat Streak', 'blurb': 'How many in a row can you name?', 'icon': 'local_fire_department', 'play_url_name': 'beat_streak'},
+    {'key': 'idol_scramble', 'name': 'Idol Scramble', 'blurb': 'Unscramble the idol before the clock dies.', 'icon': 'shuffle', 'play_url_name': 'idol_scramble'},
+    {'key': 'chart_clash', 'name': 'Chart Clash', 'blurb': 'Higher or lower on today\'s real chart?', 'icon': 'equalizer', 'play_url_name': 'chart_clash'},
+    {'key': 'lyric_drop', 'name': 'Lyric Drop', 'blurb': 'One lyric gap. Four choices. No mercy.', 'icon': 'lyrics', 'play_url_name': 'lyric_drop_play'},
+    {'key': 'fandom_trivia', 'name': 'Fandom Trivia', 'blurb': 'Deep-cut questions for real fans.', 'icon': 'psychology', 'play_url_name': 'fandom_trivia'},
+    {'key': 'mv_matcher', 'name': 'MV Matcher', 'blurb': 'Match the frame to the music video.', 'icon': 'movie', 'play_url_name': 'mv_matcher'},
+]
+
+
 def games(request):
     context = _build_basic_seo_context(
         request,
@@ -6769,6 +6856,9 @@ def games(request):
         title='K-Pop Games | Song Trivia, Bias Games and Fan Challenges',
         description='Play K-pop games on K-Beats including lyric, song, bias, and fandom challenges built for fast fan sessions and repeat play.',
     )
+    today = timezone.now().date()
+    challenge = DAILY_CHALLENGE_ROTATION[today.toordinal() % len(DAILY_CHALLENGE_ROTATION)]
+    context['daily_challenge'] = {**challenge, 'play_url': reverse(challenge['play_url_name'])}
     return render(request, 'core/games.html', context)
 
 
@@ -12218,20 +12308,8 @@ def api_live_ai_helpful(request):
         'helpful_count': normalized['helpful_count'],
     })
 
-def top_cheerleader_badges(request):
-    return _render_noindex_page(request, 'core/top_cheerleader_badges.html')
-
-def cheerleader_leaderboard(request):
-    return _render_noindex_page(request, 'core/cheerleader_leaderboard.html')
-
 def legendary_item_claimed(request):
     return _render_noindex_page(request, 'core/legendary_item_claimed.html')
-
-def neon_home_variant_1(request):
-    return _render_noindex_page(request, 'core/neon_home_variant_1.html')
-
-def neon_home_variant_2(request):
-    return _render_noindex_page(request, 'core/neon_home_variant_2.html')
 
 def test_landing_wow_hero(request):
     featured_article = BlogArticle.objects.order_by('-created_at').first()
@@ -12239,47 +12317,22 @@ def test_landing_wow_hero(request):
         'featured_article': featured_article,
     })
 
-def celebration_toggle(request):
-    return _render_noindex_page(request, 'core/celebration_toggle.html')
-
+@login_required
 def profile_personalization_settings(request):
-    return _render_noindex_page(request, 'core/profile_personalization_settings.html')
+    from .models import UserProfile
 
-def avatar_frame_gallery(request):
-    return _render_noindex_page(request, 'core/avatar_frame_gallery.html')
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    bias = user_profile.bias
+    if bias:
+        _apply_stream_image_to_field(bias, 'image_url')
+        bias.image_url = _optimize_home_image_url(bias.image_url, width=320, height=320)
 
-def legendary_item_drop(request):
-    return _render_noindex_page(request, 'core/legendary_item_drop.html')
-
-def gift_received(request):
-    return _render_noindex_page(request, 'core/gift_received.html')
-
-def k_pop_pulse_idol_emote(request):
-    return _render_noindex_page(request, 'core/k_pop_pulse_idol_emote.html')
-
-def emote_unlocked(request):
-    return _render_noindex_page(request, 'core/emote_unlocked.html')
-
-def daily_login_rewards_calendar(request):
-    return _render_noindex_page(request, 'core/daily_login_rewards_calendar.html')
-
-def streak_recovery(request):
-    return _render_noindex_page(request, 'core/streak_recovery.html')
-
-def pulse_point_store(request):
-    return _render_noindex_page(request, 'core/pulse_point_store.html')
-
-def k_pop_pulse_home_neon_variant(request):
-    return _render_noindex_page(request, 'core/k_pop_pulse_home_neon_variant.html')
-
-def purchase_successful_celebration_modal(request):
-    return _render_noindex_page(request, 'core/purchase_successful_celebration_modal.html')
+    return _render_noindex_page(request, 'core/profile_personalization_settings.html', {
+        'bias': bias,
+    })
 
 def gift_to_a_friend(request):
     return _render_noindex_page(request, 'core/gift_to_a_friend.html')
-
-def d_day_comeback_notification(request):
-    return _render_noindex_page(request, 'core/d_day_comeback_notification.html')
 
 def blog_page(request):
     articles = list(BlogArticle.objects.order_by('-created_at')[:30])
@@ -13787,15 +13840,6 @@ def blog_internal_link_pass(request):
     })
 
 
-def new_release_spotlight(request):
-    return _render_noindex_page(request, 'core/new_release_spotlight.html')
-
-def streaming_party_chat(request):
-    return _render_noindex_page(request, 'core/streaming_party_chat.html')
-
-def confetti_rain(request):
-    return _render_noindex_page(request, 'core/confetti_rain.html')
-
 # â”€â”€ AI Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @csrf_exempt
@@ -14440,12 +14484,16 @@ def calendar(request):
     for day_num in range(1, num_days + 1):
         day_key = f"{year}-{month:02d}-{day_num:02d}"
         day_data = calendar_data.get(day_key, {})
+        releases = day_data.get('releases', [])
+        birthdays = day_data.get('birthdays', [])
+        anniversaries = day_data.get('anniversaries', [])
         days.append({
             'num': day_num,
             'empty': False,
-            'releases': day_data.get('releases', []),
-            'birthdays': day_data.get('birthdays', []),
-            'anniversaries': day_data.get('anniversaries', []),
+            'releases': releases,
+            'birthdays': birthdays,
+            'anniversaries': anniversaries,
+            'total_events': len(releases) + len(birthdays) + len(anniversaries),
             'is_today': (day_num == now.day)
         })
 
