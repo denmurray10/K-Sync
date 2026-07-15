@@ -1,0 +1,81 @@
+{% comment %} Site-wide mini now-playing bar (desktop). Polls the live status API and
+offers a pop-out player so listening survives page navigation. Hidden on /live pages
+(they have the full player) and on mobile (the app bar covers it). {% endcomment %}
+<div id="ksync-mini-player" class="hidden fixed bottom-0 inset-x-0 z-[60] border-t border-white/15 bg-black/90 backdrop-blur-md" style="display:none;">
+    <div class="container mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+            <img id="ksync-mini-art" src="" alt="" class="w-9 h-9 object-cover border border-white/15 hidden" />
+            <span class="relative flex h-2 w-2 shrink-0">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
+            </span>
+            <p class="min-w-0 truncate">
+                <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-slate-400 mr-3">On Air</span>
+                <span id="ksync-mini-title" class="text-white text-sm font-bold uppercase tracking-wide"></span>
+                <span id="ksync-mini-artist" class="font-mono text-[10px] tracking-widest uppercase text-slate-400 ml-2"></span>
+            </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+            <button id="ksync-mini-popout" type="button" data-track="mini_player_popout" data-track-category="mini_player"
+                    class="inline-flex items-center gap-2 bg-primary text-black px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border border-primary hover:bg-white hover:border-white transition-colors">
+                <span class="material-symbols-outlined text-sm">open_in_new</span> Listen
+            </button>
+            <a href="{% url 'live' %}" data-track="mini_player_open_live" data-track-category="mini_player"
+               class="inline-flex items-center gap-2 border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white hover:border-primary hover:text-primary transition-colors">
+                Open Studio
+            </a>
+            <button id="ksync-mini-close" type="button" aria-label="Hide player bar"
+                    class="inline-flex items-center justify-center w-8 h-8 border border-white/10 text-slate-500 hover:text-white hover:border-white/30 transition-colors">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
+    </div>
+</div>
+<script id="ksync-mini-player-js">
+(function () {
+    var path = window.location.pathname;
+    if (path.indexOf('/live') === 0) return;                    // full player lives there
+    if (window.matchMedia('(max-width: 767px)').matches) return; // mobile app bar covers it
+    try { if (sessionStorage.getItem('ksync_mini_player_hidden') === '1') return; } catch (e) {}
+
+    var bar = document.getElementById('ksync-mini-player');
+    if (!bar) return;
+    var art = document.getElementById('ksync-mini-art');
+    var title = document.getElementById('ksync-mini-title');
+    var artist = document.getElementById('ksync-mini-artist');
+
+    function update() {
+        fetch('/api/live/status/', { headers: { 'Accept': 'application/json' } })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+                var t = data && data.ok && data.current_track;
+                if (!t || !t.title) { bar.style.display = 'none'; return; }
+                title.textContent = t.title;
+                artist.textContent = t.artist || '';
+                if (t.album_art) { art.src = t.album_art; art.classList.remove('hidden'); }
+                else { art.classList.add('hidden'); }
+                bar.style.display = 'block';
+                document.body.style.paddingBottom = '3.5rem';
+            })
+            .catch(function () { bar.style.display = 'none'; });
+    }
+    update();
+    setInterval(update, 30000);
+
+    var popoutBtn = document.getElementById('ksync-mini-popout');
+    if (popoutBtn) {
+        popoutBtn.addEventListener('click', function () {
+            window.open('{% url "live_player_popout" %}', 'kbeats_player',
+                'width=420,height=680,menubar=no,toolbar=no,location=no,status=no');
+        });
+    }
+    var closeBtn = document.getElementById('ksync-mini-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+            bar.style.display = 'none';
+            document.body.style.paddingBottom = '';
+            try { sessionStorage.setItem('ksync_mini_player_hidden', '1'); } catch (e) {}
+        });
+    }
+})();
+</script>

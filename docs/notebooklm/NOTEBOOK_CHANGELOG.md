@@ -6,6 +6,23 @@
 - Current truth: This changelog tracks curated-source changes for the `K Beats Radio` notebook.
 - Legacy context: Earlier notebook states were smaller bootstrap packs and should not be treated as complete project-brain coverage.
 
+## 2026-07-14
+
+### Homepage "For Your Bias" rail + views.py repair
+
+- Added a full "For Your Bias" section to `core/templates/core/index.html`, directly under the live player bar: `#bias-rail`, black-stage, mirroring the Today's Programming anatomy (stacked headline + mono subtitle + sharp-shadow header CTA, then full-width hover-invert rows). Three states — personalised (chart row with rank/movement/track, next-comeback row with D-day and date, hub row with group image), picker (logged in, no bias — explainer rows + Choose Your Bias CTA), and signup teaser (logged out — explainer rows + Start Free CTA). Context is built in `_build_homepage_context` (`bias_rail` key) reusing the existing station-matching helpers, `Ranking` daily data, `ComebackData`, and the stream-image helpers for the bias image.
+- New click events under `data-track-category="homepage_bias_rail"`: `bias_rail_group_home`, `bias_rail_chart_home`, `bias_rail_comeback_home`, `bias_rail_play_home`, `bias_rail_pick_home`, `bias_rail_signup_home`.
+- Rebuilt `core/static/core/css/home-tailwind.css` for the new markup.
+- Repaired a truncation in `core/views.py` left by the 14 Jul cleanup pass: restored `get_artist_stats`'s tail and the `placeholder`, `privacy_policy`, `cookie_policy`, and `terms_of_service` views from git history (the app could not boot without them).
+- Fixed double-encoded ▲/▼ chart-movement glyphs in `core/views.py` (they rendered as mojibake in Trending and would have in the new rail).
+- Current truth unchanged elsewhere; no legacy reinterpretation.
+
+### Daily-format games: Daily Drop + Chart Oracle (15 Jul)
+
+- **Daily Drop** (`/game/daily-drop/` promo, `/game/daily-drop/play/`): Heardle-format shared daily puzzle. One mystery track per chart day, deterministically seeded from the daily `Ranking` date over its top 40, enriched with an iTunes 30s preview (cached per chart day, key `daily_drop_puzzle:<date>`). Six tries on a 1/2/4/7/11/16s snippet ladder. Guesses are validated server-side (`/api/daily-drop/guess/`) so the answer never ships in page source; `/api/daily-drop/clip/` returns only the clip URL. Client keeps per-day state and streak in localStorage, posts finished games to `save_game_score` as `daily_drop`, and offers a Wordle-style share grid.
+- **Chart Oracle** (`/game/chart-oracle/` promo, `/game/chart-oracle/play/`): prediction game against tomorrow's chart. Three deterministic matchups (seeded RNG over today's Top 20) plus a #1 call from the top five. Login required to lock in (`/api/chart-oracle/predict/`; one `ChartPrediction` per user per chart day, 409 on duplicates). Predictions auto-resolve on the next visit once a newer daily ranking exists (+10 per matchup, +20 for the #1 call; a track that falls off the chart loses its matchup, both off = void) and write a `chart_oracle` `GameScore`.
+- New model `ChartPrediction`; `GameScore.GAME_CHOICES` gains `daily_drop` and `chart_oracle` — migration `0052_alter_gamescore_game_chartprediction` (a `0051` was also generated for pre-existing `writer_slug` drift). Both games are in the Games page All-Games list and the Today's Challenge rotation (now 9 entries). Neither is in the sitemap, consistent with all other game routes.
+
 ## 2026-04-06
 
 ### Bootstrap and core project-brain setup

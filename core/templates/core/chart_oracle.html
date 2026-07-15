@@ -1,0 +1,197 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+<title>Chart Oracle — K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>
+        body { margin: 0; overflow-x: hidden; background: #000; }
+        [x-cloak] { display: none !important; }
+    </style>
+{% include 'core/shared_head.html' %}
+</head>
+<body class="font-sans text-white" x-data="chartOracle()" x-init="init()">
+
+    <div class="relative min-h-screen bg-black flex flex-col">
+
+        <!-- Top Bar -->
+        <div class="bg-black/80 backdrop-blur-md flex items-center justify-between px-4 py-4 md:px-6 border-b border-white/10 shrink-0">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'games' %}" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-black uppercase tracking-[0.18em] text-[10px]">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span>
+                    Back to Games
+                </a>
+                <div>
+                    <h1 class="text-sm font-black uppercase tracking-[0.2em] text-white">Chart Oracle</h1>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-400">Call Tomorrow's Chart · Resolves At The Daily Drop</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="font-mono text-[9px] tracking-widest uppercase text-slate-400 block">Predicting Against</span>
+                <span class="font-black text-sm text-secondary">{{ chart_date_label|default:"—" }} Chart</span>
+            </div>
+        </div>
+
+        {% if not puzzle_available %}
+        <div class="flex-1 flex items-center justify-center p-8">
+            <div class="max-w-md text-center border border-white/15 p-10">
+                <span class="material-symbols-outlined text-5xl text-primary">hourglass_top</span>
+                <h2 class="mt-4 text-2xl font-black uppercase tracking-tight">Not Enough Chart Data Yet</h2>
+                <p class="mt-3 font-mono text-[11px] tracking-widest uppercase text-slate-400">The Oracle needs a full daily Top 20 to open the floor. Check back after the next chart drop.</p>
+                <a href="{% url 'charts' %}" class="mt-8 inline-flex items-center gap-2 border border-white px-6 py-3 text-xs font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-colors">See The Charts</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="flex-1 flex flex-col items-center px-4 py-10 md:py-16">
+            <div class="w-full max-w-2xl">
+
+                <!-- Last resolved scoreboard -->
+                <template x-if="lastResolved">
+                    <div class="mb-8 border border-secondary/50 p-5 flex items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-secondary">workspace_premium</span>
+                        <div class="flex-1">
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400">Your last reading · <span x-text="lastResolved.date"></span></p>
+                            <p class="font-black text-lg uppercase tracking-tight" x-text="`${lastResolved.correct}/${lastResolved.total} calls right · +${lastResolved.points} pts`"></p>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Locked state -->
+                <template x-if="locked">
+                    <div class="border border-white/15 p-6 md:p-10 text-center">
+                        <span class="material-symbols-outlined text-5xl text-primary">lock_clock</span>
+                        <h2 class="mt-4 text-2xl md:text-3xl font-black uppercase tracking-tight">Your Calls Are Locked In</h2>
+                        <p class="mt-3 font-mono text-[11px] tracking-widest uppercase text-slate-400">The Oracle speaks when the next daily chart drops</p>
+                        <p class="mt-6 font-black text-4xl text-secondary tabular-nums" x-text="countdown">--:--:--</p>
+                        <p class="mt-1 font-mono text-[9px] tracking-widest uppercase text-slate-500">Until the next drop · 08:00 UTC</p>
+                        <a href="{% url 'charts' %}" class="mt-8 inline-flex items-center gap-2 border border-white/30 px-6 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-colors">Watch The Chart</a>
+                    </div>
+                </template>
+
+                <!-- Prediction form -->
+                <template x-if="!locked">
+                    <div>
+                        <div class="space-y-6">
+                            <template x-for="(m, i) in matchups">
+                                <div class="border border-white/15 p-5">
+                                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400 mb-4">Matchup <span x-text="i+1"></span> · Who ranks higher tomorrow?</p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <template x-for="side in ['a','b']">
+                                            <button @click="picks[i] = side"
+                                                    class="group border p-4 text-left transition-colors"
+                                                    :class="picks[i] === side ? 'border-primary bg-primary/10' : 'border-white/15 hover:border-white/40'">
+                                                <div class="flex items-center gap-3">
+                                                    <template x-if="m[side].image"><img :src="m[side].image" alt="" class="w-12 h-12 object-cover border border-white/20 shrink-0"/></template>
+                                                    <div class="min-w-0">
+                                                        <p class="font-black text-sm uppercase tracking-tight truncate" x-text="m[side].title"></p>
+                                                        <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400 truncate" x-text="m[side].artist"></p>
+                                                        <p class="font-mono text-[9px] tracking-widest uppercase text-slate-600 mt-1" x-text="`Today: #${m[side].rank}`"></p>
+                                                    </div>
+                                                    <span class="material-symbols-outlined ml-auto shrink-0" :class="picks[i] === side ? 'text-primary' : 'text-slate-700'" x-text="picks[i] === side ? 'radio_button_checked' : 'radio_button_unchecked'"></span>
+                                                </div>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- #1 call -->
+                            <div class="border border-secondary/40 p-5">
+                                <p class="font-mono text-[10px] tracking-widest uppercase text-secondary mb-1">Bonus · Call Tomorrow's #1 <span class="text-slate-500">(+20 pts)</span></p>
+                                <p class="font-mono text-[9px] tracking-widest uppercase text-slate-500 mb-4">Today's top five — who holds the throne?</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-for="(t, i) in topChoices">
+                                        <button @click="topIndex = (topIndex === i ? null : i)"
+                                                class="border px-4 py-2 font-mono text-[10px] tracking-widest uppercase transition-colors"
+                                                :class="topIndex === i ? 'border-secondary bg-secondary/10 text-secondary' : 'border-white/15 text-slate-400 hover:border-white/40 hover:text-white'"
+                                                x-text="`#${t.rank} ${t.artist} — ${t.title}`"></button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if user.is_authenticated %}
+                        <button @click="lockIn()" :disabled="!complete() || submitting"
+                                class="mt-8 w-full bg-primary text-black py-4 text-sm font-black uppercase tracking-[0.2em] border border-primary shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-40 disabled:hover:shadow-[4px_4px_0px_#ffffff] disabled:hover:translate-x-0 disabled:hover:translate-y-0">
+                            <span x-text="submitting ? 'Locking In…' : (complete() ? 'Lock In My Calls' : 'Make All Three Calls First')"></span>
+                        </button>
+                        <p class="mt-3 text-center font-mono text-[9px] tracking-widest uppercase text-slate-500" x-cloak x-show="error" x-text="error"></p>
+                        {% else %}
+                        <a href="{% url 'login' %}?next={% url 'chart_oracle' %}"
+                           class="mt-8 block w-full bg-primary text-black py-4 text-center text-sm font-black uppercase tracking-[0.2em] border border-primary shadow-[4px_4px_0px_#ffffff] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all">
+                            Log In To Lock In Your Calls
+                        </a>
+                        <p class="mt-3 text-center font-mono text-[9px] tracking-widest uppercase text-slate-500">Predictions are saved to your account and scored at the next chart drop</p>
+                        {% endif %}
+                    </div>
+                </template>
+
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+<script>
+function chartOracle() {
+    return {
+        matchups: {{ matchups_json|safe }},
+        topChoices: {{ top_choices_json|safe }},
+        existing: {{ existing_prediction_json|safe }},
+        lastResolved: {{ last_resolved_json|safe }},
+        picks: [null, null, null],
+        topIndex: null,
+        locked: false,
+        submitting: false,
+        error: '',
+        countdown: '--:--:--',
+
+        init() {
+            this.locked = !!this.existing;
+            this.tickCountdown();
+            setInterval(() => this.tickCountdown(), 1000);
+        },
+        complete() { return this.picks.every(p => p === 'a' || p === 'b'); },
+        tickCountdown() {
+            const now = new Date();
+            const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 8, 0, 0));
+            if (now >= next) next.setUTCDate(next.getUTCDate() + 1);
+            const s = Math.max(0, Math.floor((next - now) / 1000));
+            const pad = n => String(n).padStart(2, '0');
+            this.countdown = `${pad(Math.floor(s/3600))}:${pad(Math.floor((s%3600)/60))}:${pad(s%60)}`;
+        },
+        async lockIn() {
+            if (!this.complete() || this.submitting) return;
+            this.submitting = true; this.error = '';
+            try {
+                const r = await fetch('{% url "api_chart_oracle_predict" %}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ picks: this.picks, top_index: this.topIndex })
+                });
+                const d = await r.json();
+                if (d.ok) { this.locked = true; }
+                else if (r.status === 409) { this.locked = true; }
+                else { this.error = d.error || 'Something went wrong — try again'; }
+            } catch (e) { this.error = 'Network hiccup — try again'; }
+            this.submitting = false;
+        }
+    };
+}
+</script>
+</body>
+</html>

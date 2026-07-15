@@ -439,6 +439,8 @@ class GameScore(models.Model):
         ('idol_scramble', 'Idol Scramble'),
         ('lyric_drop', 'Lyric Drop'),
         ('chart_clash', 'Chart Clash'),
+        ('daily_drop', 'Daily Drop'),
+        ('chart_oracle', 'Chart Oracle'),
     ]
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -457,6 +459,32 @@ class GameScore(models.Model):
 
     def __str__(self):
         return f"{self.user.username} — {self.get_game_display()} {self.score}pts"
+
+
+class ChartPrediction(models.Model):
+    """Chart Oracle: a user's call on tomorrow's chart, made against today's
+    daily ranking and resolved when the next daily ranking lands."""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='chart_predictions',
+    )
+    prediction_date = models.DateField(help_text="Date of the daily ranking the prediction was made against")
+    payload = models.JSONField(default=dict, blank=True, help_text="Matchups, the user's picks, and the #1 call")
+    resolved = models.BooleanField(default=False)
+    points = models.IntegerField(default=0)
+    correct = models.IntegerField(default=0)
+    total = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-prediction_date']
+        unique_together = ['user', 'prediction_date']
+
+    def __str__(self):
+        state = 'resolved' if self.resolved else 'open'
+        return f"{self.user.username} — Oracle {self.prediction_date} ({state})"
 
 
 class Contest(models.Model):

@@ -49,7 +49,7 @@ from .models import (
     Ranking, ComebackData, KPopGroup, KPopMember,
     LivePoll, BlogArticle, UserProfile, FavouriteSong,
     RadioTrackPlay,
-    GameScore, SongRequest, Contest, ContestEntry,
+    GameScore, ChartPrediction, SongRequest, Contest, ContestEntry,
     FanClubMembership, UserNotification, ClubInvitation, ClubLaunch, UserBadge,
     LimitedTimeEvent, EventBadgeDrop, EventParticipation,
     LiveChatMessage, ChatBlockedTerm,
@@ -3891,6 +3891,26 @@ def _build_homepage_context(request):
         upcoming_ticker = upcoming
 
     # Trending Sidebar: Use daily ranking data (now synced from iChart)
+    # ── Artist of the Week — rotates weekly through the full roster ──
+    artist_of_week = None
+    try:
+        aow_groups = list(KPopGroup.objects.exclude(slug='').order_by('rank'))
+        if aow_groups:
+            week_no = now.isocalendar()[1] if hasattr(now, 'isocalendar') else timezone.now().date().isocalendar()[1]
+            g = aow_groups[week_no % len(aow_groups)]
+            _apply_stream_image_to_field(g, 'image_url')
+            name_parts = (g.name or '').split(' ', 1)
+            artist_of_week = {
+                'name': g.name,
+                'line1': name_parts[0],
+                'line2': name_parts[1] if len(name_parts) > 1 else '',
+                'slug': g.slug,
+                'image_url': _optimize_home_image_url(g.image_url, width=1920, height=1080) if g.image_url else '',
+                'description': (g.description or '').strip(),
+            }
+    except Exception:
+        artist_of_week = None
+
     daily_rank = Ranking.objects.filter(timeframe='daily').first()
     trending_last_updated = daily_rank.created_at if daily_rank else None
     trending_all = []
@@ -3906,11 +3926,11 @@ def _build_homepage_context(request):
             if trend_raw and trend_raw != '-':
                 # Handle actual movement from the scraped data
                 if '+' in trend_raw or 'â–²' in trend_raw:
-                    trend_icon = 'â–²'
+                    trend_icon = '▲'
                     trend_class = 'text-primary'
                     trend_value = ''.join(filter(str.isdigit, trend_raw))
                 elif '-' in trend_raw or 'â–¼' in trend_raw:
-                    trend_icon = 'â–¼'
+                    trend_icon = '▼'
                     trend_class = 'text-slate-500'
                     trend_value = ''.join(filter(str.isdigit, trend_raw))
                 else:
@@ -4091,6 +4111,70 @@ def _build_homepage_context(request):
     hero_primary_event = hero_day_events[0] if hero_day_events else (upcoming[0] if upcoming else None)
     hero_support_events = hero_day_events[1:4] if len(hero_day_events) > 1 else upcoming[1:4]
 
+    # "For your bias" — full first-scroll personalisation section (growth
+    # plan #7), mirroring the Today's Programming anatomy on black.
+    # States: 'personalised' (logged in, bias set), 'picker' (logged in, no
+    # bias), 'teaser' (logged out — doubles as a signup driver).
+    bias_rail = {'state': 'teaser'}
+    if request.user.is_authenticated:
+        bias_group = profile.bias if profile else None
+        if bias_group and (bias_group.name or '').strip():
+            bias_names = [bias_group.name.strip().lower()]
+            chart_hit = next(
+                (
+                    track for track in trending_all
+                    if _text_matches_station(
+                        [track.get('artist'), track.get('title')],
+                        bias_names,
+                    )
+                ),
+                None,
+            )
+            comeback_dday = ''
+            comeback_title = ''
+            comeback_date_label = ''
+            comeback_hit = next(
+                (
+                    release for release in upcoming_all
+                    if _text_matches_station(
+                        [release.get('artist'), release.get('title')],
+                        bias_names,
+                    )
+                ),
+                None,
+            )
+            if comeback_hit:
+                try:
+                    release_date = datetime.strptime(
+                        str(comeback_hit.get('date_str') or ''), '%Y-%m-%d'
+                    ).date()
+                    days_out = (release_date - now_uk.date()).days
+                    comeback_dday = 'D-DAY' if days_out <= 0 else f'D-{days_out}'
+                    comeback_title = str(comeback_hit.get('title') or '').strip()
+                    comeback_date_label = release_date.strftime('%d %b').lstrip('0')
+                except (TypeError, ValueError):
+                    comeback_dday = ''
+                    comeback_date_label = ''
+            _apply_stream_image_to_field(bias_group, 'image_url')
+            bias_rail = {
+                'state': 'personalised',
+                'group_name': bias_group.name.strip(),
+                'group_url': (
+                    reverse('idol_page', args=[bias_group.slug])
+                    if bias_group.slug else reverse('idols')
+                ),
+                'group_image': (
+                    _optimize_home_image_url(bias_group.image_url, width=384, height=384)
+                    if bias_group.image_url else ''
+                ),
+                'chart': chart_hit,
+                'comeback_dday': comeback_dday,
+                'comeback_title': comeback_title,
+                'comeback_date_label': comeback_date_label,
+            }
+        else:
+            bias_rail = {'state': 'picker'}
+
     return {
         'seo_title': 'K-Pop Radio Online | Live K-Pop Stream UK | K-Beats Radio',
         'seo_description': 'Listen to K-pop radio online with K-Beats Radio. Stream live K-pop, discover chart songs, follow comebacks, and find a UK-based fan-first station built for repeat listening.',
@@ -4135,6 +4219,7 @@ def _build_homepage_context(request):
                 'description': "Debut acts, hidden B-sides, under-the-radar groups — this is everything the algorithm hasn't served you yet. Your next obsession is one scroll away.",
             },
         ],
+        'artist_of_week': artist_of_week,
         'upcoming_comebacks': upcoming,
         'hero_day_events': hero_day_events,
         'hero_primary_event': hero_primary_event,
@@ -4151,6 +4236,7 @@ def _build_homepage_context(request):
         'homepage_programming': homepage_programming,
         'my_station_profile': profile,
         'my_station_groups': station_group_names,
+        'bias_rail': bias_rail,
     }
 
 
@@ -6023,11 +6109,11 @@ def charts(request):
         trend_raw = item.get('trend')
         if trend_raw and trend_raw != '-' and trend_raw != 'Stable':
             if '+' in trend_raw or 'â–²' in trend_raw:
-                trend_icon = 'â–²'
+                trend_icon = '▲'
                 trend_class = 'text-primary'
                 trend_value = ''.join(filter(str.isdigit, trend_raw))
             elif '-' in trend_raw or 'â–¼' in trend_raw:
-                trend_icon = 'â–¼'
+                trend_icon = '▼'
                 trend_class = 'text-slate-500'
                 trend_value = ''.join(filter(str.isdigit, trend_raw))
             else:
@@ -6846,6 +6932,8 @@ DAILY_CHALLENGE_ROTATION = [
     {'key': 'lyric_drop', 'name': 'Lyric Drop', 'blurb': 'One lyric gap. Four choices. No mercy.', 'icon': 'lyrics', 'play_url_name': 'lyric_drop_play'},
     {'key': 'fandom_trivia', 'name': 'Fandom Trivia', 'blurb': 'Deep-cut questions for real fans.', 'icon': 'psychology', 'play_url_name': 'fandom_trivia'},
     {'key': 'mv_matcher', 'name': 'MV Matcher', 'blurb': 'Match the frame to the music video.', 'icon': 'movie', 'play_url_name': 'mv_matcher'},
+    {'key': 'daily_drop', 'name': 'Daily Drop', 'blurb': 'One mystery track. Six tries. Everyone plays the same drop.', 'icon': 'album', 'play_url_name': 'daily_drop'},
+    {'key': 'chart_oracle', 'name': 'Chart Oracle', 'blurb': "Call tomorrow's chart before it drops.", 'icon': 'online_prediction', 'play_url_name': 'chart_oracle'},
 ]
 
 
@@ -15734,3 +15822,383 @@ def terms_of_service(request):
         title='K-Beats Terms of Service',
         description='Review the K-Beats terms of service for site access, user responsibilities, contests, and use of the K-pop radio platform.',
     ))
+
+
+# ── Daily Drop & Chart Oracle (daily-format games) ──────────────────────────
+
+DAILY_DROP_SNIPPET_LADDER = [1, 2, 4, 7, 11, 16]
+DAILY_DROP_EPOCH = date(2026, 7, 1)
+CHART_ORACLE_MATCHUP_COUNT = 3
+CHART_ORACLE_TOP_CHOICES = 5
+CHART_ORACLE_MATCHUP_POINTS = 10
+CHART_ORACLE_TOP_PICK_POINTS = 20
+
+
+def _normalize_game_text(value):
+    value = str(value or '').lower().strip()
+    return re.sub(r'[^a-z0-9]+', ' ', value).strip()
+
+
+def _daily_drop_day_number(daily_rank):
+    if not daily_rank:
+        return 0
+    return max(1, daily_rank.date.toordinal() - DAILY_DROP_EPOCH.toordinal() + 1)
+
+
+def _daily_drop_candidates(daily_rank):
+    tracks = []
+    if daily_rank and daily_rank.ranking_data:
+        for item in daily_rank.ranking_data[:40]:
+            artist = str(item.get('artist') or '').strip()
+            title = str(item.get('track') or '').strip()
+            if artist and title:
+                tracks.append({
+                    'artist': artist,
+                    'title': title,
+                    'artwork': str(item.get('artwork_url') or ''),
+                })
+    return tracks
+
+
+def _fetch_itunes_preview(artist, title):
+    import urllib.request
+    try:
+        q = urllib.parse.quote(f"{artist} {title}")
+        url = f"https://itunes.apple.com/search?term={q}&entity=song&limit=1"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            data = json.loads(resp.read().decode())
+        results = data.get('results') or []
+        if results:
+            return {
+                'preview': str(results[0].get('previewUrl') or ''),
+                'artwork': str(results[0].get('artworkUrl100') or '').replace('100x100bb', '600x600bb'),
+            }
+    except Exception:
+        pass
+    return {}
+
+
+def _resolve_daily_drop_puzzle():
+    """Deterministic shared daily track (seeded by the daily chart's date),
+    enriched with an iTunes preview clip and cached for the chart day."""
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    if not daily_rank:
+        return None
+    day_key = daily_rank.date.isoformat()
+    cache_key = f'daily_drop_puzzle:{day_key}'
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+    candidates = _daily_drop_candidates(daily_rank)
+    if not candidates:
+        return None
+    start = daily_rank.date.toordinal() % len(candidates)
+    puzzle = None
+    for offset in range(len(candidates)):
+        cand = candidates[(start + offset) % len(candidates)]
+        enriched = _fetch_itunes_preview(cand['artist'], cand['title'])
+        if enriched.get('preview'):
+            puzzle = {
+                'day_number': _daily_drop_day_number(daily_rank),
+                'date': day_key,
+                'artist': cand['artist'],
+                'title': cand['title'],
+                'artwork': enriched.get('artwork') or cand.get('artwork') or '',
+                'preview': enriched['preview'],
+            }
+            break
+    if puzzle:
+        cache.set(cache_key, puzzle, 60 * 60 * 26)
+    return puzzle
+
+
+def daily_drop_promo(request):
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    return render(request, 'core/daily_drop_promo.html', {
+        'day_number': _daily_drop_day_number(daily_rank),
+        'puzzle_available': bool(daily_rank),
+    })
+
+
+def daily_drop(request):
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    options = []
+    seen = set()
+    if daily_rank and daily_rank.ranking_data:
+        for item in daily_rank.ranking_data:
+            artist = str(item.get('artist') or '').strip()
+            title = str(item.get('track') or '').strip()
+            key = (artist.lower(), title.lower())
+            if artist and title and key not in seen:
+                seen.add(key)
+                options.append(f"{artist} — {title}")
+    for track in RadioTrack.objects.exclude(title='').exclude(artist='').order_by('-created_at')[:400]:
+        artist = (track.artist or '').strip()
+        title = (track.title or '').strip()
+        key = (artist.lower(), title.lower())
+        if artist and title and key not in seen:
+            seen.add(key)
+            options.append(f"{artist} — {title}")
+    return render(request, 'core/daily_drop.html', {
+        'day_number': _daily_drop_day_number(daily_rank),
+        'puzzle_available': bool(daily_rank),
+        'guess_options_json': json.dumps(sorted(options)),
+        'snippet_ladder_json': json.dumps(DAILY_DROP_SNIPPET_LADDER),
+    })
+
+
+def api_daily_drop_clip(request):
+    puzzle = _resolve_daily_drop_puzzle()
+    if not puzzle:
+        return JsonResponse({'ok': False, 'error': 'No Daily Drop available yet'}, status=503)
+    return JsonResponse({
+        'ok': True,
+        'day_number': puzzle['day_number'],
+        'date': puzzle['date'],
+        'clip_url': puzzle['preview'],
+        'snippets': DAILY_DROP_SNIPPET_LADDER,
+    })
+
+
+@require_POST
+def api_daily_drop_guess(request):
+    puzzle = _resolve_daily_drop_puzzle()
+    if not puzzle:
+        return JsonResponse({'ok': False, 'error': 'No Daily Drop available yet'}, status=503)
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return JsonResponse({'ok': False, 'error': 'Invalid JSON body'}, status=400)
+    guess = str(data.get('guess') or '').strip()
+    try:
+        attempt = max(1, min(6, int(data.get('attempt') or 1)))
+    except (TypeError, ValueError):
+        attempt = 1
+    skipped = bool(data.get('skip'))
+    norm_guess = _normalize_game_text(guess)
+    norm_title = _normalize_game_text(puzzle['title'])
+    norm_artist = _normalize_game_text(puzzle['artist'])
+    combo = _normalize_game_text(f"{puzzle['artist']} {puzzle['title']}")
+    correct = False
+    artist_match = False
+    if norm_guess and not skipped:
+        correct = norm_guess == combo or (
+            bool(norm_title) and norm_title in norm_guess
+            and bool(norm_artist) and norm_artist in norm_guess
+        )
+        artist_match = (not correct) and bool(norm_artist) and norm_artist in norm_guess
+    done = correct or attempt >= len(DAILY_DROP_SNIPPET_LADDER)
+    payload = {
+        'ok': True,
+        'correct': correct,
+        'artist_match': artist_match,
+        'attempt': attempt,
+        'done': done,
+    }
+    if done:
+        payload['reveal'] = {
+            'artist': puzzle['artist'],
+            'title': puzzle['title'],
+            'artwork': puzzle['artwork'],
+        }
+    return JsonResponse(payload)
+
+
+def _chart_oracle_tracks(daily_rank):
+    tracks = []
+    if daily_rank and daily_rank.ranking_data:
+        for idx, item in enumerate(daily_rank.ranking_data[:20]):
+            artist = str(item.get('artist') or '').strip()
+            title = str(item.get('track') or '').strip()
+            if artist and title:
+                tracks.append({
+                    'artist': artist,
+                    'title': title,
+                    'rank': idx + 1,
+                    'image': str(item.get('artwork_url') or ''),
+                })
+    return tracks
+
+
+def _chart_oracle_matchups(daily_rank):
+    """Deterministic daily matchups + shortlist for the #1 call."""
+    import random as random_module
+    tracks = _chart_oracle_tracks(daily_rank)
+    if len(tracks) < CHART_ORACLE_MATCHUP_COUNT * 2 + 2:
+        return [], []
+    rng = random_module.Random(daily_rank.date.toordinal())
+    sampled = rng.sample(tracks, CHART_ORACLE_MATCHUP_COUNT * 2)
+    matchups = [
+        {'a': sampled[i * 2], 'b': sampled[i * 2 + 1]}
+        for i in range(CHART_ORACLE_MATCHUP_COUNT)
+    ]
+    return matchups, tracks[:CHART_ORACLE_TOP_CHOICES]
+
+
+def _resolve_chart_predictions(user):
+    """Resolve open predictions once a newer daily ranking exists."""
+    resolved_now = []
+    for pred in ChartPrediction.objects.filter(user=user, resolved=False):
+        next_rank = (
+            Ranking.objects.filter(timeframe='daily', date__gt=pred.prediction_date)
+            .order_by('date')
+            .first()
+        )
+        if not next_rank or not next_rank.ranking_data:
+            continue
+        positions = {}
+        for idx, item in enumerate(next_rank.ranking_data):
+            key = _normalize_game_text(f"{item.get('artist')} {item.get('track')}")
+            if key and key not in positions:
+                positions[key] = idx + 1
+        payload = dict(pred.payload or {})
+        correct = total = points = 0
+        for matchup in payload.get('matchups', []):
+            a_key = _normalize_game_text(f"{matchup['a']['artist']} {matchup['a']['title']}")
+            b_key = _normalize_game_text(f"{matchup['b']['artist']} {matchup['b']['title']}")
+            a_pos = positions.get(a_key)
+            b_pos = positions.get(b_key)
+            matchup['a_new_rank'] = a_pos
+            matchup['b_new_rank'] = b_pos
+            if a_pos is None and b_pos is None:
+                matchup['result'] = 'void'
+                continue
+            winner = 'a' if (b_pos is None or (a_pos is not None and a_pos < b_pos)) else 'b'
+            matchup['winner'] = winner
+            total += 1
+            if matchup.get('pick') == winner:
+                correct += 1
+                points += CHART_ORACLE_MATCHUP_POINTS
+                matchup['result'] = 'hit'
+            else:
+                matchup['result'] = 'miss'
+        top_pick = payload.get('top_pick') or {}
+        if top_pick:
+            total += 1
+            new_top = next_rank.ranking_data[0] or {}
+            payload['actual_top'] = {
+                'artist': str(new_top.get('artist') or ''),
+                'title': str(new_top.get('track') or ''),
+            }
+            top_key = _normalize_game_text(f"{new_top.get('artist')} {new_top.get('track')}")
+            pick_key = _normalize_game_text(f"{top_pick.get('artist')} {top_pick.get('title')}")
+            if top_key and top_key == pick_key:
+                correct += 1
+                points += CHART_ORACLE_TOP_PICK_POINTS
+                payload['top_pick_result'] = 'hit'
+            else:
+                payload['top_pick_result'] = 'miss'
+        payload['resolved_against'] = next_rank.date.isoformat()
+        pred.payload = payload
+        pred.correct = correct
+        pred.total = total
+        pred.points = points
+        pred.resolved = True
+        pred.resolved_at = timezone.now()
+        pred.save()
+        try:
+            GameScore.objects.create(
+                user=user,
+                game='chart_oracle',
+                score=points,
+                correct=correct,
+                total=total,
+                best_streak=0,
+            )
+            _run_progression_unlocks(user)
+        except Exception:
+            pass
+        resolved_now.append(pred)
+    return resolved_now
+
+
+def chart_oracle_promo(request):
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    top_track = None
+    if daily_rank and daily_rank.ranking_data:
+        item = daily_rank.ranking_data[0] or {}
+        top_track = {
+            'artist': str(item.get('artist') or ''),
+            'title': str(item.get('track') or ''),
+            'image': str(item.get('artwork_url') or ''),
+        }
+    return render(request, 'core/chart_oracle_promo.html', {
+        'top_track': top_track,
+        'chart_date_label': daily_rank.date.strftime('%d %b').lstrip('0') if daily_rank else '',
+    })
+
+
+def chart_oracle(request):
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    matchups, top_choices = ([], [])
+    if daily_rank:
+        matchups, top_choices = _chart_oracle_matchups(daily_rank)
+    existing = None
+    last_resolved = None
+    if request.user.is_authenticated:
+        _resolve_chart_predictions(request.user)
+        if daily_rank:
+            existing = ChartPrediction.objects.filter(
+                user=request.user, prediction_date=daily_rank.date,
+            ).first()
+        last_resolved = (
+            ChartPrediction.objects.filter(user=request.user, resolved=True)
+            .order_by('-prediction_date')
+            .first()
+        )
+    existing_payload = None
+    if existing:
+        existing_payload = {'payload': existing.payload, 'resolved': existing.resolved}
+    last_resolved_payload = None
+    if last_resolved:
+        last_resolved_payload = {
+            'date': last_resolved.prediction_date.isoformat(),
+            'points': last_resolved.points,
+            'correct': last_resolved.correct,
+            'total': last_resolved.total,
+            'payload': last_resolved.payload,
+        }
+    return render(request, 'core/chart_oracle.html', {
+        'puzzle_available': bool(matchups),
+        'chart_date_label': daily_rank.date.strftime('%d %b').lstrip('0') if daily_rank else '',
+        'matchups_json': json.dumps(matchups),
+        'top_choices_json': json.dumps(top_choices),
+        'existing_prediction_json': json.dumps(existing_payload),
+        'last_resolved_json': json.dumps(last_resolved_payload),
+    })
+
+
+@login_required
+@require_POST
+def api_chart_oracle_predict(request):
+    daily_rank = Ranking.objects.filter(timeframe='daily').first()
+    if not daily_rank:
+        return JsonResponse({'ok': False, 'error': 'No chart to predict against yet'}, status=503)
+    matchups, top_choices = _chart_oracle_matchups(daily_rank)
+    if not matchups:
+        return JsonResponse({'ok': False, 'error': 'Not enough chart data today'}, status=503)
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return JsonResponse({'ok': False, 'error': 'Invalid JSON body'}, status=400)
+    picks = data.get('picks') or []
+    if len(picks) != len(matchups) or any(p not in ('a', 'b') for p in picks):
+        return JsonResponse({'ok': False, 'error': 'Invalid picks'}, status=400)
+    top_pick = {}
+    top_index = data.get('top_index')
+    if top_index is not None and top_index != '':
+        try:
+            top_pick = top_choices[int(top_index)]
+        except (TypeError, ValueError, IndexError):
+            return JsonResponse({'ok': False, 'error': 'Invalid #1 call'}, status=400)
+    for matchup, pick in zip(matchups, picks):
+        matchup['pick'] = pick
+    prediction, created = ChartPrediction.objects.get_or_create(
+        user=request.user,
+        prediction_date=daily_rank.date,
+        defaults={'payload': {'matchups': matchups, 'top_pick': top_pick}},
+    )
+    if not created:
+        return JsonResponse({'ok': False, 'error': 'Already locked in for this chart day'}, status=409)
+    return JsonResponse({'ok': True})

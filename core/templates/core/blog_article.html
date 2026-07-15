@@ -448,6 +448,52 @@
                             <div class="article-body">
                                 {{ article_body_html|safe }}
                             </div>
+
+                            <!-- Share row -->
+                            <div class="mt-12 border-t border-white/10 pt-6 flex flex-wrap items-center gap-3" id="ksync-share-row" data-title="{{ article.title|escapejs }}">
+                                <span class="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-400 mr-2">Share this story</span>
+                                <button type="button" id="ksync-share-native" data-track="share_native" data-track-category="blog_article" class="hidden items-center gap-2 border border-primary text-primary px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-primary hover:text-black transition-colors">
+                                    <span class="material-symbols-outlined text-sm">ios_share</span> Share
+                                </button>
+                                <a id="ksync-share-x" data-track="share_x" data-track-category="blog_article" target="_blank" rel="noopener" class="inline-flex items-center gap-2 border border-white/20 text-white px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] hover:border-primary hover:text-primary transition-colors" href="#">
+                                    Post on X
+                                </a>
+                                <a id="ksync-share-fb" data-track="share_facebook" data-track-category="blog_article" target="_blank" rel="noopener" class="inline-flex items-center gap-2 border border-white/20 text-white px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] hover:border-primary hover:text-primary transition-colors" href="#">
+                                    Facebook
+                                </a>
+                                <button type="button" id="ksync-share-copy" data-track="share_copy" data-track-category="blog_article" class="inline-flex items-center gap-2 border border-white/20 text-white px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] hover:border-secondary hover:text-secondary transition-colors">
+                                    <span class="material-symbols-outlined text-sm">link</span> <span id="ksync-share-copy-label">Copy Link</span>
+                                </button>
+                            </div>
+                            <script id="ksync-share-js">
+                            (function () {
+                                var row = document.getElementById('ksync-share-row');
+                                if (!row) return;
+                                var url = window.location.href.split('#')[0];
+                                var title = row.getAttribute('data-title') || document.title;
+                                var xBtn = document.getElementById('ksync-share-x');
+                                var fbBtn = document.getElementById('ksync-share-fb');
+                                if (xBtn) xBtn.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url);
+                                if (fbBtn) fbBtn.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+                                var nativeBtn = document.getElementById('ksync-share-native');
+                                if (nativeBtn && navigator.share) {
+                                    nativeBtn.classList.remove('hidden');
+                                    nativeBtn.classList.add('inline-flex');
+                                    nativeBtn.addEventListener('click', function () {
+                                        navigator.share({ title: title, url: url }).catch(function () {});
+                                    });
+                                }
+                                var copyBtn = document.getElementById('ksync-share-copy');
+                                var copyLabel = document.getElementById('ksync-share-copy-label');
+                                if (copyBtn) {
+                                    copyBtn.addEventListener('click', function () {
+                                        (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+                                            .then(function () { copyLabel.textContent = 'Copied!'; setTimeout(function () { copyLabel.textContent = 'Copy Link'; }, 2000); })
+                                            .catch(function () { window.prompt('Copy this link:', url); });
+                                    });
+                                }
+                            })();
+                            </script>
                         </article>
 
                         <!-- Sidebar -->

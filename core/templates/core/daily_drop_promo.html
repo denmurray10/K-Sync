@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+<title>Daily Drop — The Shared Daily K-Pop Guessing Game | K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>body { margin: 0; overflow-x: hidden; background: #000; }</style>
+{% include 'core/shared_head.html' %}
+</head>
+<body class="font-sans text-white">
+{% include 'core/header.html' %}
+
+<main class="bg-black">
+    <!-- Hero -->
+    <section class="w-full border-b border-white/20 py-20 md:py-28">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary">One track · Six tries · Everyone plays the same drop</p>
+            <h1 class="mt-4 text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85]">Daily<br/><span class="text-primary">Drop</span></h1>
+            {% if puzzle_available %}
+            <p class="mt-6 font-mono text-xs tracking-widest uppercase text-slate-400">Drop #{{ day_number }} is live · a new mystery track lands with every daily chart</p>
+            {% else %}
+            <p class="mt-6 font-mono text-xs tracking-widest uppercase text-slate-400">The first drop lands with the next daily chart</p>
+            {% endif %}
+            <a href="{% url 'daily_drop' %}" class="mt-10 inline-flex items-center gap-3 bg-primary text-black px-10 py-5 text-sm font-black uppercase tracking-[0.2em] border border-primary shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all">
+                <span class="material-symbols-outlined font-black">play_arrow</span>
+                Play Today's Drop
+            </a>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="w-full py-16 md:py-24 border-b border-white/10">
+        <div class="container mx-auto px-4 sm:px-6 max-w-4xl">
+            <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter">How It <span class="text-secondary">Works</span></h2>
+            <div class="mt-10 flex flex-col border-t border-white/20">
+                <div class="flex items-start gap-6 border-b border-white/20 py-6">
+                    <span class="font-black text-3xl text-primary shrink-0">01</span>
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tight">Hear One Second</h3>
+                        <p class="mt-1 font-mono text-[11px] tracking-widest uppercase text-slate-400">Every fan gets the same mystery track, pulled from the daily chart</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-6 border-b border-white/20 py-6">
+                    <span class="font-black text-3xl text-primary shrink-0">02</span>
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tight">Guess Or Skip</h3>
+                        <p class="mt-1 font-mono text-[11px] tracking-widest uppercase text-slate-400">Six tries · each miss unlocks a longer clip · 1s up to 16s</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-6 border-b border-white/20 py-6">
+                    <span class="font-black text-3xl text-primary shrink-0">03</span>
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tight">Share The Grid</h3>
+                        <p class="mt-1 font-mono text-[11px] tracking-widest uppercase text-slate-400">Post your result, defend your streak, come back at the next chart drop</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% include 'core/footer.html' %}
+</body>
+</html>

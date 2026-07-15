@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+{% include 'core/seo_meta.html' %}
+<title>Chart Oracle — Predict Tomorrow's K-Pop Chart | K-Beats</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f425c0', secondary: '#00f0ff' },
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+            }
+        }
+    };
+    </script>
+    <style>body { margin: 0; overflow-x: hidden; background: #000; }</style>
+{% include 'core/shared_head.html' %}
+</head>
+<body class="font-sans text-white">
+{% include 'core/header.html' %}
+
+<main class="bg-black">
+    <!-- Hero -->
+    <section class="w-full border-b border-white/20 py-20 md:py-28">
+        <div class="container mx-auto px-4 sm:px-6 text-center">
+            <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary">Call it before the chart drops · 08:00 UTC daily</p>
+            <h1 class="mt-4 text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85]">Chart<br/><span class="text-secondary">Oracle</span></h1>
+            <p class="mt-6 font-mono text-xs tracking-widest uppercase text-slate-400 max-w-xl mx-auto">Three matchups from today's Top 20, one throne call. Lock in your reading — the next chart decides who saw it coming.</p>
+            {% if top_track %}
+            <div class="mt-10 inline-flex items-center gap-4 border border-white/15 px-6 py-4 text-left">
+                {% if top_track.image %}<img src="{{ top_track.image }}" alt="{{ top_track.artist }} {{ top_track.title }}" class="w-14 h-14 object-cover border border-white/20"/>{% endif %}
+                <div>
+                    <p class="font-mono text-[9px] tracking-widest uppercase text-slate-500">Today's #1 · {{ chart_date_label }}</p>
+                    <p class="font-black text-lg uppercase tracking-tight">{{ top_track.title }}</p>
+                    <p class="font-mono text-[10px] tracking-widest uppercase text-slate-400">{{ top_track.artist }} · still #1 tomorrow?</p>
+                </div>
+            </div>
+            {% endif %}
+            <div class="mt-10">
+                <a href="{% url 'chart_oracle' %}" class="inline-flex items-center gap-3 bg-secondary text-black px-10 py-5 text-sm font-black uppercase tracking-[0.2em] border border-secondary shadow-[6px_6px_0px_#ffffff] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all">
+                    <span class="material-symbols-outlined font-black">online_prediction</span>
+                    Make Your Calls
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="w-full py-16 md:py-24 border-b border-white/10">
+        <div class="container mx-auto px-4 sm:px-6 max-w-4xl">
+            <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter">How It <span class="text-primary">Works</span></h2>
+            <div class="mt-10 flex flex-col border-t border-white/20">
+                <div class="flex items-start gap-6 border-b border-white/20 py-6">
+                    <span class="font-black text-3xl text-secondary shrink-0">01</span>
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tight">Three Matchups</h3>
+                        <p class="mt-1 font-mono text-[11px] tracking-widest uppercase text-slate-400">Pairs pulled from today's real Top 20 · pick who ranks higher tomorrow · +10 each</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-6 border-b border-white/20 py-6">
+                    <span class="font-black text-3xl text-secondary shrink-0">02</span>
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tight">Call The Throne</h3>
+                        <p class="mt-1 font-mono text-[11px] tracking-widest uppercase text-slate-400">Name tomorrow's #1 from today's top five · +20 if you see it coming</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-6 border-b border-white/20 py-6">
+                    <span class="font-black text-3xl text-secondary shrink-0">03</span>
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tight">The Chart Decides</h3>
+                        <p class="mt-1 font-mono text-[11px] tracking-widest uppercase text-slate-400">Your reading resolves at the next daily drop · 08:00 UTC · streaks and bragging rights follow</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% include 'core/footer.html' %}
+</body>
+</html>
