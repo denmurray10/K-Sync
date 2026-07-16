@@ -1,5 +1,6 @@
 {% load static %}
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script defer src="{% static 'core/js/live_status.js' %}"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script defer src="{% static 'core/js/button_tracking.js' %}"></script>
 <style>
@@ -605,7 +606,7 @@
                 <span id="mobile-menu-player-status" class="font-mono text-[9px] tracking-[0.24em] uppercase text-slate-400">Ready</span>
             </div>
             <div class="mobile-menu-player-card mt-4 flex items-center gap-4 p-4">
-                <img id="mobile-menu-player-art" src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album" class="mobile-menu-player-art object-cover" alt="Now playing art" />
+                <img id="mobile-menu-player-art" src="https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album" width="64" height="64" class="mobile-menu-player-art object-cover" alt="Now playing art" />
                 <div class="min-w-0 flex-1">
                     <p id="mobile-menu-player-title" class="text-sm font-black uppercase tracking-tight text-white truncate">K-BEATS LIVE</p>
                     <p id="mobile-menu-player-artist" class="mt-1 text-[11px] font-mono uppercase tracking-[0.22em] text-slate-400 truncate">On Air</p>
@@ -798,8 +799,9 @@
         async fetchPlayerLiveStatus() {
             this.playerLoading = true;
             try {
-                const res = await fetch(`/api/live/status/?_ts=${Date.now()}`, { cache: 'no-store' });
-                const data = await res.json();
+                const data = window.KBeatsLiveStatus
+                    ? await window.KBeatsLiveStatus.refresh()
+                    : null;
                 if (data?.ok && data.current_track) {
                     await this._applyPlayerTrack(data.current_track);
                     this._syncFromState();
@@ -846,13 +848,17 @@
                 this._syncFromState();
             });
 
+            if (window.KBeatsLiveStatus) {
+                window.KBeatsLiveStatus.subscribe(async (data) => {
+                    if (!data?.ok || !data.current_track) return;
+                    await this._applyPlayerTrack(data.current_track);
+                    this._syncFromState();
+                });
+            }
+
             this.playerPollTimer = setInterval(() => {
                 this._syncFromState();
             }, 1500);
-
-            setInterval(() => {
-                this.fetchPlayerLiveStatus();
-            }, 30000);
         },
         async init() {
             this.$nextTick(() => this.computePulse());
@@ -1004,7 +1010,7 @@
                         <span class="font-mono text-[8px] tracking-widest uppercase text-slate-500" x-text="playerStatus"></span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <img :src="(playerTrack && playerTrack.album_art) ? playerTrack.album_art : 'https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album'" class="w-10 h-10 border border-white/20 object-cover" alt="Now playing art" />
+                        <img :src="(playerTrack && playerTrack.album_art) ? playerTrack.album_art : 'https://res.cloudinary.com/diuanqnce/image/upload/f_auto,q_auto/ksync/seven_album'" width="40" height="40" class="w-10 h-10 border border-white/20 object-cover" alt="Now playing art" />
                         <div class="min-w-0 flex-1">
                             <p class="text-xs font-black uppercase tracking-tight truncate" x-text="playerTrack ? playerTrack.title : 'K-BEATS LIVE'"></p>
                             <p class="text-[10px] font-mono uppercase tracking-widest text-slate-500 truncate" x-text="playerTrack ? playerTrack.artist : 'On Air'"></p>
@@ -1178,26 +1184,30 @@
             mobilePlayerIcon.textContent = isPlaying ? 'pause' : 'play_arrow';
         };
 
+        const applyMobileMenuLiveStatus = (data) => {
+            if (!data?.ok || !data.current_track) return;
+            const state = readPlayerState();
+            writePlayerState({
+                ...state,
+                track: data.current_track,
+                src: String(data.current_track.audio_url || ''),
+                mode: 'inline',
+            });
+            if (mobileMenuAudio && data.current_track.audio_url) {
+                const nextSrc = String(data.current_track.audio_url);
+                if (mobileMenuAudio.src !== nextSrc) {
+                    mobileMenuAudio.src = nextSrc;
+                }
+            }
+            syncMobilePlayerFromState();
+        };
+
         const fetchMobileMenuLiveStatus = async () => {
             try {
-                const res = await fetch(`/api/live/status/?_ts=${Date.now()}`, { cache: 'no-store' });
-                const data = await res.json();
-                if (data?.ok && data.current_track) {
-                    const state = readPlayerState();
-                    writePlayerState({
-                        ...state,
-                        track: data.current_track,
-                        src: String(data.current_track.audio_url || ''),
-                        mode: 'inline',
-                    });
-                    if (mobileMenuAudio && data.current_track.audio_url) {
-                        const nextSrc = String(data.current_track.audio_url);
-                        if (mobileMenuAudio.src !== nextSrc) {
-                            mobileMenuAudio.src = nextSrc;
-                        }
-                    }
-                    syncMobilePlayerFromState();
-                }
+                const data = window.KBeatsLiveStatus
+                    ? await window.KBeatsLiveStatus.refresh()
+                    : null;
+                applyMobileMenuLiveStatus(data);
             } catch (e) {
                 if (mobilePlayerStatus) mobilePlayerStatus.textContent = 'Offline';
             }
@@ -1261,7 +1271,11 @@
 
         if (mobilePlayerToggle) {
             syncMobilePlayerFromState();
-            fetchMobileMenuLiveStatus();
+            if (window.KBeatsLiveStatus) {
+                window.KBeatsLiveStatus.subscribe(applyMobileMenuLiveStatus);
+            } else {
+                fetchMobileMenuLiveStatus();
+            }
 
             mobilePlayerToggle.addEventListener('click', async function() {
                 const state = readPlayerState();
@@ -1323,7 +1337,6 @@
             });
 
             setInterval(syncMobilePlayerFromState, 1500);
-            setInterval(fetchMobileMenuLiveStatus, 30000);
         }
         
         window.addEventListener('scroll', function() {

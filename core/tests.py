@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone as datetime_timezone
 import io
 import os
 import tempfile
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import connection
 from django.core.cache import cache
@@ -270,12 +271,63 @@ class SeoRolloutTests(TestCase):
             is_active=True,
         )
 
-    def test_homepage_uses_dynamic_seo_metadata(self):
+    @patch('core.views._fetch_artwork_from_sources')
+    def test_homepage_uses_dynamic_seo_metadata(self, artwork_fetch):
+        today = timezone.localdate()
+        ComebackData.objects.create(
+            year=today.year,
+            month=today.month,
+            data={
+                today.isoformat(): {
+                    'releases': [
+                        {
+                            'title': 'Homepage Signal',
+                            'artist': 'Signal Queens',
+                            'type': 'Single',
+                            'image': 'https://example.com/homepage-signal.jpg',
+                        },
+                    ],
+                },
+            },
+        )
+        Ranking.objects.create(
+            timeframe='daily',
+            ranking_data=[
+                {
+                    'rank': 1,
+                    'track': 'Homepage Signal',
+                    'artist': 'Signal Queens',
+                    'artwork_url': '/assets/svg/rank/no-change.svg?w=16&q=75',
+                },
+            ],
+        )
+
         response = self.client.get(reverse('home'))
 
-        self.assertContains(response, '<title>K-Pop Radio Online | Live K-Pop Stream UK | K-Beats Radio</title>', html=True)
-        self.assertContains(response, 'Listen to K-pop radio online with K-Beats Radio.')
+        self.assertContains(response, '<title>K-Pop Radio Online | Listen Live 24/7 | K-Beats</title>', html=True)
+        self.assertContains(response, 'Listen to K-pop radio online with K-Beats. Stream live 24/7')
+        self.assertContains(response, 'core/img/kbeats-radio-social-card.png')
+        self.assertContains(response, 'property="og:image"')
+        self.assertContains(response, 'name="twitter:image"')
+        self.assertContains(response, '"@type": "Organization"')
+        self.assertContains(response, '"@type": "RadioStation"')
+        self.assertContains(response, '"@type": "BroadcastService"')
+        self.assertNotContains(response, 'SearchAction')
+        self.assertContains(response, 'data-track="listen_live_home_hero_primary"')
+        self.assertContains(response, 'aria-hidden="true" class="hero-title-echo absolute inset-0 text-transparent')
+        self.assertContains(response, 'core/js/live_status.js')
+        self.assertNotContains(response, 'Next comeback')
+        self.assertNotContains(response, 'href="#"')
+        self.assertNotContains(response, '/assets/svg/rank/no-change.svg')
         self.assertContains(response, reverse('uk_kpop_radio'))
+        schema = json.loads(response.context['extra_schema_json'])
+        schema_types = {item['@type'] for item in schema['@graph']}
+        self.assertEqual(schema_types, {'Organization', 'WebSite', 'RadioStation', 'BroadcastService'})
+        social_card = settings.BASE_DIR / 'core' / 'static' / 'core' / 'img' / 'kbeats-radio-social-card.png'
+        self.assertTrue(social_card.exists())
+        with Image.open(social_card) as image:
+            self.assertEqual(image.size, (1200, 630))
+        artwork_fetch.assert_not_called()
 
     def test_keyword_landing_pages_render_and_include_unique_h1(self):
         pages = [

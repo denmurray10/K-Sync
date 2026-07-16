@@ -21,11 +21,13 @@ feature, journey, or management surface.
 These are shared across broad parts of the site and should be treated as
 high-impact UI surfaces.
 
+`core/static/core/js/live_status.js` is the shared client-side live-status channel. The header, mobile player, My Station widget, and homepage subscribe to it so live metadata is refreshed through one deduplicated request loop.
+
 ## Main public product templates
 
 ### Brand and discovery
 
-- `index.html`
+- `index.html` (homepage SEO metadata hooks, live-listening hero, mobile discovery links, and deferred hero media)
 - `charts.html`
 - `idols.html`
 - `schedule.html`

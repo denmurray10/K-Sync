@@ -4321,21 +4321,11 @@ def _build_homepage_context(request):
             ),
         )
 
-    # Fill comeback artwork from external providers (iTunes -> Deezer), then
-    # fall back to the source image from the feed when no match is found.
-    artwork_cache = {}
+    # Homepage responses must not wait on third-party artwork APIs. The comeback
+    # sync already stores a source image when one is available, and the template
+    # supplies a branded fallback when it is not.
     for release in upcoming_all:
-        source_image = str(release.get('image') or '').strip()
-        cache_key = (
-            str(release.get('artist') or '').strip().lower(),
-            str(release.get('title') or '').strip().lower(),
-        )
-        if cache_key not in artwork_cache:
-            artwork_cache[cache_key] = _fetch_artwork_from_sources(
-                release.get('artist'),
-                release.get('title'),
-            )
-        release['image'] = artwork_cache.get(cache_key, '') or source_image
+        release['image'] = str(release.get('image') or '').strip()
 
     hero_day_events = []
     if upcoming_all:
@@ -4384,7 +4374,7 @@ def _build_homepage_context(request):
         
         for idx, item in enumerate(raw_trending):
             img_url = item.get('artwork_url')
-            if not img_url:
+            if not img_url or '/assets/svg/rank/' in str(img_url):
                 img_url = f"https://api.dicebear.com/7.x/initials/svg?seed={item.get('artist')}&backgroundColor=f425c0"
             
             trend_raw = item.get('trend')
@@ -4640,23 +4630,83 @@ def _build_homepage_context(request):
         else:
             bias_rail = {'state': 'picker'}
 
+    canonical_url = request.build_absolute_uri(reverse('home'))
+    live_url = request.build_absolute_uri(reverse('live'))
+    uk_station_url = request.build_absolute_uri(reverse('uk_kpop_radio'))
+    social_image_url = request.build_absolute_uri(static('core/img/kbeats-radio-social-card.png'))
+    logo_url = request.build_absolute_uri(static('core/img/favicon-512x512.png'))
+    seo_description = (
+        'Listen to K-pop radio online with K-Beats. Stream live 24/7, discover chart hits, '
+        'follow new comebacks and request your favourite songs.'
+    )
+
     return {
-        'seo_title': 'K-Pop Radio Online | Live K-Pop Stream UK | K-Beats Radio',
-        'seo_description': 'Listen to K-pop radio online with K-Beats Radio. Stream live K-pop, discover chart songs, follow comebacks, and find a UK-based fan-first station built for repeat listening.',
-        'canonical_url': request.build_absolute_uri(reverse('home')),
+        'seo_title': 'K-Pop Radio Online | Listen Live 24/7 | K-Beats',
+        'seo_description': seo_description,
+        'seo_image': social_image_url,
+        'seo_image_alt': 'K-Beats K-pop radio online live broadcast',
+        'seo_image_width': 1200,
+        'seo_image_height': 630,
+        'seo_image_mime': 'image/png',
+        'canonical_url': canonical_url,
         'seo_type': 'website',
         'extra_schema_json': json.dumps({
             '@context': 'https://schema.org',
-            '@type': 'WebSite',
-            'name': 'K-Beats Radio',
-            'url': request.build_absolute_uri(reverse('home')),
-            'description': 'A UK-based live K-pop radio station with charts, comeback coverage, artist discovery, and fan-first listening routes.',
-            'inLanguage': 'en-GB',
-            'potentialAction': {
-                '@type': 'SearchAction',
-                'target': request.build_absolute_uri(reverse('search_api')) + '?q={search_term_string}',
-                'query-input': 'required name=search_term_string',
-            },
+            '@graph': [
+                {
+                    '@type': 'Organization',
+                    '@id': f'{canonical_url}#organization',
+                    'name': 'K-Beats Radio',
+                    'alternateName': 'K-Beats',
+                    'url': canonical_url,
+                    'logo': {
+                        '@type': 'ImageObject',
+                        'url': logo_url,
+                        'width': 512,
+                        'height': 512,
+                    },
+                    'image': social_image_url,
+                },
+                {
+                    '@type': 'WebSite',
+                    '@id': f'{canonical_url}#website',
+                    'name': 'K-Beats Radio',
+                    'url': canonical_url,
+                    'description': seo_description,
+                    'inLanguage': 'en-GB',
+                    'publisher': {'@id': f'{canonical_url}#organization'},
+                },
+                {
+                    '@type': 'RadioStation',
+                    '@id': f'{uk_station_url}#radio-station',
+                    'name': 'K-Beats Radio',
+                    'alternateName': 'K-Beats',
+                    'url': uk_station_url,
+                    'mainEntityOfPage': uk_station_url,
+                    'description': 'A UK-based online K-pop radio station broadcasting live music, charts, requests and comeback coverage.',
+                    'logo': logo_url,
+                    'image': social_image_url,
+                    'parentOrganization': {'@id': f'{canonical_url}#organization'},
+                    'address': {
+                        '@type': 'PostalAddress',
+                        'addressRegion': 'Cornwall',
+                        'addressCountry': 'GB',
+                    },
+                    'areaServed': ['United Kingdom', 'Worldwide'],
+                    'genre': ['K-pop', 'Korean pop music', 'Internet radio'],
+                },
+                {
+                    '@type': 'BroadcastService',
+                    '@id': f'{canonical_url}#broadcast-service',
+                    'name': 'K-Beats Radio live K-pop stream',
+                    'broadcastDisplayName': 'K-Beats Radio',
+                    'url': live_url,
+                    'provider': {'@id': f'{uk_station_url}#radio-station'},
+                    'areaServed': ['United Kingdom', 'Worldwide'],
+                    'inLanguage': 'en-GB',
+                    'genre': 'K-pop',
+                },
+            ],
         }),
         'seo_jump_links': [
             {

@@ -21,6 +21,17 @@ internal linking, or the structure of content entry points.
 - `presenters/`
 - `about/` and pricing pages
 
+## Homepage SEO And Live Discovery
+
+- `/` owns the broad `K-Pop Radio Online` and live-listening intent. The dedicated `/kpop-radio-station-uk/` page retains the more specific UK radio-station intent.
+- The homepage title is `K-Pop Radio Online | Listen Live 24/7 | K-Beats`, with a concise route-specific description, canonical URL, and a fixed 1200 by 630 social-sharing image.
+- Homepage JSON-LD uses an `Organization`, `WebSite`, `RadioStation`, and `BroadcastService` graph. It deliberately omits `SearchAction` because the available search endpoint is a JSON suggestion API rather than a public results page.
+- The hero exposes server-rendered links to live listening, the schedule, the UK radio destination, the 2026 playlist, midnight listening, and new-music discovery on desktop and mobile.
+- The hero's right-hand signal panel is reserved for the current live track. Upcoming comeback information remains in the dedicated homepage comeback section below the fold.
+- Homepage rendering does not call iTunes or Deezer for comeback artwork. It uses source artwork from the synced release data and the template's branded fallback so third-party APIs cannot delay the HTML response.
+- The hero video is an optional enhancement: a poster renders first, video loading is deferred until browser idle time, and reduced-motion or data-saver users keep the static poster.
+- Shared live-status consumers subscribe to `core/static/core/js/live_status.js`, which performs one deduplicated 15-second poll rather than separate header, mobile-player, and homepage requests.
+
 ## UK K-Pop Radio Destination
 
 - `/kpop-radio-station-uk/` owns the focused `K-Pop Radio Station` and UK online-radio intent.

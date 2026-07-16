@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">K-Beats K-pop radio online</title>
+  <desc id="desc">A black, neon pink and cyan K-Beats social card promoting live K-pop radio.</desc>
+  <defs>
+    <linearGradient id="stage" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#000000"/>
+      <stop offset="0.55" stop-color="#090109"/>
+      <stop offset="1" stop-color="#001014"/>
+    </linearGradient>
+    <radialGradient id="pinkGlow" cx="18%" cy="18%" r="70%">
+      <stop offset="0" stop-color="#f425c0" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#f425c0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cyanGlow" cx="88%" cy="78%" r="62%">
+      <stop offset="0" stop-color="#00f0ff" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#00f0ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="pinkBlur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+    <filter id="cyanBlur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#stage)"/>
+  <rect width="1200" height="630" fill="url(#pinkGlow)"/>
+  <rect width="1200" height="630" fill="url(#cyanGlow)"/>
+
+  <path d="M0 74H1200M0 556H1200" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2"/>
+  <path d="M62 42H1138V588H62Z" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="2"/>
+  <path d="M78 58H1122V572H78Z" fill="none" stroke="#f425c0" stroke-opacity="0.32" stroke-width="2"/>
+
+  <g transform="translate(105 96)">
+    <text x="0" y="0" dominant-baseline="hanging" fill="#ffffff" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="8">K-BEATS RADIO</text>
+    <rect x="0" y="48" width="112" height="6" fill="#f425c0"/>
+
+    <text x="0" y="108" dominant-baseline="hanging" fill="#ffffff" font-family="Cinzel, Georgia, serif" font-size="90" font-weight="800" letter-spacing="-2">K-POP RADIO</text>
+    <text x="0" y="202" dominant-baseline="hanging" fill="#f425c0" font-family="Cinzel, Georgia, serif" font-size="104" font-weight="800" letter-spacing="-2">ONLINE</text>
+    <text x="3" y="326" dominant-baseline="hanging" fill="#cbd5e1" font-family="Montserrat, Arial, sans-serif" font-size="24" letter-spacing="1.5">LIVE MUSIC  •  CHARTS  •  COMEBACKS  •  REQUESTS</text>
+
+    <g transform="translate(0 394)">
+      <rect width="294" height="68" fill="#f425c0"/>
+      <polygon points="30,21 30,47 53,34" fill="#000000"/>
+      <text x="78" y="35" dominant-baseline="middle" fill="#000000" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="800" letter-spacing="3">LISTEN LIVE 24/7</text>
+    </g>
+  </g>
+
+  <g transform="translate(920 118)">
+    <rect x="0" y="0" width="172" height="350" fill="#020306" stroke="#00f0ff" stroke-opacity="0.48" stroke-width="2"/>
+    <rect x="18" y="18" width="136" height="314" fill="none" stroke="#ffffff" stroke-opacity="0.13"/>
+    <circle cx="86" cy="78" r="40" fill="#f425c0" opacity="0.14" filter="url(#pinkBlur)"/>
+    <circle cx="86" cy="78" r="29" fill="none" stroke="#f425c0" stroke-width="7"/>
+    <circle cx="86" cy="78" r="11" fill="#ffffff"/>
+    <text x="86" y="145" text-anchor="middle" fill="#f425c0" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="800" letter-spacing="3">ON AIR</text>
+    <g transform="translate(34 192)" fill="#00f0ff">
+      <rect x="0" y="38" width="9" height="48"/>
+      <rect x="20" y="8" width="9" height="108"/>
+      <rect x="40" y="26" width="9" height="72"/>
+      <rect x="60" y="0" width="9" height="124"/>
+      <rect x="80" y="18" width="9" height="88"/>
+      <rect x="100" y="43" width="9" height="38"/>
+    </g>
+    <circle cx="138" cy="308" r="18" fill="#00f0ff" opacity="0.18" filter="url(#cyanBlur)"/>
+  </g>
+
+  <text x="1094" y="540" text-anchor="end" fill="#94a3b8" font-family="Montserrat, Arial, sans-serif" font-size="17" letter-spacing="2">KBEATSRADIO.CO.UK</text>
+</svg>
