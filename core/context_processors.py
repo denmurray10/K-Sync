@@ -120,3 +120,102 @@ def gamification(request):
         return {'play_streak': streak, 'played_today': played_today}
     except Exception:
         return {}
+
+
+def for_you_pulse(request):
+    """'For You' flyout data: bias comeback D-day, chart position/move, and
+    Daily Drop day. Cached per (bias, chart day); auth users only."""
+    user = getattr(request, 'user', None)
+    if not user or not user.is_authenticated:
+        return {}
+    try:
+        from datetime import datetime
+
+        from django.core.cache import cache
+        from django.urls import reverse
+        from django.utils import timezone as tz
+
+        from .models import ComebackData, Ranking, UserProfile
+
+        profile = UserProfile.objects.select_related('bias').filter(user=user).first()
+        bias = profile.bias if profile else None
+        has_bias = bool(bias and (bias.name or '').strip())
+        daily_rank = Ranking.objects.filter(timeframe='daily').first()
+
+        pulse = {
+            'has_bias': has_bias,
+            'bias_name': bias.name.strip() if has_bias else '',
+            'bias_url': reverse('idol_page', args=[bias.slug]) if has_bias and bias.slug else '',
+            'chart': None,
+            'comeback_dday': '',
+            'comeback_title': '',
+            'drop_day_number': 0,
+            'drop_date': '',
+        }
+        if daily_rank:
+            epoch = datetime(2026, 7, 1).date()
+            pulse['drop_day_number'] = max(1, daily_rank.date.toordinal() - epoch.toordinal() + 1)
+            pulse['drop_date'] = daily_rank.date.isoformat()
+
+        if has_bias:
+            chart_day = daily_rank.date.isoformat() if daily_rank else 'nochart'
+            cache_key = f'foryou_pulse:{bias.pk}:{chart_day}'
+            cached = cache.get(cache_key)
+            if cached is None:
+                cached = {'chart': None, 'comeback_dday': '', 'comeback_title': ''}
+                name = bias.name.strip().lower()
+
+                if daily_rank and daily_rank.ranking_data:
+                    for idx, item in enumerate(daily_rank.ranking_data[:40]):
+                        merged = f"{item.get('artist') or ''} {item.get('track') or ''}".lower()
+                        if name in merged:
+                            trend_raw = str(item.get('trend') or '')
+                            digits = ''.join(ch for ch in trend_raw if ch.isdigit())
+                            if '+' in trend_raw and digits:
+                                trend = f'▲{digits}'
+                            elif digits and '-' in trend_raw:
+                                trend = f'▼{digits}'
+                            else:
+                                trend = ''
+                            cached['chart'] = {
+                                'rank': idx + 1,
+                                'title': str(item.get('track') or '').strip(),
+                                'trend': trend,
+                            }
+                            break
+
+                now = tz.now()
+                today_str = now.strftime('%Y-%m-%d')
+                month_pairs = [(now.year, now.month)]
+                month_pairs.append(
+                    (now.year, now.month + 1) if now.month < 12 else (now.year + 1, 1)
+                )
+                best = None
+                for year, month in month_pairs:
+                    data_obj = ComebackData.objects.filter(year=year, month=month).first()
+                    if not data_obj:
+                        continue
+                    for date_key, details in (data_obj.data or {}).items():
+                        date_str = str(date_key).strip()
+                        if date_str < today_str:
+                            continue
+                        for release in (details or {}).get('releases', []) or []:
+                            merged = f"{release.get('artist') or ''} {release.get('title') or ''}".lower()
+                            if name in merged and (best is None or date_str < best[0]):
+                                best = (date_str, str(release.get('title') or '').strip())
+                    if best:
+                        break
+                if best:
+                    try:
+                        release_date = datetime.strptime(best[0], '%Y-%m-%d').date()
+                        days_out = (release_date - tz.localtime(now).date()).days
+                        cached['comeback_dday'] = 'D-DAY' if days_out <= 0 else f'D-{days_out}'
+                        cached['comeback_title'] = best[1]
+                    except (TypeError, ValueError):
+                        pass
+                cache.set(cache_key, cached, 60 * 30)
+            pulse.update(cached)
+
+        return {'for_you_pulse': pulse}
+    except Exception:
+        return {}

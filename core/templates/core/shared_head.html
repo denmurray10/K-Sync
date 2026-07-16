@@ -3,6 +3,7 @@ Included on every page template so the logo/nav (Cinzel) renders identically
 site-wide and animations respect prefers-reduced-motion. {% endcomment %}
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet"/>
 <style id="ksync-shared-head">
+  [x-cloak] { display: none !important; }
     .nav-cinzel { font-family: 'Cinzel', serif; }
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after {

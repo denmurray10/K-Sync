@@ -73,6 +73,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.seo_defaults',
                 'core.context_processors.gamification',
+                'core.context_processors.for_you_pulse',
             ],
         },
     },

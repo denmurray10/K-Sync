@@ -855,6 +855,7 @@
             }, 30000);
         },
         async init() {
+            this.$nextTick(() => this.computePulse());
             {% if user.is_authenticated %}
             try {
                 const res = await fetch('/api/notifications/');
@@ -878,6 +879,49 @@
                 this.unreadCount = Math.max(0, this.unreadCount - 1);
             }
             {% endif %}
+        },
+        pulseNew: 0,
+        _pulseSeenKey: 'kbeats_foryou_seen_v1',
+        computePulse() {
+            try {
+                const seen = JSON.parse(localStorage.getItem(this._pulseSeenKey) || '{}');
+                let fresh = 0;
+                document.querySelectorAll('[data-pulse-item]').forEach((el) => {
+                    const key = el.getAttribute('data-pulse-item');
+                    const val = el.getAttribute('data-pulse-value') || '';
+                    const dot = el.querySelector('[data-pulse-dot]');
+                    if (val && seen[key] !== val) {
+                        fresh += 1;
+                        if (dot) dot.classList.remove('hidden');
+                    }
+                });
+                const dropEl = document.getElementById('pulse-drop-row');
+                if (dropEl) {
+                    const date = dropEl.getAttribute('data-drop-date');
+                    const state = JSON.parse(localStorage.getItem(`kbeats_daily_drop_${date}`) || 'null');
+                    const streak = (JSON.parse(localStorage.getItem('kbeats_daily_drop_streak') || '{}').streak) || 0;
+                    const sub = document.getElementById('pulse-drop-sub');
+                    if (sub && state && state.done) {
+                        sub.textContent = state.won ? `Solved ${state.guesses.length}/6 · streak ${streak}` : 'Out of tries · answer revealed';
+                        const dot = dropEl.querySelector('[data-pulse-dot]');
+                        if (dot) dot.classList.add('hidden');
+                    } else if (sub) {
+                        sub.textContent = 'Not played yet · one track, six tries';
+                    }
+                }
+                this.pulseNew = fresh;
+            } catch (e) {}
+        },
+        markPulseSeen() {
+            try {
+                const seen = {};
+                document.querySelectorAll('[data-pulse-item]').forEach((el) => {
+                    seen[el.getAttribute('data-pulse-item')] = el.getAttribute('data-pulse-value') || '';
+                });
+                localStorage.setItem(this._pulseSeenKey, JSON.stringify(seen));
+                document.querySelectorAll('[data-pulse-dot]').forEach((d) => d.classList.add('hidden'));
+                this.pulseNew = 0;
+            } catch (e) {}
         }
     }"
     class="hidden lg:block z-[70]"
@@ -895,18 +939,18 @@
         role="dialog"
         aria-modal="true"
         class="fixed top-1/2 right-0 translate-x-full -translate-y-1/2 w-[340px] border border-white/20 bg-black/95 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform z-[71]"
-        :class="open ? 'translate-x-0' : 'translate-x-full'"
+        :class="{ 'translate-x-0': open, 'translate-x-full': !open }"
     >
         <div class="p-6 border-b border-white/10">
             <div class="flex items-start justify-between gap-4">
-                <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-black">My Station</p>
+                <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-primary">For You</p>
                 <button @click="open = false" class="text-slate-400 hover:text-white transition-colors" aria-label="Close My Station">
                     <span class="material-symbols-outlined text-lg">close</span>
                 </button>
             </div>
             {% if user.is_authenticated %}
                 <h3 class="text-2xl font-black uppercase tracking-tight mt-2">Personalised for {{ user.username }}</h3>
-                <p class="text-slate-400 text-sm mt-2">Quick access to your personalised settings, live listening, and alerts.</p>
+                <p class="text-slate-400 text-sm mt-2">What changed for you since last time — comebacks, chart moves, today's drop.</p>
             {% else %}
                 <h3 class="text-2xl font-black uppercase tracking-tight mt-2">Unlock My Station</h3>
                 <p class="text-slate-400 text-sm mt-2">Sign up to customise your K-Beats experience with your biases, eras, and live recommendations.</p>
@@ -915,6 +959,45 @@
 
         <div class="p-6 space-y-5">
             {% if user.is_authenticated %}
+                <div class="space-y-2">
+                    {% if for_you_pulse.has_bias %}
+                    <a href="{% url 'calendar' %}" data-track="pulse_comeback_open" data-track-category="for_you_flyout" data-pulse-item="comeback" data-pulse-value="{{ for_you_pulse.comeback_dday }}|{{ for_you_pulse.comeback_title }}" class="flex items-center gap-3 border border-white/10 bg-white/[0.02] p-3 hover:border-primary/60 transition-colors">
+                        <span class="material-symbols-outlined text-primary text-xl shrink-0">event</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-black uppercase tracking-tight truncate">{% if for_you_pulse.comeback_dday %}{{ for_you_pulse.comeback_dday }} · {{ for_you_pulse.comeback_title|default:for_you_pulse.bias_name }}{% else %}No comeback announced yet{% endif %}</p>
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 truncate">{{ for_you_pulse.bias_name }} · comeback calendar</p>
+                        </div>
+                        <span data-pulse-dot class="hidden h-2 w-2 rounded-full bg-primary shrink-0"></span>
+                    </a>
+                    <a href="{% url 'charts' %}" data-track="pulse_chart_open" data-track-category="for_you_flyout" data-pulse-item="chart" data-pulse-value="{% if for_you_pulse.chart %}{{ for_you_pulse.chart.rank }}{{ for_you_pulse.chart.trend }}{% endif %}" class="flex items-center gap-3 border border-white/10 bg-white/[0.02] p-3 hover:border-secondary/60 transition-colors">
+                        <span class="material-symbols-outlined text-secondary text-xl shrink-0">trending_up</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-black uppercase tracking-tight truncate">{% if for_you_pulse.chart %}#{{ for_you_pulse.chart.rank }} Today{% if for_you_pulse.chart.trend %} · {{ for_you_pulse.chart.trend }}{% endif %} · {{ for_you_pulse.chart.title }}{% else %}Not in today's Top 20{% endif %}</p>
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500 truncate">{{ for_you_pulse.bias_name }} · daily chart</p>
+                        </div>
+                        <span data-pulse-dot class="hidden h-2 w-2 rounded-full bg-secondary shrink-0"></span>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'profile_personalization_settings' %}" data-track="pulse_pick_bias" data-track-category="for_you_flyout" class="flex items-center gap-3 border border-white/10 bg-white/[0.02] p-3 hover:border-primary/60 transition-colors">
+                        <span class="material-symbols-outlined text-primary text-xl shrink-0">favorite</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-black uppercase tracking-tight">Pick your bias</p>
+                            <p class="font-mono text-[10px] tracking-widest uppercase text-slate-500">Unlocks comeback + chart pulse</p>
+                        </div>
+                    </a>
+                    {% endif %}
+                    {% if for_you_pulse.drop_date %}
+                    <a id="pulse-drop-row" href="{% url 'daily_drop' %}" data-track="pulse_drop_open" data-track-category="for_you_flyout" data-pulse-item="drop" data-pulse-value="{{ for_you_pulse.drop_date }}" data-drop-date="{{ for_you_pulse.drop_date }}" class="flex items-center gap-3 border border-white/10 bg-white/[0.02] p-3 hover:border-primary/60 transition-colors">
+                        <span class="material-symbols-outlined text-primary text-xl shrink-0">album</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-black uppercase tracking-tight">Daily Drop #{{ for_you_pulse.drop_day_number }}</p>
+                            <p id="pulse-drop-sub" class="font-mono text-[10px] tracking-widest uppercase text-slate-500 truncate">One track · six tries</p>
+                        </div>
+                        <span data-pulse-dot class="hidden h-2 w-2 rounded-full bg-primary shrink-0"></span>
+                    </a>
+                    {% endif %}
+                </div>
+
                 <div class="border border-white/10 bg-white/[0.02] p-3">
                     <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-2 mb-3">
                         <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-slate-500">Live Widget</p>
@@ -975,17 +1058,17 @@
     </div>
 
     <button
-        @click="open = !open"
-        class="fixed top-1/2 right-0 -translate-y-1/2 h-36 w-10 bg-primary text-black border border-primary font-black uppercase text-[10px] leading-none shadow-[2px_2px_0px_#ffffff] hover:shadow-none transition-[right,transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[right,transform] flex items-center justify-center"
-        :class="open ? 'right-[340px] z-[72]' : 'right-0 z-[72]'"
+        @click="open = !open; open && setTimeout(() => markPulseSeen(), 1500)"
+        class="fixed top-1/2 right-0 -translate-y-1/2 z-[72] h-36 w-10 bg-primary text-black border border-primary font-black uppercase text-[10px] leading-none shadow-[2px_2px_0px_#ffffff] hover:shadow-none transition-[right,transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[right,transform] flex items-center justify-center"
+        :class="{ 'right-[340px]': open, 'right-0': !open }"
         :aria-expanded="open.toString()"
         aria-controls="my-station-panel"
     >
         <div class="relative flex items-center justify-center">
-            <span class="[writing-mode:vertical-rl] [text-orientation:mixed] tracking-[0.15em] rotate-180">My Station</span>
+            <span class="[writing-mode:vertical-rl] [text-orientation:mixed] tracking-[0.15em] rotate-180">For You</span>
             <span
-                x-show="unreadCount > 0"
-                x-text="unreadCount"
+                x-show="(unreadCount + pulseNew) > 0"
+                x-text="unreadCount + pulseNew"
                 class="absolute top-1 left-1/2 -translate-x-1/2 bg-black text-primary text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-primary"
             ></span>
         </div>

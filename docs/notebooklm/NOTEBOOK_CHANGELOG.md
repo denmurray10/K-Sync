@@ -1,5 +1,21 @@
 # K-Sync Notebook Change Log
 
+## 2026-07-16
+
+### My Station flyout → "For You" pulse drawer
+
+- Repurposed the global flyout tab (Den's pick from three options) as a return-visit engine. Tab reads **FOR YOU**; its badge now counts unread alerts **plus** pulse items that changed since the user last opened the drawer (seen-state in `localStorage` key `kbeats_foryou_seen_v1`, marked seen ~1.5s after opening).
+- Drawer rows (logged-in): bias next-comeback D-day + title → calendar; bias chart position/movement on today's Top 20 → charts; Daily Drop day number with played/solved/streak state read client-side from the game's own localStorage → play page. No bias set → "Pick your bias" row → personalisation settings. Logged-out drawer unchanged (signup variant). New `data-track-category="for_you_flyout"` events: `pulse_comeback_open`, `pulse_chart_open`, `pulse_drop_open`, `pulse_pick_bias`.
+- New `core.context_processors.for_you_pulse` (registered in settings after `gamification`): auth-only, one profile + one ranking query, with the comeback/chart scan cached per `(bias, chart-day)` for 30 min (`foryou_pulse:<bias_pk>:<date>`).
+
+### My Station flyout fix: Alpine deduplication
+
+- The My Station flyout tab (global, in `header.html`) opened blank/behaved erratically. Root cause: Alpine.js was loaded twice on ~25 pages — `header.html` has shipped its own Alpine tag since March (26e0f35) while pages kept their pre-existing ones. Double `Alpine.start()` re-initializes every component (Alpine's docs warn against it) — duplicate listeners/scopes break toggles like the flyout's.
+- Removed the page-level Alpine core tag from all 25 templates that include `core/header.html` (both the `3.x.x` and pinned `3.14.9` forms); `header.html` is now the single Alpine source on those pages. Standalone pages (game play pages, etc.) keep their own tags. The `@alpinejs/collapse` plugin tag was retained where present.
+- Also fixed the flyout's invisible title (`text-black` on the black panel → `text-primary`) and added a global `[x-cloak] { display: none !important; }` rule to `core/shared_head.html` (previously no page defined it, so `x-cloak` elements could flash before Alpine initialized).
+- Rebuilt both compiled Tailwind bundles (`home-tailwind.css`, `idols-tailwind.css`).
+- **Second root cause (confirmed from a live screenshot):** the flyout panel carried a static `translate-x-full` class while Alpine's string-ternary `:class` *added* `translate-x-0` on open without removing the static class. With both classes present, stylesheet order decides — `.translate-x-full` sits later in the compiled CSS and wins, so the tab moved and the overlay dimmed but the panel never slid in. Converted the panel and tab-button bindings to Alpine object syntax (`:class="{ 'translate-x-0': open, 'translate-x-full': !open }"`), which actively toggles the conflicting class off; pre-JS closed defaults retained.
+
 ## Freshness
 
 - Last reviewed: 2026-04-06
