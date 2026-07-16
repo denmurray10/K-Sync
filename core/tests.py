@@ -238,6 +238,58 @@ class SiteIconTests(TestCase):
         'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
     }
 )
+class VisitorWalkthroughIntegrationTests(TestCase):
+    def test_homepage_loads_shared_walkthrough_assets_and_restart_control(self):
+        response = self.client.get(reverse('home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'core/css/visitor-walkthrough.css')
+        self.assertContains(response, 'core/js/visitor-walkthrough.js')
+        self.assertContains(response, 'id="visitor-tour-launcher"')
+        self.assertContains(response, 'data-tour-start')
+        self.assertContains(response, 'aria-label="Start website tour"')
+
+    def test_live_page_exposes_walkthrough_targets_on_active_template(self):
+        response = self.client.get(reverse('live'))
+
+        self.assertEqual(response.status_code, 200)
+        for target in [
+            'live-play',
+            'live-share',
+            'live-save',
+            'request-song',
+            'up-next',
+            'recently-played',
+            'live-chat',
+        ]:
+            self.assertContains(response, f'data-tour-target="{target}"')
+
+    def test_walkthrough_assets_define_expected_steps_and_storage_key(self):
+        css_path = settings.BASE_DIR / 'core' / 'static' / 'core' / 'css' / 'visitor-walkthrough.css'
+        js_path = settings.BASE_DIR / 'core' / 'static' / 'core' / 'js' / 'visitor-walkthrough.js'
+
+        self.assertTrue(css_path.exists())
+        self.assertTrue(js_path.exists())
+
+        css = css_path.read_text(encoding='utf-8')
+        js = js_path.read_text(encoding='utf-8')
+
+        self.assertIn('#visitor-tour-overlay', css)
+        self.assertIn('.visitor-tour-spotlight', css)
+        self.assertIn('ksync_visitor_tour_seen_v1', js)
+        self.assertIn('KBeatsVisitorTour', js)
+        self.assertIn('data-tour-target', js)
+
+        for step_id in ['welcome', 'home-hero', 'live-player', 'navigation', 'my-station', 'live-play', 'live-chat']:
+            self.assertIn(step_id, js)
+
+
+@override_settings(
+    STORAGES={
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+)
 class SeoRolloutTests(TestCase):
     def setUp(self):
         self.group = KPopGroup.objects.create(

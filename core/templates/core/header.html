@@ -1,8 +1,10 @@
 {% load static %}
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="{% static 'core/css/visitor-walkthrough.css' %}"/>
 <script defer src="{% static 'core/js/live_status.js' %}"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script defer src="{% static 'core/js/button_tracking.js' %}"></script>
+<script defer src="{% static 'core/js/visitor-walkthrough.js' %}"></script>
 <style>
   :root {
     --site-gutter-x: 1rem;
@@ -397,7 +399,7 @@
 <!-- ───── LIVE PAGE HEADER ───── -->
 <header id="main-header" class="fixed top-0 left-0 right-0 z-50 py-8 bg-transparent border-none">
     <div class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 md:grid-cols-[auto_1fr_auto]">
-        <a href="{% url 'home' %}" class="flex items-center gap-0 group shrink-0 py-2">
+        <a href="{% url 'home' %}" data-tour-target="home-logo" class="flex items-center gap-0 group shrink-0 py-2">
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
             <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
@@ -455,13 +457,13 @@
 <!-- ───── STANDARD HEADER ───── -->
 <header id="main-header" class="bg-transparent fixed top-0 left-0 right-0 z-50 py-5 sm:py-8 border-none">
     <div id="header-layout-row" class="container mx-auto grid grid-cols-[auto_1fr] items-center gap-4 md:gap-8 min-w-0 md:grid-cols-[auto_1fr_auto]">
-        <a id="header-logo" class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
+        <a id="header-logo" data-tour-target="home-logo" class="flex items-center gap-0 text-primary hover:text-secondary transition-colors duration-300 group py-2 shrink-0" href="{% url 'home' %}">
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_white] uppercase tracking-[1px] leading-none drop-shadow-[0_0_8px_rgba(244,37,192,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.9)] transition-all duration-300">K</span>
             <span class="text-3xl md:text-4xl font-black text-white tracking-[1px] leading-none">-</span>
             <span class="text-3xl md:text-4xl font-black text-transparent [-webkit-text-stroke:1.5px_theme(colors.primary)] tracking-[1px] leading-none group-hover:[-webkit-text-stroke:1.5px_#00f0ff] group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] transition-all duration-500">beats</span>
         </a>
         <div data-header-nav-shell class="hidden min-w-0 justify-center md:flex">
-            <nav id="desktop-primary-nav" data-track-category="global_nav" class="hidden md:flex items-center justify-center gap-6">
+            <nav id="desktop-primary-nav" data-tour-target="navigation" data-track-category="global_nav" class="hidden md:flex items-center justify-center gap-6">
                 <a data-track="nav_live" class="{% if request.resolver_match.url_name == 'live' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'live' %}">Live</a>
                 <a data-track="nav_charts" class="{% if request.resolver_match.url_name == 'charts' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'charts' %}">Charts</a>
                 <a data-track="nav_idols" class="{% if request.resolver_match.url_name == 'idols' or request.resolver_match.url_name == 'idol_page' or request.resolver_match.url_name == 'idol_universe' %}nav-cinzel text-primary font-normal uppercase tracking-wide transition-colors underline decoration-2 underline-offset-8{% else %}nav-cinzel text-slate-200 hover:text-primary font-normal uppercase tracking-wide transition-colors{% endif %}" href="{% url 'idols' %}">Idols</a>
@@ -478,6 +480,7 @@
             <div class="flex gap-4 items-center">
                 <a
                     data-track="nav_live_mobile"
+                    data-tour-target="live-on-air"
                     data-track-category="global_header"
                     href="{% url 'live' %}"
                     class="sm:hidden inline-flex items-center justify-center w-10 h-10 border border-primary text-primary hover:bg-primary hover:text-black transition-all"
@@ -487,6 +490,7 @@
                 </a>
                 <button
                     data-track="live_on_air_header"
+                    data-tour-target="live-on-air"
                     data-track-category="global_header"
                     data-track-destination="{% url 'live' %}"
                     class="group relative hidden sm:flex items-center gap-2 border border-primary px-6 py-3 font-black text-white hover:bg-primary hover:text-black transition-all"
@@ -518,7 +522,7 @@
 {% endif %}
 
 <!-- ───── MOBILE SITE MENU ───── -->
-<nav class="mobile-app-bar md:hidden" aria-label="Mobile app navigation" data-track-category="mobile_bottom_nav">
+<nav class="mobile-app-bar md:hidden" aria-label="Mobile app navigation" data-tour-target="mobile-nav" data-track-category="mobile_bottom_nav">
     <div class="mobile-app-bar__dock">
         <a
             data-track="bottom_nav_idols"
@@ -1064,6 +1068,8 @@
     </div>
 
     <button
+        id="my-station-launcher"
+        data-tour-target="my-station"
         @click="open = !open; open && setTimeout(() => markPulseSeen(), 1500)"
         class="fixed top-1/2 right-0 -translate-y-1/2 z-[72] h-36 w-10 bg-primary text-black border border-primary font-black uppercase text-[10px] leading-none shadow-[2px_2px_0px_#ffffff] hover:shadow-none transition-[right,transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[right,transform] flex items-center justify-center"
         :class="{ 'right-[340px]': open, 'right-0': !open }"
@@ -1080,6 +1086,18 @@
         </div>
     </button>
 </div>
+
+<button
+    id="visitor-tour-launcher"
+    data-tour-start
+    type="button"
+    class="visitor-tour-launcher"
+    aria-label="Start website tour"
+    title="Start website tour"
+>
+    <span class="material-symbols-outlined visitor-tour-launcher__icon" aria-hidden="true">help</span>
+    <span class="visitor-tour-launcher__label">Tour</span>
+</button>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
