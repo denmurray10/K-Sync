@@ -13141,8 +13141,9 @@ def _inject_internal_links(html, article, all_articles):
         (r'\bdiscover new k-?pop music\b', reverse('discover_new_kpop_music'), 'discover new K-pop music'),
     ]
 
+    candidate_pool = _build_related_article_cluster(article, all_articles, limit=24)
     article_targets = []
-    for candidate in all_articles:
+    for candidate in candidate_pool:
         if candidate.pk == article.pk:
             continue
         candidate_url = reverse('blog_article_read', kwargs={'slug': candidate.slug})
@@ -13300,7 +13301,8 @@ def blog_article_read(request, slug):
     canonical_url = request.build_absolute_uri(
         reverse('blog_article_read', kwargs={'slug': article.slug})
     )
-    article_body_html = _inject_related_reading_block(article.body_html, article, related[:6])
+    article_body_html, _ = _inject_internal_links(article.body_html, article, all_articles)
+    article_body_html = _inject_related_reading_block(article_body_html, article, related[:6])
     article_body_html = _inject_article_advert_blocks(
         article_body_html,
         reverse('live'),
