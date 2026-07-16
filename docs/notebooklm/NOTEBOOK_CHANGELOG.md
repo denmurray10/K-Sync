@@ -18,7 +18,7 @@
 
 ## Freshness
 
-- Last reviewed: 2026-04-06
+- Last reviewed: 2026-07-16
 - Current truth: This changelog tracks curated-source changes for the `K Beats Radio` notebook.
 - Legacy context: Earlier notebook states were smaller bootstrap packs and should not be treated as complete project-brain coverage.
 
@@ -57,6 +57,21 @@
 - Added notebook maintenance workflow support, including validation and update-process guidance.
 - Added design-system, component-pattern, page-pattern, UX-rule, and copy-style docs so the notebook can guide future page and feature design.
 - Added a visual reference set plus captured page screenshots for the homepage, live experience, signup, and staff login surfaces so future design work can be grounded in the current UI.
+
+## 2026-07-16
+
+### UK K-pop radio SEO destination
+
+- Refreshed the SEO and template maps for the rewritten `/kpop-radio-station-uk/` landing page.
+- Recorded its dedicated content partial, keyword ownership, listener-facing internal-link cluster, social image, and radio/broadcast structured data.
+- Clarified that visible listener FAQs support the page content but are not expected to produce a Google FAQ rich result.
+
+### Best K-pop playlist 2026 SEO destination
+
+- Replaced the placeholder `/best-kpop-playlist-2026/` content with a dedicated editorial chart experience and refreshed its SEO and template maps.
+- Recorded the server-rendered daily top 10, current-month comeback edit, live update timestamp, listener-facing FAQs, descriptive internal-link cluster, and dynamic social artwork.
+- Recorded `MusicPlaylist`, `MusicRecording`, and breadcrumb structured data generated from the same visible track list.
+- Clarified that the current top 10 represents songs leading the 2026 listening conversation, while genuinely new 2026 releases are labelled separately.
 
 ## How To Use This File
 

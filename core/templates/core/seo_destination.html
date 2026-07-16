@@ -33,6 +33,11 @@ tailwind.config = {
 
 {% include 'core/header.html' %}
 
+{% if landing_page.template_variant == 'uk_radio_station' %}
+{% include 'core/seo_kpop_radio_uk.html' %}
+{% elif landing_page.template_variant == 'best_kpop_playlist_2026' %}
+{% include 'core/seo_best_kpop_playlist_2026.html' %}
+{% else %}
 <main class="pb-24 pt-36">
     <section class="relative overflow-hidden border-b border-white/10 pb-16">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,37,192,0.16),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(0,240,255,0.12),transparent_24%)]"></div>
@@ -111,6 +116,7 @@ tailwind.config = {
         </div>
     </section>
 </main>
+{% endif %}
 
 {% include 'core/footer.html' %}
 </body>

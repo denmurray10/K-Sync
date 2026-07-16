@@ -1,0 +1,289 @@
+<style>
+    .playlist-grid-lines {
+        background-image:
+            linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+    }
+    .playlist-title-stroke {
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255,255,255,.16);
+    }
+    .playlist-link:focus-visible,
+    .playlist-faq:focus-visible {
+        outline: 2px solid #00f0ff;
+        outline-offset: 4px;
+    }
+    .playlist-faq[open] .playlist-faq-icon {
+        transform: rotate(45deg);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .playlist-faq-icon { transition: none !important; }
+    }
+</style>
+
+<main id="main-content" class="overflow-hidden pb-24 pt-28 sm:pt-32">
+    <section class="relative border-b border-white/10 pb-16 pt-8 sm:pb-24 lg:pt-12">
+        <div class="playlist-grid-lines pointer-events-none absolute inset-0"></div>
+        <div class="pointer-events-none absolute -left-24 top-16 h-80 w-80 rounded-full bg-primary/20 blur-[110px]"></div>
+        <div class="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-secondary/10 blur-[130px]"></div>
+
+        <div class="relative mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
+            <div>
+                <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-white/45">
+                    <a href="{% url 'home' %}" class="playlist-link -my-2 py-2 transition hover:text-secondary">K-Beats</a>
+                    <span aria-hidden="true">/</span>
+                    <span aria-current="page" class="text-secondary">2026 Playlist</span>
+                </nav>
+                <p class="mt-9 text-[10px] font-black uppercase tracking-[0.28em] text-primary sm:text-xs">{{ landing_page.eyebrow }}</p>
+                <h1 class="mt-5 max-w-3xl font-display text-[clamp(3rem,8vw,6.6rem)] font-black uppercase leading-[0.84] tracking-[-0.055em] text-white">
+                    Best K-Pop<br><span class="playlist-title-stroke">Playlist</span> 2026
+                </h1>
+                <p class="mt-7 max-w-2xl text-base font-semibold leading-8 text-white sm:text-lg">{{ landing_page.lede }}</p>
+                <p class="mt-5 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base">{{ landing_page.intro }}</p>
+
+                <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+                    <a href="{{ landing_page.primary_cta.href }}" class="playlist-link inline-flex min-h-[54px] items-center justify-center gap-3 border border-primary bg-primary px-7 py-4 text-xs font-black uppercase tracking-[0.18em] text-black transition hover:border-white hover:bg-white">
+                        <span class="material-symbols-outlined text-lg" aria-hidden="true">play_arrow</span>
+                        {{ landing_page.primary_cta.label }}
+                    </a>
+                    <a href="{{ landing_page.secondary_cta.href }}" class="playlist-link inline-flex min-h-[54px] items-center justify-center gap-3 border border-white/15 bg-white/[0.04] px-7 py-4 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:border-secondary hover:text-secondary">
+                        {{ landing_page.secondary_cta.label }}
+                        <span class="material-symbols-outlined text-lg" aria-hidden="true">arrow_outward</span>
+                    </a>
+                </div>
+
+                <dl class="mt-10 grid max-w-2xl grid-cols-3 border-y border-white/10 py-5">
+                    <div>
+                        <dt class="text-[9px] font-black uppercase tracking-[0.2em] text-white/45">Current edit</dt>
+                        <dd class="mt-2 font-display text-xl font-black uppercase text-white sm:text-2xl">{{ playlist_tracks|length }} Tracks</dd>
+                    </div>
+                    <div class="border-l border-white/10 pl-4 sm:pl-6">
+                        <dt class="text-[9px] font-black uppercase tracking-[0.2em] text-white/45">Chart cycle</dt>
+                        <dd class="mt-2 font-display text-xl font-black uppercase text-secondary sm:text-2xl">Daily</dd>
+                    </div>
+                    <div class="border-l border-white/10 pl-4 sm:pl-6">
+                        <dt class="text-[9px] font-black uppercase tracking-[0.2em] text-white/45">Listening</dt>
+                        <dd class="mt-2 font-display text-xl font-black uppercase text-primary sm:text-2xl">Live</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="relative mx-auto w-full max-w-[560px] lg:mx-0 lg:ml-auto">
+                <div class="absolute -right-5 -top-5 h-full w-full border border-secondary/35 sm:-right-7 sm:-top-7"></div>
+                <div class="absolute -bottom-5 -left-5 h-full w-full bg-primary/15 sm:-bottom-7 sm:-left-7"></div>
+                <div class="relative aspect-square border border-white/20 bg-[#080910] p-3 shadow-[0_30px_90px_rgba(0,0,0,.65)] sm:p-4">
+                    <div class="grid h-full grid-cols-2 grid-rows-2 gap-2 overflow-hidden bg-black sm:gap-3">
+                        {% for track in playlist_tracks|slice:':4' %}
+                        <div class="relative overflow-hidden bg-[linear-gradient(135deg,rgba(244,37,192,.25),rgba(0,240,255,.08))]">
+                            {% if track.artwork %}
+                            <img src="{{ track.artwork }}" alt="Cover artwork for {{ track.title }} by {{ track.artist }}" class="h-full w-full object-cover" width="300" height="300" {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}/>
+                            {% else %}
+                            <div class="flex h-full items-center justify-center" aria-hidden="true">
+                                <span class="material-symbols-outlined text-5xl text-white/20">graphic_eq</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/75 to-transparent p-3 pt-10">
+                                <p class="truncate text-[9px] font-black uppercase tracking-[0.14em] text-white/65">#{{ track.rank_label }} · {{ track.artist }}</p>
+                                <p class="mt-1 truncate text-xs font-black uppercase text-white sm:text-sm">{{ track.title }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-span-2 row-span-2 flex flex-col items-center justify-center bg-[radial-gradient(circle_at_30%_30%,rgba(244,37,192,.24),transparent_35%),radial-gradient(circle_at_75%_70%,rgba(0,240,255,.18),transparent_30%)] p-8 text-center">
+                            <span class="material-symbols-outlined text-7xl text-primary" aria-hidden="true">equalizer</span>
+                            <p class="mt-5 font-display text-3xl font-black uppercase text-white">Chart Refreshing</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="absolute left-7 top-7 border border-white/20 bg-black/85 px-3 py-2 text-[9px] font-black uppercase tracking-[0.22em] text-white backdrop-blur sm:left-9 sm:top-9">K-Beats / Edit 26</div>
+                    <div class="absolute bottom-7 right-7 flex h-12 w-12 items-center justify-center rounded-full border border-primary bg-black text-primary sm:bottom-9 sm:right-9" aria-hidden="true">
+                        <span class="material-symbols-outlined">play_arrow</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative py-16 sm:py-24" aria-labelledby="playlist-tracklist-title">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6">
+            <div class="grid gap-6 border-b border-white/10 pb-9 lg:grid-cols-[1fr_auto] lg:items-end">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">{{ landing_page.playlist_section.eyebrow }}</p>
+                    <h2 id="playlist-tracklist-title" class="mt-4 max-w-4xl font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em] text-white sm:text-5xl">{{ landing_page.playlist_section.title }}</h2>
+                    <p class="mt-5 max-w-3xl text-sm leading-7 text-slate-400 sm:text-base">{{ landing_page.playlist_section.intro }}</p>
+                </div>
+                <div class="lg:text-right">
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Last chart sync</p>
+                    <p class="mt-2 text-xs font-black uppercase tracking-[0.12em] text-white">
+                        {% if playlist_updated_at %}{{ playlist_updated_at|date:'j F Y · H:i' }} UK{% else %}Awaiting latest data{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            {% if playlist_tracks %}
+            <ol class="mt-2" aria-label="Current best K-pop songs for 2026">
+                {% for track in playlist_tracks %}
+                <li class="group grid grid-cols-[42px_58px_minmax(0,1fr)_auto] items-center gap-3 border-b border-white/10 py-4 transition hover:bg-white/[0.035] sm:grid-cols-[58px_72px_minmax(0,1fr)_minmax(180px,0.45fr)_auto] sm:gap-5 sm:px-4">
+                    <span class="font-display text-xl font-black text-white/30 transition group-hover:text-primary sm:text-3xl" aria-label="Position {{ track.rank }}">{{ track.rank_label }}</span>
+                    <div class="aspect-square overflow-hidden border border-white/10 bg-[linear-gradient(135deg,rgba(244,37,192,.22),rgba(0,240,255,.08))]">
+                        {% if track.artwork %}
+                        <img src="{{ track.artwork }}" alt="" class="h-full w-full object-cover" width="72" height="72" loading="lazy"/>
+                        {% else %}
+                        <div class="flex h-full items-center justify-center" aria-hidden="true"><span class="material-symbols-outlined text-white/25">music_note</span></div>
+                        {% endif %}
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="truncate text-sm font-black uppercase tracking-tight text-white sm:text-lg">{{ track.title }}</h3>
+                        <p class="mt-1 truncate text-[10px] font-bold uppercase tracking-[0.14em] text-white/50 sm:text-xs">{{ track.artist }}</p>
+                    </div>
+                    <div class="hidden min-w-0 sm:block">
+                        {% if track.signal %}<p class="line-clamp-2 text-xs leading-5 text-slate-500">{{ track.signal }}</p>{% else %}<p class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-600">Daily chart signal</p>{% endif %}
+                    </div>
+                    <a href="{% url 'request_track' %}" class="playlist-link inline-flex h-10 w-10 items-center justify-center border border-white/10 text-white/55 transition hover:border-primary hover:bg-primary hover:text-black" aria-label="Request {{ track.title }} by {{ track.artist }} on K-Beats">
+                        <span class="material-symbols-outlined text-lg" aria-hidden="true">add</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ol>
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <a href="{% url 'charts' %}" class="playlist-link inline-flex min-h-[50px] items-center justify-center gap-3 border border-white/15 px-6 py-3 text-xs font-black uppercase tracking-[0.16em] text-white transition hover:border-secondary hover:text-secondary">See The Full Chart <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_outward</span></a>
+            </div>
+            {% else %}
+            <div class="mt-10 border border-secondary/25 bg-secondary/[0.06] p-7 sm:p-10">
+                <p class="font-display text-2xl font-black uppercase text-white">{{ landing_page.playlist_section.empty_title }}</p>
+                <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300">{{ landing_page.playlist_section.empty_body }}</p>
+                <a href="{% url 'live' %}" class="playlist-link mt-6 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-secondary">Listen live <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_outward</span></a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="border-y border-white/10 bg-[#07080d] py-16 sm:py-24" aria-labelledby="fresh-releases-title">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6">
+            <div class="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:gap-14">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">{{ landing_page.fresh_section.eyebrow }}</p>
+                    <h2 id="fresh-releases-title" class="mt-4 font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em] text-white sm:text-5xl">{{ landing_page.fresh_section.title }}</h2>
+                    <p class="mt-5 text-sm leading-7 text-slate-400 sm:text-base">{{ landing_page.fresh_section.intro }}</p>
+                    <a href="{% url 'comeback_timeline' %}" class="playlist-link mt-7 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.17em] text-secondary">Open the comeback calendar <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_outward</span></a>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    {% for release in fresh_releases %}
+                    <a href="{{ release.href }}" class="playlist-link group grid grid-cols-[92px_minmax(0,1fr)] gap-4 border border-white/10 bg-black/35 p-3 transition hover:border-primary sm:grid-cols-[112px_minmax(0,1fr)]">
+                        <div class="aspect-square overflow-hidden bg-[linear-gradient(135deg,rgba(244,37,192,.22),rgba(0,240,255,.08))]">
+                            {% if release.image %}
+                            <img src="{{ release.image }}" alt="Cover artwork for {{ release.title }} by {{ release.artist }}" width="180" height="180" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
+                            {% else %}
+                            <div class="flex h-full items-center justify-center" aria-hidden="true"><span class="material-symbols-outlined text-4xl text-white/20">album</span></div>
+                            {% endif %}
+                        </div>
+                        <div class="min-w-0 py-1">
+                            <p class="text-[9px] font-black uppercase tracking-[0.16em] text-primary">{{ release.date_label }} · {{ release.release_type }}</p>
+                            <h3 class="mt-3 line-clamp-2 text-sm font-black uppercase leading-5 text-white sm:text-base">{{ release.title }}</h3>
+                            <p class="mt-2 truncate text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">{{ release.artist }}</p>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="sm:col-span-2 border border-white/10 bg-black/35 p-8">
+                        <p class="text-sm leading-7 text-slate-300">Fresh releases will appear here as the current 2026 comeback calendar is updated.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 sm:py-24" aria-labelledby="playlist-method-title">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6">
+            <div class="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">{{ landing_page.method.eyebrow }}</p>
+                    <h2 id="playlist-method-title" class="mt-4 font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em] text-white sm:text-5xl">{{ landing_page.method.title }}</h2>
+                    <p class="mt-5 text-sm leading-7 text-slate-400 sm:text-base">{{ landing_page.method.intro }}</p>
+                </div>
+                <div class="space-y-3">
+                    {% for point in landing_page.method.points %}
+                    <article class="grid grid-cols-[48px_minmax(0,1fr)] gap-4 border-l border-white/15 bg-white/[0.025] p-5 sm:grid-cols-[64px_minmax(0,1fr)] sm:gap-6 sm:p-7">
+                        <span class="font-display text-2xl font-black text-primary/70 sm:text-3xl">{{ point.number }}</span>
+                        <div>
+                            <h3 class="text-base font-black uppercase text-white sm:text-lg">{{ point.title }}</h3>
+                            <p class="mt-3 text-sm leading-7 text-slate-400">{{ point.body }}</p>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mt-16 grid gap-4 md:grid-cols-3">
+                {% for route in landing_page.mood_routes %}
+                <a href="{{ route.href }}" class="playlist-link group relative min-h-[250px] overflow-hidden border border-white/10 bg-[#0a0b12] p-7 transition hover:-translate-y-1 hover:border-white/30">
+                    {% if route.accent == 'cyan' %}<div class="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-secondary/20 blur-3xl"></div>{% elif route.accent == 'pink' %}<div class="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-primary/25 blur-3xl"></div>{% else %}<div class="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/10 blur-3xl"></div>{% endif %}
+                    <div class="relative flex h-full flex-col">
+                        <p class="text-[9px] font-black uppercase tracking-[0.22em] {% if route.accent == 'cyan' %}text-secondary{% elif route.accent == 'pink' %}text-primary{% else %}text-white/65{% endif %}">{{ route.eyebrow }}</p>
+                        <h3 class="mt-5 font-display text-2xl font-black uppercase text-white">{{ route.title }}</h3>
+                        <p class="mt-4 text-sm leading-7 text-slate-400">{{ route.body }}</p>
+                        <span class="material-symbols-outlined mt-auto pt-6 text-white transition group-hover:translate-x-1" aria-hidden="true">arrow_outward</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="border-y border-white/10 bg-white/[0.025] py-16 sm:py-24" aria-labelledby="playlist-discovery-title">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6">
+            <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">{{ landing_page.related_eyebrow }}</p>
+            <h2 id="playlist-discovery-title" class="mt-4 max-w-4xl font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em] text-white sm:text-5xl">{{ landing_page.related_title }}</h2>
+            <p class="mt-5 max-w-3xl text-sm leading-7 text-slate-400 sm:text-base">{{ landing_page.related_intro }}</p>
+            <div class="mt-10 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
+                {% for link in landing_page.related_links %}
+                <a href="{{ link.href }}" class="playlist-link group bg-[#08090e] p-6 transition hover:bg-[#10121a] sm:p-7">
+                    <div class="flex items-start justify-between gap-5">
+                        <h3 class="text-base font-black uppercase leading-6 text-white">{{ link.title }}</h3>
+                        <span class="material-symbols-outlined text-lg text-white/30 transition group-hover:text-secondary" aria-hidden="true">arrow_outward</span>
+                    </div>
+                    <p class="mt-4 text-sm leading-7 text-slate-400">{{ link.body }}</p>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 sm:py-24" aria-labelledby="playlist-faq-title">
+        <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.28em] text-secondary">{{ landing_page.faq_eyebrow }}</p>
+                <h2 id="playlist-faq-title" class="mt-4 font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em] text-white sm:text-5xl">{{ landing_page.faq_title }}</h2>
+            </div>
+            <div class="border-t border-white/15">
+                {% for faq in landing_page.faqs %}
+                <details class="playlist-faq group border-b border-white/15">
+                    <summary class="flex cursor-pointer list-none items-center justify-between gap-5 py-6 text-left text-sm font-black uppercase leading-6 text-white sm:text-base">
+                        {{ faq.question }}
+                        <span class="playlist-faq-icon material-symbols-outlined shrink-0 text-primary transition duration-200" aria-hidden="true">add</span>
+                    </summary>
+                    <p class="max-w-3xl pb-7 pr-10 text-sm leading-7 text-slate-400">{{ faq.answer }}</p>
+                </details>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="px-4 sm:px-6">
+        <div class="relative mx-auto max-w-7xl overflow-hidden border border-primary/40 bg-[linear-gradient(120deg,rgba(244,37,192,.18),rgba(0,240,255,.08)_55%,rgba(0,0,0,.9))] px-6 py-12 sm:px-10 sm:py-16 lg:px-16">
+            <div class="absolute -right-16 -top-20 font-display text-[13rem] font-black leading-none text-white/[0.025]" aria-hidden="true">26</div>
+            <div class="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.28em] text-primary">{{ landing_page.final_cta.eyebrow }}</p>
+                    <h2 class="mt-4 max-w-3xl font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em] text-white sm:text-5xl">{{ landing_page.final_cta.title }}</h2>
+                    <p class="mt-5 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">{{ landing_page.final_cta.body }}</p>
+                </div>
+                <div class="flex flex-col gap-3 sm:flex-row">
+                    <a href="{{ landing_page.final_cta.primary_link.href }}" class="playlist-link inline-flex min-h-[52px] items-center justify-center gap-2 bg-primary px-6 py-3 text-xs font-black uppercase tracking-[0.16em] text-black transition hover:bg-white"><span class="material-symbols-outlined text-lg" aria-hidden="true">play_arrow</span>{{ landing_page.final_cta.primary_link.label }}</a>
+                    <a href="{{ landing_page.final_cta.secondary_link.href }}" class="playlist-link inline-flex min-h-[52px] items-center justify-center border border-white/20 px-6 py-3 text-xs font-black uppercase tracking-[0.16em] text-white transition hover:border-secondary hover:text-secondary">{{ landing_page.final_cta.secondary_link.label }}</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

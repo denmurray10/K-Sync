@@ -1,0 +1,232 @@
+<main id="main-content" class="overflow-hidden bg-black pb-24 pt-28 sm:pt-32">
+    <section class="relative border-b border-white/10" aria-labelledby="uk-radio-heading">
+        <div class="absolute inset-0 opacity-30" aria-hidden="true" style="background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:48px 48px;"></div>
+        <div class="absolute -left-40 top-0 h-[34rem] w-[34rem] rounded-full bg-primary/15 blur-[130px]" aria-hidden="true"></div>
+        <div class="absolute -right-40 bottom-0 h-[30rem] w-[30rem] rounded-full bg-secondary/10 blur-[130px]" aria-hidden="true"></div>
+
+        <div class="relative container mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
+            <div class="grid items-center gap-14 lg:grid-cols-[minmax(0,1.18fr)_minmax(320px,0.82fr)] lg:gap-16">
+                <div>
+                    <div class="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.25em] text-secondary sm:tracking-[0.34em]">
+                        <span class="inline-block h-2 w-2 rounded-full bg-primary shadow-[0_0_18px_rgba(244,37,192,0.9)]"></span>
+                        {{ landing_page.eyebrow }}
+                    </div>
+                    <h1 id="uk-radio-heading" class="mt-7 max-w-5xl font-display text-[clamp(3.25rem,8vw,7.25rem)] font-black uppercase leading-[0.84] tracking-[-0.045em] text-white">
+                        {{ landing_page.headline }}
+                    </h1>
+                    <p class="mt-8 max-w-3xl text-lg font-semibold leading-8 text-slate-100 sm:text-xl sm:leading-9">{{ landing_page.lede }}</p>
+                    <p class="mt-5 max-w-3xl text-sm leading-7 text-slate-400 sm:text-base sm:leading-8">{{ landing_page.intro }}</p>
+
+                    <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+                        <a href="{{ landing_page.primary_cta.href }}" class="group inline-flex min-h-[56px] items-center justify-center gap-3 border border-primary bg-primary px-7 py-4 text-xs font-black uppercase tracking-[0.2em] text-black transition duration-300 hover:border-white hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">
+                            <span class="material-symbols-outlined text-xl" aria-hidden="true">play_arrow</span>
+                            {{ landing_page.primary_cta.label }}
+                            <span class="material-symbols-outlined text-base transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+                        </a>
+                        <a href="{{ landing_page.secondary_cta.href }}" class="inline-flex min-h-[56px] items-center justify-center gap-3 border border-white/20 bg-black/40 px-7 py-4 text-xs font-black uppercase tracking-[0.2em] text-white backdrop-blur transition duration-300 hover:border-secondary hover:text-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">
+                            <span class="material-symbols-outlined text-lg" aria-hidden="true">calendar_month</span>
+                            {{ landing_page.secondary_cta.label }}
+                        </a>
+                    </div>
+                </div>
+
+                <aside class="relative border border-white/15 bg-black/70 p-6 shadow-[18px_18px_0_rgba(244,37,192,0.09)] backdrop-blur sm:p-8" aria-label="K-Beats station status">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-5">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Station Signal</p>
+                            <p class="mt-2 font-display text-2xl font-bold uppercase text-white">K-Beats Radio</p>
+                        </div>
+                        <span class="material-symbols-outlined text-4xl text-secondary" aria-hidden="true">graphic_eq</span>
+                    </div>
+
+                    <div class="relative my-8 flex min-h-52 items-center justify-center overflow-hidden border border-white/10 bg-white/[0.025]" aria-hidden="true">
+                        <div class="absolute h-52 w-52 rounded-full border border-primary/25"></div>
+                        <div class="absolute h-36 w-36 rounded-full border border-secondary/35"></div>
+                        <div class="absolute h-20 w-20 rounded-full border-4 border-primary shadow-[0_0_42px_rgba(244,37,192,0.28)]"></div>
+                        <div class="h-4 w-4 rounded-full bg-white shadow-[0_0_25px_rgba(255,255,255,0.95)]"></div>
+                        <div class="absolute inset-x-6 bottom-5 flex h-8 items-end justify-center gap-1">
+                            <span class="h-2 w-1 bg-secondary/70"></span><span class="h-5 w-1 bg-primary"></span><span class="h-3 w-1 bg-secondary"></span><span class="h-7 w-1 bg-primary"></span><span class="h-4 w-1 bg-secondary"></span><span class="h-6 w-1 bg-primary"></span><span class="h-3 w-1 bg-secondary/70"></span><span class="h-5 w-1 bg-primary"></span><span class="h-2 w-1 bg-secondary/70"></span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-5">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">Status</p>
+                            <p class="mt-1 flex items-center gap-2 text-sm font-black uppercase tracking-wide text-white"><span class="h-2 w-2 rounded-full bg-primary"></span> On Air</p>
+                        </div>
+                        <a href="{{ landing_page.primary_cta.href }}" class="text-xs font-black uppercase tracking-[0.18em] text-secondary underline decoration-secondary/50 underline-offset-4 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">Open Live Studio</a>
+                    </div>
+                </aside>
+            </div>
+
+            <div class="mt-14 grid border border-white/10 bg-black/60 sm:grid-cols-3">
+                {% for fact in landing_page.quick_facts %}
+                <div class="flex items-center gap-4 border-b border-white/10 p-5 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+                    <span class="material-symbols-outlined text-2xl text-primary" aria-hidden="true">{{ fact.icon }}</span>
+                    <div>
+                        <p class="font-display text-xl font-black uppercase text-white">{{ fact.value }}</p>
+                        <p class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{{ fact.label }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <nav class="border-b border-white/10 bg-[#050507]" aria-label="K-pop radio page sections">
+        <div class="container mx-auto flex gap-7 overflow-x-auto px-4 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 sm:px-6">
+            <a class="whitespace-nowrap transition hover:text-primary" href="#why-kbeats">Why K-Beats</a>
+            <a class="whitespace-nowrap transition hover:text-primary" href="#what-we-play">What We Play</a>
+            <a class="whitespace-nowrap transition hover:text-primary" href="#how-to-listen">How To Listen</a>
+            <a class="whitespace-nowrap transition hover:text-primary" href="#uk-radio">UK Listening</a>
+            <a class="whitespace-nowrap transition hover:text-primary" href="#radio-faqs">FAQs</a>
+        </div>
+    </nav>
+
+    <section id="why-kbeats" class="container mx-auto scroll-mt-28 px-4 py-20 sm:px-6 lg:py-28" aria-labelledby="why-kbeats-heading">
+        <div class="grid gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-20">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary">{{ landing_page.about.eyebrow }}</p>
+                <h2 id="why-kbeats-heading" class="mt-5 font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">{{ landing_page.about.title }}</h2>
+            </div>
+            <div class="space-y-6 border-l border-primary/50 pl-6 sm:pl-9">
+                {% for paragraph in landing_page.about.paragraphs %}
+                <p class="text-base leading-8 text-slate-300 sm:text-lg sm:leading-9">{{ paragraph }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mt-16 grid border-t border-white/10 lg:grid-cols-3">
+            {% for feature in landing_page.station_features %}
+            <article class="border-b border-white/10 py-8 lg:border-b-0 lg:border-r lg:px-8 lg:first:pl-0 lg:last:border-r-0 lg:last:pr-0">
+                <p class="font-mono text-xs font-bold tracking-[0.24em] text-primary">{{ feature.number }}</p>
+                <h3 class="mt-5 font-display text-2xl font-black uppercase text-white">{{ feature.title }}</h3>
+                <p class="mt-4 text-sm leading-7 text-slate-400">{{ feature.body }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="border-y border-white/10 bg-[#06070b]">
+        <div class="container mx-auto grid px-4 sm:px-6 lg:grid-cols-2">
+            <article id="what-we-play" class="scroll-mt-28 border-b border-white/10 py-20 lg:border-b-0 lg:border-r lg:py-24 lg:pr-16" aria-labelledby="music-mix-heading">
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-primary">{{ landing_page.music_mix.eyebrow }}</p>
+                <h2 id="music-mix-heading" class="mt-5 max-w-xl font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">{{ landing_page.music_mix.title }}</h2>
+                <p class="mt-6 max-w-xl text-base leading-8 text-slate-400">{{ landing_page.music_mix.intro }}</p>
+                <ul class="mt-9 space-y-0">
+                    {% for item in landing_page.music_mix.items %}
+                    <li class="flex gap-4 border-t border-white/10 py-5 text-sm font-semibold leading-6 text-slate-200">
+                        <span class="material-symbols-outlined text-lg text-secondary" aria-hidden="true">add</span>
+                        {{ item }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </article>
+
+            <article id="how-to-listen" class="scroll-mt-28 py-20 lg:py-24 lg:pl-16" aria-labelledby="listen-steps-heading">
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary">{{ landing_page.listen_steps.eyebrow }}</p>
+                <h2 id="listen-steps-heading" class="mt-5 max-w-xl font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">{{ landing_page.listen_steps.title }}</h2>
+                <ol class="mt-9 space-y-7">
+                    {% for step in landing_page.listen_steps.items %}
+                    <li class="grid grid-cols-[48px_1fr] gap-4">
+                        <span class="flex h-12 w-12 items-center justify-center border border-primary bg-primary/10 font-display text-lg font-black text-primary">{{ step.number }}</span>
+                        <div class="pt-1">
+                            <h3 class="text-sm font-black uppercase tracking-wide text-white">{{ step.title }}</h3>
+                            <p class="mt-2 text-sm leading-7 text-slate-400">{{ step.body }}</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ol>
+                <a href="{{ landing_page.primary_cta.href }}" class="mt-10 inline-flex min-h-[52px] items-center justify-center gap-3 border border-primary px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-primary transition hover:bg-primary hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">
+                    <span class="material-symbols-outlined text-lg" aria-hidden="true">play_arrow</span>
+                    Open The Live Stream
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <section id="uk-radio" class="container mx-auto scroll-mt-28 px-4 py-20 sm:px-6 lg:py-28" aria-labelledby="uk-listening-heading">
+        <div class="relative overflow-hidden border border-white/15 bg-[linear-gradient(120deg,rgba(244,37,192,0.12),rgba(0,240,255,0.055)_58%,rgba(255,255,255,0.02))] p-7 sm:p-10 lg:p-14">
+            <div class="absolute right-0 top-0 font-display text-[9rem] font-black leading-none text-white/[0.025] sm:text-[14rem]" aria-hidden="true">UK</div>
+            <div class="relative grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary">{{ landing_page.uk_listening.eyebrow }}</p>
+                    <h2 id="uk-listening-heading" class="mt-5 font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">{{ landing_page.uk_listening.title }}</h2>
+                </div>
+                <div>
+                    <div class="space-y-5">
+                        {% for paragraph in landing_page.uk_listening.paragraphs %}
+                        <p class="text-base leading-8 text-slate-300">{{ paragraph }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                        <a href="{{ landing_page.uk_listening.primary_link.href }}" class="inline-flex min-h-[52px] items-center justify-center gap-2 bg-white px-6 py-3 text-xs font-black uppercase tracking-[0.16em] text-black transition hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">{{ landing_page.uk_listening.primary_link.label }}</a>
+                        <a href="{{ landing_page.uk_listening.secondary_link.href }}" class="inline-flex min-h-[52px] items-center justify-center gap-2 border border-white/20 px-6 py-3 text-xs font-black uppercase tracking-[0.16em] text-white transition hover:border-primary hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">{{ landing_page.uk_listening.secondary_link.label }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="border-y border-white/10 bg-[#050507] py-20 lg:py-24" aria-labelledby="related-radio-heading">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="max-w-3xl">
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-primary">{{ landing_page.related_eyebrow }}</p>
+                <h2 id="related-radio-heading" class="mt-5 font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">{{ landing_page.related_title }}</h2>
+                <p class="mt-6 text-base leading-8 text-slate-400">{{ landing_page.related_intro }}</p>
+            </div>
+
+            <div class="mt-12 grid border-l border-t border-white/10 md:grid-cols-2 xl:grid-cols-3">
+                {% for link in landing_page.related_links %}
+                <a href="{{ link.href }}" class="group min-h-56 border-b border-r border-white/10 p-6 transition duration-300 hover:bg-white/[0.04] focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary sm:p-7">
+                    <div class="flex items-start justify-between gap-5">
+                        <span class="font-mono text-[10px] font-bold tracking-[0.22em] text-slate-600">0{{ forloop.counter }}</span>
+                        <span class="material-symbols-outlined text-lg text-secondary transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" aria-hidden="true">north_east</span>
+                    </div>
+                    <h3 class="mt-8 font-display text-xl font-black uppercase leading-tight text-white transition group-hover:text-primary">{{ link.title }}</h3>
+                    <p class="mt-4 text-sm leading-7 text-slate-400">{{ link.body }}</p>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section id="radio-faqs" class="container mx-auto scroll-mt-28 px-4 py-20 sm:px-6 lg:py-28" aria-labelledby="radio-faq-heading">
+        <div class="grid gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary">{{ landing_page.faq_eyebrow }}</p>
+                <h2 id="radio-faq-heading" class="mt-5 font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">{{ landing_page.faq_title }}</h2>
+                <p class="mt-6 text-sm leading-7 text-slate-400">Quick answers about listening to K-Beats in the UK and around the world.</p>
+            </div>
+            <div class="border-t border-white/15">
+                {% for faq in landing_page.faqs %}
+                <details class="group border-b border-white/15">
+                    <summary class="flex min-h-[76px] cursor-pointer list-none items-center justify-between gap-5 py-5 text-left text-sm font-black uppercase tracking-wide text-white transition hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary sm:text-base">
+                        {{ faq.question }}
+                        <span class="material-symbols-outlined shrink-0 text-xl text-secondary transition-transform group-open:rotate-45" aria-hidden="true">add</span>
+                    </summary>
+                    <p class="max-w-3xl pb-7 pr-8 text-sm leading-7 text-slate-400 sm:text-base sm:leading-8">{{ faq.answer }}</p>
+                </details>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-4 sm:px-6">
+        <div class="relative overflow-hidden border border-primary bg-primary px-6 py-12 text-black sm:px-10 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:px-14 lg:py-14">
+            <div class="absolute -right-8 -top-16 font-display text-[11rem] font-black leading-none text-black/[0.06]" aria-hidden="true">LIVE</div>
+            <div class="relative max-w-3xl">
+                <p class="text-[10px] font-black uppercase tracking-[0.3em]">{{ landing_page.final_cta.eyebrow }}</p>
+                <h2 class="mt-4 font-display text-4xl font-black uppercase leading-none tracking-tight sm:text-5xl">{{ landing_page.final_cta.title }}</h2>
+                <p class="mt-5 max-w-2xl text-sm font-semibold leading-7 sm:text-base">{{ landing_page.final_cta.body }}</p>
+            </div>
+            <div class="relative mt-8 flex shrink-0 flex-col gap-3 sm:flex-row lg:mt-0 lg:flex-col">
+                <a href="{{ landing_page.final_cta.primary_link.href }}" class="inline-flex min-h-[54px] items-center justify-center gap-2 border border-black bg-black px-7 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black">
+                    <span class="material-symbols-outlined text-lg" aria-hidden="true">play_arrow</span>
+                    {{ landing_page.final_cta.primary_link.label }}
+                </a>
+                <a href="{{ landing_page.final_cta.secondary_link.href }}" class="inline-flex min-h-[54px] items-center justify-center border border-black px-7 py-3 text-xs font-black uppercase tracking-[0.18em] text-black transition hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black">{{ landing_page.final_cta.secondary_link.label }}</a>
+            </div>
+        </div>
+    </section>
+</main>

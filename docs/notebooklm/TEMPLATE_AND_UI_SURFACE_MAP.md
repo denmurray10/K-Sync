@@ -2,7 +2,7 @@
 
 ## Freshness
 
-- Last reviewed: 2026-04-06
+- Last reviewed: 2026-07-16
 - Current truth: This map is based on current template files in `core/templates/core` and render calls in `core/views.py`.
 - Legacy context: Prototype, lab, and exported design pages share the same template directory as production pages.
 
@@ -36,6 +36,9 @@ high-impact UI surfaces.
 - `presenters.html`
 - `promo.html`
 - `listen_free_landing.html`
+- `seo_destination.html`
+- `seo_kpop_radio_uk.html` (dedicated content partial for `/kpop-radio-station-uk/`)
+- `seo_best_kpop_playlist_2026.html` (dedicated chart-edit partial for `/best-kpop-playlist-2026/`)
 
 ### Live and stream
 

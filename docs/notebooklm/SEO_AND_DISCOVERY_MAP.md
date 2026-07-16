@@ -2,7 +2,7 @@
 
 ## Freshness
 
-- Last reviewed: 2026-04-06
+- Last reviewed: 2026-07-16
 - Current truth: This map is based on `core/context_processors.py`, `core/sitemaps.py`, route metadata, and the editorial pipeline.
 - Legacy context: Some prototype or lab routes should not be treated as important discovery surfaces unless explicitly promoted.
 
@@ -20,6 +20,24 @@ internal linking, or the structure of content entry points.
 - `fan-clubs/`
 - `presenters/`
 - `about/` and pricing pages
+
+## UK K-Pop Radio Destination
+
+- `/kpop-radio-station-uk/` owns the focused `K-Pop Radio Station` and UK online-radio intent.
+- `core.views.uk_kpop_radio` renders the shared `seo_destination.html` shell with the dedicated `seo_kpop_radio_uk.html` content partial.
+- The page has one keyword-aligned H1, route-specific title and description metadata, a canonical URL, social preview artwork, and `RadioStation`, `BroadcastService`, and `BreadcrumbList` JSON-LD.
+- Its primary action is live listening. Supporting internal links point to the indexable live, schedule, request, charts, comebacks, idols, and news routes using descriptive anchor text.
+- Listener-facing FAQs answer free-listening, 24/7 availability, requests, music mix, UK timing, and worldwide access questions. The FAQs are visible page content and are not treated as a guaranteed Google rich-result feature.
+
+## Best K-Pop Playlist 2026 Destination
+
+- `/best-kpop-playlist-2026/` owns the focused `Best K-Pop Playlist 2026` intent and is designed as a useful, changing chart edit rather than a static keyword landing page.
+- `core.views.best_kpop_playlist_2026` renders the shared `seo_destination.html` shell with the dedicated `seo_best_kpop_playlist_2026.html` content partial.
+- The server-rendered top 10 comes from the latest daily `Ranking` record. It deliberately represents current 2026 listening momentum, so a resurgent song does not have to have been released in 2026.
+- A separate fresh-release edit comes from the current month's `ComebackData` and only shows releases dated on or before the current day. This keeps genuinely new 2026 releases distinct from the live chart.
+- The page has one keyword-aligned H1, a route-specific title and description, canonical and social metadata, and `MusicPlaylist`, `MusicRecording`, and `BreadcrumbList` JSON-LD based on the visible tracks.
+- Supporting internal links point to the indexable live, charts, comeback timeline, idols, news, song-request, and mood/discovery routes using descriptive anchor text.
+- Visible FAQs explain freshness, selection, release-year distinctions, live-radio listening, song requests, and the comeback calendar.
 
 ## Current SEO Plumbing
 

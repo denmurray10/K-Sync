@@ -29,6 +29,7 @@ from .models import (
     KPopMember,
     LivePoll,
     LivePollOption,
+    Ranking,
     FanClubMembership,
     LimitedTimeEvent,
     EventBadgeDrop,
@@ -291,6 +292,58 @@ class SeoRolloutTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, heading)
 
+    def test_best_kpop_playlist_2026_renders_current_tracks_releases_and_music_schema(self):
+        Ranking.objects.create(
+            timeframe='daily',
+            ranking_data=[
+                {
+                    'rank': 1,
+                    'track': 'Neon Signal',
+                    'artist': 'Signal Queens',
+                    'artwork_url': 'https://example.com/neon-signal.jpg',
+                    'primary_metric_support': 'Daily chart leader',
+                },
+                {
+                    'rank': 2,
+                    'track': 'Afterglow',
+                    'artist': 'Rin',
+                    'artwork_url': '/static/core/img/fallback.jpg',
+                },
+            ],
+        )
+        today = timezone.localdate()
+        today_key = today.isoformat()
+        ComebackData.objects.create(
+            year=today.year,
+            month=today.month,
+            data={
+                today_key: {
+                    'releases': [
+                        {
+                            'title': 'Electric Heart',
+                            'artist': 'Signal Queens',
+                            'type': 'Single',
+                            'image': 'https://example.com/electric-heart.jpg',
+                        },
+                    ],
+                },
+            },
+        )
+
+        response = self.client.get(reverse('best_kpop_playlist_2026'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<title>Best K-Pop Playlist 2026 | Top Songs | K-Beats</title>', html=True)
+        self.assertContains(response, 'Neon Signal')
+        self.assertContains(response, 'Afterglow')
+        self.assertContains(response, 'Electric Heart')
+        self.assertContains(response, 'Current Top 10')
+        self.assertContains(response, 'Fresh 2026 K-Pop Releases To Add Next')
+        self.assertContains(response, '"@type": "MusicPlaylist"')
+        self.assertContains(response, '"@type": "MusicRecording"')
+        self.assertNotContains(response, 'This keyword has stronger competition')
+        self.assertNotContains(response, '/static/core/img/fallback.jpg')
+
     def test_sitemap_contains_new_seo_destinations(self):
         response = self.client.get(reverse('django.contrib.sitemaps.views.sitemap'))
 
@@ -416,11 +469,47 @@ class SeoRolloutTests(TestCase):
 
         self.assertContains(uk_response, 'Track K-Pop Comebacks')
         self.assertContains(uk_response, reverse('idols'))
-        self.assertContains(uk_response, 'Lead with the main listening action for this page')
+        self.assertContains(uk_response, 'A K-Pop Radio Station Built For Live Listening')
 
         self.assertContains(rainy_response, 'Discover New K-Pop Music')
         self.assertContains(rainy_response, reverse('comeback_timeline'))
         self.assertContains(rainy_response, 'The copy should feel fan-aware and calm, not generic.')
+
+    def test_uk_kpop_radio_page_has_listener_facing_copy_and_complete_seo_signals(self):
+        response = self.client.get(reverse('uk_kpop_radio'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.count(b'<h1'), 1)
+        self.assertContains(
+            response,
+            '<title>K-Pop Radio Station UK | Listen Live Online | K-Beats</title>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            'Listen to K-Beats, a UK K-pop radio station broadcasting online 24/7.',
+        )
+        self.assertContains(
+            response,
+            f'<link rel="canonical" href="http://testserver{reverse("uk_kpop_radio")}"/>',
+            html=True,
+        )
+        self.assertContains(response, 'property="og:image"')
+        self.assertContains(response, '"@type": "RadioStation"')
+        self.assertContains(response, '"@type": "BroadcastService"')
+        self.assertContains(response, '"@type": "BreadcrumbList"')
+        self.assertContains(response, 'K-Pop Radio Station FAQs')
+
+        for route_name in ['live', 'schedule', 'request_track', 'charts', 'comeback_timeline', 'idols', 'news']:
+            self.assertContains(response, reverse(route_name))
+
+        for placeholder_copy in [
+            'Lead with the main listening action',
+            'How the page should convert',
+            'Why UK radio intent matters',
+            'Internal Routes That Support This Topic',
+        ]:
+            self.assertNotContains(response, placeholder_copy)
 
     def test_blog_archive_consolidates_to_news_hub(self):
         response = self.client.get(reverse('blog_page'))

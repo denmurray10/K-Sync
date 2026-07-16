@@ -1,4 +1,5 @@
 import json
+import html
 import hashlib
 import logging
 import os
@@ -99,6 +100,212 @@ def _build_seo_collection_schema(*, request, page_name, page_description, path_n
     })
 
 
+def _build_uk_kpop_radio_schema(request, page, seo):
+    canonical_url = request.build_absolute_uri(reverse('uk_kpop_radio'))
+    live_url = request.build_absolute_uri(reverse('live'))
+    station_id = f'{canonical_url}#radio-station'
+
+    return json.dumps([
+        {
+            '@context': 'https://schema.org',
+            '@type': 'RadioStation',
+            '@id': station_id,
+            'name': 'K-Beats Radio',
+            'alternateName': 'K-Beats',
+            'url': canonical_url,
+            'mainEntityOfPage': canonical_url,
+            'description': seo['description'],
+            'image': request.build_absolute_uri(static('core/img/listening-live-poster.svg')),
+            'logo': request.build_absolute_uri(static('core/img/favicon-512x512.png')),
+            'foundingDate': '2026',
+            'address': {
+                '@type': 'PostalAddress',
+                'addressRegion': 'Cornwall',
+                'addressCountry': 'GB',
+            },
+            'areaServed': ['United Kingdom', 'Worldwide'],
+            'genre': ['K-pop', 'Korean pop music', 'Internet radio'],
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BroadcastService',
+            '@id': f'{canonical_url}#broadcast-service',
+            'name': 'K-Beats Radio live K-pop stream',
+            'broadcastDisplayName': 'K-Beats Radio',
+            'url': live_url,
+            'description': page['lede'],
+            'provider': {'@id': station_id},
+            'areaServed': ['United Kingdom', 'Worldwide'],
+            'inLanguage': 'en-GB',
+            'genre': 'K-pop',
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            'itemListElement': [
+                {
+                    '@type': 'ListItem',
+                    'position': 1,
+                    'name': 'K-Beats Radio',
+                    'item': request.build_absolute_uri(reverse('home')),
+                },
+                {
+                    '@type': 'ListItem',
+                    'position': 2,
+                    'name': page['headline'],
+                    'item': canonical_url,
+                },
+            ],
+        },
+    ])
+
+
+def _build_best_kpop_playlist_tracks(limit=10):
+    try:
+        ranking = Ranking.objects.filter(timeframe='daily').first()
+    except DatabaseError:
+        return [], None
+
+    raw_tracks = ranking.ranking_data if ranking and isinstance(ranking.ranking_data, list) else []
+    tracks = []
+    for item in raw_tracks:
+        if not isinstance(item, dict):
+            continue
+
+        title = html.unescape(str(item.get('track') or '').strip())
+        artist = html.unescape(str(item.get('artist') or '').strip())
+        if not title or not artist:
+            continue
+
+        artwork = str(item.get('artwork_url') or '').strip()
+        if not artwork.startswith(('https://', 'http://')):
+            artwork = ''
+
+        position = len(tracks) + 1
+        tracks.append({
+            'rank': position,
+            'rank_label': f'{position:02d}',
+            'title': title,
+            'artist': artist,
+            'artwork': artwork,
+            'trend': str(item.get('trend') or '').strip(),
+            'signal': html.unescape(str(item.get('primary_metric_support') or '').strip()),
+        })
+        if len(tracks) >= limit:
+            break
+
+    return tracks, getattr(ranking, 'created_at', None)
+
+
+def _build_playlist_fresh_releases(limit=4):
+    today = timezone.localdate()
+    try:
+        comeback_month = ComebackData.objects.filter(year=today.year, month=today.month).first()
+    except DatabaseError:
+        return []
+
+    if not comeback_month or not isinstance(comeback_month.data, dict):
+        return []
+
+    releases = []
+    seen = set()
+    for raw_date, payload in comeback_month.data.items():
+        try:
+            release_date = datetime.strptime(str(raw_date), '%Y-%m-%d').date()
+        except (TypeError, ValueError):
+            continue
+        if release_date > today or not isinstance(payload, dict):
+            continue
+
+        day_releases = payload.get('releases')
+        if not isinstance(day_releases, list):
+            continue
+        for release in day_releases:
+            if not isinstance(release, dict):
+                continue
+            title = html.unescape(str(release.get('title') or '').strip())
+            artist = html.unescape(str(release.get('artist') or '').strip())
+            if not title or not artist:
+                continue
+            identity = (title.casefold(), artist.casefold())
+            if identity in seen:
+                continue
+            seen.add(identity)
+
+            image_url = str(release.get('image') or '').strip()
+            if not image_url.startswith(('https://', 'http://')):
+                image_url = ''
+            releases.append({
+                'title': title,
+                'artist': artist,
+                'release_type': html.unescape(str(release.get('type') or 'New release').strip()),
+                'image': image_url,
+                'date': release_date,
+                'date_label': f'{release_date.day} {release_date.strftime("%B %Y")}',
+                'href': reverse('comeback_timeline'),
+            })
+
+    releases.sort(key=lambda release: release['date'], reverse=True)
+    return releases[:limit]
+
+
+def _build_best_kpop_playlist_schema(request, page, seo, tracks, updated_at):
+    canonical_url = request.build_absolute_uri(reverse('best_kpop_playlist_2026'))
+    playlist_schema = {
+        '@context': 'https://schema.org',
+        '@type': 'MusicPlaylist',
+        '@id': f'{canonical_url}#playlist',
+        'name': page['headline'],
+        'description': seo['description'],
+        'url': canonical_url,
+        'mainEntityOfPage': canonical_url,
+        'genre': ['K-pop', 'Korean pop music'],
+        'inLanguage': 'en-GB',
+        'numTracks': len(tracks),
+    }
+    if updated_at:
+        playlist_schema['dateModified'] = updated_at.isoformat()
+    if tracks:
+        playlist_schema['track'] = {
+            '@type': 'ItemList',
+            'numberOfItems': len(tracks),
+            'itemListElement': [
+                {
+                    '@type': 'ListItem',
+                    'position': track['rank'],
+                    'item': {
+                        '@type': 'MusicRecording',
+                        'name': track['title'],
+                        'description': f"Performed by {track['artist']}",
+                    },
+                }
+                for track in tracks
+            ],
+        }
+
+    return json.dumps([
+        playlist_schema,
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            'itemListElement': [
+                {
+                    '@type': 'ListItem',
+                    'position': 1,
+                    'name': 'K-Beats Radio',
+                    'item': request.build_absolute_uri(reverse('home')),
+                },
+                {
+                    '@type': 'ListItem',
+                    'position': 2,
+                    'name': page['headline'],
+                    'item': canonical_url,
+                },
+            ],
+        },
+    ])
+
+
 def _seo_feature_link(request, *, title, body, url_name):
     return {
         'title': title,
@@ -132,45 +339,155 @@ def _build_seo_destination_context(request, destination_key):
 
     page_map = {
         'uk_kpop_radio': {
-            'eyebrow': 'UK Discovery',
+            'template_variant': 'uk_radio_station',
+            'eyebrow': 'Live From Cornwall · Broadcasting 24/7',
             'headline': 'K-Pop Radio Station UK',
-            'lede': 'K-Beats is a UK-based K-pop radio station for listeners who want a live stream, current comeback energy, and a station that feels active the moment they press play.',
-            'intro': 'This page is built for listeners searching specifically for a K-pop radio station in the UK. The promise is simple: live K-pop, low-friction listening, and clear routes into charts, artist discovery, and comeback coverage without sending fans into a generic playlist maze.',
-            'primary_cta': {'label': 'Start The Live Stream', 'href': reverse('live')},
-            'secondary_cta': {'label': 'Listen Free First', 'href': reverse('listen_free_landing')},
-            'highlights': [
-                'UK-based positioning with global K-pop coverage and fan-first discovery.',
-                'A live K-pop stream, chart updates, and comeback context in one route.',
-                'Clear handoffs into idols, editorial coverage, and free listening surfaces.',
+            'lede': 'Listen to K-Beats, a UK K-pop radio station broadcasting online 24 hours a day. Press play for current releases, fan favourites, themed shows and a live schedule built around UK time.',
+            'intro': 'Based in Cornwall and open to listeners worldwide, K-Beats brings live radio energy to K-pop discovery. Stream free from your browser, see what is playing now, request a song and keep up with the artists and comebacks shaping the scene.',
+            'primary_cta': {'label': 'Listen Live', 'href': reverse('live')},
+            'secondary_cta': {'label': 'View The UK Schedule', 'href': reverse('schedule')},
+            'quick_facts': [
+                {'value': '24/7', 'label': 'Online broadcast', 'icon': 'cell_tower'},
+                {'value': 'UK Time', 'label': 'GMT/BST schedule', 'icon': 'schedule'},
+                {'value': 'Free', 'label': 'Listen in your browser', 'icon': 'headphones'},
             ],
-            'sections': [
+            'station_features': [
                 {
-                    'title': 'Why UK radio intent matters',
-                    'body': 'Searchers using UK radio phrasing are usually close to choosing a listening destination. This page needs to reassure them that K-Beats is active, current, and built around repeat live listening rather than a one-off playlist result.',
+                    'number': '01',
+                    'title': 'Live K-Pop, All Day',
+                    'body': 'Drop into a continuous online broadcast whenever you want music, not another playlist to manage.',
                 },
                 {
-                    'title': 'How the page should convert',
-                    'body': 'Lead with the live player, support it with a free-listen fallback, and then move first-time visitors toward charts, comebacks, and editorial routes so they stay inside the wider K-Beats discovery loop.',
+                    'number': '02',
+                    'title': 'Fresh Releases And Favourites',
+                    'body': 'Hear new comebacks alongside fan favourites, solo releases, deeper cuts and themed K-pop shows.',
                 },
                 {
-                    'title': 'What makes K-Beats useful',
-                    'body': 'A strong UK K-pop radio page should feel practical, not fluffy. Fans need to know they can listen immediately, track what is moving in the scene, and keep exploring artists and new releases without friction.',
+                    'number': '03',
+                    'title': 'A Station Fans Can Shape',
+                    'body': 'Request songs, follow the live queue, vote in station polls and find your next comeback to track.',
                 },
             ],
-            'related_links': related_links + [
+            'about': {
+                'eyebrow': 'More Than Shuffle',
+                'title': 'A K-Pop Radio Station Built For Live Listening',
+                'paragraphs': [
+                    'K-Beats is an online K-pop radio station with a real broadcast rhythm: music is already playing, the queue keeps moving and every visit starts in the middle of something. You can tune in for a few songs or leave the station running through the day.',
+                    'The mix moves between new K-pop releases, established fan favourites, group and solo tracks, K-R&B, K-hip-hop and themed programming. Now-playing details, recently played tracks and the upcoming queue make it easy to discover a song without losing the live experience.',
+                ],
+            },
+            'music_mix': {
+                'eyebrow': 'On The Playlist',
+                'title': 'What You Will Hear On K-Beats',
+                'intro': 'The station is programmed for discovery as well as familiarity, so a new comeback can sit beside the track that made you a fan.',
+                'items': [
+                    'Current K-pop singles and newly landed comebacks',
+                    'Fan-favourite tracks from girl groups, boy groups and soloists',
+                    'K-R&B, K-hip-hop, laid-back cuts and late-night shows',
+                    'Listener requests, artist spotlights and themed programmes',
+                ],
+            },
+            'listen_steps': {
+                'eyebrow': 'Start In Seconds',
+                'title': 'How To Listen To K-Pop Radio Online',
+                'items': [
+                    {'number': '1', 'title': 'Open the live station', 'body': 'Go to the K-Beats live page on your phone, tablet or computer.'},
+                    {'number': '2', 'title': 'Press play', 'body': 'Start the free stream—there is no app download or payment card required.'},
+                    {'number': '3', 'title': 'Make the station yours', 'body': 'Check what is next, request a track or use the UK schedule to plan your next session.'},
+                ],
+            },
+            'uk_listening': {
+                'eyebrow': 'UK Based · Worldwide Stream',
+                'title': 'Made For UK K-Pop Fans, Open To Everyone',
+                'paragraphs': [
+                    'K-Beats broadcasts online from Cornwall, with programme times shown in UK time (GMT or BST). That makes it simple to find the next artist spotlight, late-night session or special show without converting from Korean Standard Time.',
+                    'Listening is not limited to the UK. The online stream is available worldwide, so international fans can join the same live station, follow the queue and discover what K-Beats is playing now.',
+                ],
+                'primary_link': {'label': 'See The Full Radio Schedule', 'href': reverse('schedule')},
+                'secondary_link': {'label': 'Request A K-Pop Song', 'href': reverse('request_track')},
+            },
+            'related_eyebrow': 'Keep Discovering',
+            'related_title': 'Explore More From K-Beats Radio',
+            'related_intro': 'Stay close to the live broadcast or follow the music into charts, artists, new releases and fan-led station features.',
+            'related_links': [
+                _seo_feature_link(
+                    request,
+                    title='Listen To K-Pop Live',
+                    body='Open the 24/7 live stream, see what is playing and follow the upcoming queue.',
+                    url_name='live',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Check The K-Pop Radio Schedule',
+                    body='Plan your listening around themed programmes and artist spotlight shows in UK time.',
+                    url_name='schedule',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Request A K-Pop Song',
+                    body='Send a track request to the station and keep listening for it in the live queue.',
+                    url_name='request_track',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Follow The K-Pop Charts',
+                    body='See the songs and artists building the most momentum with K-Beats listeners.',
+                    url_name='charts',
+                ),
                 _seo_feature_link(
                     request,
                     title='Track K-Pop Comebacks',
-                    body='Follow the comeback calendar to see what is landing next across K-pop.',
+                    body='Follow upcoming releases and find the next comeback to add to your listening list.',
                     url_name='comeback_timeline',
                 ),
                 _seo_feature_link(
                     request,
                     title='Explore K-Pop Idols',
-                    body='Open artist pages for groups, members, releases, and fandom context.',
+                    body='Browse K-pop groups, members, releases and artist profiles beyond the broadcast.',
                     url_name='idols',
                 ),
+                _seo_feature_link(
+                    request,
+                    title='Read The Latest K-Pop News',
+                    body='Catch up on comeback coverage, new music and stories from across the K-pop world.',
+                    url_name='news',
+                ),
             ],
+            'faq_eyebrow': 'Listener Questions',
+            'faq_title': 'K-Pop Radio Station FAQs',
+            'faqs': [
+                {
+                    'question': 'Is K-Beats a UK K-pop radio station?',
+                    'answer': 'Yes. K-Beats is an online K-pop radio station based in Cornwall, UK. The live stream runs online, and scheduled programme times are displayed in GMT or BST for UK listeners.',
+                },
+                {
+                    'question': 'Can I listen to K-pop radio online for free?',
+                    'answer': 'Yes. You can listen to the K-Beats live stream free in your web browser. You do not need to download an app or enter payment details to start the station.',
+                },
+                {
+                    'question': 'Does K-Beats broadcast K-pop 24/7?',
+                    'answer': 'Yes. K-Beats broadcasts online 24 hours a day, seven days a week, with continuous music plus scheduled themed shows and artist spotlights.',
+                },
+                {
+                    'question': 'Can I request a K-pop song?',
+                    'answer': 'Yes. Use the K-Beats song request page to send the track and artist you want to hear. Then keep the live station open and follow the queue.',
+                },
+                {
+                    'question': 'What music does K-Beats play?',
+                    'answer': 'K-Beats plays current K-pop releases, comeback tracks, fan favourites, soloists, deeper cuts, K-R&B, K-hip-hop and themed selections across the weekly schedule.',
+                },
+                {
+                    'question': 'Can I listen to K-Beats outside the UK?',
+                    'answer': 'Yes. K-Beats is UK-based, but the online radio stream is available to listeners worldwide.',
+                },
+            ],
+            'final_cta': {
+                'eyebrow': 'On Air Now',
+                'title': 'Your K-Pop Station Is Live',
+                'body': 'Hear what K-Beats is playing right now, follow the queue and make your next K-pop discovery live.',
+                'primary_link': {'label': 'Start Listening Live', 'href': reverse('live')},
+                'secondary_link': {'label': 'Send A Song Request', 'href': reverse('request_track')},
+            },
             'seo_type': 'website',
         },
         'midnight_kpop_vibes': {
@@ -266,28 +583,146 @@ def _build_seo_destination_context(request, destination_key):
             'seo_type': 'website',
         },
         'best_kpop_playlist_2026': {
-            'eyebrow': 'Playlist Guide',
+            'template_variant': 'best_kpop_playlist_2026',
+            'eyebrow': 'The 2026 Edit · Updated From The K-Beats Chart',
             'headline': 'Best K-Pop Playlist 2026',
-            'lede': 'A playlist-led discovery page for fans who want the best K-pop playlist for 2026, built around chart momentum, fresh releases, and the fastest routes into active listening.',
-            'intro': 'This keyword has stronger competition than the mood cluster, so the page should lean into freshness, editorial clarity, and internal links to existing chart and blog surfaces rather than trying to mimic a giant catalog product.',
-            'primary_cta': {'label': 'See This Week’s Charts', 'href': reverse('charts')},
-            'secondary_cta': {'label': 'Read The Blog', 'href': reverse('blog_page')},
-            'highlights': [
-                'Targets a freshness-led playlist keyword for 2026.',
-                'Supports charts and blog as the main discovery surfaces.',
-                'Acts as a bridge between playlist intent and active listening.',
-            ],
-            'sections': [
+            'lede': 'Start with the K-pop songs defining 2026 right now: current chart leaders, fast-rising fan favourites and the newest comebacks worth adding to your rotation.',
+            'intro': 'This is a living K-pop playlist guide, not a frozen year-end list. The top 10 follows the latest daily K-Beats chart signal, while the new-release edit spotlights music that has landed in 2026. Save the page, check back for movement and press play when you want the full live-radio mix.',
+            'primary_cta': {'label': 'Listen Live On K-Beats', 'href': reverse('live')},
+            'secondary_cta': {'label': 'Open The Full K-Pop Chart', 'href': reverse('charts')},
+            'playlist_section': {
+                'eyebrow': 'Current Top 10',
+                'title': 'The K-Pop Songs Leading 2026 Right Now',
+                'intro': 'A chart-led snapshot of what is cutting through today. Positions can move as fan attention changes, new comebacks land and familiar favourites surge again.',
+                'empty_title': 'The next chart sync is on its way',
+                'empty_body': 'The live playlist is refreshing. In the meantime, tune into K-Beats or open the full chart to keep discovering songs.',
+            },
+            'fresh_section': {
+                'eyebrow': 'Just Landed',
+                'title': 'Fresh 2026 K-Pop Releases To Add Next',
+                'intro': 'The newest releases are kept separate from the live top 10, so you can tell what has just arrived from what is currently leading the wider conversation.',
+            },
+            'method': {
+                'eyebrow': 'How The Edit Works',
+                'title': 'A Playlist With A Visible Pulse',
+                'intro': 'The main ranking is built from the latest daily chart data available to K-Beats. We pair that moving snapshot with the comeback calendar so the page answers two different questions: what is biggest now, and what is genuinely new in 2026?',
+                'points': [
+                    {
+                        'number': '01',
+                        'title': 'Current chart position',
+                        'body': 'The top 10 follows the latest daily ranking, giving the playlist a clear and repeatable order rather than an unexplained opinion.',
+                    },
+                    {
+                        'number': '02',
+                        'title': 'Fresh comeback context',
+                        'body': 'New releases from the 2026 comeback calendar sit in their own edit, ready to watch before they break into the chart.',
+                    },
+                    {
+                        'number': '03',
+                        'title': 'More ways to discover',
+                        'body': 'The live station, full charts, artist pages and mood-led listening guides let you keep going beyond ten tracks.',
+                    },
+                ],
+            },
+            'mood_routes': [
                 {
-                    'title': 'Why the page is different',
-                    'body': 'Instead of trying to be an endless playlist index, it frames the best K-pop playlist for 2026 through momentum, recency, and fan relevance, which fits K-Beats better.',
+                    'eyebrow': 'After Dark',
+                    'title': 'Late-Night K-Pop',
+                    'body': 'Slow the energy down with an after-hours K-pop listening guide for headphones and midnight sessions.',
+                    'href': reverse('late_night_kpop_music'),
+                    'accent': 'cyan',
                 },
                 {
-                    'title': 'How it should perform',
-                    'body': 'The page should capture search interest around fresh playlist phrasing and then move those visitors into charts, new-release coverage, and the live stream.',
+                    'eyebrow': 'Soft Focus',
+                    'title': 'Rainy-Day K-Pop',
+                    'body': 'Move into reflective songs and softer fan picks when the forecast calls for a calmer rotation.',
+                    'href': reverse('rainy_day_kpop'),
+                    'accent': 'pink',
+                },
+                {
+                    'eyebrow': 'New Music',
+                    'title': 'Discover More K-Pop',
+                    'body': 'Follow the chart into comeback tracking, artist discovery and more of the music shaping 2026.',
+                    'href': reverse('discover_new_kpop_music'),
+                    'accent': 'white',
                 },
             ],
-            'related_links': related_links,
+            'related_eyebrow': 'Keep The Rotation Moving',
+            'related_title': 'More Ways To Find Your Next K-Pop Favourite',
+            'related_intro': 'Go deeper than the top 10 with the live broadcast, complete chart, comeback calendar, artist profiles and current K-pop coverage.',
+            'related_links': [
+                _seo_feature_link(
+                    request,
+                    title='Listen To K-Pop Live',
+                    body='Press play on the K-Beats stream and hear current releases, fan favourites and themed programmes in one continuous broadcast.',
+                    url_name='live',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Browse The Full K-Pop Chart',
+                    body='See the complete daily ranking, movement and the artists building momentum beyond this playlist edit.',
+                    url_name='charts',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Track 2026 K-Pop Comebacks',
+                    body='Follow upcoming release dates and see which singles, albums and debuts are arriving next.',
+                    url_name='comeback_timeline',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Explore K-Pop Idols',
+                    body='Move from a song into group and member profiles, fandom details and more artist discovery.',
+                    url_name='idols',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Read The Latest K-Pop News',
+                    body='Catch up on new music, comeback stories and the moments driving today’s K-pop conversation.',
+                    url_name='news',
+                ),
+                _seo_feature_link(
+                    request,
+                    title='Request A Song On K-Beats',
+                    body='Tell the station which track belongs in your rotation, then keep listening for it in the live queue.',
+                    url_name='request_track',
+                ),
+            ],
+            'faq_eyebrow': 'Playlist Notes',
+            'faq_title': 'Best K-Pop Playlist 2026 FAQs',
+            'faqs': [
+                {
+                    'question': 'What is on the best K-pop playlist for 2026?',
+                    'answer': 'The K-Beats 2026 edit combines the current daily top 10 with a separate selection of newly landed 2026 comebacks. That keeps the page useful for both chart hits and fresh discoveries.',
+                },
+                {
+                    'question': 'How often is this K-pop playlist updated?',
+                    'answer': 'The top 10 refreshes when the latest daily K-Beats chart data is synced. The fresh-release section follows the current comeback calendar, so it can change as new music lands.',
+                },
+                {
+                    'question': 'Were all of the top 10 songs released in 2026?',
+                    'answer': 'Not necessarily. The top 10 shows the songs leading the current 2026 listening conversation, and older favourites can return. Releases that have actually landed in 2026 are clearly separated in the fresh-release edit.',
+                },
+                {
+                    'question': 'Can I listen to these songs on K-Beats?',
+                    'answer': 'K-Beats is a live online radio station rather than an on-demand queue, so songs play as part of the broadcast. Open the live station to hear the current mix or send a request for a track you want on air.',
+                },
+                {
+                    'question': 'How are the songs selected?',
+                    'answer': 'The numbered top 10 follows the latest available daily chart order. New-release recommendations come from the 2026 K-pop comeback calendar, keeping chart momentum and release freshness transparent.',
+                },
+                {
+                    'question': 'Where can I find upcoming K-pop comebacks?',
+                    'answer': 'Open the K-Beats comeback timeline for upcoming release dates, recently landed music and more artists to add to your 2026 listening list.',
+                },
+            ],
+            'final_cta': {
+                'eyebrow': 'From The List To The Airwaves',
+                'title': 'Press Play On K-Pop In 2026',
+                'body': 'Hear new releases meet fan favourites on a live K-pop station that keeps moving all day.',
+                'primary_link': {'label': 'Start Listening Live', 'href': reverse('live')},
+                'secondary_link': {'label': 'Request Your Pick', 'href': reverse('request_track')},
+            },
             'seo_type': 'website',
         },
         'discover_new_kpop_music': {
@@ -340,6 +775,36 @@ def _build_seo_destination_context(request, destination_key):
             related_links=page['related_links'],
         ),
     }
+    if destination_key == 'uk_kpop_radio':
+        context.update({
+            'seo_image': request.build_absolute_uri(static('core/img/listening-live-poster.svg')),
+            'seo_image_alt': 'K-Beats UK K-pop radio station live broadcast poster',
+            'extra_schema_json': _build_uk_kpop_radio_schema(request, page, seo),
+        })
+    elif destination_key == 'best_kpop_playlist_2026':
+        playlist_tracks, playlist_updated_at = _build_best_kpop_playlist_tracks()
+        fresh_releases = _build_playlist_fresh_releases()
+        context.update({
+            'playlist_tracks': playlist_tracks,
+            'playlist_updated_at': playlist_updated_at,
+            'fresh_releases': fresh_releases,
+            'extra_schema_json': _build_best_kpop_playlist_schema(
+                request,
+                page,
+                seo,
+                playlist_tracks,
+                playlist_updated_at,
+            ),
+        })
+        social_artwork = next(
+            (track['artwork'] for track in playlist_tracks if track['artwork']),
+            next((release['image'] for release in fresh_releases if release['image']), ''),
+        )
+        if social_artwork:
+            context.update({
+                'seo_image': social_artwork,
+                'seo_image_alt': 'Cover artwork from the K-Beats best K-pop playlist for 2026',
+            })
     return context
 
 
@@ -348,8 +813,8 @@ RADIO_BUCKET_PREFIX = '/file/StrayKids/Music/'
 
 SEO_INTERNAL_DESTINATIONS = {
     'uk_kpop_radio': {
-        'title': 'K-Pop Radio Station UK | K-Beats Radio',
-        'description': 'Listen to a UK-based K-pop radio station with live streaming, charts, comeback coverage, and fan-first programming from K-Beats Radio.',
+        'title': 'K-Pop Radio Station UK | Listen Live Online | K-Beats',
+        'description': 'Listen to K-Beats, a UK K-pop radio station broadcasting online 24/7. Stream K-pop free, check the UK schedule, request songs and follow new releases.',
     },
     'midnight_kpop_vibes': {
         'title': 'Midnight K-Pop Vibes | After-Hours K-Pop Stream & Playlist',
@@ -364,8 +829,8 @@ SEO_INTERNAL_DESTINATIONS = {
         'description': 'Discover late night K-pop music for slower sessions, headphone listening, and soft after-hours energy with K-Beats recommendations.',
     },
     'best_kpop_playlist_2026': {
-        'title': 'Best K-Pop Playlist 2026 | Fresh Fan Favourites & Chart Heat',
-        'description': 'Explore the best K-pop playlist picks for 2026 with chart momentum, new-release highlights, and fan-first listening routes from K-Beats.',
+        'title': 'Best K-Pop Playlist 2026 | Top Songs | K-Beats',
+        'description': 'Discover the best K-pop playlist for 2026, updated with current chart leaders, fresh comebacks and fan favourites. See the top 10 and listen on K-Beats.',
     },
     'discover_new_kpop_music': {
         'title': 'Discover New K-Pop Music | Fresh Songs, Charts & Comebacks',
