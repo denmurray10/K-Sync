@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Dict
 
-DEFAULT_TITLE = 'K-Pop Radio Online | Live K-Pop Stream UK | K-Beats Radio'
+DEFAULT_TITLE = 'K-Pop Radio Online | Listen Live 24/7 | K-Beats'
 DEFAULT_DESCRIPTION = (
-    'Listen to K-pop radio online with K-Beats Radio. Stream live K-pop, discover charts and new releases, '
-    'read K-pop news, and stay connected with your favourite artists.'
+    'Listen to K-pop radio online with K-Beats. Stream live 24/7, discover chart hits, '
+    'follow new comebacks and request your favourite songs.'
 )
 
 SEO_BY_ROUTE: Dict[str, Dict[str, str]] = {

@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone as datetime_timezone
 import io
 import os
 import tempfile
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import connection
 from django.core.cache import cache
@@ -237,6 +238,58 @@ class SiteIconTests(TestCase):
         'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
     }
 )
+class VisitorWalkthroughIntegrationTests(TestCase):
+    def test_homepage_loads_shared_walkthrough_assets_and_restart_control(self):
+        response = self.client.get(reverse('home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'core/css/visitor-walkthrough.css')
+        self.assertContains(response, 'core/js/visitor-walkthrough.js')
+        self.assertContains(response, 'id="visitor-tour-launcher"')
+        self.assertContains(response, 'data-tour-start')
+        self.assertContains(response, 'aria-label="Start website tour"')
+
+    def test_live_page_exposes_walkthrough_targets_on_active_template(self):
+        response = self.client.get(reverse('live'))
+
+        self.assertEqual(response.status_code, 200)
+        for target in [
+            'live-play',
+            'live-share',
+            'live-save',
+            'request-song',
+            'up-next',
+            'recently-played',
+            'live-chat',
+        ]:
+            self.assertContains(response, f'data-tour-target="{target}"')
+
+    def test_walkthrough_assets_define_expected_steps_and_storage_key(self):
+        css_path = settings.BASE_DIR / 'core' / 'static' / 'core' / 'css' / 'visitor-walkthrough.css'
+        js_path = settings.BASE_DIR / 'core' / 'static' / 'core' / 'js' / 'visitor-walkthrough.js'
+
+        self.assertTrue(css_path.exists())
+        self.assertTrue(js_path.exists())
+
+        css = css_path.read_text(encoding='utf-8')
+        js = js_path.read_text(encoding='utf-8')
+
+        self.assertIn('#visitor-tour-overlay', css)
+        self.assertIn('.visitor-tour-spotlight', css)
+        self.assertIn('ksync_visitor_tour_seen_v1', js)
+        self.assertIn('KBeatsVisitorTour', js)
+        self.assertIn('data-tour-target', js)
+
+        for step_id in ['welcome', 'home-hero', 'live-player', 'navigation', 'my-station', 'live-play', 'live-chat']:
+            self.assertIn(step_id, js)
+
+
+@override_settings(
+    STORAGES={
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }
+)
 class SeoRolloutTests(TestCase):
     def setUp(self):
         self.group = KPopGroup.objects.create(
@@ -270,12 +323,63 @@ class SeoRolloutTests(TestCase):
             is_active=True,
         )
 
-    def test_homepage_uses_dynamic_seo_metadata(self):
+    @patch('core.views._fetch_artwork_from_sources')
+    def test_homepage_uses_dynamic_seo_metadata(self, artwork_fetch):
+        today = timezone.localdate()
+        ComebackData.objects.create(
+            year=today.year,
+            month=today.month,
+            data={
+                today.isoformat(): {
+                    'releases': [
+                        {
+                            'title': 'Homepage Signal',
+                            'artist': 'Signal Queens',
+                            'type': 'Single',
+                            'image': 'https://example.com/homepage-signal.jpg',
+                        },
+                    ],
+                },
+            },
+        )
+        Ranking.objects.create(
+            timeframe='daily',
+            ranking_data=[
+                {
+                    'rank': 1,
+                    'track': 'Homepage Signal',
+                    'artist': 'Signal Queens',
+                    'artwork_url': '/assets/svg/rank/no-change.svg?w=16&q=75',
+                },
+            ],
+        )
+
         response = self.client.get(reverse('home'))
 
-        self.assertContains(response, '<title>K-Pop Radio Online | Live K-Pop Stream UK | K-Beats Radio</title>', html=True)
-        self.assertContains(response, 'Listen to K-pop radio online with K-Beats Radio.')
+        self.assertContains(response, '<title>K-Pop Radio Online | Listen Live 24/7 | K-Beats</title>', html=True)
+        self.assertContains(response, 'Listen to K-pop radio online with K-Beats. Stream live 24/7')
+        self.assertContains(response, 'core/img/kbeats-radio-social-card.png')
+        self.assertContains(response, 'property="og:image"')
+        self.assertContains(response, 'name="twitter:image"')
+        self.assertContains(response, '"@type": "Organization"')
+        self.assertContains(response, '"@type": "RadioStation"')
+        self.assertContains(response, '"@type": "BroadcastService"')
+        self.assertNotContains(response, 'SearchAction')
+        self.assertContains(response, 'data-track="listen_live_home_hero_primary"')
+        self.assertContains(response, 'aria-hidden="true" class="hero-title-echo absolute inset-0 text-transparent')
+        self.assertContains(response, 'core/js/live_status.js')
+        self.assertNotContains(response, 'Next comeback')
+        self.assertNotContains(response, 'href="#"')
+        self.assertNotContains(response, '/assets/svg/rank/no-change.svg')
         self.assertContains(response, reverse('uk_kpop_radio'))
+        schema = json.loads(response.context['extra_schema_json'])
+        schema_types = {item['@type'] for item in schema['@graph']}
+        self.assertEqual(schema_types, {'Organization', 'WebSite', 'RadioStation', 'BroadcastService'})
+        social_card = settings.BASE_DIR / 'core' / 'static' / 'core' / 'img' / 'kbeats-radio-social-card.png'
+        self.assertTrue(social_card.exists())
+        with Image.open(social_card) as image:
+            self.assertEqual(image.size, (1200, 630))
+        artwork_fetch.assert_not_called()
 
     def test_keyword_landing_pages_render_and_include_unique_h1(self):
         pages = [
@@ -348,14 +452,62 @@ class SeoRolloutTests(TestCase):
         response = self.client.get(reverse('django.contrib.sitemaps.views.sitemap'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, reverse('uk_kpop_radio'))
-        self.assertContains(response, reverse('midnight_kpop_vibes'))
-        self.assertContains(response, reverse('best_kpop_playlist_2026'))
-        self.assertContains(response, reverse('discover_new_kpop_music'))
-        self.assertContains(response, reverse('idol_page', args=[self.group.slug]))
-        self.assertContains(response, reverse('member_page', args=[self.group.slug, self.member.slug]))
-        self.assertContains(response, reverse('member_birthday_page', args=[self.group.slug, self.member.slug]))
-        self.assertNotContains(response, reverse('blog_page'))
+        self.assertEqual(response['Content-Type'], 'application/xml')
+        for section in ['static', 'blog', 'groups', 'members', 'member-birthdays']:
+            self.assertContains(
+                response,
+                reverse('sitemap_section', kwargs={'section': section}),
+            )
+
+        static_response = self.client.get(
+            reverse('sitemap_section', kwargs={'section': 'static'})
+        )
+        self.assertContains(static_response, reverse('uk_kpop_radio'))
+        self.assertContains(static_response, reverse('midnight_kpop_vibes'))
+        self.assertContains(static_response, reverse('best_kpop_playlist_2026'))
+        self.assertContains(static_response, reverse('discover_new_kpop_music'))
+        self.assertNotContains(static_response, reverse('blog_page'))
+
+        groups_response = self.client.get(
+            reverse('sitemap_section', kwargs={'section': 'groups'})
+        )
+        self.assertContains(groups_response, reverse('idol_page', args=[self.group.slug]))
+
+        members_response = self.client.get(
+            reverse('sitemap_section', kwargs={'section': 'members'})
+        )
+        self.assertContains(
+            members_response,
+            reverse('member_page', args=[self.group.slug, self.member.slug]),
+        )
+
+        birthdays_response = self.client.get(
+            reverse('sitemap_section', kwargs={'section': 'member-birthdays'})
+        )
+        self.assertContains(
+            birthdays_response,
+            reverse('member_birthday_page', args=[self.group.slug, self.member.slug]),
+        )
+
+    def test_dynamic_sitemaps_defer_large_content_fields(self):
+        from .sitemaps import BlogArticleSitemap, MemberProfileSitemap
+
+        article = BlogArticle.objects.create(
+            slug='sitemap-performance-test',
+            title='Sitemap Performance Test',
+            category='News',
+            source_title='K-Beats Editorial',
+            body_html='<p>Large article content should not be loaded.</p>',
+        )
+
+        sitemap_article = BlogArticleSitemap().items().get(pk=article.pk)
+        self.assertIn('body_html', sitemap_article.get_deferred_fields())
+        self.assertIn('facebook_reel_video_path', sitemap_article.get_deferred_fields())
+
+        sitemap_member = MemberProfileSitemap().items().get(pk=self.member.pk)
+        self.assertIn('profile_bio', sitemap_member.get_deferred_fields())
+        self.assertIn('profile_metadata', sitemap_member.get_deferred_fields())
+        self.assertIn('group_bio', sitemap_member.group.get_deferred_fields())
 
     def test_non_seo_routes_emit_noindex_headers(self):
         routes = [
