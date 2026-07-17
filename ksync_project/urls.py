@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import TemplateView
 from django.views.generic import RedirectView
-from django.contrib.sitemaps.views import sitemap
+from django.contrib.sitemaps.views import index, sitemap
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -46,7 +46,18 @@ urlpatterns = [
     path('favicon.ico', RedirectView.as_view(url=f'{settings.STATIC_URL}core/img/favicon.ico', permanent=True)),
     path('apple-touch-icon.png', RedirectView.as_view(url=f'{settings.STATIC_URL}core/img/apple-touch-icon.png', permanent=True)),
     path('site.webmanifest', RedirectView.as_view(url=f'{settings.STATIC_URL}core/site.webmanifest', permanent=True)),
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path(
+        'sitemap.xml',
+        index,
+        {'sitemaps': sitemaps, 'sitemap_url_name': 'sitemap_section'},
+        name='django.contrib.sitemaps.views.sitemap',
+    ),
+    path(
+        'sitemap-<section>.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='sitemap_section',
+    ),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots_txt'),
     path('sw.js', TemplateView.as_view(template_name='sw.js', content_type='application/javascript'), name='service_worker'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

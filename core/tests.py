@@ -452,14 +452,62 @@ class SeoRolloutTests(TestCase):
         response = self.client.get(reverse('django.contrib.sitemaps.views.sitemap'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, reverse('uk_kpop_radio'))
-        self.assertContains(response, reverse('midnight_kpop_vibes'))
-        self.assertContains(response, reverse('best_kpop_playlist_2026'))
-        self.assertContains(response, reverse('discover_new_kpop_music'))
-        self.assertContains(response, reverse('idol_page', args=[self.group.slug]))
-        self.assertContains(response, reverse('member_page', args=[self.group.slug, self.member.slug]))
-        self.assertContains(response, reverse('member_birthday_page', args=[self.group.slug, self.member.slug]))
-        self.assertNotContains(response, reverse('blog_page'))
+        self.assertEqual(response['Content-Type'], 'application/xml')
+        for section in ['static', 'blog', 'groups', 'members', 'member-birthdays']:
+            self.assertContains(
+                response,
+                reverse('sitemap_section', kwargs={'section': section}),
+            )
+
+        static_response = self.client.get(
+            reverse('sitemap_section', kwargs={'section': 'static'})
+        )
+        self.assertContains(static_response, reverse('uk_kpop_radio'))
+        self.assertContains(static_response, reverse('midnight_kpop_vibes'))
+        self.assertContains(static_response, reverse('best_kpop_playlist_2026'))
+        self.assertContains(static_response, reverse('discover_new_kpop_music'))
+        self.assertNotContains(static_response, reverse('blog_page'))
+
+        groups_response = self.client.get(
+            reverse('sitemap_section', kwargs={'section': 'groups'})
+        )
+        self.assertContains(groups_response, reverse('idol_page', args=[self.group.slug]))
+
+        members_response = self.client.get(
+            reverse('sitemap_section', kwargs={'section': 'members'})
+        )
+        self.assertContains(
+            members_response,
+            reverse('member_page', args=[self.group.slug, self.member.slug]),
+        )
+
+        birthdays_response = self.client.get(
+            reverse('sitemap_section', kwargs={'section': 'member-birthdays'})
+        )
+        self.assertContains(
+            birthdays_response,
+            reverse('member_birthday_page', args=[self.group.slug, self.member.slug]),
+        )
+
+    def test_dynamic_sitemaps_defer_large_content_fields(self):
+        from .sitemaps import BlogArticleSitemap, MemberProfileSitemap
+
+        article = BlogArticle.objects.create(
+            slug='sitemap-performance-test',
+            title='Sitemap Performance Test',
+            category='News',
+            source_title='K-Beats Editorial',
+            body_html='<p>Large article content should not be loaded.</p>',
+        )
+
+        sitemap_article = BlogArticleSitemap().items().get(pk=article.pk)
+        self.assertIn('body_html', sitemap_article.get_deferred_fields())
+        self.assertIn('facebook_reel_video_path', sitemap_article.get_deferred_fields())
+
+        sitemap_member = MemberProfileSitemap().items().get(pk=self.member.pk)
+        self.assertIn('profile_bio', sitemap_member.get_deferred_fields())
+        self.assertIn('profile_metadata', sitemap_member.get_deferred_fields())
+        self.assertIn('group_bio', sitemap_member.group.get_deferred_fields())
 
     def test_non_seo_routes_emit_noindex_headers(self):
         routes = [
